@@ -140,18 +140,12 @@ export function Totals() {
     settings?.preferences?.dashboard_charts?.range || 'this_month';
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
-    start_date: new Date(
+    start_date:
       GLOBAL_DATE_RANGES[dateRange as keyof typeof GLOBAL_DATE_RANGES]?.start ||
-        ''
-    )
-      .toISOString()
-      .split('T')[0],
-    end_date: new Date(
+      '',
+    end_date:
       GLOBAL_DATE_RANGES[dateRange as keyof typeof GLOBAL_DATE_RANGES]?.end ||
-        ''
-    )
-      .toISOString()
-      .split('T')[0],
+      '',
   });
 
   console.log(dates);

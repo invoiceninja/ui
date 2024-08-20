@@ -30,7 +30,7 @@ import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
 
 type Props = {
   data: ChartData;
-  dates: any;
+  dates: { start_date: string; end_date: string };
   chartSensitivity: 'day' | 'week' | 'month';
   currency: string;
 };
@@ -44,7 +44,7 @@ type LineChartData = {
 }[];
 
 export function Chart(props: Props) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
   const { currency, chartSensitivity } = props;
 
   const company = useCurrentCompany();
@@ -211,7 +211,7 @@ export function Chart(props: Props) {
     });
 
     setChartData(data);
-  }, [props]);
+  }, [props.data, props.dates, props.chartSensitivity]);
 
   const colors = useColorScheme();
 
