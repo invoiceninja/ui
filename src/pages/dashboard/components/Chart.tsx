@@ -27,6 +27,7 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
+import { generateMonthDateRange } from '../helpers/generateMonthDateRange';
 
 type Props = {
   data: ChartData;
@@ -82,14 +83,7 @@ export function Chart(props: Props) {
         break;
 
       case 'month':
-        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
-          if (currentDate.isSame(start, 'day')) {
-            dates.push(start.toDate());
-          }
-
-          dates.push(currentDate.endOf('month').toDate());
-          currentDate = currentDate.add(1, 'month');
-        }
+        dates = generateMonthDateRange(startDate, endDate);
         break;
 
       default:
@@ -102,7 +96,20 @@ export function Chart(props: Props) {
       dates[lengthOfDates - 1] = end.toDate();
     }
 
-    return dates;
+    return (dates = dates.reduce((uniqueDates, currentDate) => {
+      const currentDateString = dayjs.utc(currentDate).format('YYYY-MM-DD');
+
+      if (
+        !uniqueDates.some(
+          (date: Date) =>
+            dayjs.utc(date).format('YYYY-MM-DD') === currentDateString
+        )
+      ) {
+        uniqueDates.push(currentDate);
+      }
+
+      return uniqueDates;
+    }, [] as Date[]));
   };
 
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
