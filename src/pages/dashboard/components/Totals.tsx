@@ -74,7 +74,7 @@ export enum TotalColors {
   Gray = '#242930',
 }
 
-const GLOBAL_DATE_RANGES = {
+const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
   last7_days: {
     start: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
     end: dayjs().format('YYYY-MM-DD'),
@@ -140,27 +140,17 @@ export function Totals() {
     settings?.preferences?.dashboard_charts?.range || 'this_month';
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
-    start_date:
-      GLOBAL_DATE_RANGES[dateRange as keyof typeof GLOBAL_DATE_RANGES]?.start ||
-      '',
-    end_date:
-      GLOBAL_DATE_RANGES[dateRange as keyof typeof GLOBAL_DATE_RANGES]?.end ||
-      '',
+    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
+    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
   });
-
-  console.log(dates);
 
   const [body, setBody] = useState<{
     start_date: string;
     end_date: string;
     date_range: string;
   }>({
-    start_date:
-      GLOBAL_DATE_RANGES[dateRange as keyof typeof GLOBAL_DATE_RANGES]?.start ||
-      '',
-    end_date:
-      GLOBAL_DATE_RANGES[dateRange as keyof typeof GLOBAL_DATE_RANGES]?.end ||
-      '',
+    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
+    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
     date_range: dateRange,
   });
 
