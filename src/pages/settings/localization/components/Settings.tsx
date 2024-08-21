@@ -25,7 +25,7 @@ import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { hasLanguageChanged } from '../common/atoms';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
@@ -35,32 +35,47 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { SearchableSelect } from '$app/components/SearchableSelect';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
 export function Settings() {
   const [t] = useTranslation();
+
   const { data: statics } = useStaticsQuery();
 
-  const disableSettingsField = useDisableSettingsField();
-
+  const company = useInjectCompanyChanges();
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const dispatch = useDispatch();
-  const company = useInjectCompanyChanges();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
-
+  const formatMoney = useFormatMoney();
   const handleChange = useHandleCurrentCompanyChange();
+  const disableSettingsField = useDisableSettingsField();
   const handlePropertyChange = useHandleCurrentCompanyChangeProperty();
 
-  const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
+  const errors = useAtomValue(companySettingsErrorsAtom);
+  const setHasLanguageIdChanged = useSetAtom(hasLanguageChanged);
 
   const currencyFormats = [
     {
       id: 'symbol',
-      title: `${t('currency_symbol')}: $1,000.00`,
+      title: `${t('currency_symbol')}: ${formatMoney(
+        1000,
+        company?.settings.country_id,
+        company?.settings.currency_id,
+        2
+      )}`,
       value: 'false',
     },
-    { id: 'code', title: `${t('currency_code')}: 1,000.00 USD`, value: 'true' },
+    {
+      id: 'code',
+      title: `${t('currency_code')}: ${formatMoney(
+        1000,
+        company?.settings.country_id,
+        company?.settings.currency_id,
+        2,
+        true
+      )}`,
+      value: 'true',
+    },
   ];
 
   return (

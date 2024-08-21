@@ -22,7 +22,8 @@ export function useFormatMoney() {
     value: string | number,
     countryId: string | undefined,
     currencyId: string | undefined,
-    fractionDigits?: number
+    fractionDigits?: number,
+    showCurrencyCode?: boolean
   ) => {
     const currentCountryId = countryId || company?.settings.country_id;
     const currentCurrencyId =
@@ -39,7 +40,8 @@ export function useFormatMoney() {
         currency,
         country,
         {
-          showCurrencyCode: company.settings.show_currency_code,
+          showCurrencyCode:
+            showCurrencyCode ?? company.settings.show_currency_code,
         }
       );
     }
