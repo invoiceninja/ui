@@ -13,9 +13,7 @@ import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 
-export function generateMonthDateRange(startDate: Date, endDate: Date) {
-  const start = dayjs.utc(startDate);
-  const end = dayjs.utc(endDate);
+export function generateMonthDateRange(start: dayjs.Dayjs, end: dayjs.Dayjs) {
   const dates = [];
 
   let currentDate = start.clone();
@@ -36,6 +34,7 @@ export function generateMonthDateRange(startDate: Date, endDate: Date) {
     }
 
     const endOfMonth = currentDate.endOf('month');
+
     if (endOfMonth.isSame(end, 'day') || endOfMonth.isBefore(end, 'day')) {
       dates.push(endOfMonth.toDate());
     }
@@ -48,4 +47,31 @@ export function generateMonthDateRange(startDate: Date, endDate: Date) {
   }
 
   return dates;
+}
+
+export function ensureUniqueDates(dates: Date[], end: dayjs.Dayjs): Date[] {
+  let currentDates = dates;
+
+  const lengthOfDates = currentDates.length;
+
+  if (dayjs.utc(currentDates[lengthOfDates - 1]).isAfter(end)) {
+    currentDates[lengthOfDates - 1] = end.toDate();
+  }
+
+  currentDates = currentDates.reduce((uniqueDates, currentDate) => {
+    const currentDateString = dayjs.utc(currentDate).format('YYYY-MM-DD');
+
+    if (
+      !uniqueDates.some(
+        (date: Date) =>
+          dayjs.utc(date).format('YYYY-MM-DD') === currentDateString
+      )
+    ) {
+      uniqueDates.push(currentDate);
+    }
+
+    return uniqueDates;
+  }, [] as Date[]);
+
+  return currentDates;
 }
