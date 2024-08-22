@@ -28,6 +28,7 @@ import { useColorScheme } from '$app/common/colors';
 import { DurationClock } from './DurationClock';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { useStart } from '../hooks/useStart';
+import dayjs from 'dayjs';
 
 interface Props {
   task: Task;
@@ -54,6 +55,21 @@ export function TaskTable(props: Props) {
   const handleTaskDateChange = useHandleTaskDateChange();
 
   const [lastChangedIndex, setLastChangedIndex] = useState<number>();
+
+  const createTableRow = () => {
+    const logs = parseTimeLog(task.time_log);
+    const last = logs.at(-1);
+
+    let startTime = dayjs().unix();
+
+    if (last && last[1] !== 0) {
+      startTime = last[1] + 1;
+    }
+
+    logs.push([startTime, 0, '', true]);
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
 
   const deleteTableRow = (index: number) => {
     const logs: TimeLogsType = parseTimeLog(task.time_log);
@@ -239,7 +255,7 @@ export function TaskTable(props: Props) {
                   </Td>
 
                   <Td>
-                    {stop !== 0 ? (
+                    {stop !== 0 || task.created_at === 0 ? (
                       <InputField
                         debounceTimeout={1000}
                         value={duration(
@@ -316,11 +332,11 @@ export function TaskTable(props: Props) {
         <Tr className="bg-slate-100 hover:bg-slate-200">
           <Td colSpan={100}>
             <button
-              onClick={() => start(task)}
+              onClick={() => (task.created_at ? start(task) : createTableRow())}
               className="w-full py-2 inline-flex justify-center items-center space-x-2 disabled:cursor-not-allowed"
-              disabled={isTaskRunning(task)}
+              disabled={isTaskRunning(task) && task.created_at !== 0}
             >
-              {isTaskRunning(task) ? (
+              {isTaskRunning(task) && task.created_at !== 0 ? (
                 <span>{t('stop_task_to_add_task_entry')}</span>
               ) : (
                 <>

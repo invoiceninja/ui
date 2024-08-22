@@ -19,7 +19,6 @@ import {
   Youtube,
 } from 'react-feather';
 import { Modal } from './Modal';
-import { version } from '$app/common/helpers/version';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction, useState } from 'react';
@@ -205,7 +204,7 @@ export function AboutModal(props: Props) {
             <span>{user?.email}</span>
           </div>
 
-          <span className="mt-4">{version}</span>
+          <span className="mt-4">v{currentSystemInfo?.api_version}</span>
         </div>
 
         {isSelfHosted() && (
