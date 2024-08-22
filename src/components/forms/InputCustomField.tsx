@@ -58,10 +58,13 @@ export function InputCustomField(props: Props) {
       {type === AvailableTypes.Switch && (
         <Toggle
           style={{ color: colors.$3, colorScheme: colors.$0 }}
-          onChange={props.onValueChange}
+          onChange={(value) => {
+            const e = Boolean(value) === true ? 'yes' : 'no';
+            props.onValueChange(e);
+          }}
           checked={
             typeof props.defaultValue === 'string'
-              ? props.defaultValue === 'true' || props.defaultValue === '1'
+              ? props.defaultValue === 'true' || props.defaultValue === '1' || props.defaultValue === '1'
               : props.defaultValue
           }
         />
