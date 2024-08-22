@@ -64,7 +64,7 @@ export function InputCustomField(props: Props) {
           }}
           checked={
             typeof props.defaultValue === 'string'
-              ? props.defaultValue === 'true' || props.defaultValue === '1' || props.defaultValue === '1'
+              ? props.defaultValue === 'true' || props.defaultValue === '1' || props.defaultValue === 'yes'
               : props.defaultValue
           }
         />
