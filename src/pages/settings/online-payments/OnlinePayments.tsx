@@ -89,7 +89,6 @@ export function OnlinePayments() {
       docsLink="en/basic-settings/#online_payments"
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      
     >
       <Gateways />
 
@@ -612,6 +611,28 @@ export function OnlinePayments() {
             }
             disabled={disableSettingsField('payment_email_all_contacts')}
           />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="payment_flow"
+              labelElement={<SettingsLabel label={t('payment_flow')} />}
+              defaultValue={false}
+            />
+          }
+          leftSideHelp={t('payment_flow_help')}
+        >
+          <SelectField
+            value={company?.settings.payment_flow || 'default'}
+            id="settings.payment_flow"
+            onChange={handleChange}
+            disabled={disableSettingsField('payment_flow')}
+            errorMessage={errors?.errors['settings.payment_flow']}
+          >
+            <option value="default">{t('default')}</option>
+            <option value="smooth">{t('smooth')}</option>
+          </SelectField>
         </Element>
       </Card>
     </Settings>
