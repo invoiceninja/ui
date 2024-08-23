@@ -240,16 +240,12 @@ export default function Reports() {
           });
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
+        setIsPendingExport(false);
+
         if (error.response?.status === 422) {
-          if (report.payload.send_email) {
-            setErrors(error.response.data as ValidationBag);
-          }
+          console.log(error);
 
-          if (!report.payload.send_email) {
-            const blob = error.response.data as Blob;
-
-            blob.text().then((text) => setErrors(JSON.parse(text)));
-          }
+          setErrors(error.response.data as ValidationBag);
         }
       })
       .finally(() => {
