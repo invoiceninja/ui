@@ -31,6 +31,7 @@ import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useEvents } from './common/hooks/useEvents';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Create() {
   const [t] = useTranslation();
@@ -128,7 +129,7 @@ export function Create() {
         </Element>
 
         <Element leftSide={t('event_type')}>
-          <SelectField
+          <SearchableSelect
             value={apiWebHook?.event_id}
             onValueChange={(value) => handleChange('event_id', value)}
             errorMessage={errors?.errors.event_id}
@@ -138,7 +139,7 @@ export function Create() {
                 {event.label}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('method')}>
