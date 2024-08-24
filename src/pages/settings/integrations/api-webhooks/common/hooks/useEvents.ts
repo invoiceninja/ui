@@ -77,6 +77,7 @@ export function useEvents() {
   const EVENT_DELETE_PURCHASE_ORDER = '57';
   const EVENT_RESTORE_PURCHASE_ORDER = '58';
   const EVENT_ARCHIVE_PURCHASE_ORDER = '59';
+  const EVENT_ACCEPTED_PURCHASE_ORDER = '65';
 
   return [
     { event: EVENT_CREATE_CLIENT, label: t('create_client') },
@@ -158,6 +159,10 @@ export function useEvents() {
     {
       event: EVENT_ARCHIVE_PURCHASE_ORDER,
       label: t('archive_purchase_order'),
+    },
+    {
+      event: EVENT_ACCEPTED_PURCHASE_ORDER,
+      label: t('accept_purchase_order'),
     },
   ];
 }
