@@ -239,14 +239,12 @@ export default function Reports() {
             setIsPendingExport(false);
           });
       })
-      .catch((error: AxiosError<ValidationBag | Blob>) => {
-        setIsPendingExport(false);
-
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          console.log(error);
-
           setErrors(error.response.data as ValidationBag);
         }
+
+        setIsPendingExport(false);
       })
       .finally(() => {
         if (showCustomColumns) {
