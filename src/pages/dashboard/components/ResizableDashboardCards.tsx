@@ -48,6 +48,7 @@ import { UpcomingInvoices } from './UpcomingInvoices';
 import { Activity } from './Activity';
 import { RecentPayments } from './RecentPayments';
 import { useEnabled } from '$app/common/guards/guards/enabled';
+import dayjs from 'dayjs';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -100,6 +101,48 @@ export enum TotalColors {
   Gray = '#242930',
 }
 
+const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
+  last7_days: {
+    start: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
+    end: dayjs().format('YYYY-MM-DD'),
+  },
+  last30_days: {
+    start: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
+    end: dayjs().format('YYYY-MM-DD'),
+  },
+  last365_days: {
+    start: dayjs().subtract(365, 'days').format('YYYY-MM-DD'),
+    end: dayjs().format('YYYY-MM-DD'),
+  },
+  this_month: {
+    start: dayjs().startOf('month').format('YYYY-MM-DD'),
+    end: dayjs().endOf('month').format('YYYY-MM-DD'),
+  },
+  last_month: {
+    start: dayjs().startOf('month').subtract(1, 'month').format('YYYY-MM-DD'),
+    end: dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
+  },
+  this_quarter: {
+    start: dayjs().startOf('quarter').format('YYYY-MM-DD'),
+    end: dayjs().endOf('quarter').format('YYYY-MM-DD'),
+  },
+  last_quarter: {
+    start: dayjs()
+      .subtract(1, 'quarter')
+      .startOf('quarter')
+      .format('YYYY-MM-DD'),
+    end: dayjs().subtract(1, 'quarter').endOf('quarter').format('YYYY-MM-DD'),
+  },
+  this_year: {
+    start: dayjs().startOf('year').format('YYYY-MM-DD'),
+    end: dayjs().format('YYYY-MM-DD'),
+  },
+  last_year: {
+    start: dayjs().subtract(1, 'year').startOf('year').format('YYYY-MM-DD'),
+    end: dayjs().subtract(1, 'year').endOf('year').format('YYYY-MM-DD'),
+  },
+};
+
 export function ResizableDashboardCards() {
   const [t] = useTranslation();
 
@@ -129,10 +172,8 @@ export function ResizableDashboardCards() {
     settings?.preferences?.dashboard_charts?.range || 'this_month';
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
-    start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-      .toISOString()
-      .split('T')[0],
-    end_date: new Date().toISOString().split('T')[0],
+    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
+    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
   });
 
   const [body, setBody] = useState<{
@@ -140,8 +181,8 @@ export function ResizableDashboardCards() {
     end_date: string;
     date_range: string;
   }>({
-    start_date: '',
-    end_date: '',
+    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
+    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
     date_range: dateRange,
   });
 
