@@ -10,6 +10,7 @@
 
 import { EInvoiceType } from '$app/pages/settings';
 import { Expense } from './expense';
+import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Vendor } from './vendor';
 
@@ -79,6 +80,8 @@ export interface PurchaseOrder {
   vendor?: Vendor;
   expense?: Expense;
   e_invoice?: EInvoiceType;
+  activities?: Activity[];
+  reminder_schedule?: string;
 }
 
 export interface Invitation {
