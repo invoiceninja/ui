@@ -47,6 +47,12 @@ export function TaskClock(props: Props) {
   };
 
   useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+
     const calculation = calculateTime(props.task.time_log, {
       inSeconds: true,
       calculateLastTimeLog: Boolean(props.calculateLastTimeLog),
@@ -66,9 +72,10 @@ export function TaskClock(props: Props) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [props.task.updated_at]);
 
   return (
     <p>

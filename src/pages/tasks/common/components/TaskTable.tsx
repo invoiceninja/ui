@@ -144,6 +144,18 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
+  const isValidTimeFormat = (value: string) => {
+    const parts = value.split(':');
+
+    return parts.length === 3 && parts.every((part) => part.length === 2);
+  };
+
+  const isValidDateFormat = (value: string) => {
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+    return datePattern.test(value);
+  };
+
   const getDescriptionColSpan = () => {
     let colSpan = 4;
 
@@ -198,23 +210,39 @@ export function TaskTable(props: Props) {
                 <Tr>
                   <Td>
                     <InputField
+                      key={`${dayjs().unix().toString()}StartDate`}
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="date"
                       value={parseTimeToDate(start)}
                       onValueChange={(value) =>
-                        handleDateChange(start, value, index, LogPosition.Start)
+                        handleDateChange(
+                          start,
+                          isValidDateFormat(value)
+                            ? value
+                            : parseTimeToDate(start) || '',
+                          index,
+                          LogPosition.Start
+                        )
                       }
                     />
                   </Td>
 
                   <Td>
                     <InputField
+                      key={`${dayjs().unix().toString()}StartTime`}
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
                       value={parseTime(start)}
                       onValueChange={(value) =>
-                        handleTimeChange(start, value, LogPosition.Start, index)
+                        handleTimeChange(
+                          start,
+                          isValidTimeFormat(value)
+                            ? value
+                            : parseTime(start) || '',
+                          LogPosition.Start,
+                          index
+                        )
                       }
                     />
                   </Td>
@@ -222,13 +250,20 @@ export function TaskTable(props: Props) {
                   {company?.show_task_end_date && (
                     <Td>
                       <InputField
+                        key={`${dayjs().unix().toString()}EndDate`}
                         style={{ color: colors.$3, colorScheme: colors.$0 }}
                         type="date"
                         value={parseTimeToDate(stop)}
                         onValueChange={(value) =>
                           handleDateChange(
                             stop,
-                            value || parseTimeToDate(start) || '',
+                            value
+                              ? isValidDateFormat(value)
+                                ? value
+                                : parseTimeToDate(stop) || ''
+                              : parseTimeToDate(stop) ||
+                                  parseTimeToDate(start) ||
+                                  '',
                             index,
                             LogPosition.End
                           )
@@ -239,6 +274,7 @@ export function TaskTable(props: Props) {
 
                   <Td>
                     <InputField
+                      key={`${dayjs().unix().toString()}EndTime`}
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
@@ -246,7 +282,11 @@ export function TaskTable(props: Props) {
                       onValueChange={(value) =>
                         handleTimeChange(
                           stop,
-                          value || parseTime(start) || '',
+                          value
+                            ? isValidTimeFormat(value)
+                              ? value
+                              : parseTime(stop) || ''
+                            : parseTime(stop) || parseTime(start) || '',
                           LogPosition.End,
                           index
                         )
@@ -281,7 +321,7 @@ export function TaskTable(props: Props) {
                       <Checkbox
                         style={{ color: colors.$3, colorScheme: colors.$0 }}
                         checked={billable || typeof billable === 'undefined'}
-                        onValueChange={(value, checked) =>
+                        onValueChange={(_, checked) =>
                           handleBillableChange(
                             checked || false,
                             index,
