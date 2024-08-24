@@ -288,7 +288,7 @@ export function ResizableDashboardCards() {
     >
       {!totals.isLoading ? (
         <GridLayout
-          cols={24}
+          cols={100}
           width={width}
           draggableHandle=".drag-handle"
           margin={[0, 20]}
@@ -306,9 +306,9 @@ export function ResizableDashboardCards() {
             key="1"
             className="flex justify-end"
             data-grid={{
-              x: 16,
+              x: 80, // Prilagođeno u odnosu na 100 kolona
               y: 0,
-              w: 24,
+              w: 20, // Prilagođeno u odnosu na 100 kolona
               h: 0.25,
               isResizable: false,
               static: true,
@@ -449,8 +449,10 @@ export function ResizableDashboardCards() {
               data-grid={{
                 x: 0,
                 y: 1,
-                w: 9.5,
+                w: 38, // Prilagođeno u odnosu na 100 kolona
                 h: 3.2,
+                minH: 1.62,
+                minW: 18, // Prilagođeno u odnosu na 100 kolona
                 isResizable: isEditMode,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
                 isDraggable: isEditMode,
@@ -460,6 +462,7 @@ export function ResizableDashboardCards() {
                 title={t('account_login_text')}
                 className="col-span-12 xl:col-span-4"
                 height="full"
+                withScrollableBody
               >
                 <div className="pb-8">
                   <div className="flex flex-col space-y-2 px-6">
@@ -565,10 +568,12 @@ export function ResizableDashboardCards() {
                 'cursor-grab': isEditMode,
               })}
               data-grid={{
-                x: 11,
+                x: 40, // Prilagođeno u odnosu na 100 kolona
                 y: 1,
-                w: 14.2,
+                w: 60, // Prilagođeno u odnosu na 100 kolona
                 h: 3.2,
+                minH: 1.62,
+                minW: 18, // Prilagođeno u odnosu na 100 kolona
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
                 isResizable: isEditMode,
                 isDraggable: isEditMode,
@@ -578,6 +583,7 @@ export function ResizableDashboardCards() {
                 title={t('overview')}
                 className="col-span-12 xl:col-span-8 pr-4"
                 height="full"
+                withScrollableBody
               >
                 <Chart
                   chartSensitivity={chartScale}
@@ -600,8 +606,10 @@ export function ResizableDashboardCards() {
             data-grid={{
               x: 0,
               y: 2,
-              w: 11.85,
+              w: 49, // Prilagođeno u odnosu na 100 kolona
               h: 2.2,
+              minH: 1.62,
+              minW: 18, // Prilagođeno u odnosu na 100 kolona
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
               isResizable: isEditMode,
               isDraggable: isEditMode,
@@ -616,10 +624,12 @@ export function ResizableDashboardCards() {
               'cursor-grab': isEditMode,
             })}
             data-grid={{
-              x: 13,
+              x: 51, // Prilagođeno u odnosu na 100 kolona
               y: 2,
-              w: 11.85,
+              w: 49, // Prilagođeno u odnosu na 100 kolona
               h: 2.2,
+              minH: 1.62,
+              minW: 18, // Prilagođeno u odnosu na 100 kolona
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
               isResizable: isEditMode,
               isDraggable: isEditMode,
@@ -637,8 +647,10 @@ export function ResizableDashboardCards() {
               data-grid={{
                 x: 0,
                 y: 3,
-                w: 11.85,
+                w: 49, // Prilagođeno u odnosu na 100 kolona
                 h: 2.2,
+                minH: 1.62,
+                minW: 18, // Prilagođeno u odnosu na 100 kolona
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
                 isResizable: isEditMode,
                 isDraggable: isEditMode,
@@ -655,10 +667,12 @@ export function ResizableDashboardCards() {
                 'cursor-grab': isEditMode,
               })}
               data-grid={{
-                x: 13,
+                x: 51, // Prilagođeno u odnosu na 100 kolona
                 y: 3,
-                w: 11.85,
+                w: 49, // Prilagođeno u odnosu na 100 kolona
                 h: 2.2,
+                minH: 1.62,
+                minW: 18, // Prilagođeno u odnosu na 100 kolona
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
                 isResizable: isEditMode,
                 isDraggable: isEditMode,
@@ -677,8 +691,10 @@ export function ResizableDashboardCards() {
               data-grid={{
                 x: 0,
                 y: 4,
-                w: 11.85,
+                w: 49, // Prilagođeno u odnosu na 100 kolona
                 h: 2.2,
+                minH: 1.62,
+                minW: 18, // Prilagođeno u odnosu na 100 kolona
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
                 isResizable: isEditMode,
                 isDraggable: isEditMode,
@@ -695,10 +711,12 @@ export function ResizableDashboardCards() {
                 'cursor-grab': isEditMode,
               })}
               data-grid={{
-                x: 13,
+                x: 51, // Prilagođeno u odnosu na 100 kolona
                 y: 4,
-                w: 11.85,
+                w: 49, // Prilagođeno u odnosu na 100 kolona
                 h: 2.2,
+                minH: 1.62,
+                minW: 18, // Prilagođeno u odnosu na 100 kolona
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
                 isResizable: isEditMode,
                 isDraggable: isEditMode,
@@ -717,8 +735,10 @@ export function ResizableDashboardCards() {
               data-grid={{
                 x: 0,
                 y: 5,
-                w: 11.85,
+                w: 49, // Prilagođeno u odnosu na 100 kolona
                 h: 2.2,
+                minH: 1.62,
+                minW: 18, // Prilagođeno u odnosu na 100 kolona
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
                 isResizable: isEditMode,
                 isDraggable: isEditMode,

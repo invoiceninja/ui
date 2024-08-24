@@ -36,6 +36,7 @@ export function Activity() {
       className="relative"
       height="full"
       withoutBodyPadding
+      withScrollableBody
     >
       {isLoading && (
         <NonClickableElement>
@@ -47,11 +48,8 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      <div className="h-full pl-6 pr-4">
-        <div
-          className="flex flex-col overflow-y-auto pr-4"
-          style={{ height: '78%' }}
-        >
+      <div className="pl-6 pr-4">
+        <div className="flex flex-col pr-4">
           {data?.data.data &&
             data.data.data.map((record: ActivityRecord, index: number) => (
               <React.Fragment key={index}>
