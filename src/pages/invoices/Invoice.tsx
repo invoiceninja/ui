@@ -33,6 +33,7 @@ import { Client } from '$app/common/interfaces/client';
 import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -92,49 +93,53 @@ export default function Invoice() {
   }, [invoice]);
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      {...((hasPermission('edit_invoice') || entityAssigned(invoice)) &&
-        invoice && {
-          navigationTopRight: (
-            <ResourceActions
-              resource={invoice}
-              actions={actions}
-              onSaveClick={() => save(invoice)}
-              disableSaveButton={
-                invoice &&
-                (invoice.status_id === InvoiceStatus.Cancelled ||
-                  invoice.is_deleted)
-              }
-              cypressRef="invoiceActionDropdown"
-            />
-          ),
-          topRight: <CommonActions invoice={invoice} />,
-        })}
-    >
-      {invoice?.id === id ? (
-        <div className="space-y-4">
-          <Tabs tabs={tabs} />
+    <>
+      <Default
+        title={documentTitle}
+        breadcrumbs={pages}
+        {...((hasPermission('edit_invoice') || entityAssigned(invoice)) &&
+          invoice && {
+            navigationTopRight: (
+              <ResourceActions
+                resource={invoice}
+                actions={actions}
+                onSaveClick={() => save(invoice)}
+                disableSaveButton={
+                  invoice &&
+                  (invoice.status_id === InvoiceStatus.Cancelled ||
+                    invoice.is_deleted)
+                }
+                cypressRef="invoiceActionDropdown"
+              />
+            ),
+            topRight: <CommonActions invoice={invoice} />,
+          })}
+      >
+        {invoice?.id === id ? (
+          <div className="space-y-4">
+            <Tabs tabs={tabs} />
 
-          <Outlet
-            context={{
-              invoice,
-              setInvoice,
-              errors,
-              isDefaultTerms,
-              setIsDefaultTerms,
-              isDefaultFooter,
-              setIsDefaultFooter,
-              client,
-            }}
-          />
-        </div>
-      ) : (
-        <div className="flex justify-center items-center">
-          <Spinner />
-        </div>
-      )}
-    </Default>
+            <Outlet
+              context={{
+                invoice,
+                setInvoice,
+                errors,
+                isDefaultTerms,
+                setIsDefaultTerms,
+                isDefaultFooter,
+                setIsDefaultFooter,
+                client,
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex justify-center items-center">
+            <Spinner />
+          </div>
+        )}
+      </Default>
+
+      <AddUninvoicedItemsButton invoice={invoice} />
+    </>
   );
 }
