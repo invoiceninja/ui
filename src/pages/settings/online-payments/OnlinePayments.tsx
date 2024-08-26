@@ -617,22 +617,20 @@ export function OnlinePayments() {
           leftSide={
             <PropertyCheckbox
               propertyKey="payment_flow"
-              labelElement={<SettingsLabel label={t('payment_flow')} />}
+              labelElement={<SettingsLabel label={t('one_page_checkout')} />}
               defaultValue={false}
             />
           }
-          leftSideHelp={t('payment_flow_help')}
+          leftSideHelp={t('one_page_checkout_help')}
         >
-          <SelectField
-            value={company?.settings.payment_flow || 'default'}
-            id="settings.payment_flow"
-            onChange={handleChange}
+          <Toggle
+            id="payment_flow"
+            checked={Boolean(company?.settings.payment_flow === 'smooth')}
+            onChange={(value) =>
+              handleChangeProperty('settings.payment_flow', value ? 'smooth': 'default')
+            }
             disabled={disableSettingsField('payment_flow')}
-            errorMessage={errors?.errors['settings.payment_flow']}
-          >
-            <option value="default">{t('default')}</option>
-            <option value="smooth">{t('smooth')}</option>
-          </SelectField>
+          />
         </Element>
       </Card>
     </Settings>
