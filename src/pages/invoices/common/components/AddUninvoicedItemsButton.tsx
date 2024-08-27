@@ -103,6 +103,9 @@ export function AddUninvoicedItemsButton(props: Props) {
 
   useEffect(() => {
     if (invoice) {
+      setSelectedTasks([]);
+      setSelectedExpenses([]);
+
       setInvoice(
         (current) =>
           current && {
