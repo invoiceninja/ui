@@ -69,7 +69,6 @@ export function AddUninvoicedItemsButton(props: Props) {
   const { create } = useInvoiceExpense({ onlyAddToInvoice: true });
   const invoiceProducts = useInvoiceProducts({ onlyAddToInvoice: true });
 
-  const [tabIndex, setTabIndex] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
@@ -82,23 +81,19 @@ export function AddUninvoicedItemsButton(props: Props) {
   };
 
   const disableAddButton = () => {
-    if (tabIndex === 0) {
-      return !selectedProducts.length;
-    }
-
-    if (tabIndex === 1) {
-      return !selectedTasks.filter(
+    return (
+      !selectedProducts.length &&
+      !selectedTasks.filter(
         (task) =>
           !invoice?.line_items.find((lineItem) => lineItem.task_id === task.id)
-      ).length;
-    }
-
-    return !selectedExpenses.filter(
-      (expense) =>
-        !invoice?.line_items.find(
-          (lineItem) => lineItem.expense_id === expense.id
-        )
-    ).length;
+      ).length &&
+      !selectedExpenses.filter(
+        (expense) =>
+          !invoice?.line_items.find(
+            (lineItem) => lineItem.expense_id === expense.id
+          )
+      ).length
+    );
   };
 
   useEffect(() => {
@@ -167,7 +162,6 @@ export function AddUninvoicedItemsButton(props: Props) {
         <TabGroup
           tabs={[t('products'), t('tasks'), t('expenses')]}
           width="full"
-          onTabChange={(index) => setTabIndex(index)}
         >
           <div className="flex flex-col space-y-4 pt-4">
             <ProductSelector
@@ -374,25 +368,26 @@ export function AddUninvoicedItemsButton(props: Props) {
           <Button
             behavior="button"
             onClick={() => {
-              tabIndex === 0 && invoiceProducts(selectedProducts);
-              tabIndex === 1 &&
-                invoiceTasks(
-                  selectedTasks.filter(
-                    (task) =>
-                      !invoice?.line_items.find(
-                        (lineItem) => lineItem.task_id === task.id
-                      )
+              selectedProducts.length && invoiceProducts(selectedProducts);
+
+              const currentTasks = selectedTasks.filter(
+                (task) =>
+                  !invoice?.line_items.find(
+                    (lineItem) => lineItem.task_id === task.id
                   )
-                );
-              tabIndex === 2 &&
-                create(
-                  selectedExpenses.filter(
-                    (expense) =>
-                      !invoice?.line_items.find(
-                        (lineItem) => lineItem.expense_id === expense.id
-                      )
+              );
+
+              currentTasks.length && invoiceTasks(currentTasks);
+
+              const currentExpenses = selectedExpenses.filter(
+                (expense) =>
+                  !invoice?.line_items.find(
+                    (lineItem) => lineItem.expense_id === expense.id
                   )
-                );
+              );
+
+              currentExpenses.length && create(currentExpenses);
+
               handleOnClose();
             }}
             disabled={disableAddButton()}
