@@ -139,7 +139,7 @@ export default function Invoice() {
         )}
       </Default>
 
-      <AddUninvoicedItemsButton invoice={invoice} />
+      <AddUninvoicedItemsButton invoice={invoice} setInvoice={setInvoice} />
     </>
   );
 }

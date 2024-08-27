@@ -9,20 +9,29 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { date } from '$app/common/helpers';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Expense } from '$app/common/interfaces/expense';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
-import { useProductsQuery } from '$app/common/queries/products';
-import { Button, Checkbox } from '$app/components/forms';
+import { Task } from '$app/common/interfaces/task';
+import { ExpenseSelector } from '$app/components/expenses/ExpenseSelector';
+import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
+import { ProductSelector } from '$app/components/products/ProductSelector';
 import { TabGroup } from '$app/components/TabGroup';
+import { TaskSelector } from '$app/components/tasks/TaskSelector';
 import { Tooltip } from '$app/components/Tooltip';
-import { ChangeEvent, useState } from 'react';
+import { useInvoiceExpense } from '$app/pages/expenses/common/useInvoiceExpense';
+import { useInvoiceProducts } from '$app/pages/products/common/hooks/useInvoiceProducts';
+import { useInvoiceTask } from '$app/pages/tasks/common/hooks/useInvoiceTask';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd } from 'react-icons/md';
+import { MdAdd, MdClose } from 'react-icons/md';
 import styled from 'styled-components';
 
 const RoundButton = styled.div`
@@ -34,52 +43,89 @@ const RoundButton = styled.div`
   border-radius: 50%;
 `;
 
+const Div = styled.div`
+  background-color: ${(props) => props.theme.color};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
 interface Props {
   invoice: Invoice | undefined;
-}
-
-interface ProductItemProps {
-  product: Product;
-  isChecked: boolean;
-}
-
-function ProductItem(props: ProductItemProps) {
-  const { product, isChecked } = props;
-
-  const formatMoney = useFormatMoney();
-
-  return (
-    <div className="flex py-2 justify-between cursor-pointer">
-      <div className="flex space-x-5">
-        <Checkbox
-          checked={isChecked}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            console.log(event.currentTarget.checked)
-          }
-        />
-
-        <span>{product.product_key}</span>
-
-        <span>{product.notes}</span>
-      </div>
-
-      <div>{formatMoney(product.price, '', '')}</div>
-    </div>
-  );
+  setInvoice: Dispatch<SetStateAction<Invoice | undefined>>;
 }
 
 export function AddUninvoicedItemsButton(props: Props) {
   const [t] = useTranslation();
 
-  const { invoice } = props;
-
-  const { data: products } = useProductsQuery();
+  const { invoice, setInvoice } = props;
 
   const colors = useColorScheme();
   const accentColor = useAccentColor();
   const reactSettings = useReactSettings();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const invoiceTasks = useInvoiceTask({ onlyAddToInvoice: true });
+  const { create } = useInvoiceExpense({ onlyAddToInvoice: true });
+  const invoiceProducts = useInvoiceProducts({ onlyAddToInvoice: true });
+
+  const [tabIndex, setTabIndex] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
+  const [selectedExpenses, setSelectedExpenses] = useState<Expense[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+
+  const handleOnClose = () => {
+    setIsModalOpen(false);
+    setSelectedProducts([]);
+  };
+
+  const disableAddButton = () => {
+    if (tabIndex === 0) {
+      return !selectedProducts.length;
+    }
+
+    if (tabIndex === 1) {
+      return !selectedTasks.filter(
+        (task) =>
+          !invoice?.line_items.find((lineItem) => lineItem.task_id === task.id)
+      ).length;
+    }
+
+    return !selectedExpenses.filter(
+      (expense) =>
+        !invoice?.line_items.find(
+          (lineItem) => lineItem.expense_id === expense.id
+        )
+    ).length;
+  };
+
+  useEffect(() => {
+    if (invoice) {
+      setInvoice(
+        (current) =>
+          current && {
+            ...current,
+            line_items: current.line_items.filter(
+              (item) =>
+                !selectedTasks.find((task) => task.id === item.task_id) &&
+                !selectedExpenses.find(
+                  (expense) => expense.id === item.expense_id
+                )
+            ),
+          }
+      );
+    }
+  }, [invoice?.client_id]);
+
+  useEffect(() => {
+    return () => {
+      setSelectedTasks([]);
+      setSelectedProducts([]);
+      setSelectedExpenses([]);
+    };
+  }, []);
 
   return (
     <>
@@ -109,34 +155,248 @@ export function AddUninvoicedItemsButton(props: Props) {
       )}
 
       <Modal
-        size="regular"
+        size="small"
         title={t('add_item')}
         visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleOnClose}
+        overflowVisible
       >
         <TabGroup
-          tabs={[
-            `${t('products')} (${products?.length})`,
-            `${t('tasks')}`,
-            `${t('expenses')}`,
-          ]}
+          tabs={[t('products'), t('tasks'), t('expenses')]}
           width="full"
+          onTabChange={(index) => setTabIndex(index)}
         >
-          <div className="overflow-y-auto">
-            {products?.map((product) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                isChecked={false}
-              />
-            ))}
+          <div className="flex flex-col space-y-4 pt-4">
+            <ProductSelector
+              label={t('products') as string}
+              onChange={(product) =>
+                setSelectedProducts((current) => [
+                  ...current,
+                  product.resource as Product,
+                ])
+              }
+              withoutAction
+              clearInputAfterSelection
+            />
+
+            <div className="flex flex-col max-h-96 overflow-y-auto">
+              {selectedProducts.map((product, index) => (
+                <Div
+                  key={`${product.id}${index}Products`}
+                  className="flex items-center justify-between p-2"
+                  theme={{
+                    hoverColor: colors.$5,
+                  }}
+                >
+                  <div className="flex flex-col space-y-1">
+                    <span>{product.product_key}</span>
+                    <span className="text-xs">{product.notes}</span>
+                  </div>
+
+                  <div
+                    className="cursor-pointer"
+                    onClick={() =>
+                      setSelectedProducts((current) =>
+                        current.filter(
+                          (_, productIndex) => productIndex !== index
+                        )
+                      )
+                    }
+                  >
+                    <Icon element={MdClose} size={23} />
+                  </div>
+                </Div>
+              ))}
+
+              {!selectedProducts.length && (
+                <span className="text-center">{t('no_items_selected')}</span>
+              )}
+            </div>
           </div>
-          <div className="overflow-y-auto"></div>
-          <div className="overflow-y-auto"></div>
+
+          <div className="flex flex-col space-y-4 pt-4">
+            {invoice?.client_id ? (
+              <>
+                <TaskSelector
+                  label={t('tasks') as string}
+                  clientId={invoice?.client_id}
+                  clientStatus="uninvoiced"
+                  onValueChange={(task) =>
+                    setSelectedTasks((current) => [
+                      ...current,
+                      task.resource as Task,
+                    ])
+                  }
+                  clearInputAfterSelection
+                  exclude={[
+                    ...invoice.line_items
+                      .filter(
+                        (lineItem) =>
+                          lineItem.type_id === InvoiceItemType.Task &&
+                          lineItem.task_id
+                      )
+                      .map((lineItem) => lineItem.task_id as string),
+                    ...selectedTasks.map((task) => task.id),
+                  ]}
+                />
+
+                <div className="flex flex-col max-h-96 overflow-y-auto">
+                  {selectedTasks.map((task, index) => (
+                    <Div
+                      key={`${task.id}${index}Tasks`}
+                      className="flex items-center justify-between p-2"
+                      theme={{
+                        hoverColor: colors.$5,
+                      }}
+                    >
+                      <div className="flex space-x-1">
+                        <span># {task.number}</span>
+                        {task.date && <span>-</span>}
+                        {task.date && (
+                          <span>{date(task.date, dateFormat)}</span>
+                        )}
+                      </div>
+
+                      {!invoice?.line_items.find(
+                        (lineItem) => lineItem.task_id === task.id
+                      ) && (
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            setSelectedTasks((current) =>
+                              current.filter(
+                                (_, taskIndex) => taskIndex !== index
+                              )
+                            )
+                          }
+                        >
+                          <Icon element={MdClose} size={23} />
+                        </div>
+                      )}
+                    </Div>
+                  ))}
+
+                  {!selectedTasks.length && (
+                    <span className="text-center">
+                      {t('no_items_selected')}
+                    </span>
+                  )}
+                </div>
+              </>
+            ) : (
+              <span className="text-center font-medium">
+                {t('no_client_selected')}.
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col space-y-4 pt-4">
+            {invoice?.client_id ? (
+              <>
+                <ExpenseSelector
+                  label={t('expenses') as string}
+                  clientId={invoice?.client_id}
+                  clientStatus="logged"
+                  onValueChange={(expense) =>
+                    setSelectedExpenses((current) => [
+                      ...current,
+                      expense.resource as Expense,
+                    ])
+                  }
+                  clearInputAfterSelection
+                  exclude={[
+                    ...invoice.line_items
+                      .filter(
+                        (lineItem) =>
+                          lineItem.type_id === InvoiceItemType.Product &&
+                          lineItem.expense_id
+                      )
+                      .map((lineItem) => lineItem.expense_id as string),
+                    ...selectedExpenses.map((expense) => expense.id),
+                  ]}
+                />
+
+                <div className="flex flex-col max-h-96 overflow-y-auto">
+                  {selectedExpenses.map((expense, index) => (
+                    <Div
+                      key={`${expense.id}${index}Expenses`}
+                      className="flex items-center justify-between p-2"
+                      theme={{
+                        hoverColor: colors.$5,
+                      }}
+                    >
+                      <div className="flex space-x-1">
+                        <span># {expense.number}</span>
+                        {expense.date && <span>-</span>}
+                        {expense.date && (
+                          <span>{date(expense.date, dateFormat)}</span>
+                        )}
+                      </div>
+
+                      {!invoice?.line_items.find(
+                        (lineItem) => lineItem.expense_id === expense.id
+                      ) && (
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            setSelectedExpenses((current) =>
+                              current.filter(
+                                (_, expenseIndex) => expenseIndex !== index
+                              )
+                            )
+                          }
+                        >
+                          <Icon element={MdClose} size={23} />
+                        </div>
+                      )}
+                    </Div>
+                  ))}
+
+                  {!selectedExpenses.length && (
+                    <span className="text-center">
+                      {t('no_items_selected')}
+                    </span>
+                  )}
+                </div>
+              </>
+            ) : (
+              <span className="text-center font-medium">
+                {t('no_client_selected')}.
+              </span>
+            )}
+          </div>
         </TabGroup>
 
         <div className="self-end">
-          <Button behavior="button">{t('add')}</Button>
+          <Button
+            behavior="button"
+            onClick={() => {
+              tabIndex === 0 && invoiceProducts(selectedProducts);
+              tabIndex === 1 &&
+                invoiceTasks(
+                  selectedTasks.filter(
+                    (task) =>
+                      !invoice?.line_items.find(
+                        (lineItem) => lineItem.task_id === task.id
+                      )
+                  )
+                );
+              tabIndex === 2 &&
+                create(
+                  selectedExpenses.filter(
+                    (expense) =>
+                      !invoice?.line_items.find(
+                        (lineItem) => lineItem.expense_id === expense.id
+                      )
+                  )
+                );
+              handleOnClose();
+            }}
+            disabled={disableAddButton()}
+            disableWithoutIcon
+          >
+            {t('add')}
+          </Button>
         </div>
       </Modal>
     </>
