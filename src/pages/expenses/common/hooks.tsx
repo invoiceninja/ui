@@ -61,6 +61,12 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
+import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -582,6 +588,13 @@ export function useExpenseFilters() {
 
   const statusThemeColors = useStatusThemeColorScheme();
 
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
+    status: ['active'],
+    perPage: 1000,
+  });
+
   const filters: SelectOption[] = [
     {
       label: t('logged'),
@@ -620,6 +633,22 @@ export function useExpenseFilters() {
       backgroundColor: '#b5812c',
     },
   ];
+
+  expenseCategoriesResponse?.forEach((expenseCategory) => {
+    const { red, green, blue, hex } = hexToRGB(expenseCategory.color || '');
+
+    const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+    filters.push({
+      value: expenseCategory.id,
+      label: expenseCategory.name,
+      color: adjustColorDarkness(hex, darknessAmount),
+      backgroundColor: expenseCategory.color || '',
+      queryKey: 'categories',
+      dropdownKey: '1',
+      placeHolder: 'expense_categories',
+    });
+  });
 
   return filters;
 }
