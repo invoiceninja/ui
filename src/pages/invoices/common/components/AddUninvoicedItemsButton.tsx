@@ -293,7 +293,7 @@ export function AddUninvoicedItemsButton(props: Props) {
                 <ExpenseSelector
                   label={t('expenses') as string}
                   clientId={invoice?.client_id}
-                  clientStatus="logged"
+                  clientStatus="uninvoiced"
                   onValueChange={(expense) =>
                     setSelectedExpenses((current) => [
                       ...current,
