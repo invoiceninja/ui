@@ -11,7 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { Dialog, Transition } from '@headlessui/react';
 import classNames from 'classnames';
-import { Fragment, useState, useEffect, ReactNode } from 'react';
+import { Fragment, useState, useEffect, ReactNode, RefObject } from 'react';
 import { X } from 'react-feather';
 
 interface Props {
@@ -28,6 +28,7 @@ interface Props {
   closeButtonCypressRef?: string;
   stopPropagationInHeader?: boolean;
   renderTransitionChildAsFragment?: boolean;
+  initialFocusRef?: RefObject<HTMLElement>;
 }
 
 interface TransitionChildProps {
@@ -72,6 +73,7 @@ export function Modal(props: Props) {
           !props.disableClosing && setOpen(value);
           !props.disableClosing && props.onClose(value);
         }}
+        initialFocus={props.initialFocusRef}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
