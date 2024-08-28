@@ -22,11 +22,14 @@ import {
   lastHistoryLocationAtom,
   preventLeavingPageAtom,
 } from '$app/common/hooks/useAddPreventNavigationEvents';
+import { changesAtom } from '$app/common/hooks/useAtomWithPrevent';
 
 export function PreventNavigationModal() {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const changes = useAtomValue(changesAtom);
 
   const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
     lastHistoryLocationAtom
@@ -113,6 +116,8 @@ export function PreventNavigationModal() {
         <span className="font-medium text-lg text-center">
           {t('error_unsaved_changes')}
         </span>
+
+        {changes && <span>{JSON.stringify(changes)}</span>}
 
         <div className="flex justify-between">
           <Button type="secondary" onClick={handleContinueEditing}>
