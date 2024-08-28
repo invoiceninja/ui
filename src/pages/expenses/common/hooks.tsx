@@ -592,7 +592,7 @@ export function useExpenseFilters() {
 
   const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
     status: ['active'],
-    perPage: 1000,
+    perPage: 500,
   });
 
   const filters: SelectOption[] = [
