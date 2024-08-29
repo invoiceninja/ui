@@ -33,6 +33,7 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { AddUninvoicedItemsButton } from '../common/components/AddUninvoicedItemsButton';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -199,35 +200,39 @@ export default function Create() {
   }, [invoice]);
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onSaveClick={() => save(invoice as Invoice)}
-      disableSaveButton={invoice?.client_id.length === 0}
-    >
-      {!isLoading ? (
-        <div className="space-y-4">
-          <Tabs tabs={tabs} />
+    <>
+      <Default
+        title={documentTitle}
+        breadcrumbs={pages}
+        onSaveClick={() => save(invoice as Invoice)}
+        disableSaveButton={invoice?.client_id.length === 0}
+      >
+        {!isLoading ? (
+          <div className="space-y-4">
+            <Tabs tabs={tabs} />
 
-          <Outlet
-            context={{
-              invoice,
-              setInvoice,
-              errors,
-              isDefaultTerms,
-              setIsDefaultTerms,
-              isDefaultFooter,
-              setIsDefaultFooter,
-              client,
-              invoiceSum,
-            }}
-          />
-        </div>
-      ) : (
-        <div className="flex justify-center items-center">
-          <Spinner />
-        </div>
-      )}
-    </Default>
+            <Outlet
+              context={{
+                invoice,
+                setInvoice,
+                errors,
+                isDefaultTerms,
+                setIsDefaultTerms,
+                isDefaultFooter,
+                setIsDefaultFooter,
+                client,
+                invoiceSum,
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex justify-center items-center">
+            <Spinner />
+          </div>
+        )}
+      </Default>
+
+      <AddUninvoicedItemsButton invoice={invoice} setInvoice={setInvoice} />
+    </>
   );
 }

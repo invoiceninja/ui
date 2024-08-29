@@ -110,7 +110,7 @@ export function useActions() {
       expense.invoice_id.length === 0 &&
       hasPermission('create_invoice') && (
         <DropdownElement
-          onClick={() => create(expense)}
+          onClick={() => create([expense])}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_expense')}
