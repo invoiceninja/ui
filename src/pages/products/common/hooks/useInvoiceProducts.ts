@@ -17,8 +17,14 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
-export const useInvoiceProducts = () => {
+interface Params {
+  onlyAddToInvoice?: boolean;
+}
+
+export const useInvoiceProducts = (params?: Params) => {
   const navigate = useNavigate();
+
+  const { onlyAddToInvoice } = params || {};
 
   const company = useCurrentCompany();
 
@@ -51,9 +57,19 @@ export const useInvoiceProducts = () => {
         }),
       }));
 
-      setInvoice({ ...blankInvoice, line_items: lineItems });
+      if (!onlyAddToInvoice) {
+        setInvoice({ ...blankInvoice, line_items: lineItems });
 
-      navigate('/invoices/create?action=invoice_product');
+        navigate('/invoices/create?action=invoice_product');
+      } else {
+        setInvoice(
+          (current) =>
+            current && {
+              ...current,
+              line_items: [...current.line_items, ...lineItems],
+            }
+        );
+      }
     }
   };
 };
