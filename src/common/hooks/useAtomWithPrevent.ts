@@ -17,7 +17,7 @@ import {
 } from 'jotai';
 import { Invoice } from '../interfaces/invoice';
 import { useEffect, useState } from 'react';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep, flatMapDeep, isEqual, isObject, keys } from 'lodash';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 import { useParams } from 'react-router-dom';
 import { diff } from 'deep-object-diff';
@@ -27,6 +27,13 @@ type Entity = Invoice;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 
 export const changesAtom = atom<any | null>(null);
+
+const EXCLUDING_PROPERTIES_KEYS = [
+  'public_notes',
+  'private_notes',
+  'terms',
+  'footer',
+];
 
 export function useAtomWithPrevent(
   atom: PrimitiveAtom<Entity | undefined>
@@ -45,6 +52,23 @@ export function useAtomWithPrevent(
   const isFunctionalityDisabled =
     import.meta.env.VITE_DISABLE_PREVENT_NAVIGATION_FEATURE === 'true';
 
+  const buildPaths = (currentEntity: Entity, path = ''): string[] => {
+    return flatMapDeep(keys(currentEntity), (key) => {
+      const value = currentEntity[key as keyof Entity];
+      const newPath = path ? `${path}.${key}` : key;
+
+      if (isObject(value)) {
+        return buildPaths(value as unknown as Entity, newPath);
+      }
+
+      return newPath;
+    });
+  };
+
+  const generatePaths = (currentEInvoice: Entity, currentPath = '') => {
+    return buildPaths(currentEInvoice, currentPath);
+  };
+
   useEffect(() => {
     if (
       entity &&
@@ -52,6 +76,21 @@ export function useAtomWithPrevent(
       entity.id === currentInitialValue.id &&
       !isFunctionalityDisabled
     ) {
+      const currentEntityPaths = generatePaths(entity);
+
+      const currentPathsForExcluding = currentEntityPaths.filter((path) =>
+        EXCLUDING_PROPERTIES_KEYS.some((excludingPropertyKey) =>
+          path.includes(excludingPropertyKey)
+        )
+      );
+
+      currentPathsForExcluding.forEach((path) => {
+        if (!path.includes('.')) {
+          delete entity[path as unknown as keyof Entity];
+          delete currentInitialValue[path as unknown as keyof Entity];
+        }
+      });
+
       const currentPreventValue = isEqual(entity, currentInitialValue);
 
       setChanges(diff(currentInitialValue, entity));
@@ -69,18 +108,22 @@ export function useAtomWithPrevent(
     }
   }, [entity]);
 
-  useEffect(() => {
-    if (entity && entity.id === id && currentInitialValue) {
-      setCurrentInitialValue(cloneDeep(entity));
-      setPreventLeavingPage(
-        (current) =>
-          current && {
-            ...current,
-            prevent: false,
-          }
-      );
-    }
-  }, [entity?.updated_at]);
+  useDebounce(
+    () => {
+      if (entity && entity.id === id && currentInitialValue) {
+        setCurrentInitialValue(cloneDeep(entity));
+        setPreventLeavingPage(
+          (current) =>
+            current && {
+              ...current,
+              prevent: false,
+            }
+        );
+      }
+    },
+    50,
+    [entity?.updated_at]
+  );
 
   useDebounce(
     () => {
@@ -88,7 +131,7 @@ export function useAtomWithPrevent(
         setCurrentInitialValue(cloneDeep(entity));
       }
     },
-    100,
+    50,
     [entity, currentInitialValue]
   );
 
