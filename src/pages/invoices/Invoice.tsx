@@ -114,7 +114,19 @@ export default function Invoice() {
               <ResourceActions
                 resource={invoice}
                 actions={actions}
-                onSaveClick={() => save(invoice)}
+                onSaveClick={() => {
+                  if (eInvoiceRef?.current?.saveEInvoice()) {
+                    setInvoice(
+                      (current) =>
+                        current && {
+                          ...current,
+                          e_invoice: eInvoiceRef?.current?.saveEInvoice(),
+                        }
+                    );
+                  }
+
+                  setSaveChanges(true);
+                }}
                 disableSaveButton={
                   invoice &&
                   (invoice.status_id === InvoiceStatus.Cancelled ||
@@ -140,6 +152,7 @@ export default function Invoice() {
                 isDefaultFooter,
                 setIsDefaultFooter,
                 client,
+                eInvoiceRef,
               }}
             />
           </div>
