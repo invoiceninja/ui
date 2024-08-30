@@ -197,30 +197,34 @@ export function EInvoice() {
           </SelectField>
         </Element>
 
-        {company?.settings.e_invoice_type === 'PEPPOL' ? (
-          <EInvoiceGenerator
-            ref={eInvoiceRef}
-            currentEInvoice={company?.e_invoice || {}}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="enable_e_invoice"
+              labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
+            />
+          }
+        >
+          <Toggle
+            checked={Boolean(company?.settings.enable_e_invoice)}
+            onValueChange={(value) =>
+              handleChange('settings.enable_e_invoice', value)
+            }
+            disabled={disableSettingsField('enable_e_invoice')}
           />
+        </Element>
+
+        {company?.settings.e_invoice_type === 'PEPPOL' ? (
+          <>
+            {company?.settings.enable_e_invoice && (
+              <EInvoiceGenerator
+                ref={eInvoiceRef}
+                currentEInvoice={company?.e_invoice || {}}
+              />
+            )}
+          </>
         ) : (
           <>
-            <Element
-              leftSide={
-                <PropertyCheckbox
-                  propertyKey="enable_e_invoice"
-                  labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
-                />
-              }
-            >
-              <Toggle
-                checked={Boolean(company?.settings.enable_e_invoice)}
-                onValueChange={(value) =>
-                  handleChange('settings.enable_e_invoice', value)
-                }
-                disabled={disableSettingsField('enable_e_invoice')}
-              />
-            </Element>
-
             {company?.settings.enable_e_invoice ? (
               <>
                 <Element

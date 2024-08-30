@@ -46,7 +46,10 @@ export function useTabs(params: Params) {
     {
       name: t('e_invoice'),
       href: route('/invoices/:id/e_invoice', { id }),
-      enabled: Boolean(company?.settings.e_invoice_type === 'PEPPOL'),
+      enabled: Boolean(
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice
+      ),
     },
     {
       name: t('documents'),
