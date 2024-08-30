@@ -10,6 +10,7 @@
 
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
@@ -22,6 +23,8 @@ interface Params {
 }
 export function useTabs(params: Params) {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -43,6 +46,7 @@ export function useTabs(params: Params) {
     {
       name: t('e_invoice'),
       href: route('/invoices/:id/e_invoice', { id }),
+      enabled: Boolean(company?.settings.e_invoice_type === 'PEPPOL'),
     },
     {
       name: t('documents'),
