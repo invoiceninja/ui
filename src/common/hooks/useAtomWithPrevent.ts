@@ -22,8 +22,9 @@ import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 import { useParams } from 'react-router-dom';
 import { diff } from 'deep-object-diff';
 import { useDebounce } from 'react-use';
+import { Quote } from '../interfaces/quote';
 
-type Entity = Invoice;
+type Entity = Invoice | Quote;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 
 export const changesAtom = atom<any | null>(null);
@@ -35,9 +36,9 @@ const EXCLUDING_PROPERTIES_KEYS = [
   'footer',
 ];
 
-export function useAtomWithPrevent(
-  atom: PrimitiveAtom<Entity | undefined>
-): [Entity | undefined, SetAtom<[SetStateAction<Invoice | undefined>], void>] {
+export function useAtomWithPrevent<T extends Entity>(
+  atom: PrimitiveAtom<T | undefined>
+): [T | undefined, SetAtom<[SetStateAction<T | undefined>], void>] {
   const { id } = useParams();
 
   const setChanges = useSetAtom(changesAtom);
@@ -47,25 +48,25 @@ export function useAtomWithPrevent(
     preventLeavingPageAtom
   );
 
-  const [currentInitialValue, setCurrentInitialValue] = useState<Entity>();
+  const [currentInitialValue, setCurrentInitialValue] = useState<T>();
 
   const isFunctionalityDisabled =
     import.meta.env.VITE_DISABLE_PREVENT_NAVIGATION_FEATURE === 'true';
 
-  const buildPaths = (currentEntity: Entity, path = ''): string[] => {
+  const buildPaths = (currentEntity: T, path = ''): string[] => {
     return flatMapDeep(keys(currentEntity), (key) => {
       const value = currentEntity[key as keyof Entity];
       const newPath = path ? `${path}.${key}` : key;
 
       if (isObject(value)) {
-        return buildPaths(value as unknown as Entity, newPath);
+        return buildPaths(value as unknown as T, newPath);
       }
 
       return newPath;
     });
   };
 
-  const generatePaths = (currentEInvoice: Entity, currentPath = '') => {
+  const generatePaths = (currentEInvoice: T, currentPath = '') => {
     return buildPaths(currentEInvoice, currentPath);
   };
 
@@ -76,7 +77,7 @@ export function useAtomWithPrevent(
       entity.id === currentInitialValue.id &&
       !isFunctionalityDisabled
     ) {
-      const currentEntityPaths = generatePaths(entity);
+      const currentEntityPaths = generatePaths(entity as T);
 
       const currentPathsForExcluding = currentEntityPaths.filter((path) =>
         EXCLUDING_PROPERTIES_KEYS.some((excludingPropertyKey) =>
@@ -111,7 +112,7 @@ export function useAtomWithPrevent(
   useDebounce(
     () => {
       if (entity && entity.id === id && currentInitialValue) {
-        setCurrentInitialValue(cloneDeep(entity));
+        setCurrentInitialValue(cloneDeep(entity) as T);
         setPreventLeavingPage(
           (current) =>
             current && {
@@ -128,7 +129,7 @@ export function useAtomWithPrevent(
   useDebounce(
     () => {
       if (entity && (!id || entity.id === id) && !currentInitialValue) {
-        setCurrentInitialValue(cloneDeep(entity));
+        setCurrentInitialValue(cloneDeep(entity) as T);
       }
     },
     50,

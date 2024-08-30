@@ -32,8 +32,8 @@ import { v4 } from 'uuid';
 import { Client } from '$app/common/interfaces/client';
 import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
+import { useAtom } from 'jotai';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -55,7 +55,7 @@ export default function Invoice() {
 
   const { calculateInvoiceSum } = useInvoiceUtilities({ client });
 
-  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);

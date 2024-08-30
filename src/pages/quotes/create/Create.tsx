@@ -30,6 +30,7 @@ import { Quote } from '$app/common/interfaces/quote';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Tab, Tabs } from '$app/components/Tabs';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export interface QuoteContext {
   quote: Quote | undefined;
@@ -74,7 +75,7 @@ export default function Create() {
 
   const [searchParams] = useSearchParams();
 
-  const [quote, setQuote] = useAtom(quoteAtom);
+  const [quote, setQuote] = useAtomWithPrevent(quoteAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
