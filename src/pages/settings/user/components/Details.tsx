@@ -22,6 +22,7 @@ import { InputField } from '../../../../components/forms';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { useAtom } from 'jotai';
 import { hasLanguageChanged } from '../../localization/common/atoms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 export function Details() {
   const [t] = useTranslation();
@@ -93,6 +94,13 @@ export function Details() {
               value={userChanges?.phone || user?.phone || ''}
               onValueChange={(value) => handleChange('phone', value)}
               errorMessage={(errors?.errors?.phone ?? [])[0]}
+            />
+          </Element>
+
+          <Element leftSide={t('signature')}>
+            <MarkdownEditor
+              value={userChanges?.signature || ''}
+              onChange={(value) => handleChange('signature', value)}
             />
           </Element>
 
