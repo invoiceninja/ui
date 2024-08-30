@@ -370,6 +370,8 @@ export function TemplatesAndReminders() {
                 </option>
               ))}
 
+            <option value="payment_failed">{t('payment_failed')}</option>
+
             <option value="custom1">{t('first_custom')}</option>
             <option value="custom2">{t('second_custom')}</option>
             <option value="custom3">{t('third_custom')}</option>
