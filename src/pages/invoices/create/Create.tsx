@@ -178,17 +178,29 @@ export default function Create() {
 
         handleChange('invitations', invitations);
 
-        if (company && company.enabled_tax_rates > 0) {
+        if (
+          company &&
+          company.enabled_tax_rates > 0 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name1', settingResolver(client, 'tax_name1'));
           handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
         }
 
-        if (company && company.enabled_tax_rates > 1) {
+        if (
+          company &&
+          company.enabled_tax_rates > 1 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name2', settingResolver(client, 'tax_name2'));
           handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
         }
 
-        if (company && company.enabled_tax_rates > 2) {
+        if (
+          company &&
+          company.enabled_tax_rates > 2 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name3', settingResolver(client, 'tax_name3'));
           handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
         }
