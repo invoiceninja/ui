@@ -925,9 +925,9 @@ export function useCreditColumns() {
     },
     {
       column: 'valid_until',
-      id: 'id',
+      id: 'due_date',
       label: t('valid_until'),
-      format: (value, credit) => date(credit.due_date, dateFormat),
+      format: (value) => date(value, dateFormat),
     },
   ];
 
