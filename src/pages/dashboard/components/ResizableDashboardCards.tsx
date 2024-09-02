@@ -35,7 +35,7 @@ import { useColorScheme } from '$app/common/colors';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
 import { DashboardCardSelector } from './DashboardCardSelector';
-import GridLayout from 'react-grid-layout';
+import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout';
 import { Icon } from '$app/components/icons/Icon';
 import { BiMove } from 'react-icons/bi';
 import classNames from 'classnames';
@@ -49,6 +49,8 @@ import { Activity } from './Activity';
 import { RecentPayments } from './RecentPayments';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import dayjs from 'dayjs';
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -143,6 +145,93 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
   },
 };
 
+const initialLayouts = {
+  lg: [
+    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '2',
+      x: 0,
+      y: 1,
+      w: 33,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '3',
+      x: 40,
+      y: 1,
+      w: 66,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '4',
+      x: 0,
+      y: 2,
+      w: 49.6,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '5',
+      x: 51,
+      y: 2,
+      w: 49.6,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '6',
+      x: 0,
+      y: 3,
+      w: 49.6,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '7',
+      x: 51,
+      y: 3,
+      w: 49.6,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '8',
+      x: 0,
+      y: 4,
+      w: 49.6,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '9',
+      x: 51,
+      y: 4,
+      w: 49.6,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '10',
+      x: 0,
+      y: 5,
+      w: 49.6,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+  ],
+};
+
 export function ResizableDashboardCards() {
   const [t] = useTranslation();
 
@@ -162,6 +251,8 @@ export function ResizableDashboardCards() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
+  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>('lg');
+  const [layouts, setLayouts] = useState<GridLayout.Layouts>(initialLayouts);
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
@@ -220,6 +311,24 @@ export function ResizableDashboardCards() {
       ),
     staleTime: Infinity,
   });
+
+  const onLayoutChange = (newLayout: GridLayout.Layout[]) => {
+    console.log(newLayout);
+
+    setLayouts((current) => ({ ...current, [layoutBreakpoint]: newLayout }));
+  };
+
+  // const onResizeStop = (
+  //   layout: GridLayout.Layout[],
+  //   oldItem: GridLayout.Layout,
+  //   newItem: GridLayout.Layout
+  // ) => {
+  //   setLayouts(
+  //     layout.map((item) =>
+  //       item.i === newItem.i ? { ...item, h: newItem.h } : item
+  //     )
+  //   );
+  // };
 
   useEffect(() => {
     setBody((current) => ({
@@ -287,13 +396,27 @@ export function ResizableDashboardCards() {
       style={{ width: '100%' }}
     >
       {!totals.isLoading ? (
-        <GridLayout
-          cols={100}
+        <ResponsiveGridLayout
+          className="layout"
+          breakpoints={{
+            lg: 1000,
+            md: 800,
+            sm: 600,
+            xs: 300,
+            xxs: 0,
+          }}
           width={width}
+          layouts={layouts}
+          cols={{ lg: 100, md: 30, sm: 30, xs: 30, xxs: 30 }}
           draggableHandle=".drag-handle"
           margin={[0, 20]}
+          rowHeight={1}
           isDraggable={isEditMode}
           isDroppable={isEditMode}
+          isResizable={isEditMode}
+          onLayoutChange={onLayoutChange}
+          onBreakpointChange={(breakPoint) => setLayoutBreakpoint(breakPoint)}
+          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
         >
           {totals.isLoading && (
             <div className="w-full flex justify-center">
@@ -302,18 +425,7 @@ export function ResizableDashboardCards() {
           )}
 
           {/* Quick date, currency & date picker. */}
-          <div
-            key="1"
-            className="flex justify-end"
-            data-grid={{
-              x: 80, // Prilagođeno u odnosu na 100 kolona
-              y: 0,
-              w: 20, // Prilagođeno u odnosu na 100 kolona
-              h: 0.25,
-              isResizable: false,
-              static: true,
-            }}
-          >
+          <div key="1" className="flex justify-end">
             <div className="flex space-x-2">
               {currencies && (
                 <SelectField
@@ -443,20 +555,9 @@ export function ResizableDashboardCards() {
           {company && (
             <div
               key="2"
-              className={classNames('drag-handle mt-4', {
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
-              data-grid={{
-                x: 0,
-                y: 1,
-                w: 38, // Prilagođeno u odnosu na 100 kolona
-                h: 3.2,
-                minH: 1.62,
-                minW: 18, // Prilagođeno u odnosu na 100 kolona
-                isResizable: isEditMode,
-                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-                isDraggable: isEditMode,
-              }}
             >
               <Card
                 title={t('account_login_text')}
@@ -564,20 +665,9 @@ export function ResizableDashboardCards() {
           {chartData && (
             <div
               key="3"
-              className={classNames('drag-handle mt-4', {
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
-              data-grid={{
-                x: 40, // Prilagođeno u odnosu na 100 kolona
-                y: 1,
-                w: 60, // Prilagođeno u odnosu na 100 kolona
-                h: 3.2,
-                minH: 1.62,
-                minW: 18, // Prilagođeno u odnosu na 100 kolona
-                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-                isResizable: isEditMode,
-                isDraggable: isEditMode,
-              }}
             >
               <Card
                 title={t('overview')}
@@ -600,40 +690,18 @@ export function ResizableDashboardCards() {
 
           <div
             key="4"
-            className={classNames('drag-handle mt-4', {
+            className={classNames('drag-handle', {
               'cursor-grab': isEditMode,
             })}
-            data-grid={{
-              x: 0,
-              y: 2,
-              w: 49, // Prilagođeno u odnosu na 100 kolona
-              h: 2.2,
-              minH: 1.62,
-              minW: 18, // Prilagođeno u odnosu na 100 kolona
-              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-              isResizable: isEditMode,
-              isDraggable: isEditMode,
-            }}
           >
             <Activity />
           </div>
 
           <div
             key="5"
-            className={classNames('drag-handle mt-4', {
+            className={classNames('drag-handle', {
               'cursor-grab': isEditMode,
             })}
-            data-grid={{
-              x: 51, // Prilagođeno u odnosu na 100 kolona
-              y: 2,
-              w: 49, // Prilagođeno u odnosu na 100 kolona
-              h: 2.2,
-              minH: 1.62,
-              minW: 18, // Prilagođeno u odnosu na 100 kolona
-              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-              isResizable: isEditMode,
-              isDraggable: isEditMode,
-            }}
           >
             <RecentPayments />
           </div>
@@ -641,20 +709,9 @@ export function ResizableDashboardCards() {
           {enabled(ModuleBitmask.Invoices) && (
             <div
               key="6"
-              className={classNames('drag-handle mt-4', {
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
-              data-grid={{
-                x: 0,
-                y: 3,
-                w: 49, // Prilagođeno u odnosu na 100 kolona
-                h: 2.2,
-                minH: 1.62,
-                minW: 18, // Prilagođeno u odnosu na 100 kolona
-                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-                isResizable: isEditMode,
-                isDraggable: isEditMode,
-              }}
             >
               <UpcomingInvoices />
             </div>
@@ -663,20 +720,9 @@ export function ResizableDashboardCards() {
           {enabled(ModuleBitmask.Invoices) && (
             <div
               key="7"
-              className={classNames('drag-handle mt-4', {
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
-              data-grid={{
-                x: 51, // Prilagođeno u odnosu na 100 kolona
-                y: 3,
-                w: 49, // Prilagođeno u odnosu na 100 kolona
-                h: 2.2,
-                minH: 1.62,
-                minW: 18, // Prilagođeno u odnosu na 100 kolona
-                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-                isResizable: isEditMode,
-                isDraggable: isEditMode,
-              }}
             >
               <PastDueInvoices />
             </div>
@@ -685,20 +731,9 @@ export function ResizableDashboardCards() {
           {enabled(ModuleBitmask.Quotes) && (
             <div
               key="8"
-              className={classNames('drag-handle mt-4', {
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
-              data-grid={{
-                x: 0,
-                y: 4,
-                w: 49, // Prilagođeno u odnosu na 100 kolona
-                h: 2.2,
-                minH: 1.62,
-                minW: 18, // Prilagođeno u odnosu na 100 kolona
-                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-                isResizable: isEditMode,
-                isDraggable: isEditMode,
-              }}
             >
               <ExpiredQuotes />
             </div>
@@ -707,20 +742,9 @@ export function ResizableDashboardCards() {
           {enabled(ModuleBitmask.Quotes) && (
             <div
               key="9"
-              className={classNames('drag-handle mt-4', {
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
-              data-grid={{
-                x: 51, // Prilagođeno u odnosu na 100 kolona
-                y: 4,
-                w: 49, // Prilagođeno u odnosu na 100 kolona
-                h: 2.2,
-                minH: 1.62,
-                minW: 18, // Prilagođeno u odnosu na 100 kolona
-                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-                isResizable: isEditMode,
-                isDraggable: isEditMode,
-              }}
             >
               <UpcomingQuotes />
             </div>
@@ -729,25 +753,14 @@ export function ResizableDashboardCards() {
           {enabled(ModuleBitmask.RecurringInvoices) && (
             <div
               key="10"
-              className={classNames('drag-handle mt-4', {
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
-              data-grid={{
-                x: 0,
-                y: 5,
-                w: 49, // Prilagođeno u odnosu na 100 kolona
-                h: 2.2,
-                minH: 1.62,
-                minW: 18, // Prilagođeno u odnosu na 100 kolona
-                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
-                isResizable: isEditMode,
-                isDraggable: isEditMode,
-              }}
             >
               <UpcomingRecurringInvoices />
             </div>
           )}
-        </GridLayout>
+        </ResponsiveGridLayout>
       ) : (
         <div className="w-full flex justify-center">
           <Spinner />
