@@ -32,6 +32,8 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 export default function PurchaseOrder() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -52,6 +54,9 @@ export default function PurchaseOrder() {
   ];
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [invoiceSum, setInvoiceSum] = useState<
+    InvoiceSum | InvoiceSumInclusive
+  >();
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
   const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrderType>();
@@ -112,6 +117,8 @@ export default function PurchaseOrder() {
               setIsDefaultTerms,
               isDefaultFooter,
               setIsDefaultFooter,
+              invoiceSum,
+              setInvoiceSum,
             }}
           />
         </div>
