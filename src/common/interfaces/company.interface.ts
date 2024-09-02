@@ -323,6 +323,7 @@ export interface Settings {
   task_round_up: boolean;
   task_round_to_nearest: number;
   merge_e_invoice_to_pdf: boolean;
+  payment_flow: string;
 }
 
 export interface TaxData {
