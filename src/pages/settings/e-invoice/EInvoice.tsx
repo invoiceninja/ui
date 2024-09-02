@@ -153,6 +153,8 @@ export function EInvoice() {
       onSaveClick={() => {
         if (eInvoiceRef?.current?.saveEInvoice()) {
           handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
+        } else {
+          handleChange('e_invoice', {});
         }
 
         setSaveChanges(true);
