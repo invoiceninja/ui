@@ -52,6 +52,8 @@ export function useAtomWithPrevent<T extends Entity>(
 
   const isFunctionalityDisabled =
     import.meta.env.VITE_DISABLE_PREVENT_NAVIGATION_FEATURE === 'true';
+  const isTrackingChangesEnabled =
+    import.meta.env.VITE_ENABLE_DISCARD_CHANGES_TRACKING === 'true';
 
   const buildPaths = (currentEntity: T, path = ''): string[] => {
     return flatMapDeep(keys(currentEntity), (key) => {
@@ -94,7 +96,9 @@ export function useAtomWithPrevent<T extends Entity>(
 
       const currentPreventValue = isEqual(entity, currentInitialValue);
 
-      setChanges(diff(currentInitialValue, entity));
+      if (isTrackingChangesEnabled) {
+        setChanges(diff(currentInitialValue, entity));
+      }
 
       const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;
 
@@ -146,7 +150,10 @@ export function useAtomWithPrevent<T extends Entity>(
             prevent: false,
           }
       );
-      setChanges(null);
+
+      if (isTrackingChangesEnabled) {
+        setChanges(null);
+      }
     };
   }, []);
 

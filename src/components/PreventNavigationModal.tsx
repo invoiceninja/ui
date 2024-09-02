@@ -29,6 +29,9 @@ export function PreventNavigationModal() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isTrackingChangesEnabled =
+    import.meta.env.VITE_ENABLE_DISCARD_CHANGES_TRACKING === 'true';
+
   const changes = useAtomValue(changesAtom);
 
   const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
@@ -117,7 +120,9 @@ export function PreventNavigationModal() {
           {t('error_unsaved_changes')}
         </span>
 
-        {changes && <span>{JSON.stringify(changes)}</span>}
+        {changes && isTrackingChangesEnabled && (
+          <span className="break-words">{JSON.stringify(changes)}</span>
+        )}
 
         <div className="flex justify-between">
           <Button type="secondary" onClick={handleContinueEditing}>
