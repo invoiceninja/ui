@@ -32,7 +32,7 @@ import { Settings as CompanySettings } from '$app/common/interfaces/company.inte
 import { Tab, Tabs } from '$app/components/Tabs';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { AddUninvoicedItemsButton } from '../common/components/AddUninvoicedItemsButton';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -55,7 +55,7 @@ export default function Create() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
 
-  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const { data, isLoading } = useBlankInvoiceQuery({
     enabled: typeof invoice === 'undefined',
@@ -177,17 +177,29 @@ export default function Create() {
 
         handleChange('invitations', invitations);
 
-        if (company && company.enabled_tax_rates > 0) {
+        if (
+          company &&
+          company.enabled_tax_rates > 0 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name1', settingResolver(client, 'tax_name1'));
           handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
         }
 
-        if (company && company.enabled_tax_rates > 1) {
+        if (
+          company &&
+          company.enabled_tax_rates > 1 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name2', settingResolver(client, 'tax_name2'));
           handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
         }
 
-        if (company && company.enabled_tax_rates > 2) {
+        if (
+          company &&
+          company.enabled_tax_rates > 2 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name3', settingResolver(client, 'tax_name3'));
           handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
         }
@@ -199,35 +211,39 @@ export default function Create() {
   }, [invoice]);
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onSaveClick={() => save(invoice as Invoice)}
-      disableSaveButton={invoice?.client_id.length === 0}
-    >
-      {!isLoading ? (
-        <div className="space-y-4">
-          <Tabs tabs={tabs} />
+    <>
+      <Default
+        title={documentTitle}
+        breadcrumbs={pages}
+        onSaveClick={() => save(invoice as Invoice)}
+        disableSaveButton={invoice?.client_id.length === 0}
+      >
+        {!isLoading ? (
+          <div className="space-y-4">
+            <Tabs tabs={tabs} />
 
-          <Outlet
-            context={{
-              invoice,
-              setInvoice,
-              errors,
-              isDefaultTerms,
-              setIsDefaultTerms,
-              isDefaultFooter,
-              setIsDefaultFooter,
-              client,
-              invoiceSum,
-            }}
-          />
-        </div>
-      ) : (
-        <div className="flex justify-center items-center">
-          <Spinner />
-        </div>
-      )}
-    </Default>
+            <Outlet
+              context={{
+                invoice,
+                setInvoice,
+                errors,
+                isDefaultTerms,
+                setIsDefaultTerms,
+                isDefaultFooter,
+                setIsDefaultFooter,
+                client,
+                invoiceSum,
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex justify-center items-center">
+            <Spinner />
+          </div>
+        )}
+      </Default>
+
+      <AddUninvoicedItemsButton invoice={invoice} setInvoice={setInvoice} />
+    </>
   );
 }

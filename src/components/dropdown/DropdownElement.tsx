@@ -24,6 +24,7 @@ interface Props extends CommonProps {
   icon?: ReactElement;
   cypressRef?: string;
   actionKey?: 'switchCompany';
+  disablePreventNavigation?: boolean;
 }
 
 const Button = styled.button`
@@ -45,7 +46,9 @@ export function DropdownElement(props: Props) {
 
   const { prevent: preventLeavingPage } = useAtomValue(preventLeavingPageAtom);
 
-  const preventNavigation = usePreventNavigation();
+  const preventNavigation = usePreventNavigation({
+    disablePrevention: props.disablePreventNavigation,
+  });
 
   const { actionKey } = props;
 

@@ -30,6 +30,7 @@ import { Quote } from '$app/common/interfaces/quote';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Tab, Tabs } from '$app/components/Tabs';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export interface QuoteContext {
   quote: Quote | undefined;
@@ -74,7 +75,7 @@ export default function Create() {
 
   const [searchParams] = useSearchParams();
 
-  const [quote, setQuote] = useAtom(quoteAtom);
+  const [quote, setQuote] = useAtomWithPrevent(quoteAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
@@ -159,17 +160,29 @@ export default function Create() {
 
         handleChange('invitations', invitations);
 
-        if (company && company.enabled_tax_rates > 0) {
+        if (
+          company &&
+          company.enabled_tax_rates > 0 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name1', settingResolver(client, 'tax_name1'));
           handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
         }
 
-        if (company && company.enabled_tax_rates > 1) {
+        if (
+          company &&
+          company.enabled_tax_rates > 1 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name2', settingResolver(client, 'tax_name2'));
           handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
         }
 
-        if (company && company.enabled_tax_rates > 2) {
+        if (
+          company &&
+          company.enabled_tax_rates > 2 &&
+          searchParams.get('action') !== 'clone'
+        ) {
           handleChange('tax_name3', settingResolver(client, 'tax_name3'));
           handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
         }

@@ -7,7 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, InputField } from './forms';
@@ -68,6 +68,8 @@ export function PasswordConfirmation(props: Props) {
   const company = useCurrentCompany();
   const user = useCurrentUser();
 
+  const inputFieldRef = useRef<HTMLInputElement>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
 
@@ -121,9 +123,11 @@ export function PasswordConfirmation(props: Props) {
       visible={isModalOpen && isPasswordTimeoutExpired}
       title={t('confirmation')}
       text={t('please_enter_your_password')}
+      initialFocusRef={inputFieldRef}
     >
       <form onSubmit={(event) => handleConfirm(event, true)}>
         <InputField
+          innerRef={inputFieldRef}
           id="current_password"
           type="password"
           label={t('current_password')}

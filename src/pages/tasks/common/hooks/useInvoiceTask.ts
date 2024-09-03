@@ -22,7 +22,7 @@ import {
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
 import collect from 'collect.js';
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { useTranslation } from 'react-i18next';
@@ -30,16 +30,22 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
-export function useInvoiceTask() {
+interface Params {
+  onlyAddToInvoice?: boolean;
+}
+
+export function useInvoiceTask(params?: Params) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const { onlyAddToInvoice } = params || {};
+
   const company = useCurrentCompany();
-
-  const { dateFormat } = useCurrentCompanyDateFormats();
-  const { timeFormat } = useCompanyTimeFormat();
   const { data } = useBlankInvoiceQuery();
+  const { timeFormat } = useCompanyTimeFormat();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const [, setInvoice] = useAtom(invoiceAtom);
+  const setInvoice = useSetAtom(invoiceAtom);
 
   const formatNumber = useFormatNumber();
 
@@ -190,16 +196,26 @@ export function useInvoiceTask() {
         invoice.line_items.push(item);
       });
 
-      setInvoice(invoice);
+      if (!onlyAddToInvoice) {
+        setInvoice(invoice);
 
-      navigate(
-        route(
-          '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
-          {
-            projectAssigned: Boolean(tasks[0].project_id),
-          }
-        )
-      );
+        navigate(
+          route(
+            '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
+            {
+              projectAssigned: Boolean(tasks[0].project_id),
+            }
+          )
+        );
+      } else {
+        setInvoice(
+          (current) =>
+            current && {
+              ...current,
+              line_items: [...current.line_items, ...invoice.line_items],
+            }
+        );
+      }
     }
   };
 }

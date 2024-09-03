@@ -13,7 +13,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -575,7 +575,7 @@ export function ComboboxStatic<T = any>({
       <HeadlessCombobox
         as="div"
         value={selectedValue}
-        onChange={(value) => handleChangeValue(value)}
+        onChange={(value: Entry | null) => handleChangeValue(value)}
         disabled={readonly}
         ref={comboboxRef}
       >
@@ -613,7 +613,7 @@ export function ComboboxStatic<T = any>({
 
             {!readonly && (
               <HeadlessCombobox.Button
-                onClick={(e) => {
+                onClick={(e: MouseEvent<HTMLButtonElement>) => {
                   if (onDismiss) {
                     e.preventDefault();
 

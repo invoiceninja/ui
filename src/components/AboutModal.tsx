@@ -510,7 +510,11 @@ export function AboutModal(props: Props) {
 
             <Button
               behavior="button"
-              onClick={() => setIsPasswordConfirmModalOpen(true)}
+              onClick={() => {
+                setIsAboutVisible(false);
+                setIsForceUpdateModalOpen(false);
+                setIsPasswordConfirmModalOpen(true);
+              }}
               disableWithoutIcon
               disabled={isFormBusy}
             >

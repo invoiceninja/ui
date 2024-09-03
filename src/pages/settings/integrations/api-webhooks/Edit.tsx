@@ -32,6 +32,7 @@ import { useHandleChange } from './common/hooks';
 import { useActions } from './common/useActions';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useEvents } from './common/hooks/useEvents';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -137,7 +138,7 @@ export function Edit() {
         </Element>
 
         <Element leftSide={t('event_type')}>
-          <SelectField
+          <SearchableSelect
             value={apiWebHook?.event_id}
             onValueChange={(value) => handleChange('event_id', value)}
             errorMessage={errors?.errors.event_id}
@@ -147,7 +148,7 @@ export function Edit() {
                 {event.label}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('method')}>
