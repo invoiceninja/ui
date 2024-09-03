@@ -36,9 +36,7 @@ import { useRefetch } from './common/hooks/useRefetch';
 import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
-import Pusher from 'pusher-js';
-import { apiEndpoint } from './common/helpers';
-import { defaultHeaders } from './common/queries/common/headers';
+import { useSockets } from './common/hooks/useSockets';
 
 export function App() {
   const [t] = useTranslation();
@@ -193,63 +191,33 @@ export function App() {
     }
   }, [location, user]);
 
-  const headers = defaultHeaders();
-
-  let pusherClient : Pusher | null;
+  const sockets = useSockets();
 
   useEffect(() => {
-    
     if (company) {
-    
-    async function authenticate() {
-            
-      try {
-         pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_ID ?? '', {
-          cluster: 'eu',
-          authEndpoint: apiEndpoint() + '/broadcasting/auth',
-          forceTLS: false,
-          enableStats: true,
-          wsHost: 'socket.invoicing.co',
-          wsPort: 6002,
-          enabledTransports: ['ws', 'wss'],
-          auth: {
-            headers: headers,
-          },
-        });
+      sockets.connect();
+      sockets.subscribe(`private-company-${company.company_key}`);
 
-        // Pusher.logToConsole = true;
+      sockets.connection.bind('connected', () => {
+        console.log('Connected to Pusher');
+      });
 
-        const channel = pusherClient.subscribe("private-company-" + company.company_key);
+      sockets.connection.bind('disconnected', () => {
+        console.log('Disconnected from Pusher');
+      });
 
-        channel.bind_global((eventName: string, data: any) => {
-          console.log(`P Channel: ${eventName} received:`, data);
-        });
-
-        pusherClient.connection.bind('connected', () => {
-          console.log('Connected to Pusher');
-        });
-
-        pusherClient.connection.bind('disconnected', () => {
-          console.log('Disconnected from Pusher');
-        });
-      } catch (error) {
-        console.log(error);
-      }
+      sockets.connection.bind('error', () => {
+        console.error('Error from Pusher');
+      });
     }
 
-    authenticate();
-
-    // Cleanup function to unbind events and unsubscribe on component unmount
     return () => {
-      if (pusherClient) {
-        pusherClient.connection.unbind();
-        pusherClient.unsubscribe("private-company-" + company.company_key);
+      if (sockets && company) {
+        sockets.connection.unbind();
+        sockets.unsubscribe(`private-company-${company.company_key}`);
       }
     };
-  }
-
   }, [company?.company_key]);
-
 
   return (
     <>
@@ -264,7 +232,6 @@ export function App() {
       />
 
       <PreventNavigationModal />
-
     </>
   );
 }
