@@ -87,6 +87,7 @@ export function EntityActionElement(props: Props) {
       icon={<Icon element={props.icon} />}
       onClick={onClick}
       setVisible={setVisible}
+      disablePreventNavigation={props.disablePreventNavigation}
     >
       {props.children}
     </DropdownElement>

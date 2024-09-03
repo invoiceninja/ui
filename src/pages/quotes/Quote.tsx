@@ -16,7 +16,6 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +33,7 @@ import { quoteAtom } from './common/atoms';
 import { useActions, useQuoteUtilities, useSave } from './common/hooks';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -55,7 +55,7 @@ export default function Edit() {
 
   const { data, isLoading } = useQuoteQuery({ id: id! });
 
-  const [quote, setQuote] = useAtom(quoteAtom);
+  const [quote, setQuote] = useAtomWithPrevent(quoteAtom);
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();

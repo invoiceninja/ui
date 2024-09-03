@@ -416,6 +416,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => printPdf([quote.id])}
           icon={<Icon element={MdPrint} />}
+          disablePreventNavigation
         >
           {t('print_pdf')}
         </DropdownElement>
@@ -424,6 +425,7 @@ export function useActions(params?: Params) {
       <DropdownElement
         onClick={() => downloadPdf(quote)}
         icon={<Icon element={MdDownload} />}
+        disablePreventNavigation
       >
         {t('download_pdf')}
       </DropdownElement>
@@ -433,6 +435,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => downloadEQuote(quote)}
           icon={<Icon element={MdDownload} />}
+          disablePreventNavigation
         >
           {t('download_e_quote')}
         </DropdownElement>
@@ -472,6 +475,7 @@ export function useActions(params?: Params) {
       <DropdownElement
         onClick={() => quote && openClientPortal(quote)}
         icon={<Icon element={MdCloudCircle} />}
+        disablePreventNavigation
       >
         {t('client_portal')}
       </DropdownElement>
@@ -481,6 +485,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => markSent(quote)}
           icon={<Icon element={MdMarkEmailRead} />}
+          disablePreventNavigation
         >
           {t('mark_sent')}
         </DropdownElement>
@@ -491,6 +496,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => approve(quote)}
           icon={<Icon element={MdDone} />}
+          disablePreventNavigation
         >
           {t('approve')}
         </DropdownElement>
@@ -501,6 +507,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'convert_to_invoice')}
           icon={<Icon element={MdSwitchRight} />}
+          disablePreventNavigation
         >
           {t('convert_to_invoice')}
         </DropdownElement>
@@ -508,7 +515,10 @@ export function useActions(params?: Params) {
     (quote) =>
       !quote.project_id &&
       hasPermission('create_project') && (
-        <ConvertToProjectBulkAction selectedIds={[quote.id]} />
+        <ConvertToProjectBulkAction
+          selectedIds={[quote.id]}
+          disablePreventNavigation
+        />
       ),
     (quote) => (
       <DropdownElement
@@ -546,6 +556,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'archive')}
           icon={<Icon element={MdArchive} />}
+          disablePreventNavigation
         >
           {t('archive')}
         </DropdownElement>
@@ -556,6 +567,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'restore')}
           icon={<Icon element={MdRestore} />}
+          disablePreventNavigation
         >
           {t('restore')}
         </DropdownElement>
@@ -566,6 +578,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'delete')}
           icon={<Icon element={MdDelete} />}
+          disablePreventNavigation
         >
           {t('delete')}
         </DropdownElement>

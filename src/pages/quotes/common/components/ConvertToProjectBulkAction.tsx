@@ -21,6 +21,7 @@ import { useColorScheme } from '$app/common/colors';
 interface Props {
   selectedIds: string[];
   setSelected?: Dispatch<SetStateAction<string[]>>;
+  disablePreventNavigation?: boolean;
 }
 export const ConvertToProjectBulkAction = (props: Props) => {
   const [t] = useTranslation();
@@ -36,6 +37,7 @@ export const ConvertToProjectBulkAction = (props: Props) => {
       <DropdownElement
         onClick={() => setIsModalOpen(true)}
         icon={<Icon element={MdSwitchRight} />}
+        disablePreventNavigation={props.disablePreventNavigation}
       >
         {t('convert_to_project')}
       </DropdownElement>
@@ -45,9 +47,16 @@ export const ConvertToProjectBulkAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg"
-          style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-        >{t('are_you_sure')}</span>
+        <span
+          className="text-lg"
+          style={{
+            backgroundColor: colors.$2,
+            color: colors.$3,
+            colorScheme: colors.$0,
+          }}
+        >
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button
