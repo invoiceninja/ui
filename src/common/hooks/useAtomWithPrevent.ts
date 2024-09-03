@@ -8,35 +8,97 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
+import {
+  atom,
+  PrimitiveAtom,
+  SetStateAction,
+  useAtom,
+  useSetAtom,
+} from 'jotai';
 import { Invoice } from '../interfaces/invoice';
 import { useEffect, useState } from 'react';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep, flatMapDeep, isEqual, isObject, keys } from 'lodash';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
-import { useDebounce } from 'react-use';
 import { useParams } from 'react-router-dom';
+import { diff } from 'deep-object-diff';
+import { useDebounce } from 'react-use';
+import { Quote } from '../interfaces/quote';
 
-type Entity = Invoice;
+type Entity = Invoice | Quote;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 
-export function useAtomWithPrevent(
-  atom: PrimitiveAtom<Entity | undefined>
-): [Entity | undefined, SetAtom<[SetStateAction<Invoice | undefined>], void>] {
+export const changesAtom = atom<any | null>(null);
+
+const EXCLUDING_PROPERTIES_KEYS = [
+  'public_notes',
+  'private_notes',
+  'terms',
+  'footer',
+];
+
+export function useAtomWithPrevent<T extends Entity>(
+  atom: PrimitiveAtom<T | undefined>
+): [T | undefined, SetAtom<[SetStateAction<T | undefined>], void>] {
   const { id } = useParams();
+
+  const setChanges = useSetAtom(changesAtom);
 
   const [entity, setEntity] = useAtom(atom);
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
     preventLeavingPageAtom
   );
 
-  const [currentInitialValue, setCurrentInitialValue] = useState<Entity>();
+  const [currentInitialValue, setCurrentInitialValue] = useState<T>();
 
   const isFunctionalityDisabled =
     import.meta.env.VITE_DISABLE_PREVENT_NAVIGATION_FEATURE === 'true';
+  const isTrackingChangesEnabled =
+    import.meta.env.VITE_ENABLE_DISCARD_CHANGES_TRACKING === 'true';
+
+  const buildPaths = (currentEntity: T, path = ''): string[] => {
+    return flatMapDeep(keys(currentEntity), (key) => {
+      const value = currentEntity[key as keyof Entity];
+      const newPath = path ? `${path}.${key}` : key;
+
+      if (isObject(value)) {
+        return buildPaths(value as unknown as T, newPath);
+      }
+
+      return newPath;
+    });
+  };
+
+  const generatePaths = (currentEInvoice: T, currentPath = '') => {
+    return buildPaths(currentEInvoice, currentPath);
+  };
 
   useEffect(() => {
-    if (entity && currentInitialValue && !isFunctionalityDisabled) {
+    if (
+      entity &&
+      currentInitialValue &&
+      entity.id === currentInitialValue.id &&
+      !isFunctionalityDisabled
+    ) {
+      const currentEntityPaths = generatePaths(entity as T);
+
+      const currentPathsForExcluding = currentEntityPaths.filter((path) =>
+        EXCLUDING_PROPERTIES_KEYS.some((excludingPropertyKey) =>
+          path.includes(excludingPropertyKey)
+        )
+      );
+
+      currentPathsForExcluding.forEach((path) => {
+        if (!path.includes('.')) {
+          delete entity[path as unknown as keyof Entity];
+          delete currentInitialValue[path as unknown as keyof Entity];
+        }
+      });
+
       const currentPreventValue = isEqual(entity, currentInitialValue);
+
+      if (isTrackingChangesEnabled) {
+        setChanges(diff(currentInitialValue, entity));
+      }
 
       const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;
 
@@ -54,7 +116,7 @@ export function useAtomWithPrevent(
   useDebounce(
     () => {
       if (entity && entity.id === id && currentInitialValue) {
-        setCurrentInitialValue(cloneDeep(entity));
+        setCurrentInitialValue(cloneDeep(entity) as T);
         setPreventLeavingPage(
           (current) =>
             current && {
@@ -64,25 +126,19 @@ export function useAtomWithPrevent(
         );
       }
     },
-    900,
+    50,
     [entity?.updated_at]
   );
 
   useDebounce(
     () => {
-      if (entity && entity.id === id && !currentInitialValue) {
-        setCurrentInitialValue(cloneDeep(entity));
+      if (entity && (!id || entity.id === id) && !currentInitialValue) {
+        setCurrentInitialValue(cloneDeep(entity) as T);
       }
     },
-    900,
-    [entity]
+    50,
+    [entity, currentInitialValue]
   );
-
-  useEffect(() => {
-    if (entity && !id && !currentInitialValue) {
-      setCurrentInitialValue(cloneDeep(entity));
-    }
-  }, [entity]);
 
   useEffect(() => {
     return () => {
@@ -94,6 +150,10 @@ export function useAtomWithPrevent(
             prevent: false,
           }
       );
+
+      if (isTrackingChangesEnabled) {
+        setChanges(null);
+      }
     };
   }, []);
 
