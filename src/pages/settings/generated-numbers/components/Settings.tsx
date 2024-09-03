@@ -185,9 +185,16 @@ export function Settings() {
       >
         <SelectField
           value={companyChanges?.settings?.reset_counter_frequency_id || '0'}
-          onValueChange={(value) =>
-            handleChange('settings.reset_counter_frequency_id', parseInt(value))
-          }
+          onValueChange={(value) => {
+            handleChange(
+              'settings.reset_counter_frequency_id',
+              parseInt(value)
+            );
+
+            if (value === '0') {
+              handleChange('settings.reset_counter_date', '');
+            }
+          }}
           disabled={disableSettingsField('reset_counter_frequency_id')}
           errorMessage={errors?.errors['settings.reset_counter_frequency_id']}
         >
