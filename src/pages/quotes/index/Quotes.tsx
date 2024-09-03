@@ -46,6 +46,7 @@ import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
+import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -65,6 +66,7 @@ export default function Quotes() {
   const columns = useQuoteColumns();
   const reactSettings = useReactSettings();
   const quoteColumns = useAllQuoteColumns();
+  const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
   const { footerColumns, allFooterColumns } = useFooterColumns();
 
@@ -94,7 +96,7 @@ export default function Quotes() {
         resource="quote"
         columns={columns}
         footerColumns={footerColumns}
-        endpoint="/api/v1/quotes?include=client&filter_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/quotes?include=client&without_deleted_clients=true&sort=id|desc"
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
         bulkRoute="/api/v1/quotes/bulk"
@@ -138,6 +140,7 @@ export default function Quotes() {
           setSliderQuoteId(quote.id);
           setQuoteSliderVisibility(true);
         }}
+        dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_quote')]}
         hideEditableOptions={!hasPermission('edit_quote')}
       />

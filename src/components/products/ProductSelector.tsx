@@ -29,6 +29,10 @@ interface Props {
   onInputFocus?: () => unknown;
   errorMessage?: string | string[];
   displayStockQuantity?: boolean;
+  onInputValueChange?: (value: string) => void;
+  label?: string | undefined;
+  withoutAction?: boolean;
+  clearInputAfterSelection?: boolean;
 }
 
 export function ProductSelector(props: Props) {
@@ -49,7 +53,7 @@ export function ProductSelector(props: Props) {
 
       <ComboboxAsync<Product>
         endpoint={endpoint('/api/v1/products?per_page=800')}
-        inputOptions={{ value: props.defaultValue ?? null }}
+        inputOptions={{ value: props.defaultValue ?? null, label: props.label }}
         entryOptions={{
           id: 'id',
           label: 'product_key',
@@ -83,15 +87,17 @@ export function ProductSelector(props: Props) {
           ),
         }}
         onChange={(product) => props.onChange && props.onChange(product)}
+        onInputValueChange={props.onInputValueChange}
         action={{
           label: t('new_product'),
           onClick: () => setIsModalOpen(true),
-          visible: hasPermission('create_product'),
+          visible: hasPermission('create_product') && !props.withoutAction,
         }}
         onDismiss={props.onClearButtonClick}
         sortBy="product_key|asc"
         nullable
         key="product_selector"
+        clearInputAfterSelection={props.clearInputAfterSelection}
       />
 
       {props.errorMessage && (

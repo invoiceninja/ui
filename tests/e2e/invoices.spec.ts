@@ -107,12 +107,14 @@ const checkEditPage = async (
     await expect(
       page
         .locator('[data-cy="tabs"]')
+        .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
     ).not.toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
+        .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
     ).toBeVisible();
   }
@@ -145,7 +147,12 @@ const createInvoice = async (params: CreateParams) => {
   await page.getByRole('option').first().click();
 
   if (assignTo) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'Settings', exact: true })
+      .first()
+      .click();
     await page.getByLabel('User').first().click();
     await page.getByRole('option', { name: assignTo }).first().click();
   }
@@ -227,7 +234,7 @@ test('can edit invoice', async ({ page }) => {
 
   await checkTableEditability(page, true);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
+  const tableRow = page.locator('tbody').first().getByRole('row').nth(3);
 
   await tableRow.getByRole('link').first().click();
 
@@ -475,7 +482,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   }
 
   await page
-    .getByRole('button', {
+    .getByRole('link', {
       name: 'Documents',
     })
     .click();
@@ -524,7 +531,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   }
 
   await page
-    .getByRole('button', {
+    .getByRole('link', {
       name: 'Documents',
     })
     .click();
@@ -1032,6 +1039,101 @@ test('Prevent back button', async ({ page }) => {
     .click();
 
   await page.waitForURL('**/invoices/create');
+
+  await logout(page);
+});
+
+test('Products combobox various selections', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Invoice' })
+    .click();
+
+  await page.waitForTimeout(1000);
+
+  await page.getByRole('option').first().click();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').first().click();
+
+  await page.waitForTimeout(500);
+
+  await page.locator('[data-combobox-element-id="0"]').first().click();
+
+  await page.waitForTimeout(100);
+
+  expect(
+    (await page.locator('[id="notes"]').first().inputValue()) ===
+      'Et aliquid soluta.'
+  ).toBeTruthy();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').nth(1).click();
+
+  await page.waitForTimeout(500);
+
+  await page.locator('[data-cy="comboboxInput"]').nth(1).fill('Qui');
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-combobox-element-id="0"]').first().click();
+
+  await page.waitForTimeout(100);
+
+  expect(
+    (await page.locator('[id="notes"]').nth(1).inputValue()) ===
+      'Et aliquid soluta.'
+  ).toBeTruthy();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').nth(2).click();
+
+  await page.waitForTimeout(500);
+
+  await page.keyboard.press('ArrowDown');
+
+  await page.waitForTimeout(50);
+
+  await page.keyboard.press('ArrowDown');
+
+  await page.keyboard.press('Enter');
+
+  await page.waitForTimeout(100);
+
+  expect(
+    (await page.locator('[id="notes"]').nth(2).inputValue()) ===
+      'Atque non quibusdam.'
+  ).toBeTruthy();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').nth(3).click();
+
+  await page.waitForTimeout(500);
+
+  await page
+    .locator('[data-cy="comboboxInput"]')
+    .nth(3)
+    .fill('test product name');
+
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(page.getByText('Successfully created invoice')).toBeVisible();
+
+  expect(
+    (await page.locator('[data-cy="comboboxInput"]').nth(3).inputValue()) ===
+      'test product name'
+  ).toBeTruthy();
 
   await logout(page);
 });

@@ -61,6 +61,8 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
 
 export const defaultColumns: string[] = [
   'status',
@@ -238,7 +240,9 @@ export function useRecurringExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -349,7 +353,9 @@ export function useRecurringExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -501,6 +507,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/recurring_expenses/create?action=clone');
@@ -512,6 +519,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/expenses/create?action=clone');

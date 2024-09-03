@@ -142,7 +142,9 @@ export function ViewSlider() {
         <DocumentsTable
           documents={currentTask?.documents || []}
           onDocumentDelete={onSuccess}
-          disableEditableOptions={!entityAssigned(currentTask, true)}
+          disableEditableOptions={
+            !entityAssigned(currentTask, true) && !hasPermission('edit_task')
+          }
         />
       </div>
     </TabGroup>

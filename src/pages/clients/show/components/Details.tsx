@@ -18,6 +18,9 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { route } from '$app/common/helpers/route';
+import { CustomFields, useCustomField } from '$app/components/CustomField';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   client: Client;
@@ -28,10 +31,13 @@ export function Details(props: Props) {
 
   const { client } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const getSetting = useGetSetting();
   const formatMoney = useFormatMoney();
+  const customField = useCustomField();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   return (
     <>
@@ -111,6 +117,30 @@ export function Details(props: Props) {
                     {getSetting(props.client, 'military_time')}
                   </span>
                 )}
+
+                <div className="flex flex-col space-y-1 mt-2">
+                  {['client1', 'client2', 'client3', 'client4'].map((field) => {
+                    const label = customField(field as CustomFields).label();
+                    const value =
+                      client[`custom_value${field.slice(-1)}` as keyof Client];
+
+                    return (
+                      Boolean(label && value) && (
+                        <div key={field} className="flex space-x-2">
+                          <span
+                            className="font-medium"
+                            style={{ color: colors.$3, colorScheme: colors.$0 }}
+                          >
+                            {label}
+                          </span>
+                          <span>
+                            {formatCustomFieldValue(field, value as string)}
+                          </span>
+                        </div>
+                      )
+                    );
+                  })}
+                </div>
               </>
             }
             className="h-full"

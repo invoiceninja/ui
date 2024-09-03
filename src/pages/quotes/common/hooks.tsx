@@ -51,6 +51,7 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
@@ -100,6 +101,8 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -172,7 +175,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );
@@ -339,7 +342,16 @@ export function useActions(params?: Params) {
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'quote',
+    editPageTabs: [
+      'documents',
+      'settings',
+      'activity',
+      'history',
+      'email_history',
+    ],
+  });
 
   const approve = useApprove();
   const bulk = useBulkAction();
@@ -404,6 +416,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => printPdf([quote.id])}
           icon={<Icon element={MdPrint} />}
+          disablePreventNavigation
         >
           {t('print_pdf')}
         </DropdownElement>
@@ -412,6 +425,7 @@ export function useActions(params?: Params) {
       <DropdownElement
         onClick={() => downloadPdf(quote)}
         icon={<Icon element={MdDownload} />}
+        disablePreventNavigation
       >
         {t('download_pdf')}
       </DropdownElement>
@@ -421,6 +435,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => downloadEQuote(quote)}
           icon={<Icon element={MdDownload} />}
+          disablePreventNavigation
         >
           {t('download_e_quote')}
         </DropdownElement>
@@ -437,6 +452,18 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (quote) => (
+      <AddActivityComment
+        entity="quote"
+        entityId={quote.id}
+        label={`#${quote.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
+    (quote) => (
       <DropdownElement
         to={route('/quotes/:id/email', { id: quote.id })}
         icon={<Icon element={MdSend} />}
@@ -448,6 +475,7 @@ export function useActions(params?: Params) {
       <DropdownElement
         onClick={() => quote && openClientPortal(quote)}
         icon={<Icon element={MdCloudCircle} />}
+        disablePreventNavigation
       >
         {t('client_portal')}
       </DropdownElement>
@@ -457,6 +485,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => markSent(quote)}
           icon={<Icon element={MdMarkEmailRead} />}
+          disablePreventNavigation
         >
           {t('mark_sent')}
         </DropdownElement>
@@ -467,6 +496,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => approve(quote)}
           icon={<Icon element={MdDone} />}
+          disablePreventNavigation
         >
           {t('approve')}
         </DropdownElement>
@@ -477,6 +507,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'convert_to_invoice')}
           icon={<Icon element={MdSwitchRight} />}
+          disablePreventNavigation
         >
           {t('convert_to_invoice')}
         </DropdownElement>
@@ -484,7 +515,10 @@ export function useActions(params?: Params) {
     (quote) =>
       !quote.project_id &&
       hasPermission('create_project') && (
-        <ConvertToProjectBulkAction selectedIds={[quote.id]} />
+        <ConvertToProjectBulkAction
+          selectedIds={[quote.id]}
+          disablePreventNavigation
+        />
       ),
     (quote) => (
       <DropdownElement
@@ -522,6 +556,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'archive')}
           icon={<Icon element={MdArchive} />}
+          disablePreventNavigation
         >
           {t('archive')}
         </DropdownElement>
@@ -532,6 +567,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'restore')}
           icon={<Icon element={MdRestore} />}
+          disablePreventNavigation
         >
           {t('restore')}
         </DropdownElement>
@@ -542,6 +578,7 @@ export function useActions(params?: Params) {
         <DropdownElement
           onClick={() => bulk([quote.id], 'delete')}
           icon={<Icon element={MdDelete} />}
+          disablePreventNavigation
         >
           {t('delete')}
         </DropdownElement>
@@ -896,7 +933,9 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -920,7 +959,9 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}

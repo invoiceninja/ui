@@ -14,7 +14,6 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useTaxRateQuery } from '$app/common/queries/tax-rates';
 import { Badge } from '$app/components/Badge';
-import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
@@ -95,7 +94,7 @@ export function Edit() {
           />
         )
       }
-      breadcrumbs={[]}
+      breadcrumbs={pages}
     >
       {!data && (
         <div className="flex justify-center">
@@ -104,7 +103,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container className="space-y-6" breadcrumbs={pages}>
+        <div className="max-w-3xl">
           <Card
             withSaveButton
             onFormSubmit={formik.handleSubmit}
@@ -145,7 +144,7 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-        </Container>
+        </div>
       )}
     </Settings>
   );

@@ -29,12 +29,15 @@ interface Props extends CommonProps {
   entity: Entity;
   actionKey: string;
   excludePreferences?: boolean;
+  disablePreventNavigation?: boolean;
 }
 
 export function EntityActionElement(props: Props) {
   const navigate = useNavigate();
 
-  const preventNavigation = usePreventNavigation();
+  const preventNavigation = usePreventNavigation({
+    disablePrevention: props.disablePreventNavigation,
+  });
 
   const {
     isCommonActionSection,
@@ -84,6 +87,7 @@ export function EntityActionElement(props: Props) {
       icon={<Icon element={props.icon} />}
       onClick={onClick}
       setVisible={setVisible}
+      disablePreventNavigation={props.disablePreventNavigation}
     >
       {props.children}
     </DropdownElement>

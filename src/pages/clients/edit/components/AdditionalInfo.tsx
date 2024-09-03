@@ -31,6 +31,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   client: Client | undefined;
@@ -45,6 +46,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   const currencies = useCurrencies();
   const languages = useLanguages();
 
+  const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const { data: paymentTermsResponse } = usePaymentTermsQuery({});
@@ -287,7 +289,9 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               <DocumentsTable
                 documents={client?.documents || []}
                 onDocumentDelete={onSuccess}
-                disableEditableOptions={!entityAssigned(client, true)}
+                disableEditableOptions={
+                  !entityAssigned(client, true) && !hasPermission('edit_client')
+                }
               />
             </div>
           </div>

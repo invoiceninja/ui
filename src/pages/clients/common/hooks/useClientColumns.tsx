@@ -35,6 +35,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'name',
@@ -133,7 +134,7 @@ export function useClientColumns() {
     {
       column: 'number',
       id: 'number',
-      label: t('id_number'),
+      label: t('number'),
     },
     {
       column: 'name',
@@ -324,7 +325,9 @@ export function useClientColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -348,7 +351,9 @@ export function useClientColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}

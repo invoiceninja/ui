@@ -8,78 +8,43 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default, SaveOption } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
+import { useAtomValue } from 'jotai';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { v4 } from 'uuid';
-import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { invoiceSumAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import {
-  useActions,
-  useRecurringInvoiceUtilities,
-  useSave,
-} from '../common/hooks';
-import { useRecurringInvoiceQuery } from '../common/queries';
-import { Icon } from '$app/components/icons/Icon';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { MdNotStarted, MdSend } from 'react-icons/md';
-import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
+import { useRecurringInvoiceUtilities } from '../common/hooks';
 import { Card } from '$app/components/cards';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
-import {
-  ConfirmActionModal,
-  confirmActionModalAtom,
-} from '../common/components/ConfirmActionModal';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
+import { RecurringInvoiceContext } from '../create/Create';
 
 export default function Edit() {
-  const { t } = useTranslation();
-  const { id } = useParams();
-  const { documentTitle } = useTitle('edit_recurring_invoice');
-  const { data } = useRecurringInvoiceQuery({ id: id! });
+  const [t] = useTranslation();
 
+  const [searchParams] = useSearchParams();
+
+  const colors = useColorScheme();
+  const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
+  const productColumns = useProductColumns();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const context: RecurringInvoiceContext = useOutletContext();
 
-  const [saveOptions, setSaveOptions] = useState<SaveOption[]>();
+  const { recurringInvoice, errors, client } = context;
 
-  const pages: Page[] = [
-    { name: t('recurring_invoices'), href: '/recurring_invoices' },
-    {
-      name: t('edit_recurring_invoice'),
-      href: route('/recurring_invoices/:id/edit', { id }),
-    },
-  ];
-
-  const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [invoiceSum] = useAtom(invoiceSumAtom);
-
-  const [client, setClient] = useState<Client>();
-  const [errors, setErrors] = useState<ValidationBag>();
+  const invoiceSum = useAtomValue(invoiceSumAtom);
 
   const {
     handleChange,
@@ -88,94 +53,10 @@ export default function Edit() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
-    calculateInvoiceSum,
   } = useRecurringInvoiceUtilities({ client });
 
-  const productColumns = useProductColumns();
-
-  useEffect(() => {
-    if (data) {
-      const ri = cloneDeep(data);
-
-      ri.line_items.map((item) => (item._id = v4()));
-
-      setRecurringInvoice(ri);
-
-      if (ri && ri.client) {
-        setClient(ri.client);
-      }
-    }
-  }, [data]);
-
-  const actions = useActions();
-  const save = useSave({ setErrors });
-
-  const [, setSendConfirmationVisible] = useAtom(confirmActionModalAtom);
-
-  const initializeSaveOptions = (recurringInvoice: RecurringInvoice) => {
-    let currentSaveOptions: SaveOption[] | undefined;
-
-    if (recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT) {
-      const sendNowOption = {
-        onClick: () => setSendConfirmationVisible(true),
-        label: t('send_now'),
-        icon: <Icon element={MdSend} />,
-      };
-
-      currentSaveOptions = [sendNowOption];
-    }
-
-    if (
-      recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
-      recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED
-    ) {
-      const startOption = {
-        onClick: () => save(recurringInvoice as RecurringInvoice, 'start'),
-        label: t('start'),
-        icon: <Icon element={MdNotStarted} />,
-      };
-
-      if (currentSaveOptions) {
-        currentSaveOptions = [...currentSaveOptions, startOption];
-      } else {
-        currentSaveOptions = [startOption];
-      }
-    }
-
-    setSaveOptions(currentSaveOptions);
-  };
-
-  useEffect(() => {
-    recurringInvoice && calculateInvoiceSum(recurringInvoice);
-
-    if (recurringInvoice) {
-      initializeSaveOptions(recurringInvoice);
-    }
-  }, [recurringInvoice]);
-
-  const [searchParams] = useSearchParams();
-  const taskColumns = useTaskColumns();
-  const colors = useColorScheme();
-
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      {...((hasPermission('edit_recurring_invoice') ||
-        entityAssigned(recurringInvoice)) &&
-        recurringInvoice && {
-          onSaveClick: () => save(recurringInvoice),
-          navigationTopRight: (
-            <ResourceActions
-              resource={recurringInvoice}
-              label={t('more_actions')}
-              actions={actions}
-              cypressRef="recurringInvoiceActionDropdown"
-            />
-          ),
-          additionalSaveOptions: saveOptions,
-        })}
-    >
+    <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {recurringInvoice && (
@@ -293,12 +174,6 @@ export default function Edit() {
           )}
         </div>
       )}
-
-      {recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT ? (
-        <ConfirmActionModal
-          onClick={() => save(recurringInvoice as RecurringInvoice, 'send_now')}
-        />
-      ) : null}
-    </Default>
+    </>
   );
 }

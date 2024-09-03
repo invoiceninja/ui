@@ -87,6 +87,36 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   }
+
+  await page
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Documents' })
+    .click();
+
+  await page
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Activity', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'History', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Email History', exact: true })
+    .click();
 };
 
 interface CreateParams {
@@ -116,7 +146,11 @@ const createPurchaseOrder = async (params: CreateParams) => {
   await page.getByRole('option').first().click();
 
   if (assignTo) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'Settings', exact: true })
+      .click();
     await page.getByLabel('User').first().click();
     await page.getByRole('option', { name: assignTo }).first().click();
   }
@@ -480,9 +514,9 @@ test('purchase_order documents preview with edit_purchase_order', async ({
   await page.waitForURL('**/purchase_orders/**/edit');
 
   await page
-    .getByRole('button', {
-      name: 'Documents',
-    })
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Documents' })
     .click();
 
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
@@ -535,9 +569,9 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   await page.waitForURL('**/purchase_orders/**/edit');
 
   await page
-    .getByRole('button', {
-      name: 'Documents',
-    })
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Documents' })
     .click();
 
   await page

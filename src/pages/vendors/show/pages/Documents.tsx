@@ -45,7 +45,9 @@ export default function Documents() {
         <DocumentsTable
           documents={vendor?.documents || []}
           onDocumentDelete={onSuccess}
-          disableEditableOptions={!entityAssigned(vendor, true)}
+          disableEditableOptions={
+            !entityAssigned(vendor, true) && !hasPermission('edit_vendor')
+          }
         />
       </div>
     </div>

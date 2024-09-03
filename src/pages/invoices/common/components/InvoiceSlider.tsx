@@ -44,7 +44,7 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { Tooltip } from '$app/components/Tooltip';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { EmailRecord } from '$app/components/EmailRecord';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -52,6 +52,13 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import Toggle from '$app/components/forms/Toggle';
+import { useColorScheme } from '$app/common/colors';
+import { ViewLineItemExpense } from './ViewLineItemExpense';
+import { ViewLineItemTask } from './ViewLineItemTask';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -104,7 +111,34 @@ export function useGenerateActivityElement() {
             {activity?.contact?.label}
           </Link>
         ) ?? '',
+
+      notes: activity?.notes && (
+        <>
+          <br />
+
+          {activity?.notes}
+        </>
+      ),
+
+      payment_amount: activity?.payment_amount?.label,
+
+      payment: (
+        <Link
+          to={route('/payments/:id/edit', { id: activity?.payment?.hashed_id })}
+        >
+          {activity?.payment?.label}
+        </Link>
+      ),
+
+      credit: (
+        <Link
+          to={route('/credits/:id/edit', { id: activity?.credit?.hashed_id })}
+        >
+          {activity?.credit?.label}
+        </Link>
+      ),
     };
+
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -120,10 +154,16 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
+  const reactSettings = useReactSettings();
+
+  const colors = useColorScheme();
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
+  const activityElement = useGenerateActivityElement();
 
+  const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const queryClient = useQueryClient();
@@ -167,27 +207,7 @@ export function InvoiceSlider() {
     setEmailRecords(response);
   };
 
-  useEffect(() => {
-    if (invoice) {
-      fetchEmailHistory();
-    }
-  }, [invoice]);
-
-  //duplicate not needed
-  // const { data: activities } = useQuery({
-  //   queryKey: [`/api/v1/invoices`, invoice?.id, 'activities'],
-  //   queryFn: () =>
-  //     request(
-  //       'GET',
-  //       endpoint(`/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`)
-  //     ).then(
-  //       (response: GenericSingleResourceResponse<Invoice>) =>
-  //         response.data.data.activities
-  //     ),
-  //   enabled: invoice !== null && isVisible,
-  // });
-
-  const { data: activities2 } = useQuery({
+  const { data: activities } = useQuery({
     queryKey: ['/api/v1/activities/entity', invoice?.id],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
@@ -201,7 +221,11 @@ export function InvoiceSlider() {
     staleTime: Infinity,
   });
 
-  const activityElement = useGenerateActivityElement();
+  useEffect(() => {
+    if (invoice) {
+      fetchEmailHistory();
+    }
+  }, [invoice]);
 
   return (
     <Slider
@@ -304,7 +328,9 @@ export function InvoiceSlider() {
                 width="auto"
                 tooltipElement={
                   <article
-                    className="prose prose-sm"
+                    className={classNames('prose prose-sm', {
+                      'prose-invert': reactSettings.dark_mode,
+                    })}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
                         (resource?.reminder_schedule as string) ?? ''
@@ -385,13 +411,30 @@ export function InvoiceSlider() {
                   ))
               )}
           </div>
+
+          {invoice && (
+            <div className="flex flex-col px-6 py-2">
+              {invoice.line_items.map(
+                (lineItem, index) =>
+                  (lineItem.expense_id || lineItem.task_id) && (
+                    <React.Fragment key={index}>
+                      {lineItem.expense_id && (
+                        <ViewLineItemExpense expenseId={lineItem.expense_id} />
+                      )}
+
+                      {lineItem.task_id && (
+                        <ViewLineItemTask taskId={lineItem.task_id} />
+                      )}
+                    </React.Fragment>
+                  )
+              )}
+            </div>
+          )}
         </div>
 
         <div>
           {resource?.activities && resource.activities.length === 0 && (
-            <NonClickableElement>
-              {t('nothing_to_see_here')}
-            </NonClickableElement>
+            <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
 
           {resource?.activities &&
@@ -399,6 +442,7 @@ export function InvoiceSlider() {
               <ClickableElement
                 key={activity.id}
                 to={`/activities/${activity.id}`}
+                disableNavigation={Boolean(!activity.history.id)}
               >
                 <div className="flex flex-col">
                   <div className="flex space-x-1">
@@ -432,16 +476,47 @@ export function InvoiceSlider() {
         </div>
 
         <div>
-          {activities2?.map((activity) => (
-            <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
-              <p className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </p>
-            </NonClickableElement>
-          ))}
+          <div
+            className="flex items-center border-b px-6 pb-4 justify-between"
+            style={{ borderColor: colors.$4 }}
+          >
+            <Toggle
+              label={t('comments_only')}
+              checked={commentsOnly}
+              onValueChange={(value) => setCommentsOnly(value)}
+            />
+
+            <AddActivityComment
+              entity="invoice"
+              entityId={resource?.id}
+              label={`#${resource?.number}`}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            {activities
+              ?.filter(
+                (activity) =>
+                  (commentsOnly && activity.activity_type_id === 141) ||
+                  !commentsOnly
+              )
+              .map((activity) => (
+                <NonClickableElement
+                  key={activity.id}
+                  className="flex flex-col space-y-2"
+                >
+                  <p>{activityElement(activity)}</p>
+
+                  <p className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{activity.ip}</p>
+                  </p>
+                </NonClickableElement>
+              ))}
+          </div>
         </div>
 
         <div className="flex flex-col">

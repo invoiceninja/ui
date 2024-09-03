@@ -135,6 +135,7 @@ export const settingsRoutes = (
         <Route path="messages" element={<Settings.Messages />} />
         <Route path="customize" element={<Settings.Customize />} />
       </Route>
+      <Route path="e_invoice" element={<Settings.EInvoice />} />
       <Route path="email_settings" element={<Settings.EmailSettings />} />
       <Route
         path="templates_and_reminders"

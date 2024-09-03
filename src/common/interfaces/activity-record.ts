@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface ActivityRecordBase {
+export interface ActivityRecordBase {
   label: string;
   hashed_id: string;
   contact_entity: string;
