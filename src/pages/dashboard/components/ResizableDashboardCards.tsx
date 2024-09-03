@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -15,7 +14,7 @@ import '$app/resources/css/gridLayout.css';
 import { Button, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { Chart } from '$app/pages/dashboard/components/Chart';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Spinner } from '$app/components/Spinner';
 import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
 import { Card } from '$app/components/cards';
@@ -49,6 +48,15 @@ import { Activity } from './Activity';
 import { RecentPayments } from './RecentPayments';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import dayjs from 'dayjs';
+import { useDebounce } from 'react-use';
+import { diff } from 'deep-object-diff';
+import { User } from '$app/common/interfaces/user';
+import { cloneDeep, set } from 'lodash';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { updateUser } from '$app/common/stores/slices/user';
+import { useDispatch } from 'react-redux';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -63,6 +71,8 @@ interface Currency {
   value: string;
   label: string;
 }
+
+export type DashboardGridLayouts = GridLayout.Layouts;
 
 export interface ChartData {
   invoices: {
@@ -85,15 +95,6 @@ export interface ChartData {
     date: string;
     currency: string;
   }[];
-}
-
-interface GridItem {
-  i: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  content: string;
 }
 
 export enum TotalColors {
@@ -170,7 +171,7 @@ const initialLayouts = {
       i: '4',
       x: 0,
       y: 2,
-      w: 49.6,
+      w: 49.5,
       h: 20,
       minH: 18.144,
       minW: 18,
@@ -179,7 +180,7 @@ const initialLayouts = {
       i: '5',
       x: 51,
       y: 2,
-      w: 49.6,
+      w: 49.5,
       h: 20,
       minH: 18.144,
       minW: 18,
@@ -188,7 +189,7 @@ const initialLayouts = {
       i: '6',
       x: 0,
       y: 3,
-      w: 49.6,
+      w: 49.5,
       h: 20,
       minH: 18.144,
       minW: 18,
@@ -197,7 +198,7 @@ const initialLayouts = {
       i: '7',
       x: 51,
       y: 3,
-      w: 49.6,
+      w: 49.5,
       h: 20,
       minH: 18.144,
       minW: 18,
@@ -206,7 +207,7 @@ const initialLayouts = {
       i: '8',
       x: 0,
       y: 4,
-      w: 49.6,
+      w: 49.5,
       h: 20,
       minH: 18.144,
       minW: 18,
@@ -215,7 +216,7 @@ const initialLayouts = {
       i: '9',
       x: 51,
       y: 4,
-      w: 49.6,
+      w: 49.5,
       h: 20,
       minH: 18.144,
       minW: 18,
@@ -224,7 +225,343 @@ const initialLayouts = {
       i: '10',
       x: 0,
       y: 5,
-      w: 49.6,
+      w: 49.5,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+  ],
+  md: [
+    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '2',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '3',
+      x: 0,
+      y: 2,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '4',
+      x: 0,
+      y: 3,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '5',
+      x: 0,
+      y: 4,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '6',
+      x: 0,
+      y: 5,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '7',
+      x: 0,
+      y: 6,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '8',
+      x: 0,
+      y: 7,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '9',
+      x: 0,
+      y: 8,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '10',
+      x: 0,
+      y: 9,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+  ],
+  sm: [
+    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '2',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '3',
+      x: 0,
+      y: 2,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '4',
+      x: 0,
+      y: 3,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '5',
+      x: 0,
+      y: 4,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '6',
+      x: 0,
+      y: 5,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '7',
+      x: 0,
+      y: 6,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '8',
+      x: 0,
+      y: 7,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '9',
+      x: 0,
+      y: 8,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '10',
+      x: 0,
+      y: 9,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+  ],
+  xs: [
+    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '2',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '3',
+      x: 0,
+      y: 2,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '4',
+      x: 0,
+      y: 3,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '5',
+      x: 0,
+      y: 4,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '6',
+      x: 0,
+      y: 5,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '7',
+      x: 0,
+      y: 6,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '8',
+      x: 0,
+      y: 7,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '9',
+      x: 0,
+      y: 8,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '10',
+      x: 0,
+      y: 9,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+  ],
+  xxs: [
+    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '2',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '3',
+      x: 0,
+      y: 2,
+      w: 100,
+      h: 25.4,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '4',
+      x: 0,
+      y: 3,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '5',
+      x: 0,
+      y: 4,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '6',
+      x: 0,
+      y: 5,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '7',
+      x: 0,
+      y: 6,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '8',
+      x: 0,
+      y: 7,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '9',
+      x: 0,
+      y: 8,
+      w: 100,
+      h: 20,
+      minH: 18.144,
+      minW: 18,
+    },
+    {
+      i: '10',
+      x: 0,
+      y: 9,
+      w: 100,
       h: 20,
       minH: 18.144,
       minW: 18,
@@ -238,22 +575,23 @@ export function ResizableDashboardCards() {
   const { Preferences, update } = usePreferences();
 
   const enabled = useEnabled();
+  const dispatch = useDispatch();
   const formatMoney = useFormatMoney();
-
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const user = useCurrentUser();
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const settings = useReactSettings();
 
-  const [width, setWidth] = useState<number>(1000);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
-  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>('lg');
-  const [layouts, setLayouts] = useState<GridLayout.Layouts>(initialLayouts);
 
+  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>();
+  const [layouts, setLayouts] = useState<DashboardGridLayouts>(initialLayouts);
+
+  const [isLayoutsInitialized, setIsLayoutsInitialized] =
+    useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   const chartScale =
@@ -312,23 +650,51 @@ export function ResizableDashboardCards() {
     staleTime: Infinity,
   });
 
-  const onLayoutChange = (newLayout: GridLayout.Layout[]) => {
-    console.log(newLayout);
-
-    setLayouts((current) => ({ ...current, [layoutBreakpoint]: newLayout }));
+  const onResizeStop = (
+    layout: GridLayout.Layout[],
+    oldItem: GridLayout.Layout,
+    newItem: GridLayout.Layout
+  ) => {
+    if (layoutBreakpoint) {
+      setLayouts((current) => ({
+        ...current,
+        [layoutBreakpoint]: layout.map((item) => ({
+          ...item,
+          h: item.y === newItem.y ? newItem.h : item.h,
+        })),
+      }));
+    }
   };
 
-  // const onResizeStop = (
-  //   layout: GridLayout.Layout[],
-  //   oldItem: GridLayout.Layout,
-  //   newItem: GridLayout.Layout
-  // ) => {
-  //   setLayouts(
-  //     layout.map((item) =>
-  //       item.i === newItem.i ? { ...item, h: newItem.h } : item
-  //     )
-  //   );
-  // };
+  const onDragStop = (layout: GridLayout.Layout[]) => {
+    layoutBreakpoint &&
+      setLayouts((current) => ({
+        ...current,
+        [layoutBreakpoint]: layout,
+      }));
+  };
+
+  const handleUpdateUserPreferences = () => {
+    const updatedUser = cloneDeep(user) as User;
+
+    set(
+      updatedUser,
+      'company_user.react_settings.dashboard_cards_configuration',
+      cloneDeep(layouts)
+    );
+
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+      updatedUser
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(updatedUser, 'company_user', response.data.data);
+
+      $refetch(['company_users']);
+
+      dispatch(updateUser(updatedUser));
+    });
+  };
 
   useEffect(() => {
     setBody((current) => ({
@@ -372,29 +738,40 @@ export function ResizableDashboardCards() {
   }, [chart.data]);
 
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      if (entries[0]) {
-        setWidth(entries[0].contentRect.width);
+    if (layoutBreakpoint) {
+      if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
+        setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
       }
-    });
 
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
+      setIsLayoutsInitialized(true);
     }
+  }, [layoutBreakpoint]);
 
-    return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
+  useDebounce(
+    () => {
+      if (
+        settings &&
+        !settings.dashboard_cards_configuration &&
+        Object.keys(diff(initialLayouts, layouts)).length
+      ) {
+        handleUpdateUserPreferences();
       }
-    };
-  }, []);
+
+      if (
+        settings &&
+        settings.dashboard_cards_configuration &&
+        Object.keys(diff(settings.dashboard_cards_configuration, layouts))
+          .length
+      ) {
+        handleUpdateUserPreferences();
+      }
+    },
+    1500,
+    [layouts]
+  );
 
   return (
-    <div
-      className={classNames({ 'select-none': isEditMode })}
-      ref={containerRef}
-      style={{ width: '100%' }}
-    >
+    <div className={classNames('w-full', { 'select-none': isEditMode })}>
       {!totals.isLoading ? (
         <ResponsiveGridLayout
           className="layout"
@@ -405,26 +782,29 @@ export function ResizableDashboardCards() {
             xs: 300,
             xxs: 0,
           }}
-          width={width}
           layouts={layouts}
-          cols={{ lg: 100, md: 30, sm: 30, xs: 30, xxs: 30 }}
+          cols={{ lg: 100, md: 100, sm: 60, xs: 40, xxs: 30 }}
           draggableHandle=".drag-handle"
           margin={[0, 20]}
           rowHeight={1}
           isDraggable={isEditMode}
           isDroppable={isEditMode}
           isResizable={isEditMode}
-          onLayoutChange={onLayoutChange}
-          onBreakpointChange={(breakPoint) => setLayoutBreakpoint(breakPoint)}
+          onBreakpointChange={(currentBreakPoint) =>
+            setLayoutBreakpoint(currentBreakPoint)
+          }
+          onResizeStop={onResizeStop}
+          onDragStop={onDragStop}
           resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
         >
-          {totals.isLoading && (
+          {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
               <Spinner />
             </div>
           )}
 
           {/* Quick date, currency & date picker. */}
+
           <div key="1" className="flex justify-end">
             <div className="flex space-x-2">
               {currencies && (

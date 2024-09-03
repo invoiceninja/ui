@@ -110,6 +110,7 @@ export function PastDueInvoices() {
             height: '19.9rem',
           }}
           withoutSortQueryParameter
+          withResourcefulActions
         />
       </div>
     </Card>
