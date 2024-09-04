@@ -266,10 +266,12 @@ export default function Refund() {
                     </div>
                   </Element>
 
-                  {errors?.errors[`invoices.${[index]}.amount`] && (
+                  {(errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                    errors?.errors[`invoices.${[index]}.amount`]) && (
                     <div className="px-6">
                       <Alert className="mt-2 break-all" type="danger">
-                        {errors?.errors[`invoices.${[index]}.amount`]}
+                        {errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                          errors?.errors[`invoices.${[index]}.amount`]}
                       </Alert>
                     </div>
                   )}
