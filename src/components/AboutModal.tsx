@@ -223,7 +223,8 @@ export function AboutModal(props: Props) {
         {isSelfHosted() &&
           latestVersion &&
           currentSystemInfo?.api_version &&
-          currentSystemInfo.api_version !== latestVersion && (
+          currentSystemInfo.api_version !== latestVersion &&
+          !currentSystemInfo?.is_docker && (
             <Button
               behavior="button"
               className="flex items-center"
