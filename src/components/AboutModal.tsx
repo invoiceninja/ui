@@ -521,13 +521,13 @@ export function AboutModal(props: Props) {
       </Modal>
 
       <Modal
-        title={t('updating_app')}
+        title={t('self-update')}
         visible={isUpgradeLoadingModalOpen}
         onClose={() => {}}
         disableClosing
       >
         <span className="text-center py-3 font-medium">
-          {t('upgrade_in_progress')}
+          {t('in_progress')}
         </span>
       </Modal>
 
