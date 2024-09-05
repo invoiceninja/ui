@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from '$app/common/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface NotificationOptionType {
