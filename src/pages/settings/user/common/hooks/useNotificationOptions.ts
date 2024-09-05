@@ -26,7 +26,7 @@ export function useNotificationOptions() {
     },
     {
       key: 'invoice_sent',
-      label: trans('invoice_sent', { count: '' }),
+      label: t('invoice_sent_notification_label'),
     },
     {
       key: 'invoice_viewed',
