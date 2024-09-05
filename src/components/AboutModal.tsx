@@ -156,12 +156,8 @@ export function AboutModal(props: Props) {
 
   const handleUpdateApp = (password: string) => {
     if (!isFormBusy) {
-      const timeoutId = setTimeout(() => {
-        setIsUpgradeLoadingModalOpen(true);
-      }, 25000);
-
-      toast.processing();
       setIsFormBusy(true);
+      setIsUpgradeLoadingModalOpen(true);
 
       request(
         'POST',
@@ -177,8 +173,8 @@ export function AboutModal(props: Props) {
           }
         })
         .finally(() => {
-          clearTimeout(timeoutId);
           setIsFormBusy(false);
+          setIsUpgradeLoadingModalOpen(false);
         });
     }
   };
@@ -526,11 +522,14 @@ export function AboutModal(props: Props) {
       </Modal>
 
       <Modal
-        title={t('updating_app')}
+        title={t('self-update')}
         visible={isUpgradeLoadingModalOpen}
-        onClose={() => setIsUpgradeLoadingModalOpen(false)}
+        onClose={() => {}}
+        disableClosing
       >
-        {t('upgrade_in_progress')}
+        <span className="text-center py-3 font-medium">
+          {t('in_progress')}
+        </span>
       </Modal>
 
       <PasswordConfirmation
