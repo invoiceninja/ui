@@ -57,6 +57,8 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
+import { DashboardCard } from './DashboardCard';
+import { MdRefresh } from 'react-icons/md';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -148,11 +150,21 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 
 const initialLayouts = {
   lg: [
-    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 6.3,
+      minH: 6.3,
+      minW: 100,
+      isResizable: false,
+    },
     {
       i: '2',
       x: 0,
-      y: 1,
+      y: 2,
       w: 33,
       h: 25.4,
       minH: 18.144,
@@ -161,7 +173,7 @@ const initialLayouts = {
     {
       i: '3',
       x: 40,
-      y: 1,
+      y: 2,
       w: 66,
       h: 25.4,
       minH: 18.144,
@@ -170,7 +182,7 @@ const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 2,
+      y: 3,
       w: 49.5,
       h: 20,
       minH: 18.144,
@@ -179,7 +191,7 @@ const initialLayouts = {
     {
       i: '5',
       x: 51,
-      y: 2,
+      y: 3,
       w: 49.5,
       h: 20,
       minH: 18.144,
@@ -188,7 +200,7 @@ const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 3,
+      y: 4,
       w: 49.5,
       h: 20,
       minH: 18.144,
@@ -197,7 +209,7 @@ const initialLayouts = {
     {
       i: '7',
       x: 51,
-      y: 3,
+      y: 4,
       w: 49.5,
       h: 20,
       minH: 18.144,
@@ -206,7 +218,7 @@ const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 4,
+      y: 5,
       w: 49.5,
       h: 20,
       minH: 18.144,
@@ -215,7 +227,7 @@ const initialLayouts = {
     {
       i: '9',
       x: 51,
-      y: 4,
+      y: 5,
       w: 49.5,
       h: 20,
       minH: 18.144,
@@ -224,7 +236,7 @@ const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 5,
+      y: 6,
       w: 49.5,
       h: 20,
       minH: 18.144,
@@ -314,6 +326,15 @@ const initialLayouts = {
       minH: 18.144,
       minW: 18,
     },
+    {
+      i: '11',
+      x: 0,
+      y: 1,
+      w: 40,
+      h: 30,
+      minH: 10,
+      minW: 10,
+    },
   ],
   sm: [
     { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
@@ -397,6 +418,15 @@ const initialLayouts = {
       h: 20,
       minH: 18.144,
       minW: 18,
+    },
+    {
+      i: '11',
+      x: 0,
+      y: 1,
+      w: 40,
+      h: 30,
+      minH: 10,
+      minW: 10,
     },
   ],
   xs: [
@@ -482,6 +512,15 @@ const initialLayouts = {
       minH: 18.144,
       minW: 18,
     },
+    {
+      i: '11',
+      x: 0,
+      y: 1,
+      w: 40,
+      h: 30,
+      minH: 10,
+      minW: 10,
+    },
   ],
   xxs: [
     { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
@@ -565,6 +604,15 @@ const initialLayouts = {
       h: 20,
       minH: 18.144,
       minW: 18,
+    },
+    {
+      i: '11',
+      x: 0,
+      y: 1,
+      w: 40,
+      h: 30,
+      minH: 10,
+      minW: 10,
     },
   ],
 };
@@ -674,6 +722,36 @@ export function ResizableDashboardCards() {
       }));
   };
 
+  const updateLayoutHeight = () => {
+    const currentHeight =
+      document.getElementById('cardsContainer')?.clientHeight;
+
+    setLayouts((currentLayouts) => {
+      const updatedLayouts = cloneDeep(currentLayouts);
+
+      const cardsNumbers =
+        user?.company_user?.settings.dashboard_fields?.length;
+
+      Object.keys(updatedLayouts).forEach((breakpoint) => {
+        updatedLayouts[breakpoint] = updatedLayouts[breakpoint].map((item) =>
+          item.i === '1'
+            ? {
+                ...item,
+                h:
+                  currentHeight && cardsNumbers
+                    ? (currentHeight + 80) / 30
+                    : cardsNumbers
+                    ? 6.3
+                    : 0,
+              }
+            : item
+        );
+      });
+
+      return updatedLayouts;
+    });
+  };
+
   const handleUpdateUserPreferences = () => {
     const updatedUser = cloneDeep(user) as User;
 
@@ -682,6 +760,9 @@ export function ResizableDashboardCards() {
       'company_user.react_settings.dashboard_cards_configuration',
       cloneDeep(layouts)
     );
+
+    // delete updatedUser.company_user.react_settings
+    //   .dashboard_cards_configuration;
 
     request(
       'PUT',
@@ -740,12 +821,21 @@ export function ResizableDashboardCards() {
   useEffect(() => {
     if (layoutBreakpoint) {
       if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
-        setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
+        //setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
       }
 
       setIsLayoutsInitialized(true);
     }
   }, [layoutBreakpoint]);
+
+  useEffect(() => {
+    if (isLayoutsInitialized) {
+      updateLayoutHeight();
+    }
+  }, [
+    user?.company_user?.settings.dashboard_fields?.length,
+    isLayoutsInitialized,
+  ]);
 
   useDebounce(
     () => {
@@ -805,7 +895,7 @@ export function ResizableDashboardCards() {
 
           {/* Quick date, currency & date picker. */}
 
-          <div key="1" className="flex justify-end">
+          <div key="0" className="flex justify-end">
             <div className="flex space-x-2">
               {currencies && (
                 <SelectField
@@ -922,15 +1012,49 @@ export function ResizableDashboardCards() {
               >
                 <Icon element={BiMove} size={23} />
               </div>
+
+              {isEditMode && (
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() =>
+                    layoutBreakpoint &&
+                    setLayouts((currentLayouts) => ({
+                      ...currentLayouts,
+                      [layoutBreakpoint]:
+                        initialLayouts[
+                          layoutBreakpoint as keyof typeof initialLayouts
+                        ],
+                    }))
+                  }
+                >
+                  <Icon element={MdRefresh} size={23} />
+                </div>
+              )}
             </div>
           </div>
 
-          {/* <DashboardCards
-        dateRange={dateRange}
-        startDate={dates.start_date}
-        endDate={dates.end_date}
-        currencyId={currency.toString()}
-      /> */}
+          {Boolean(user?.company_user?.settings.dashboard_fields?.length) && (
+            <div
+              key="1"
+              id="cardsContainer"
+              className={classNames('flex flex-wrap gap-5 drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
+              {user?.company_user?.settings.dashboard_fields?.map(
+                (field, index) => (
+                  <DashboardCard
+                    key={(20 + index).toString()}
+                    field={field}
+                    dateRange={dateRange}
+                    startDate={dates.start_date}
+                    endDate={dates.end_date}
+                    currencyId={currency.toString()}
+                  />
+                )
+              )}
+            </div>
+          )}
 
           {company && (
             <div
@@ -941,7 +1065,6 @@ export function ResizableDashboardCards() {
             >
               <Card
                 title={t('account_login_text')}
-                className="col-span-12 xl:col-span-4"
                 height="full"
                 withScrollableBody
               >

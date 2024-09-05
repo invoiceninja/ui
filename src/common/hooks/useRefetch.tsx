@@ -20,6 +20,7 @@ export const keys = {
       '/api/v1/activities/entity',
       '/api/v1/activities',
       '/api/v1/documents',
+      '/api/v1/charts/calculated_fields',
     ],
   },
   designs: {
@@ -64,6 +65,7 @@ export const keys = {
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
       '/api/v1/documents',
+      '/api/v1/charts/calculated_fields',
     ],
   },
   group_settings: {
@@ -80,6 +82,7 @@ export const keys = {
       '/api/v1/charts/chart_summary_v2',
       '/api/v1/activities',
       '/api/v1/documents',
+      '/api/v1/charts/calculated_fields',
     ],
   },
   purchase_orders: {
@@ -96,7 +99,11 @@ export const keys = {
   },
   tasks: {
     path: '/api/v1/tasks',
-    dependencies: ['/api/v1/projects', '/api/v1/documents'],
+    dependencies: [
+      '/api/v1/projects',
+      '/api/v1/documents',
+      '/api/v1/charts/calculated_fields',
+    ],
   },
   tax_rates: {
     path: '/api/v1/tax_rates',
@@ -181,6 +188,7 @@ export const keys = {
       '/api/v1/clients',
       '/api/v1/activities',
       '/api/v1/documents',
+      '/api/v1/charts/calculated_fields',
     ],
   },
   recurring_invoices: {

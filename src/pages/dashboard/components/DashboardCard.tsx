@@ -9,7 +9,6 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { DashboardField } from '$app/common/interfaces/company-user';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,9 +18,6 @@ import { useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
-
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 
 interface DashboardCardsProps {
   dateRange: string;
@@ -39,7 +35,7 @@ export const PERIOD_LABELS = {
   previous: 'previous_period',
 };
 
-function Card(props: CardProps) {
+export function DashboardCard(props: CardProps) {
   const [t] = useTranslation();
 
   const { dateRange, startDate, endDate, field, currencyId } = props;
@@ -48,31 +44,46 @@ function Card(props: CardProps) {
   const formatMoney = useFormatMoney();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [responseData, setResponseData] = useState<number>(0);
+  const [responseData, setResponseData] = useState<number>();
 
   useEffect(() => {
-    setIsFormBusy(true);
+    (async () => {
+      typeof responseData === 'undefined' && setIsFormBusy(true);
 
-    queryClient.fetchQuery(['/api/v1/charts/calculated_fields'], () =>
-      request('POST', endpoint('/api/v1/charts/calculated_fields'), {
-        date_range: dateRange,
-        start_date: startDate,
-        end_date: endDate,
-        field: field.field,
-        calculation: field.calculate,
-        period: field.period,
-        format: field.format,
-        currency_id: currencyId,
-      })
-        .then((response) => setResponseData(response.data))
-        .finally(() => setIsFormBusy(false))
-    );
+      const response = await queryClient.fetchQuery(
+        [
+          '/api/v1/charts/calculated_fields',
+          dateRange,
+          startDate,
+          endDate,
+          field.field,
+          field.calculate,
+          field.period,
+          currencyId,
+        ],
+        () =>
+          request('POST', endpoint('/api/v1/charts/calculated_fields'), {
+            date_range: dateRange,
+            start_date: startDate,
+            end_date: endDate,
+            field: field.field,
+            calculation: field.calculate,
+            period: field.period,
+            format: field.format,
+            currency_id: currencyId,
+          }).then((response) => response.data),
+        { staleTime: Infinity }
+      );
+
+      setResponseData(response);
+      typeof responseData === 'undefined' && setIsFormBusy(false);
+    })();
   }, [field]);
 
   return (
-    <CardElement>
+    <CardElement className="flex px-6">
       {isFormBusy && (
-        <div className="flex justify-center">
+        <div className="flex items-center justify-center">
           <Spinner />
         </div>
       )}
@@ -81,9 +92,11 @@ function Card(props: CardProps) {
         <div className="flex flex-col items-center justify-center space-y-1">
           <span className="font-medium">{t(FIELDS_LABELS[field.field])}</span>
 
-          {field.format === 'money' && (
-            <span>{formatMoney(responseData, '', '')}</span>
-          )}
+          <span>
+            {field.format === 'money' && field.calculate !== 'count'
+              ? formatMoney(responseData ?? 0, '', '')
+              : responseData}
+          </span>
 
           <span>
             {t(
@@ -94,38 +107,5 @@ function Card(props: CardProps) {
         </div>
       )}
     </CardElement>
-  );
-}
-
-export function DashboardCards(props: DashboardCardsProps) {
-  const { dateRange, startDate, endDate, currencyId } = props;
-
-  const currentUser = useCurrentUser();
-
-  const [currentFields, setCurrentFields] = useState<DashboardField[]>([]);
-
-  useEffect(() => {
-    if (currentUser && Object.keys(currentUser).length) {
-      setCurrentFields(
-        currentUser.company_user?.settings.dashboard_fields ?? []
-      );
-    }
-  }, [currentUser]);
-
-  return (
-    <>
-      <div className="grid grid-cols-7 mt-4 gap-4">
-        {currentFields.map((field, index) => (
-          <Card
-            key={index}
-            field={field}
-            dateRange={dateRange}
-            startDate={startDate}
-            endDate={endDate}
-            currencyId={currencyId}
-          />
-        ))}
-      </div>
-    </>
   );
 }

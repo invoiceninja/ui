@@ -32,7 +32,7 @@ export interface CompanyUser {
   react_settings: ReactSettings;
 }
 
-type Format = 'time' | 'money';
+export type Format = 'time' | 'money';
 export type Period = 'current' | 'previous' | 'total';
 export type Calculate = 'sum' | 'avg' | 'count';
 export type Field =

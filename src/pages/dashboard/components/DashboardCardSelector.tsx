@@ -18,6 +18,7 @@ import {
   CompanyUser,
   DashboardField,
   Field,
+  Format,
   Period,
 } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -32,14 +33,14 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, isEqual, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgOptions } from 'react-icons/cg';
 import { MdClose, MdDragHandle } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
-import { PERIOD_LABELS } from './DashboardCards';
+import { PERIOD_LABELS } from './DashboardCard';
 
 const FIELDS = [
   'active_invoices',
@@ -102,7 +103,7 @@ export function DashboardCardSelector() {
       field: '' as Field,
       period: 'current',
       calculate: 'sum',
-      format: 'time',
+      format: 'money',
     });
   };
 
@@ -116,9 +117,9 @@ export function DashboardCardSelector() {
     setCurrentFields(sorted);
   };
 
-  const handleDelete = (fieldKey: Field) => {
+  const handleDelete = (field: DashboardField) => {
     const updatedCurrentColumns = currentFields.filter(
-      (field) => field.field !== fieldKey
+      (currentField) => !isEqual(currentField, field)
     );
 
     setCurrentFields(updatedCurrentColumns);
@@ -247,7 +248,7 @@ export function DashboardCardSelector() {
                               className="cursor-pointer"
                               element={MdClose}
                               size={24}
-                              onClick={() => handleDelete(field.field)}
+                              onClick={() => handleDelete(field)}
                             />
 
                             <div className="flex flex-col">
@@ -294,17 +295,6 @@ export function DashboardCardSelector() {
           >
             {t('add_field')}
           </Button>
-
-          {/* <SelectField>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-          </SelectField> */}
 
           <Button
             behavior="button"
@@ -371,6 +361,22 @@ export function DashboardCardSelector() {
             <option value="avg">{t('average')}</option>
             <option value="count">{t('count')}</option>
           </SelectField>
+
+          {currentField.field.endsWith('tasks') && (
+            <SelectField
+              label={t('format')}
+              value={currentField.format}
+              onValueChange={(value) =>
+                setCurrentField((currentField) => ({
+                  ...currentField,
+                  format: value as Format,
+                }))
+              }
+            >
+              <option value="money">{t('money')}</option>
+              <option value="time">{t('time')}</option>
+            </SelectField>
+          )}
 
           <Button
             behavior="button"
