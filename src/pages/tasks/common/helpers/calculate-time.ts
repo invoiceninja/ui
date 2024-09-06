@@ -40,8 +40,14 @@ export function calculateHours(log: string, includeRunning = false) {
       continue;
     }
 
-    const finishTime = finish !== 0 ? finish : Math.floor(Date.now() / 1000);
-    const durationInSeconds = finishTime - start;
+    const finishTime =
+      finish !== 0
+        ? typeof finish === 'number'
+          ? finish
+          : 0
+        : Math.floor(Date.now() / 1000);
+    const durationInSeconds =
+      finishTime - (typeof start === 'number' ? start : 0);
 
     seconds += Math.max(durationInSeconds, 0);
   }
