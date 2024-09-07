@@ -23,7 +23,7 @@ export function useCompanyTimeZone() {
   useEffect(() => {
     if (statics?.timezones) {
       const result = statics.timezones.find(
-        (format: any) => format.id === company?.settings?.timezone_id ?? '1'
+        (format: any) => format.id === (company?.settings?.timezone_id ?? '1')
       );
 
       if (result) {
