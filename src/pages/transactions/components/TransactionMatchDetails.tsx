@@ -243,6 +243,7 @@ export function TransactionMatchDetails(props: Props) {
                   dataKey="invoices"
                   setSelectedIds={setInvoiceIds}
                   selectedIds={invoiceIds}
+                  calculateTotal
                 />
               ) : (
                 <>
@@ -323,6 +324,7 @@ export function TransactionMatchDetails(props: Props) {
                   dataKey="payments"
                   setSelectedIds={setPaymentIds}
                   selectedIds={paymentIds}
+                  calculateTotal
                 />
               ) : (
                 <ListBox

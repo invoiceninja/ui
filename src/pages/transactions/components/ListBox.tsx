@@ -23,6 +23,8 @@ import { useExpensesQuery } from '$app/common/queries/expenses';
 import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import collect from 'collect.js';
 
 export interface ResourceItem {
   id: string;
@@ -63,6 +65,10 @@ interface Props extends CommonProps {
 export function ListBox(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
+  const formatMoney = useFormatMoney();
+
   const [searchParams, setSearchParams] = useState<SearchInput>({
     searchTerm: '',
     minAmount: 0,
@@ -71,15 +77,11 @@ export function ListBox(props: Props) {
     endDate: '',
   });
 
-  const isInvoicesDataKey = props.dataKey === 'invoices';
-
   const isVendorsDataKey = props.dataKey === 'vendors';
-
-  const isExpenseCategoriesDataKey = props.dataKey === 'categories';
-
-  const isPaymentsDataKey = props.dataKey === 'payments';
-
   const isExpensesDataKey = props.dataKey === 'expenses';
+  const isPaymentsDataKey = props.dataKey === 'payments';
+  const isInvoicesDataKey = props.dataKey === 'invoices';
+  const isExpenseCategoriesDataKey = props.dataKey === 'categories';
 
   const [clientId, setClientId] = useState<string>();
 
@@ -171,6 +173,25 @@ export function ListBox(props: Props) {
     }));
   };
 
+  const getCalculatedTotalByCurrency = (currencyId: string) => {
+    return (
+      (
+        resourceItems?.filter(
+          (item) => isItemChecked(item.id) && item.currency_id === currencyId
+        ) || []
+      ).reduce((total, resourceItem) => total + resourceItem.amount, 0) ?? 0
+    );
+  };
+
+  const getAllUniqueResourceCurrencies = () => {
+    return collect(
+      resourceItems?.filter((item) => isItemChecked(item.id)) || []
+    )
+      .pluck('currency_id')
+      .unique()
+      .toArray();
+  };
+
   useEffect(() => {
     setClients(clientsResponse);
 
@@ -201,12 +222,10 @@ export function ListBox(props: Props) {
     }
   }, [props.selectedIds]);
 
-  const colors = useColorScheme();
-
   return (
     <div
       className={classNames('flex flex-col flex-1 w-full relative', {
-        'pb-5': props.calculateTotal,
+        'pb-7': props.calculateTotal,
       })}
       style={{
         color: colors.$3,
@@ -275,7 +294,19 @@ export function ListBox(props: Props) {
 
               <span>&middot;</span>
 
-              <span></span>
+              <span>
+                {getAllUniqueResourceCurrencies()
+                  .map((currencyId, index) =>
+                    formatMoney(
+                      getCalculatedTotalByCurrency(
+                        currencyId as unknown as string
+                      ),
+                      resourceItems?.[index].country_id,
+                      currencyId as unknown as string
+                    )
+                  )
+                  .join(' | ')}
+              </span>
             </div>
           </div>
         )}
