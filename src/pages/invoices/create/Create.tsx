@@ -145,11 +145,11 @@ export default function Create() {
   }, [data]);
 
   const settingResolver = (client: Client, prop: string) => {
-    if (client?.settings && client?.settings[prop]) {
+    if (typeof client?.settings?.[prop] !== 'undefined') {
       return client.settings[prop];
     }
 
-    if (client?.group_settings && client?.group_settings?.settings[prop]) {
+    if (typeof client?.group_settings?.settings?.[prop] !== 'undefined') {
       return client?.group_settings?.settings[prop];
     }
 
