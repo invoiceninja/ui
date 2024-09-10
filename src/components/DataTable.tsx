@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -152,6 +153,9 @@ interface Props<T> extends CommonProps {
   withoutPerPageAsPreference?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
+  enableFormattingEditPageLinkColumn?: boolean;
+  formatEditPageLinkColumn?: (value: ReactNode, resource: T) => ReactElement;
+  editPageLinkColumnOptions?: string[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -193,6 +197,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutPerPageAsPreference = false,
     withoutSortQueryParameter = false,
     showRestoreBulk,
+    enableFormattingEditPageLinkColumn,
+    formatEditPageLinkColumn,
+    editPageLinkColumnOptions = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -742,7 +749,15 @@ export function DataTable<T extends object>(props: Props<T>) {
                           }
                         }}
                       >
-                        {column.format
+                        {formatEditPageLinkColumn &&
+                        editPageLinkColumnOptions.includes(column.id)
+                          ? formatEditPageLinkColumn(
+                              column.format
+                                ? column.format(resource[column.id], resource)
+                                : resource[column.id],
+                              resource as T
+                            )
+                          : column.format
                           ? column.format(resource[column.id], resource)
                           : resource[column.id]}
                       </Td>

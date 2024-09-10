@@ -36,7 +36,7 @@ import {
   taskSliderAtom,
   taskSliderVisibilityAtom,
 } from '../common/components/TaskSlider';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
@@ -45,6 +45,8 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { ExtensionBanner } from '../common/components/ExtensionBanner';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { route } from '$app/common/helpers/route';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -55,6 +57,8 @@ export default function Tasks() {
   const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
+
+  const isFormattingEditPageLinkColumnEnabled = useRef<boolean>(false);
 
   const actions = useActions();
   const filters = useTaskFilters();
@@ -85,6 +89,14 @@ export default function Tasks() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+
+  useEffect(() => {
+    if (columns.some((column) => column.id === 'number')) {
+      isFormattingEditPageLinkColumnEnabled.current = false;
+    } else {
+      isFormattingEditPageLinkColumnEnabled.current = true;
+    }
+  }, [columns]);
 
   return (
     <Default
@@ -135,6 +147,33 @@ export default function Tasks() {
           setSliderTaskId(quote.id);
           setTaskSliderVisibility(true);
         }}
+        formatEditPageLinkColumn={(value, task) => {
+          const lastValue = isFormattingEditPageLinkColumnEnabled.current;
+
+          if (value) {
+            isFormattingEditPageLinkColumnEnabled.current = false;
+          }
+
+          return value && lastValue ? (
+            <DynamicLink
+              to={route('/tasks/:id/edit', { id: task.id })}
+              renderSpan={disableNavigation('task', task)}
+            >
+              {value}
+            </DynamicLink>
+          ) : (
+            (value as unknown as ReactElement)
+          );
+        }}
+        editPageLinkColumnOptions={[
+          'description',
+          'number',
+          'time_log',
+          'entity_state',
+          'calculated_rate',
+          'is_running',
+          'rate',
+        ]}
       />
 
       {!disableNavigation('task', taskSlider) && <TaskSlider />}
