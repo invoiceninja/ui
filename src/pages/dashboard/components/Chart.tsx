@@ -135,7 +135,9 @@ export function Chart(props: Props) {
     const largestTick = chartData.reduce((maxTick, data) => {
       return properties.reduce((currentMax, property) => {
         const currentTickLength = formatMoney(
-          Number(data[property as keyof typeof data]) ?? 0,
+          typeof data[property as keyof typeof data] === 'number'
+            ? Number((data[property as keyof typeof data] as number) * 10)
+            : 0,
           company?.settings.country_id,
           currency
         ).toString().length;

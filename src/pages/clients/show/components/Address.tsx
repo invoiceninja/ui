@@ -32,21 +32,24 @@ export function Address(props: Props) {
             title={t('address')}
             value={
               <>
-                <p>
+                <p className="break-all">
                   {client.address1.length > 0 && client.address1}
                   {client.address1.length > 0 && <br />}
                   {client.address2}
                 </p>
 
-                <p>
+                <p className="break-all">
                   {client.city.length > 0 && client.city} &nbsp;
                   {client.state} &nbsp;
                   {client.postal_code.length > 0 && client.postal_code}
                 </p>
 
-                <p>{resolveCountry(client.country_id)?.name}</p>
+                <p className="break-all">
+                  {resolveCountry(client.country_id)?.name}
+                </p>
               </>
             }
+            withoutTruncate
             className="h-full"
           />
         </div>
