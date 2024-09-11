@@ -10,7 +10,7 @@
 
 export function getEditPageLinkColumnOptions() {
   return {
-    mainEditPageLinkColumns: ['number', 'status_id'],
+    mainEditPageLinkColumns: ['number', 'status'],
     editPageLinkColumnOptions: [
       'date',
       'amount',

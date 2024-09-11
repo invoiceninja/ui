@@ -70,6 +70,7 @@ export interface DateRangeColumn {
 export type DataTableColumn<T = any> = {
   id: string;
   label: string;
+  column?: string;
   format?: (field: string | number, resource: T) => unknown;
 };
 
@@ -474,7 +475,9 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   useEffect(() => {
     if (
-      props.columns.some((column) => editPageLinkColumns.includes(column.id))
+      props.columns.some(
+        (column) => column.column && editPageLinkColumns.includes(column.column)
+      )
     ) {
       firstEditPageLinkColumnOption.current = '';
     }
@@ -496,8 +499,8 @@ export function DataTable<T extends object>(props: Props<T>) {
       return currentValue;
     }
 
-    const isEditPageColumnAvailable = props.columns.some((col) =>
-      editPageLinkColumns.includes(col.id)
+    const isEditPageColumnAvailable = props.columns.some(
+      (col) => col.column && editPageLinkColumns.includes(col.column)
     );
 
     if (
