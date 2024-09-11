@@ -92,6 +92,27 @@ export default function Create() {
     client,
   });
 
+  const settingResolver = (client: Client, taxNumber: '1' | '2' | '3') => {
+    if (client?.settings?.[`tax_name${taxNumber}`]) {
+      return {
+        name: client.settings[`tax_name${taxNumber}`],
+        rate: client.settings[`tax_rate${taxNumber}`],
+      };
+    }
+
+    if (client?.group_settings?.settings?.[`tax_name${taxNumber}`]) {
+      return {
+        name: client?.group_settings?.settings[`tax_name${taxNumber}`],
+        rate: client?.group_settings?.settings[`tax_rate${taxNumber}`],
+      };
+    }
+
+    return {
+      name: company?.settings[`tax_name${taxNumber}`],
+      rate: company?.settings[`tax_rate${taxNumber}`],
+    };
+  };
+
   useEffect(() => {
     setRecurringInvoice((current) => {
       let value = current;
@@ -106,21 +127,6 @@ export default function Create() {
         searchParams.get('action') !== 'clone'
       ) {
         const _recurringInvoice = cloneDeep(data);
-
-        if (company && company.enabled_tax_rates > 0) {
-          _recurringInvoice.tax_name1 = company.settings.tax_name1;
-          _recurringInvoice.tax_rate1 = company.settings.tax_rate1;
-        }
-
-        if (company && company.enabled_tax_rates > 1) {
-          _recurringInvoice.tax_name2 = company.settings.tax_name2;
-          _recurringInvoice.tax_rate2 = company.settings.tax_rate2;
-        }
-
-        if (company && company.enabled_tax_rates > 2) {
-          _recurringInvoice.tax_name3 = company.settings.tax_name3;
-          _recurringInvoice.tax_rate3 = company.settings.tax_rate3;
-        }
 
         if (typeof _recurringInvoice.line_items === 'string') {
           _recurringInvoice.line_items = [];
@@ -172,6 +178,39 @@ export default function Create() {
         });
 
         handleChange('invitations', invitations);
+
+        if (
+          company &&
+          company.enabled_tax_rates > 0 &&
+          searchParams.get('action') !== 'clone'
+        ) {
+          const { name, rate } = settingResolver(client, '1');
+
+          handleChange('tax_name1', name);
+          handleChange('tax_rate1', rate);
+        }
+
+        if (
+          company &&
+          company.enabled_tax_rates > 1 &&
+          searchParams.get('action') !== 'clone'
+        ) {
+          const { name, rate } = settingResolver(client, '2');
+
+          handleChange('tax_name2', name);
+          handleChange('tax_rate2', rate);
+        }
+
+        if (
+          company &&
+          company.enabled_tax_rates > 2 &&
+          searchParams.get('action') !== 'clone'
+        ) {
+          const { name, rate } = settingResolver(client, '3');
+
+          handleChange('tax_name3', name);
+          handleChange('tax_rate3', rate);
+        }
       });
   }, [recurringInvoice?.client_id]);
 
