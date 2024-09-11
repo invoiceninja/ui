@@ -58,6 +58,9 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { getEditPageLinkColumnOptions } from '$app/pages/tasks/common/helpers/columns';
 
 dayjs.extend(duration);
 
@@ -93,18 +96,19 @@ export default function Show() {
     staleTime: Infinity,
   });
 
-  const projectActions = useProjectsActions();
-  const taskActions = useTasksActions();
-  const columns = useTaskColumns();
-  const formatMoney = useFormatMoney();
-
-  const filters = useTaskFilters();
-  const taskColumns = useAllTaskColumns();
-
-  const customBulkActions = useCustomBulkActions();
-
-  const showEditOption = useShowEditOption();
   const colors = useColorScheme();
+  const filters = useTaskFilters();
+  const columns = useTaskColumns();
+  const taskActions = useTasksActions();
+  const taskColumns = useAllTaskColumns();
+  const projectActions = useProjectsActions();
+  const customBulkActions = useCustomBulkActions();
+  const { mainEditPageLinkColumn, editPageLinkColumnOptions } =
+    getEditPageLinkColumnOptions();
+
+  const formatMoney = useFormatMoney();
+  const showEditOption = useShowEditOption();
+  const disableNavigation = useDisableNavigation();
 
   const {
     changeTemplateVisible,
@@ -251,6 +255,16 @@ export default function Show() {
             }
             linkToCreateGuards={[permission('create_task')]}
             hideEditableOptions={!hasPermission('edit_task')}
+            formatEditPageLinkColumn={(value, task) => (
+              <DynamicLink
+                to={route('/tasks/:id/edit', { id: task.id })}
+                renderSpan={disableNavigation('task', task)}
+              >
+                {value}
+              </DynamicLink>
+            )}
+            editPageLinkColumn={mainEditPageLinkColumn}
+            editPageLinkColumnOptions={editPageLinkColumnOptions}
           />
         </div>
       )}

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -68,11 +67,13 @@ export interface DateRangeColumn {
   queryParameterKey: string;
 }
 
-export type DataTableColumns<T = any> = {
+export type DataTableColumn<T = any> = {
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
-}[];
+};
+
+export type DataTableColumns<T = any> = DataTableColumn<T>[];
 
 export type FooterColumns<T = any> = {
   id: string;
@@ -156,6 +157,7 @@ interface Props<T> extends CommonProps {
   enableFormattingEditPageLinkColumn?: boolean;
   formatEditPageLinkColumn?: (value: ReactNode, resource: T) => ReactElement;
   editPageLinkColumnOptions?: string[];
+  editPageLinkColumn?: string;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -197,11 +199,12 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutPerPageAsPreference = false,
     withoutSortQueryParameter = false,
     showRestoreBulk,
-    enableFormattingEditPageLinkColumn,
     formatEditPageLinkColumn,
     editPageLinkColumnOptions = [],
+    editPageLinkColumn,
   } = props;
 
+  const firstEditPageLinkColumnOption = useRef<string>('');
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [filter, setFilter] = useState<string>('');
@@ -470,8 +473,56 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [perPage]);
 
   useEffect(() => {
+    if (
+      editPageLinkColumn &&
+      props.columns.some((column) => column.id === editPageLinkColumn)
+    ) {
+      firstEditPageLinkColumnOption.current = '';
+    }
+  }, [props.columns]);
+
+  useEffect(() => {
     emitter.on('bulk.completed', () => setSelected([]));
   }, []);
+
+  const getColumnFormatted = (resource: T, column: DataTableColumn<T>) => {
+    const currentValue = column.format
+      ? column.format(
+          resource[column.id as keyof T] as unknown as string | number,
+          resource
+        )
+      : (resource[column.id as keyof T] as T);
+
+    if (!editPageLinkColumn) {
+      return currentValue;
+    }
+
+    const isEditPageColumnAvailable = props.columns.some(
+      (col) => col.id === editPageLinkColumn
+    );
+
+    if (
+      !isEditPageColumnAvailable &&
+      formatEditPageLinkColumn &&
+      editPageLinkColumnOptions.includes(column.id)
+    ) {
+      if (currentValue && !firstEditPageLinkColumnOption.current) {
+        firstEditPageLinkColumnOption.current = column.id;
+      }
+
+      const shouldColumnBeFormatted =
+        column.id === firstEditPageLinkColumnOption.current;
+
+      return shouldColumnBeFormatted
+        ? formatEditPageLinkColumn(
+            currentValue as React.ReactNode,
+            resource as T
+          )
+        : (currentValue as React.ReactNode);
+    }
+
+    return currentValue;
+  };
 
   return (
     <div data-cy="dataTable">
@@ -749,17 +800,12 @@ export function DataTable<T extends object>(props: Props<T>) {
                           }
                         }}
                       >
-                        {formatEditPageLinkColumn &&
-                        editPageLinkColumnOptions.includes(column.id)
-                          ? formatEditPageLinkColumn(
-                              column.format
-                                ? column.format(resource[column.id], resource)
-                                : resource[column.id],
-                              resource as T
-                            )
-                          : column.format
-                          ? column.format(resource[column.id], resource)
-                          : resource[column.id]}
+                        {
+                          getColumnFormatted(
+                            resource,
+                            column
+                          ) as React.ReactNode
+                        }
                       </Td>
                     )
                 )}

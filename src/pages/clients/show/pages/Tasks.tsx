@@ -11,9 +11,12 @@
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Task } from '$app/common/interfaces/task';
 import { useClientQuery } from '$app/common/queries/clients';
 import { DataTable } from '$app/components/DataTable';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { getEditPageLinkColumnOptions } from '$app/pages/tasks/common/helpers/columns';
 import {
   useActions,
   useCustomBulkActions,
@@ -27,18 +30,17 @@ export default function Tasks() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
+  const showEditOption = useShowEditOption();
+  const disableNavigation = useDisableNavigation();
 
   const { data: client } = useClientQuery({ id, enabled: true });
 
-  const columns = useTaskColumns();
-
-  const filters = useTaskFilters();
-
   const actions = useActions();
-
+  const filters = useTaskFilters();
+  const columns = useTaskColumns();
   const customBulkActions = useCustomBulkActions();
-
-  const showEditOption = useShowEditOption();
+  const { mainEditPageLinkColumn, editPageLinkColumnOptions } =
+    getEditPageLinkColumnOptions();
 
   return (
     <DataTable
@@ -65,6 +67,16 @@ export default function Tasks() {
       showEdit={(task: Task) => showEditOption(task)}
       linkToCreateGuards={[permission('create_task')]}
       hideEditableOptions={!hasPermission('edit_task')}
+      formatEditPageLinkColumn={(value, task) => (
+        <DynamicLink
+          to={route('/tasks/:id/edit', { id: task.id })}
+          renderSpan={disableNavigation('task', task)}
+        >
+          {value}
+        </DynamicLink>
+      )}
+      editPageLinkColumn={mainEditPageLinkColumn}
+      editPageLinkColumnOptions={editPageLinkColumnOptions}
     />
   );
 }

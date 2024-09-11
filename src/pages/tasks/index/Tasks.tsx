@@ -36,7 +36,7 @@ import {
   taskSliderAtom,
   taskSliderVisibilityAtom,
 } from '../common/components/TaskSlider';
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
@@ -47,6 +47,7 @@ import {
 import { ExtensionBanner } from '../common/components/ExtensionBanner';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { route } from '$app/common/helpers/route';
+import { getEditPageLinkColumnOptions } from '../common/helpers/columns';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -58,13 +59,13 @@ export default function Tasks() {
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
-  const isFormattingEditPageLinkColumnEnabled = useRef<boolean>(false);
-
   const actions = useActions();
   const filters = useTaskFilters();
   const columns = useTaskColumns();
   const taskColumns = useAllTaskColumns();
   const customBulkActions = useCustomBulkActions();
+  const { mainEditPageLinkColumn, editPageLinkColumnOptions } =
+    getEditPageLinkColumnOptions();
 
   const [sliderTaskId, setSliderTaskId] = useState<string>('');
   const [taskSlider, setTaskSlider] = useAtom(taskSliderAtom);
@@ -89,14 +90,6 @@ export default function Tasks() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
-
-  useEffect(() => {
-    if (columns.some((column) => column.id === 'number')) {
-      isFormattingEditPageLinkColumnEnabled.current = false;
-    } else {
-      isFormattingEditPageLinkColumnEnabled.current = true;
-    }
-  }, [columns]);
 
   return (
     <Default
@@ -147,33 +140,16 @@ export default function Tasks() {
           setSliderTaskId(quote.id);
           setTaskSliderVisibility(true);
         }}
-        formatEditPageLinkColumn={(value, task) => {
-          const lastValue = isFormattingEditPageLinkColumnEnabled.current;
-
-          if (value) {
-            isFormattingEditPageLinkColumnEnabled.current = false;
-          }
-
-          return value && lastValue ? (
-            <DynamicLink
-              to={route('/tasks/:id/edit', { id: task.id })}
-              renderSpan={disableNavigation('task', task)}
-            >
-              {value}
-            </DynamicLink>
-          ) : (
-            (value as unknown as ReactElement)
-          );
-        }}
-        editPageLinkColumnOptions={[
-          'description',
-          'number',
-          'time_log',
-          'entity_state',
-          'calculated_rate',
-          'is_running',
-          'rate',
-        ]}
+        formatEditPageLinkColumn={(value, task) => (
+          <DynamicLink
+            to={route('/tasks/:id/edit', { id: task.id })}
+            renderSpan={disableNavigation('task', task)}
+          >
+            {value}
+          </DynamicLink>
+        )}
+        editPageLinkColumn={mainEditPageLinkColumn}
+        editPageLinkColumnOptions={editPageLinkColumnOptions}
       />
 
       {!disableNavigation('task', taskSlider) && <TaskSlider />}
