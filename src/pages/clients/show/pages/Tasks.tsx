@@ -39,7 +39,7 @@ export default function Tasks() {
   const filters = useTaskFilters();
   const columns = useTaskColumns();
   const customBulkActions = useCustomBulkActions();
-  const { mainEditPageLinkColumn, editPageLinkColumnOptions } =
+  const { mainEditPageLinkColumns, editPageLinkColumnOptions } =
     getEditPageLinkColumnOptions();
 
   return (
@@ -75,7 +75,7 @@ export default function Tasks() {
           {value}
         </DynamicLink>
       )}
-      editPageLinkColumn={mainEditPageLinkColumn}
+      editPageLinkColumns={mainEditPageLinkColumns}
       editPageLinkColumnOptions={editPageLinkColumnOptions}
     />
   );

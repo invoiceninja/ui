@@ -11,7 +11,11 @@
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { DataTable } from '$app/components/DataTable';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { getEditPageLinkColumnOptions } from '$app/pages/recurring-expenses/common/helpers/columns';
 import {
   useActions,
   useRecurringExpenseColumns,
@@ -22,10 +26,12 @@ export default function RecurringExpenses() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
-
-  const columns = useRecurringExpenseColumns();
+  const disableNavigation = useDisableNavigation();
 
   const actions = useActions();
+  const columns = useRecurringExpenseColumns();
+  const { mainEditPageLinkColumns, editPageLinkColumnOptions } =
+    getEditPageLinkColumnOptions();
 
   return (
     <DataTable
@@ -43,6 +49,18 @@ export default function RecurringExpenses() {
       excludeColumns={['vendor_id']}
       linkToCreateGuards={[permission('create_recurring_expense')]}
       hideEditableOptions={!hasPermission('edit_recurring_expense')}
+      formatEditPageLinkColumn={(value, recurringExpense: RecurringExpense) => (
+        <DynamicLink
+          to={route('/recurring_expenses/:id/edit', {
+            id: recurringExpense.id,
+          })}
+          renderSpan={disableNavigation('recurring_expense', recurringExpense)}
+        >
+          {value}
+        </DynamicLink>
+      )}
+      editPageLinkColumns={mainEditPageLinkColumns}
+      editPageLinkColumnOptions={editPageLinkColumnOptions}
     />
   );
 }

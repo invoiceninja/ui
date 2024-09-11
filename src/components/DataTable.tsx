@@ -157,7 +157,7 @@ interface Props<T> extends CommonProps {
   enableFormattingEditPageLinkColumn?: boolean;
   formatEditPageLinkColumn?: (value: ReactNode, resource: T) => ReactElement;
   editPageLinkColumnOptions?: string[];
-  editPageLinkColumn?: string;
+  editPageLinkColumns?: string[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -201,7 +201,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     showRestoreBulk,
     formatEditPageLinkColumn,
     editPageLinkColumnOptions = [],
-    editPageLinkColumn,
+    editPageLinkColumns = [],
   } = props;
 
   const firstEditPageLinkColumnOption = useRef<string>('');
@@ -474,8 +474,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   useEffect(() => {
     if (
-      editPageLinkColumn &&
-      props.columns.some((column) => column.id === editPageLinkColumn)
+      props.columns.some((column) => editPageLinkColumns.includes(column.id))
     ) {
       firstEditPageLinkColumnOption.current = '';
     }
@@ -493,12 +492,12 @@ export function DataTable<T extends object>(props: Props<T>) {
         )
       : (resource[column.id as keyof T] as T);
 
-    if (!editPageLinkColumn) {
+    if (!editPageLinkColumns.length) {
       return currentValue;
     }
 
-    const isEditPageColumnAvailable = props.columns.some(
-      (col) => col.id === editPageLinkColumn
+    const isEditPageColumnAvailable = props.columns.some((col) =>
+      editPageLinkColumns.includes(col.id)
     );
 
     if (

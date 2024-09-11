@@ -11,7 +11,11 @@
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { Expense } from '$app/common/interfaces/expense';
 import { DataTable } from '$app/components/DataTable';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { getEditPageLinkColumnOptions } from '$app/pages/expenses/common/helpers/columns';
 import {
   useActions,
   useExpenseColumns,
@@ -23,12 +27,13 @@ export default function Expenses() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
-
-  const columns = useExpenseColumns();
-
-  const filters = useExpenseFilters();
+  const disableNavigation = useDisableNavigation();
 
   const actions = useActions();
+  const filters = useExpenseFilters();
+  const columns = useExpenseColumns();
+  const { mainEditPageLinkColumns, editPageLinkColumnOptions } =
+    getEditPageLinkColumnOptions();
 
   return (
     <DataTable
@@ -50,6 +55,16 @@ export default function Expenses() {
       excludeColumns={['vendor_id']}
       linkToCreateGuards={[permission('create_expense')]}
       hideEditableOptions={!hasPermission('edit_expense')}
+      formatEditPageLinkColumn={(value, expense: Expense) => (
+        <DynamicLink
+          to={route('/expenses/:id/edit', { id: expense.id })}
+          renderSpan={disableNavigation('expense', expense)}
+        >
+          {value}
+        </DynamicLink>
+      )}
+      editPageLinkColumns={mainEditPageLinkColumns}
+      editPageLinkColumnOptions={editPageLinkColumnOptions}
     />
   );
 }

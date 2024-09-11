@@ -103,7 +103,7 @@ export default function Show() {
   const taskColumns = useAllTaskColumns();
   const projectActions = useProjectsActions();
   const customBulkActions = useCustomBulkActions();
-  const { mainEditPageLinkColumn, editPageLinkColumnOptions } =
+  const { mainEditPageLinkColumns, editPageLinkColumnOptions } =
     getEditPageLinkColumnOptions();
 
   const formatMoney = useFormatMoney();
@@ -263,7 +263,7 @@ export default function Show() {
                 {value}
               </DynamicLink>
             )}
-            editPageLinkColumn={mainEditPageLinkColumn}
+            editPageLinkColumns={mainEditPageLinkColumns}
             editPageLinkColumnOptions={editPageLinkColumnOptions}
           />
         </div>

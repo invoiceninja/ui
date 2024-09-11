@@ -26,6 +26,10 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { route } from '$app/common/helpers/route';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { getEditPageLinkColumnOptions } from '../common/helpers/columns';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -35,22 +39,18 @@ export default function Expenses() {
 
   const pages = [{ name: t('expenses'), href: '/expenses' }];
 
-  const columns = useExpenseColumns();
+  const disableNavigation = useDisableNavigation();
 
   const actions = useActions();
-
   const filters = useExpenseFilters();
-
+  const columns = useExpenseColumns();
   const expenseColumns = useAllExpenseColumns();
-
   const customBulkActions = useCustomBulkActions();
+  const { mainEditPageLinkColumns, editPageLinkColumnOptions } =
+    getEditPageLinkColumnOptions();
 
   return (
-    <Default
-      title={t('expenses')}
-      breadcrumbs={pages}
-      docsLink="en/expenses"
-    >
+    <Default title={t('expenses')} breadcrumbs={pages} docsLink="en/expenses">
       <DataTable
         resource="expense"
         endpoint="/api/v1/expenses?include=client,vendor,category&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc"
@@ -81,6 +81,16 @@ export default function Expenses() {
         }
         linkToCreateGuards={[permission('create_expense')]}
         hideEditableOptions={!hasPermission('edit_expense')}
+        formatEditPageLinkColumn={(value, expense) => (
+          <DynamicLink
+            to={route('/expenses/:id/edit', { id: expense.id })}
+            renderSpan={disableNavigation('expense', expense)}
+          >
+            {value}
+          </DynamicLink>
+        )}
+        editPageLinkColumns={mainEditPageLinkColumns}
+        editPageLinkColumnOptions={editPageLinkColumnOptions}
       />
     </Default>
   );

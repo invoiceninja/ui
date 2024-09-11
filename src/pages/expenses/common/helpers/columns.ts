@@ -10,15 +10,12 @@
 
 export function getEditPageLinkColumnOptions() {
   return {
-    mainEditPageLinkColumns: ['number'],
+    mainEditPageLinkColumns: ['number', 'status_id'],
     editPageLinkColumnOptions: [
-      'description',
-      'number',
-      'time_log',
-      'entity_state',
-      'calculated_rate',
-      'is_running',
-      'rate',
+      'date',
+      'amount',
+      'public_notes',
+      'exchange_rate',
     ],
   };
 }

@@ -64,7 +64,7 @@ export default function Tasks() {
   const columns = useTaskColumns();
   const taskColumns = useAllTaskColumns();
   const customBulkActions = useCustomBulkActions();
-  const { mainEditPageLinkColumn, editPageLinkColumnOptions } =
+  const { mainEditPageLinkColumns, editPageLinkColumnOptions } =
     getEditPageLinkColumnOptions();
 
   const [sliderTaskId, setSliderTaskId] = useState<string>('');
@@ -148,7 +148,7 @@ export default function Tasks() {
             {value}
           </DynamicLink>
         )}
-        editPageLinkColumn={mainEditPageLinkColumn}
+        editPageLinkColumns={mainEditPageLinkColumns}
         editPageLinkColumnOptions={editPageLinkColumnOptions}
       />
 

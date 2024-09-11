@@ -21,6 +21,10 @@ import {
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { route } from '$app/common/helpers/route';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { getEditPageLinkColumnOptions } from '../common/helpers/columns';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -28,18 +32,18 @@ export default function RecurringExpenses() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
   ];
 
-  const columns = useRecurringExpenseColumns();
-
   const actions = useActions();
-
-  const recurringExpenseColumns = useAllRecurringExpenseColumns();
-
+  const columns = useRecurringExpenseColumns();
   const customBulkActions = useCustomBulkActions();
+  const recurringExpenseColumns = useAllRecurringExpenseColumns();
+  const { mainEditPageLinkColumns, editPageLinkColumnOptions } =
+    getEditPageLinkColumnOptions();
 
   return (
     <Default
@@ -66,6 +70,21 @@ export default function RecurringExpenses() {
         }
         linkToCreateGuards={[permission('create_recurring_expense')]}
         hideEditableOptions={!hasPermission('edit_recurring_expense')}
+        formatEditPageLinkColumn={(value, recurringExpense) => (
+          <DynamicLink
+            to={route('/recurring_expenses/:id/edit', {
+              id: recurringExpense.id,
+            })}
+            renderSpan={disableNavigation(
+              'recurring_expense',
+              recurringExpense
+            )}
+          >
+            {value}
+          </DynamicLink>
+        )}
+        editPageLinkColumns={mainEditPageLinkColumns}
+        editPageLinkColumnOptions={editPageLinkColumnOptions}
       />
     </Default>
   );
