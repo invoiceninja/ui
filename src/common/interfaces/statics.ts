@@ -10,13 +10,14 @@
 
 import { Country } from './country';
 import { Currency } from './currency';
+import { DateFormat } from './date-format';
 
 export interface Statics {
   banks: Bank[];
   countries: Country[];
   currencies: Currency[];
-  date_formats: DateeFormat[];
-  datetime_formats: DateeFormat[];
+  date_formats: DateFormat[];
+  datetime_formats: DateFormat[];
   gateways: Gateway[];
   industries: Industry[];
   languages: Language[];
@@ -33,13 +34,6 @@ export interface Bank {
   remote_id: string;
   bank_library_id: number;
   config: string;
-}
-
-export interface DateeFormat {
-  id: string;
-  format: string;
-  format_moment: string;
-  format_dart: string;
 }
 
 export interface Gateway {
