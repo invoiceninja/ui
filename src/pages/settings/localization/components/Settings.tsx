@@ -263,6 +263,20 @@ export function Settings() {
           />
         </Element>
 
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('decimal_comma')}
+            leftSideHelp={t('use_comma_as_decimal_place')}
+          >
+            <Toggle
+              checked={Boolean(company?.use_comma_as_decimal_place)}
+              onChange={(value: boolean) =>
+                handlePropertyChange('use_comma_as_decimal_place', value)
+              }
+            />
+          </Element>
+        )}
+
         {isCompanySettingsActive && <Divider />}
 
         {isCompanySettingsActive && (

@@ -78,6 +78,7 @@ export interface Company {
   smtp_local_domain: string;
   smtp_verify_peer: boolean;
   e_invoice?: EInvoiceType;
+  use_comma_as_decimal_place?: boolean;
 }
 
 export interface Settings {

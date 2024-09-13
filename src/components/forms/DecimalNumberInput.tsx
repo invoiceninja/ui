@@ -16,6 +16,7 @@ import { DebounceInput } from 'react-debounce-input';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props extends CommonProps {
   id?: string;
@@ -29,6 +30,8 @@ interface Props extends CommonProps {
 }
 
 export function DecimalNumberInput(props: Props) {
+  const company = useCurrentCompany();
+
   const [value, setValue] = useState<number>(0);
 
   useEffect(() => {
@@ -44,6 +47,8 @@ export function DecimalNumberInput(props: Props) {
   }, [props.initialValue]);
 
   const colors = useColorScheme();
+
+  console.log(props.currency?.thousandSeparator);
 
   return (
     <section>
@@ -63,8 +68,12 @@ export function DecimalNumberInput(props: Props) {
               props.onChange(
                 String(
                   currency(event.target.value, {
-                    separator: props.currency?.thousandSeparator,
-                    decimal: props.currency?.decimalSeparator,
+                    separator: company?.use_comma_as_decimal_place
+                      ? '.'
+                      : props.currency?.thousandSeparator,
+                    decimal: company?.use_comma_as_decimal_place
+                      ? ','
+                      : props.currency?.decimalSeparator,
                     symbol: '',
                     precision: props.precision,
                   }).value
@@ -85,8 +94,12 @@ export function DecimalNumberInput(props: Props) {
               ? props.onBlurValue(
                   String(
                     currency(event.target.value, {
-                      separator: props.currency?.thousandSeparator,
-                      decimal: props.currency?.decimalSeparator,
+                      separator: company?.use_comma_as_decimal_place
+                        ? '.'
+                        : props.currency?.thousandSeparator,
+                      decimal: company?.use_comma_as_decimal_place
+                        ? ','
+                        : props.currency?.decimalSeparator,
                       symbol: '',
                       precision: props.precision,
                     }).value
@@ -94,7 +107,12 @@ export function DecimalNumberInput(props: Props) {
                 )
               : null
           }
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5, color: colors.$3, colorScheme: colors.$0 }}
+          style={{
+            backgroundColor: colors.$1,
+            borderColor: colors.$5,
+            color: colors.$3,
+            colorScheme: colors.$0,
+          }}
         />
       )}
 
