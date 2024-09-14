@@ -48,8 +48,6 @@ export function DecimalNumberInput(props: Props) {
 
   const colors = useColorScheme();
 
-  console.log(props.currency?.thousandSeparator);
-
   return (
     <section>
       {props.currency && (
@@ -81,8 +79,12 @@ export function DecimalNumberInput(props: Props) {
               );
           }}
           value={currency(value, {
-            separator: props.currency?.thousandSeparator,
-            decimal: props.currency?.decimalSeparator,
+            separator: company?.use_comma_as_decimal_place
+              ? '.'
+              : props.currency?.thousandSeparator,
+            decimal: company?.use_comma_as_decimal_place
+              ? ','
+              : props.currency?.decimalSeparator,
             symbol: '',
             precision:
               props.precision === 6

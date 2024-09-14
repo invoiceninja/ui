@@ -110,7 +110,9 @@ export function Edit() {
                 type="number"
                 id="num_days"
                 label={t('number_of_days')}
-                onChange={formik.handleChange}
+                onValueChange={(value) =>
+                  formik.setFieldValue('num_days', value)
+                }
               />
             </CardContainer>
           </Card>

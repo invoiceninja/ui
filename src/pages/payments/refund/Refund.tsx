@@ -244,7 +244,12 @@ export default function Refund() {
                         value={
                           (formik.values.invoices[index] as Invoice).amount
                         }
-                        onChange={formik.handleChange}
+                        onValueChange={(value) =>
+                          formik.setFieldValue(
+                            `invoices.${index}.amount`,
+                            value
+                          )
+                        }
                       />
 
                       <Button

@@ -138,7 +138,7 @@ export function Edit() {
                 type="number"
                 id="rate"
                 label={t('tax_rate')}
-                onChange={formik.handleChange}
+                onValueChange={(value) => formik.setFieldValue('rate', value)}
                 errorMessage={errors?.errors?.rate}
                 value={formik.values.rate}
               />
