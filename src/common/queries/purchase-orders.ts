@@ -91,6 +91,10 @@ export function useBulk() {
 
       $refetch(['purchase_orders']);
 
+      if (action === 'expense') {
+        $refetch(['expenses']);
+      }
+
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
     });
