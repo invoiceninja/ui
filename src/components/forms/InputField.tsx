@@ -19,6 +19,8 @@ import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { NumericFormat } from 'react-number-format';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDebounce } from 'react-use';
+import currency from 'currency.js';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -53,6 +55,7 @@ export function InputField(props: Props) {
   const isInitialTypePassword = props.type === 'password';
 
   const [isInputMasked, setIsInputMasked] = useState<boolean>(true);
+  const [currentValue, setCurrentValue] = useState<string>(props.value);
 
   const inputType = useMemo(() => {
     if (props.type === 'password' && isInputMasked) {
@@ -65,6 +68,28 @@ export function InputField(props: Props) {
 
     return props.type;
   }, [props.type, isInputMasked]);
+
+  useDebounce(
+    () => {
+      if (props.type === 'number' && props.onValueChange) {
+        const formattedValue = currency(currentValue, {
+          separator: company?.use_comma_as_decimal_place ? '.' : ',',
+          decimal: company?.use_comma_as_decimal_place ? ',' : '.',
+          symbol: '',
+          precision:
+            reactSettings?.number_precision &&
+            reactSettings?.number_precision > 0 &&
+            reactSettings?.number_precision <= 100
+              ? reactSettings.number_precision
+              : 2,
+        }).value;
+
+        props.onValueChange(String(formattedValue));
+      }
+    },
+    500,
+    [currentValue]
+  );
 
   return (
     <section style={{ width: props.width }}>
@@ -90,10 +115,35 @@ export function InputField(props: Props) {
               }
             )}
             value={props.value}
-            onValueChange={(value) => props.onValueChange?.(value.value)}
+            onChange={(event) =>
+              props.changeOverride && setCurrentValue(event.target.value || '0')
+            }
+            onBlur={(event) => {
+              if (!props.changeOverride && props.onValueChange) {
+                const formattedValue = currency(event.target.value || '0', {
+                  separator: company?.use_comma_as_decimal_place ? '.' : ',',
+                  decimal: company?.use_comma_as_decimal_place ? ',' : '.',
+                  symbol: '',
+                  precision:
+                    reactSettings?.number_precision &&
+                    reactSettings?.number_precision > 0 &&
+                    reactSettings?.number_precision <= 100
+                      ? reactSettings.number_precision
+                      : 2,
+                }).value;
+
+                props.onValueChange(String(formattedValue));
+              }
+            }}
             thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
             decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
-            decimalScale={2}
+            decimalScale={
+              reactSettings?.number_precision &&
+              reactSettings?.number_precision > 0 &&
+              reactSettings?.number_precision <= 100
+                ? reactSettings.number_precision
+                : 2
+            }
             allowNegative
             style={{
               backgroundColor: colors.$1,
@@ -129,20 +179,10 @@ export function InputField(props: Props) {
             )}
             placeholder={props.placeholder || ''}
             onBlur={(event) => {
-              event.target.value =
-                event.target.value === '' && props.type === 'number'
-                  ? '0'
-                  : event.target.value;
-
               props.onValueChange && props.onValueChange(event.target.value);
               props.onChange && props.onChange(event);
             }}
             onChange={(event) => {
-              event.target.value =
-                event.target.value === '' && props.type === 'number'
-                  ? '0'
-                  : event.target.value;
-
               if (
                 props.element === 'textarea' &&
                 reactSettings.preferences.auto_expand_product_table_notes

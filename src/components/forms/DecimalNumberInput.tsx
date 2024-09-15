@@ -11,12 +11,13 @@ import classNames from 'classnames';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { Alert } from '$app/components/Alert';
 import currency from 'currency.js';
-import { useEffect, useState } from 'react';
-import { DebounceInput } from 'react-debounce-input';
+import { useState } from 'react';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { NumericFormat } from 'react-number-format';
+import { useDebounce } from 'react-use';
 
 interface Props extends CommonProps {
   id?: string;
@@ -30,67 +31,47 @@ interface Props extends CommonProps {
 }
 
 export function DecimalNumberInput(props: Props) {
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  const [value, setValue] = useState<number>(0);
+  const [currentValue, setCurrentValue] = useState<number>(
+    parseFloat(props.initialValue || '0')
+  );
 
-  useEffect(() => {
-    if (typeof props.initialValue !== 'undefined') {
-      setValue(parseFloat(props.initialValue));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof props.initialValue !== 'undefined') {
-      setValue(parseFloat(props.initialValue));
-    }
-  }, [props.initialValue]);
-
-  const colors = useColorScheme();
+  useDebounce(
+    () => {
+      if (!props.onBlurValue) {
+        props.onValueChange?.(String(currentValue));
+        props.onChange?.(String(currentValue));
+      }
+    },
+    500,
+    [currentValue]
+  );
 
   return (
     <section>
       {props.currency && (
-        <DebounceInput
-          debounceTimeout={1200}
-          id={props.id}
-          type={'text'}
+        <NumericFormat
           className={classNames(
-            `w-full py-2 px-3 rounded text-sm disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
+            `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
             {
               'border border-gray-300': props.border !== false,
             }
           )}
+          value={props.initialValue}
           onChange={(event) => {
-            props.onChange &&
-              props.onChange(
-                String(
-                  currency(event.target.value, {
-                    separator: company?.use_comma_as_decimal_place
-                      ? '.'
-                      : props.currency?.thousandSeparator,
-                    decimal: company?.use_comma_as_decimal_place
-                      ? ','
-                      : props.currency?.decimalSeparator,
-                    symbol: '',
-                    precision: props.precision,
-                  }).value
-                )
-              );
+            if (props.onChange || props.onValueChange) {
+              const formattedValue = currency(event.target.value, {
+                separator: company?.use_comma_as_decimal_place ? '.' : ',',
+                decimal: company?.use_comma_as_decimal_place ? ',' : '.',
+                symbol: '',
+                precision: props.precision || 2,
+              }).value;
+
+              setCurrentValue(formattedValue);
+            }
           }}
-          value={currency(value, {
-            separator: company?.use_comma_as_decimal_place
-              ? '.'
-              : props.currency?.thousandSeparator,
-            decimal: company?.use_comma_as_decimal_place
-              ? ','
-              : props.currency?.decimalSeparator,
-            symbol: '',
-            precision:
-              props.precision === 6
-                ? value.toString().split('.')[1]?.length || 2
-                : props.precision,
-          }).format()}
           onBlur={(event) =>
             props.onBlurValue
               ? props.onBlurValue(
@@ -98,22 +79,24 @@ export function DecimalNumberInput(props: Props) {
                     currency(event.target.value, {
                       separator: company?.use_comma_as_decimal_place
                         ? '.'
-                        : props.currency?.thousandSeparator,
-                      decimal: company?.use_comma_as_decimal_place
-                        ? ','
-                        : props.currency?.decimalSeparator,
+                        : ',',
+                      decimal: company?.use_comma_as_decimal_place ? ',' : '.',
                       symbol: '',
-                      precision: props.precision,
+                      precision: props.precision || 2,
                     }).value
                   )
                 )
               : null
           }
+          thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
+          decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
+          decimalScale={props.precision || 2}
+          allowNegative
           style={{
             backgroundColor: colors.$1,
             borderColor: colors.$5,
             color: colors.$3,
-            colorScheme: colors.$0,
+            ...props.style,
           }}
         />
       )}
