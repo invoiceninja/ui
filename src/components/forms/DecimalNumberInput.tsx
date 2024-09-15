@@ -42,7 +42,6 @@ export function DecimalNumberInput(props: Props) {
     () => {
       if (!props.onBlurValue) {
         props.onValueChange?.(String(currentValue));
-        props.onChange?.(String(currentValue));
       }
     },
     500,
