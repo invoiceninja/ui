@@ -2378,7 +2378,7 @@
           "max_occurs": 1,
           "min_occurs": 0,
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 3
         },
         "IndustryClassificationCode": {
           "name": "IndustryClassificationCode",
@@ -2391,7 +2391,7 @@
           "max_occurs": 1,
           "min_occurs": 0,
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 3
         },
         "PartyIdentification": {
           "name": "PartyIdentification",
@@ -2404,7 +2404,7 @@
           "max_occurs": -1,
           "min_occurs": 0,
           "namespace": "cac",
-          "visibility": 0
+          "visibility": 3
         },
         "PartyName": {
           "name": "PartyName",
@@ -2469,7 +2469,7 @@
           "max_occurs": -1,
           "min_occurs": 0,
           "namespace": "cac",
-          "visibility": 0
+          "visibility": 3
         },
         "PartyLegalEntity": {
           "name": "PartyLegalEntity",
