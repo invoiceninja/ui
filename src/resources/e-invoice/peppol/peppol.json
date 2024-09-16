@@ -3006,11 +3006,255 @@
           "name": "PaymentMeansCode",
           "base_type": "CodeType",
           "resource": {
-            "selectDropdownLabel": {
-              "key1": "value1",
-              "key2": "value2",
-              "key3": "value3"
-            }
+              "Instrument not defined": {
+                "value": "1"
+              },
+              "Automated clearing house credit": {
+                "value": "2"
+              },
+              "Automated clearing house debit": {
+                "value": "3"
+              },
+              "ACH demand debit reversal": {
+                "value": "4"
+              },
+              "ACH demand credit reversal": {
+                "value": "5"
+              },
+              "ACH demand credit": {
+                "value": "6"
+              },
+              "ACH demand debit": {
+                "value": "7"
+              },
+              "Hold": {
+                "value": "8"
+              },
+              "National or regional clearing": {
+                "value": "9"
+              },
+              "In cash": {
+                "value": "10"
+              },
+              "ACH savings credit reversal": {
+                "value": "11"
+              },
+              "ACH savings debit reversal": {
+                "value": "12"
+              },
+              "ACH savings credit": {
+                "value": "13"
+              },
+              "ACH savings debit": {
+                "value": "14"
+              },
+              "Bookentry credit": {
+                "value": "15"
+              },
+              "Bookentry debit": {
+                "value": "16"
+              },
+              "ACH demand cash concentration/disbursement (CCD) credit": {
+                "value": "17"
+              },
+              "ACH demand cash concentration/disbursement (CCD) debit": {
+                "value": "18"
+              },
+              "ACH demand corporate trade payment (CTP) credit": {
+                "value": "19"
+              },
+              "Cheque": {
+                "value": "20"
+              },
+              "Banker's draft": {
+                "value": "21"
+              },
+              "Certified banker's draft": {
+                "value": "22"
+              },
+              "Bank cheque (issued by a banking or similar establishment)": {
+                "value": "23"
+              },
+              "Bill of exchange awaiting acceptance": {
+                "value": "24"
+              },
+              "Certified cheque": {
+                "value": "25"
+              },
+              "Local cheque": {
+                "value": "26"
+              },
+              "ACH demand corporate trade payment (CTP) debit": {
+                "value": "27"
+              },
+              "ACH demand corporate trade exchange (CTX) credit": {
+                "value": "28"
+              },
+              "ACH demand corporate trade exchange (CTX) debit": {
+                "value": "29"
+              },
+              "Credit transfer": {
+                "value": "30"
+              },
+              "Debit transfer": {
+                "value": "31"
+              },
+              "ACH demand cash concentration/disbursement plus (CCD+) credit": {
+                "value": "32"
+              },
+              "ACH demand cash concentration/disbursement plus (CCD+) debit": {
+                "value": "33"
+              },
+              "ACH prearranged payment and deposit (PPD)": {
+                "value": "34"
+              },
+              "ACH savings cash concentration/disbursement (CCD) credit": {
+                "value": "35"
+              },
+              "ACH savings cash concentration/disbursement (CCD) debit": {
+                "value": "36"
+              },
+              "ACH savings corporate trade payment (CTP) credit": {
+                "value": "37"
+              },
+              "ACH savings corporate trade payment (CTP) debit": {
+                "value": "38"
+              },
+              "ACH savings corporate trade exchange (CTX) credit": {
+                "value": "39"
+              },
+              "ACH savings corporate trade exchange (CTX) debit": {
+                "value": "40"
+              },
+              "ACH savings cash concentration/disbursement plus (CCD+) credit": {
+                "value": "41"
+              },
+              "Payment to bank account": {
+                "value": "42"
+              },
+              "ACH savings cash concentration/disbursement plus (CCD+) debit": {
+                "value": "43"
+              },
+              "Accepted bill of exchange": {
+                "value": "44"
+              },
+              "Referenced home-banking credit transfer": {
+                "value": "45"
+              },
+              "Interbank debit transfer": {
+                "value": "46"
+              },
+              "Home-banking debit transfer": {
+                "value": "47"
+              },
+              "Bank card": {
+                "value": "48"
+              },
+              "Direct debit": {
+                "value": "49"
+              },
+              "Payment by postgiro": {
+                "value": "50"
+              },
+              "FR, norme 6 97-Telereglement CFONB (French Organisation for Banking Standards) - Option A": {
+                "value": "51"
+              },
+              "Urgent commercial payment": {
+                "value": "52"
+              },
+              "Urgent Treasury Payment": {
+                "value": "53"
+              },
+              "Credit card": {
+                "value": "54"
+              },
+              "Debit card": {
+                "value": "55"
+              },
+              "Bankgiro": {
+                "value": "56"
+              },
+              "Standing agreement": {
+                "value": "57"
+              },
+              "SEPA credit transfer": {
+                "value": "58"
+              },
+              "SEPA direct debit": {
+                "value": "59"
+              },
+              "Promissory note": {
+                "value": "60"
+              },
+              "Promissory note signed by the debtor": {
+                "value": "61"
+              },
+              "Promissory note signed by the debtor and endorsed by a bank": {
+                "value": "62"
+              },
+              "Promissory note signed by the debtor and endorsed by a third party": {
+                "value": "63"
+              },
+              "Promissory note signed by a bank": {
+                "value": "64"
+              },
+              "Promissory note signed by a bank and endorsed by another bank": {
+                "value": "65"
+              },
+              "Promissory note signed by a third party": {
+                "value": "66"
+              },
+              "Promissory note signed by a third party and endorsed by a bank": {
+                "value": "67"
+              },
+              "Online payment service": {
+                "value": "68"
+              },
+              "Bill drawn by the creditor on the debtor": {
+                "value": "70"
+              },
+              "Bill drawn by the creditor on a bank": {
+                "value": "74"
+              },
+              "Bill drawn by the creditor, endorsed by another bank": {
+                "value": "75"
+              },
+              "Bill drawn by the creditor on a bank and endorsed by a third party": {
+                "value": "76"
+              },
+              "Bill drawn by the creditor on a third party": {
+                "value": "77"
+              },
+              "Bill drawn by creditor on third party, accepted and endorsed by bank": {
+                "value": "78"
+              },
+              "Not transferable banker's draft": {
+                "value": "91"
+              },
+              "Not transferable local cheque": {
+                "value": "92"
+              },
+              "Reference giro": {
+                "value": "93"
+              },
+              "Urgent giro": {
+                "value": "94"
+              },
+              "Free format giro": {
+                "value": "95"
+              },
+              "Requested method for payment was not used": {
+                "value": "96"
+              },
+              "Clearing between partners": {
+                "value": "97"
+              },
+              "JP, Electronically Recorded Monetary Claims": {
+                "value": "98"
+              },
+              "Mutually defined": {
+                "value": "ZZZ"
+              }
           },
           "max_length": null,
           "min_length": null,
