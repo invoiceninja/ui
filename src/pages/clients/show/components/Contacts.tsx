@@ -18,7 +18,6 @@ import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
-import { MdContentCopy } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 
 interface Props {
@@ -82,7 +81,7 @@ export function Contacts(props: Props) {
                             )}
                           </div>
 
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-2">
                             <div
                               className="cursor-pointer"
                               onClick={() =>
@@ -107,10 +106,18 @@ export function Contacts(props: Props) {
                               message={t('copy_link') as string}
                               placement="top"
                               width="auto"
+                              centerVertically
                             >
-                              <div>
-                                <Icon element={MdContentCopy} size={19} />
-                              </div>
+                              <CopyToClipboardIconOnly
+                                text={route(
+                                  `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
+                                  {
+                                    clientHash: client.client_hash,
+                                  }
+                                )}
+                                iconColor={accentColor}
+                                iconSize={20}
+                              />
                             </Tooltip>
                           </div>
                         </div>
