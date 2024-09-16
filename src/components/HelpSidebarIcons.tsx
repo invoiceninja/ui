@@ -9,7 +9,7 @@
  */
 
 import Tippy from '@tippyjs/react';
-import { endpoint, isSelfHosted } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
@@ -37,6 +37,8 @@ import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useU
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import classNames from 'classnames';
 import { AboutModal } from './AboutModal';
+import { Icon } from './icons/Icon';
+import { FaSlack } from 'react-icons/fa';
 
 interface Props {
   docsLink?: string;
@@ -45,11 +47,11 @@ interface Props {
 
 export function HelpSidebarIcons(props: Props) {
   const [t] = useTranslation();
-  const user = useInjectUserChanges();
-  const currentUser = useCurrentUser();
-  const account = useCurrentAccount();
 
   const colors = useColorScheme();
+  const user = useInjectUserChanges();
+  const account = useCurrentAccount();
+  const currentUser = useCurrentUser();
 
   const { mobileNavbar } = props;
 
@@ -199,18 +201,31 @@ export function HelpSidebarIcons(props: Props) {
               </button>
             )}
 
-            <button
-              className="p-2 hover:bg-ninja-gray-darker rounded-full"
-              onClick={() => setIsContactVisible(true)}
-            >
+            <div className="flex p-2">
               <Tippy
                 duration={0}
                 content={t('contact_us')}
                 className="text-white rounded text-xs mb-2"
               >
-                <Mail />
+                {isHosted() ? (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => setIsContactVisible(true)}
+                  >
+                    <Mail />
+                  </div>
+                ) : (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() =>
+                      window.open('https://slack.invoiceninja.com', '_blank')
+                    }
+                  >
+                    <Icon element={FaSlack} color="white" size={23} />
+                  </div>
+                )}
               </Tippy>
-            </button>
+            </div>
 
             <a
               href="https://forum.invoiceninja.com"
