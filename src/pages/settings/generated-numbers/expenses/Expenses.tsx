@@ -22,6 +22,7 @@ import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHan
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Expenses() {
   const [t] = useTranslation();
@@ -73,8 +74,7 @@ export function Expenses() {
           />
         }
       >
-        <InputField
-          type="number"
+        <NumberInputField
           value={companyChanges?.settings?.expense_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

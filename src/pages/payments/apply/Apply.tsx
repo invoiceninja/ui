@@ -31,6 +31,7 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Apply() {
   const { id } = useParams();
@@ -231,14 +232,12 @@ export default function Apply() {
                 label={t('invoice_number')}
                 value={record.number}
               />
-              <InputField
-                type="number"
+              <NumberInputField
                 label={t('amount_received')}
-                id={`invoices[${index}].amount`}
+                value={record.amount}
                 onValueChange={(value) =>
                   formik.setFieldValue(`invoices.${index}.amount`, value)
                 }
-                value={record.amount}
               />
 
               <Button

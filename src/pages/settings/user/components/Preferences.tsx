@@ -17,13 +17,13 @@ import {
   preferencesDefaults,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { InputField } from '$app/components/forms';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { StatusColorTheme } from './StatusColorTheme';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -89,7 +89,7 @@ export function Preferences() {
           leftSide={t('number_precision')}
           leftSideHelp={t('number_precision_help')}
         >
-          <InputField
+          <NumberInputField
             value={reactSettings?.number_precision}
             onValueChange={(value) =>
               handleChange(
@@ -97,7 +97,6 @@ export function Preferences() {
                 value
               )
             }
-            type="number"
             placeholder={t('number_precision')}
           />
         </Element>
@@ -131,7 +130,9 @@ export function Preferences() {
           leftSideHelp={t('auto_expand_product_table_notes_help')}
         >
           <Toggle
-            checked={Boolean(reactSettings.preferences.auto_expand_product_table_notes)}
+            checked={Boolean(
+              reactSettings.preferences.auto_expand_product_table_notes
+            )}
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.preferences.auto_expand_product_table_notes',

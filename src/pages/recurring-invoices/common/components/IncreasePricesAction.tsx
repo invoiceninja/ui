@@ -14,9 +14,10 @@ import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useBulkAction } from '../queries';
 import { Modal } from '$app/components/Modal';
-import { Button, InputField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { BiChevronUpSquare } from 'react-icons/bi';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   selectedIds: string[];
@@ -61,9 +62,8 @@ export const IncreasePricesAction = (props: Props) => {
         visible={isModalOpen}
         onClose={handleOnUpdatedPrices}
       >
-        <InputField
+        <NumberInputField
           label={t('percent')}
-          type="number"
           value={increasingPercent}
           onValueChange={(value) => {
             setIncreasingPercent(Number(value));

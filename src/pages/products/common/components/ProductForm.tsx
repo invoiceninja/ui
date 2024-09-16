@@ -21,6 +21,7 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { TaxCategorySelector } from '$app/components/tax-rates/TaxCategorySelector';
 import { Alert } from '$app/components/Alert';
 import { useSearchParams } from 'react-router-dom';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -67,8 +68,7 @@ export function ProductForm(props: Props) {
       </Element>
 
       <Element leftSide={t('price')}>
-        <InputField
-          type="number"
+        <NumberInputField
           value={product.price}
           onValueChange={(value) => handleChange('price', value)}
           errorMessage={errors?.errors.price}
@@ -87,8 +87,7 @@ export function ProductForm(props: Props) {
 
       {company?.enable_product_quantity && (
         <Element leftSide={t('default_quantity')}>
-          <InputField
-            type="number"
+          <NumberInputField
             value={product.quantity}
             onValueChange={(value) => handleChange('quantity', value)}
             errorMessage={errors?.errors.quantity}
@@ -97,8 +96,7 @@ export function ProductForm(props: Props) {
       )}
 
       <Element leftSide={t('max_quantity')}>
-        <InputField
-          type="number"
+        <NumberInputField
           value={product.max_quantity}
           onValueChange={(value) => handleChange('max_quantity', value)}
           errorMessage={errors?.errors.max_quantity}
@@ -129,8 +127,7 @@ export function ProductForm(props: Props) {
       {company?.track_inventory && (
         <>
           <Element leftSide={t('stock_quantity')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={product.in_stock_quantity}
               onValueChange={(value) => {
                 handleChange('in_stock_quantity', Number(value));
@@ -156,8 +153,7 @@ export function ProductForm(props: Props) {
           </Element>
 
           <Element leftSide={t('notification_threshold')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={product.stock_notification_threshold}
               onValueChange={(value) =>
                 handleChange('stock_notification_threshold', value)

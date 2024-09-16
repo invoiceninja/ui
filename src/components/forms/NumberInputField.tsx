@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import classNames from 'classnames';
-import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { Alert } from '$app/components/Alert';
 import currency from 'currency.js';
 import { useState } from 'react';
@@ -18,19 +17,23 @@ import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumericFormat } from 'react-number-format';
 import { useDebounce } from 'react-use';
+import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
   id?: string;
   border?: boolean;
   precision?: number;
   errorMessage?: string | string[];
-  currency?: DecimalInputSeparators;
   initialValue?: string;
   onValueChange?: (value: string) => unknown;
-  onBlurValue?: (value: string) => unknown;
+  changeOverride?: boolean;
+  label?: string | null;
+  required?: boolean;
+  withoutLabelWrapping?: boolean;
+  placeholder?: string | null;
 }
 
-export function DecimalNumberInput(props: Props) {
+export function NumberInputField(props: Props) {
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
@@ -40,8 +43,8 @@ export function DecimalNumberInput(props: Props) {
 
   useDebounce(
     () => {
-      if (!props.onBlurValue) {
-        props.onValueChange?.(String(currentValue));
+      if (props.onValueChange) {
+        props.onValueChange(String(currentValue));
       }
     },
     500,
@@ -50,7 +53,19 @@ export function DecimalNumberInput(props: Props) {
 
   return (
     <section>
-      {props.currency && (
+      {props.label && (
+        <InputLabel
+          className={classNames('mb-2', {
+            'whitespace-nowrap': props.withoutLabelWrapping,
+          })}
+          for={props.id}
+        >
+          {props.label}
+          {props.required && <span className="ml-1 text-red-600">*</span>}
+        </InputLabel>
+      )}
+
+      <div className="relative">
         <NumericFormat
           className={classNames(
             `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
@@ -59,8 +74,9 @@ export function DecimalNumberInput(props: Props) {
             }
           )}
           value={props.initialValue}
+          placeholder={props.placeholder ?? undefined}
           onChange={(event) => {
-            if (props.onChange || props.onValueChange) {
+            if (props.onValueChange && props.changeOverride) {
               const formattedValue = currency(event.target.value, {
                 separator: company?.use_comma_as_decimal_place ? '.' : ',',
                 decimal: company?.use_comma_as_decimal_place ? ',' : '.',
@@ -71,22 +87,20 @@ export function DecimalNumberInput(props: Props) {
               setCurrentValue(formattedValue);
             }
           }}
-          onBlur={(event) =>
-            props.onBlurValue
-              ? props.onBlurValue(
-                  String(
-                    currency(event.target.value, {
-                      separator: company?.use_comma_as_decimal_place
-                        ? '.'
-                        : ',',
-                      decimal: company?.use_comma_as_decimal_place ? ',' : '.',
-                      symbol: '',
-                      precision: props.precision || 2,
-                    }).value
-                  )
+          onBlur={(event) => {
+            if (props.onValueChange && !props.changeOverride) {
+              props.onValueChange(
+                String(
+                  currency(event.target.value, {
+                    separator: company?.use_comma_as_decimal_place ? '.' : ',',
+                    decimal: company?.use_comma_as_decimal_place ? ',' : '.',
+                    symbol: '',
+                    precision: props.precision || 2,
+                  }).value
                 )
-              : null
-          }
+              );
+            }
+          }}
           thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
           decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
           decimalScale={props.precision || 2}
@@ -98,7 +112,7 @@ export function DecimalNumberInput(props: Props) {
             ...props.style,
           }}
         />
-      )}
+      </div>
 
       {props.errorMessage && (
         <Alert className="mt-2" type="danger">

@@ -28,6 +28,7 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Edit() {
   const { setDocumentTitle } = useTitle('edit_tax_rate');
@@ -134,13 +135,11 @@ export function Edit() {
                 value={formik.values.name}
               />
 
-              <InputField
-                type="number"
-                id="rate"
+              <NumberInputField
+                value={formik.values.rate}
                 label={t('tax_rate')}
                 onValueChange={(value) => formik.setFieldValue('rate', value)}
                 errorMessage={errors?.errors?.rate}
-                value={formik.values.rate}
               />
             </CardContainer>
           </Card>

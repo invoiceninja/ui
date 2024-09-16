@@ -11,7 +11,6 @@
 import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { transactionTypes } from '$app/common/constants/transactions';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import {
   ApiTransactionType,
   TransactionType,
@@ -24,6 +23,7 @@ import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-in
 import { EntityStatus } from './EntityStatus';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useColorScheme } from '$app/common/colors';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   transaction: Transaction;
@@ -87,10 +87,9 @@ export function TransactionForm(props: Props) {
       </Element>
 
       <Element leftSide={t('amount')}>
-        <DecimalNumberInput
+        <NumberInputField
           border
           precision={props.currencySeparators.precision}
-          currency={props.currencySeparators}
           className="auto"
           initialValue={props.transaction.amount.toString()}
           value={props.transaction.amount.toString()}

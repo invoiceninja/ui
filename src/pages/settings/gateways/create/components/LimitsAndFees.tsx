@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import {
   CompanyGateway,
   FeesAndLimitsEntry,
@@ -27,6 +27,7 @@ import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { Entry } from '$app/components/forms/Combobox';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   gateway: Gateway;
@@ -103,8 +104,7 @@ export function LimitsAndFees(props: Props) {
 
           <Element leftSide={`${t('min')} ${t('limit')}`}>
             <div className="space-y-4">
-              <InputField
-                type="number"
+              <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                     ?.min_limit
@@ -134,8 +134,7 @@ export function LimitsAndFees(props: Props) {
 
           <Element leftSide={`${t('max')} ${t('limit')}`}>
             <div className="space-y-4">
-              <InputField
-                type="number"
+              <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                     ?.max_limit
@@ -166,8 +165,7 @@ export function LimitsAndFees(props: Props) {
           <Divider />
 
           <Element leftSide={t('fee_percent')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                   ?.fee_percent
@@ -180,8 +178,7 @@ export function LimitsAndFees(props: Props) {
           </Element>
 
           <Element leftSide={t('fee_amount')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                   ?.fee_amount
@@ -272,8 +269,7 @@ export function LimitsAndFees(props: Props) {
           )}
 
           <Element leftSide={t('fee_cap')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                   ?.fee_cap

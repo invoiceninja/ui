@@ -17,10 +17,6 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { NumericFormat } from 'react-number-format';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useDebounce } from 'react-use';
-import currency from 'currency.js';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -49,13 +45,11 @@ interface Props extends CommonProps {
 
 export function InputField(props: Props) {
   const colors = useColorScheme();
-  const company = useCurrentCompany();
   const reactSettings = useReactSettings({ overwrite: false });
 
   const isInitialTypePassword = props.type === 'password';
 
   const [isInputMasked, setIsInputMasked] = useState<boolean>(true);
-  const [currentValue, setCurrentValue] = useState<string>(props.value);
 
   const inputType = useMemo(() => {
     if (props.type === 'password' && isInputMasked) {
@@ -68,28 +62,6 @@ export function InputField(props: Props) {
 
     return props.type;
   }, [props.type, isInputMasked]);
-
-  useDebounce(
-    () => {
-      if (props.type === 'number' && props.onValueChange) {
-        const formattedValue = currency(currentValue, {
-          separator: company?.use_comma_as_decimal_place ? '.' : ',',
-          decimal: company?.use_comma_as_decimal_place ? ',' : '.',
-          symbol: '',
-          precision:
-            reactSettings?.number_precision &&
-            reactSettings?.number_precision > 0 &&
-            reactSettings?.number_precision <= 100
-              ? reactSettings.number_precision
-              : 2,
-        }).value;
-
-        props.onValueChange(String(formattedValue));
-      }
-    },
-    500,
-    [currentValue]
-  );
 
   return (
     <section style={{ width: props.width }}>
@@ -106,129 +78,81 @@ export function InputField(props: Props) {
       )}
 
       <div className="relative">
-        {props.type === 'number' ? (
-          <NumericFormat
-            className={classNames(
-              `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
-              {
-                'border border-gray-300': props.border !== false,
-              }
-            )}
-            value={props.value}
-            onChange={(event) =>
-              props.changeOverride && setCurrentValue(event.target.value || '0')
+        <DebounceInput
+          style={{
+            backgroundColor: colors.$1,
+            borderColor: colors.$5,
+            color: colors.$3,
+            ...props.style,
+          }}
+          min={props.min}
+          max={props.type === 'date' ? '9999-12-31' : undefined}
+          maxLength={props.maxLength}
+          autoComplete={props.autoComplete || 'new-password'}
+          disabled={props.disabled}
+          element={props.element || 'input'}
+          inputRef={props.innerRef}
+          debounceTimeout={props.debounceTimeout ?? 300}
+          required={props.required}
+          id={props.id}
+          type={inputType}
+          className={classNames(
+            `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
+            {
+              'border border-gray-300': props.border !== false,
             }
-            onBlur={(event) => {
-              if (!props.changeOverride && props.onValueChange) {
-                const formattedValue = currency(event.target.value || '0', {
-                  separator: company?.use_comma_as_decimal_place ? '.' : ',',
-                  decimal: company?.use_comma_as_decimal_place ? ',' : '.',
-                  symbol: '',
-                  precision:
-                    reactSettings?.number_precision &&
-                    reactSettings?.number_precision > 0 &&
-                    reactSettings?.number_precision <= 100
-                      ? reactSettings.number_precision
-                      : 2,
-                }).value;
+          )}
+          placeholder={props.placeholder || ''}
+          onBlur={(event) => {
+            props.onValueChange && props.onValueChange(event.target.value);
+            props.onChange && props.onChange(event);
+          }}
+          onChange={(event) => {
+            if (
+              props.element === 'textarea' &&
+              reactSettings.preferences.auto_expand_product_table_notes
+            ) {
+              const scrollHeight = event.target.scrollHeight + 2;
 
-                props.onValueChange(String(formattedValue));
+              if (scrollHeight < 200) {
+                event.target.style.height = scrollHeight + 'px';
               }
-            }}
-            thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
-            decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
-            decimalScale={
-              reactSettings?.number_precision &&
-              reactSettings?.number_precision > 0 &&
-              reactSettings?.number_precision <= 100
-                ? reactSettings.number_precision
-                : 2
             }
-            allowNegative
-            style={{
-              backgroundColor: colors.$1,
-              borderColor: colors.$5,
-              color: colors.$3,
-              ...props.style,
-            }}
-          />
-        ) : (
-          <DebounceInput
-            style={{
-              backgroundColor: colors.$1,
-              borderColor: colors.$5,
-              color: colors.$3,
-              ...props.style,
-            }}
-            min={props.min}
-            max={props.type === 'date' ? '9999-12-31' : undefined}
-            maxLength={props.maxLength}
-            autoComplete={props.autoComplete || 'new-password'}
-            disabled={props.disabled}
-            element={props.element || 'input'}
-            inputRef={props.innerRef}
-            debounceTimeout={props.debounceTimeout ?? 300}
-            required={props.required}
-            id={props.id}
-            type={inputType}
-            className={classNames(
-              `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
-              {
-                'border border-gray-300': props.border !== false,
-              }
-            )}
-            placeholder={props.placeholder || ''}
-            onBlur={(event) => {
+
+            if (props.changeOverride && props.changeOverride === true) {
               props.onValueChange && props.onValueChange(event.target.value);
               props.onChange && props.onChange(event);
-            }}
-            onChange={(event) => {
-              if (
-                props.element === 'textarea' &&
-                reactSettings.preferences.auto_expand_product_table_notes
-              ) {
-                const scrollHeight = event.target.scrollHeight + 2;
+            }
+          }}
+          onClick={(event: any) => {
+            if (
+              props.element === 'textarea' &&
+              reactSettings.preferences.auto_expand_product_table_notes
+            ) {
+              const scrollHeight = event.target.scrollHeight + 2;
 
-                if (scrollHeight < 200) {
-                  event.target.style.height = scrollHeight + 'px';
-                }
+              if (scrollHeight < 200) {
+                event.target.style.height = scrollHeight + 'px';
               }
 
-              if (props.changeOverride && props.changeOverride === true) {
-                props.onValueChange && props.onValueChange(event.target.value);
-                props.onChange && props.onChange(event);
+              if (scrollHeight > 200) {
+                event.target.style.height = 200 + 'px';
               }
-            }}
-            onClick={(event: any) => {
-              if (
-                props.element === 'textarea' &&
-                reactSettings.preferences.auto_expand_product_table_notes
-              ) {
-                const scrollHeight = event.target.scrollHeight + 2;
-
-                if (scrollHeight < 200) {
-                  event.target.style.height = scrollHeight + 'px';
-                }
-
-                if (scrollHeight > 200) {
-                  event.target.style.height = 200 + 'px';
-                }
-              }
-            }}
-            onBlurCapture={(event: any) => {
-              if (props.element === 'textarea') {
-                event.target.style.removeProperty('height');
-              }
-            }}
-            value={props.value}
-            list={props.list}
-            rows={props.textareaRows || 5}
-            step={props.step}
-            data-cy={props.cypressRef}
-            name={props.name}
-            readOnly={props.readOnly}
-          />
-        )}
+            }
+          }}
+          onBlurCapture={(event: any) => {
+            if (props.element === 'textarea') {
+              event.target.style.removeProperty('height');
+            }
+          }}
+          value={props.value}
+          list={props.list}
+          rows={props.textareaRows || 5}
+          step={props.step}
+          data-cy={props.cypressRef}
+          name={props.name}
+          readOnly={props.readOnly}
+        />
 
         {isInitialTypePassword && (
           <span className="absolute top-1/4 right-3 cursor-pointer">
