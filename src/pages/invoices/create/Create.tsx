@@ -185,37 +185,39 @@ export default function Create() {
 
         handleChange('invitations', invitations);
 
-        if (
-          company &&
-          company.enabled_tax_rates > 0 &&
-          searchParams.get('action') !== 'clone'
-        ) {
-          const { name, rate } = settingResolver(client, '1');
+        if (!client.is_tax_exempt) {
+          if (
+            company &&
+            company.enabled_tax_rates > 0 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '1');
 
-          handleChange('tax_name1', name);
-          handleChange('tax_rate1', rate);
-        }
+            handleChange('tax_name1', name);
+            handleChange('tax_rate1', rate);
+          }
 
-        if (
-          company &&
-          company.enabled_tax_rates > 1 &&
-          searchParams.get('action') !== 'clone'
-        ) {
-          const { name, rate } = settingResolver(client, '2');
+          if (
+            company &&
+            company.enabled_tax_rates > 1 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '2');
 
-          handleChange('tax_name2', name);
-          handleChange('tax_rate2', rate);
-        }
+            handleChange('tax_name2', name);
+            handleChange('tax_rate2', rate);
+          }
 
-        if (
-          company &&
-          company.enabled_tax_rates > 2 &&
-          searchParams.get('action') !== 'clone'
-        ) {
-          const { name, rate } = settingResolver(client, '3');
+          if (
+            company &&
+            company.enabled_tax_rates > 2 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '3');
 
-          handleChange('tax_name3', name);
-          handleChange('tax_rate3', rate);
+            handleChange('tax_name3', name);
+            handleChange('tax_rate3', rate);
+          }
         }
       });
   }, [invoice?.client_id]);
