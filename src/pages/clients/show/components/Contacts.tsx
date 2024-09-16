@@ -88,7 +88,7 @@ export function Contacts(props: Props) {
                               onClick={() =>
                                 window.open(
                                   route(
-                                    `${client.contacts[0].link}?silent=true&client_hash=:clientHash`,
+                                    `${client.contacts[index].link}?silent=true&client_hash=:clientHash`,
                                     {
                                       clientHash: client.client_hash,
                                     }

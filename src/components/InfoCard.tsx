@@ -34,14 +34,13 @@ export function InfoCard(props: Props) {
       }}
     >
       <dd className="text-xl font-medium">{props.title}</dd>
-
-      <div
+      <dt
         className={classNames('text-sm', {
           truncate: !props.withoutTruncate,
         })}
       >
         {props.value} {props.children}
-      </div>
+      </dt>
     </div>
   );
 }
