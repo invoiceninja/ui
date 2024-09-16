@@ -13,13 +13,12 @@ import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { Tooltip } from '$app/components/Tooltip';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { Icon } from '$app/components/icons/Icon';
-import { MdMoreVert } from 'react-icons/md';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ExternalLink } from 'react-feather';
+import { MdContentCopy } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 
 interface Props {
@@ -38,62 +37,87 @@ export function Contacts(props: Props) {
       {client && (
         <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoCard
-            title={
-              <div className="flex items-center justify-between">
-                <span className="text-xl font-medium">{t('contacts')}</span>
-
-                <Dropdown
-                  customLabelButton={
-                    <div className="cursor-pointer">
-                      <Icon element={MdMoreVert} size={28} />
-                    </div>
-                  }
-                  minDropdownElementWidth="9rem"
-                  maxDropdownElementWidth="9rem"
-                >
-                  <DropdownElement
-                    onClick={() =>
-                      window.open(
-                        route(
-                          `${client.contacts[0].link}?silent=true&client_hash=:clientHash`,
-                          {
-                            clientHash: client.client_hash,
-                          }
-                        ),
-                        '__blank'
-                      )
-                    }
-                    icon={<Icon className="w-5 h-5" element={ExternalLink} />}
-                  >
-                    {t('view_portal')}
-                  </DropdownElement>
-                </Dropdown>
-              </div>
-            }
+            title={t('contacts')}
             value={
               <div className="space-y-2">
                 {client.contacts.map(
-                  (contact: ClientContact, index: number) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center"
-                    >
-                      <div>
-                        <p
-                          className="font-semibold"
-                          style={{ color: accentColor }}
-                        >
-                          {contact.first_name} {contact.last_name}
-                        </p>
+                  (contact: ClientContact, index: number) =>
+                    Boolean(
+                      contact.first_name ||
+                        contact.last_name ||
+                        contact.phone ||
+                        contact.email
+                    ) && (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center"
+                      >
+                        <div className="flex items-center space-x-6">
+                          <div>
+                            <p
+                              className="font-semibold"
+                              style={{ color: accentColor }}
+                            >
+                              {contact.first_name} {contact.last_name}
+                            </p>
 
-                        <p>{contact.phone}</p>
+                            <p>{contact.phone}</p>
 
-                        <CopyToClipboard text={contact.email} />
+                            {Boolean(contact.email) && (
+                              <div className="flex space-x-1">
+                                <span>{contact.email}</span>
+
+                                <Tooltip
+                                  message={t('copy_email') as string}
+                                  placement="top"
+                                  width="auto"
+                                >
+                                  <div className="mt-0.5">
+                                    <CopyToClipboardIconOnly
+                                      text={contact.email}
+                                    />
+                                  </div>
+                                </Tooltip>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className="cursor-pointer"
+                              onClick={() =>
+                                window.open(
+                                  route(
+                                    `${client.contacts[0].link}?silent=true&client_hash=:clientHash`,
+                                    {
+                                      clientHash: client.client_hash,
+                                    }
+                                  ),
+                                  '__blank'
+                                )
+                              }
+                            >
+                              <Icon
+                                className="h-5 w-5"
+                                element={ExternalLink}
+                              />
+                            </div>
+
+                            <Tooltip
+                              message={t('copy_link') as string}
+                              placement="top"
+                              width="auto"
+                            >
+                              <div>
+                                <Icon element={MdContentCopy} size={19} />
+                              </div>
+                            </Tooltip>
+                          </div>
+                        </div>
+
+                        {contact.is_locked && <UserUnsubscribedTooltip />}
                       </div>
-
-                      {contact.is_locked && <UserUnsubscribedTooltip />}
-                    </div>
-                  )
+                    )
                 )}
               </div>
             }

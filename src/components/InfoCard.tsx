@@ -13,7 +13,7 @@ import classNames from 'classnames';
 import { CSSProperties, ReactNode } from 'react';
 
 interface Props {
-  title: string | ReactNode;
+  title: string;
   value?: ReactNode;
   children?: ReactNode;
   className?: string;
@@ -33,19 +33,15 @@ export function InfoCard(props: Props) {
         ...props.style,
       }}
     >
-      {typeof props.title === 'string' ? (
-        <dd className="text-xl font-medium">{props.title}</dd>
-      ) : (
-        props.title
-      )}
+      <dd className="text-xl font-medium">{props.title}</dd>
 
-      <dt
+      <div
         className={classNames('text-sm', {
           truncate: !props.withoutTruncate,
         })}
       >
         {props.value} {props.children}
-      </dt>
+      </div>
     </div>
   );
 }

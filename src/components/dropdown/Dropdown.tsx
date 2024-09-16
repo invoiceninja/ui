@@ -14,7 +14,6 @@ import { ChevronDown } from 'react-feather';
 import {
   Children,
   cloneElement,
-  ReactElement,
   ReactNode,
   useEffect,
   useRef,
@@ -31,9 +30,6 @@ interface Props extends CommonProps {
   label?: string | null;
   cardActions?: boolean;
   cypressRef?: string;
-  customLabelButton?: ReactElement;
-  minDropdownElementWidth?: number | string;
-  maxDropdownElementWidth?: number | string;
 }
 
 const LabelButton = styled.button`
@@ -93,8 +89,8 @@ export function Dropdown(props: Props) {
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$4,
-              minWidth: props.minDropdownElementWidth ?? '12rem',
-              maxWidth: props.maxDropdownElementWidth ?? '14.7rem',
+              minWidth: '12rem',
+              maxWidth: '14.7rem',
             }}
             data-cy={props.cypressRef}
           >
@@ -113,37 +109,31 @@ export function Dropdown(props: Props) {
         )}
         visible={visible}
       >
-        {props.customLabelButton ? (
-          <div onClick={() => setVisible(!visible)}>
-            {props.customLabelButton}
-          </div>
-        ) : (
-          <LabelButton
-            theme={{
-              backgroundColor: accentColor,
-              color: colors.$9,
-              borderColor: colors.$5,
-            }}
-            type="button"
-            disabled={props.disabled}
-            onClick={() => setVisible(!visible)}
-            className={classNames(
-              `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
-              {
-                'hover:bg-white hover:border-gray-300': !props.cardActions,
-                'hover:opacity-90': props.cardActions,
-              }
-            )}
-            style={{
-              backgroundColor: props.cardActions && accentColor,
-              color: props.cardActions ? 'white' : '',
-            }}
-            data-cy="chevronDownButton"
-          >
-            {!props.cardActions && <span>{props.label}</span>}
-            <ChevronDown size={props.cardActions ? 18 : 14} />
-          </LabelButton>
-        )}
+        <LabelButton
+          theme={{
+            backgroundColor: accentColor,
+            color: colors.$9,
+            borderColor: colors.$5,
+          }}
+          type="button"
+          disabled={props.disabled}
+          onClick={() => setVisible(!visible)}
+          className={classNames(
+            `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
+            {
+              'hover:bg-white hover:border-gray-300': !props.cardActions,
+              'hover:opacity-90': props.cardActions,
+            }
+          )}
+          style={{
+            backgroundColor: props.cardActions && accentColor,
+            color: props.cardActions ? 'white' : '',
+          }}
+          data-cy="chevronDownButton"
+        >
+          {!props.cardActions && <span>{props.label}</span>}
+          <ChevronDown size={props.cardActions ? 18 : 14} />
+        </LabelButton>
       </Tippy>
     </div>
   );
