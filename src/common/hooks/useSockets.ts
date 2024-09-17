@@ -17,26 +17,26 @@ import { useEffect } from 'react';
 export const pusherAtom = atom<Pusher | null>(null);
 
 export function useSockets() {
-  const [, setPusher] = useAtom(pusherAtom);
-
-  const client = new Pusher(import.meta.env.VITE_PUSHER_APP_ID, {
-    cluster: 'eu',
-    authEndpoint: apiEndpoint() + '/broadcasting/auth',
-    forceTLS: false,
-    enableStats: true,
-    wsHost: isHosted()
-      ? 'socket.invoicing.co'
-      : import.meta.env.VITE_PUSHER_URL,
-    wsPort: isHosted() ? 6002 : parseInt(import.meta.env.VITE_PUSHER_PORT),
-    enabledTransports: ['ws', 'wss'],
-    auth: {
-      headers: defaultHeaders(),
-    },
-  });
+  const [pusher, setPusher] = useAtom(pusherAtom);
 
   useEffect(() => {
+    const client = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+      cluster: 'eu',
+      authEndpoint: apiEndpoint() + '/broadcasting/auth',
+      forceTLS: false,
+      enableStats: true,
+      wsHost: import.meta.env.VITE_PUSHER_URL ?? 'socket.invoicing.co',
+      wsPort: import.meta.env.VITE_PUSHER_PORT
+        ? parseInt(import.meta.env.VITE_PUSHER_PORT)
+        : 6002,
+      enabledTransports: ['ws', 'wss'],
+      auth: {
+        headers: defaultHeaders(),
+      },
+    });
+
     setPusher(client);
   }, []);
 
-  return client;
+  return pusher;
 }
