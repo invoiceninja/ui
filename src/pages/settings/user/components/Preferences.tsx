@@ -90,11 +90,12 @@ export function Preferences() {
           leftSideHelp={t('number_precision_help')}
         >
           <NumberInputField
+            precision={0}
             value={reactSettings?.number_precision}
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.number_precision',
-                Math.round(Number(value))
+                Number(value)
               )
             }
             placeholder={t('number_precision')}

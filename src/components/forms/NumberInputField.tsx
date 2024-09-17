@@ -119,10 +119,11 @@ export function NumberInputField(props: Props) {
                 decimal: company?.use_comma_as_decimal_place ? ',' : '.',
                 symbol: '',
                 precision:
-                  props.precision ||
-                  (reactSettings?.number_precision &&
-                    reactSettings?.number_precision > 0 &&
-                    reactSettings?.number_precision <= 100)
+                  typeof props.precision === 'number'
+                    ? props.precision
+                    : reactSettings?.number_precision &&
+                      reactSettings?.number_precision > 0 &&
+                      reactSettings?.number_precision <= 100
                     ? reactSettings.number_precision
                     : 2,
               }).value;
@@ -139,10 +140,11 @@ export function NumberInputField(props: Props) {
                     decimal: company?.use_comma_as_decimal_place ? ',' : '.',
                     symbol: '',
                     precision:
-                      props.precision ||
-                      (reactSettings?.number_precision &&
-                        reactSettings?.number_precision > 0 &&
-                        reactSettings?.number_precision <= 100)
+                      typeof props.precision === 'number'
+                        ? props.precision
+                        : reactSettings?.number_precision &&
+                          reactSettings?.number_precision > 0 &&
+                          reactSettings?.number_precision <= 100
                         ? reactSettings.number_precision
                         : 2,
                   }).value
@@ -153,10 +155,11 @@ export function NumberInputField(props: Props) {
           thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
           decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
           decimalScale={
-            props.precision ||
-            (reactSettings?.number_precision &&
-              reactSettings?.number_precision > 0 &&
-              reactSettings?.number_precision <= 100)
+            typeof props.precision === 'number'
+              ? props.precision
+              : reactSettings?.number_precision &&
+                reactSettings?.number_precision > 0 &&
+                reactSettings?.number_precision <= 100
               ? reactSettings.number_precision
               : 2
           }
