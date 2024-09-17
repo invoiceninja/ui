@@ -11,7 +11,7 @@
 import { atom, useAtom } from 'jotai';
 import Pusher from 'pusher-js';
 import { defaultHeaders } from '../queries/common/headers';
-import { apiEndpoint, isHosted } from '../helpers';
+import { apiEndpoint } from '../helpers';
 import { useEffect } from 'react';
 
 export const pusherAtom = atom<Pusher | null>(null);
