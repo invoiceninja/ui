@@ -82,25 +82,32 @@ export function Contacts(props: Props) {
                           </div>
 
                           <div className="flex items-center space-x-2">
-                            <div
-                              className="cursor-pointer"
-                              onClick={() =>
-                                window.open(
-                                  route(
-                                    `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
-                                    {
-                                      clientHash: client.client_hash,
-                                    }
-                                  ),
-                                  '__blank'
-                                )
-                              }
+                            <Tooltip
+                              message={t('client_portal') as string}
+                              placement="top"
+                              width="auto"
+                              centerVertically
                             >
-                              <Icon
-                                className="h-5 w-5"
-                                element={ExternalLink}
-                              />
-                            </div>
+                              <div
+                                className="cursor-pointer"
+                                onClick={() =>
+                                  window.open(
+                                    route(
+                                      `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
+                                      {
+                                        clientHash: client.client_hash,
+                                      }
+                                    ),
+                                    '__blank'
+                                  )
+                                }
+                              >
+                                <Icon
+                                  className="h-5 w-5"
+                                  element={ExternalLink}
+                                />
+                              </div>
+                            </Tooltip>
 
                             <Tooltip
                               message={t('copy_link') as string}
