@@ -229,8 +229,8 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           </Element>
 
           <Element leftSide={t('exchange_rate')}>
-            <InputField
-              value={expense.exchange_rate.toFixed(5)}
+            <NumberInputField
+              value={expense.exchange_rate}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
@@ -249,7 +249,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
                   : currencySeparators?.precision || 2
               }
               className="auto"
-              initialValue={(expense.foreign_amount || 0).toString()}
+              value={(expense.foreign_amount || 0).toString()}
               onChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }

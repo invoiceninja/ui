@@ -66,7 +66,7 @@ export const IncreasePricesAction = (props: Props) => {
           label={t('percent')}
           value={increasingPercent}
           onValueChange={(value) => {
-            setIncreasingPercent(Number(value));
+            setIncreasingPercent(parseFloat(value));
             errors && setErrors(undefined);
           }}
           errorMessage={errors?.errors.percentage_increase}

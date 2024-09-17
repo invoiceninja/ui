@@ -30,7 +30,7 @@ export function Preferences() {
   const dispatch = useDispatch();
   const reactSettings = useReactSettings();
 
-  const handleChange = (property: string, value: string | boolean) => {
+  const handleChange = (property: string, value: string | number | boolean) => {
     dispatch(
       updateChanges({
         property: property,
@@ -94,7 +94,7 @@ export function Preferences() {
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.number_precision',
-                value
+                Math.round(Number(value))
               )
             }
             placeholder={t('number_precision')}

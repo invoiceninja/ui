@@ -104,10 +104,20 @@ export function InputField(props: Props) {
           )}
           placeholder={props.placeholder || ''}
           onBlur={(event) => {
+            event.target.value =
+              event.target.value === '' && props.type === 'number'
+                ? '0'
+                : event.target.value;
+
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);
           }}
           onChange={(event) => {
+            event.target.value =
+              event.target.value === '' && props.type === 'number'
+                ? '0'
+                : event.target.value;
+
             if (
               props.element === 'textarea' &&
               reactSettings.preferences.auto_expand_product_table_notes

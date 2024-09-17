@@ -246,7 +246,7 @@ export default function Refund() {
                         onValueChange={(value) =>
                           formik.setFieldValue(
                             `invoices.${index}.amount`,
-                            value
+                            parseFloat(value)
                           )
                         }
                       />

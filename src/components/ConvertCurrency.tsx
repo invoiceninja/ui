@@ -47,10 +47,10 @@ export function ConvertCurrency(props: Props) {
 
       <Element leftSide={t('exchange_rate')}>
         <NumberInputField
+          value={props.exchangeRate}
           onValueChange={(value) =>
             props.onExchangeRateChange(parseFloat(value))
           }
-          value={props.exchangeRate}
         />
       </Element>
 

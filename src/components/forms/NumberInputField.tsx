@@ -10,7 +10,7 @@
 import classNames from 'classnames';
 import { Alert } from '$app/components/Alert';
 import currency from 'currency.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
@@ -18,6 +18,8 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumericFormat } from 'react-number-format';
 import { useDebounce } from 'react-use';
 import { InputLabel } from './InputLabel';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { InputField } from './InputField';
 
 interface Props extends CommonProps {
   id?: string;
@@ -37,19 +39,54 @@ export function NumberInputField(props: Props) {
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  const [currentValue, setCurrentValue] = useState<number>(
-    parseFloat(props.initialValue || '0')
+  const reactSettings = useReactSettings({ overwrite: false });
+
+  const [currentValue, setCurrentValue] = useState<number | undefined>(
+    typeof props.value === 'number'
+      ? props.value
+      : props.value
+      ? parseFloat(String(props.value))
+      : undefined
   );
 
   useDebounce(
     () => {
-      if (props.onValueChange) {
+      if (props.onValueChange && currentValue) {
         props.onValueChange(String(currentValue));
       }
     },
     500,
     [currentValue]
   );
+
+  useEffect(() => {
+    if (props.value) {
+      setCurrentValue(parseFloat(String(props.value)));
+    }
+  }, [props.value]);
+
+  if (import.meta.env.VITE_RETURN_NUMBER_FIELD === 'true') {
+    return (
+      <InputField
+        type="number"
+        value={props.value}
+        errorMessage={props.errorMessage}
+        onValueChange={props.onValueChange}
+        disabled={props.disabled}
+        label={props.label}
+        required={props.required}
+        withoutLabelWrapping={props.withoutLabelWrapping}
+        border={props.border}
+        className={props.className}
+        style={props.style}
+        id={props.id}
+        changeOverride={props.changeOverride}
+        placeholder={props.placeholder}
+        cypressRef={props.cypressRef}
+        innerRef={props.innerRef}
+      />
+    );
+  }
 
   return (
     <section>
@@ -73,7 +110,7 @@ export function NumberInputField(props: Props) {
               'border border-gray-300': props.border !== false,
             }
           )}
-          value={props.initialValue}
+          value={currentValue}
           placeholder={props.placeholder ?? undefined}
           onChange={(event) => {
             if (props.onValueChange && props.changeOverride) {
@@ -81,7 +118,13 @@ export function NumberInputField(props: Props) {
                 separator: company?.use_comma_as_decimal_place ? '.' : ',',
                 decimal: company?.use_comma_as_decimal_place ? ',' : '.',
                 symbol: '',
-                precision: props.precision || 2,
+                precision:
+                  props.precision ||
+                  (reactSettings?.number_precision &&
+                    reactSettings?.number_precision > 0 &&
+                    reactSettings?.number_precision <= 100)
+                    ? reactSettings.number_precision
+                    : 2,
               }).value;
 
               setCurrentValue(formattedValue);
@@ -95,7 +138,13 @@ export function NumberInputField(props: Props) {
                     separator: company?.use_comma_as_decimal_place ? '.' : ',',
                     decimal: company?.use_comma_as_decimal_place ? ',' : '.',
                     symbol: '',
-                    precision: props.precision || 2,
+                    precision:
+                      props.precision ||
+                      (reactSettings?.number_precision &&
+                        reactSettings?.number_precision > 0 &&
+                        reactSettings?.number_precision <= 100)
+                        ? reactSettings.number_precision
+                        : 2,
                   }).value
                 )
               );
@@ -103,7 +152,14 @@ export function NumberInputField(props: Props) {
           }}
           thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
           decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
-          decimalScale={props.precision || 2}
+          decimalScale={
+            props.precision ||
+            (reactSettings?.number_precision &&
+              reactSettings?.number_precision > 0 &&
+              reactSettings?.number_precision <= 100)
+              ? reactSettings.number_precision
+              : 2
+          }
           allowNegative
           style={{
             backgroundColor: colors.$1,
@@ -111,6 +167,7 @@ export function NumberInputField(props: Props) {
             color: colors.$3,
             ...props.style,
           }}
+          disabled={props.disabled}
         />
       </div>
 

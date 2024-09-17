@@ -70,7 +70,7 @@ export function ProductForm(props: Props) {
       <Element leftSide={t('price')}>
         <NumberInputField
           value={product.price}
-          onValueChange={(value) => handleChange('price', value)}
+          onValueChange={(value) => handleChange('price', parseFloat(value))}
           errorMessage={errors?.errors.price}
         />
       </Element>
@@ -89,7 +89,9 @@ export function ProductForm(props: Props) {
         <Element leftSide={t('default_quantity')}>
           <NumberInputField
             value={product.quantity}
-            onValueChange={(value) => handleChange('quantity', value)}
+            onValueChange={(value) =>
+              handleChange('quantity', parseFloat(value))
+            }
             errorMessage={errors?.errors.quantity}
           />
         </Element>
@@ -98,7 +100,9 @@ export function ProductForm(props: Props) {
       <Element leftSide={t('max_quantity')}>
         <NumberInputField
           value={product.max_quantity}
-          onValueChange={(value) => handleChange('max_quantity', value)}
+          onValueChange={(value) =>
+            handleChange('max_quantity', parseFloat(value))
+          }
           errorMessage={errors?.errors.max_quantity}
         />
       </Element>
@@ -156,7 +160,7 @@ export function ProductForm(props: Props) {
             <NumberInputField
               value={product.stock_notification_threshold}
               onValueChange={(value) =>
-                handleChange('stock_notification_threshold', value)
+                handleChange('stock_notification_threshold', parseFloat(value))
               }
               errorMessage={errors?.errors.stock_notification_threshold}
             />

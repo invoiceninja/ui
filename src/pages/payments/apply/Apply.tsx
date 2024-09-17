@@ -236,7 +236,10 @@ export default function Apply() {
                 label={t('amount_received')}
                 value={record.amount}
                 onValueChange={(value) =>
-                  formik.setFieldValue(`invoices.${index}.amount`, value)
+                  formik.setFieldValue(
+                    `invoices.${index}.amount`,
+                    parseFloat(value)
+                  )
                 }
               />
 

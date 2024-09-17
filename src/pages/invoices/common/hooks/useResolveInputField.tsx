@@ -368,7 +368,7 @@ export function useResolveInputField(props: Props) {
                 : inputCurrencySeparators?.precision || 2
             }
             id={property}
-            initialValue={resource?.line_items[index][property] as string}
+            value={resource?.line_items[index][property] as string}
             className="auto"
             onValueChange={(value: string) => {
               onChange(

@@ -259,7 +259,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
                   : currencySeparators?.precision || 2
               }
               className="auto"
-              initialValue={(recurringExpense.foreign_amount || 0).toString()}
+              value={(recurringExpense.foreign_amount || 0).toString()}
               onChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }
