@@ -194,10 +194,7 @@ export function App() {
   const sockets = useSockets();
 
   useEffect(() => {
-    if (company) {
-      sockets.connect();
-      sockets.subscribe(`private-company-${company.company_key}`);
-
+    if (company && sockets) {
       sockets.connection.bind('connected', () => {
         console.log('Connected to Pusher');
       });
@@ -209,12 +206,15 @@ export function App() {
       sockets.connection.bind('error', () => {
         console.error('Error from Pusher');
       });
+
+      sockets.connect();
+      sockets.subscribe(`private-company-${company.company_key}`);
     }
 
     return () => {
       if (sockets && company) {
-        sockets.connection.unbind();
         sockets.unsubscribe(`private-company-${company.company_key}`);
+        sockets.disconnect();
       }
     };
   }, [company?.company_key]);
