@@ -37,6 +37,7 @@ import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 import { useSockets } from './common/hooks/useSockets';
+import { useGlobalSocketEvents } from './common/queries/sockets';
 
 export function App() {
   const [t] = useTranslation();
@@ -192,13 +193,11 @@ export function App() {
   }, [location, user]);
 
   const sockets = useSockets();
+  
+  useGlobalSocketEvents();
 
   useEffect(() => {
     if (company && sockets) {
-      sockets.connection.bind('connected', () => {
-        console.log('Connected to Pusher');
-      });
-
       sockets.connection.bind('disconnected', () => {
         console.log('Disconnected from Pusher');
       });
@@ -208,12 +207,10 @@ export function App() {
       });
 
       sockets.connect();
-      sockets.subscribe(`private-company-${company.company_key}`);
     }
 
     return () => {
       if (sockets && company) {
-        sockets.unsubscribe(`private-company-${company.company_key}`);
         sockets.disconnect();
       }
     };
