@@ -89,7 +89,7 @@ export function Selector(props: Props) {
                 <option
                   data-rate={0}
                   data-rate-name="settings.tax_name1"
-                  value="0"
+                  value=""
                 />
                 {data &&
                   data.data.data.map((taxRate: TaxRate) => (
@@ -132,7 +132,7 @@ export function Selector(props: Props) {
                 <option
                   data-rate={0}
                   data-rate-name="settings.tax_name2"
-                  value="0"
+                  value=""
                 />
                 {data &&
                   data.data.data.map((taxRate: TaxRate) => (
@@ -175,7 +175,7 @@ export function Selector(props: Props) {
                 <option
                   data-rate={0}
                   data-rate-name="settings.tax_name3"
-                  value="0"
+                  value=""
                 />
                 {data &&
                   data.data.data.map((taxRate: TaxRate) => (

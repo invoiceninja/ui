@@ -235,39 +235,47 @@ export default function Refund() {
 
             if (invoiceItem)
               return (
-                <Element
-                  key={index}
-                  leftSide={`${t('invoice')}: ${invoiceItem?.number}`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <InputField
-                      id={`invoices[${index}].amount`}
-                      type="number"
-                      value={(formik.values.invoices[index] as Invoice).amount}
-                      onChange={formik.handleChange}
-                      errorMessage={
-                        errors?.errors[`invoices.${[index]}.invoice_id`]
-                      }
-                    />
+                <div key={index} className="flex flex-col">
+                  <Element leftSide={`${t('invoice')}: ${invoiceItem?.number}`}>
+                    <div className="flex items-center space-x-2">
+                      <InputField
+                        id={`invoices[${index}].amount`}
+                        type="number"
+                        value={
+                          (formik.values.invoices[index] as Invoice).amount
+                        }
+                        onChange={formik.handleChange}
+                      />
 
-                    <Button
-                      behavior="button"
-                      type="minimal"
-                      onClick={() => {
-                        formik.setFieldValue(
-                          'invoices',
-                          formik.values.invoices.filter(
-                            (invoice: any) =>
-                              invoice.invoice_id !=
-                              requestInvoiceItem.invoice_id
-                          )
-                        );
-                      }}
-                    >
-                      <X />
-                    </Button>
-                  </div>
-                </Element>
+                      <Button
+                        behavior="button"
+                        type="minimal"
+                        onClick={() => {
+                          formik.setFieldValue(
+                            'invoices',
+                            formik.values.invoices.filter(
+                              (invoice: any) =>
+                                invoice.invoice_id !=
+                                requestInvoiceItem.invoice_id
+                            )
+                          );
+                        }}
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                  </Element>
+
+                  {(errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                    errors?.errors[`invoices.${[index]}.amount`]) && (
+                    <div className="px-6">
+                      <Alert className="mt-2 break-all" type="danger">
+                        {errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                          errors?.errors[`invoices.${[index]}.amount`]}
+                      </Alert>
+                    </div>
+                  )}
+                </div>
               );
           }
         )}
