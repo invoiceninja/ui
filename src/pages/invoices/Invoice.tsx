@@ -34,6 +34,7 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
+import { Presence } from './edit/components/Presence';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -112,7 +113,12 @@ export default function Invoice() {
                 cypressRef="invoiceActionDropdown"
               />
             ),
-            topRight: <CommonActions invoice={invoice} />,
+            topRight: (
+              <div className="flex items-center space-x-2 flex-wrap">
+                <Presence invoice={invoice} />
+                <CommonActions invoice={invoice} />
+              </div>
+            ),
           })}
       >
         {invoice?.id === id ? (
