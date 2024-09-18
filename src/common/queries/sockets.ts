@@ -15,17 +15,23 @@ import { $refetch } from '../hooks/useRefetch';
 
 // This file defines global events system for query invalidation.
 
-type Callbacks = Record<string, (data: unknown) => unknown>;
+export const events = [
+  'App\\Events\\Invoice\\InvoiceWasPaid',
+  'App\\Events\\Invoice\\InvoiceWasArchived',
+] as const;
+
+
+export type Event = (typeof events)[number];
+
+export type Callbacks = Record<Event, (data: unknown) => unknown>;
 
 export function useGlobalSocketEvents() {
   const sockets = useSockets();
   const company = useCurrentCompany();
 
   const callbacks: Callbacks = {
-    'client.archived': () => console.log('Client was archived'),
-    'invoice.paid': () => {
-      $refetch(['invoices']);
-    },
+    'App\\Events\\Invoice\\InvoiceWasPaid': () => $refetch(['invoices']),
+    'App\\Events\\Invoice\\InvoiceWasArchived': () => $refetch(['invoices']),
   };
 
   useEffect(() => {
@@ -35,7 +41,7 @@ export function useGlobalSocketEvents() {
 
     const channel = sockets.subscribe(`private-company-${company.company_key}`);
 
-    channel.bind_global((eventName: string, data: unknown) => {
+    channel.bind_global((eventName: Event, data: unknown) => {
       console.log(`channel: ${eventName}`);
 
       const callback = callbacks[eventName];
@@ -56,24 +62,45 @@ export function useGlobalSocketEvents() {
 }
 
 export interface SocketEventProps<T> {
-  name: string;
+  on: Event | Event[];
   callback: (data: T) => unknown;
 }
 
-export function useSocketEvent<T>({ name, callback }: SocketEventProps<T>) {
+export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     const eventHandler = (event: CustomEvent<T>) => {
-      callback(event.detail);
-      console.log({ name });
+      if (!signal.aborted) {
+        callback(event.detail);
+      }
     };
 
-    window.addEventListener(`pusher::${name}`, eventHandler as EventListener);
+    const events = Array.isArray(on) ? on : [on];
+
+    events.forEach((eventName) => {
+      const handlerWithSignal = (event: CustomEvent<T>) => {
+        if (!signal.aborted) {
+          eventHandler(event);
+        }
+      };
+
+      window.addEventListener(
+        `pusher::${eventName}`,
+        handlerWithSignal as EventListener
+      );
+
+      signal.addEventListener('abort', () => {
+        window.removeEventListener(
+          `pusher::${eventName}`,
+          handlerWithSignal as EventListener
+        );
+      });
+    });
 
     return () => {
-      window.removeEventListener(
-        `pusher::${name}`,
-        eventHandler as EventListener
-      );
+      controller.abort();
     };
-  }, [name, callback]);
+  }, [on, callback]);
 }
