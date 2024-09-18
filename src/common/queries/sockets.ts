@@ -25,8 +25,8 @@ export function useGlobalSocketEvents() {
     }
 
     sockets.connection.bind('connected', () => {
-      const invoices = sockets.subscribe(`${company.company_key}_invoices`);
-
+      const invoices = sockets.subscribe(`${company.company_key}.invoices`);
+      
       invoices.bind('invoice.paid', () => $refetch(['invoices']));
     });
   }, [sockets, company]);
