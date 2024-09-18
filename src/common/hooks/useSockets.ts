@@ -13,22 +13,26 @@ import Pusher from 'pusher-js';
 import { defaultHeaders } from '../queries/common/headers';
 import { apiEndpoint } from '../helpers';
 import { useEffect } from 'react';
+import { useCurrentCompany } from './useCurrentCompany';
 
 export const pusherAtom = atom<Pusher | null>(null);
 
 export function useSockets() {
   const [pusher, setPusher] = useAtom(pusherAtom);
+  const company = useCurrentCompany();
 
   useEffect(() => {
-    const client = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+    if (!company) {
+      return;
+    }
+
+    const client = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY ?? '', {
       cluster: 'eu',
       authEndpoint: apiEndpoint() + '/broadcasting/auth',
       forceTLS: false,
       enableStats: true,
-      wsHost: import.meta.env.VITE_PUSHER_URL ?? 'socket.invoicing.co',
-      wsPort: import.meta.env.VITE_PUSHER_PORT
-        ? parseInt(import.meta.env.VITE_PUSHER_PORT)
-        : 6002,
+      wsHost: 'socket.invoicing.co',
+      wsPort: 6002,
       enabledTransports: ['ws', 'wss'],
       auth: {
         headers: defaultHeaders(),
@@ -36,7 +40,9 @@ export function useSockets() {
     });
 
     setPusher(client);
-  }, []);
+
+    return () => client.disconnect();
+  }, [company]);
 
   return pusher;
 }
