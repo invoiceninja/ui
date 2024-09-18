@@ -15,11 +15,7 @@ import { $refetch } from '../hooks/useRefetch';
 
 // This file defines global events system for query invalidation.
 
-export const events = [
-  'App\\Events\\Invoice\\InvoiceWasPaid',
-  'App\\Events\\Invoice\\InvoiceWasArchived',
-] as const;
-
+export const events = ['App\\Events\\Invoice\\InvoiceWasPaid'] as const;
 
 export type Event = (typeof events)[number];
 
@@ -31,7 +27,6 @@ export function useGlobalSocketEvents() {
 
   const callbacks: Callbacks = {
     'App\\Events\\Invoice\\InvoiceWasPaid': () => $refetch(['invoices']),
-    'App\\Events\\Invoice\\InvoiceWasArchived': () => $refetch(['invoices']),
   };
 
   useEffect(() => {
