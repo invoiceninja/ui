@@ -25,7 +25,6 @@ import { invoiceSumAtom, quoteAtom } from '../common/atoms';
 import { useCreate, useQuoteUtilities } from '../common/hooks';
 import { useBlankQuoteQuery } from '../common/queries';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
 import { Quote } from '$app/common/interfaces/quote';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
@@ -92,16 +91,25 @@ export default function Create() {
   const save = useCreate({ setErrors, isDefaultFooter, isDefaultTerms });
   const { handleChange, calculateInvoiceSum } = useQuoteUtilities({ client });
 
-  const settingResolver = (client: Client, prop: string) => {
-    if (client?.settings && client?.settings[prop]) {
-      return client.settings[prop];
+  const settingResolver = (client: Client, taxNumber: '1' | '2' | '3') => {
+    if (client?.settings?.[`tax_name${taxNumber}`]) {
+      return {
+        name: client.settings[`tax_name${taxNumber}`],
+        rate: client.settings[`tax_rate${taxNumber}`],
+      };
     }
 
-    if (client?.group_settings && client?.group_settings?.settings[prop]) {
-      return client?.group_settings?.settings[prop];
+    if (client?.group_settings?.settings?.[`tax_name${taxNumber}`]) {
+      return {
+        name: client?.group_settings?.settings[`tax_name${taxNumber}`],
+        rate: client?.group_settings?.settings[`tax_rate${taxNumber}`],
+      };
     }
 
-    return company?.settings[prop as keyof CompanySettings];
+    return {
+      name: company?.settings[`tax_name${taxNumber}`],
+      rate: company?.settings[`tax_rate${taxNumber}`],
+    };
   };
 
   useEffect(() => {
@@ -160,31 +168,39 @@ export default function Create() {
 
         handleChange('invitations', invitations);
 
-        if (
-          company &&
-          company.enabled_tax_rates > 0 &&
-          searchParams.get('action') !== 'clone'
-        ) {
-          handleChange('tax_name1', settingResolver(client, 'tax_name1'));
-          handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
-        }
+        if (!client.is_tax_exempt) {
+          if (
+            company &&
+            company.enabled_tax_rates > 0 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '1');
 
-        if (
-          company &&
-          company.enabled_tax_rates > 1 &&
-          searchParams.get('action') !== 'clone'
-        ) {
-          handleChange('tax_name2', settingResolver(client, 'tax_name2'));
-          handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
-        }
+            handleChange('tax_name1', name);
+            handleChange('tax_rate1', rate);
+          }
 
-        if (
-          company &&
-          company.enabled_tax_rates > 2 &&
-          searchParams.get('action') !== 'clone'
-        ) {
-          handleChange('tax_name3', settingResolver(client, 'tax_name3'));
-          handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
+          if (
+            company &&
+            company.enabled_tax_rates > 1 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '2');
+
+            handleChange('tax_name2', name);
+            handleChange('tax_rate2', rate);
+          }
+
+          if (
+            company &&
+            company.enabled_tax_rates > 2 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '3');
+
+            handleChange('tax_name3', name);
+            handleChange('tax_rate3', rate);
+          }
         }
       });
   }, [quote?.client_id]);
