@@ -17,7 +17,12 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useParams, useSearchParams } from 'react-router-dom';
+import {
+  Outlet,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { invoiceAtom } from './common/atoms';
@@ -34,6 +39,9 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
+import { Modal } from '$app/components/Modal';
+import { Button } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -41,9 +49,11 @@ export default function Invoice() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-
   const [searchParams] = useSearchParams();
 
+  const currentCompany = useCurrentCompany();
+
+  const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
@@ -60,6 +70,8 @@ export default function Invoice() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+  const [isLockedInvoiceModalOpen, setIsLockedInvoiceModalOpen] =
+    useState<boolean>(false);
 
   const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
@@ -69,6 +81,18 @@ export default function Invoice() {
     { name: t('invoices'), href: '/invoices' },
     { name: t('edit_invoice'), href: route('/invoices/:id/edit', { id }) },
   ];
+
+  const isInvoiceLocked = () => {
+    if (currentCompany?.settings.lock_invoices === 'when_sent') {
+      return invoice?.status_id === InvoiceStatus.Sent;
+    }
+
+    if (currentCompany?.settings.lock_invoices === 'when_paid') {
+      return invoice?.status_id === InvoiceStatus.Paid;
+    }
+
+    return false;
+  };
 
   useEffect(() => {
     const isAnyAction = searchParams.get('action');
@@ -92,8 +116,38 @@ export default function Invoice() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
+  useEffect(() => {
+    if (invoice && invoice.id === id && isInvoiceLocked()) {
+      setIsLockedInvoiceModalOpen(true);
+    }
+  }, [invoice]);
+
   return (
     <>
+      <Modal
+        visible={isLockedInvoiceModalOpen}
+        onClose={() => setIsLockedInvoiceModalOpen(false)}
+        disableClosing
+      >
+        <div className="flex flex-col space-y-6">
+          {invoice?.status_id === InvoiceStatus.Sent && (
+            <span className="font-medium text-lg text-center">
+              {t('sent_invoices_are_locked')}.
+            </span>
+          )}
+
+          {invoice?.status_id === InvoiceStatus.Paid && (
+            <span className="font-medium text-lg text-center">
+              {t('paid_invoices_are_locked')}.
+            </span>
+          )}
+
+          <Button behavior="button" onClick={() => navigate('/invoices')}>
+            {t('dismiss')}
+          </Button>
+        </div>
+      </Modal>
+
       <Default
         title={documentTitle}
         breadcrumbs={pages}

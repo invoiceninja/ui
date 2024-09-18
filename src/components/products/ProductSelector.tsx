@@ -33,7 +33,6 @@ interface Props {
   label?: string | undefined;
   withoutAction?: boolean;
   clearInputAfterSelection?: boolean;
-  readOnly?: boolean;
 }
 
 export function ProductSelector(props: Props) {
@@ -99,7 +98,6 @@ export function ProductSelector(props: Props) {
         nullable
         key="product_selector"
         clearInputAfterSelection={props.clearInputAfterSelection}
-        readonly={props.readOnly}
       />
 
       {props.errorMessage && (

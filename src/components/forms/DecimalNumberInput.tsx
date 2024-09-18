@@ -100,7 +100,6 @@ export function DecimalNumberInput(props: Props) {
             color: colors.$3,
             colorScheme: colors.$0,
           }}
-          disabled={props.disabled}
         />
       )}
 
