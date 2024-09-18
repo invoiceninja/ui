@@ -51,6 +51,25 @@ export function Settings(props: SubscriptionProps) {
         </SelectField>
       </Element>
 
+
+      <Element leftSide={t('remaining_cycles')}>
+        <SelectField
+          value={subscription?.remaining_cycles}
+          onValueChange={(value) => handleChange('remaining_cycles', value)}
+          errorMessage={errors?.errors.remaining_cycles}
+        >
+          <option value="-1">{t('endless')}</option>
+          {[...Array(37).keys()].map((number, index) => (
+            <option value={number} key={index}>
+              {number}
+            </option>
+          ))}
+        </SelectField>
+      </Element>
+
+
+
+
       <Element leftSide={t('auto_bill')}>
         <SelectField
           value={subscription.auto_bill}
