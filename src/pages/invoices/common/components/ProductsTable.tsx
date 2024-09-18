@@ -49,6 +49,7 @@ interface Props {
   onDeleteRowClick: (index: number) => unknown;
   onCreateItemClick: () => unknown;
   shouldCreateInitialLineItem?: boolean;
+  disableTable?: boolean;
 }
 
 export function ProductsTable(props: Props) {
@@ -71,6 +72,7 @@ export function ProductsTable(props: Props) {
     relationType,
     createItem: props.onCreateItemClick,
     deleteLineItem: props.onDeleteRowClick,
+    disabledTable: props.disableTable,
   });
 
   const onDragEnd = useHandleSortingRows({
@@ -111,7 +113,10 @@ export function ProductsTable(props: Props) {
         ))}
       </Thead>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="product-table">
+        <Droppable
+          droppableId="product-table"
+          isDropDisabled={props.disableTable}
+        >
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
               {items.map((lineItem, index) => (
@@ -119,6 +124,7 @@ export function ProductsTable(props: Props) {
                   key={getLineItemIndex(lineItem)}
                   draggableId={getLineItemIndex(lineItem).toString()}
                   index={getLineItemIndex(lineItem)}
+                  isDragDisabled={props.disableTable}
                 >
                   {(provided) => (
                     <Tr
@@ -170,6 +176,7 @@ export function ProductsTable(props: Props) {
                                       getLineItemIndex(lineItem)
                                     );
                                   }}
+                                  disabled={props.disableTable}
                                 >
                                   <Trash2 size={18} />
                                 </button>
@@ -187,17 +194,25 @@ export function ProductsTable(props: Props) {
 
               <Tr className="bg-slate-100 hover:bg-slate-200">
                 <Td colSpan={100}>
-                  <button
-                    onClick={() =>
-                      !isAnyLineItemEmpty() && props.onCreateItemClick()
-                    }
-                    className="w-full py-2 inline-flex justify-center items-center space-x-2"
-                  >
-                    <Plus size={18} />
-                    <span>
-                      {props.type === 'product' ? t('add_item') : t('add_line')}
-                    </span>
-                  </button>
+                  {props.disableTable ? (
+                    <div className="flex w-full justify-center">
+                      <span>{t('locked_invoice')}</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        !isAnyLineItemEmpty() && props.onCreateItemClick()
+                      }
+                      className="w-full py-2 inline-flex justify-center items-center space-x-2"
+                    >
+                      <Plus size={18} />
+                      <span>
+                        {props.type === 'product'
+                          ? t('add_item')
+                          : t('add_line')}
+                      </span>
+                    </button>
+                  )}
                 </Td>
               </Tr>
             </Tbody>

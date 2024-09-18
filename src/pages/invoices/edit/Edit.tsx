@@ -140,6 +140,7 @@ export default function Edit() {
                     handleCreateLineItem(InvoiceItemType.Product)
                   }
                   onDeleteRowClick={handleDeleteLineItem}
+                  disableTable
                 />
               ) : (
                 <Spinner />

@@ -15,6 +15,7 @@ interface Props {
   value: string | null;
   label?: string;
   onChange: (taxCategory: Entry) => unknown;
+  readOnly?: boolean;
 }
 
 export function useTaxCategories() {
@@ -98,7 +99,12 @@ export function useTaxCategories() {
   return taxCategories;
 }
 
-export function TaxCategorySelector({ value, label, onChange }: Props) {
+export function TaxCategorySelector({
+  value,
+  label,
+  onChange,
+  readOnly,
+}: Props) {
   const taxCategories = useTaxCategories();
 
   return (
@@ -115,6 +121,7 @@ export function TaxCategorySelector({ value, label, onChange }: Props) {
       }}
       onChange={onChange}
       onEmptyValues={() => null}
+      readonly={readOnly}
     />
   );
 }

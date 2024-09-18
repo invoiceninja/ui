@@ -75,6 +75,7 @@ interface Props {
   ) => unknown;
   createItem: () => unknown;
   deleteLineItem: (index: number) => unknown;
+  disabledTable?: boolean;
 }
 
 export const isLineItemEmpty = (lineItem: InvoiceItem) => {
@@ -261,12 +262,14 @@ export function useResolveInputField(props: Props) {
                 ]
               }
               onClearButtonClick={() => handleTaxRateChange(property, index)}
+              readOnly={props.disabledTable}
             />
 
             {property === 'tax_rate1' ? (
               <button
                 type="button"
                 onClick={() => onChange('tax_id', '1', index)}
+                disabled={props.disabledTable}
               >
                 <FiRepeat />
               </button>
@@ -288,6 +291,7 @@ export function useResolveInputField(props: Props) {
               onChange={(taxCategory) =>
                 onChange('tax_id', taxCategory.value, index)
               }
+              readOnly={props.disabledTable}
             />
           </Inline>
         );
@@ -311,6 +315,7 @@ export function useResolveInputField(props: Props) {
           ]
         }
         onClearButtonClick={() => handleTaxRateChange(property, index)}
+        readOnly={props.disabledTable}
       />
     );
   };
@@ -334,6 +339,7 @@ export function useResolveInputField(props: Props) {
           onInputValueChange={(value) => onChange('product_key', value, index)}
           onClearButtonClick={() => handleProductChange(index, '', null)}
           displayStockQuantity={location.pathname.startsWith('/invoices')}
+          readOnly={props.disabledTable}
         />
       );
     }
@@ -350,6 +356,7 @@ export function useResolveInputField(props: Props) {
           }
           style={{ marginTop: '4px' }}
           textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
+          disabled={props.disabledTable}
         />
       );
     }
@@ -378,6 +385,7 @@ export function useResolveInputField(props: Props) {
                 index
               );
             }}
+            disabled={props.disabledTable}
           />
         )
       );
@@ -416,6 +424,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          disabled={props.disabledTable}
         />
       ) : (
         <InputField
@@ -424,6 +433,7 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+          disabled={props.disabledTable}
         />
       );
     }
@@ -441,6 +451,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          disabled={props.disabledTable}
         />
       ) : (
         <InputField
@@ -449,6 +460,7 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+          disabled={props.disabledTable}
         />
       );
     }
@@ -460,6 +472,7 @@ export function useResolveInputField(props: Props) {
         onChange={(event: ChangeEvent<HTMLInputElement>) =>
           onChange(property, event.target.value, index)
         }
+        disabled={props.disabledTable}
       />
     );
   };

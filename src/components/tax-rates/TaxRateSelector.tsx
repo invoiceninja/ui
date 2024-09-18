@@ -25,6 +25,7 @@ interface Props {
   onTaxCreated?: (taxRate: TaxRate) => unknown;
   resourceTaxName?: string;
   resourceTaxRate?: number;
+  readOnly?: boolean;
 }
 
 export function TaxRateSelector(props: Props) {
@@ -65,6 +66,7 @@ export function TaxRateSelector(props: Props) {
         }}
         sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
+        readonly={props.readOnly}
       />
 
       <TaxCreate
