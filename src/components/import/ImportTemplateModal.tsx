@@ -92,7 +92,7 @@ export function ImportTemplateModal(props: Props) {
 
     Object.keys(reactSettings?.import_templates?.[entity]).forEach(
       (currentTemplateName) => {
-        if (currentTemplateName.toLowerCase() === templateName.toLowerCase()) {
+        if (currentTemplateName === templateName) {
           isTemplateDuplicated = true;
         }
       }
