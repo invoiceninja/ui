@@ -22,6 +22,7 @@ import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHan
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function RecurringExpenses() {
   const [t] = useTranslation();
@@ -77,8 +78,7 @@ export function RecurringExpenses() {
           />
         }
       >
-        <InputField
-          type="number"
+        <NumberInputField
           value={
             companyChanges?.settings?.recurring_expense_number_counter || ''
           }

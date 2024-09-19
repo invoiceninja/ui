@@ -36,6 +36,7 @@ import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
 import { useLocation } from 'react-router-dom';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useColorScheme } from '$app/common/colors';
+import { NumberInputField } from '../forms/NumberInputField';
 
 export type Country = 'italy';
 
@@ -495,8 +496,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             }
             noExternalPadding
           >
-            <InputField
-              type="number"
+            <NumberInputField
               value={payload[fieldKey] || 0}
               onValueChange={(value) =>
                 handleChange(
