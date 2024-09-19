@@ -1343,8 +1343,14 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 (element) => element.base_type === component?.type
               )
             );
+          const isIndividualComponent = !Object.values(components).some(
+            (currentComponent) =>
+              Object.values(currentComponent?.elements || {}).some(
+                (element) => element.base_type === component?.type
+              )
+          );
 
-          if (index === 0 || !isAlreadyRendered) {
+          if (index === 0 || (!isAlreadyRendered && isIndividualComponent)) {
             return (
               component &&
               renderComponent(
