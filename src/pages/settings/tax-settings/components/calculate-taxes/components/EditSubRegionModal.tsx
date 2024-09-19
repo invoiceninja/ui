@@ -14,6 +14,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   region: string;
@@ -51,8 +52,7 @@ export function EditSubRegionModal(props: Props) {
         }
       />
 
-      <InputField
-        type="number"
+      <NumberInputField
         label={t('tax_rate')}
         value={taxSetting.tax_rate}
         onValueChange={(value) =>
@@ -63,8 +63,7 @@ export function EditSubRegionModal(props: Props) {
         }
       />
 
-      <InputField
-        type="number"
+      <NumberInputField
         label={t('reduced_rate')}
         value={taxSetting.reduced_tax_rate}
         onValueChange={(value) =>

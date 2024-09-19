@@ -41,6 +41,7 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { cloneDeep } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { Spinner } from '$app/components/Spinner';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -440,7 +441,7 @@ export function TemplatesAndReminders() {
             templateId === 'quote_reminder1' ? (
               <>
                 <Element leftSide={t('days')}>
-                  <InputField
+                  <NumberInputField
                     value={
                       company?.settings[getNumDaysReminderKey(reminderIndex)] ||
                       0
@@ -451,7 +452,6 @@ export function TemplatesAndReminders() {
                         parseFloat(value) || 0
                       )
                     }
-                    type="number"
                   />
                 </Element>
 
@@ -525,8 +525,7 @@ export function TemplatesAndReminders() {
                 </Element>
 
                 <Element leftSide={t('late_fee_amount')}>
-                  <InputField
-                    type="number"
+                  <NumberInputField
                     value={
                       company?.settings[getLateFeeAmountKey(reminderIndex)] || 0
                     }
@@ -540,8 +539,7 @@ export function TemplatesAndReminders() {
                 </Element>
 
                 <Element leftSide={t('late_fee_percent')}>
-                  <InputField
-                    type="number"
+                  <NumberInputField
                     value={
                       company?.settings[getLateFeePercentKey(reminderIndex)] ||
                       0

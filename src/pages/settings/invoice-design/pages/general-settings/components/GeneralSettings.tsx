@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updatingRecordsAtom as updatingRecordsAtom } from '../../../common/atoms';
 import { Card, Element } from '$app/components/cards';
-import { InputField, Radio, SelectField } from '$app/components/forms';
+import { Radio, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
@@ -30,6 +30,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import classNames from 'classnames';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -1250,8 +1251,7 @@ export default function GeneralSettings() {
       >
         <div className="w-full inline-flex items-center space-x-2">
           <div className="w-full">
-            <InputField
-              type="number"
+            <NumberInputField
               value={(company?.settings.company_logo_size || '')
                 ?.replaceAll('px', '')
                 ?.replaceAll('%', '')}
