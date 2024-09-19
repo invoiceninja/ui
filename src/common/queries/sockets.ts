@@ -11,7 +11,6 @@
 import { useSockets } from '../hooks/useSockets';
 import { useEffect } from 'react';
 import { useCurrentCompany } from '../hooks/useCurrentCompany';
-import { $refetch } from '../hooks/useRefetch';
 
 // This file defines global events system for query invalidation.
 
@@ -26,7 +25,7 @@ export function useGlobalSocketEvents() {
   const company = useCurrentCompany();
 
   const callbacks: Callbacks = {
-    'App\\Events\\Invoice\\InvoiceWasPaid': () => $refetch(['invoices']),
+    'App\\Events\\Invoice\\InvoiceWasPaid': () => {},
   };
 
   useEffect(() => {
