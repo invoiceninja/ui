@@ -96,7 +96,6 @@ export function Contacts(props: Props) {
                                   }
                                 )}
                                 iconColor={accentColor}
-                                iconSize={20}
                               />
                             </Tooltip>
                           </div>
