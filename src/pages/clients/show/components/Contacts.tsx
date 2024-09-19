@@ -16,9 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
 import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { Icon } from '$app/components/icons/Icon';
-import { ExternalLink } from 'react-feather';
 import { route } from '$app/common/helpers/route';
+import { Link } from '$app/components/forms';
 
 interface Props {
   client: Client;
@@ -51,63 +50,37 @@ export function Contacts(props: Props) {
                         key={index}
                         className="flex justify-between items-center"
                       >
-                        <div className="flex items-center space-x-6">
-                          <div>
-                            <p
-                              className="font-semibold"
-                              style={{ color: accentColor }}
-                            >
-                              {contact.first_name} {contact.last_name}
-                            </p>
+                        <div className="flex flex-col space-y-1">
+                          <p
+                            className="font-semibold"
+                            style={{ color: accentColor }}
+                          >
+                            {contact.first_name} {contact.last_name}
+                          </p>
 
-                            <p>{contact.phone}</p>
+                          <p>{contact.phone}</p>
 
-                            {Boolean(contact.email) && (
-                              <div className="flex space-x-1">
-                                <span>{contact.email}</span>
+                          {Boolean(contact.email) && (
+                            <div className="flex space-x-1">
+                              <span>{contact.email}</span>
 
-                                <Tooltip
-                                  message={t('copy_email') as string}
-                                  placement="top"
-                                  width="auto"
-                                >
-                                  <div className="mt-0.5">
-                                    <CopyToClipboardIconOnly
-                                      text={contact.email}
-                                    />
-                                  </div>
-                                </Tooltip>
-                              </div>
-                            )}
-                          </div>
+                              <CopyToClipboardIconOnly text={contact.email} />
+                            </div>
+                          )}
 
                           <div className="flex items-center space-x-2">
-                            <Tooltip
-                              message={t('client_portal') as string}
-                              placement="top"
-                              width="auto"
-                              centerVertically
-                            >
-                              <div
-                                className="cursor-pointer"
-                                onClick={() =>
-                                  window.open(
-                                    route(
-                                      `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
-                                      {
-                                        clientHash: client.client_hash,
-                                      }
-                                    ),
-                                    '__blank'
-                                  )
+                            <Link
+                              className="cursor-pointer"
+                              to={route(
+                                `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
+                                {
+                                  clientHash: client.client_hash,
                                 }
-                              >
-                                <Icon
-                                  className="h-5 w-5"
-                                  element={ExternalLink}
-                                />
-                              </div>
-                            </Tooltip>
+                              )}
+                              external
+                            >
+                              {t('client_portal')}
+                            </Link>
 
                             <Tooltip
                               message={t('copy_link') as string}
