@@ -56,6 +56,7 @@ import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { Notifications } from '../Notifications';
 
 export interface SaveOption {
   label: string;
@@ -412,6 +413,8 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+              <Notifications />
+
               {shouldShowUnlockButton && (
                 <button
                   className="hidden sm:inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
