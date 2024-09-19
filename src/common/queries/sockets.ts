@@ -45,7 +45,10 @@ export function useGlobalSocketEvents() {
 
         window.dispatchEvent(
           new CustomEvent(`pusher::${eventName}`, {
-            detail: data,
+            detail: {
+              event: eventName,
+              data: data,
+            },
           })
         );
       }
@@ -55,9 +58,14 @@ export function useGlobalSocketEvents() {
   return null;
 }
 
+export interface CallbackOptions<T> {
+  event: Event;
+  data: T;
+}
+
 export interface SocketEventProps<T> {
   on: Event | Event[];
-  callback: (data: T) => unknown;
+  callback: (options: CallbackOptions<T>) => unknown;
 }
 
 export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
@@ -65,16 +73,19 @@ export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
     const controller = new AbortController();
     const signal = controller.signal;
 
-    const eventHandler = (event: CustomEvent<T>) => {
+    const eventHandler = (event: CustomEvent<CallbackOptions<T>>) => {
       if (!signal.aborted) {
-        callback(event.detail);
+        callback({
+          event: event.detail.event,
+          data: event.detail.data,
+        });
       }
     };
 
     const events = Array.isArray(on) ? on : [on];
 
     events.forEach((eventName) => {
-      const handlerWithSignal = (event: CustomEvent<T>) => {
+      const handlerWithSignal = (event: CustomEvent<CallbackOptions<T>>) => {
         if (!signal.aborted) {
           eventHandler(event);
         }
