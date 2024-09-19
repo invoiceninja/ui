@@ -9,7 +9,6 @@
  */
 
 import { ButtonOption, Card, CardContainer } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -28,6 +27,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Create() {
   const { documentTitle } = useTitle('create_payment_term');
@@ -115,10 +115,9 @@ export function Create() {
           additionalSaveOptions={saveOptions}
         >
           <CardContainer>
-            <InputField
+            <NumberInputField
               required
               value={paymentTerm?.num_days}
-              type="number"
               label={t('number_of_days')}
               onValueChange={(value) => handleChange('num_days', Number(value))}
               errorMessage={errors?.errors.num_days}

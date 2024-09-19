@@ -28,15 +28,14 @@ import { useStop } from '../hooks/useStop';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { TaskClock } from '../../kanban/components/TaskClock';
 import { calculateTime } from '../helpers/calculate-time';
-import {
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   task: Task;
@@ -233,8 +232,7 @@ export function TaskDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('rate')}>
-          <InputField
-            type="number"
+          <NumberInputField
             value={task.rate}
             onValueChange={(value) => handleChange('rate', parseFloat(value))}
             errorMessage={errors?.errors.rate}

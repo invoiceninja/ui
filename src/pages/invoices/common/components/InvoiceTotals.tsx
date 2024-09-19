@@ -135,7 +135,9 @@ export function InvoiceTotals(props: Props) {
           type="number"
           defaultValue={resource?.custom_surcharge1}
           value={resource?.custom_surcharge1}
-          onValueChange={(value) => handleChange('custom_surcharge1', value)}
+          onValueChange={(value) =>
+            handleChange('custom_surcharge1', parseFloat(value as string))
+          }
         />
       )}
 
@@ -145,7 +147,9 @@ export function InvoiceTotals(props: Props) {
           type="number"
           defaultValue={resource?.custom_surcharge2}
           value={resource?.custom_surcharge2}
-          onValueChange={(value) => handleChange('custom_surcharge2', value)}
+          onValueChange={(value) =>
+            handleChange('custom_surcharge2', parseFloat(value as string))
+          }
         />
       )}
 
@@ -155,7 +159,9 @@ export function InvoiceTotals(props: Props) {
           type="number"
           defaultValue={resource?.custom_surcharge3}
           value={resource?.custom_surcharge3}
-          onValueChange={(value) => handleChange('custom_surcharge3', value)}
+          onValueChange={(value) =>
+            handleChange('custom_surcharge3', parseFloat(value as string))
+          }
         />
       )}
 
@@ -165,7 +171,9 @@ export function InvoiceTotals(props: Props) {
           type="number"
           defaultValue={resource?.custom_surcharge4}
           value={resource?.custom_surcharge4}
-          onValueChange={(value) => handleChange('custom_surcharge4', value)}
+          onValueChange={(value) =>
+            handleChange('custom_surcharge4', parseFloat(value as string))
+          }
         />
       )}
     </Card>

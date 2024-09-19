@@ -15,7 +15,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { InputField, Link, SelectField } from '../../../components/forms';
+import { Link, SelectField } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
@@ -35,6 +35,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useStaticsQuery } from '$app/common/queries/statics';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function OnlinePayments() {
   useTitle('online_payments');
@@ -518,8 +519,7 @@ export function OnlinePayments() {
               />
             }
           >
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 company?.settings.client_portal_under_payment_minimum || ''
               }
@@ -572,8 +572,7 @@ export function OnlinePayments() {
               />
             }
           >
-            <InputField
-              type="number"
+            <NumberInputField
               value={company?.settings.client_initiated_payments_minimum || ''}
               onValueChange={(value) =>
                 handleChangeProperty(
@@ -627,7 +626,10 @@ export function OnlinePayments() {
             id="payment_flow"
             checked={Boolean(company?.settings.payment_flow === 'smooth')}
             onChange={(value) =>
-              handleChangeProperty('settings.payment_flow', value ? 'smooth': 'default')
+              handleChangeProperty(
+                'settings.payment_flow',
+                value ? 'smooth' : 'default'
+              )
             }
             disabled={disableSettingsField('payment_flow')}
           />
