@@ -20,11 +20,13 @@ import { route } from '$app/common/helpers/route';
 import { ClickableElement } from './cards';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { NonClickableElement } from './cards/NonClickableElement';
 
 export interface Notification {
   label: string;
   date: string;
   link: string;
+  readAt: string | null;
 }
 
 export const notificationsAtom = atomWithStorage<Notification[]>(
@@ -48,6 +50,7 @@ export function Notifications() {
           label: `${$invoice.number}: ${t('invoice_paid')}`,
           date: new Date().toString(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
+          readAt: null,
         };
 
         if (
@@ -70,7 +73,9 @@ export function Notifications() {
         <button onClick={() => setIsVisible(!isVisible)}>
           <Bell size={20} />
 
-          <span className="absolute top-0 right-0 h-2 w-2 rounded-full border-white border-2 bg-blue-500"></span>
+          {notifications.length > 0 ? (
+            <span className="absolute top-0 right-0 h-2 w-2 rounded-full border-white border-2 bg-blue-500"></span>
+          ) : null}
         </button>
       </div>
 
@@ -95,6 +100,12 @@ export function Notifications() {
             </div>
           </ClickableElement>
         ))}
+
+        {notifications.length === 0 ? (
+          <NonClickableElement>
+            {t('no_unread_notifications')}
+          </NonClickableElement>
+        ) : null}
       </Slider>
     </>
   );
