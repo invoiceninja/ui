@@ -204,10 +204,7 @@ export function ImportTemplateModal(props: Props) {
 
           <Button
             behavior="button"
-            onClick={() => {
-              setIsTemplateModalOpen(false);
-              setIsSaveTemplateModalOpen(true);
-            }}
+            onClick={() => setIsSaveTemplateModalOpen(true)}
           >
             {t('yes')}
           </Button>
