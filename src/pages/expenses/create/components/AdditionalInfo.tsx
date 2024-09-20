@@ -14,7 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { CurrencySelector } from '$app/components/CurrencySelector';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import Toggle from '$app/components/forms/Toggle';
 import { PaymentTypeSelector } from '$app/components/payment-types/PaymentTypeSelector';
 import dayjs from 'dayjs';
@@ -23,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ExpenseCardProps } from './Details';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();
@@ -229,8 +229,8 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           </Element>
 
           <Element leftSide={t('exchange_rate')}>
-            <InputField
-              value={expense.exchange_rate.toFixed(5)}
+            <NumberInputField
+              value={expense.exchange_rate}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
@@ -239,7 +239,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           </Element>
 
           <Element leftSide={t('converted_amount')}>
-            <DecimalNumberInput
+            <NumberInputField
               border
               precision={
                 reactSettings?.number_precision &&
@@ -248,9 +248,8 @@ export function AdditionalInfo(props: ExpenseCardProps) {
                   ? reactSettings.number_precision
                   : currencySeparators?.precision || 2
               }
-              currency={currencySeparators}
               className="auto"
-              initialValue={(expense.foreign_amount || 0).toString()}
+              value={(expense.foreign_amount || 0).toString()}
               onChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }

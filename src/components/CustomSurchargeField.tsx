@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { Element } from './cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InputField } from './forms';
+import { NumberInputField } from './forms/NumberInputField';
 
 interface Props {
   defaultValue: string | number;
@@ -31,7 +32,11 @@ export function CustomSurchargeField(props: Props) {
 
   return (
     <Element leftSide={label}>
-      <InputField {...props} />
+      {props.type === 'number' ? (
+        <NumberInputField {...props} />
+      ) : (
+        <InputField {...props} />
+      )}
     </Element>
   );
 }

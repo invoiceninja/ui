@@ -12,8 +12,8 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { getExchangeRate } from '$app/pages/payments/common/helpers/resolve-exchange-rate';
 import { useTranslation } from 'react-i18next';
 import { Element } from './cards';
-import { InputField } from './forms';
 import { CurrencySelector } from './CurrencySelector';
+import { NumberInputField } from './forms/NumberInputField';
 
 interface Props {
   amount: number;
@@ -46,19 +46,17 @@ export function ConvertCurrency(props: Props) {
       </Element>
 
       <Element leftSide={t('exchange_rate')}>
-        <InputField
+        <NumberInputField
+          value={props.exchangeRate}
           onValueChange={(value) =>
             props.onExchangeRateChange(parseFloat(value))
           }
-          value={props.exchangeRate}
-          type="number"
         />
       </Element>
 
       <Element leftSide={t('converted_amount')}>
-        <InputField
+        <NumberInputField
           value={props.amount * parseFloat(props.exchangeRate)}
-          type="number"
         />
       </Element>
     </>

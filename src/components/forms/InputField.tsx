@@ -44,9 +44,12 @@ interface Props extends CommonProps {
 }
 
 export function InputField(props: Props) {
+  const colors = useColorScheme();
+  const reactSettings = useReactSettings({ overwrite: false });
+
   const isInitialTypePassword = props.type === 'password';
 
-  const [isInputMasked, setIsInputMasked] = useState(true);
+  const [isInputMasked, setIsInputMasked] = useState<boolean>(true);
 
   const inputType = useMemo(() => {
     if (props.type === 'password' && isInputMasked) {
@@ -59,9 +62,6 @@ export function InputField(props: Props) {
 
     return props.type;
   }, [props.type, isInputMasked]);
-
-  const colors = useColorScheme();
-  const reactSettings = useReactSettings({ overwrite: false });
 
   return (
     <section style={{ width: props.width }}>
@@ -113,6 +113,11 @@ export function InputField(props: Props) {
             props.onChange && props.onChange(event);
           }}
           onChange={(event) => {
+            event.target.value =
+              event.target.value === '' && props.type === 'number'
+                ? '0'
+                : event.target.value;
+
             if (
               props.element === 'textarea' &&
               reactSettings.preferences.auto_expand_product_table_notes

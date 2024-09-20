@@ -9,7 +9,6 @@
  */
 
 import { Card } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
@@ -18,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 import { PurchaseOrderContext } from '../../create/Create';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Settings() {
   const [t] = useTranslation();
@@ -63,9 +63,8 @@ export default function Settings() {
         </div>
 
         <div className="col-span-12 lg:col-span-6 space-y-6">
-          <InputField
+          <NumberInputField
             label={t('exchange_rate')}
-            type="number"
             value={purchaseOrder?.exchange_rate || 1.0}
             onValueChange={(value) =>
               handleChange('exchange_rate', parseFloat(value) || 1.0)
