@@ -21,6 +21,7 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -103,8 +104,7 @@ export default function Edit() {
       </Element>
 
       <Element leftSide={t('budgeted_hours')}>
-        <InputField
-          type="number"
+        <NumberInputField
           value={project?.budgeted_hours}
           onValueChange={(value) =>
             handleChange('budgeted_hours', parseFloat(value))
@@ -114,8 +114,7 @@ export default function Edit() {
       </Element>
 
       <Element leftSide={t('task_rate')}>
-        <InputField
-          type="number"
+        <NumberInputField
           value={project?.task_rate}
           onValueChange={(value) =>
             handleChange('task_rate', parseFloat(value))
