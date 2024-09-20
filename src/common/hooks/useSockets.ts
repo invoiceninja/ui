@@ -11,7 +11,7 @@
 import { atom, useAtom } from 'jotai';
 import Pusher from 'pusher-js';
 import { defaultHeaders } from '../queries/common/headers';
-import { apiEndpoint } from '../helpers';
+import { apiEndpoint, isHosted } from '../helpers';
 import { useEffect } from 'react';
 import { useCurrentCompany } from './useCurrentCompany';
 
@@ -23,6 +23,10 @@ export function useSockets() {
 
   useEffect(() => {
     if (!company) {
+      return;
+    }
+
+    if (!isHosted()) {
       return;
     }
 
