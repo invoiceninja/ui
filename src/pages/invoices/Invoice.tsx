@@ -42,6 +42,10 @@ import { useAtom } from 'jotai';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -91,6 +95,19 @@ export default function Invoice() {
       return invoice?.status_id === InvoiceStatus.Paid;
     }
 
+    if (invoice && currentCompany?.settings.lock_invoices === 'end_of_month') {
+      const createdAtDateYear = dayjs.unix(invoice.created_at).year();
+      const createdAtDateMonth = dayjs.unix(invoice.created_at).month();
+
+      const currentDateYear = dayjs().utc().year();
+      const currentDateMonth = dayjs().utc().month();
+
+      return (
+        currentDateYear > createdAtDateYear ||
+        currentDateMonth > createdAtDateMonth
+      );
+    }
+
     return false;
   };
 
@@ -130,15 +147,21 @@ export default function Invoice() {
         disableClosing
       >
         <div className="flex flex-col space-y-6">
-          {invoice?.status_id === InvoiceStatus.Sent && (
+          {currentCompany?.settings.lock_invoices === 'when_sent' && (
             <span className="font-medium text-lg text-center">
               {t('sent_invoices_are_locked')}.
             </span>
           )}
 
-          {invoice?.status_id === InvoiceStatus.Paid && (
+          {currentCompany?.settings.lock_invoices === 'when_paid' && (
             <span className="font-medium text-lg text-center">
               {t('paid_invoices_are_locked')}.
+            </span>
+          )}
+
+          {currentCompany?.settings.lock_invoices === 'end_of_month' && (
+            <span className="font-medium text-lg text-center">
+              {t('invoices_locked_end_of_month')}.
             </span>
           )}
 
