@@ -36,6 +36,8 @@ import { useRefetch } from './common/hooks/useRefetch';
 import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
+import { useSockets } from './common/hooks/useSockets';
+import { useGlobalSocketEvents } from './common/queries/sockets';
 
 export function App() {
   const [t] = useTranslation();
@@ -190,11 +192,34 @@ export function App() {
     }
   }, [location, user]);
 
+  const sockets = useSockets();
+  
+  useGlobalSocketEvents();
+
+  useEffect(() => {
+    if (company && sockets) {
+      sockets.connection.bind('disconnected', () => {
+        console.log('Disconnected from Pusher');
+      });
+
+      sockets.connection.bind('error', () => {
+        console.error('Error from Pusher');
+      });
+
+      sockets.connect();
+    }
+
+    return () => {
+      if (sockets && company) {
+        sockets.disconnect();
+      }
+    };
+  }, [company?.company_key]);
+
   return (
     <>
       <div className="App">
         <Toaster position="top-center" />
-
         {routes}
       </div>
 

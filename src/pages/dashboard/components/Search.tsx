@@ -122,7 +122,7 @@ export function Search$() {
             })
           : null
       }
-      className="w-full"
+      style={{ width: '70%' }}
       ref={comboboxRef}
     >
       <div className="relative mt-2">
