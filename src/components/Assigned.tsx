@@ -19,7 +19,7 @@ type EntityType = Project;
 
 interface Props {
   apiEndpoint: string;
-  entityId: string;
+  entityId: string | undefined;
   cacheEndpoint: string;
   component?: ReactNode;
   preCheck?: boolean;

@@ -96,22 +96,20 @@ export default function Edit() {
             </div>
           )}
 
-          {invoice?.project_id && (
-            <div className="flex space-x-20">
-              <span className="text-sm">{t('project')}</span>
+          <Assigned
+            entityId={invoice?.project_id}
+            cacheEndpoint="/api/v1/projects"
+            apiEndpoint="/api/v1/projects/:id?include=client"
+            componentCallbackFn={(resource: Project) => (
+              <div className="flex space-x-20">
+                <span className="text-sm">{t('project')}</span>
 
-              <Assigned
-                entityId={invoice.project_id}
-                cacheEndpoint="/api/v1/projects"
-                apiEndpoint="/api/v1/projects/:id?include=client"
-                componentCallbackFn={(resource: Project) => (
-                  <Link to={route('/projects/:id', { id: invoice.project_id })}>
-                    {resource.name}
-                  </Link>
-                )}
-              />
-            </div>
-          )}
+                <Link to={route('/projects/:id', { id: invoice?.project_id })}>
+                  {resource.name}
+                </Link>
+              </div>
+            )}
+          />
 
           <ClientSelector
             resource={invoice}
