@@ -39,6 +39,8 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import toast from 'react-hot-toast';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -138,6 +140,11 @@ export default function Invoice() {
       setIsLockedInvoiceModalOpen(true);
     }
   }, [invoice]);
+
+  useSocketEvent({
+    on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
+    callback: () => toast(t('invoice_status_changed'), { duration: 5000 }),
+  });
 
   return (
     <>
