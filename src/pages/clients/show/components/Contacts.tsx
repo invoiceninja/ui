@@ -90,10 +90,7 @@ export function Contacts(props: Props) {
                             >
                               <CopyToClipboardIconOnly
                                 text={route(
-                                  `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
-                                  {
-                                    clientHash: client.client_hash,
-                                  }
+                                  `${client.contacts[index]?.link}?silent=true`
                                 )}
                                 iconColor={accentColor}
                               />
