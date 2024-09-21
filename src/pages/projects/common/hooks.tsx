@@ -370,7 +370,7 @@ export function useActions() {
           return toast.error('no_assigned_tasks');
         }
 
-        invoiceProject(unInvoicedTasks, project.client_id);
+        invoiceProject(unInvoicedTasks, project.client_id, project.id);
       });
   };
 
@@ -461,7 +461,10 @@ export const useCustomBulkActions = () => {
 
   const documentsBulk = useDocumentsBulk();
 
-  const handleInvoiceProjects = (tasks: Task[] | null) => {
+  const handleInvoiceProjects = (
+    tasks: Task[] | null,
+    projectsIds: string[]
+  ) => {
     if (tasks && !tasks.length) {
       return toast.error('no_assigned_tasks');
     }
@@ -470,7 +473,13 @@ export const useCustomBulkActions = () => {
       return toast.error('multiple_client_error');
     }
 
-    invoiceProject(tasks, tasks[0].client_id);
+    const projectsIdsLength = projectsIds.length;
+
+    invoiceProject(
+      tasks,
+      tasks[0].client_id,
+      projectsIds[projectsIdsLength - 1]
+    );
   };
 
   const shouldDownloadDocuments = (projects: Project[]) => {
@@ -503,7 +512,8 @@ export const useCustomBulkActions = () => {
         <DropdownElement
           onClick={async () => {
             handleInvoiceProjects(
-              await combineProjectsTasks(selectedIds, selectedResources)
+              await combineProjectsTasks(selectedIds, selectedResources),
+              selectedIds
             );
 
             setSelected([]);
