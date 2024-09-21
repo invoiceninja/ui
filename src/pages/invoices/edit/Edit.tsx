@@ -35,6 +35,10 @@ import {
 import { Invoice as IInvoice, Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Client } from '$app/common/interfaces/client';
+import { Assigned } from '$app/components/Assigned';
+import { route } from '$app/common/helpers/route';
+import { Link } from '$app/components/forms';
+import { Project } from '$app/common/interfaces/project';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -63,9 +67,8 @@ export default function Edit() {
     client,
   } = context;
 
-  const reactSettings = useReactSettings();
-
   const taskColumns = useTaskColumns();
+  const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
 
   const [invoiceSum] = useAtom(invoiceSumAtom);
@@ -90,6 +93,23 @@ export default function Edit() {
             <div className="flex space-x-20">
               <span className="text-sm">{t('status')}</span>
               <InvoiceStatusBadge entity={invoice} />
+            </div>
+          )}
+
+          {invoice?.project_id && (
+            <div className="flex space-x-20">
+              <span className="text-sm">{t('project')}</span>
+
+              <Assigned
+                entityId={invoice.project_id}
+                cacheEndpoint="/api/v1/projects"
+                apiEndpoint="/api/v1/projects/:id?include=client"
+                componentCallbackFn={(resource: Project) => (
+                  <Link to={route('/projects/:id', { id: invoice.project_id })}>
+                    {resource.name}
+                  </Link>
+                )}
+              />
             </div>
           )}
 

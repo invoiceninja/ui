@@ -169,7 +169,7 @@ export function useTaskColumns() {
         <Assigned
           entityId={task.project_id}
           cacheEndpoint="/api/v1/projects"
-          apiEndpoint="/api/v1/projects/:id"
+          apiEndpoint="/api/v1/projects/:id?include=client"
           preCheck={
             hasPermission('view_project') || hasPermission('edit_project')
           }
