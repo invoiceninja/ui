@@ -35,6 +35,8 @@ import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
 import { EInvoiceComponent } from '../settings';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import toast from 'react-hot-toast';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -102,6 +104,11 @@ export default function Invoice() {
       setSaveChanges(false);
     }
   }, [saveChanges]);
+
+  useSocketEvent({
+    on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
+    callback: () => toast(t('invoice_status_changed'), { duration: 5000 }),
+  });
 
   return (
     <>
