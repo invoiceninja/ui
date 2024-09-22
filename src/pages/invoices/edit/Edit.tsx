@@ -15,7 +15,11 @@ import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from 'react-router-dom';
 import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
@@ -37,8 +41,9 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Client } from '$app/common/interfaces/client';
 import { Assigned } from '$app/components/Assigned';
 import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms';
 import { Project } from '$app/common/interfaces/project';
+import { Icon } from '$app/components/icons/Icon';
+import { ExternalLink } from 'react-feather';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -55,6 +60,8 @@ export default function Edit() {
   const [t] = useTranslation();
 
   const [searchParams] = useSearchParams();
+
+  const navigate = useNavigate();
 
   const context: Context = useOutletContext();
   const {
@@ -104,9 +111,23 @@ export default function Edit() {
               <div className="flex space-x-20">
                 <span className="text-sm">{t('project')}</span>
 
-                <Link to={route('/projects/:id', { id: invoice?.project_id })}>
-                  {resource.name}
-                </Link>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">{resource.name}</span>
+
+                  <div
+                    className="cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        route('/projects/:id', { id: invoice?.project_id })
+                      )
+                    }
+                  >
+                    <Icon
+                      element={ExternalLink}
+                      style={{ width: '1.17rem', height: '1.17rem' }}
+                    />
+                  </div>
+                </div>
               </div>
             )}
           />
