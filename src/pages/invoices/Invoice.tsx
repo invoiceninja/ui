@@ -17,12 +17,7 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
-import {
-  Outlet,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { invoiceAtom } from './common/atoms';
@@ -41,9 +36,6 @@ import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItems
 import { useAtom } from 'jotai';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import toast from 'react-hot-toast';
-import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
@@ -57,15 +49,12 @@ export default function Invoice() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
 
-  const currentCompany = useCurrentCompany();
-
-  const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
 
-  const { data } = useInvoiceQuery({ id });
+  const { data } = useInvoiceQuery({ id, includeIsLocked: true });
 
   const [client, setClient] = useState<Client | undefined>();
 
@@ -76,8 +65,6 @@ export default function Invoice() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
-  const [isLockedInvoiceModalOpen, setIsLockedInvoiceModalOpen] =
-    useState<boolean>(false);
 
   const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
@@ -87,31 +74,6 @@ export default function Invoice() {
     { name: t('invoices'), href: '/invoices' },
     { name: t('edit_invoice'), href: route('/invoices/:id/edit', { id }) },
   ];
-
-  const isInvoiceLocked = () => {
-    if (currentCompany?.settings.lock_invoices === 'when_sent') {
-      return invoice?.status_id === InvoiceStatus.Sent;
-    }
-
-    if (currentCompany?.settings.lock_invoices === 'when_paid') {
-      return invoice?.status_id === InvoiceStatus.Paid;
-    }
-
-    if (invoice && currentCompany?.settings.lock_invoices === 'end_of_month') {
-      const createdAtDateYear = dayjs.unix(invoice.created_at).year();
-      const createdAtDateMonth = dayjs.unix(invoice.created_at).month();
-
-      const currentDateYear = dayjs().utc().year();
-      const currentDateMonth = dayjs().utc().month();
-
-      return (
-        currentDateYear > createdAtDateYear ||
-        currentDateMonth > createdAtDateMonth
-      );
-    }
-
-    return false;
-  };
 
   useEffect(() => {
     const isAnyAction = searchParams.get('action');
@@ -135,12 +97,6 @@ export default function Invoice() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  useEffect(() => {
-    if (invoice && invoice.id === id && isInvoiceLocked()) {
-      setIsLockedInvoiceModalOpen(true);
-    }
-  }, [invoice]);
-
   useSocketEvent({
     on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
     callback: () => toast(t('invoice_status_changed'), { duration: 5000 }),
@@ -148,36 +104,6 @@ export default function Invoice() {
 
   return (
     <>
-      <Modal
-        visible={isLockedInvoiceModalOpen}
-        onClose={() => setIsLockedInvoiceModalOpen(false)}
-        disableClosing
-      >
-        <div className="flex flex-col space-y-6">
-          {currentCompany?.settings.lock_invoices === 'when_sent' && (
-            <span className="font-medium text-lg text-center">
-              {t('sent_invoices_are_locked')}.
-            </span>
-          )}
-
-          {currentCompany?.settings.lock_invoices === 'when_paid' && (
-            <span className="font-medium text-lg text-center">
-              {t('paid_invoices_are_locked')}.
-            </span>
-          )}
-
-          {currentCompany?.settings.lock_invoices === 'end_of_month' && (
-            <span className="font-medium text-lg text-center">
-              {t('invoices_locked_end_of_month')}.
-            </span>
-          )}
-
-          <Button behavior="button" onClick={() => navigate('/invoices')}>
-            {t('dismiss')}
-          </Button>
-        </div>
-      </Modal>
-
       <Default
         title={documentTitle}
         breadcrumbs={pages}
@@ -193,6 +119,7 @@ export default function Invoice() {
                   (invoice.status_id === InvoiceStatus.Cancelled ||
                     invoice.is_deleted)
                 }
+                disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"
               />
             ),
@@ -200,21 +127,32 @@ export default function Invoice() {
           })}
       >
         {invoice?.id === id ? (
-          <div className="space-y-4">
-            <Tabs tabs={tabs} />
+          <div className="space-y-2">
+            {Boolean(invoice?.is_locked) && (
+              <div
+                className="flex items-center justify-center h-10 w-full text-white"
+                style={{ backgroundColor: '#4DA6FF' }}
+              >
+                {t('locked_invoice')}.
+              </div>
+            )}
 
-            <Outlet
-              context={{
-                invoice,
-                setInvoice,
-                errors,
-                isDefaultTerms,
-                setIsDefaultTerms,
-                isDefaultFooter,
-                setIsDefaultFooter,
-                client,
-              }}
-            />
+            <div className="space-y-4">
+              <Tabs tabs={tabs} />
+
+              <Outlet
+                context={{
+                  invoice,
+                  setInvoice,
+                  errors,
+                  isDefaultTerms,
+                  setIsDefaultTerms,
+                  isDefaultFooter,
+                  setIsDefaultFooter,
+                  client,
+                }}
+              />
+            </div>
           </div>
         ) : (
           <div className="flex justify-center items-center">
