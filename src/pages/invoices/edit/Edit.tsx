@@ -15,7 +15,11 @@ import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from 'react-router-dom';
 import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
@@ -35,6 +39,11 @@ import {
 import { Invoice as IInvoice, Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Client } from '$app/common/interfaces/client';
+import { Assigned } from '$app/components/Assigned';
+import { route } from '$app/common/helpers/route';
+import { Project } from '$app/common/interfaces/project';
+import { Icon } from '$app/components/icons/Icon';
+import { ExternalLink } from 'react-feather';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -52,6 +61,8 @@ export default function Edit() {
 
   const [searchParams] = useSearchParams();
 
+  const navigate = useNavigate();
+
   const context: Context = useOutletContext();
   const {
     invoice,
@@ -63,9 +74,8 @@ export default function Edit() {
     client,
   } = context;
 
-  const reactSettings = useReactSettings();
-
   const taskColumns = useTaskColumns();
+  const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
 
   const [invoiceSum] = useAtom(invoiceSumAtom);
@@ -92,6 +102,35 @@ export default function Edit() {
               <InvoiceStatusBadge entity={invoice} />
             </div>
           )}
+
+          <Assigned
+            entityId={invoice?.project_id}
+            cacheEndpoint="/api/v1/projects"
+            apiEndpoint="/api/v1/projects/:id?include=client"
+            componentCallbackFn={(resource: Project) => (
+              <div className="flex space-x-20">
+                <span className="text-sm">{t('project')}</span>
+
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">{resource.name}</span>
+
+                  <div
+                    className="cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        route('/projects/:id', { id: invoice?.project_id })
+                      )
+                    }
+                  >
+                    <Icon
+                      element={ExternalLink}
+                      style={{ width: '1.17rem', height: '1.17rem' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          />
 
           <ClientSelector
             resource={invoice}
