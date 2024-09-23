@@ -83,6 +83,7 @@ export interface Invoice {
   payments?: Payment[];
   reminder_schedule?: string;
   e_invoice?: EInvoiceType;
+  is_locked?: boolean;
 }
 
 export interface Activity {

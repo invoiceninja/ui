@@ -21,6 +21,7 @@ interface Props {
   actions: Action<any>[];
   onSaveClick?: () => void;
   disableSaveButton?: boolean;
+  disableSaveButtonOnly?: boolean;
   cypressRef?: string;
   saveButtonLabel?: string | null;
 }
@@ -28,7 +29,13 @@ interface Props {
 export function ResourceActions(props: Props) {
   const [t] = useTranslation();
 
-  const { onSaveClick, disableSaveButton, label, saveButtonLabel } = props;
+  const {
+    onSaveClick,
+    disableSaveButton,
+    label,
+    saveButtonLabel,
+    disableSaveButtonOnly,
+  } = props;
 
   return (
     <>
@@ -38,7 +45,7 @@ export function ResourceActions(props: Props) {
             behavior="button"
             className="rounded-br-none rounded-tr-none px-3"
             onClick={onSaveClick}
-            disabled={disableSaveButton}
+            disabled={disableSaveButton || disableSaveButtonOnly}
             disableWithoutIcon
           >
             {saveButtonLabel ?? t('save')}
