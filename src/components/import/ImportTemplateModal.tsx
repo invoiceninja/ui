@@ -102,19 +102,40 @@ export function ImportTemplateModal(props: Props) {
   };
 
   const handleSaveTemplate = () => {
-    if (!isFormBusy) {
+    if (!isFormBusy && templateName) {
       toast.processing();
       setIsFormBusy(true);
 
       const updatedUser = cloneDeep(user) as User;
 
       if (updatedUser) {
+        const currentEntityImportTemplates = (cloneDeep(
+          updatedUser.company_user?.react_settings.import_templates?.[
+            props.entity
+          ]
+        ) || {}) as Record<string, Record<number, string>>;
+
+        const updatedEntityImportTemplates: Record<string, (string | null)[]> =
+          {};
+
+        if (!Array.isArray(currentEntityImportTemplates)) {
+          Object.entries(currentEntityImportTemplates).forEach(
+            ([key, value]) => {
+              if (!key || !value || !Array.isArray(value)) return;
+
+              updatedEntityImportTemplates[key] = value;
+            }
+          );
+        }
+
+        updatedEntityImportTemplates[templateName] = Object.values(
+          importMap.column_map?.[props.entity]?.mapping
+        ).map((column) => column || '') as string[];
+
         set(
           updatedUser,
-          `company_user.react_settings.import_templates.${props.entity}.${templateName}`,
-          Object.values(importMap.column_map?.[props.entity]?.mapping).map(
-            (column) => column || ''
-          )
+          `company_user.react_settings.import_templates.${props.entity}`,
+          updatedEntityImportTemplates
         );
 
         request(

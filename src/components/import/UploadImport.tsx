@@ -467,11 +467,13 @@ export function UploadImport(props: Props) {
               }}
               withBlank
             >
-              {templates.map((template, index) => (
-                <option key={index} value={template}>
-                  {template}
-                </option>
-              ))}
+              {templates
+                .filter((currentTemplate) => currentTemplate)
+                .map((template, index) => (
+                  <option key={index} value={template}>
+                    {template}
+                  </option>
+                ))}
             </SelectField>
           </Element>
 
