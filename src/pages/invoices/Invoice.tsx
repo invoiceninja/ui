@@ -36,6 +36,10 @@ import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItems
 import { useAtom } from 'jotai';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -43,7 +47,6 @@ export default function Invoice() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-
   const [searchParams] = useSearchParams();
 
   const hasPermission = useHasPermission();
@@ -51,7 +54,7 @@ export default function Invoice() {
 
   const actions = useActions();
 
-  const { data } = useInvoiceQuery({ id });
+  const { data } = useInvoiceQuery({ id, includeIsLocked: true });
 
   const [client, setClient] = useState<Client | undefined>();
 
@@ -116,6 +119,7 @@ export default function Invoice() {
                   (invoice.status_id === InvoiceStatus.Cancelled ||
                     invoice.is_deleted)
                 }
+                disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"
               />
             ),
@@ -123,21 +127,32 @@ export default function Invoice() {
           })}
       >
         {invoice?.id === id ? (
-          <div className="space-y-4">
-            <Tabs tabs={tabs} />
+          <div className="space-y-2">
+            {Boolean(invoice?.is_locked) && (
+              <div
+                className="flex items-center justify-center h-10 w-full text-white"
+                style={{ backgroundColor: '#4DA6FF' }}
+              >
+                {t('locked_invoice')}.
+              </div>
+            )}
 
-            <Outlet
-              context={{
-                invoice,
-                setInvoice,
-                errors,
-                isDefaultTerms,
-                setIsDefaultTerms,
-                isDefaultFooter,
-                setIsDefaultFooter,
-                client,
-              }}
-            />
+            <div className="space-y-4">
+              <Tabs tabs={tabs} />
+
+              <Outlet
+                context={{
+                  invoice,
+                  setInvoice,
+                  errors,
+                  isDefaultTerms,
+                  setIsDefaultTerms,
+                  isDefaultFooter,
+                  setIsDefaultFooter,
+                  client,
+                }}
+              />
+            </div>
           </div>
         ) : (
           <div className="flex justify-center items-center">
