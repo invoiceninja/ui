@@ -170,6 +170,7 @@ export function TaskDetails(props: Props) {
                   handleChange('rate', project.task_rate);
                 }}
                 value={task.project_id}
+                clientId={task.client_id}
                 clearButton={Boolean(task.project_id)}
                 onClearButtonClick={() => handleChange('project_id', '')}
                 errorMessage={errors?.errors.project_id}
