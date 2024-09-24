@@ -71,6 +71,15 @@ export function PaymentOverviewInvoice(props: Props) {
                 dateFormat
               )}
             </span>
+            {props.paymentable.refunded > 0 && (
+              <span className="" style={{ color: "red", colorScheme: colors.$0 }}>
+                ( {formatMoney(
+                  props?.paymentable?.refunded || 0,
+                  props.payment.client?.country_id,
+                  props.payment?.currency_id
+                )} { t('refunded')} )
+              </span>
+            )}
           </div>
         </div>
       )}
@@ -102,6 +111,15 @@ export function PaymentOverviewInvoice(props: Props) {
                 dateFormat
               )}
             </span>
+            {props.paymentable.refunded > 0 && (
+              <span className="" style={{ color: "red", colorScheme: colors.$0 }}>
+                ( {formatMoney(
+                  props?.paymentable?.refunded || 0,
+                  props.payment.client?.country_id,
+                  props.payment?.currency_id
+                )} {t('refunded')} )
+              </span>
+            )}
           </div>
         </div>
       )}

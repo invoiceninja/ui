@@ -21,10 +21,15 @@ export function useFormatMoney() {
   return (
     value: string | number,
     countryId: string | undefined,
-    currencyId: string | undefined
+    currencyId: string | undefined,
+    fractionDigits?: number,
+    showCurrencyCode?: boolean
   ) => {
     const currentCountryId = countryId || company?.settings.country_id;
-    const currentCurrencyId = currencyId || company?.settings.currency_id;
+    const currentCurrencyId =
+      currencyId && currencyId !== '999'
+        ? currencyId
+        : company?.settings.currency_id;
 
     const country = resolveCountry(currentCountryId);
     const currency = resolveCurrency(currentCurrencyId);
@@ -35,9 +40,14 @@ export function useFormatMoney() {
         currency,
         country,
         {
-          showCurrencyCode: company.settings.show_currency_code,
+          showCurrencyCode:
+            showCurrencyCode ?? company.settings.show_currency_code,
         }
       );
+    }
+
+    if (fractionDigits) {
+      return Number(value).toFixed(fractionDigits);
     }
 
     return value;

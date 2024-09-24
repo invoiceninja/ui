@@ -9,7 +9,6 @@
  */
 
 import { Card, CardContainer, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -26,6 +25,7 @@ import { useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Edit() {
   useTitle('payment_terms');
@@ -83,7 +83,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container>
+        <Container breadcrumbs={[]}>
           <Card
             title={data.data.data.name}
             disableSubmitButton={formik.isSubmitting}
@@ -105,12 +105,12 @@ export function Edit() {
             </Element>
 
             <CardContainer>
-              <InputField
+              <NumberInputField
                 value={formik.values.num_days}
-                type="number"
-                id="num_days"
                 label={t('number_of_days')}
-                onChange={formik.handleChange}
+                onValueChange={(value) =>
+                  formik.setFieldValue('num_days', value)
+                }
               />
             </CardContainer>
           </Card>

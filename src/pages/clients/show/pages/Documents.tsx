@@ -46,8 +46,9 @@ export interface Document {
   link: string;
 }
 
-interface Context {
+export interface Context {
   isPurgeOrMergeActionCalled: boolean;
+  displayName: string;
 }
 export default function Documents() {
   const { id } = useParams();

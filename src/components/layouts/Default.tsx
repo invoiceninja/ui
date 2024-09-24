@@ -36,7 +36,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
-import { isDemo, isSelfHosted } from '$app/common/helpers';
+import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -56,6 +56,7 @@ import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { Notifications } from '../Notifications';
 
 export interface SaveOption {
   label: string;
@@ -67,14 +68,12 @@ interface Props extends CommonProps {
   title?: string | null;
   onSaveClick?: any;
   onCancelClick?: any;
-  breadcrumbs?: Page[];
+  breadcrumbs: Page[];
   topRight?: ReactNode;
   docsLink?: string;
   navigationTopRight?: ReactNode;
   saveButtonLabel?: string | null;
-  backButtonLabel?: string;
   disableSaveButton?: boolean;
-  withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
   aboveMainContainer?: ReactNode;
 }
@@ -398,7 +397,7 @@ export function Default(props: Props) {
             <MenuIcon className="dark:text-gray-100" />
           </button>
           <div
-            className="flex-1 px-4 md:px-8 flex items-center"
+            className="flex-1 px-4 xl:px-8 flex items-center"
             data-cy="topNavbar"
           >
             <div className="flex flex-1 items-center space-x-4">
@@ -414,9 +413,11 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+              {isHosted() ? <Notifications /> : null}
+
               {shouldShowUnlockButton && (
                 <button
-                  className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
+                  className="hidden sm:inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
                   onClick={() =>
                     preventNavigation({
                       url: (isSelfHosted()
@@ -439,20 +440,24 @@ export function Default(props: Props) {
                 </Button>
               )}
 
-              {!props.withoutBackButton && (
-                <Button
-                  onClick={() => preventNavigation({ url: 'back' })}
-                  type="secondary"
-                >
-                  {t('back')}
-                </Button>
-              )}
-
-              {(props.onSaveClick || saveBtn) && (
+              {(Boolean(props.onSaveClick) || saveBtn) && (
                 <div>
-                  {(props.onSaveClick || saveBtn?.onClick) &&
-                    !props.additionalSaveOptions && (
+                  {!props.additionalSaveOptions && (
+                    <Button
+                      onClick={saveBtn?.onClick || props.onSaveClick}
+                      disabled={
+                        saveBtn?.disableSaveButton || props.disableSaveButton
+                      }
+                      disableWithoutIcon
+                    >
+                      {(saveBtn?.label || props.saveButtonLabel) ?? t('save')}
+                    </Button>
+                  )}
+
+                  {props.additionalSaveOptions && (
+                    <div className="flex">
                       <Button
+                        className="rounded-br-none rounded-tr-none px-3"
                         onClick={saveBtn?.onClick || props.onSaveClick}
                         disabled={
                           saveBtn?.disableSaveButton || props.disableSaveButton
@@ -461,50 +466,32 @@ export function Default(props: Props) {
                       >
                         {(saveBtn?.label || props.saveButtonLabel) ?? t('save')}
                       </Button>
-                    )}
 
-                  {(props.onSaveClick || saveBtn?.onClick) &&
-                    props.additionalSaveOptions && (
-                      <div className="flex">
-                        <Button
-                          className="rounded-br-none rounded-tr-none px-3"
-                          onClick={saveBtn?.onClick || props.onSaveClick}
-                          disabled={
-                            saveBtn?.disableSaveButton ||
-                            props.disableSaveButton
-                          }
-                          disableWithoutIcon
-                        >
-                          {(saveBtn?.label || props.saveButtonLabel) ??
-                            t('save')}
-                        </Button>
-
-                        <Dropdown
-                          className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
-                          cardActions
-                          disabled={
-                            saveBtn?.disableSaveButton ||
-                            props.disableSaveButton
-                          }
-                        >
-                          {props.additionalSaveOptions.map((option, index) => (
-                            <DropdownElement
-                              key={index}
-                              icon={option.icon}
-                              disabled={props.disableSaveButton}
-                              onClick={option.onClick}
-                            >
-                              {option.label}
-                            </DropdownElement>
-                          ))}
-                        </Dropdown>
-                      </div>
-                    )}
+                      <Dropdown
+                        className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                        cardActions
+                        disabled={
+                          saveBtn?.disableSaveButton || props.disableSaveButton
+                        }
+                      >
+                        {props.additionalSaveOptions.map((option, index) => (
+                          <DropdownElement
+                            key={index}
+                            icon={option.icon}
+                            disabled={props.disableSaveButton}
+                            onClick={option.onClick}
+                          >
+                            {option.label}
+                          </DropdownElement>
+                        ))}
+                      </Dropdown>
+                    </div>
+                  )}
                 </div>
               )}
 
               {(navigationTopRightElement || props.navigationTopRight) && (
-                <div className="space-x-3 items-center hidden lg:flex">
+                <div className="flex space-x-3 items-center">
                   {navigationTopRightElement?.element ||
                     props.navigationTopRight}
                 </div>
@@ -516,15 +503,18 @@ export function Default(props: Props) {
         {props.aboveMainContainer}
 
         <main className="flex-1">
-          {(props.breadcrumbs || props.topRight) && (
-            <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-              <div className="">
-                {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
-              </div>
+          {(props.breadcrumbs || props.topRight) &&
+            props.breadcrumbs.length > 0 && (
+              <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+                <div className="">
+                  {props.breadcrumbs && (
+                    <Breadcrumbs pages={props.breadcrumbs} />
+                  )}
+                </div>
 
-              {props.topRight && <div>{props.topRight}</div>}
-            </div>
-          )}
+                {props.topRight && <div>{props.topRight}</div>}
+              </div>
+            )}
 
           <div
             style={{ color: colors.$3, backgroundColor: colors.$2 }}

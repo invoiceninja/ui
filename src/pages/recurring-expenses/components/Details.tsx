@@ -32,6 +32,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -230,8 +231,7 @@ export function Details(props: Props) {
                   errorMessage={errors?.errors.tax_name1}
                   cypressRef="taxNameByAmount1"
                 />
-                <InputField
-                  type="number"
+                <NumberInputField
                   label={t('tax_amount')}
                   value={recurringExpense.tax_amount1}
                   onValueChange={(value) =>
@@ -283,8 +283,7 @@ export function Details(props: Props) {
                   errorMessage={errors?.errors.tax_name2}
                   cypressRef="taxNameByAmount2"
                 />
-                <InputField
-                  type="number"
+                <NumberInputField
                   label={t('tax_amount')}
                   value={recurringExpense.tax_amount2}
                   onValueChange={(value) =>
@@ -335,8 +334,7 @@ export function Details(props: Props) {
                   onValueChange={(value) => handleChange('tax_name3', value)}
                   errorMessage={errors?.errors.tax_name3}
                 />
-                <InputField
-                  type="number"
+                <NumberInputField
                   label={t('tax_amount')}
                   value={recurringExpense.tax_amount3}
                   onValueChange={(value) =>
@@ -350,8 +348,7 @@ export function Details(props: Props) {
 
         {recurringExpense && (
           <Element leftSide={t('amount')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={recurringExpense.amount}
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value) || 0)
@@ -367,6 +364,7 @@ export function Details(props: Props) {
               value={recurringExpense.currency_id}
               onChange={(currency) => handleChange('currency_id', currency)}
               errorMessage={errors?.errors.currency_id}
+              dismissable
             />
           </Element>
         )}

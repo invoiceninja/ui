@@ -43,6 +43,7 @@ import { endpoint } from '$app/common/helpers';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -218,7 +219,7 @@ export default function Create() {
       onSaveClick={() => onSubmit(payment as unknown as Payment, sendEmail)}
       disableSaveButton={!payment || isFormBusy}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector
@@ -250,9 +251,7 @@ export default function Create() {
             leftSide={t('amount_received')}
             leftSideHelp={t('amount_received_help')}
           >
-            <InputField
-              id="amount"
-              type="number"
+            <NumberInputField
               value={payment?.amount}
               onValueChange={(value) =>
                 handleChange(
@@ -313,9 +312,9 @@ export default function Create() {
                         .toArray()}
                     />
 
-                    <InputField
-                      type="number"
+                    <NumberInputField
                       label={t('amount_received')}
+                      value={invoice.amount}
                       onValueChange={(value) =>
                         handleInvoiceInputChange(
                           index,
@@ -323,7 +322,6 @@ export default function Create() {
                         )
                       }
                       className="w-full"
-                      value={invoice.amount}
                       withoutLabelWrapping
                     />
 
@@ -430,8 +428,7 @@ export default function Create() {
                         .toArray()}
                     />
 
-                    <InputField
-                      type="number"
+                    <NumberInputField
                       label={t('amount')}
                       onValueChange={(value) =>
                         handleCreditInputChange(

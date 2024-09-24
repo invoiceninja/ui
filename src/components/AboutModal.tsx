@@ -19,7 +19,6 @@ import {
   Youtube,
 } from 'react-feather';
 import { Modal } from './Modal';
-import { version } from '$app/common/helpers/version';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction, useState } from 'react';
@@ -48,6 +47,7 @@ interface SystemInfo {
     is_okay: boolean;
     memory_limit: string;
   };
+  is_docker: boolean;
   env_writable: boolean;
   simple_db_check: boolean;
   cache_enabled: boolean;
@@ -115,6 +115,9 @@ export function AboutModal(props: Props) {
         (response) => response.data
       ),
     staleTime: Infinity,
+    enabled:
+      isSelfHosted() &&
+      !(import.meta.env.VITE_API_URL as string).includes('staging'), // Note: The staging API helped me test this functionality, but the health_check endpoint is not available on the staging API.
   });
 
   const handleHealthCheck = (allowAction?: boolean) => {
@@ -153,12 +156,8 @@ export function AboutModal(props: Props) {
 
   const handleUpdateApp = (password: string) => {
     if (!isFormBusy) {
-      const timeoutId = setTimeout(() => {
-        setIsUpgradeLoadingModalOpen(true);
-      }, 25000);
-
-      toast.processing();
       setIsFormBusy(true);
+      setIsUpgradeLoadingModalOpen(true);
 
       request(
         'POST',
@@ -174,8 +173,8 @@ export function AboutModal(props: Props) {
           }
         })
         .finally(() => {
-          clearTimeout(timeoutId);
           setIsFormBusy(false);
+          setIsUpgradeLoadingModalOpen(false);
         });
     }
   };
@@ -201,7 +200,7 @@ export function AboutModal(props: Props) {
             <span>{user?.email}</span>
           </div>
 
-          <span className="mt-4">{version}</span>
+          <span className="mt-4">v{currentSystemInfo?.api_version}</span>
         </div>
 
         {isSelfHosted() && (
@@ -220,7 +219,8 @@ export function AboutModal(props: Props) {
         {isSelfHosted() &&
           latestVersion &&
           currentSystemInfo?.api_version &&
-          currentSystemInfo.api_version !== latestVersion && (
+          currentSystemInfo.api_version !== latestVersion &&
+          !currentSystemInfo?.is_docker && (
             <Button
               behavior="button"
               className="flex items-center"
@@ -349,38 +349,39 @@ export function AboutModal(props: Props) {
           </div>
 
           {(Boolean(!systemInfo?.env_writable) ||
-            Boolean(systemInfo?.file_permissions !== 'Ok')) && (
-            <Div
-              className="flex justify-between items-center cursor-pointer py-1 px-3"
-              theme={{
-                hoverColor: colors.$5,
-              }}
-              onClick={() =>
-                window
-                  .open(
-                    'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
-                    '_blank'
-                  )
-                  ?.focus()
-              }
-            >
-              <div className="flex flex-col">
-                <span className="font-medium text-base mb-1">
-                  {t('permissions')}
-                </span>
+            Boolean(systemInfo?.file_permissions !== 'Ok')) &&
+            Boolean(!systemInfo?.is_docker) && (
+              <Div
+                className="flex justify-between items-center cursor-pointer py-1 px-3"
+                theme={{
+                  hoverColor: colors.$5,
+                }}
+                onClick={() =>
+                  window
+                    .open(
+                      'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
+                      '_blank'
+                    )
+                    ?.focus()
+                }
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium text-base mb-1">
+                    {t('permissions')}
+                  </span>
 
-                <span>
-                  {!systemInfo?.env_writable
-                    ? t('env_not_writable')
-                    : systemInfo?.file_permissions}
-                </span>
-              </div>
+                  <span>
+                    {!systemInfo?.env_writable
+                      ? t('env_not_writable')
+                      : systemInfo?.file_permissions}
+                  </span>
+                </div>
 
-              <div>
-                <Icon element={MdWarning} color="red" size={25} />
-              </div>
-            </Div>
-          )}
+                <div>
+                  <Icon element={MdWarning} color="red" size={25} />
+                </div>
+              </Div>
+            )}
 
           {systemInfo?.pdf_engine !== 'SnapPDF PDF Generator' && (
             <Div
@@ -506,7 +507,11 @@ export function AboutModal(props: Props) {
 
             <Button
               behavior="button"
-              onClick={() => setIsPasswordConfirmModalOpen(true)}
+              onClick={() => {
+                setIsAboutVisible(false);
+                setIsForceUpdateModalOpen(false);
+                setIsPasswordConfirmModalOpen(true);
+              }}
               disableWithoutIcon
               disabled={isFormBusy}
             >
@@ -517,11 +522,14 @@ export function AboutModal(props: Props) {
       </Modal>
 
       <Modal
-        title={t('updating_app')}
+        title={t('self-update')}
         visible={isUpgradeLoadingModalOpen}
-        onClose={() => setIsUpgradeLoadingModalOpen(false)}
+        onClose={() => {}}
+        disableClosing
       >
-        {t('upgrade_in_progress')}
+        <span className="text-center py-3 font-medium">
+          {t('in_progress')}
+        </span>
       </Modal>
 
       <PasswordConfirmation

@@ -303,13 +303,36 @@ export function UploadImport(props: Props) {
         );
 
         if (isFilesTypeCorrect) {
-          acceptedFiles.forEach((file) => {
-            if (isImportFileTypeZip) {
-              setFiles((prevState) => [...prevState, file]);
-            } else {
-              formData.append(`files[${props.entity}]`, file);
-            }
-          });
+          await Promise.all(
+            acceptedFiles.map(async (file) => {
+              if (isImportFileTypeZip) {
+                setFiles((prevState) => [...prevState, file]);
+              } else {
+                const arrayBuffer = await file.arrayBuffer();
+
+                const textDecoder = new TextDecoder();
+                const text = textDecoder.decode(arrayBuffer);
+
+                const textEncoder = new TextEncoder();
+                const utf8ArrayBuffer = textEncoder.encode(text);
+
+                const modifiedFile = new File([utf8ArrayBuffer], file.name, {
+                  type: file.type,
+                });
+
+                if (file['path' as keyof typeof file]) {
+                  Object.defineProperty(modifiedFile, 'path', {
+                    value: file['path' as keyof typeof file],
+                    writable: false,
+                    enumerable: true,
+                    configurable: true,
+                  });
+                }
+
+                formData.append(`files[${props.entity}]`, modifiedFile);
+              }
+            })
+          );
 
           if (!isImportFileTypeZip) {
             formData.append('import_type', props.entity);
@@ -444,11 +467,13 @@ export function UploadImport(props: Props) {
               }}
               withBlank
             >
-              {templates.map((template, index) => (
-                <option key={index} value={template}>
-                  {template}
-                </option>
-              ))}
+              {templates
+                .filter((currentTemplate) => currentTemplate)
+                .map((template, index) => (
+                  <option key={index} value={template}>
+                    {template}
+                  </option>
+                ))}
             </SelectField>
           </Element>
 

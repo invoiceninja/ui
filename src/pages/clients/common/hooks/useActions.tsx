@@ -21,6 +21,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdDelete,
   MdDesignServices,
   MdPictureAsPdf,
@@ -38,6 +39,7 @@ import { MergeClientAction } from '../components/MergeClientAction';
 import { Dispatch, SetStateAction } from 'react';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useBulk } from '$app/common/queries/clients';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface Params {
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
@@ -52,7 +54,7 @@ export function useActions(params?: Params) {
 
   const { isAdmin, isOwner } = useAdmin();
 
-  const { isEditOrShowPage } = useEntityPageIdentifier({
+  const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
     entity: 'client',
   });
 
@@ -75,7 +77,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      Boolean(!client.is_deleted && !isShowPage) && (
         <DropdownElement
           onClick={() =>
             window.open(
@@ -93,6 +95,18 @@ export function useActions(params?: Params) {
           {t('client_portal')}
         </DropdownElement>
       ),
+    (client) => (
+      <AddActivityComment
+        entity="client"
+        entityId={client.id}
+        label={client.display_name}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (client) =>
       !client.is_deleted &&
       (isAdmin || isOwner) && (

@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import {
   CompanyGateway,
   FeesAndLimitsEntry,
@@ -27,6 +27,7 @@ import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { Entry } from '$app/components/forms/Combobox';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   gateway: Gateway;
@@ -103,18 +104,17 @@ export function LimitsAndFees(props: Props) {
 
           <Element leftSide={`${t('min')} ${t('limit')}`}>
             <div className="space-y-4">
-              <InputField
-                type="number"
+              <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .min_limit
+                    ?.min_limit
                 }
                 onValueChange={(value) =>
                   handleEntryChange('min_limit', parseFloat(value) || -1)
                 }
                 disabled={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .min_limit === -1
+                    ?.min_limit === -1
                 }
                 errorMessage={props.errors?.errors.min_limit}
               />
@@ -122,7 +122,7 @@ export function LimitsAndFees(props: Props) {
               <Toggle
                 checked={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .min_limit >= 0
+                    ?.min_limit >= 0
                 }
                 label={t('enable_min')}
                 onValueChange={(value) =>
@@ -134,18 +134,17 @@ export function LimitsAndFees(props: Props) {
 
           <Element leftSide={`${t('max')} ${t('limit')}`}>
             <div className="space-y-4">
-              <InputField
-                type="number"
+              <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .max_limit
+                    ?.max_limit
                 }
                 onValueChange={(value) =>
                   handleEntryChange('max_limit', parseFloat(value) || -1)
                 }
                 disabled={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .max_limit === -1
+                    ?.max_limit === -1
                 }
                 errorMessage={props.errors?.errors.max_limit}
               />
@@ -153,7 +152,7 @@ export function LimitsAndFees(props: Props) {
               <Toggle
                 checked={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .max_limit >= 0
+                    ?.max_limit >= 0
                 }
                 label={t('enable_max')}
                 onValueChange={(value) =>
@@ -166,11 +165,10 @@ export function LimitsAndFees(props: Props) {
           <Divider />
 
           <Element leftSide={t('fee_percent')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .fee_percent
+                  ?.fee_percent
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_percent', parseFloat(value))
@@ -180,11 +178,10 @@ export function LimitsAndFees(props: Props) {
           </Element>
 
           <Element leftSide={t('fee_amount')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .fee_amount
+                  ?.fee_amount
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_amount', parseFloat(value))
@@ -272,11 +269,10 @@ export function LimitsAndFees(props: Props) {
           )}
 
           <Element leftSide={t('fee_cap')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .fee_cap
+                  ?.fee_cap
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_cap', parseFloat(value))
@@ -289,7 +285,7 @@ export function LimitsAndFees(props: Props) {
             <Toggle
               checked={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .adjust_fee_percent
+                  ?.adjust_fee_percent
               }
               label={t('adjust_fee_percent_help')}
               onValueChange={(value) =>

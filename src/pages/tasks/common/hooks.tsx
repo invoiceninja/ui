@@ -77,6 +77,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'status',
@@ -136,9 +137,10 @@ export function useTaskColumns() {
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+
   const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -167,7 +169,7 @@ export function useTaskColumns() {
         <Assigned
           entityId={task.project_id}
           cacheEndpoint="/api/v1/projects"
-          apiEndpoint="/api/v1/projects/:id"
+          apiEndpoint="/api/v1/projects/:id?include=client"
           preCheck={
             hasPermission('view_project') || hasPermission('edit_project')
           }
@@ -188,14 +190,21 @@ export function useTaskColumns() {
           <TaskStatus entity={task} />
 
           {task.invoice_id && (
-            <MdTextSnippet
-              className="cursor-pointer"
-              fontSize={19}
-              color={accentColor}
-              onClick={() =>
-                navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
-              }
-            />
+            <Tooltip
+              width="auto"
+              message={t('view_invoice') as string}
+              withoutArrow
+              placement="bottom"
+            >
+              <MdTextSnippet
+                className="cursor-pointer"
+                fontSize={19}
+                color={accentColor}
+                onClick={() =>
+                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+                }
+              />
+            </Tooltip>
           )}
         </div>
       ),
@@ -237,7 +246,9 @@ export function useTaskColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -403,12 +414,6 @@ export function useTaskFilters() {
   });
 
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('invoiced'),
       value: 'invoiced',

@@ -28,6 +28,7 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Credit } from '$app/common/interfaces/credit';
+import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 
 export default function Credits() {
   useTitle('credits');
@@ -40,9 +41,8 @@ export default function Credits() {
   const actions = useActions();
   const columns = useCreditColumns();
   const filters = useCreditsFilters();
-
   const creditColumns = useAllCreditColumns();
-
+  const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
 
   const {
@@ -52,12 +52,7 @@ export default function Credits() {
   } = useChangeTemplate();
 
   return (
-    <Default
-      title={t('credits')}
-      breadcrumbs={pages}
-      docsLink="en/credits/"
-      withoutBackButton
-    >
+    <Default title={t('credits')} breadcrumbs={pages} docsLink="en/credits/">
       <DataTable
         resource="credit"
         endpoint="/api/v1/credits?include=client&without_deleted_clients=true&sort=id|desc"
@@ -77,6 +72,7 @@ export default function Credits() {
             table="credit"
           />
         }
+        dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_credit')]}
         hideEditableOptions={!hasPermission('edit_credit')}
       />

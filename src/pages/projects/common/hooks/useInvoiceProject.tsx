@@ -27,7 +27,7 @@ import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { toast } from '$app/common/helpers/toast/toast';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export const calculateTaskHours = (timeLog: string) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
@@ -36,12 +36,14 @@ export const calculateTaskHours = (timeLog: string) => {
 
   if (parsedTimeLogs.length) {
     parsedTimeLogs.forEach(([start, stop]) => {
-      const unixStart = dayjs.unix(start);
-      const unixStop = dayjs.unix(stop);
+      if (start && stop) {
+        const unixStart = dayjs.unix(start);
+        const unixStop = dayjs.unix(stop);
 
-      hoursSum += Number(
-        (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
-      );
+        hoursSum += Number(
+          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+        );
+      }
     });
   }
 
@@ -49,6 +51,7 @@ export const calculateTaskHours = (timeLog: string) => {
 };
 
 export function useInvoiceProject() {
+  const [t] = useTranslation();
   const navigate = useNavigate();
   const company = useCurrentCompany();
 
@@ -58,7 +61,7 @@ export function useInvoiceProject() {
 
   const setInvoice = useSetAtom(invoiceAtom);
 
-  return (tasks: Task[]) => {
+  return (tasks: Task[], clientId: string, projectId: string) => {
     if (data) {
       const invoice: Invoice = { ...data };
 
@@ -83,8 +86,8 @@ export function useInvoiceProject() {
         return toast.error('multiple_client_error');
       }
 
-      invoice.client_id = tasks.length ? tasks[0].client_id : '';
-
+      invoice.project_id = projectId;
+      invoice.client_id = clientId;
       invoice.line_items = [];
 
       tasks.forEach((task: Task) => {

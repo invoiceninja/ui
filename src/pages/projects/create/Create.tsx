@@ -33,6 +33,7 @@ import { projectAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { CustomField } from '$app/components/CustomField';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_project');
@@ -126,7 +127,7 @@ export default function Create() {
       disableSaveButton={!project}
       onSaveClick={onSave}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
           <Element leftSide={t('project_name')} required>
             <InputField
@@ -166,8 +167,7 @@ export default function Create() {
           </Element>
 
           <Element leftSide={t('budgeted_hours')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={project?.budgeted_hours}
               onValueChange={(value) =>
                 handleChange('budgeted_hours', parseFloat(value))
@@ -177,8 +177,7 @@ export default function Create() {
           </Element>
 
           <Element leftSide={t('task_rate')}>
-            <InputField
-              type="number"
+            <NumberInputField
               value={project?.task_rate}
               onValueChange={(value) =>
                 handleChange('task_rate', parseFloat(value))

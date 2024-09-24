@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 import { SelectField } from '$app/components/forms';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
 
 interface Field {
   key: string;
@@ -126,6 +127,16 @@ export function Registration() {
           onValueChange={(value) => handleChange('client_can_register', value)}
         />
       </Element>
+
+      {company?.client_can_register && (
+      <Element
+        leftSide={t('registration_url')}
+      >
+        
+        <CopyToClipboard text={`${company?.portal_domain}/client/register?company_key=${company?.company_key}`} />
+
+      </Element>
+      )}
 
       <div className="pt-4 border-b"></div>
 

@@ -33,11 +33,10 @@ interface Props {
   children: ReactNode;
   onSaveClick?: any;
   onCancelClick?: any;
-  breadcrumbs?: Page[];
+  breadcrumbs: Page[];
   docsLink?: string;
   navigationTopRight?: ReactNode;
   disableSaveButton?: boolean;
-  withoutBackButton?: boolean;
 }
 
 const LinkStyled = styled(Link)`
@@ -76,7 +75,7 @@ export function Settings(props: Props) {
       docsLink={props.docsLink}
       navigationTopRight={props.navigationTopRight}
       disableSaveButton={props.disableSaveButton}
-      withoutBackButton={props.withoutBackButton}
+      breadcrumbs={[]}
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">

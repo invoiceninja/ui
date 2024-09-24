@@ -41,7 +41,6 @@ export function AccountManagement() {
       title={t('account_management')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#account_management"
-      withoutBackButton
     >
       <Tabs tabs={tabs} className="mt-6" />
 

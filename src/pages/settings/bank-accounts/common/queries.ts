@@ -14,6 +14,7 @@ import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { Params } from '$app/common/queries/common/params.interface';
 
 interface BankAccountParams {
   id: string | undefined;
@@ -40,11 +41,18 @@ export function useBankAccountQuery(params: BankAccountParams) {
   );
 }
 
-export function useBankAccountsQuery() {
+export function useBankAccountsQuery(params?: Params) {
+  const { perPage } = params || {};
+
   return useQuery<BankAccount[]>(
     ['/api/v1/bank_integrations'],
     () =>
-      request('GET', endpoint('/api/v1/bank_integrations')).then(
+      request(
+        'GET',
+        endpoint('/api/v1/bank_integrations?per_page=:perPage&status=active', {
+          perPage: perPage ?? 20,
+        })
+      ).then(
         (response: GenericSingleResourceResponse<BankAccount[]>) =>
           response.data.data
       ),

@@ -271,7 +271,10 @@ export function PaymentSlider() {
 
         <div>
           {activities?.map((activity) => (
-            <NonClickableElement key={activity.id} className="flex flex-col">
+            <NonClickableElement
+              key={activity.id}
+              className="flex flex-col space-y-2"
+            >
               <p>{activityElement(activity, payment)}</p>
               <div className="inline-flex items-center space-x-1">
                 <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>

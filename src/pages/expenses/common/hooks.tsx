@@ -59,6 +59,14 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -79,7 +87,13 @@ export function useActions() {
   const { create } = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {
-    setExpense({ ...expense, id: '', documents: [], number: '' });
+    setExpense({
+      ...expense,
+      id: '',
+      documents: [],
+      number: '',
+      date: dayjs().format('YYYY-MM-DD'),
+    });
 
     navigate('/expenses/create?action=clone');
   };
@@ -90,6 +104,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/recurring_expenses/create?action=clone');
@@ -101,7 +116,7 @@ export function useActions() {
       expense.invoice_id.length === 0 &&
       hasPermission('create_invoice') && (
         <DropdownElement
-          onClick={() => create(expense)}
+          onClick={() => create([expense])}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_expense')}
@@ -362,7 +377,9 @@ export function useExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -471,7 +488,9 @@ export function useExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -569,13 +588,14 @@ export function useExpenseFilters() {
 
   const statusThemeColors = useStatusThemeColorScheme();
 
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
+    status: ['active'],
+    perPage: 500,
+  });
+
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('logged'),
       value: 'logged',
@@ -613,6 +633,22 @@ export function useExpenseFilters() {
       backgroundColor: '#b5812c',
     },
   ];
+
+  expenseCategoriesResponse?.forEach((expenseCategory) => {
+    const { red, green, blue, hex } = hexToRGB(expenseCategory.color || '');
+
+    const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+    filters.push({
+      value: expenseCategory.id,
+      label: expenseCategory.name,
+      color: adjustColorDarkness(hex, darknessAmount),
+      backgroundColor: expenseCategory.color || '',
+      queryKey: 'categories',
+      dropdownKey: '1',
+      placeHolder: 'expense_categories',
+    });
+  });
 
   return filters;
 }

@@ -21,6 +21,10 @@ import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categorie
 import { usePaymentsQuery } from '$app/common/queries/payments';
 import { useExpensesQuery } from '$app/common/queries/expenses';
 import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import collect from 'collect.js';
 
 export interface ResourceItem {
   id: string;
@@ -55,9 +59,16 @@ interface Props extends CommonProps {
   dataKey: 'invoices' | 'categories' | 'vendors' | 'payments' | 'expenses';
   setSelectedIds: Dispatch<SetStateAction<string[]>>;
   selectedIds: string[];
+  calculateTotal?: boolean;
 }
 
 export function ListBox(props: Props) {
+  const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
+  const formatMoney = useFormatMoney();
+
   const [searchParams, setSearchParams] = useState<SearchInput>({
     searchTerm: '',
     minAmount: 0,
@@ -66,15 +77,11 @@ export function ListBox(props: Props) {
     endDate: '',
   });
 
-  const isInvoicesDataKey = props.dataKey === 'invoices';
-
   const isVendorsDataKey = props.dataKey === 'vendors';
-
-  const isExpenseCategoriesDataKey = props.dataKey === 'categories';
-
-  const isPaymentsDataKey = props.dataKey === 'payments';
-
   const isExpensesDataKey = props.dataKey === 'expenses';
+  const isPaymentsDataKey = props.dataKey === 'payments';
+  const isInvoicesDataKey = props.dataKey === 'invoices';
+  const isExpenseCategoriesDataKey = props.dataKey === 'categories';
 
   const [clientId, setClientId] = useState<string>();
 
@@ -166,6 +173,25 @@ export function ListBox(props: Props) {
     }));
   };
 
+  const getCalculatedTotalByCurrency = (currencyId: string) => {
+    return (
+      (
+        resourceItems?.filter(
+          (item) => isItemChecked(item.id) && item.currency_id === currencyId
+        ) || []
+      ).reduce((total, resourceItem) => total + resourceItem.amount, 0) ?? 0
+    );
+  };
+
+  const getAllUniqueResourceCurrencies = () => {
+    return collect(
+      resourceItems?.filter((item) => isItemChecked(item.id)) || []
+    )
+      .pluck('currency_id')
+      .unique()
+      .toArray();
+  };
+
   useEffect(() => {
     setClients(clientsResponse);
 
@@ -195,13 +221,26 @@ export function ListBox(props: Props) {
       setClientId('');
     }
   }, [props.selectedIds]);
-  
-  const colors = useColorScheme();
 
   return (
-    <div className="flex flex-col flex-1 w-full" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+    <div
+      className={classNames('flex flex-col flex-1 w-full relative', {
+        'pb-7': props.calculateTotal,
+      })}
+      style={{
+        color: colors.$3,
+        colorScheme: colors.$0,
+        backgroundColor: colors.$1,
+        borderColor: colors.$4,
+      }}
+    >
       <div
-        style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+        style={{
+          color: colors.$3,
+          colorScheme: colors.$0,
+          backgroundColor: colors.$1,
+          borderColor: colors.$4,
+        }}
         className={`flex justify-center px-5 py-3 relative border-b border-t ${props.className}`}
       >
         <SearchArea
@@ -213,8 +252,15 @@ export function ListBox(props: Props) {
           setSelectedIds={props.setSelectedIds}
         />
       </div>
+
       <ul
-        style={{ height: isInvoicesDataKey ? 400 : 200, color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+        style={{
+          height: isInvoicesDataKey ? 400 : 200,
+          color: colors.$3,
+          colorScheme: colors.$0,
+          backgroundColor: colors.$1,
+          borderColor: colors.$4,
+        }}
         className="flex flex-col grow justify-start overflow-y-auto"
       >
         {resourceItems?.map(
@@ -233,6 +279,37 @@ export function ListBox(props: Props) {
             )
         )}
       </ul>
+
+      {props.calculateTotal &&
+        Boolean(
+          resourceItems?.filter((item) => isItemChecked(item.id)).length
+        ) && (
+          <div className="absolute flex w-full bottom-2 text-sm">
+            <div className="flex flex-1 justify-center items-center space-x-1">
+              <span>
+                {resourceItems?.filter((item) => isItemChecked(item.id)).length}
+              </span>
+
+              <span>{t('selected')}</span>
+
+              <span>&middot;</span>
+
+              <span>
+                {getAllUniqueResourceCurrencies()
+                  .map((currencyId, index) =>
+                    formatMoney(
+                      getCalculatedTotalByCurrency(
+                        currencyId as unknown as string
+                      ),
+                      resourceItems?.[index].country_id,
+                      currencyId as unknown as string
+                    )
+                  )
+                  .join(' | ')}
+              </span>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

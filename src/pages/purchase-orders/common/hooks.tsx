@@ -33,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
@@ -77,6 +78,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -393,12 +395,6 @@ export function usePurchaseOrderFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
-    {
       label: t('draft'),
       value: 'draft',
       color: 'white',
@@ -521,6 +517,18 @@ export function useActions() {
           {t('schedule')}
         </DropdownElement>
       ),
+    (purchaseOrder) => (
+      <AddActivityComment
+        entity="purchase_order"
+        entityId={purchaseOrder.id}
+        label={`#${purchaseOrder.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (purchaseOrder) => (
       <DropdownElement
         onClick={() => downloadPdf(purchaseOrder)}

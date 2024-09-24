@@ -41,7 +41,9 @@ export default function Documents() {
       <DocumentsTable
         documents={task?.documents || []}
         onDocumentDelete={invalidateCache}
-        disableEditableOptions={!entityAssigned(task, true)}
+        disableEditableOptions={
+          !entityAssigned(task, true) && !hasPermission('edit_task')
+        }
       />
     </div>
   );

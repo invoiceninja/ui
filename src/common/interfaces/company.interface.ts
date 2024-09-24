@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { BankAccount } from './bank-accounts';
 import { Document } from './document.interface';
 
@@ -76,6 +77,8 @@ export interface Company {
   smtp_password: string;
   smtp_local_domain: string;
   smtp_verify_peer: boolean;
+  e_invoice?: EInvoiceType;
+  use_comma_as_decimal_place?: boolean;
 }
 
 export interface Settings {
@@ -320,6 +323,8 @@ export interface Settings {
   brevo_secret: string;
   task_round_up: boolean;
   task_round_to_nearest: number;
+  merge_e_invoice_to_pdf: boolean;
+  payment_flow: string;
 }
 
 export interface TaxData {

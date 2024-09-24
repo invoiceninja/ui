@@ -27,7 +27,6 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
-  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -58,6 +57,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'name',
@@ -179,7 +179,9 @@ export function useProjectColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -203,7 +205,9 @@ export function useProjectColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -316,7 +320,7 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
+  const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'project',
     editPageTabs: ['documents'],
   });
@@ -347,7 +351,7 @@ export function useActions() {
           request(
             'GET',
             endpoint(
-              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active&without_deleted_clients=true',
               {
                 projectId: project.id,
               }
@@ -366,7 +370,7 @@ export function useActions() {
           return toast.error('no_assigned_tasks');
         }
 
-        invoiceProject(unInvoicedTasks);
+        invoiceProject(unInvoicedTasks, project.client_id, project.id);
       });
   };
 
@@ -377,18 +381,6 @@ export function useActions() {
   } = useChangeTemplate();
 
   const actions = [
-    (project: Project) =>
-      isShowPage && (
-        <DropdownElement
-          onClick={() =>
-            navigate(route('/projects/:id/edit', { id: project.id }))
-          }
-          icon={<Icon element={MdEdit} />}
-        >
-          {t('edit')}
-        </DropdownElement>
-      ),
-    () => isShowPage && <Divider withoutPadding />,
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement
@@ -469,7 +461,10 @@ export const useCustomBulkActions = () => {
 
   const documentsBulk = useDocumentsBulk();
 
-  const handleInvoiceProjects = (tasks: Task[] | null) => {
+  const handleInvoiceProjects = (
+    tasks: Task[] | null,
+    projectsIds: string[]
+  ) => {
     if (tasks && !tasks.length) {
       return toast.error('no_assigned_tasks');
     }
@@ -478,7 +473,13 @@ export const useCustomBulkActions = () => {
       return toast.error('multiple_client_error');
     }
 
-    invoiceProject(tasks);
+    const projectsIdsLength = projectsIds.length;
+
+    invoiceProject(
+      tasks,
+      tasks[0].client_id,
+      projectsIds[projectsIdsLength - 1]
+    );
   };
 
   const shouldDownloadDocuments = (projects: Project[]) => {
@@ -511,7 +512,8 @@ export const useCustomBulkActions = () => {
         <DropdownElement
           onClick={async () => {
             handleInvoiceProjects(
-              await combineProjectsTasks(selectedIds, selectedResources)
+              await combineProjectsTasks(selectedIds, selectedResources),
+              selectedIds
             );
 
             setSelected([]);

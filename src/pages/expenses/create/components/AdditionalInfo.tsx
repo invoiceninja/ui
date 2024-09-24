@@ -14,24 +14,25 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { CurrencySelector } from '$app/components/CurrencySelector';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import Toggle from '$app/components/forms/Toggle';
 import { PaymentTypeSelector } from '$app/components/payment-types/PaymentTypeSelector';
 import dayjs from 'dayjs';
 import { useResolveCurrencySeparator } from '$app/pages/transactions/common/hooks/useResolveCurrencySeparator';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExpenseCardProps } from './Details';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { ExpenseCardProps } from './Details';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();
   const { expense, handleChange, errors } = props;
 
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
+
   const resolveCurrency = useResolveCurrency();
   const resolveCurrencySeparator = useResolveCurrencySeparator();
-  const reactSettings = useReactSettings();
 
   const [currencySeparators, setCurrencySeparators] =
     useState<DecimalInputSeparators>({
@@ -75,12 +76,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
   };
 
   useEffect(() => {
-    if (
-      expense &&
-      expense.exchange_rate &&
-      expense.invoice_currency_id &&
-      expense.currency_id
-    ) {
+    if (expense && expense.exchange_rate && expense.invoice_currency_id) {
       handleChange('foreign_amount', expense.amount * expense.exchange_rate);
     } else {
       handleChange('foreign_amount', 0);
@@ -89,29 +85,20 @@ export function AdditionalInfo(props: ExpenseCardProps) {
 
   useEffect(() => {
     if (expense) {
-      if (expense.currency_id) {
-        handleChange('currency_id', expense.currency_id);
-      } else {
-        handleChange('invoice_currency_id', expense.invoice_currency_id);
-      }
+      handleChange('invoice_currency_id', expense.invoice_currency_id);
 
-      if (expense.currency_id && expense.invoice_currency_id) {
-        const resolveExpenseCurrency = resolveCurrency(expense.currency_id);
+      if (expense.invoice_currency_id) {
         const resolveConvertCurrency = resolveCurrency(
           expense.invoice_currency_id
         );
 
-        if (resolveExpenseCurrency && resolveConvertCurrency) {
-          handleChange(
-            'exchange_rate',
-            (1 / resolveExpenseCurrency?.exchange_rate) *
-              resolveConvertCurrency?.exchange_rate
-          );
+        if (resolveConvertCurrency) {
+          handleChange('exchange_rate', resolveConvertCurrency.exchange_rate);
 
           if (expense.amount) {
             handleChange(
               'foreign_amount',
-              expense.amount * expense.exchange_rate
+              expense.amount * resolveConvertCurrency.exchange_rate
             );
           }
         }
@@ -123,7 +110,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
       handleChange('foreign_amount', 0);
       handleChange('exchange_rate', 1);
     }
-  }, [expense?.currency_id, expense?.invoice_currency_id]);
+  }, [expense?.invoice_currency_id]);
 
   useEffect(() => {
     if (expense?.invoice_currency_id) {
@@ -141,11 +128,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
     if (expense && expense.exchange_rate) {
       handleChange('exchange_rate', expense.exchange_rate);
 
-      if (
-        expense.amount &&
-        expense.invoice_currency_id &&
-        expense.currency_id
-      ) {
+      if (expense.amount && expense.invoice_currency_id) {
         handleChange('foreign_amount', expense.amount * expense.exchange_rate);
       }
     } else {
@@ -240,13 +223,14 @@ export function AdditionalInfo(props: ExpenseCardProps) {
             <CurrencySelector
               value={expense.invoice_currency_id}
               onChange={(id) => handleChange('invoice_currency_id', id)}
+              dismissable
               errorMessage={errors?.errors.invoice_currency_id}
             />
           </Element>
 
           <Element leftSide={t('exchange_rate')}>
-            <InputField
-              value={expense.exchange_rate.toFixed(5)}
+            <NumberInputField
+              value={expense.exchange_rate}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
@@ -255,7 +239,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           </Element>
 
           <Element leftSide={t('converted_amount')}>
-            <DecimalNumberInput
+            <NumberInputField
               border
               precision={
                 reactSettings?.number_precision &&
@@ -264,9 +248,8 @@ export function AdditionalInfo(props: ExpenseCardProps) {
                   ? reactSettings.number_precision
                   : currencySeparators?.precision || 2
               }
-              currency={currencySeparators}
               className="auto"
-              initialValue={(expense.foreign_amount || 0).toString()}
+              value={(expense.foreign_amount || 0).toString()}
               onChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }

@@ -27,10 +27,11 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
+import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
 
 type Props = {
   data: ChartData;
-  dates: any;
+  dates: { start_date: string; end_date: string };
   chartSensitivity: 'day' | 'week' | 'month';
   currency: string;
 };
@@ -44,7 +45,7 @@ type LineChartData = {
 }[];
 
 export function Chart(props: Props) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
   const { currency, chartSensitivity } = props;
 
   const company = useCurrentCompany();
@@ -82,33 +83,20 @@ export function Chart(props: Props) {
         break;
 
       case 'month':
-        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
-          if (currentDate.isSame(start, 'day')) {
-            dates.push(start.toDate());
-          }
-
-          dates.push(currentDate.endOf('month').toDate());
-          currentDate = currentDate.add(1, 'month');
-        }
+        dates = generateMonthDateRange(start, end);
         break;
 
       default:
         return [];
     }
 
-    const lengthOfDates = dates.length;
-
-    if (dayjs.utc(dates[lengthOfDates - 1]).isAfter(end)) {
-      dates[lengthOfDates - 1] = end.toDate();
-    }
-
-    return dates;
+    return ensureUniqueDates(dates, end);
   };
 
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
     if (!data || !date) return -1;
 
-    let isMatchingWithLastPointDay = false;
+    let isEntryDateMatch = false;
 
     const recordIndex = data.findIndex((entry, index) => {
       const nextEntry = data[index + 1];
@@ -120,25 +108,23 @@ export function Chart(props: Props) {
         const endDate = parseDayjs(nextEntry.date);
 
         const isDateInRange =
-          dateToCheck.isAfter(startDate) &&
-          dateToCheck.isBefore(endDate) &&
-          !dateToCheck.isSame(parseDayjs(data[0].date));
+          dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
 
-        const isEntryDateMatch = entry.date === date;
-
-        isMatchingWithLastPointDay =
-          startDate.isSame(dateToCheck) &&
-          !dateToCheck.isSame(parseDayjs(data[0].date));
+        isEntryDateMatch = entry.date === date;
 
         return isDateInRange || isEntryDateMatch;
+      }
+
+      if (!nextEntry && entry) {
+        isEntryDateMatch = entry.date === date;
+
+        return isEntryDateMatch;
       }
 
       return false;
     });
 
-    return chartSensitivity !== 'day' &&
-      recordIndex > -1 &&
-      !isMatchingWithLastPointDay
+    return chartSensitivity !== 'day' && recordIndex > -1 && !isEntryDateMatch
       ? recordIndex + 1
       : recordIndex;
   };
@@ -149,7 +135,9 @@ export function Chart(props: Props) {
     const largestTick = chartData.reduce((maxTick, data) => {
       return properties.reduce((currentMax, property) => {
         const currentTickLength = formatMoney(
-          Number(data[property as keyof typeof data]) ?? 0,
+          typeof data[property as keyof typeof data] === 'number'
+            ? Number((data[property as keyof typeof data] as number) * 10)
+            : 0,
           company?.settings.country_id,
           currency
         ).toString().length;
@@ -213,7 +201,7 @@ export function Chart(props: Props) {
     });
 
     setChartData(data);
-  }, [props]);
+  }, [props.data, props.dates, props.chartSensitivity]);
 
   const colors = useColorScheme();
 
@@ -221,7 +209,8 @@ export function Chart(props: Props) {
     return formatMoney(
       Number(number) || 0,
       company.settings.country_id,
-      currency
+      currency,
+      2
     ).toString();
   };
 

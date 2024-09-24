@@ -10,7 +10,6 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
 import { Card } from '$app/components/cards';
 import { Badge } from '$app/components/Badge';
@@ -18,8 +17,10 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useTranslation } from 'react-i18next';
 
 export function UpcomingRecurringInvoices() {
+  const [t] = useTranslation();
   const dateTime = useDateTime();
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
@@ -63,9 +64,9 @@ export function UpcomingRecurringInvoices() {
     },
     {
       id: 'balance',
-      label: t('balance'),
+      label: t('amount'),
       format: (value, recurringInvoice) => (
-        <Badge variant="red">
+        <Badge variant="blue">
           {formatMoney(
             value,
             recurringInvoice.client?.country_id,
@@ -92,6 +93,7 @@ export function UpcomingRecurringInvoices() {
           withoutActions
           withoutPagination
           withoutPadding
+          withoutPerPageAsPreference
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,

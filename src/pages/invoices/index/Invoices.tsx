@@ -45,6 +45,8 @@ import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -89,13 +91,13 @@ export default function Invoices() {
     changeTemplateResources,
   } = useChangeTemplate();
 
+  useSocketEvent({
+    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
+    callback: () => $refetch(['invoices']),
+  });
+
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      docsLink="en/invoices"
-      withoutBackButton
-    >
+    <Default title={documentTitle} breadcrumbs={pages} docsLink="en/invoices">
       <DataTable
         resource="invoice"
         endpoint="/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&sort=id|desc"
@@ -126,14 +128,10 @@ export default function Invoices() {
             })}
           >
             {Boolean(reactSettings.show_table_footer) && (
-              <>
-                <DataTableFooterColumnsPicker
-                  table="invoice"
-                  columns={allFooterColumns}
-                />
-
-                <span>|</span>
-              </>
+              <DataTableFooterColumnsPicker
+                table="invoice"
+                columns={allFooterColumns}
+              />
             )}
 
             <DataTableColumnsPicker

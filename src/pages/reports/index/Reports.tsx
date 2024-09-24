@@ -239,18 +239,12 @@ export default function Reports() {
             setIsPendingExport(false);
           });
       })
-      .catch((error: AxiosError<ValidationBag | Blob>) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          if (report.payload.send_email) {
-            setErrors(error.response.data as ValidationBag);
-          }
-
-          if (!report.payload.send_email) {
-            const blob = error.response.data as Blob;
-
-            blob.text().then((text) => setErrors(JSON.parse(text)));
-          }
+          setErrors(error.response.data as ValidationBag);
         }
+
+        setIsPendingExport(false);
       })
       .finally(() => {
         if (showCustomColumns) {
@@ -349,7 +343,6 @@ export default function Reports() {
           </DropdownElement>
         </Dropdown>
       }
-      withoutBackButton
     >
       <ReportsPlanAlert />
 

@@ -19,7 +19,6 @@ import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -44,6 +43,8 @@ import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useLocation } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 const numberInputs = [
   'discount',
@@ -231,6 +232,7 @@ export function useResolveInputField(props: Props) {
   }, [resource?.line_items, isDeleteActionTriggered]);
 
   const taxCategories = useTaxCategories();
+  const { preferences } = usePreferences();
 
   const showTaxRateSelector = (
     property: 'tax_rate1' | 'tax_rate2' | 'tax_rate3',
@@ -329,6 +331,7 @@ export function useResolveInputField(props: Props) {
             product && onProductChange(index, product.product_key, product)
           }
           clearButton
+          onInputValueChange={(value) => onChange('product_key', value, index)}
           onClearButtonClick={() => handleProductChange(index, '', null)}
           displayStockQuantity={location.pathname.startsWith('/invoices')}
         />
@@ -345,6 +348,8 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+          style={{ marginTop: '4px' }}
+          textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
       );
     }
@@ -352,7 +357,7 @@ export function useResolveInputField(props: Props) {
     if (numberInputs.includes(property)) {
       return (
         inputCurrencySeparators && (
-          <DecimalNumberInput
+          <NumberInputField
             precision={
               property === 'quantity'
                 ? 6
@@ -363,10 +368,9 @@ export function useResolveInputField(props: Props) {
                 : inputCurrencySeparators?.precision || 2
             }
             id={property}
-            currency={inputCurrencySeparators}
-            initialValue={resource?.line_items[index][property] as string}
+            value={resource?.line_items[index][property] as string}
             className="auto"
-            onBlurValue={(value: string) => {
+            onValueChange={(value: string) => {
               onChange(
                 property,
                 isNaN(parseFloat(value)) ? 0 : parseFloat(value),

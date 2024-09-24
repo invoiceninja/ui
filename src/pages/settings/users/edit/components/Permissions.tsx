@@ -87,9 +87,16 @@ export function Permissions(props: Props) {
 
     if (entity === 'all') {
       currentPermissions = currentPermissions.filter(
-        (currentPermission) => !currentPermission.startsWith(permissionType)
+        (currentPermission) =>
+          !currentPermission.startsWith(permissionType) ||
+          currentPermission === 'view_reports' ||
+          currentPermission === 'view_dashboard'
       );
-    } else if (currentPermissions.includes(`${permissionType}_all`)) {
+    } else if (
+      currentPermissions.includes(`${permissionType}_all`) &&
+      permission !== 'view_reports' &&
+      permission !== 'view_dashboard'
+    ) {
       const permissionsByType = permissions
         .map((currentPermission) => `${permissionType}_${currentPermission}`)
         .filter((currentPermission) => currentPermission !== permission);

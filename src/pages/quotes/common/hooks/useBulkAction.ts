@@ -63,7 +63,13 @@ export const useBulkAction = () => {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
+      if (action === 'convert_to_invoice') {
+        $refetch(['invoices']);
+      }
+
       if (action === 'convert_to_project') {
+        $refetch(['projects']);
+
         navigate(
           route('/projects/:id', { id: response.data.data[0].project_id })
         );

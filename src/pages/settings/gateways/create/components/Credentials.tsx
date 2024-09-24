@@ -28,6 +28,7 @@ import { Modal } from '$app/components/Modal';
 import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
+import { useLocation } from 'react-router-dom';
 
 interface Props {
   gateway: Gateway;
@@ -36,10 +37,13 @@ interface Props {
     React.SetStateAction<CompanyGateway | undefined>
   >;
   errors: ValidationBag | undefined;
+  isGatewaySaved?: boolean;
 }
 
 export function Credentials(props: Props) {
   const [t] = useTranslation();
+
+  const location = useLocation();
 
   const resolveInputField = useResolveInputField(
     props.companyGateway,
@@ -65,6 +69,7 @@ export function Credentials(props: Props) {
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
   const [isTestingSuccessful, setIsTestingSuccessful] = useState<boolean>();
+  const [testingMessage, setTestingMessage] = useState<string>('');
 
   const handleTestCredentials = () => {
     if (!isTestingBusy) {
@@ -78,7 +83,10 @@ export function Credentials(props: Props) {
         })
       )
         .then(() => setIsTestingSuccessful(true))
-        .catch(() => setIsTestingSuccessful(false))
+        .catch((error) => {
+          setTestingMessage(error.response?.data?.message);
+          setIsTestingSuccessful(false);
+        })
         .finally(() => {
           toast.dismiss();
           setIsTestingBusy(false);
@@ -152,17 +160,22 @@ export function Credentials(props: Props) {
           )}
 
         <Divider />
+        {!location.pathname.includes('/create') && (
+          <>
+            <Divider />
 
-        <div className="flex justify-end pr-6">
-          <Button
-            behavior="button"
-            onClick={handleTestCredentials}
-            disableWithoutIcon
-            disabled={isTestingBusy}
-          >
-            {t('health_check')}
-          </Button>
-        </div>
+            <div className="flex justify-end pr-6">
+              <Button
+                behavior="button"
+                onClick={handleTestCredentials}
+                disableWithoutIcon
+                disabled={isTestingBusy || !props.isGatewaySaved}
+              >
+                {t('health_check')}
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
 
       <Modal
@@ -172,7 +185,11 @@ export function Credentials(props: Props) {
       >
         {typeof isTestingSuccessful !== 'undefined' && (
           <span className="text-center font-medium text-base pb-3">
-            {t(isTestingSuccessful ? 'success' : 'status_failed')}
+            {t(
+              isTestingSuccessful
+                ? 'success'
+                : testingMessage || 'status_failed'
+            )}
           </span>
         )}
       </Modal>

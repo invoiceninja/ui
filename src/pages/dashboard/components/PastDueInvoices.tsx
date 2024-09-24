@@ -10,7 +10,6 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Card } from '$app/components/cards';
@@ -19,8 +18,10 @@ import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useTranslation } from 'react-i18next';
 
 export function PastDueInvoices() {
+  const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -88,10 +89,11 @@ export function PastDueInvoices() {
           resource="invoice"
           columns={columns}
           className="pr-4"
-          endpoint="/api/v1/invoices?include=client.group_settings&overdue=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
+          endpoint="/api/v1/invoices?include=client.group_settings&overdue=true&without_deleted_clients=true&per_page=50&page=1&sort=due_date|asc"
           withoutActions
           withoutPagination
           withoutPadding
+          withoutPerPageAsPreference
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,
@@ -107,6 +109,7 @@ export function PastDueInvoices() {
           style={{
             height: '19.9rem',
           }}
+          withoutSortQueryParameter
         />
       </div>
     </Card>

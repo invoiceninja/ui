@@ -58,11 +58,15 @@ export function Field(props: Props) {
     if (props.initialValue) {
       const initialValueParts = props.initialValue.split('|');
 
-      if (dropdownTypes.includes(initialValueParts[1] as AvailableTypes)) {
-        setDropdownType(initialValueParts[1] as AvailableTypes);
+      if (!props.initialValue.includes('|')) {
+        setDropdownType(AvailableTypes.MultiLineText);
       } else {
-        setDropdownType(AvailableTypes.Dropdown);
-        setDropdownInitialValue(initialValueParts[1]);
+        if (dropdownTypes.includes(initialValueParts[1] as AvailableTypes)) {
+          setDropdownType(initialValueParts[1] as AvailableTypes);
+        } else {
+          setDropdownType(AvailableTypes.Dropdown);
+          setDropdownInitialValue(initialValueParts[1]);
+        }
       }
 
       setInitialValue(initialValueParts[0]);
@@ -78,9 +82,14 @@ export function Field(props: Props) {
             .join(',')
         : dropdownTypeRef.current?.value;
 
+    const currentValue =
+      type === 'multi_line_text'
+        ? `${inputRef.current?.value || ''}`
+        : `${inputRef.current?.value || ''}|${type}`;
+
     props.onChange &&
       props.onChange(
-        `${inputRef.current?.value || ''}|${type}`,
+        currentValue,
         props.field,
         dropdownTypeRef.current?.value as AvailableTypes
       );

@@ -149,6 +149,9 @@ interface Props<T> extends CommonProps {
   queryIdentificator?: string;
   disableQuery?: boolean;
   footerColumns?: FooterColumns;
+  withoutPerPageAsPreference?: boolean;
+  withoutSortQueryParameter?: boolean;
+  showRestoreBulk?: (selectedResources: T[]) => boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -187,6 +190,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     disableQuery,
     footerColumns = [],
     bottomActionsKeys = [],
+    withoutPerPageAsPreference = false,
+    withoutSortQueryParameter = false,
+    showRestoreBulk,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -197,7 +203,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<PerPage>(
-    (apiEndpoint.searchParams.get('perPage') as PerPage) || '10'
+    (apiEndpoint.searchParams.get('per_page') as PerPage) || '10'
   );
   const [sort, setSort] = useState<string>(
     apiEndpoint.searchParams.get('sort') || 'id|asc'
@@ -228,6 +234,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     setStatus,
     tableKey,
     customFilters,
+    withoutStoringPerPage: withoutPerPageAsPreference,
   });
 
   const {
@@ -268,7 +275,13 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     handleChangingCustomFilters();
 
-    apiEndpoint.searchParams.set('sort', sort);
+    if (
+      !withoutSortQueryParameter ||
+      (withoutSortQueryParameter && sort !== 'id|asc')
+    ) {
+      apiEndpoint.searchParams.set('sort', sort);
+    }
+
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     if (dateRangeColumns.length && dateRangeQueryParameter) {
@@ -413,6 +426,16 @@ export function DataTable<T extends object>(props: Props<T>) {
       );
 
       setSelectedResources(filteredSelectedResources);
+
+      const shouldDeselectMainCheckbox = data.data.data.some(
+        (resource: any) => !selected.includes(resource.id)
+      );
+
+      if (shouldDeselectMainCheckbox && mainCheckbox.current) {
+        mainCheckbox.current.checked = false;
+      } else if (mainCheckbox.current) {
+        mainCheckbox.current.checked = true;
+      }
     }
   }, [selected]);
 
@@ -421,6 +444,23 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (data) {
+      if (
+        Number(perPage) < selected.length ||
+        Number(perPage) === selected.length
+      ) {
+        setSelected(
+          data.data.data
+            .map((resource: any) => resource.id)
+            .filter((resourceId: string) => selected.includes(resourceId))
+        );
+      } else if (Number(perPage) > selected.length && mainCheckbox.current) {
+        mainCheckbox.current.checked = false;
+      }
+    }
+  }, [perPage]);
 
   useEffect(() => {
     emitter.on('bulk.completed', () => setSelected([]));
@@ -440,6 +480,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
+          customFilter={customFilter}
           rightSide={
             <>
               {props.rightSide}
@@ -511,7 +552,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                     {t('delete')}
                   </DropdownElement>
 
-                  {showRestoreBulkAction() && (
+                  {(showRestoreBulk
+                    ? showRestoreBulk(selectedResources)
+                    : showRestoreBulkAction()) && (
                     <DropdownElement
                       onClick={() => {
                         if (onBulkActionCall) {
@@ -558,11 +601,17 @@ export function DataTable<T extends object>(props: Props<T>) {
                   ).forEach((checkbox: HTMLInputElement | any) => {
                     checkbox.checked = event.target.checked;
 
-                    event.target.checked
-                      ? setSelected((current) => [...current, checkbox.id])
-                      : setSelected((current) =>
-                          current.filter((value) => value !== checkbox.id)
-                        );
+                    if (event.target.checked) {
+                      const isAlreadyAdded = selected.find(
+                        (resourceId) => resourceId === checkbox.id
+                      );
+
+                      if (!isAlreadyAdded) {
+                        setSelected((current) => [...current, checkbox.id]);
+                      }
+                    } else {
+                      setSelected([]);
+                    }
                   });
                 }}
                 cypressRef="dataTableCheckbox"

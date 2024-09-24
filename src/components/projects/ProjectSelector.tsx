@@ -19,11 +19,17 @@ import { endpoint } from '$app/common/helpers';
 import { Alert } from '../Alert';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
-export function ProjectSelector(props: GenericSelectorProps<Project>) {
+interface Props extends GenericSelectorProps<Project> {
+  clientId?: string;
+}
+
+export function ProjectSelector(props: Props) {
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const clientIdParam = props.clientId ? `&client_id=${props.clientId}` : '';
 
   return (
     <>
@@ -38,7 +44,9 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
           label: props.inputLabel?.toString(),
           value: props.value ?? null,
         }}
-        endpoint={endpoint('/api/v1/projects?status=active')}
+        endpoint={endpoint(
+          `/api/v1/projects?status=active&filter_deleted_clients=true${clientIdParam}`
+        )}
         entryOptions={{ id: 'id', label: 'name', value: 'id' }}
         onChange={(entry) =>
           entry.resource ? props.onChange(entry.resource) : null

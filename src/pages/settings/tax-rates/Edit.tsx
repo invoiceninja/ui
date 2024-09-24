@@ -14,14 +14,12 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useTaxRateQuery } from '$app/common/queries/tax-rates';
 import { Badge } from '$app/components/Badge';
-import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -30,6 +28,7 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Edit() {
   const { setDocumentTitle } = useTitle('edit_tax_rate');
@@ -96,6 +95,7 @@ export function Edit() {
           />
         )
       }
+      breadcrumbs={pages}
     >
       {!data && (
         <div className="flex justify-center">
@@ -104,9 +104,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container className="space-y-6">
-          <Breadcrumbs pages={pages} />
-
+        <div className="max-w-3xl">
           <Card
             withSaveButton
             onFormSubmit={formik.handleSubmit}
@@ -137,17 +135,15 @@ export function Edit() {
                 value={formik.values.name}
               />
 
-              <InputField
-                type="number"
-                id="rate"
-                label={t('tax_rate')}
-                onChange={formik.handleChange}
-                errorMessage={errors?.errors?.rate}
+              <NumberInputField
                 value={formik.values.rate}
+                label={t('tax_rate')}
+                onValueChange={(value) => formik.setFieldValue('rate', value)}
+                errorMessage={errors?.errors?.rate}
               />
             </CardContainer>
           </Card>
-        </Container>
+        </div>
       )}
     </Settings>
   );

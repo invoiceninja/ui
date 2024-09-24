@@ -66,6 +66,10 @@ export function useHandleCreate(params: Params) {
 
         $refetch(['products', 'tasks']);
 
+        if (searchParams.get('action') === 'invoice_expense') {
+          $refetch(['expenses']);
+        }
+
         navigate(
           route('/invoices/:id/edit?table=:table', {
             id: response.data.data.id,

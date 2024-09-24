@@ -51,12 +51,7 @@ export default function Projects() {
   } = useChangeTemplate();
 
   return (
-    <Default
-      title={t('projects')}
-      breadcrumbs={pages}
-      docsLink="en/projects/"
-      withoutBackButton
-    >
+    <Default title={t('projects')} breadcrumbs={pages} docsLink="en/projects/">
       <DataTable
         resource="project"
         endpoint="/api/v1/projects?status=active&include=client&without_deleted_clients=true&sort=id|desc"

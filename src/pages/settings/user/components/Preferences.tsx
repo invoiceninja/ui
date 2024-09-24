@@ -17,20 +17,20 @@ import {
   preferencesDefaults,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { InputField } from '$app/components/forms';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { StatusColorTheme } from './StatusColorTheme';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Preferences() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const reactSettings = useReactSettings();
 
-  const handleChange = (property: string, value: string | boolean) => {
+  const handleChange = (property: string, value: string | number | boolean) => {
     dispatch(
       updateChanges({
         property: property,
@@ -89,15 +89,15 @@ export function Preferences() {
           leftSide={t('number_precision')}
           leftSideHelp={t('number_precision_help')}
         >
-          <InputField
+          <NumberInputField
+            precision={0}
             value={reactSettings?.number_precision}
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.number_precision',
-                value
+                Number(value)
               )
             }
-            type="number"
             placeholder={t('number_precision')}
           />
         </Element>
@@ -120,6 +120,23 @@ export function Preferences() {
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.show_table_footer',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('auto_expand_product_table_notes')}
+          leftSideHelp={t('auto_expand_product_table_notes_help')}
+        >
+          <Toggle
+            checked={Boolean(
+              reactSettings.preferences.auto_expand_product_table_notes
+            )}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.auto_expand_product_table_notes',
                 value
               )
             }

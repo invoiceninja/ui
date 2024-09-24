@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
@@ -31,6 +31,8 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   client: Client | undefined;
@@ -45,6 +47,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   const currencies = useCurrencies();
   const languages = useLanguages();
 
+  const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const { data: paymentTermsResponse } = usePaymentTermsQuery({});
@@ -178,12 +181,10 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           )}
 
           <Element leftSide={t('task_rate')}>
-            <InputField
-              id="settings.default_task_rate"
-              type="number"
+            <NumberInputField
               value={client?.settings?.default_task_rate}
               onValueChange={(value) =>
-                handleSettingsChange('default_task_rate', value)
+                handleSettingsChange('default_task_rate', parseFloat(value))
               }
               errorMessage={errors?.errors['settings.default_task_rate']}
             />
@@ -287,7 +288,9 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               <DocumentsTable
                 documents={client?.documents || []}
                 onDocumentDelete={onSuccess}
-                disableEditableOptions={!entityAssigned(client, true)}
+                disableEditableOptions={
+                  !entityAssigned(client, true) && !hasPermission('edit_client')
+                }
               />
             </div>
           </div>

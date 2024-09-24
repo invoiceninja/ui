@@ -34,7 +34,9 @@ export function QuoteSelector(props: Props) {
       inputOptions={{
         value: props.value ?? null,
       }}
-      endpoint={endpoint('/api/v1/quotes?include=client&status=active')}
+      endpoint={endpoint(
+        '/api/v1/quotes?include=client&filter_deleted_clients=true&status=active'
+      )}
       onChange={(quote: Entry<Quote>) =>
         quote.resource && props.onChange(quote.resource)
       }

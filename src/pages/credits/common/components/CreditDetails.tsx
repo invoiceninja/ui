@@ -17,6 +17,7 @@ import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { creditAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -53,14 +54,12 @@ export function CreditDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('partial')}>
-          <InputField
-            id="partial"
-            type="number"
-            changeOverride={true}
+          <NumberInputField
+            value={credit?.partial || ''}
             onValueChange={(value) =>
               handleChange('partial', parseFloat(value))
             }
-            value={credit?.partial || ''}
+            changeOverride
             errorMessage={errors?.errors.partial}
           />
         </Element>
