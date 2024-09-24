@@ -11,7 +11,7 @@
 import { toast } from '$app/common/helpers/toast/toast';
 import { Card, Element } from '$app/components/cards';
 import { useFormik } from 'formik';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +37,7 @@ interface Props {
   onSuccess: boolean;
   onFileImported?: () => unknown;
   type: string;
+  postWidgetSlot?: ReactNode;
 }
 
 export interface ImportMap extends Record<string, any> {
@@ -416,6 +417,8 @@ export function UploadImport(props: Props) {
               ))}
             </ul>
           )}
+
+          {props.postWidgetSlot ?? null}
         </Element>
 
         {isImportFileTypeZip && (
