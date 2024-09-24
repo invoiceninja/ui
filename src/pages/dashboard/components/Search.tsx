@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { useTranslation } from 'react-i18next';
@@ -123,7 +123,7 @@ export function Search$() {
   const options = filtered.count() === 0 ? collect(data) : filtered;
 
   useEffect(() => {
-    if (query && filtered.count() === 0) {
+    if (query && filtered.count() === 0 && isHosted()) {
       refetch();
     }
   }, [query]);
