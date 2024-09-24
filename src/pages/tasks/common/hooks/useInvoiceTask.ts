@@ -29,6 +29,8 @@ import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 
 interface Params {
   onlyAddToInvoice?: boolean;
@@ -36,13 +38,16 @@ interface Params {
 
 export function useInvoiceTask(params?: Params) {
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
   const { onlyAddToInvoice } = params || {};
+
+  const navigate = useNavigate();
+  const numericFormatter = useNumericFormatter();
 
   const company = useCurrentCompany();
   const { data } = useBlankInvoiceQuery();
   const { timeFormat } = useCompanyTimeFormat();
+  const userNumberPrecision = useUserNumberPrecision();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const setInvoice = useSetAtom(invoiceAtom);
@@ -65,7 +70,7 @@ export function useInvoiceTask(params?: Params) {
           const unixStop = dayjs.unix(stop);
 
           hoursSum += unixStop.diff(unixStart, 'seconds') / 3600;
-          hoursSum = Number(hoursSum.toFixed(4));
+          hoursSum = Number(hoursSum.toFixed(userNumberPrecision));
         }
       });
     }
@@ -123,9 +128,9 @@ export function useInvoiceTask(params?: Params) {
               const unixStart = dayjs.unix(start);
               const unixStop = dayjs.unix(stop);
 
-              const hours = (
-                unixStop.diff(unixStart, 'seconds') / 3600
-              ).toFixed(4);
+              const hours = numericFormatter(
+                (unixStop.diff(unixStart, 'seconds') / 3600).toString()
+              );
 
               hoursDescription = `• ${formatNumber(hours)} ${t('hours')}`;
             }
@@ -171,7 +176,9 @@ export function useInvoiceTask(params?: Params) {
           type_id: InvoiceItemType.Task,
           cost: task.rate,
           quantity: taskQuantity,
-          line_total: Number((task.rate * taskQuantity).toFixed(2)),
+          line_total: Number(
+            (task.rate * taskQuantity).toFixed(userNumberPrecision)
+          ),
           task_id: task.id,
           tax_id: '',
           custom_value1: task.custom_value1,

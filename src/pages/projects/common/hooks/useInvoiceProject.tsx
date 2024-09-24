@@ -28,8 +28,10 @@ import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 
-export const calculateTaskHours = (timeLog: string) => {
+export const calculateTaskHours = (timeLog: string, precision: number) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
 
   let hoursSum = 0;
@@ -41,7 +43,7 @@ export const calculateTaskHours = (timeLog: string) => {
         const unixStop = dayjs.unix(stop);
 
         hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(precision)
         );
       }
     });
@@ -53,11 +55,15 @@ export const calculateTaskHours = (timeLog: string) => {
 export function useInvoiceProject() {
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const company = useCurrentCompany();
 
-  const { dateFormat } = useCurrentCompanyDateFormats();
-  const { timeFormat } = useCompanyTimeFormat();
+  const numericFormatter = useNumericFormatter();
+
+  const company = useCurrentCompany();
+  const userNumberPrecision = useUserNumberPrecision();
+
   const { data } = useBlankInvoiceQuery();
+  const { timeFormat } = useCompanyTimeFormat();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const setInvoice = useSetAtom(invoiceAtom);
 
@@ -106,9 +112,9 @@ export function useInvoiceProject() {
               const unixStart = dayjs.unix(start);
               const unixStop = dayjs.unix(stop);
 
-              const hours = (
-                unixStop.diff(unixStart, 'seconds') / 3600
-              ).toFixed(4);
+              const hours = numericFormatter(
+                (unixStop.diff(unixStart, 'seconds') / 3600).toString()
+              );
 
               hoursDescription = `• ${hours} ${t('hours')}`;
             }
@@ -147,14 +153,19 @@ export function useInvoiceProject() {
           }
         });
 
-        const taskQuantity = calculateTaskHours(task.time_log);
+        const taskQuantity = calculateTaskHours(
+          task.time_log,
+          userNumberPrecision
+        );
 
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
           cost: task.rate,
           quantity: taskQuantity,
-          line_total: Number((task.rate * taskQuantity).toFixed(2)),
+          line_total: Number(
+            (task.rate * taskQuantity).toFixed(userNumberPrecision)
+          ),
           task_id: task.id,
           tax_id: '',
         };
