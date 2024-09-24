@@ -54,7 +54,7 @@ export function useActions(params?: Params) {
 
   const { isAdmin, isOwner } = useAdmin();
 
-  const { isEditOrShowPage } = useEntityPageIdentifier({
+  const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
     entity: 'client',
   });
 
@@ -77,7 +77,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      Boolean(!client.is_deleted && !isShowPage) && (
         <DropdownElement
           onClick={() =>
             window.open(
