@@ -44,7 +44,7 @@ export default function Import() {
                 className="inline-flex items-center space-x-1 mt-4"
               >
                 <HelpCircle size={18} />
-                <span>How to import data</span>
+                <span>{t('how_to_import_data')}</span>
               </button>
             }
           />
