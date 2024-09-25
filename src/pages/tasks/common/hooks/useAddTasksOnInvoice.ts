@@ -56,7 +56,7 @@ export function useAddTasksOnInvoice(params: Params) {
 
     if (tasks) {
       const currencySeparators = await getCurrencySeparators(
-        tasks[0].client_id,
+        tasks[0]?.client_id,
         'client_id'
       );
 
@@ -122,7 +122,7 @@ export function useAddTasksOnInvoice(params: Params) {
 
         const taskQuantity = calculateTaskHours(
           task.time_log,
-          currencySeparators?.precision
+          userNumberPrecision
         );
 
         const item: InvoiceItem = {
@@ -131,9 +131,7 @@ export function useAddTasksOnInvoice(params: Params) {
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number(
-            (task.rate * taskQuantity).toFixed(
-              currencySeparators?.precision || userNumberPrecision
-            )
+            (task.rate * taskQuantity).toFixed(userNumberPrecision)
           ),
           task_id: task.id,
           tax_id: '',

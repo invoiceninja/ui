@@ -63,8 +63,8 @@ export function useGetCurrencySeparators(
           });
       });
     } else if (relationId.length >= 1 && relationType === 'vendor_id') {
-      await vendorResolver.find(relationId).then((vendor: Vendor) =>
-        currencyResolver
+      await vendorResolver.find(relationId).then(async (vendor: Vendor) => {
+        await currencyResolver
           .find(vendor.currency_id || company.settings?.currency_id)
           .then((currency: Currency | undefined) => {
             const companyCountry = resolveCountry(company.settings.country_id);
@@ -86,8 +86,8 @@ export function useGetCurrencySeparators(
             } else {
               separators = currentSeparators;
             }
-          })
-      );
+          });
+      });
     } else {
       await currencyResolver
         .find(company.settings?.currency_id)
