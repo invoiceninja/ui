@@ -36,6 +36,7 @@ import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
+import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import classNames from 'classnames';
 
 const gatewaysStyles = [
@@ -104,10 +105,20 @@ export function Create() {
     setGateway(gateway);
 
     if (gateway?.key === '80af24a6a691230bbec33e930ab40666') {
-      handleSetup();
-    } else if (gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') {
-      handleStripeSetup();
-    } else isManualChange && setTabIndex(1);
+      return handleSetup();
+    }
+
+    if (gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') {
+      return handleStripeSetup();
+    }
+
+    if (gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' && isHosted()) {
+      return handleGoCardless();
+    }
+
+    if (isManualChange) {
+      setTabIndex(1);
+    }
   };
 
   const handleSetup = () => {
@@ -139,6 +150,8 @@ export function Create() {
         ?.focus()
     );
   };
+
+  const handleGoCardless = useHandleGoCardless();
 
   const defaultTab = [t('payment_provider')];
 
