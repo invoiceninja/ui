@@ -31,6 +31,7 @@ import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplate
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
 import { Icon } from '../icons/Icon';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 interface Props {
   entity: string;
@@ -38,6 +39,7 @@ interface Props {
   onFileImported?: () => unknown;
   type: string;
   postWidgetSlot?: ReactNode;
+  exampleUrl?: string;
 }
 
 export interface ImportMap extends Record<string, any> {
@@ -363,6 +365,14 @@ export function UploadImport(props: Props) {
     return () => setSelectedTemplate('');
   }, []);
 
+  const accentColor = useAccentColor();
+
+  const downloadExampleFile = () => {
+    if (props.exampleUrl) {
+      window.open(props.exampleUrl, '_blank');
+    }
+  };
+
   return (
     <>
       <Card title={t(props.entity)}>
@@ -370,6 +380,17 @@ export function UploadImport(props: Props) {
           leftSide={t(isImportFileTypeZip ? 'company_backup_file' : 'csv_file')}
           leftSideHelp={isImportFileTypeZip && t('company_backup_file_help')}
         >
+          {props.exampleUrl ? (
+            <button
+              type="button"
+              style={{ color: accentColor }}
+              className="inline-flex items-center space-x-1 mb-4"
+              onClick={downloadExampleFile}
+            >
+              <span>{t('download_example_file')}</span>
+            </button>
+          ) : null}
+
           {!files.length ? (
             <div
               {...getRootProps()}
