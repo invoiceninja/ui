@@ -16,6 +16,7 @@ import { UploadImport } from '$app/components/import/UploadImport';
 import { Default } from '$app/components/layouts/Default';
 import { HelpCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import exampleCsv from 'public/example-imports/invoices.csv?url';
 
 export default function Import() {
   const { t } = useTranslation();
@@ -47,6 +48,7 @@ export default function Import() {
                 <span>{t('how_to_import_data')}</span>
               </button>
             }
+            exampleUrl={exampleCsv}
           />
 
           <HelpWidget
