@@ -31,6 +31,7 @@ import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 
 interface Params {
   onlyAddToInvoice?: boolean;
@@ -43,6 +44,7 @@ export function useInvoiceTask(params?: Params) {
 
   const navigate = useNavigate();
   const numericFormatter = useNumericFormatter();
+  const getCurrencySeparators = useGetCurrencySeparators();
 
   const company = useCurrentCompany();
   const { data } = useBlankInvoiceQuery();
@@ -54,7 +56,7 @@ export function useInvoiceTask(params?: Params) {
 
   const formatNumber = useFormatNumber();
 
-  const calculateTaskHours = (timeLog: string) => {
+  const calculateTaskHours = (timeLog: string, precision?: number) => {
     const parsedTimeLogs = parseTimeLog(timeLog);
 
     let hoursSum = 0;
@@ -70,7 +72,7 @@ export function useInvoiceTask(params?: Params) {
           const unixStop = dayjs.unix(stop);
 
           hoursSum += unixStop.diff(unixStart, 'seconds') / 3600;
-          hoursSum = Number(hoursSum.toFixed(userNumberPrecision));
+          hoursSum = Number(hoursSum.toFixed(precision || userNumberPrecision));
         }
       });
     }
@@ -112,6 +114,11 @@ export function useInvoiceTask(params?: Params) {
         invoice.project_id = tasks[0]?.project_id;
       }
 
+      const currencySeparators = await getCurrencySeparators(
+        tasks[0]?.client_id,
+        'client_id'
+      );
+
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
@@ -129,7 +136,10 @@ export function useInvoiceTask(params?: Params) {
               const unixStop = dayjs.unix(stop);
 
               const hours = numericFormatter(
-                (unixStop.diff(unixStart, 'seconds') / 3600).toString()
+                (unixStop.diff(unixStart, 'seconds') / 3600).toString(),
+                currencySeparators?.thousandSeparator,
+                currencySeparators?.decimalSeparator,
+                currencySeparators?.precision
               );
 
               hoursDescription = `• ${formatNumber(hours)} ${t('hours')}`;
@@ -169,7 +179,10 @@ export function useInvoiceTask(params?: Params) {
           }
         });
 
-        const taskQuantity = calculateTaskHours(task.time_log);
+        const taskQuantity = calculateTaskHours(
+          task.time_log,
+          currencySeparators?.precision
+        );
 
         const item: InvoiceItem = {
           ...blankLineItem(),
@@ -177,7 +190,7 @@ export function useInvoiceTask(params?: Params) {
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number(
-            (task.rate * taskQuantity).toFixed(userNumberPrecision)
+            (task.rate * taskQuantity).toFixed(currencySeparators?.precision)
           ),
           task_id: task.id,
           tax_id: '',

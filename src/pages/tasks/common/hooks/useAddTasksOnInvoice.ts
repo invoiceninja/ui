@@ -29,6 +29,7 @@ import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 
 interface Params {
   tasks: Task[];
@@ -41,6 +42,7 @@ export function useAddTasksOnInvoice(params: Params) {
 
   const navigate = useNavigate();
   const numericFormatter = useNumericFormatter();
+  const getCurrencySeparators = useGetCurrencySeparators();
 
   const company = useCurrentCompany();
   const { timeFormat } = useCompanyTimeFormat();
@@ -49,10 +51,15 @@ export function useAddTasksOnInvoice(params: Params) {
 
   const setInvoiceAtom = useSetAtom(invoiceAtom);
 
-  return (invoice: Invoice) => {
+  return async (invoice: Invoice) => {
     const updatedInvoice = cloneDeep(invoice);
 
     if (tasks) {
+      const currencySeparators = await getCurrencySeparators(
+        tasks[0].client_id,
+        'client_id'
+      );
+
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
@@ -70,7 +77,10 @@ export function useAddTasksOnInvoice(params: Params) {
               const unixStop = dayjs.unix(stop);
 
               const hours = numericFormatter(
-                (unixStop.diff(unixStart, 'seconds') / 3600).toString()
+                (unixStop.diff(unixStart, 'seconds') / 3600).toString(),
+                currencySeparators?.thousandSeparator,
+                currencySeparators?.decimalSeparator,
+                currencySeparators?.precision
               );
 
               hoursDescription = `• ${hours} ${t('hours')}`;
@@ -112,7 +122,7 @@ export function useAddTasksOnInvoice(params: Params) {
 
         const taskQuantity = calculateTaskHours(
           task.time_log,
-          userNumberPrecision
+          currencySeparators?.precision
         );
 
         const item: InvoiceItem = {
@@ -121,7 +131,9 @@ export function useAddTasksOnInvoice(params: Params) {
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number(
-            (task.rate * taskQuantity).toFixed(userNumberPrecision)
+            (task.rate * taskQuantity).toFixed(
+              currencySeparators?.precision || userNumberPrecision
+            )
           ),
           task_id: task.id,
           tax_id: '',

@@ -30,9 +30,11 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 
-export const calculateTaskHours = (timeLog: string, precision: number) => {
+export const calculateTaskHours = (timeLog: string, precision?: number) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
+  const userNumberPrecision = useUserNumberPrecision();
 
   let hoursSum = 0;
 
@@ -43,7 +45,9 @@ export const calculateTaskHours = (timeLog: string, precision: number) => {
         const unixStop = dayjs.unix(stop);
 
         hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(precision)
+          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(
+            precision || userNumberPrecision
+          )
         );
       }
     });
@@ -57,9 +61,9 @@ export function useInvoiceProject() {
   const navigate = useNavigate();
 
   const numericFormatter = useNumericFormatter();
+  const getCurrencySeparators = useGetCurrencySeparators();
 
   const company = useCurrentCompany();
-  const userNumberPrecision = useUserNumberPrecision();
 
   const { data } = useBlankInvoiceQuery();
   const { timeFormat } = useCompanyTimeFormat();
@@ -67,7 +71,7 @@ export function useInvoiceProject() {
 
   const setInvoice = useSetAtom(invoiceAtom);
 
-  return (tasks: Task[], clientId: string, projectId: string) => {
+  return async (tasks: Task[], clientId: string, projectId: string) => {
     if (data) {
       const invoice: Invoice = { ...data };
 
@@ -96,6 +100,11 @@ export function useInvoiceProject() {
       invoice.client_id = clientId;
       invoice.line_items = [];
 
+      const currencySeparators = await getCurrencySeparators(
+        clientId,
+        'client_id'
+      );
+
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
@@ -113,7 +122,10 @@ export function useInvoiceProject() {
               const unixStop = dayjs.unix(stop);
 
               const hours = numericFormatter(
-                (unixStop.diff(unixStart, 'seconds') / 3600).toString()
+                (unixStop.diff(unixStart, 'seconds') / 3600).toString(),
+                currencySeparators?.thousandSeparator,
+                currencySeparators?.decimalSeparator,
+                currencySeparators?.precision
               );
 
               hoursDescription = `• ${hours} ${t('hours')}`;
@@ -155,7 +167,7 @@ export function useInvoiceProject() {
 
         const taskQuantity = calculateTaskHours(
           task.time_log,
-          userNumberPrecision
+          currencySeparators?.precision
         );
 
         const item: InvoiceItem = {
@@ -164,7 +176,7 @@ export function useInvoiceProject() {
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number(
-            (task.rate * taskQuantity).toFixed(userNumberPrecision)
+            (task.rate * taskQuantity).toFixed(currencySeparators?.precision)
           ),
           task_id: task.id,
           tax_id: '',

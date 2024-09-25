@@ -16,11 +16,24 @@ export function useNumericFormatter() {
   const company = useCurrentCompany();
   const userNumberPrecision = useUserNumberPrecision();
 
-  return (numStr: string) => {
+  return (
+    numStr: string,
+    thousandSeparator?: string,
+    decimalSeparator?: string,
+    precision?: number
+  ) => {
     return numericFormatter(numStr, {
-      thousandSeparator: company?.use_comma_as_decimal_place ? '.' : ',',
-      decimalSeparator: company?.use_comma_as_decimal_place ? ',' : '.',
-      decimalScale: userNumberPrecision,
+      thousandSeparator: thousandSeparator
+        ? thousandSeparator
+        : company?.use_comma_as_decimal_place
+        ? '.'
+        : ',',
+      decimalSeparator: decimalSeparator
+        ? decimalSeparator
+        : company?.use_comma_as_decimal_place
+        ? ','
+        : '.',
+      decimalScale: precision || userNumberPrecision,
     });
   };
 }

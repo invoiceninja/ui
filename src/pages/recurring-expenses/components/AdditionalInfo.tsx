@@ -23,7 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { RecurringExpenseCardProps } from './Details';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 
 export function AdditionalInfo(props: RecurringExpenseCardProps) {
   const [t] = useTranslation();
@@ -31,7 +30,6 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
 
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
-  const userNumberPrecision = useUserNumberPrecision();
 
   const resolveCurrency = useResolveCurrency();
   const resolveCurrencySeparator = useResolveCurrencySeparator();
@@ -241,10 +239,8 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           </Element>
 
           <Element leftSide={t('exchange_rate')}>
-            <InputField
-              value={recurringExpense.exchange_rate.toFixed(
-                userNumberPrecision
-              )}
+            <NumberInputField
+              value={recurringExpense.exchange_rate}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
