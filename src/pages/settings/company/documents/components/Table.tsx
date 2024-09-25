@@ -235,7 +235,7 @@ export function Table() {
                 <Td>{document.type}</Td>
                 <Td>{prettyBytes(document.size)}</Td>
                 <Td>
-                  <Dropdown label={t('more_actions')}>
+                  <Dropdown label={t('actions')}>
                     <DropdownElement
                       onClick={() => {
                         downloadDocument(document, true);
