@@ -18,7 +18,6 @@ export function useCompanyTimeZone() {
 
   const { data: statics } = useStaticsQuery();
 
-  const [timeZoneId, setTimeZoneId] = useState('1');
   const [timeZone, setTimeZone] = useState<Timezone>();
 
   useEffect(() => {
@@ -29,14 +28,13 @@ export function useCompanyTimeZone() {
 
       if (result) {
         setTimeZone(result);
-        setTimeZoneId(result.id);
       }
     }
   }, [company, statics]);
 
   return {
-    timeZoneId,
-    timeZone: timeZone?.name,
-    timeZoneOffset: timeZone?.utc_offset,
+    timeZoneId: timeZone?.id || '1',
+    timeZone: timeZone?.name || '',
+    timeZoneOffset: timeZone?.utc_offset || 0,
   };
 }
