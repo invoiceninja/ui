@@ -49,11 +49,9 @@ export function useResolveDateAndTimeClientFormat() {
           );
         }
 
-        if (client.settings.military_time) {
-          dateTimeFormats.timeFormat = getTimeFormat(
-            Boolean(client.settings.military_time)
-          );
-        }
+        dateTimeFormats.timeFormat = getTimeFormat(
+          Boolean(client.settings.military_time)
+        );
       });
     }
 

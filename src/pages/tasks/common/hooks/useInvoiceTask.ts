@@ -32,6 +32,8 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
+import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
+import { useCompanyTimeZone } from '$app/common/hooks/useCompanyTimeZone';
 
 interface Params {
   onlyAddToInvoice?: boolean;
@@ -51,10 +53,12 @@ export function useInvoiceTask(params?: Params) {
   const { timeFormat } = useCompanyTimeFormat();
   const userNumberPrecision = useUserNumberPrecision();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const { timeZoneOffset: companyTimezoneOffset } = useCompanyTimeZone();
 
   const setInvoice = useSetAtom(invoiceAtom);
 
   const formatNumber = useFormatNumber();
+  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat();
 
   const calculateTaskHours = (timeLog: string, precision?: number) => {
     const parsedTimeLogs = parseTimeLog(timeLog);
@@ -119,6 +123,12 @@ export function useInvoiceTask(params?: Params) {
         'client_id'
       );
 
+      const {
+        dateFormat: clientDateFormat,
+        timeFormat: clientTimeFormat,
+        timeZone: clientTimezone,
+      } = await resolveDateAndTimeClientFormat(tasks[0]?.client_id);
+
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
@@ -152,15 +162,56 @@ export function useInvoiceTask(params?: Params) {
             }
 
             if (company.invoice_task_datelog) {
-              description.push(dayjs.unix(start).format(dateFormat));
+              description.push(
+                dayjs
+                  .unix(start)
+                  .add(
+                    clientTimezone?.utc_offset
+                      ? clientTimezone.utc_offset
+                      : companyTimezoneOffset
+                      ? companyTimezoneOffset
+                      : 0,
+                    'seconds'
+                  )
+                  .format(
+                    clientDateFormat?.format_moment
+                      ? clientDateFormat.format_moment
+                      : dateFormat
+                  )
+              );
             }
 
             if (company.invoice_task_timelog) {
-              description.push(dayjs.unix(start).format(timeFormat) + ' - ');
+              description.push(
+                dayjs
+                  .unix(start)
+                  .add(
+                    clientTimezone?.utc_offset
+                      ? clientTimezone.utc_offset
+                      : companyTimezoneOffset
+                      ? companyTimezoneOffset
+                      : 0,
+                    'seconds'
+                  )
+                  .format(clientTimeFormat ? clientTimeFormat : timeFormat) +
+                  ' - '
+              );
             }
 
             if (company.invoice_task_timelog) {
-              description.push(dayjs.unix(stop).format(timeFormat));
+              description.push(
+                dayjs
+                  .unix(stop)
+                  .add(
+                    clientTimezone?.utc_offset
+                      ? clientTimezone.utc_offset
+                      : companyTimezoneOffset
+                      ? companyTimezoneOffset
+                      : 0,
+                    'seconds'
+                  )
+                  .format(clientTimeFormat ? clientTimeFormat : timeFormat)
+              );
             }
 
             if (company.invoice_task_hours) {
