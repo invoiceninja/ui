@@ -9,10 +9,12 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { Layers, X } from 'react-feather';
+import { ExternalLink, Layers, X } from 'react-feather';
 import Markdown from 'react-markdown';
 import { useQuery } from 'react-query';
 import rehypeRaw from 'rehype-raw';
+import { Link } from './forms';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   id: string;
@@ -34,6 +36,8 @@ function processMarkdownContent(content: string) {
 }
 
 export function HelpWidget({ id, url }: Props) {
+  const { t } = useTranslation();
+
   const { data } = useQuery({
     queryKey: ['help-widget', id, url],
     queryFn: () =>
@@ -42,7 +46,7 @@ export function HelpWidget({ id, url }: Props) {
       ),
   });
 
-  // const [, slug] = url.split('v5-rework/source');
+  const [, slug] = url.split('v5-rework/source');
 
   const colors = useColorScheme();
 
@@ -87,12 +91,15 @@ export function HelpWidget({ id, url }: Props) {
       <div className="prose-sm p-5">
         <Markdown rehypePlugins={[rehypeRaw]}>{data}</Markdown>
 
-        {/* <Link
-          to={`https://invoiceninja.github.io/${slug.replace('.md', '')}`}
-          external
-        >
-          {t('view_docs')}
-        </Link> */}
+        <div className="flex justify-center">
+          <Link
+            to={`https://invoiceninja.github.io/${slug.replace('.md', '')}`}
+            external
+            className="flex items-center space-x-2"
+          >
+            <span>{t('view_docs')}</span> <ExternalLink size={16} />
+          </Link>
+        </div>
       </div>
     </div>
   );
