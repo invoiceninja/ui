@@ -11,6 +11,7 @@
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
 import { useCurrentCompany } from './useCurrentCompany';
+import { Timezone } from '../interfaces/timezone';
 
 export function useCompanyTimeZone() {
   const company = useCurrentCompany();
@@ -18,7 +19,7 @@ export function useCompanyTimeZone() {
   const { data: statics } = useStaticsQuery();
 
   const [timeZoneId, setTimeZoneId] = useState('1');
-  const [timeZone, setTimZone] = useState('America/Tijuana');
+  const [timeZone, setTimeZone] = useState<Timezone>();
 
   useEffect(() => {
     if (statics?.timezones) {
@@ -27,7 +28,7 @@ export function useCompanyTimeZone() {
       );
 
       if (result) {
-        setTimZone(result.name);
+        setTimeZone(result);
         setTimeZoneId(result.id);
       }
     }
@@ -35,6 +36,7 @@ export function useCompanyTimeZone() {
 
   return {
     timeZoneId,
-    timeZone,
+    timeZone: timeZone?.name,
+    timeZoneOffset: timeZone?.utc_offset,
   };
 }
