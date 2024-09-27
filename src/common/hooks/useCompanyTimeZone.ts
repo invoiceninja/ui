@@ -11,14 +11,14 @@
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
 import { useCurrentCompany } from './useCurrentCompany';
-import { Timezone } from '../interfaces/timezone';
 
 export function useCompanyTimeZone() {
   const company = useCurrentCompany();
 
   const { data: statics } = useStaticsQuery();
 
-  const [timeZone, setTimeZone] = useState<Timezone>();
+  const [timeZoneId, setTimeZoneId] = useState('1');
+  const [timeZone, setTimZone] = useState('America/Tijuana');
 
   useEffect(() => {
     if (statics?.timezones) {
@@ -27,14 +27,14 @@ export function useCompanyTimeZone() {
       );
 
       if (result) {
-        setTimeZone(result);
+        setTimZone(result.name);
+        setTimeZoneId(result.id);
       }
     }
   }, [company, statics]);
 
   return {
-    timeZoneId: timeZone?.id || '1',
-    timeZone: timeZone?.name || '',
-    timeZoneOffset: timeZone?.utc_offset || 0,
+    timeZoneId,
+    timeZone,
   };
 }

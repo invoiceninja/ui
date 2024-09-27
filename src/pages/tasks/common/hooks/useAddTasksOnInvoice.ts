@@ -31,7 +31,6 @@ import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
-import { useCompanyTimeZone } from '$app/common/hooks/useCompanyTimeZone';
 
 interface Params {
   tasks: Task[];
@@ -52,8 +51,6 @@ export function useAddTasksOnInvoice(params: Params) {
   const userNumberPrecision = useUserNumberPrecision();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { timeZoneOffset: companyTimezoneOffset } = useCompanyTimeZone();
-
   const setInvoiceAtom = useSetAtom(invoiceAtom);
 
   return async (invoice: Invoice) => {
@@ -65,11 +62,8 @@ export function useAddTasksOnInvoice(params: Params) {
         'client_id'
       );
 
-      const {
-        dateFormat: clientDateFormat,
-        timeFormat: clientTimeFormat,
-        timeZone: clientTimezone,
-      } = await resolveDateAndTimeClientFormat(tasks[0]?.client_id);
+      const { dateFormat: clientDateFormat, timeFormat: clientTimeFormat } =
+        await resolveDateAndTimeClientFormat(tasks[0]?.client_id);
 
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
@@ -107,14 +101,6 @@ export function useAddTasksOnInvoice(params: Params) {
               description.push(
                 dayjs
                   .unix(start)
-                  .add(
-                    clientTimezone?.utc_offset
-                      ? clientTimezone.utc_offset
-                      : companyTimezoneOffset
-                      ? companyTimezoneOffset
-                      : 0,
-                    'seconds'
-                  )
                   .format(
                     clientDateFormat?.format_moment
                       ? clientDateFormat.format_moment
@@ -127,14 +113,6 @@ export function useAddTasksOnInvoice(params: Params) {
               description.push(
                 dayjs
                   .unix(start)
-                  .add(
-                    clientTimezone?.utc_offset
-                      ? clientTimezone.utc_offset
-                      : companyTimezoneOffset
-                      ? companyTimezoneOffset
-                      : 0,
-                    'seconds'
-                  )
                   .format(clientTimeFormat ? clientTimeFormat : timeFormat) +
                   ' - '
               );
@@ -144,14 +122,6 @@ export function useAddTasksOnInvoice(params: Params) {
               description.push(
                 dayjs
                   .unix(stop)
-                  .add(
-                    clientTimezone?.utc_offset
-                      ? clientTimezone.utc_offset
-                      : companyTimezoneOffset
-                      ? companyTimezoneOffset
-                      : 0,
-                    'seconds'
-                  )
                   .format(clientTimeFormat ? clientTimeFormat : timeFormat)
               );
             }

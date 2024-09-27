@@ -32,7 +32,6 @@ import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
-import { useCompanyTimeZone } from '$app/common/hooks/useCompanyTimeZone';
 
 export const calculateTaskHours = (timeLog: string, precision?: number) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
@@ -70,8 +69,6 @@ export function useInvoiceProject() {
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { timeZoneOffset: companyTimezoneOffset } = useCompanyTimeZone();
-
   const setInvoice = useSetAtom(invoiceAtom);
 
   return async (tasks: Task[], clientId: string, projectId: string) => {
@@ -108,11 +105,8 @@ export function useInvoiceProject() {
         'client_id'
       );
 
-      const {
-        dateFormat: clientDateFormat,
-        timeFormat: clientTimeFormat,
-        timeZone: clientTimezone,
-      } = await resolveDateAndTimeClientFormat(clientId);
+      const { dateFormat: clientDateFormat, timeFormat: clientTimeFormat } =
+        await resolveDateAndTimeClientFormat(clientId);
 
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
@@ -150,14 +144,6 @@ export function useInvoiceProject() {
               description.push(
                 dayjs
                   .unix(start)
-                  .add(
-                    clientTimezone?.utc_offset
-                      ? clientTimezone.utc_offset
-                      : companyTimezoneOffset
-                      ? companyTimezoneOffset
-                      : 0,
-                    'seconds'
-                  )
                   .format(
                     clientDateFormat?.format_moment
                       ? clientDateFormat.format_moment
@@ -170,14 +156,6 @@ export function useInvoiceProject() {
               description.push(
                 dayjs
                   .unix(start)
-                  .add(
-                    clientTimezone?.utc_offset
-                      ? clientTimezone.utc_offset
-                      : companyTimezoneOffset
-                      ? companyTimezoneOffset
-                      : 0,
-                    'seconds'
-                  )
                   .format(clientTimeFormat ? clientTimeFormat : timeFormat) +
                   ' - '
               );
@@ -187,14 +165,6 @@ export function useInvoiceProject() {
               description.push(
                 dayjs
                   .unix(stop)
-                  .add(
-                    clientTimezone?.utc_offset
-                      ? clientTimezone.utc_offset
-                      : companyTimezoneOffset
-                      ? companyTimezoneOffset
-                      : 0,
-                    'seconds'
-                  )
                   .format(clientTimeFormat ? clientTimeFormat : timeFormat)
               );
             }
