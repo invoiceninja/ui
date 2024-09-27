@@ -45,6 +45,8 @@ import { useLocation } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Tooltip } from '$app/components/Tooltip';
+import { useTranslation } from 'react-i18next';
 
 const numberInputs = [
   'discount',
@@ -91,6 +93,7 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 };
 
 export function useResolveInputField(props: Props) {
+  const [t] = useTranslation();
   const location = useLocation();
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
@@ -357,27 +360,55 @@ export function useResolveInputField(props: Props) {
     if (numberInputs.includes(property)) {
       return (
         inputCurrencySeparators && (
-          <NumberInputField
-            precision={
-              property === 'quantity'
-                ? 6
-                : reactSettings?.number_precision &&
-                  reactSettings?.number_precision > 0 &&
-                  reactSettings?.number_precision <= 100
-                ? reactSettings.number_precision
-                : inputCurrencySeparators?.precision || 2
-            }
-            id={property}
-            value={resource?.line_items[index][property] as string}
-            className="auto"
-            onValueChange={(value: string) => {
-              onChange(
-                property,
-                isNaN(parseFloat(value)) ? 0 : parseFloat(value),
-                index
-              );
-            }}
-          />
+          <>
+            {property === 'quantity' && company.track_inventory ? (
+              <Tooltip message={t('quantity_level') as string} width="auto">
+                <NumberInputField
+                  precision={
+                    property === 'quantity'
+                      ? 6
+                      : reactSettings?.number_precision &&
+                        reactSettings?.number_precision > 0 &&
+                        reactSettings?.number_precision <= 100
+                      ? reactSettings.number_precision
+                      : inputCurrencySeparators?.precision || 2
+                  }
+                  id={property}
+                  value={resource?.line_items[index][property]?.toString()}
+                  className="auto"
+                  onValueChange={(value: string) => {
+                    onChange(
+                      property,
+                      isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+                      index
+                    );
+                  }}
+                />
+              </Tooltip>
+            ) : (
+              <NumberInputField
+                precision={
+                  property === 'quantity'
+                    ? 6
+                    : reactSettings?.number_precision &&
+                      reactSettings?.number_precision > 0 &&
+                      reactSettings?.number_precision <= 100
+                    ? reactSettings.number_precision
+                    : inputCurrencySeparators?.precision || 2
+                }
+                id={property}
+                value={resource?.line_items[index][property]?.toString()}
+                className="auto"
+                onValueChange={(value: string) => {
+                  onChange(
+                    property,
+                    isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+                    index
+                  );
+                }}
+              />
+            )}
+          </>
         )
       );
     }
