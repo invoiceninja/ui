@@ -115,6 +115,7 @@ export default function Edit() {
                     handleCreateLineItem(InvoiceItemType.Product)
                   }
                   onDeleteRowClick={handleDeleteLineItem}
+                  showQuantityTooltip
                 />
               ) : (
                 <Spinner />
@@ -138,6 +139,7 @@ export default function Edit() {
                     handleCreateLineItem(InvoiceItemType.Task)
                   }
                   onDeleteRowClick={handleDeleteLineItem}
+                  showQuantityTooltip
                 />
               ) : (
                 <Spinner />

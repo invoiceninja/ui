@@ -77,6 +77,7 @@ interface Props {
   ) => unknown;
   createItem: () => unknown;
   deleteLineItem: (index: number) => unknown;
+  showQuantityTooltip?: boolean;
 }
 
 export const isLineItemEmpty = (lineItem: InvoiceItem) => {
@@ -361,7 +362,9 @@ export function useResolveInputField(props: Props) {
       return (
         inputCurrencySeparators && (
           <>
-            {property === 'quantity' && company.track_inventory ? (
+            {property === 'quantity' &&
+            company.track_inventory &&
+            props.showQuantityTooltip ? (
               <Tooltip message={t('quantity_level') as string} width="auto">
                 <NumberInputField
                   precision={

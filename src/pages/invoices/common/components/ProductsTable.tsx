@@ -49,6 +49,7 @@ interface Props {
   onDeleteRowClick: (index: number) => unknown;
   onCreateItemClick: () => unknown;
   shouldCreateInitialLineItem?: boolean;
+  showQuantityTooltip?: boolean;
 }
 
 export function ProductsTable(props: Props) {
@@ -71,6 +72,7 @@ export function ProductsTable(props: Props) {
     relationType,
     createItem: props.onCreateItemClick,
     deleteLineItem: props.onDeleteRowClick,
+    showQuantityTooltip: props.showQuantityTooltip,
   });
 
   const onDragEnd = useHandleSortingRows({
