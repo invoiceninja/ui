@@ -11,21 +11,30 @@
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { route } from '$app/common/helpers/route';
 import { Card, Element } from '../../../../components/cards';
-import { SelectField } from '../../../../components/forms';
+import { Button, SelectField } from '../../../../components/forms';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useNavigate } from 'react-router-dom';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function SecuritySettings() {
   const [t] = useTranslation();
+
   const companyChanges = useCompanyChanges();
+  const errors = useAtomValue(companySettingsErrorsAtom);
+
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const errors = useAtomValue(companySettingsErrorsAtom);
+  const [isSessionsLogoutBusy, setIsSessionsLogoutBusy] =
+    useState<boolean>(false);
 
   const options = [
     {
@@ -76,6 +85,19 @@ export function SecuritySettings() {
       })
     );
 
+  const handleLogoutAllSessions = () => {
+    if (!isSessionsLogoutBusy) {
+      setIsSessionsLogoutBusy(true);
+
+      request('POST', endpoint('/api/v1/logout'))
+        .then(() => {
+          toast.success('success');
+          navigate('/logout');
+        })
+        .finally(() => setIsSessionsLogoutBusy(false));
+    }
+  };
+
   return (
     <Card title={t('security_settings')}>
       <Element leftSide={t('password_timeout')}>
@@ -116,6 +138,16 @@ export function SecuritySettings() {
             handleToggleChange('oauth_password_required', value)
           }
         />
+      </Element>
+
+      <Element leftSide={t('logout_all_sessions')}>
+        <Button
+          behavior="button"
+          type="secondary"
+          onClick={handleLogoutAllSessions}
+        >
+          {t('logout')}
+        </Button>
       </Element>
     </Card>
   );
