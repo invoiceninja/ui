@@ -47,6 +47,7 @@ import { usePreferences } from '$app/common/hooks/usePreferences';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Tooltip } from '$app/components/Tooltip';
 import { useTranslation } from 'react-i18next';
+import { useResolveProduct } from '$app/common/hooks/useResolveProduct';
 
 const numberInputs = [
   'discount',
@@ -96,6 +97,8 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
   const location = useLocation();
+
+  const resolveProduct = useResolveProduct({ resolveByProductKey: true });
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
@@ -322,6 +325,10 @@ export function useResolveInputField(props: Props) {
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
+    const resolvedProduct = resolveProduct(
+      resource?.line_items[index]?.product_key
+    );
+
     if (property === 'product_key') {
       return (
         <ProductSelector
@@ -364,8 +371,18 @@ export function useResolveInputField(props: Props) {
           <>
             {property === 'quantity' &&
             company.track_inventory &&
-            props.showQuantityTooltip ? (
-              <Tooltip message={t('quantity_level') as string} width="auto">
+            props.showQuantityTooltip &&
+            resolvedProduct ? (
+              <Tooltip
+                tooltipElement={
+                  <div className="flex space-x-2">
+                    <span>{t('in_stock_quantity')}:</span>
+
+                    <span>{resolvedProduct?.in_stock_quantity}</span>
+                  </div>
+                }
+                width="auto"
+              >
                 <NumberInputField
                   precision={
                     property === 'quantity'
