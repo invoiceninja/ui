@@ -148,6 +148,8 @@ export function SecuritySettings() {
           behavior="button"
           type="secondary"
           onClick={handleLogoutAllSessions}
+          disabled={isSessionsLogoutBusy}
+          disableWithoutIcon
         >
           {t('logout')}
         </Button>
