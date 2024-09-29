@@ -140,7 +140,10 @@ export function SecuritySettings() {
         />
       </Element>
 
-      <Element leftSide={t('logout_all_sessions')}>
+      <Element
+        leftSide={t('end_all_sessions')}
+        leftSideHelp={t('end_all_sessions_help')}
+      >
         <Button
           behavior="button"
           type="secondary"
