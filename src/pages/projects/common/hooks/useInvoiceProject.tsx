@@ -137,7 +137,7 @@ export function useInvoiceProject() {
             const description = [];
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
-              description.push('<div class="task-time-details">');
+              description.push('<div class="task-time-details">\n');
             }
 
             if (company.invoice_task_datelog) {
@@ -173,11 +173,13 @@ export function useInvoiceProject() {
               description.push(hoursDescription);
             }
 
-            if (company.invoice_task_item_description) {
-              description.push(intervalDescription);
+            if (company.invoice_task_item_description && intervalDescription) {
+              description.push(`\n\n${intervalDescription}`);
             }
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
+              description.push('\n');
+
               description.push('</div>\n');
             }
 
