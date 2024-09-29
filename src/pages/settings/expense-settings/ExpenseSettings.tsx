@@ -127,16 +127,9 @@ export function ExpenseSettings() {
 
         {isCompanySettingsActive && isSelfHosted() && (
           <>
-            <Element leftSide={t('expense_mailbox')}>
-              <InputField
-                value={companyChanges?.expense_mailbox || ''}
-                onValueChange={(value) =>
-                  handleCurrentCompanyChangeProperty('expense_mailbox', value)
-                }
-              />
-            </Element>
+            <Divider withoutPadding />
 
-            <Element leftSide={t('expense_mailbox_active')}>
+            <Element className="mt-3.5" leftSide={t('expense_mailbox_active')}>
               <Toggle
                 checked={Boolean(companyChanges?.expense_mailbox_active)}
                 onChange={(value: boolean) =>
@@ -148,89 +141,111 @@ export function ExpenseSettings() {
               />
             </Element>
 
-            <Element leftSide={t('inbound_mailbox_allow_company_users')}>
-              <Toggle
-                checked={Boolean(
-                  companyChanges?.inbound_mailbox_allow_company_users
-                )}
-                onChange={(value: boolean) =>
-                  handleCurrentCompanyChangeProperty(
-                    'inbound_mailbox_allow_company_users',
-                    value
-                  )
-                }
-              />
-            </Element>
+            {Boolean(companyChanges?.expense_mailbox_active) && (
+              <>
+                <Element leftSide={t('expense_mailbox')}>
+                  <InputField
+                    value={companyChanges?.expense_mailbox || ''}
+                    onValueChange={(value) =>
+                      handleCurrentCompanyChangeProperty(
+                        'expense_mailbox',
+                        value
+                      )
+                    }
+                  />
+                </Element>
 
-            <Element leftSide={t('inbound_mailbox_allow_vendors')}>
-              <Toggle
-                checked={Boolean(companyChanges?.inbound_mailbox_allow_vendors)}
-                onChange={(value: boolean) =>
-                  handleCurrentCompanyChangeProperty(
-                    'inbound_mailbox_allow_vendors',
-                    value
-                  )
-                }
-              />
-            </Element>
+                <Element leftSide={t('inbound_mailbox_allow_company_users')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_company_users
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_company_users',
+                        value
+                      )
+                    }
+                  />
+                </Element>
 
-            <Element leftSide={t('inbound_mailbox_allow_clients')}>
-              <Toggle
-                checked={Boolean(companyChanges?.inbound_mailbox_allow_clients)}
-                onChange={(value: boolean) =>
-                  handleCurrentCompanyChangeProperty(
-                    'inbound_mailbox_allow_clients',
-                    value
-                  )
-                }
-              />
-            </Element>
+                <Element leftSide={t('inbound_mailbox_allow_vendors')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_vendors
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_vendors',
+                        value
+                      )
+                    }
+                  />
+                </Element>
 
-            <Element
-              leftSide={t('inbound_mailbox_whitelist')}
-              leftSideHelp={t('inbound_mailbox_whitelist_help')}
-            >
-              <InputField
-                value={companyChanges?.inbound_mailbox_whitelist || ''}
-                onValueChange={(value) =>
-                  handleCurrentCompanyChangeProperty(
-                    'inbound_mailbox_whitelist',
-                    value
-                  )
-                }
-              />
-            </Element>
+                <Element leftSide={t('inbound_mailbox_allow_clients')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_clients
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_clients',
+                        value
+                      )
+                    }
+                  />
+                </Element>
 
-            <Element
-              leftSide={t('inbound_mailbox_blacklist')}
-              leftSideHelp={t('inbound_mailbox_blacklist_help')}
-            >
-              <InputField
-                value={companyChanges?.inbound_mailbox_blacklist || ''}
-                onValueChange={(value) =>
-                  handleCurrentCompanyChangeProperty(
-                    'inbound_mailbox_blacklist',
-                    value
-                  )
-                }
-              />
-            </Element>
+                <Element
+                  leftSide={t('inbound_mailbox_whitelist')}
+                  leftSideHelp={t('inbound_mailbox_whitelist_help')}
+                >
+                  <InputField
+                    value={companyChanges?.inbound_mailbox_whitelist || ''}
+                    onValueChange={(value) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_whitelist',
+                        value
+                      )
+                    }
+                  />
+                </Element>
 
-            <Element leftSide={t('inbound_mailbox_allow_unknown')}>
-              <Toggle
-                checked={Boolean(companyChanges?.inbound_mailbox_allow_unknown)}
-                onChange={(value: boolean) =>
-                  handleCurrentCompanyChangeProperty(
-                    'inbound_mailbox_allow_unknown',
-                    value
-                  )
-                }
-              />
-            </Element>
+                <Element
+                  leftSide={t('inbound_mailbox_blacklist')}
+                  leftSideHelp={t('inbound_mailbox_blacklist_help')}
+                >
+                  <InputField
+                    value={companyChanges?.inbound_mailbox_blacklist || ''}
+                    onValueChange={(value) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_blacklist',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+
+                <Element leftSide={t('inbound_mailbox_allow_unknown')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_unknown
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_unknown',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+              </>
+            )}
           </>
         )}
 
-        <Divider />
+        <Divider className="pb-3.5" withoutPadding />
 
         <Element leftSide={t('enter_taxes')}>
           <Radio
