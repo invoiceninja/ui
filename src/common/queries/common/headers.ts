@@ -11,7 +11,7 @@
 import { isHosted } from '$app/common/helpers';
 
 export function defaultHeaders() {
-  const headers: Record<string, unknown> = {
+  const headers: Record<string, string | number | boolean> = {
     'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
     'X-Requested-With': 'XMLHttpRequest',
     'X-React': 'true',
