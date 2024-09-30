@@ -110,7 +110,7 @@ export function NumberInputField(props: Props) {
               'border border-gray-300': props.border !== false,
             }
           )}
-          value={currentValue}
+          value={currentValue || ''}
           placeholder={props.placeholder ?? undefined}
           onChange={(event) => {
             if (props.onValueChange && props.changeOverride) {
