@@ -123,7 +123,6 @@ export default function Invoice() {
                 cypressRef="invoiceActionDropdown"
               />
             ),
-            topRight: <CommonActions invoice={invoice} />,
           })}
       >
         {invoice?.id === id ? (
@@ -138,7 +137,16 @@ export default function Invoice() {
             )}
 
             <div className="space-y-4">
-              <Tabs tabs={tabs} />
+              <Tabs
+                tabs={tabs}
+                rightSide={
+                  invoice && (
+                    <div className="flex items-center">
+                      <CommonActions invoice={invoice} />
+                    </div>
+                  )
+                }
+              />
 
               <Outlet
                 context={{
