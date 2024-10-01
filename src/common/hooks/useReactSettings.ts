@@ -46,7 +46,7 @@ export interface Preferences {
   auto_expand_product_table_notes: boolean;
 }
 
-type ImportTemplates = Record<string, Record<string, Record<number, string>>>;
+export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
 
 type ColorTheme = Record<ThemeColorField, string>;
 

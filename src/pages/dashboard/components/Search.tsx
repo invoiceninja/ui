@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { useTranslation } from 'react-i18next';
@@ -17,21 +17,39 @@ import { Entry } from '$app/components/forms/Combobox';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { memo, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { styled } from 'styled-components';
 import { Combobox } from '@headlessui/react';
 import { useClickAway } from 'react-use';
 import collect from 'collect.js';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { debounce } from 'lodash';
 
-export function useSearch() {
+const ComboboxOption = styled(Combobox.Option)`
+  color: ${(props) => props.theme.color};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
+export function Search$() {
   const [t] = useTranslation();
 
-  const { data } = useQuery(
+  const [query, setQuery] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+
+  const preventNavigation = usePreventNavigation();
+
+  const { data, refetch } = useQuery(
     ['/api/v1/search'],
-    () =>
-      request('POST', endpoint('/api/v1/search')).then(
+    () => {
+      const $endpoint =
+        query.length === 0
+          ? '/api/v1/search'
+          : `/api/v1/search?search=${query}`;
+
+      return request('POST', endpoint($endpoint)).then(
         (response: AxiosResponse<SearchResponse>) => {
           const formatted: Entry<SearchRecord>[] = [];
 
@@ -52,28 +70,13 @@ export function useSearch() {
 
           return formatted;
         }
-      ),
-    { staleTime: Infinity }
+      );
+    },
+    {
+      staleTime: Infinity,
+    }
   );
 
-  return data;
-}
-
-const ComboboxOption = styled(Combobox.Option)`
-  color: ${(props) => props.theme.color};
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
-`;
-
-export function Search$() {
-  const [t] = useTranslation();
-  const [query, setQuery] = useState('');
-  const [isVisible, setIsVisible] = useState(false);
-
-  const preventNavigation = usePreventNavigation();
-
-  const data = useSearch();
   const colors = useColorScheme();
 
   const comboboxRef = useRef<HTMLDivElement | null>(null);
@@ -112,6 +115,19 @@ export function Search$() {
 
   useClickAway(comboboxRef, () => setIsVisible(false));
 
+  const handleChange = debounce(
+    (event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value),
+    500
+  );
+
+  const options = filtered.count() === 0 ? collect(data) : filtered;
+
+  useEffect(() => {
+    if (query && filtered.count() === 0 && isHosted()) {
+      refetch();
+    }
+  }, [query]);
+
   return (
     <Combobox
       as="div"
@@ -122,13 +138,13 @@ export function Search$() {
             })
           : null
       }
-      className="w-full"
+      style={{ width: '70%' }}
       ref={comboboxRef}
     >
       <div className="relative mt-2">
         <Combobox.Input
           className="border-transparent focus:border-transparent focus:ring-0 w-full"
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={handleChange}
           ref={inputRef}
           onFocus={() => setIsVisible(true)}
           placeholder={`${t('search')}... (Ctrl K)`}
@@ -145,7 +161,7 @@ export function Search$() {
           style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
           static={true}
         >
-          {filtered?.map((entry) => (
+          {options?.map((entry) => (
             <ComboboxOption
               key={entry.id}
               value={entry}
@@ -171,7 +187,7 @@ export function Search$() {
             </ComboboxOption>
           ))}
 
-          {filtered.count() === 0 && (
+          {options.count() === 0 && (
             <ComboboxOption
               value={null}
               theme={{ color: colors.$3, hoverColor: colors.$2 }}

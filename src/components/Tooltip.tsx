@@ -27,6 +27,7 @@ interface Props {
   tooltipElement?: ReactNode;
   disabled?: boolean;
   withoutWrapping?: boolean;
+  centerVertically?: boolean;
 }
 
 export function Tooltip(props: Props) {
@@ -119,6 +120,7 @@ export function Tooltip(props: Props) {
           ref={parentChildrenElement}
           className={classNames('cursor-pointer', {
             'truncate w-full': props.truncate,
+            'flex items-center': props.centerVertically,
           })}
         >
           {props.children}

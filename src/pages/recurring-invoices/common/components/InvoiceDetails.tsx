@@ -19,6 +19,7 @@ import { useAtom } from 'jotai';
 import { recurringInvoiceAtom } from '../atoms';
 import dayjs from 'dayjs';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -139,12 +140,11 @@ export function InvoiceDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <InputField
-                type="number"
+              <NumberInputField
+                value={recurringInvoice?.discount || ''}
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value))
                 }
-                value={recurringInvoice?.discount || ''}
                 errorMessage={props.errors?.errors.discount}
               />
             </div>

@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { date as formatDate } from '$app/common/helpers';
 import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export interface PurchaseOrderCardProps {
   purchaseOrder: PurchaseOrder;
@@ -55,13 +56,12 @@ export function Details(props: PurchaseOrderCardProps) {
         </Element>
 
         <Element leftSide={t('partial')}>
-          <InputField
-            type="number"
-            changeOverride={true}
+          <NumberInputField
             value={purchaseOrder.partial}
             onValueChange={(partial) =>
               handleChange('partial', parseFloat(partial) || 0)
             }
+            changeOverride
             errorMessage={errors?.errors.partial}
           />
         </Element>
@@ -114,8 +114,7 @@ export function Details(props: PurchaseOrderCardProps) {
         <Element leftSide={t('discount')}>
           <Inline>
             <div className="w-full lg:w-1/2">
-              <InputField
-                type="number"
+              <NumberInputField
                 value={purchaseOrder.discount}
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value) || 0)

@@ -92,7 +92,7 @@ export function ImportTemplateModal(props: Props) {
 
     Object.keys(reactSettings?.import_templates?.[entity]).forEach(
       (currentTemplateName) => {
-        if (currentTemplateName.toLowerCase() === templateName.toLowerCase()) {
+        if (currentTemplateName === templateName) {
           isTemplateDuplicated = true;
         }
       }
@@ -102,19 +102,40 @@ export function ImportTemplateModal(props: Props) {
   };
 
   const handleSaveTemplate = () => {
-    if (!isFormBusy) {
+    if (!isFormBusy && templateName) {
       toast.processing();
       setIsFormBusy(true);
 
       const updatedUser = cloneDeep(user) as User;
 
       if (updatedUser) {
+        const currentEntityImportTemplates = (cloneDeep(
+          updatedUser.company_user?.react_settings.import_templates?.[
+            props.entity
+          ]
+        ) || {}) as Record<string, Record<number, string>>;
+
+        const updatedEntityImportTemplates: Record<string, (string | null)[]> =
+          {};
+
+        if (!Array.isArray(currentEntityImportTemplates)) {
+          Object.entries(currentEntityImportTemplates).forEach(
+            ([key, value]) => {
+              if (!key || !value || !Array.isArray(value)) return;
+
+              updatedEntityImportTemplates[key] = value;
+            }
+          );
+        }
+
+        updatedEntityImportTemplates[templateName] = Object.values(
+          importMap.column_map?.[props.entity]?.mapping
+        ).map((column) => column || '') as string[];
+
         set(
           updatedUser,
-          `company_user.react_settings.import_templates.${props.entity}.${templateName}`,
-          Object.values(importMap.column_map?.[props.entity]?.mapping).map(
-            (column) => column || ''
-          )
+          `company_user.react_settings.import_templates.${props.entity}`,
+          updatedEntityImportTemplates
         );
 
         request(
@@ -204,10 +225,7 @@ export function ImportTemplateModal(props: Props) {
 
           <Button
             behavior="button"
-            onClick={() => {
-              setIsTemplateModalOpen(false);
-              setIsSaveTemplateModalOpen(true);
-            }}
+            onClick={() => setIsSaveTemplateModalOpen(true)}
           >
             {t('yes')}
           </Button>

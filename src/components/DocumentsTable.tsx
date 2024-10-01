@@ -227,7 +227,7 @@ export function DocumentsTable(props: Props) {
               <Td>{prettyBytes(document.size)}</Td>
               {!disableEditableOptions && (
                 <Td>
-                  <Dropdown label={t('more_actions')}>
+                  <Dropdown label={t('actions')}>
                     <DropdownElement
                       onClick={() => {
                         downloadDocument(document, true);

@@ -18,6 +18,7 @@ import Toggle from '$app/components/forms/Toggle';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { trans } from '$app/common/helpers';
 import { useEffect } from 'react';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Settings(props: SubscriptionProps) {
   const [t] = useTranslation();
@@ -95,8 +96,7 @@ export function Settings(props: SubscriptionProps) {
       <Element leftSide={t('promo_discount')}>
         <Inline>
           <div className="w-full lg:w-1/2">
-            <InputField
-              type="number"
+            <NumberInputField
               value={subscription.promo_discount || ''}
               onValueChange={(value) =>
                 handleChange('promo_discount', parseFloat(value))

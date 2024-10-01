@@ -18,6 +18,7 @@ interface Props {
   secure?: boolean;
   limit?: number;
   stopPropagation?: boolean;
+  iconColor?: string;
 }
 
 export function CopyToClipboardIconOnly({
@@ -26,6 +27,7 @@ export function CopyToClipboardIconOnly({
   secure,
   limit = 0,
   stopPropagation,
+  iconColor,
 }: Props) {
   const value = text || '';
 
@@ -47,7 +49,7 @@ export function CopyToClipboardIconOnly({
 
       {value.length > 0 && (
         <button type="button" onClick={handleClick}>
-          <MdOutlineContentCopy size={18} />
+          <MdOutlineContentCopy size={18} color={iconColor} />
         </button>
       )}
     </div>

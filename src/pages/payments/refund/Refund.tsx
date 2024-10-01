@@ -31,6 +31,7 @@ import collect from 'collect.js';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Refund() {
   const { id } = useParams();
@@ -238,13 +239,16 @@ export default function Refund() {
                 <div key={index} className="flex flex-col">
                   <Element leftSide={`${t('invoice')}: ${invoiceItem?.number}`}>
                     <div className="flex items-center space-x-2">
-                      <InputField
-                        id={`invoices[${index}].amount`}
-                        type="number"
+                      <NumberInputField
                         value={
                           (formik.values.invoices[index] as Invoice).amount
                         }
-                        onChange={formik.handleChange}
+                        onValueChange={(value) =>
+                          formik.setFieldValue(
+                            `invoices.${index}.amount`,
+                            parseFloat(value)
+                          )
+                        }
                       />
 
                       <Button
