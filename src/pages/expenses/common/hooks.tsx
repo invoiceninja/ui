@@ -125,7 +125,7 @@ export function useActions() {
     (expense) =>
       expense.should_be_invoiced === true &&
       expense.invoice_id.length === 0 && (
-        <AddToInvoiceAction expense={expense} />
+        <AddToInvoiceAction expenses={[expense]} />
       ),
     (expense) =>
       hasPermission('create_expense') && (
