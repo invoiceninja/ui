@@ -79,6 +79,15 @@ export interface Company {
   smtp_verify_peer: boolean;
   e_invoice?: EInvoiceType;
   use_comma_as_decimal_place?: boolean;
+  notify_vendor_when_paid?: boolean;
+  expense_mailbox_active?: boolean;
+  inbound_mailbox_allow_company_users?: boolean;
+  inbound_mailbox_allow_vendors?: boolean;
+  inbound_mailbox_allow_clients?: boolean;
+  inbound_mailbox_whitelist?: string;
+  inbound_mailbox_blacklist?: string;
+  inbound_mailbox_allow_unknown?: boolean;
+  expense_mailbox?: string;
 }
 
 export interface Settings {
