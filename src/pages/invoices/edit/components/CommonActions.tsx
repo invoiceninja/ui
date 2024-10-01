@@ -16,11 +16,15 @@ import { MdSettings } from 'react-icons/md';
 import { useActions } from './Actions';
 import { ResourceAction } from '$app/components/DataTable';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useTranslation } from 'react-i18next';
+import { Tooltip } from '$app/components/Tooltip';
 
 interface Props {
   invoice: Invoice;
 }
 export function CommonActions(props: Props) {
+  const [t] = useTranslation();
+
   const user = useCurrentUser();
   const actions = useActions({ dropdown: false });
 
@@ -65,14 +69,21 @@ export function CommonActions(props: Props) {
           <div key={index}>{action(invoice)}</div>
         ))}
 
-        <div>
-          <Icon
-            className="cursor-pointer"
-            element={MdSettings}
-            size={25}
-            onClick={() => setIsPreferenceModalOpen(true)}
-          />
-        </div>
+        <Tooltip
+          width="auto"
+          message={t('quick_actions') as string}
+          placement="bottom"
+          withoutArrow
+        >
+          <div>
+            <Icon
+              className="cursor-pointer"
+              element={MdSettings}
+              size={25}
+              onClick={() => setIsPreferenceModalOpen(true)}
+            />
+          </div>
+        </Tooltip>
       </div>
 
       <CommonActionsPreferenceModal
