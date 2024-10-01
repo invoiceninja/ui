@@ -49,6 +49,30 @@ export function NumberInputField(props: Props) {
       : undefined
   );
 
+  const getNumberPrecision = () => {
+    if (typeof props.precision === 'number') {
+      return props.precision;
+    }
+
+    if (
+      reactSettings?.number_precision &&
+      reactSettings?.number_precision > 0 &&
+      reactSettings?.number_precision <= 100
+    ) {
+      return reactSettings.number_precision;
+    }
+
+    return 2;
+  };
+
+  const getDecimalSeparator = () => {
+    return company?.use_comma_as_decimal_place ? ',' : '.';
+  };
+
+  const getThousandSeparator = () => {
+    return company?.use_comma_as_decimal_place ? '.' : ',';
+  };
+
   useDebounce(
     () => {
       if (props.onValueChange) {
@@ -116,17 +140,10 @@ export function NumberInputField(props: Props) {
             if (props.onValueChange && props.changeOverride) {
               const formattedValue = event.target.value
                 ? currency(event.target.value, {
-                    separator: company?.use_comma_as_decimal_place ? '.' : ',',
-                    decimal: company?.use_comma_as_decimal_place ? ',' : '.',
+                    separator: getThousandSeparator(),
+                    decimal: getDecimalSeparator(),
                     symbol: '',
-                    precision:
-                      typeof props.precision === 'number'
-                        ? props.precision
-                        : reactSettings?.number_precision &&
-                          reactSettings?.number_precision > 0 &&
-                          reactSettings?.number_precision <= 100
-                        ? reactSettings.number_precision
-                        : 2,
+                    precision: getNumberPrecision(),
                   }).value
                 : undefined;
 
@@ -139,38 +156,19 @@ export function NumberInputField(props: Props) {
                 event.target.value
                   ? String(
                       currency(event.target.value, {
-                        separator: company?.use_comma_as_decimal_place
-                          ? '.'
-                          : ',',
-                        decimal: company?.use_comma_as_decimal_place
-                          ? ','
-                          : '.',
+                        separator: getThousandSeparator(),
+                        decimal: getDecimalSeparator(),
                         symbol: '',
-                        precision:
-                          typeof props.precision === 'number'
-                            ? props.precision
-                            : reactSettings?.number_precision &&
-                              reactSettings?.number_precision > 0 &&
-                              reactSettings?.number_precision <= 100
-                            ? reactSettings.number_precision
-                            : 2,
+                        precision: getNumberPrecision(),
                       }).value
                     )
                   : ''
               );
             }
           }}
-          thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
-          decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
-          decimalScale={
-            typeof props.precision === 'number'
-              ? props.precision
-              : reactSettings?.number_precision &&
-                reactSettings?.number_precision > 0 &&
-                reactSettings?.number_precision <= 100
-              ? reactSettings.number_precision
-              : 2
-          }
+          thousandSeparator={getThousandSeparator()}
+          decimalSeparator={getDecimalSeparator()}
+          decimalScale={getNumberPrecision()}
           allowNegative
           style={{
             backgroundColor: colors.$1,
