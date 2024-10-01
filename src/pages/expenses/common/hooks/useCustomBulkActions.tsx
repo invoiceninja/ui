@@ -128,7 +128,7 @@ export const useCustomBulkActions = () => {
   };
 
   const handleDisplayAddToInvoice = (expenses: Expense[]) => {
-    return expenses.some(({ should_be_invoiced, invoice_id }) => {
+    return expenses.every(({ should_be_invoiced, invoice_id }) => {
       return should_be_invoiced && !invoice_id.length;
     });
   };
