@@ -250,7 +250,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
               }
               className="auto"
               value={(expense.foreign_amount || 0).toString()}
-              onChange={(value: string) =>
+              onValueChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }
               errorMessage={errors?.errors.foreign_amount}

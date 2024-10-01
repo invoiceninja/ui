@@ -260,7 +260,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
               }
               className="auto"
               value={(recurringExpense.foreign_amount || 0).toString()}
-              onChange={(value: string) =>
+              onValueChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }
               errorMessage={errors?.errors.foreign_amount}
