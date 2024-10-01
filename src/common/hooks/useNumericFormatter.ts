@@ -16,6 +16,32 @@ export function useNumericFormatter() {
   const company = useCurrentCompany();
   const userNumberPrecision = useUserNumberPrecision();
 
+  const getThousandSeparator = (
+    currentThousandSeparator: string | undefined
+  ) => {
+    if (currentThousandSeparator) {
+      return currentThousandSeparator;
+    }
+
+    if (company?.use_comma_as_decimal_place) {
+      return '.';
+    }
+
+    return ',';
+  };
+
+  const getDecimalSeparator = (currentDecimalSeparator: string | undefined) => {
+    if (currentDecimalSeparator) {
+      return currentDecimalSeparator;
+    }
+
+    if (company?.use_comma_as_decimal_place) {
+      return ',';
+    }
+
+    return '.';
+  };
+
   return (
     numStr: string,
     thousandSeparator?: string,
@@ -23,16 +49,8 @@ export function useNumericFormatter() {
     precision?: number
   ) => {
     return numericFormatter(numStr, {
-      thousandSeparator: thousandSeparator
-        ? thousandSeparator
-        : company?.use_comma_as_decimal_place
-        ? '.'
-        : ',',
-      decimalSeparator: decimalSeparator
-        ? decimalSeparator
-        : company?.use_comma_as_decimal_place
-        ? ','
-        : '.',
+      thousandSeparator: getThousandSeparator(thousandSeparator),
+      decimalSeparator: getDecimalSeparator(decimalSeparator),
       decimalScale: precision || userNumberPrecision,
     });
   };
