@@ -239,8 +239,8 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           </Element>
 
           <Element leftSide={t('exchange_rate')}>
-            <InputField
-              value={recurringExpense.exchange_rate.toFixed(5)}
+            <NumberInputField
+              value={recurringExpense.exchange_rate}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
@@ -260,7 +260,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
               }
               className="auto"
               value={(recurringExpense.foreign_amount || 0).toString()}
-              onChange={(value: string) =>
+              onValueChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }
               errorMessage={errors?.errors.foreign_amount}
