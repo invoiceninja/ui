@@ -9,6 +9,7 @@
  */
 
 import { isHosted } from '$app/common/helpers';
+import { socketId } from '../sockets';
 
 export function defaultHeaders() {
   const headers: Record<string, string | number | boolean> = {
@@ -17,10 +18,8 @@ export function defaultHeaders() {
     'X-React': 'true',
   };
 
-  if (localStorage.getItem('X-SOCKET-ID') && isHosted()) {
-    headers['X-Socket-Id'] = parseInt(
-      localStorage.getItem('X-SOCKET-ID') as string
-    );
+  if (socketId() && isHosted()) {
+    headers['X-Socket-ID'] = socketId()!;
   }
 
   return headers;
