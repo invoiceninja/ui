@@ -49,10 +49,36 @@ export function NumberInputField(props: Props) {
       : undefined
   );
 
+  const getNumberPrecision = () => {
+    if (typeof props.precision === 'number') {
+      return props.precision;
+    }
+
+    if (
+      reactSettings?.number_precision &&
+      reactSettings?.number_precision > 0 &&
+      reactSettings?.number_precision <= 100
+    ) {
+      return reactSettings.number_precision;
+    }
+
+    return 2;
+  };
+
+  const getDecimalSeparator = () => {
+    return company?.use_comma_as_decimal_place ? ',' : '.';
+  };
+
+  const getThousandSeparator = () => {
+    return company?.use_comma_as_decimal_place ? '.' : ',';
+  };
+
   useDebounce(
     () => {
-      if (props.onValueChange && currentValue) {
-        props.onValueChange(String(currentValue));
+      if (props.onValueChange) {
+        props.onValueChange(
+          typeof currentValue === 'number' ? String(currentValue) : ''
+        );
       }
     },
     500,
@@ -60,9 +86,7 @@ export function NumberInputField(props: Props) {
   );
 
   useEffect(() => {
-    if (props.value) {
-      setCurrentValue(parseFloat(String(props.value)));
-    }
+    setCurrentValue(props.value ? parseFloat(String(props.value)) : undefined);
   }, [props.value]);
 
   if (import.meta.env.VITE_RETURN_NUMBER_FIELD === 'true') {
@@ -110,23 +134,18 @@ export function NumberInputField(props: Props) {
               'border border-gray-300': props.border !== false,
             }
           )}
-          value={currentValue}
+          value={currentValue || ''}
           placeholder={props.placeholder ?? undefined}
           onChange={(event) => {
             if (props.onValueChange && props.changeOverride) {
-              const formattedValue = currency(event.target.value, {
-                separator: company?.use_comma_as_decimal_place ? '.' : ',',
-                decimal: company?.use_comma_as_decimal_place ? ',' : '.',
-                symbol: '',
-                precision:
-                  typeof props.precision === 'number'
-                    ? props.precision
-                    : reactSettings?.number_precision &&
-                      reactSettings?.number_precision > 0 &&
-                      reactSettings?.number_precision <= 100
-                    ? reactSettings.number_precision
-                    : 2,
-              }).value;
+              const formattedValue = event.target.value
+                ? currency(event.target.value, {
+                    separator: getThousandSeparator(),
+                    decimal: getDecimalSeparator(),
+                    symbol: '',
+                    precision: getNumberPrecision(),
+                  }).value
+                : undefined;
 
               setCurrentValue(formattedValue);
             }
@@ -134,35 +153,22 @@ export function NumberInputField(props: Props) {
           onBlur={(event) => {
             if (props.onValueChange && !props.changeOverride) {
               props.onValueChange(
-                String(
-                  currency(event.target.value, {
-                    separator: company?.use_comma_as_decimal_place ? '.' : ',',
-                    decimal: company?.use_comma_as_decimal_place ? ',' : '.',
-                    symbol: '',
-                    precision:
-                      typeof props.precision === 'number'
-                        ? props.precision
-                        : reactSettings?.number_precision &&
-                          reactSettings?.number_precision > 0 &&
-                          reactSettings?.number_precision <= 100
-                        ? reactSettings.number_precision
-                        : 2,
-                  }).value
-                )
+                event.target.value
+                  ? String(
+                      currency(event.target.value, {
+                        separator: getThousandSeparator(),
+                        decimal: getDecimalSeparator(),
+                        symbol: '',
+                        precision: getNumberPrecision(),
+                      }).value
+                    )
+                  : ''
               );
             }
           }}
-          thousandSeparator={company?.use_comma_as_decimal_place ? '.' : ','}
-          decimalSeparator={company?.use_comma_as_decimal_place ? ',' : '.'}
-          decimalScale={
-            typeof props.precision === 'number'
-              ? props.precision
-              : reactSettings?.number_precision &&
-                reactSettings?.number_precision > 0 &&
-                reactSettings?.number_precision <= 100
-              ? reactSettings.number_precision
-              : 2
-          }
+          thousandSeparator={getThousandSeparator()}
+          decimalSeparator={getDecimalSeparator()}
+          decimalScale={getNumberPrecision()}
           allowNegative
           style={{
             backgroundColor: colors.$1,

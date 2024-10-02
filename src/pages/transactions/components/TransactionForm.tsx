@@ -92,7 +92,7 @@ export function TransactionForm(props: Props) {
           precision={props.currencySeparators.precision}
           className="auto"
           value={props.transaction.amount.toString()}
-          onChange={(value: string) =>
+          onValueChange={(value: string) =>
             props.handleChange('amount', Number(value))
           }
           errorMessage={props.errors?.errors.amount}
