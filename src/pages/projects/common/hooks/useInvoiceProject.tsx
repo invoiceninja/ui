@@ -28,8 +28,12 @@ import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
+import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
 
-export const calculateTaskHours = (timeLog: string) => {
+export const calculateTaskHours = (timeLog: string, precision?: number) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
 
   let hoursSum = 0;
@@ -41,7 +45,7 @@ export const calculateTaskHours = (timeLog: string) => {
         const unixStop = dayjs.unix(stop);
 
         hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(precision)
         );
       }
     });
@@ -53,15 +57,21 @@ export const calculateTaskHours = (timeLog: string) => {
 export function useInvoiceProject() {
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const company = useCurrentCompany();
 
-  const { dateFormat } = useCurrentCompanyDateFormats();
-  const { timeFormat } = useCompanyTimeFormat();
+  const numericFormatter = useNumericFormatter();
+  const getCurrencySeparators = useGetCurrencySeparators();
+  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat();
+
+  const company = useCurrentCompany();
+  const userNumberPrecision = useUserNumberPrecision();
+
   const { data } = useBlankInvoiceQuery();
+  const { timeFormat } = useCompanyTimeFormat();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const setInvoice = useSetAtom(invoiceAtom);
 
-  return (tasks: Task[], clientId: string, projectId: string) => {
+  return async (tasks: Task[], clientId: string, projectId: string) => {
     if (data) {
       const invoice: Invoice = { ...data };
 
@@ -90,6 +100,14 @@ export function useInvoiceProject() {
       invoice.client_id = clientId;
       invoice.line_items = [];
 
+      const currencySeparators = await getCurrencySeparators(
+        clientId,
+        'client_id'
+      );
+
+      const { dateFormat: clientDateFormat, timeFormat: clientTimeFormat } =
+        await resolveDateAndTimeClientFormat(clientId);
+
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
@@ -106,9 +124,12 @@ export function useInvoiceProject() {
               const unixStart = dayjs.unix(start);
               const unixStop = dayjs.unix(stop);
 
-              const hours = (
-                unixStop.diff(unixStart, 'seconds') / 3600
-              ).toFixed(4);
+              const hours = numericFormatter(
+                (unixStop.diff(unixStart, 'seconds') / 3600).toString(),
+                currencySeparators?.thousandSeparator,
+                currencySeparators?.decimalSeparator,
+                currencySeparators?.precision
+              );
 
               hoursDescription = `• ${hours} ${t('hours')}`;
             }
@@ -116,30 +137,49 @@ export function useInvoiceProject() {
             const description = [];
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
-              description.push('<div class="task-time-details">');
+              description.push('<div class="task-time-details">\n');
             }
 
             if (company.invoice_task_datelog) {
-              description.push(dayjs.unix(start).format(dateFormat));
+              description.push(
+                dayjs
+                  .unix(start)
+                  .format(
+                    clientDateFormat?.format_moment
+                      ? clientDateFormat.format_moment
+                      : dateFormat
+                  )
+              );
             }
 
             if (company.invoice_task_timelog) {
-              description.push(dayjs.unix(start).format(timeFormat) + ' - ');
+              description.push(
+                dayjs
+                  .unix(start)
+                  .format(clientTimeFormat ? clientTimeFormat : timeFormat) +
+                  ' - '
+              );
             }
 
             if (company.invoice_task_timelog) {
-              description.push(dayjs.unix(stop).format(timeFormat));
+              description.push(
+                dayjs
+                  .unix(stop)
+                  .format(clientTimeFormat ? clientTimeFormat : timeFormat)
+              );
             }
 
             if (company.invoice_task_hours) {
               description.push(hoursDescription);
             }
 
-            if (company.invoice_task_item_description) {
-              description.push(intervalDescription);
+            if (company.invoice_task_item_description && intervalDescription) {
+              description.push(`\n\n${intervalDescription}`);
             }
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
+              description.push('\n');
+
               description.push('</div>\n');
             }
 
@@ -147,14 +187,19 @@ export function useInvoiceProject() {
           }
         });
 
-        const taskQuantity = calculateTaskHours(task.time_log);
+        const taskQuantity = calculateTaskHours(
+          task.time_log,
+          userNumberPrecision
+        );
 
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
           cost: task.rate,
           quantity: taskQuantity,
-          line_total: Number((task.rate * taskQuantity).toFixed(2)),
+          line_total: Number(
+            (task.rate * taskQuantity).toFixed(userNumberPrecision)
+          ),
           task_id: task.id,
           tax_id: '',
         };
