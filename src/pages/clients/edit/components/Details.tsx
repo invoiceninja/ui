@@ -86,6 +86,7 @@ export function Details(props: Props) {
             value={props.client?.group_settings_id}
             onChange={handleChange}
             errorMessage={props.errors?.errors.group_settings_id}
+            customSelector
           >
             <option value=""></option>
             {groupSettings.map((group, index: number) => (
@@ -104,6 +105,7 @@ export function Details(props: Props) {
             onChange={handleChange}
             defaultValue={props.client?.assigned_user_id}
             errorMessage={props.errors?.errors.assigned_user_id}
+            customSelector
           >
             <option value=""></option>
             {users.data.data.map((user: User, index: number) => (
@@ -186,6 +188,7 @@ export function Details(props: Props) {
           defaultValue={props.client?.classification ?? ''}
           onChange={handleChange}
           withBlank
+          customSelector
         >
           <option value="individual">{t('individual')}</option>
           <option value="business">{t('business')}</option>

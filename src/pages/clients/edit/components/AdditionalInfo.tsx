@@ -146,6 +146,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                   handleSettingsChange('payment_terms', value)
                 }
                 withBlank
+                customSelector
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
@@ -168,6 +169,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 }
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
+                customSelector
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
@@ -211,6 +213,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               }
               withBlank
               errorMessage={errors?.errors['settings.send_reminders']}
+              customSelector
             >
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>
@@ -243,6 +246,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 onValueChange={(value) => handleChange('size_id', value)}
                 errorMessage={errors?.errors.size_id}
                 withBlank
+                customSelector
               >
                 {statics?.sizes.map(
                   (size: { id: string; name: string }, index: number) => (
@@ -263,6 +267,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 errorMessage={errors?.errors.industry_id}
                 onValueChange={(value) => handleChange('industry_id', value)}
                 withBlank
+                customSelector
               >
                 {statics?.industries.map(
                   (size: { id: string; name: string }, index: number) => (
