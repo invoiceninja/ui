@@ -141,7 +141,6 @@ export function Card(props: Props) {
             'py-0': props.withoutBodyPadding,
             'py-4': padding === 'regular' && !props.withoutBodyPadding,
             'py-2': padding === 'small' && !props.withoutBodyPadding,
-            'h-full': height === 'full',
           })}
         >
           {props.isLoading && <Element leftSide={<Spinner />} />}

@@ -65,6 +65,7 @@ export interface ReactSettings {
   show_table_footer?: boolean;
   dark_mode?: boolean;
   color_theme?: ColorTheme;
+  dashboard_cards_configuration?: any;
 }
 
 export type ReactTableColumns =
