@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { InputField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { CustomField } from '$app/components/CustomField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -18,10 +18,10 @@ import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { TaxCategorySelector } from '$app/components/tax-rates/TaxCategorySelector';
 import { Alert } from '$app/components/Alert';
 import { useSearchParams } from 'react-router-dom';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useTaxCategories } from '$app/components/tax-rates/TaxCategorySelector';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -38,6 +38,7 @@ export function ProductForm(props: Props) {
   const [, setSearchParams] = useSearchParams();
 
   const company = useCurrentCompany();
+  const taxCategories = useTaxCategories();
 
   const { errors, handleChange, type, product } = props;
 
@@ -108,10 +109,18 @@ export function ProductForm(props: Props) {
       </Element>
 
       <Element leftSide={t('tax_category')}>
-        <TaxCategorySelector
+        <SelectField
           value={product.tax_id}
-          onChange={(taxCategory) => handleChange('tax_id', taxCategory.value)}
-        />
+          onValueChange={(value) => handleChange('tax_id', value)}
+          customSelector
+          dismissable={false}
+        >
+          {taxCategories.map((taxCategory, index) => (
+            <option key={index} value={taxCategory.value as string}>
+              {taxCategory.label}
+            </option>
+          ))}
+        </SelectField>
 
         {errors?.errors.tax_id ? (
           <Alert className="mt-2" type="danger">
