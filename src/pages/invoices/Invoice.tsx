@@ -34,10 +34,15 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
-import { useSocketEvent } from '$app/common/queries/sockets';
+import {
+  socketId,
+  useSocketEvent,
+  WithSocketId,
+} from '$app/common/queries/sockets';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { Banner } from '$app/components/Banner';
+import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
 
 dayjs.extend(utc);
 
@@ -97,12 +102,15 @@ export default function Invoice() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  useSocketEvent({
+  useSocketEvent<WithSocketId<InvoiceType>>({
     on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
-    callback: () =>
-      document
-        .getElementById('invoiceUpdateBanner')
-        ?.classList.remove('hidden'),
+    callback: ({ data }) => {
+      if (socketId()?.toString() !== data['x-socket-id']) {
+        document
+          .getElementById('invoiceUpdateBanner')
+          ?.classList.remove('hidden');
+      }
+    },
   });
 
   return (
