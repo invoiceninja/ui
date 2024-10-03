@@ -51,12 +51,14 @@ export function ConvertCurrency(props: Props) {
           onValueChange={(value) =>
             props.onExchangeRateChange(parseFloat(value))
           }
+          disablePrecision
         />
       </Element>
 
       <Element leftSide={t('converted_amount')}>
         <NumberInputField
           value={props.amount * parseFloat(props.exchangeRate)}
+          disablePrecision
         />
       </Element>
     </>
