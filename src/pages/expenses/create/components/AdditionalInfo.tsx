@@ -77,7 +77,17 @@ export function AdditionalInfo(props: ExpenseCardProps) {
 
   useEffect(() => {
     if (expense && expense.exchange_rate && expense.invoice_currency_id) {
-      handleChange('foreign_amount', expense.amount * expense.exchange_rate);
+      const expenseCurrency = expense.currency_id
+        ? resolveCurrency(expense.currency_id)
+        : null;
+
+      handleChange(
+        'foreign_amount',
+        expenseCurrency
+          ? (expense.exchange_rate / expenseCurrency.exchange_rate) *
+              expense.amount
+          : expense.amount * expense.exchange_rate
+      );
     } else {
       handleChange('foreign_amount', 0);
     }
@@ -92,13 +102,29 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           expense.invoice_currency_id
         );
 
+        console.log(resolveConvertCurrency);
+
         if (resolveConvertCurrency) {
-          handleChange('exchange_rate', resolveConvertCurrency.exchange_rate);
+          const expenseCurrency = expense.currency_id
+            ? resolveCurrency(expense.currency_id)
+            : null;
+
+          handleChange(
+            'exchange_rate',
+            expenseCurrency
+              ? resolveConvertCurrency.exchange_rate /
+                  expenseCurrency.exchange_rate
+              : resolveConvertCurrency.exchange_rate
+          );
 
           if (expense.amount) {
             handleChange(
               'foreign_amount',
-              expense.amount * resolveConvertCurrency.exchange_rate
+              expenseCurrency
+                ? (expenseCurrency.exchange_rate /
+                    resolveConvertCurrency.exchange_rate) *
+                    expense.amount
+                : expense.amount * resolveConvertCurrency.exchange_rate
             );
           }
         }
@@ -126,8 +152,6 @@ export function AdditionalInfo(props: ExpenseCardProps) {
 
   useEffect(() => {
     if (expense && expense.exchange_rate) {
-      handleChange('exchange_rate', expense.exchange_rate);
-
       if (expense.amount && expense.invoice_currency_id) {
         handleChange('foreign_amount', expense.amount * expense.exchange_rate);
       }
@@ -135,7 +159,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
       handleChange('exchange_rate', 1);
       handleChange('foreign_amount', 0);
     }
-  }, [expense?.exchange_rate]);
+  }, [expense?.exchange_rate, expense?.currency_id]);
 
   useEffect(() => {
     if (expense && typeof convertCurrency === 'undefined') {
@@ -231,9 +255,27 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <Element leftSide={t('exchange_rate')}>
             <NumberInputField
               value={expense.exchange_rate}
-              onValueChange={(value) =>
-                handleChange('exchange_rate', parseFloat(value))
-              }
+              onValueChange={(value) => {
+                const expenseCurrency = expense.currency_id
+                  ? resolveCurrency(expense.currency_id)
+                  : null;
+
+                const resolveConvertCurrency = resolveCurrency(
+                  expense.invoice_currency_id
+                );
+
+                if (resolveConvertCurrency) {
+                  handleChange(
+                    'exchange_rate',
+                    expenseCurrency
+                      ? resolveConvertCurrency.exchange_rate /
+                          expenseCurrency.exchange_rate
+                      : resolveConvertCurrency.exchange_rate
+                  );
+                } else {
+                  handleChange('exchange_rate', parseFloat(value));
+                }
+              }}
               errorMessage={errors?.errors.exchange_rate}
               disablePrecision
             />
