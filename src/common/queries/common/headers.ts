@@ -8,10 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isHosted } from '$app/common/helpers';
+import { socketId } from '../sockets';
+
 export function defaultHeaders() {
-  return {
+  const headers: Record<string, string | number | boolean> = {
     'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
     'X-Requested-With': 'XMLHttpRequest',
     'X-React': 'true',
   };
+
+  if (socketId() && isHosted()) {
+    headers['X-Socket-ID'] = socketId()!;
+  }
+
+  return headers;
 }
