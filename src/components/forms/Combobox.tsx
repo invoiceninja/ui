@@ -259,14 +259,6 @@ export function Combobox<T = any>({
   useClickAway(comboboxRef, () => {
     setIsOpen(false);
 
-    if (selectedOption && selectedOption.value) {
-      return;
-    }
-
-    if (inputValue === '') {
-      return;
-    }
-
     const option: Entry = {
       id: Date.now(),
       label: inputValue,
