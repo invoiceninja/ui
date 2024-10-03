@@ -123,7 +123,7 @@ export function Search$() {
   const options = filtered.count() === 0 ? collect(data) : filtered;
 
   useEffect(() => {
-    if (query && filtered.count() === 0 && isHosted()) {
+    if (query && filtered.count() === 0) {
       refetch();
     }
   }, [query]);
@@ -153,12 +153,12 @@ export function Search$() {
 
         <Combobox.Options
           className={classNames(
-            'absolute border rounded w-96 max-h-72 overflow-y-auto shadow-lg',
+            'absolute border rounded max-h-72 overflow-y-auto shadow-lg',
             {
               hidden: !isVisible,
             }
           )}
-          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          style={{ backgroundColor: colors.$1, borderColor: colors.$4, maxWidth: '32rem' }}
           static={true}
         >
           {options?.map((entry) => (
