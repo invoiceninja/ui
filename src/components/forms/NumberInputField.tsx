@@ -33,6 +33,7 @@ interface Props extends CommonProps {
   required?: boolean;
   withoutLabelWrapping?: boolean;
   placeholder?: string | null;
+  disablePrecision?: boolean;
 }
 
 export function NumberInputField(props: Props) {
@@ -49,7 +50,25 @@ export function NumberInputField(props: Props) {
       : undefined
   );
 
-  const getNumberPrecision = () => {
+  const getDecimalSeparator = () => {
+    return company?.use_comma_as_decimal_place ? ',' : '.';
+  };
+
+  const getNumberPrecision = (enteredValue?: string) => {
+    if (props.disablePrecision && enteredValue) {
+      const currentDecimalSeparator = getDecimalSeparator();
+
+      if (enteredValue.includes(currentDecimalSeparator)) {
+        return enteredValue.split(currentDecimalSeparator)?.[1]?.length || 2;
+      }
+
+      return undefined;
+    }
+
+    if (props.disablePrecision) {
+      return undefined;
+    }
+
     if (typeof props.precision === 'number') {
       return props.precision;
     }
@@ -63,10 +82,6 @@ export function NumberInputField(props: Props) {
     }
 
     return 2;
-  };
-
-  const getDecimalSeparator = () => {
-    return company?.use_comma_as_decimal_place ? ',' : '.';
   };
 
   const getThousandSeparator = () => {
@@ -143,7 +158,7 @@ export function NumberInputField(props: Props) {
                     separator: getThousandSeparator(),
                     decimal: getDecimalSeparator(),
                     symbol: '',
-                    precision: getNumberPrecision(),
+                    precision: getNumberPrecision(event.target.value),
                   }).value
                 : undefined;
 
@@ -159,7 +174,7 @@ export function NumberInputField(props: Props) {
                         separator: getThousandSeparator(),
                         decimal: getDecimalSeparator(),
                         symbol: '',
-                        precision: getNumberPrecision(),
+                        precision: getNumberPrecision(event.target.value),
                       }).value
                     )
                   : ''

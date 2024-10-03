@@ -235,6 +235,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
                 handleChange('exchange_rate', parseFloat(value))
               }
               errorMessage={errors?.errors.exchange_rate}
+              disablePrecision
             />
           </Element>
 
@@ -254,6 +255,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
                 onConvertedAmountChange(parseFloat(value))
               }
               errorMessage={errors?.errors.foreign_amount}
+              disablePrecision
             />
           </Element>
         </>
