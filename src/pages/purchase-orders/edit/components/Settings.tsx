@@ -70,6 +70,7 @@ export default function Settings() {
               handleChange('exchange_rate', parseFloat(value) || 1.0)
             }
             errorMessage={errors?.errors.exchange_rate}
+            disablePrecision
           />
         </div>
 
