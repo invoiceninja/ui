@@ -156,6 +156,8 @@ export function InvoiceDetails(props: Props) {
                 }
                 value={recurringInvoice?.is_amount_discount.toString()}
                 errorMessage={props.errors?.errors.is_amount_discount}
+                customSelector
+                dismissable={false}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
@@ -169,6 +171,8 @@ export function InvoiceDetails(props: Props) {
             value={recurringInvoice?.auto_bill || false}
             onValueChange={(value) => handleChange('auto_bill', value)}
             errorMessage={props.errors?.errors.auto_bill}
+            customSelector
+            dismissable={false}
           >
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('optout')}</option>
