@@ -42,6 +42,8 @@ export function InvoiceDetails(props: Props) {
             value={recurringInvoice?.frequency_id}
             onValueChange={(value) => handleChange('frequency_id', value)}
             errorMessage={props.errors?.errors.frequency_id}
+            customSelector
+            dismissable={false}
           >
             {Object.keys(frequencies).map((frequency, index) => (
               <option key={index} value={frequency}>
@@ -65,15 +67,17 @@ export function InvoiceDetails(props: Props) {
 
         <Element leftSide={t('remaining_cycles')}>
           <SelectField
-            value={recurringInvoice?.remaining_cycles}
+            value={recurringInvoice?.remaining_cycles?.toString()}
             onValueChange={(value) =>
               handleChange('remaining_cycles', parseInt(value))
             }
             errorMessage={props.errors?.errors.remaining_cycles}
+            customSelector
+            dismissable={false}
           >
             <option value="-1">{t('endless')}</option>
             {[...Array(37).keys()].map((number, index) => (
-              <option value={number} key={index}>
+              <option value={number.toString()} key={index}>
                 {number}
               </option>
             ))}
@@ -82,13 +86,15 @@ export function InvoiceDetails(props: Props) {
 
         <Element leftSide={t('due_date')}>
           <SelectField
-            value={recurringInvoice?.due_date_days}
+            value={recurringInvoice?.due_date_days?.toString()}
             onValueChange={(value) => handleChange('due_date_days', value)}
             errorMessage={props.errors?.errors.due_date_days}
+            customSelector
+            dismissable={false}
           >
             <option value="terms">{t('use_payment_terms')}</option>
             {[...Array(31).keys()].map((number, index) => (
-              <option value={number + 1} key={index}>
+              <option value={(number + 1).toString()} key={index}>
                 {t('day')} {number + 1}
               </option>
             ))}
