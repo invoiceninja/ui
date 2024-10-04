@@ -58,7 +58,7 @@ export interface ComboboxStaticProps<T = any> {
   includeByLabel?: boolean;
   action?: Action;
   onChange: (entry: Entry<T>) => unknown;
-  onEmptyValues: (query: string) => unknown;
+  onEmptyValues?: (query: string) => unknown;
   onDismiss?: () => unknown;
   onFocus?: () => any;
   errorMessage?: string | string[];
@@ -259,6 +259,14 @@ export function Combobox<T = any>({
   useClickAway(comboboxRef, () => {
     setIsOpen(false);
 
+    if (selectedOption && selectedOption.value) {
+      return;
+    }
+    
+    if (inputValue === '') {
+      return;
+    }
+
     const option: Entry = {
       id: Date.now(),
       label: inputValue,
@@ -278,6 +286,10 @@ export function Combobox<T = any>({
 
   useDebounce(
     () => {
+      if (!onEmptyValues) {
+        return;
+      }
+
       if (inputValue === '' && filteredOptions.length > 0) {
         return onEmptyValues(inputValue);
       }
@@ -491,6 +503,10 @@ export function ComboboxStatic<T = any>({
 
   useDebounce(
     () => {
+      if (!onEmptyValues) {
+        return;
+      }
+
       if (query === '' && filteredValues.length > 0) {
         return onEmptyValues(query);
       }
@@ -957,7 +973,6 @@ export function ComboboxAsync<T = any>({
         inputOptions={inputOptions}
         readonly={readonly}
         onChange={onChange}
-        onEmptyValues={onEmptyValues}
         onDismiss={onDismiss}
         initiallyVisible={initiallyVisible}
         exclude={exclude}
