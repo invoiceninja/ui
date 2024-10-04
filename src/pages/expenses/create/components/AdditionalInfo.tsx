@@ -91,14 +91,12 @@ export function AdditionalInfo(props: ExpenseCardProps) {
         const resolveConvertCurrency = resolveCurrency(
           expense.invoice_currency_id
         );
+        const expenseCurrency = resolveCurrency(expense.currency_id);
 
-        if (resolveConvertCurrency) {
-          const expenseCurrency = resolveCurrency(expense.currency_id);
-
-          const currentExchangeRate = expenseCurrency
-            ? expenseCurrency.exchange_rate /
-              resolveConvertCurrency.exchange_rate
-            : resolveConvertCurrency.exchange_rate;
+        if (resolveConvertCurrency && expenseCurrency) {
+          const currentExchangeRate =
+            expenseCurrency.exchange_rate /
+            resolveConvertCurrency.exchange_rate;
 
           handleChange('exchange_rate', currentExchangeRate);
         }
