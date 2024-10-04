@@ -77,17 +77,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
 
   useEffect(() => {
     if (expense && expense.exchange_rate && expense.invoice_currency_id) {
-      const expenseCurrency = expense.currency_id
-        ? resolveCurrency(expense.currency_id)
-        : null;
-
-      handleChange(
-        'foreign_amount',
-        expenseCurrency
-          ? (expense.exchange_rate / expenseCurrency.exchange_rate) *
-              expense.amount
-          : expense.amount * expense.exchange_rate
-      );
+      handleChange('foreign_amount', expense.amount * expense.exchange_rate);
     } else {
       handleChange('foreign_amount', 0);
     }
@@ -97,36 +87,20 @@ export function AdditionalInfo(props: ExpenseCardProps) {
     if (expense) {
       handleChange('invoice_currency_id', expense.invoice_currency_id);
 
-      if (expense.invoice_currency_id) {
+      if (expense.invoice_currency_id && expense.currency_id) {
         const resolveConvertCurrency = resolveCurrency(
           expense.invoice_currency_id
         );
 
-        console.log(resolveConvertCurrency);
-
         if (resolveConvertCurrency) {
-          const expenseCurrency = expense.currency_id
-            ? resolveCurrency(expense.currency_id)
-            : null;
+          const expenseCurrency = resolveCurrency(expense.currency_id);
 
-          handleChange(
-            'exchange_rate',
-            expenseCurrency
-              ? resolveConvertCurrency.exchange_rate /
-                  expenseCurrency.exchange_rate
-              : resolveConvertCurrency.exchange_rate
-          );
+          const currentExchangeRate = expenseCurrency
+            ? expenseCurrency.exchange_rate /
+              resolveConvertCurrency.exchange_rate
+            : resolveConvertCurrency.exchange_rate;
 
-          if (expense.amount) {
-            handleChange(
-              'foreign_amount',
-              expenseCurrency
-                ? (expenseCurrency.exchange_rate /
-                    resolveConvertCurrency.exchange_rate) *
-                    expense.amount
-                : expense.amount * resolveConvertCurrency.exchange_rate
-            );
-          }
+          handleChange('exchange_rate', currentExchangeRate);
         }
       } else {
         handleChange('foreign_amount', 0);
@@ -136,9 +110,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
       handleChange('foreign_amount', 0);
       handleChange('exchange_rate', 1);
     }
-  }, [expense?.invoice_currency_id]);
 
-  useEffect(() => {
     if (expense?.invoice_currency_id) {
       const resolvedCurrencySeparators = resolveCurrencySeparator(
         expense.invoice_currency_id
@@ -148,7 +120,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
         setCurrencySeparators(resolvedCurrencySeparators);
       }
     }
-  }, [expense?.invoice_currency_id]);
+  }, [expense?.invoice_currency_id, expense?.currency_id]);
 
   useEffect(() => {
     if (expense && expense.exchange_rate) {
@@ -159,7 +131,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
       handleChange('exchange_rate', 1);
       handleChange('foreign_amount', 0);
     }
-  }, [expense?.exchange_rate, expense?.currency_id]);
+  }, [expense?.exchange_rate]);
 
   useEffect(() => {
     if (expense && typeof convertCurrency === 'undefined') {
@@ -255,27 +227,9 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <Element leftSide={t('exchange_rate')}>
             <NumberInputField
               value={expense.exchange_rate}
-              onValueChange={(value) => {
-                const expenseCurrency = expense.currency_id
-                  ? resolveCurrency(expense.currency_id)
-                  : null;
-
-                const resolveConvertCurrency = resolveCurrency(
-                  expense.invoice_currency_id
-                );
-
-                if (resolveConvertCurrency) {
-                  handleChange(
-                    'exchange_rate',
-                    expenseCurrency
-                      ? resolveConvertCurrency.exchange_rate /
-                          expenseCurrency.exchange_rate
-                      : resolveConvertCurrency.exchange_rate
-                  );
-                } else {
-                  handleChange('exchange_rate', parseFloat(value));
-                }
-              }}
+              onValueChange={(value) =>
+                handleChange('exchange_rate', parseFloat(value))
+              }
               errorMessage={errors?.errors.exchange_rate}
               disablePrecision
             />
