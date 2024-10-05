@@ -107,8 +107,8 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
 
         if (resolveConvertCurrency && recurringExpenseCurrency) {
           const currentExchangeRate =
-            recurringExpenseCurrency.exchange_rate /
-            resolveConvertCurrency.exchange_rate;
+            resolveConvertCurrency.exchange_rate /
+            recurringExpenseCurrency.exchange_rate;
 
           handleChange('exchange_rate', currentExchangeRate);
         }

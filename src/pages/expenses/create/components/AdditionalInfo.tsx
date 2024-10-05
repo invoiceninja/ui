@@ -95,8 +95,8 @@ export function AdditionalInfo(props: ExpenseCardProps) {
 
         if (resolveConvertCurrency && expenseCurrency) {
           const currentExchangeRate =
-            expenseCurrency.exchange_rate /
-            resolveConvertCurrency.exchange_rate;
+            resolveConvertCurrency.exchange_rate /
+            expenseCurrency.exchange_rate;
 
           handleChange('exchange_rate', currentExchangeRate);
         }
