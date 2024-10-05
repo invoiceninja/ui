@@ -90,9 +90,9 @@ export function NumberInputField(props: Props) {
 
   useDebounce(
     () => {
-      if (props.onValueChange) {
+      if (props.onValueChange && props.changeOverride) {
         props.onValueChange(
-          typeof currentValue === 'number' ? String(currentValue) : ''
+          typeof currentValue === 'number' ? String(currentValue) : '0'
         );
       }
     },
