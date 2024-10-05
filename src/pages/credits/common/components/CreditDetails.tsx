@@ -120,12 +120,11 @@ export function CreditDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <InputField
-                type="number"
+              <NumberInputField
+                value={credit?.discount || ''}
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value))
                 }
-                value={credit?.discount || ''}
                 errorMessage={errors?.errors.discount}
               />
             </div>

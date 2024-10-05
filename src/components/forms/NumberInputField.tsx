@@ -92,7 +92,7 @@ export function NumberInputField(props: Props) {
     () => {
       if (props.onValueChange && props.changeOverride) {
         props.onValueChange(
-          typeof currentValue === 'number' ? String(currentValue) : ''
+          typeof currentValue === 'number' ? String(currentValue) : '0'
         );
       }
     },
