@@ -87,20 +87,18 @@ export function AdditionalInfo(props: ExpenseCardProps) {
     if (expense) {
       handleChange('invoice_currency_id', expense.invoice_currency_id);
 
-      if (expense.invoice_currency_id) {
+      if (expense.invoice_currency_id && expense.currency_id) {
         const resolveConvertCurrency = resolveCurrency(
           expense.invoice_currency_id
         );
+        const expenseCurrency = resolveCurrency(expense.currency_id);
 
-        if (resolveConvertCurrency) {
-          handleChange('exchange_rate', resolveConvertCurrency.exchange_rate);
+        if (resolveConvertCurrency && expenseCurrency) {
+          const currentExchangeRate =
+            resolveConvertCurrency.exchange_rate /
+            expenseCurrency.exchange_rate;
 
-          if (expense.amount) {
-            handleChange(
-              'foreign_amount',
-              expense.amount * resolveConvertCurrency.exchange_rate
-            );
-          }
+          handleChange('exchange_rate', currentExchangeRate);
         }
       } else {
         handleChange('foreign_amount', 0);
@@ -110,9 +108,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
       handleChange('foreign_amount', 0);
       handleChange('exchange_rate', 1);
     }
-  }, [expense?.invoice_currency_id]);
 
-  useEffect(() => {
     if (expense?.invoice_currency_id) {
       const resolvedCurrencySeparators = resolveCurrencySeparator(
         expense.invoice_currency_id
@@ -122,12 +118,10 @@ export function AdditionalInfo(props: ExpenseCardProps) {
         setCurrencySeparators(resolvedCurrencySeparators);
       }
     }
-  }, [expense?.invoice_currency_id]);
+  }, [expense?.invoice_currency_id, expense?.currency_id]);
 
   useEffect(() => {
     if (expense && expense.exchange_rate) {
-      handleChange('exchange_rate', expense.exchange_rate);
-
       if (expense.amount && expense.invoice_currency_id) {
         handleChange('foreign_amount', expense.amount * expense.exchange_rate);
       }

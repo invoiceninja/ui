@@ -172,17 +172,6 @@ export default function Create() {
     }
   }, [blankPayment]);
 
-  useEffect(() => {
-    setPayment(
-      (current) =>
-        current && {
-          ...current,
-          currency_id: current.client?.settings.currency_id,
-          // amount: collect(payment?.invoices).sum('amount') as number,
-        }
-    );
-  }, [payment?.invoices]);
-
   const {
     handleInvoiceChange,
     handleExistingInvoiceChange,
@@ -225,7 +214,10 @@ export default function Create() {
             <ClientSelector
               onChange={(client) => {
                 handleChange('client_id', client?.id as string);
-                handleChange('currency_id', client?.settings.currency_id);
+                handleChange(
+                  'currency_id',
+                  client?.settings.currency_id || '1'
+                );
                 handleChange('invoices', []);
                 handleChange('credits', []);
               }}
