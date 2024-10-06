@@ -75,6 +75,7 @@ export function Vendors() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.vendor_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

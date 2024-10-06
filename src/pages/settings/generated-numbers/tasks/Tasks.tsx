@@ -75,6 +75,7 @@ export function Tasks() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.task_number_counter || ''}
           onValueChange={(value) =>
             handleChange('settings.task_number_counter', parseFloat(value) || 0)

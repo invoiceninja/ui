@@ -75,6 +75,7 @@ export function Expenses() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.expense_number_counter || ''}
           onValueChange={(value) =>
             handleChange(
