@@ -114,6 +114,7 @@ export function Create() {
 
     if (
       gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' &&
+      isHosted() &&
       import.meta.env.VITE_GOCARDLESS_OAUTH_TESTING === 'true'
     ) {
       return handleGoCardless();
