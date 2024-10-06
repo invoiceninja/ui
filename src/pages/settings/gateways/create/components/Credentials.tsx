@@ -62,7 +62,8 @@ export function Credentials(props: Props) {
   if (
     isHosted() &&
     props.gateway.key === GOCARDLESS &&
-    config('oauth2') === true
+    config('oauth2') === true &&
+    import.meta.env.VITE_GOCARDLESS_OAUTH_TESTING === 'true'
   ) {
     hostedGateways.push(GOCARDLESS);
   }
@@ -147,7 +148,8 @@ export function Credentials(props: Props) {
         {props.gateway &&
           props.gateway.key === GOCARDLESS &&
           isHosted() &&
-          config('oauth2') !== true && (
+          config('oauth2') !== true &&
+          import.meta.env.VITE_GOCARDLESS_OAUTH_TESTING === 'true' && (
             <Element leftSide={t('OAuth 2.0')}>
               <Button
                 behavior="button"
