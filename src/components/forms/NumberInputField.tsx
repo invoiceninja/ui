@@ -51,13 +51,21 @@ export function NumberInputField(props: Props) {
   );
 
   const getDecimalSeparator = () => {
+    if (props.precision === 0) {
+      return undefined;
+    }
+
     return company?.use_comma_as_decimal_place ? ',' : '.';
   };
 
   const getNumberPrecision = (enteredValue?: string) => {
-    if (props.disablePrecision && enteredValue) {
-      const currentDecimalSeparator = getDecimalSeparator();
+    const currentDecimalSeparator = getDecimalSeparator();
 
+    if (currentDecimalSeparator === undefined) {
+      return 0;
+    }
+
+    if (props.disablePrecision && enteredValue) {
       if (enteredValue.includes(currentDecimalSeparator)) {
         return enteredValue.split(currentDecimalSeparator)?.[1]?.length || 2;
       }
@@ -85,6 +93,10 @@ export function NumberInputField(props: Props) {
   };
 
   const getThousandSeparator = () => {
+    if (props.precision === 0) {
+      return undefined;
+    }
+
     return company?.use_comma_as_decimal_place ? '.' : ',';
   };
 

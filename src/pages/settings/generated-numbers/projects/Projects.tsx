@@ -75,6 +75,7 @@ export function Projects() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.project_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

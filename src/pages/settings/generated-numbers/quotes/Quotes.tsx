@@ -75,6 +75,7 @@ export function Quotes() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.quote_number_counter || ''}
           onValueChange={(value) =>
             handleChange(
