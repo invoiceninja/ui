@@ -259,7 +259,7 @@ export function Combobox<T = any>({
   useClickAway(comboboxRef, () => {
     setIsOpen(false);
 
-    if (selectedOption && selectedOption.value) {
+    if (selectedOption && selectedOption.value && inputValue === selectedOption.value) {
       return;
     }
     
