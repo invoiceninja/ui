@@ -136,7 +136,7 @@ export function Edit() {
               />
 
               <NumberInputField
-                value={formik.values.rate}
+                value={formik.values.rate || ''}
                 label={t('tax_rate')}
                 onValueChange={(value) => formik.setFieldValue('rate', value)}
                 errorMessage={errors?.errors?.rate}

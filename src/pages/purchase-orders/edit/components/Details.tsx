@@ -57,7 +57,7 @@ export function Details(props: PurchaseOrderCardProps) {
 
         <Element leftSide={t('partial')}>
           <NumberInputField
-            value={purchaseOrder.partial}
+            value={purchaseOrder.partial || ''}
             onValueChange={(partial) =>
               handleChange('partial', parseFloat(partial) || 0)
             }
@@ -115,7 +115,7 @@ export function Details(props: PurchaseOrderCardProps) {
           <Inline>
             <div className="w-full lg:w-1/2">
               <NumberInputField
-                value={purchaseOrder.discount}
+                value={purchaseOrder.discount || ''}
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value) || 0)
                 }

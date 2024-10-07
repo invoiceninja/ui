@@ -184,7 +184,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
           <Element leftSide={t('task_rate')}>
             <NumberInputField
-              value={client?.settings?.default_task_rate}
+              value={client?.settings?.default_task_rate || ''}
               onValueChange={(value) =>
                 handleSettingsChange('default_task_rate', parseFloat(value))
               }
