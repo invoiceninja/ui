@@ -824,9 +824,22 @@ export default function GeneralSettings() {
         ?.replaceAll('%', '')
         ?.replaceAll('px', '');
 
-      handleChange('company_logo_size', `${value}${logoSizeType}`);
+      if (value) {
+        handleChange('company_logo_size', `${value}${logoSizeType}`);
+      } else {
+        handleChange('company_logo_size', '');
+      }
     }
   }, [logoSizeType]);
+
+  useEffect(() => {
+    if (
+      company?.settings &&
+      company?.settings.company_logo_size.includes('px')
+    ) {
+      setLogoSizeType('px');
+    }
+  }, [company?.settings.company_logo_size]);
 
   useEffect(() => {
     setUpdatingRecords([]);
@@ -1258,7 +1271,7 @@ export default function GeneralSettings() {
               onValueChange={(value) =>
                 handleChange(
                   'company_logo_size',
-                  `${parseFloat(value) || 0}${logoSizeType}`
+                  value ? `${parseFloat(value) || 0}${logoSizeType}` : ''
                 )
               }
               disabled={disableSettingsField('company_logo_size')}
