@@ -986,6 +986,7 @@ export function ComboboxAsync<T = any>({
         isDataLoading={isLoading}
         onFocus={() => setEnableQuery(true)}
         onInputValueChange={onInputValueChange}
+        onEmptyValues={onEmptyValues}
       />
     );
   }
