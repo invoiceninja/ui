@@ -139,7 +139,15 @@ export default function Create() {
     });
 
     return () => {
-      setInvoice(undefined);
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'invoice_project' &&
+        searchParams.get('action') !== 'invoice_task' &&
+        searchParams.get('action') !== 'invoice_expense' &&
+        searchParams.get('action') !== 'invoice_product'
+      ) {
+        setInvoice(undefined);
+      }
     };
   }, [data]);
 
