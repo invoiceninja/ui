@@ -33,7 +33,6 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { isEqual } from 'lodash';
 import { HelpWidget } from '$app/components/HelpWidget';
-import { createPortal } from 'react-dom';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_gateway');
