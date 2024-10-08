@@ -116,11 +116,13 @@ export function Create() {
         >
           <CardContainer>
             <NumberInputField
+              precision={0}
               required
-              value={paymentTerm?.num_days}
+              value={paymentTerm?.num_days || ''}
               label={t('number_of_days')}
               onValueChange={(value) => handleChange('num_days', Number(value))}
               errorMessage={errors?.errors.num_days}
+              disablePrecision
             />
           </CardContainer>
         </Card>

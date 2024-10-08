@@ -16,7 +16,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +30,7 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Credit as ICredit } from '$app/common/interfaces/credit';
 import { useCreditQuery } from './common/queries';
-import { creditAtom } from './common/atoms';
+import { creditAtom, invoiceSumAtom } from './common/atoms';
 import { useActions, useCreditUtilities, useSave } from './common/hooks';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './common/hooks/useTabs';
@@ -55,6 +55,7 @@ export default function Credit() {
   const { data } = useCreditQuery({ id: id! });
 
   const [credit, setQuote] = useAtom(creditAtom);
+  const invoiceSum = useAtomValue(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -121,6 +122,7 @@ export default function Credit() {
               isDefaultFooter,
               setIsDefaultFooter,
               client,
+              invoiceSum,
             }}
           />
         </div>

@@ -106,11 +106,13 @@ export function Edit() {
 
             <CardContainer>
               <NumberInputField
-                value={formik.values.num_days}
+                precision={0}
+                value={formik.values.num_days || ''}
                 label={t('number_of_days')}
                 onValueChange={(value) =>
                   formik.setFieldValue('num_days', value)
                 }
+                disablePrecision
               />
             </CardContainer>
           </Card>
