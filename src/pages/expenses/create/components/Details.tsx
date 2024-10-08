@@ -227,7 +227,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={expense.tax_amount1}
+                  value={expense.tax_amount1 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount1', parseFloat(value))
                   }
@@ -279,7 +279,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={expense.tax_amount2}
+                  value={expense.tax_amount2 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount2', parseFloat(value))
                   }
@@ -330,7 +330,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={expense.tax_amount3}
+                  value={expense.tax_amount3 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount3', parseFloat(value))
                   }
@@ -343,7 +343,7 @@ export function Details(props: Props) {
         {expense && (
           <Element leftSide={t('amount')}>
             <NumberInputField
-              value={expense.amount}
+              value={expense.amount || ''}
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value) || 0)
               }

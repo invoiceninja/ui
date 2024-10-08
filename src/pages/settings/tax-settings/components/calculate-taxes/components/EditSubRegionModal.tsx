@@ -54,7 +54,7 @@ export function EditSubRegionModal(props: Props) {
 
       <NumberInputField
         label={t('tax_rate')}
-        value={taxSetting.tax_rate}
+        value={taxSetting.tax_rate || ''}
         onValueChange={(value) =>
           handleChange(
             `tax_data.regions.${region}.subregions.${subregion}.tax_rate`,
@@ -65,7 +65,7 @@ export function EditSubRegionModal(props: Props) {
 
       <NumberInputField
         label={t('reduced_rate')}
-        value={taxSetting.reduced_tax_rate}
+        value={taxSetting.reduced_tax_rate || ''}
         onValueChange={(value) =>
           handleChange(
             `tax_data.regions.${region}.subregions.${subregion}.reduced_tax_rate`,

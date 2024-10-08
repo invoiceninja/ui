@@ -417,6 +417,7 @@ export function TaskSettings() {
         {isTaskRoundToNearestCustom() && (
           <Element leftSide={t('task_round_to_nearest')}>
             <NumberInputField
+              precision={0}
               value={companyChanges?.settings?.task_round_to_nearest || -1}
               onValueChange={(value) =>
                 handleSettingsChange(
@@ -425,6 +426,7 @@ export function TaskSettings() {
                 )
               }
               disabled={disableSettingsField('task_round_to_nearest')}
+              disablePrecision
             />
           </Element>
         )}
