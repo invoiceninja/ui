@@ -107,7 +107,7 @@ export function LimitsAndFees(props: Props) {
               <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    ?.min_limit
+                    ?.min_limit || ''
                 }
                 onValueChange={(value) =>
                   handleEntryChange('min_limit', parseFloat(value) || -1)
@@ -137,7 +137,7 @@ export function LimitsAndFees(props: Props) {
               <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    ?.max_limit
+                    ?.max_limit || ''
                 }
                 onValueChange={(value) =>
                   handleEntryChange('max_limit', parseFloat(value) || -1)
@@ -168,7 +168,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_percent
+                  ?.fee_percent || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_percent', parseFloat(value))
@@ -181,7 +181,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_amount
+                  ?.fee_amount || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_amount', parseFloat(value))
@@ -272,7 +272,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_cap
+                  ?.fee_cap || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_cap', parseFloat(value))

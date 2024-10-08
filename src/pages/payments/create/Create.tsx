@@ -244,7 +244,7 @@ export default function Create() {
             leftSideHelp={t('amount_received_help')}
           >
             <NumberInputField
-              value={payment?.amount}
+              value={payment?.amount || ''}
               onValueChange={(value) =>
                 handleChange(
                   'amount',
@@ -306,7 +306,7 @@ export default function Create() {
 
                     <NumberInputField
                       label={t('amount_received')}
-                      value={invoice.amount}
+                      value={invoice.amount || ''}
                       onValueChange={(value) =>
                         handleInvoiceInputChange(
                           index,
@@ -429,7 +429,7 @@ export default function Create() {
                         )
                       }
                       className="w-full"
-                      value={credit.amount}
+                      value={credit.amount || ''}
                       withoutLabelWrapping
                     />
 
@@ -606,7 +606,7 @@ export default function Create() {
               currencyId={payment.currency_id || '1'}
               amount={
                 (collect(payment?.invoices).sum('amount') as number) +
-                  payment?.amount ?? 0
+                (payment?.amount ?? 0)
               }
               onChange={(exchangeRate, exchangeCurrencyId) => {
                 handleChange('exchange_rate', exchangeRate);
