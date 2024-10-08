@@ -34,6 +34,7 @@ import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useCalculateInvoiceSum } from './edit/hooks/useCalculateInvoiceSum';
 
 export default function PurchaseOrder() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -64,6 +65,8 @@ export default function PurchaseOrder() {
   const actions = useActions();
   const tabs = useTabs({ purchaseOrder });
 
+  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
+
   const onSave = useSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
   const {
@@ -86,6 +89,10 @@ export default function PurchaseOrder() {
       setPurchaseOrder(po);
     }
   }, [data]);
+
+  useEffect(() => {
+    purchaseOrder && calculateInvoiceSum(purchaseOrder);
+  }, [purchaseOrder]);
 
   return (
     <Default
