@@ -16,6 +16,7 @@ import rehypeRaw from 'rehype-raw';
 import { Link } from './forms';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   id: string;
@@ -86,7 +87,7 @@ export function HelpWidget({ id, url }: Props) {
     return () => controller.abort();
   }, []);
 
-  return (
+  return createPortal(
     <div
       id={`help-widget-${id}`}
       className="hidden fixed top-0 right-0 w-full md:w-1/2 lg:w-1/3 xl:w-1/4 h-full shadow-xl border rounded-l-lg z-50 overflow-y-auto"
@@ -138,7 +139,8 @@ export function HelpWidget({ id, url }: Props) {
           </Link>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
