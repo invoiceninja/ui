@@ -239,7 +239,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
 
           <Element leftSide={t('exchange_rate')}>
             <NumberInputField
-              value={recurringExpense.exchange_rate}
+              value={recurringExpense.exchange_rate || ''}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }

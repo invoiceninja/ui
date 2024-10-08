@@ -126,7 +126,7 @@ export function Create() {
             <NumberInputField
               required
               label={t('tax_rate')}
-              value={taxRate?.rate}
+              value={taxRate?.rate || ''}
               onValueChange={(value) => handleChange('rate', Number(value))}
               errorMessage={errors?.errors.rate}
             />

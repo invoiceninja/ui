@@ -442,6 +442,7 @@ export function TemplatesAndReminders() {
               <>
                 <Element leftSide={t('days')}>
                   <NumberInputField
+                    precision={0}
                     value={
                       company?.settings[getNumDaysReminderKey(reminderIndex)] ||
                       0
@@ -452,6 +453,7 @@ export function TemplatesAndReminders() {
                         parseFloat(value) || 0
                       )
                     }
+                    disablePrecision
                   />
                 </Element>
 
