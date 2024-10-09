@@ -15,6 +15,8 @@ import { useQuery } from 'react-query';
 import rehypeRaw from 'rehype-raw';
 import { Link } from './forms';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   id: string;
@@ -49,8 +51,43 @@ export function HelpWidget({ id, url }: Props) {
   const [, slug] = url.split('v5-rework/source');
 
   const colors = useColorScheme();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const helpWidgetRef = useRef<HTMLDivElement>(null);
 
-  return (
+  useEffect(() => {
+    const controller = new AbortController();
+
+    window.addEventListener(
+      `help-widget-${id}:moveToHeading`,
+      (event) => {
+        if ('detail' in event && contentRef.current && helpWidgetRef.current) {
+          const heading = contentRef.current?.querySelectorAll('h3');
+
+          if (heading) {
+            const headingIndex = Array.from(heading).findIndex(
+              (h) => h.innerText === event.detail
+            );
+
+            if (headingIndex > -1) {
+              const headingElement = heading[headingIndex];
+
+              if (headingElement) {
+                helpWidgetRef.current.scrollTo({
+                  behavior: 'smooth',
+                  top: headingElement.offsetTop - 50,
+                });
+              }
+            }
+          }
+        }
+      },
+      { signal: controller.signal }
+    );
+
+    return () => controller.abort();
+  }, []);
+
+  return createPortal(
     <div
       id={`help-widget-${id}`}
       className="hidden fixed top-0 right-0 w-full md:w-1/2 lg:w-1/3 xl:w-1/4 h-full shadow-xl border rounded-l-lg z-50 overflow-y-auto"
@@ -59,6 +96,7 @@ export function HelpWidget({ id, url }: Props) {
         color: colors.$3,
         borderColor: colors.$4,
       }}
+      ref={helpWidgetRef}
     >
       <div
         className="flex justify-between items-center sticky px-5 py-3 top-0"
@@ -88,7 +126,7 @@ export function HelpWidget({ id, url }: Props) {
         </div>
       </div>
 
-      <div className="prose-sm p-5">
+      <div className="prose-sm p-5" ref={contentRef}>
         <Markdown rehypePlugins={[rehypeRaw]}>{data}</Markdown>
 
         <div className="flex justify-center">
@@ -101,16 +139,31 @@ export function HelpWidget({ id, url }: Props) {
           </Link>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
-export function $help(id: string) {
+export interface HelpOptions {
+  moveToHeading: string;
+}
+
+export function $help(id: string, options?: HelpOptions) {
   const div = document.querySelector(
     `div#help-widget-${id}`
   ) as HTMLDivElement | null;
 
+  console.log(div);
+
   if (div) {
     div.classList.toggle('hidden');
+
+    if (options?.moveToHeading) {
+      window.dispatchEvent(
+        new CustomEvent(`help-widget-${id}:moveToHeading`, {
+          detail: options.moveToHeading,
+        })
+      );
+    }
   }
 }
