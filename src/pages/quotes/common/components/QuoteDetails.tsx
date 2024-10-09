@@ -130,11 +130,13 @@ export function QuoteDetails(props: Props) {
 
             <div className="w-full lg:w-1/2">
               <SelectField
+                value={quote?.is_amount_discount.toString()}
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
-                value={quote?.is_amount_discount.toString()}
                 errorMessage={errors?.errors.is_amount_discount}
+                customSelector
+                dismissable={false}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
