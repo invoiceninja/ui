@@ -8,31 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { cloneDeep } from 'lodash';
-import { useCalculateInvoiceSum } from './useCalculateInvoiceSum';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { cloneDeep, set } from 'lodash';
 
 export function useHandleLineItemPropertyChange(
-  setPurchaseOrder: (purchaseOrder: PurchaseOrder) => unknown,
-  setInvoiceSum: (invoiceSum: InvoiceSum | InvoiceSumInclusive) => unknown
+  setPurchaseOrder: (purchaseOrder: PurchaseOrder) => unknown
 ) {
-  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
-
-  return async (
+  return (
     purchaseOrder: PurchaseOrder,
     property: keyof InvoiceItem,
     value: unknown,
     index: number
   ) => {
-    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
+    const updatedPurchaseOrder = cloneDeep(purchaseOrder) as PurchaseOrder;
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    po.line_items[index][property] = value;
+    set(updatedPurchaseOrder, `line_items.${index}.${property}`, value);
 
-    setPurchaseOrder(await calculateInvoiceSum(po));
+    setPurchaseOrder(updatedPurchaseOrder);
   };
 }
