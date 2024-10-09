@@ -89,6 +89,10 @@ export function MergeVendorsAction(props: Props) {
           inputLabel={t('vendor')}
           value={mergeIntoVendorId}
           onChange={(vendor) => setMergeIntoVendorId(vendor.id)}
+          onClearButtonClick={() => setMergeIntoVendorId('')}
+          exclude={[mergeFromVendorId]}
+          withoutAction
+          initiallyVisible
         />
 
         <div className="self-end pt-2">
