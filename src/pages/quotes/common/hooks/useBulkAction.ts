@@ -22,7 +22,7 @@ const successMessages = {
   convert_to_invoice: 'converted_quote',
   convert_to_project: 'converted_quote',
   email: 'emailed_quotes',
-  sent: 'marked_quote_as_sent',
+  mark_sent: 'marked_quote_as_sent',
 };
 
 export const useBulkAction = () => {
@@ -40,7 +40,7 @@ export const useBulkAction = () => {
       | 'convert_to_project'
       | 'email'
       | 'approve'
-      | 'sent'
+      | 'mark_sent'
   ) => {
     toast.processing();
 
