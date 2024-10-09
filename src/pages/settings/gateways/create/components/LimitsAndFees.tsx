@@ -28,6 +28,9 @@ import { Entry } from '$app/components/forms/Combobox';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { $help } from '$app/components/HelpWidget';
+import { HelpCircle } from 'react-feather';
 
 interface Props {
   gateway: Gateway;
@@ -81,8 +84,27 @@ export function LimitsAndFees(props: Props) {
     }
   };
 
+  const accentColor = useAccentColor();
+
   return (
-    <Card title={t('limits_and_fees')}>
+    <Card
+      title={t('limits_and_fees')}
+      topRight={
+        <button
+          style={{ color: accentColor }}
+          type="button"
+          onClick={() =>
+            $help('gateways', {
+              moveToHeading: 'Limits/Fees',
+            })
+          }
+          className="inline-flex items-center space-x-1 text-sm"
+        >
+          <HelpCircle size={18} />
+          <span>{t('documentation')}</span>
+        </button>
+      }
+    >
       <Element leftSide={t('payment_type')}>
         <SelectField
           onChange={handlePaymentTypeChange}
