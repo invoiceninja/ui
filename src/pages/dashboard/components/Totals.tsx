@@ -220,6 +220,10 @@ export function Totals() {
   }, [totals.data]);
 
   useEffect(() => {
+    console.log(settings?.preferences?.dashboard_charts?.currency);
+  }, [settings?.preferences?.dashboard_charts?.currency]);
+
+  useEffect(() => {
     if (chart.data) {
       setDates({
         start_date: chart.data.start_date,
