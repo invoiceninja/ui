@@ -36,6 +36,7 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
+import { Onboarding } from './peppol/Onboarding';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -202,10 +203,14 @@ export function EInvoice() {
 
         {company?.settings.e_invoice_type === 'PEPPOL' &&
         isPeppolStandardEnabled ? (
-          <EInvoiceGenerator
-            ref={eInvoiceRef}
-            currentEInvoice={company?.e_invoice || {}}
-          />
+          company?.legal_entity_id ? (
+            <EInvoiceGenerator
+              ref={eInvoiceRef}
+              currentEInvoice={company?.e_invoice || {}}
+            />
+          ) : (
+            <Onboarding />
+          )
         ) : (
           <>
             <Element
