@@ -21,10 +21,6 @@ import { endpoint } from '$app/common/helpers';
 import { MdWarning } from 'react-icons/md';
 import { Tooltip } from '$app/components/Tooltip';
 
-enum IntegrationType {
-  Yodlee = 'YODLEE',
-  Nordigen = 'NORDIGEN',
-}
 export const useBankAccountColumns = () => {
   const { t } = useTranslation();
   const company = useCurrentCompany();
@@ -60,24 +56,23 @@ export const useBankAccountColumns = () => {
             {bankAccount?.bank_account_name}
           </Link>
 
-          {bankAccount.integration_type === IntegrationType.Nordigen &&
-            bankAccount.disabled_upstream && (
-              <Tooltip
-                message={t('reconnect') as string}
-                width="auto"
-                placement="top"
+          {bankAccount.disabled_upstream && (
+            <Tooltip
+              message={t('reconnect') as string}
+              width="auto"
+              placement="top"
+            >
+              <div
+                className="cursor-pointer"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleConnectNordigen(bankAccount.nordigen_institution_id);
+                }}
               >
-                <div
-                  className="cursor-pointer"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleConnectNordigen(bankAccount.nordigen_institution_id);
-                  }}
-                >
-                  <MdWarning color="red" size={22} />
-                </div>
-              </Tooltip>
-            )}
+                <MdWarning color="red" size={22} />
+              </div>
+            </Tooltip>
+          )}
         </div>
       ),
     },

@@ -76,6 +76,7 @@ export function Invoices() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.invoice_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

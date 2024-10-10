@@ -131,32 +131,32 @@ export function TaskDetails(props: Props) {
           </div>
         )}
 
-        {!task.project_id && (
-          <Element leftSide={t('client')}>
-            <div className="flex flex-col space-y-2">
-              <ClientSelector
-                onChange={(client) => {
-                  handleChange('client_id', client.id);
+        <Element leftSide={t('client')}>
+          <div className="flex flex-col space-y-2">
+            <ClientSelector
+              onChange={(client) => {
+                handleChange('client_id', client.id);
 
-                  if (!task.id) {
-                    handleChange(
-                      'rate',
-                      client?.settings?.default_task_rate ?? 0
-                    );
-                  }
-                }}
-                value={task.client_id}
-                clearButton={Boolean(task.client_id)}
-                onClearButtonClick={() => handleChange('client_id', '')}
-                errorMessage={errors?.errors.client_id}
-              />
+                if (!task.id) {
+                  handleChange(
+                    'rate',
+                    client?.settings?.default_task_rate ?? 0
+                  );
+                }
+              }}
+              value={task.client_id}
+              clearButton={Boolean(task.client_id)}
+              onClearButtonClick={() => handleChange('client_id', '')}
+              readonly={Boolean(task.project_id)}
+              errorMessage={errors?.errors.client_id}
+            />
 
-              {task.client_id && (
-                <ClientActionButtons clientId={task.client_id} />
-              )}
-            </div>
-          </Element>
-        )}
+            {task.client_id && (
+              <ClientActionButtons clientId={task.client_id} />
+            )}
+          </div>
+        </Element>
+
         <Element leftSide={t('project')}>
           <div className="flex items-center justify-center">
             <span
@@ -166,13 +166,16 @@ export function TaskDetails(props: Props) {
               <ProjectSelector
                 onChange={(project) => {
                   handleChange('project_id', project.id);
-                  handleChange('client_id', '');
+                  handleChange('client_id', project.client_id);
                   handleChange('rate', project.task_rate);
                 }}
                 value={task.project_id}
                 clientId={task.client_id}
                 clearButton={Boolean(task.project_id)}
-                onClearButtonClick={() => handleChange('project_id', '')}
+                onClearButtonClick={() => {
+                  handleChange('project_id', '');
+                  handleChange('client_id', '');
+                }}
                 errorMessage={errors?.errors.project_id}
               />
             </span>
@@ -234,7 +237,7 @@ export function TaskDetails(props: Props) {
 
         <Element leftSide={t('rate')}>
           <NumberInputField
-            value={task.rate}
+            value={task.rate || ''}
             onValueChange={(value) => handleChange('rate', parseFloat(value))}
             errorMessage={errors?.errors.rate}
           />

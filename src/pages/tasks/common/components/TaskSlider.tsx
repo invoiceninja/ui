@@ -46,6 +46,7 @@ import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceP
 import { date as formatDate } from '$app/common/helpers';
 import { useFormatTimeLog } from '../../kanban/common/hooks';
 import { TaskClock } from '../../kanban/components/TaskClock';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -104,6 +105,7 @@ export function TaskSlider() {
     showEditAction: true,
   });
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const userNumberPrecision = useUserNumberPrecision();
 
   const formatMoney = useFormatMoney();
   const formatTimeLog = useFormatTimeLog();
@@ -157,7 +159,8 @@ export function TaskSlider() {
             <Element leftSide={t('amount')}>
               {task
                 ? formatMoney(
-                    task.rate * calculateTaskHours(task.time_log),
+                    task.rate *
+                      calculateTaskHours(task.time_log, userNumberPrecision),
                     task.client?.country_id,
                     task.client?.settings.currency_id
                   )

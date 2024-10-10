@@ -238,6 +238,15 @@ export function Form(props: Props) {
                 />
               </Element>
 
+              <Element leftSide={t('tax_exempt')}>
+                <Toggle
+                  checked={Boolean(vendor.is_tax_exempt)}
+                  onValueChange={(value) =>
+                    handleChange('is_tax_exempt', value)
+                  }
+                />
+              </Element>
+
               <Element leftSide={t('classification')}>
                 <SelectField
                   id="classification"

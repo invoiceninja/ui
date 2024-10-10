@@ -167,7 +167,7 @@ export function useCustomBulkActions() {
       showMarkSentAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
-            bulk(selectedIds, 'sent');
+            bulk(selectedIds, 'mark_sent');
             setSelected([]);
           }}
           icon={<Icon element={MdMarkEmailRead} />}

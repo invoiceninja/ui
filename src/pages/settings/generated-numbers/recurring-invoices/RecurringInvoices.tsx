@@ -80,6 +80,7 @@ export function RecurringInvoices() {
         }
       >
         <NumberInputField
+          precision={0}
           value={
             companyChanges?.settings?.recurring_invoice_number_counter || ''
           }

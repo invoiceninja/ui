@@ -64,7 +64,7 @@ export const IncreasePricesAction = (props: Props) => {
       >
         <NumberInputField
           label={t('percent')}
-          value={increasingPercent}
+          value={increasingPercent || ''}
           onValueChange={(value) => {
             setIncreasingPercent(parseFloat(value));
             errors && setErrors(undefined);

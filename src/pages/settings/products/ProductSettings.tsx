@@ -92,6 +92,7 @@ export function ProductSettings() {
           <>
             <Element leftSide={t('notification_threshold')}>
               <NumberInputField
+                precision={0}
                 value={companyChanges?.inventory_notification_threshold || ''}
                 onValueChange={(value) =>
                   handleChange(
@@ -100,6 +101,7 @@ export function ProductSettings() {
                   )
                 }
                 errorMessage={errors?.errors.inventory_notification_threshold}
+                disablePrecision
               />
             </Element>
           </>

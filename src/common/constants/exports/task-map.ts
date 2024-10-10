@@ -28,4 +28,6 @@ export const taskMap: Record[] = [
   { trans: 'project', value: 'task.project_id', map: 'task' },
   { trans: 'billable', value: 'task.billable', map: 'task' },
   { trans: 'item_notes', value: 'task.item_notes', map: 'task' },
+  { trans: 'assigned_user', value: 'task.assigned_user_id', map: 'task' },
+  { trans: 'user', value: 'task.user_id', map: 'task' },
 ];

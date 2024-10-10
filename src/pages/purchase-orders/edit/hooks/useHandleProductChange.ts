@@ -8,28 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { cloneDeep } from 'lodash';
-import { useCalculateInvoiceSum } from './useCalculateInvoiceSum';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { cloneDeep, set } from 'lodash';
 
 export function useHandleProductChange(
-  setPurchaseOrder: (purchaseOrder: PurchaseOrder) => unknown,
-  setInvoiceSum: (invoiceSum: InvoiceSum | InvoiceSumInclusive) => unknown
+  setPurchaseOrder: (purchaseOrder: PurchaseOrder) => unknown
 ) {
-  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
-
-  return async (
+  return (
     purchaseOrder: PurchaseOrder,
     index: number,
     lineItem: InvoiceItem
   ) => {
-    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
+    const updatedPurchaseOrder = cloneDeep(purchaseOrder) as PurchaseOrder;
 
-    po.line_items[index] = lineItem;
+    set(updatedPurchaseOrder, `line_items.${index}`, lineItem);
 
-    setPurchaseOrder(await calculateInvoiceSum(po));
+    setPurchaseOrder(updatedPurchaseOrder);
   };
 }

@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { InputField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { CustomField } from '$app/components/CustomField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -18,10 +18,10 @@ import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { TaxCategorySelector } from '$app/components/tax-rates/TaxCategorySelector';
 import { Alert } from '$app/components/Alert';
 import { useSearchParams } from 'react-router-dom';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useTaxCategories } from '$app/components/tax-rates/TaxCategorySelector';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -38,6 +38,7 @@ export function ProductForm(props: Props) {
   const [, setSearchParams] = useSearchParams();
 
   const company = useCurrentCompany();
+  const taxCategories = useTaxCategories();
 
   const { errors, handleChange, type, product } = props;
 
@@ -69,7 +70,7 @@ export function ProductForm(props: Props) {
 
       <Element leftSide={t('price')}>
         <NumberInputField
-          value={product.price}
+          value={product.price || ''}
           onValueChange={(value) => handleChange('price', parseFloat(value))}
           errorMessage={errors?.errors.price}
         />
@@ -88,7 +89,7 @@ export function ProductForm(props: Props) {
       {company?.enable_product_quantity && (
         <Element leftSide={t('default_quantity')}>
           <NumberInputField
-            value={product.quantity}
+            value={product.quantity || ''}
             onValueChange={(value) =>
               handleChange('quantity', parseFloat(value))
             }
@@ -99,7 +100,7 @@ export function ProductForm(props: Props) {
 
       <Element leftSide={t('max_quantity')}>
         <NumberInputField
-          value={product.max_quantity}
+          value={product.max_quantity || ''}
           onValueChange={(value) =>
             handleChange('max_quantity', parseFloat(value))
           }
@@ -108,10 +109,18 @@ export function ProductForm(props: Props) {
       </Element>
 
       <Element leftSide={t('tax_category')}>
-        <TaxCategorySelector
+        <SelectField
           value={product.tax_id}
-          onChange={(taxCategory) => handleChange('tax_id', taxCategory.value)}
-        />
+          onValueChange={(value) => handleChange('tax_id', value)}
+          customSelector
+          dismissable={false}
+        >
+          {taxCategories.map((taxCategory, index) => (
+            <option key={index} value={taxCategory.value as string}>
+              {taxCategory.label}
+            </option>
+          ))}
+        </SelectField>
 
         {errors?.errors.tax_id ? (
           <Alert className="mt-2" type="danger">
@@ -132,7 +141,7 @@ export function ProductForm(props: Props) {
         <>
           <Element leftSide={t('stock_quantity')}>
             <NumberInputField
-              value={product.in_stock_quantity}
+              value={product.in_stock_quantity || ''}
               onValueChange={(value) => {
                 handleChange('in_stock_quantity', Number(value));
 
@@ -158,7 +167,7 @@ export function ProductForm(props: Props) {
 
           <Element leftSide={t('notification_threshold')}>
             <NumberInputField
-              value={product.stock_notification_threshold}
+              value={product.stock_notification_threshold || ''}
               onValueChange={(value) =>
                 handleChange('stock_notification_threshold', parseFloat(value))
               }
