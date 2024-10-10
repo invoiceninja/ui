@@ -52,6 +52,7 @@ export function ImportTemplateModal(props: Props) {
   const handleOnClose = () => {
     setTemplateName('');
     setIsSaveTemplateModalOpen(false);
+    navigate(`/${entity}s`);
   };
 
   const shouldOpenTemplateModal = () => {
@@ -225,7 +226,12 @@ export function ImportTemplateModal(props: Props) {
 
           <Button
             behavior="button"
-            onClick={() => setIsSaveTemplateModalOpen(true)}
+            onClick={() => {
+              setIsTemplateModalOpen(false);
+              setTimeout(() => {
+                setIsSaveTemplateModalOpen(true);
+              }, 310);
+            }}
           >
             {t('yes')}
           </Button>
