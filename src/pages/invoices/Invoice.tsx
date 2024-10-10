@@ -17,7 +17,12 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useParams, useSearchParams } from 'react-router-dom';
+import {
+  Outlet,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { invoiceAtom } from './common/atoms';
@@ -44,6 +49,8 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { Banner } from '$app/components/Banner';
 import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
+import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 dayjs.extend(utc);
 
@@ -55,12 +62,22 @@ export default function Invoice() {
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
   const { id } = useParams();
+  const location = useLocation();
+  const company = useCurrentCompany();
   const [searchParams] = useSearchParams();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
+
+  const { isValid } = useCheckEInvoiceValidation({
+    entity: 'invoices',
+    entity_id: id as string,
+    enableQuery:
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.settings.enable_e_invoice,
+  });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
 
@@ -151,7 +168,8 @@ export default function Invoice() {
                 disableSaveButton={
                   invoice &&
                   (invoice.status_id === InvoiceStatus.Cancelled ||
-                    invoice.is_deleted)
+                    invoice.is_deleted ||
+                    (!isValid && location.pathname.endsWith('/e_invoice')))
                 }
                 disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"
@@ -198,6 +216,7 @@ export default function Invoice() {
                   setIsDefaultFooter,
                   client,
                   eInvoiceRef,
+                  isEInvoiceValid: isValid,
                 }}
               />
             </div>
