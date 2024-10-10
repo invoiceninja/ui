@@ -42,6 +42,11 @@ export function MergeVendorsAction(props: Props) {
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState<boolean>(false);
 
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setMergeIntoVendorId('');
+  };
+
   const handleMergeVendor = (password: string) => {
     if (!isFormBusy) {
       toast.processing();
@@ -59,7 +64,10 @@ export function MergeVendorsAction(props: Props) {
         {},
         { headers: { 'X-Api-Password': password } }
       )
-        .then(() => $refetch(['vendors']))
+        .then(() => {
+          handleClose();
+          $refetch(['vendors']);
+        })
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
             toast.error('password_error_incorrect');
@@ -82,7 +90,7 @@ export function MergeVendorsAction(props: Props) {
       <Modal
         title={t('merge_into')}
         visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleClose}
         overflowVisible
       >
         <VendorSelector
@@ -99,7 +107,13 @@ export function MergeVendorsAction(props: Props) {
           <Button
             disableWithoutIcon
             disabled={!mergeIntoVendorId}
-            onClick={() => setPasswordConfirmModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(false);
+
+              setTimeout(() => {
+                setPasswordConfirmModalOpen(true);
+              }, 310);
+            }}
           >
             {t('merge')}
           </Button>
