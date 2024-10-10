@@ -42,7 +42,7 @@ export function useConfigureClientSettings(params?: Params) {
           object: 'company',
           data: {
             ...company,
-            settings: client.settings,
+            settings: { id: client.id, ...client.settings },
             e_invoice: client.e_invoice || {},
           },
         })
@@ -53,7 +53,7 @@ export function useConfigureClientSettings(params?: Params) {
           object: 'company',
           data: {
             ...companyChanges,
-            settings: client.settings,
+            settings: { id: client.id, ...client.settings },
             e_invoice: client.e_invoice || {},
           },
         })

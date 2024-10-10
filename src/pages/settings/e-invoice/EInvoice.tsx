@@ -36,6 +36,9 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
+import { ValidationAlert } from './common/components/ValidationAlert';
+import { useCheckEInvoiceValidation } from './common/hooks/useCheckEInvoiceValidation';
+import { route } from '$app/common/helpers/route';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -63,6 +66,15 @@ export function EInvoice() {
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const company = useInjectCompanyChanges();
+  const { isValid } = useCheckEInvoiceValidation({
+    entity: isCompanySettingsActive ? 'companies' : 'clients',
+    entity_id: (isCompanySettingsActive
+      ? company?.id
+      : company?.settings.id) as string,
+    enableQuery:
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.settings.enable_e_invoice,
+  });
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
@@ -159,8 +171,23 @@ export function EInvoice() {
 
         setSaveChanges(true);
       }}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={showPlanAlert || !isValid}
     >
+      {Boolean(
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          !isValid
+      ) && (
+        <ValidationAlert
+          to={
+            isCompanySettingsActive
+              ? '/settings/company_details'
+              : route('/clients/:id/edit', { id: company?.settings.id })
+          }
+          entity={isCompanySettingsActive ? 'company' : 'client'}
+        />
+      )}
+
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('e_invoice')}>

@@ -91,6 +91,7 @@ export interface Company {
 }
 
 export interface Settings {
+  id?: string;
   accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
   auto_bill_standard_invoices: boolean;
