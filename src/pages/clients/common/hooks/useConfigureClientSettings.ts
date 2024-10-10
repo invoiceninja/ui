@@ -12,10 +12,7 @@ import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
-import {
-  injectInChanges,
-  updateChanges,
-} from '$app/common/stores/slices/company-users';
+import { injectInChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { useSetAtom } from 'jotai';
 import { useDispatch } from 'react-redux';
@@ -43,15 +40,22 @@ export function useConfigureClientSettings(params?: Params) {
       dispatch(
         injectInChanges({
           object: 'company',
-          data: { ...company, settings: client.settings },
+          data: {
+            ...company,
+            settings: { id: client.id, ...client.settings },
+            e_invoice: client.e_invoice || {},
+          },
         })
       );
     } else {
       dispatch(
-        updateChanges({
+        injectInChanges({
           object: 'company',
-          property: 'settings',
-          value: client.settings,
+          data: {
+            ...companyChanges,
+            settings: { id: client.id, ...client.settings },
+            e_invoice: client.e_invoice || {},
+          },
         })
       );
     }

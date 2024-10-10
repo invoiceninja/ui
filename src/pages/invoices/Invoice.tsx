@@ -21,7 +21,7 @@ import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { invoiceAtom } from './common/atoms';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CommonActions } from './edit/components/CommonActions';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -34,6 +34,7 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
+import { EInvoiceComponent } from '../settings';
 import {
   socketId,
   useSocketEvent,
@@ -50,6 +51,8 @@ export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
 
   const [t] = useTranslation();
+
+  const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -68,6 +71,7 @@ export default function Invoice() {
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [saveChanges, setSaveChanges] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
@@ -102,6 +106,13 @@ export default function Invoice() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
+  useEffect(() => {
+    if (saveChanges && invoice) {
+      save(invoice);
+      setSaveChanges(false);
+    }
+  }, [saveChanges]);
+
   useSocketEvent<WithSocketId<InvoiceType>>({
     on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
     callback: ({ data }) => {
@@ -124,7 +135,19 @@ export default function Invoice() {
               <ResourceActions
                 resource={invoice}
                 actions={actions}
-                onSaveClick={() => save(invoice)}
+                onSaveClick={() => {
+                  if (eInvoiceRef?.current?.saveEInvoice()) {
+                    setInvoice(
+                      (current) =>
+                        current && {
+                          ...current,
+                          e_invoice: eInvoiceRef?.current?.saveEInvoice(),
+                        }
+                    );
+                  }
+
+                  setSaveChanges(true);
+                }}
                 disableSaveButton={
                   invoice &&
                   (invoice.status_id === InvoiceStatus.Cancelled ||
@@ -174,6 +197,7 @@ export default function Invoice() {
                   isDefaultFooter,
                   setIsDefaultFooter,
                   client,
+                  eInvoiceRef,
                 }}
               />
             </div>
