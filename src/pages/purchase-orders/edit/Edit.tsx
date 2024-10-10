@@ -47,7 +47,6 @@ export default function Edit() {
     setIsDefaultFooter,
     setIsDefaultTerms,
     invoiceSum,
-    setInvoiceSum,
   } = context;
 
   const colors = useColorScheme();
@@ -65,15 +64,10 @@ export default function Edit() {
   const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
   const handleDeleteLineItem = useHandleDeleteLineItem(setPurchaseOrder);
 
-  const handleProductChange = useHandleProductChange(
-    setPurchaseOrder,
-    setInvoiceSum
-  );
+  const handleProductChange = useHandleProductChange(setPurchaseOrder);
 
-  const handleLineItemPropertyChange = useHandleLineItemPropertyChange(
-    setPurchaseOrder,
-    setInvoiceSum
-  );
+  const handleLineItemPropertyChange =
+    useHandleLineItemPropertyChange(setPurchaseOrder);
 
   const {
     changeTemplateVisible,
