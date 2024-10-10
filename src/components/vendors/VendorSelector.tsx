@@ -23,6 +23,8 @@ export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
   staleTime?: number;
   initiallyVisible?: boolean;
+  exclude?: string[];
+  withoutAction?: boolean;
 }
 
 export function VendorSelector(props: VendorSelectorProps) {
@@ -58,7 +60,7 @@ export function VendorSelector(props: VendorSelectorProps) {
           action={{
             label: t('new_vendor'),
             onClick: () => setIsModalOpen(true),
-            visible: hasPermission('create_vendor'),
+            visible: hasPermission('create_vendor') && !props.withoutAction,
           }}
           readonly={props.readonly}
           onDismiss={props.onClearButtonClick}
@@ -66,6 +68,7 @@ export function VendorSelector(props: VendorSelectorProps) {
           sortBy="name|asc"
           staleTime={props.staleTime || Infinity}
           errorMessage={props.errorMessage}
+          exclude={props.exclude}
         />
       )}
     </>
