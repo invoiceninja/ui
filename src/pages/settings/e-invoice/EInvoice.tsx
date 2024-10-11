@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -175,13 +174,16 @@ export function EInvoice() {
 
       //   setSaveChanges(true);
       // }}
-      onSaveClick={onSave}
-      // disableSaveButton={
-      //   showPlanAlert ||
-      //   (company?.settings.e_invoice_type === 'PEPPOL' &&
-      //     company?.settings.enable_e_invoice &&
-      //     !isValid)
-      // }
+      onSaveClick={() => {
+        eInvoiceRef?.current?.saveEInvoice();
+        onSave();
+      }}
+      disableSaveButton={
+        showPlanAlert ||
+        (company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          !isValid)
+      }
     >
       {Boolean(
         company?.settings.e_invoice_type === 'PEPPOL' &&
@@ -265,7 +267,11 @@ export function EInvoice() {
             )} */}
 
             {company?.settings.enable_e_invoice && (
-              <PaymentMeansForm currentEInvoice={company?.e_invoice || {}} />
+              <PaymentMeansForm
+                ref={eInvoiceRef}
+                currentEInvoice={company?.e_invoice || {}}
+                entity="company"
+              />
             )}
           </>
         ) : (
