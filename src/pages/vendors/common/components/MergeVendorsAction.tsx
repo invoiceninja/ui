@@ -65,6 +65,7 @@ export function MergeVendorsAction(props: Props) {
         { headers: { 'X-Api-Password': password } }
       )
         .then(() => {
+          toast.success('merged_vendors');
           handleClose();
           $refetch(['vendors']);
         })
