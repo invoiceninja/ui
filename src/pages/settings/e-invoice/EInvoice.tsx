@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -11,7 +12,6 @@
 import { useTranslation } from 'react-i18next';
 import { Settings } from '$app/components/layouts/Settings';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
@@ -39,6 +39,7 @@ import { Image } from 'react-feather';
 import { ValidationAlert } from './common/components/ValidationAlert';
 import { useCheckEInvoiceValidation } from './common/hooks/useCheckEInvoiceValidation';
 import { route } from '$app/common/helpers/route';
+import { PaymentMeansForm } from '$app/components/e-invoice/PaymentMeansForm';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -47,6 +48,9 @@ export type EInvoiceType = {
 export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
+
+const PEPPOL_COUNTRIES = ['276', '724', '756'];
+
 export function EInvoice() {
   const [t] = useTranslation();
 
@@ -162,16 +166,22 @@ export function EInvoice() {
       title={t('e_invoice')}
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
-      onSaveClick={() => {
-        if (eInvoiceRef?.current?.saveEInvoice()) {
-          handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
-        } else {
-          handleChange('e_invoice', {});
-        }
+      // onSaveClick={() => {
+      //   if (eInvoiceRef?.current?.saveEInvoice()) {
+      //     handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
+      //   } else {
+      //     handleChange('e_invoice', {});
+      //   }
 
-        setSaveChanges(true);
-      }}
-      disableSaveButton={showPlanAlert || !isValid}
+      //   setSaveChanges(true);
+      // }}
+      onSaveClick={onSave}
+      // disableSaveButton={
+      //   showPlanAlert ||
+      //   (company?.settings.e_invoice_type === 'PEPPOL' &&
+      //     company?.settings.enable_e_invoice &&
+      //     !isValid)
+      // }
     >
       {Boolean(
         company?.settings.e_invoice_type === 'PEPPOL' &&
@@ -207,7 +217,9 @@ export function EInvoice() {
             }
             disabled={disableSettingsField('e_invoice_type')}
           >
-            <option value="PEPPOL">PEPPOL</option>
+            {PEPPOL_COUNTRIES.includes(company?.settings.country_id || '') && (
+              <option value="PEPPOL">PEPPOL</option>
+            )}
             <option value="FACT1">FACT1</option>
             <option value="EN16931">EN16931</option>
             <option value="XInvoice_3_0">XInvoice_3.0</option>
@@ -245,11 +257,15 @@ export function EInvoice() {
 
         {company?.settings.e_invoice_type === 'PEPPOL' ? (
           <>
-            {company?.settings.enable_e_invoice && (
+            {/* {company?.settings.enable_e_invoice && (
               <EInvoiceGenerator
                 ref={eInvoiceRef}
                 currentEInvoice={company?.e_invoice || {}}
               />
+            )} */}
+
+            {company?.settings.enable_e_invoice && (
+              <PaymentMeansForm currentEInvoice={company?.e_invoice || {}} />
             )}
           </>
         ) : (
