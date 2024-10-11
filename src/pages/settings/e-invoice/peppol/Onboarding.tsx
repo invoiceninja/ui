@@ -26,14 +26,27 @@ import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type Step = 'plan_check' | 'buy_credits' | 'form' | 'completed';
+export type Step =
+  | 'plan_check'
+  | 'token'
+  | 'buy_credits'
+  | 'form'
+  | 'completed';
 
 export function Onboarding() {
   const accentColor = useAccentColor();
   const { t } = useTranslation();
 
   const [isVisible, setIsVisible] = useState(false);
+
   const [step, setStep] = useState<Step>('plan_check');
+  const [steps, setSteps] = useState<Step[]>([
+    'plan_check',
+    'token',
+    'buy_credits',
+    'form',
+    'completed',
+  ]);
 
   useEffect(() => {
     if (step === 'completed') {
@@ -42,6 +55,20 @@ export function Onboarding() {
       toast.success('Successfully configured PEPPOL');
     }
   }, [step]);
+
+  useEffect(() => {
+    if (isHosted()) {
+      setSteps((c) => c.filter((s) => s !== 'token'));
+    }
+  }, []);
+
+  const next = () => {
+    const next = steps[steps.indexOf(step) + 1];
+
+    if (next) {
+      setStep(next);
+    }
+  };
 
   return (
     <>
@@ -70,71 +97,43 @@ export function Onboarding() {
         <div className="">
           <div className="max-w-xl mx-auto space-y-10">
             <ol className="lg:flex items-center w-full space-y-4 lg:space-x-8 lg:space-y-0">
-              <li className=" flex-1">
-                <a
-                  className="border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid font-medium lg:pt-4 lg:border-t-2 lg:border-l-0 lg:pl-0"
-                  style={{
-                    borderColor: step === 'plan_check' ? accentColor : '',
-                  }}
-                >
-                  <span
-                    className="text-sm"
-                    style={{ color: step === 'plan_check' ? accentColor : '' }}
-                  >
-                    {t('step')} 1
-                  </span>
-                  <h4 className="text-base lg:text-lg text-gray-900">
-                    {t('plan')}
-                  </h4>
-                </a>
-              </li>
-              <li className=" flex-1">
-                <a
-                  className="border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid font-medium lg:pt-4 lg:border-t-2 lg:border-l-0 lg:pl-0"
-                  style={{
-                    borderColor: step === 'buy_credits' ? accentColor : '',
-                  }}
-                >
-                  <span
-                    className="text-sm"
-                    style={{ color: step === 'buy_credits' ? accentColor : '' }}
-                  >
-                    {t('step')} 2
-                  </span>
-                  <h4 className="text-base lg:text-lg text-gray-900">
-                    {t('list_of_credits')}
-                  </h4>
-                </a>
-              </li>
-              <li className=" flex-1">
-                <a
-                  className="border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid font-medium lg:pt-4 lg:border-t-2 lg:border-l-0 lg:pl-0"
-                  style={{
-                    borderColor: step === 'form' ? accentColor : '',
-                  }}
-                >
-                  <span
-                    className="text-sm"
-                    style={{ color: step === 'form' ? accentColor : '' }}
-                  >
-                    {t('step')} 3
-                  </span>
-                  <h4 className="text-base lg:text-lg text-gray-900">
-                    {t('details')}
-                  </h4>
-                </a>
-              </li>
+              {steps
+                .filter((s) => s !== 'completed')
+                .map((s, i) => (
+                  <li className="flex-1" key={i}>
+                    <a
+                      className="border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid font-medium lg:pt-4 lg:border-t-2 lg:border-l-0 lg:pl-0"
+                      style={{
+                        borderColor: step === s ? accentColor : '',
+                      }}
+                    >
+                      <span
+                        className="text-sm"
+                        style={{
+                          color: step === s ? accentColor : '',
+                        }}
+                      >
+                        {t('step')} {i + 1}
+                      </span>
+                      <h4 className="text-base lg:text-lg text-gray-900">
+                        {t(s)}
+                      </h4>
+                    </a>
+                  </li>
+                ))}
             </ol>
 
             {step === 'plan_check' && (
-              <PlanCheck step={step} setStep={setStep} />
+              <PlanCheck step={step} onContinue={next} />
             )}
+
+            {step === 'token' && <Token step={step} onContinue={next} />}
 
             {step === 'buy_credits' && (
-              <BuyCredits step={step} setStep={setStep} />
+              <BuyCredits step={step} onContinue={next} />
             )}
 
-            {step === 'form' && <Form step={step} setStep={setStep} />}
+            {step === 'form' && <Form step={step} onContinue={next} />}
           </div>
         </div>
       </Modal>
@@ -144,10 +143,10 @@ export function Onboarding() {
 
 interface StepProps {
   step: Step;
-  setStep: (step: Step) => void;
+  onContinue: () => void;
 }
 
-function PlanCheck({ setStep }: StepProps) {
+function PlanCheck({ onContinue }: StepProps) {
   const isPaid = useIsPaid();
   const isWhitelabelled = useIsWhitelabelled();
 
@@ -155,13 +154,13 @@ function PlanCheck({ setStep }: StepProps) {
 
   useEffect(() => {
     if (isSelfHosted() && isWhitelabelled) {
-      setStep('buy_credits');
+      onContinue();
 
       return;
     }
 
     if (isHosted() && isPaid) {
-      setStep('buy_credits');
+      onContinue();
 
       return;
     }
@@ -186,19 +185,53 @@ function PlanCheck({ setStep }: StepProps) {
       ) : null}
 
       <div className="flex justify-end">
-        <Button
-          behavior="button"
-          type="primary"
-          onClick={() => setStep('buy_credits')}
-        >
-          {t('continue')}
+        <Button behavior="button" type="primary" onClick={() => onContinue()}>
+          {t('continue')} (in dev)
         </Button>
       </div>
     </div>
   );
 }
 
-function BuyCredits({ setStep }: StepProps) {
+function Token({ onContinue }: StepProps) {
+  const { t } = useTranslation();
+
+  const accentColor = useAccentColor();
+
+  const [isTokenGenerated, setIsTokenGenerated] = useState(false);
+
+  return (
+    <div>
+      <p>{t('peppol_tokens_info')}</p>
+      <p className="mt-2">
+        Token is used as another step to make sure invoices are sent securely.
+        Unlike white-label licenses, token can be rotated at any point without
+        need to wait on Invoice Ninja support.
+      </p>
+
+      <div className="flex items-center gap-1 my-3">
+        <p>You need to generate a token to continue.</p>
+        <button
+          type="button"
+          style={{ color: accentColor }}
+          onClick={() => setIsTokenGenerated(true)}
+        >
+          Generate token
+        </button>
+      </div>
+
+      <div className="flex justify-end">
+        {isTokenGenerated ? (
+          <Button behavior="button" type="primary" onClick={() => onContinue()}>
+            {t('continue')}
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function BuyCredits({ onContinue }: StepProps) {
   const { t } = useTranslation();
 
   return (
@@ -210,11 +243,7 @@ function BuyCredits({ setStep }: StepProps) {
       </Link>
 
       <div className="flex justify-end">
-        <Button
-          behavior="button"
-          type="primary"
-          onClick={() => setStep('form')}
-        >
+        <Button behavior="button" type="primary" onClick={() => onContinue()}>
           {t('continue')}
         </Button>
       </div>
@@ -222,7 +251,7 @@ function BuyCredits({ setStep }: StepProps) {
   );
 }
 
-function Form({ setStep }: StepProps) {
+function Form({ onContinue }: StepProps) {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
@@ -244,7 +273,7 @@ function Form({ setStep }: StepProps) {
         .then(() => {
           toast.success('peppol_successfully_configured');
 
-          setStep('completed');
+          onContinue();
 
           refresh();
         })
