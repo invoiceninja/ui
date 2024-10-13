@@ -173,9 +173,7 @@ export default function Create() {
   }, [purchaseOrder?.vendor_id]);
 
   useEffect(() => {
-    if (purchaseOrder && purchaseOrder.vendor_id) {
-      calculateInvoiceSum(purchaseOrder);
-    }
+    purchaseOrder && calculateInvoiceSum(purchaseOrder);
   }, [purchaseOrder]);
 
   return (
