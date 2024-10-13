@@ -21,6 +21,9 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { ProductTableResource, RelationType } from './ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Entry } from '$app/components/forms/Combobox';
+import { Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { MdWarning } from 'react-icons/md';
 
 interface Props {
   resource: ProductTableResource;
@@ -46,8 +49,29 @@ export function InvoiceTotals(props: Props) {
 
   const [t] = useTranslation();
 
+  const isAnyTaxEntered = () => {
+    return (
+      company.enabled_tax_rates === 0 &&
+      (resource?.tax_name1 || resource?.tax_name2 || resource?.tax_name3)
+    );
+  };
+
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
+      {isAnyTaxEntered() && (
+        <div className="flex items-center space-x-3 px-6">
+          <div>
+            <Icon element={MdWarning} size={20} color="orange" />
+          </div>
+
+          <div className="text-sm font-medium">
+            Some applied taxes are hidden due to current settings.
+            <Link to="/settings/tax_settings"> Manage tax settings</Link> to
+            view them.
+          </div>
+        </div>
+      )}
+
       {variables.map(
         (variable, index) =>
           (variable === '$subtotal' || variable === '$taxes') && (
