@@ -84,7 +84,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
-          this.invoice.tax_rate1.toFixed(this.currency.precision)
+          this.invoice.tax_rate1.toFixed(this.currency?.precision || 2)
         )} %`,
       });
     }
@@ -96,7 +96,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
-          this.invoice.tax_rate2.toFixed(this.currency.precision)
+          this.invoice.tax_rate2.toFixed(this.currency?.precision || 2)
         )} %`,
       });
     }
@@ -108,7 +108,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
-          this.invoice.tax_rate3.toFixed(this.currency.precision)
+          this.invoice.tax_rate3.toFixed(this.currency?.precision || 2)
         )} %`,
       });
     }
@@ -137,7 +137,7 @@ export class InvoiceSumInclusive {
     if (this.invoice.custom_surcharge_tax1) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -145,7 +145,7 @@ export class InvoiceSumInclusive {
     if (this.invoice.custom_surcharge_tax2) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -153,7 +153,7 @@ export class InvoiceSumInclusive {
     if (this.invoice.custom_surcharge_tax3) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -161,7 +161,7 @@ export class InvoiceSumInclusive {
     if (this.invoice.custom_surcharge_tax4) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -204,7 +204,9 @@ export class InvoiceSumInclusive {
   }
 
   protected calculateTotals() {
-    this.totalTaxes = Number(this.totalTaxes.toFixed(this.currency.precision));
+    this.totalTaxes = Number(
+      this.totalTaxes.toFixed(this.currency?.precision || 2)
+    );
 
     return this;
   }
@@ -216,14 +218,13 @@ export class InvoiceSumInclusive {
   }
 
   protected setCalculatedAttributes() {
-
     this.invoice.amount = parseFloat(
-      NumberFormatter.formatValue(this.total, this.currency.precision)
+      NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
     );
 
     this.invoice.balance =
       parseFloat(
-        NumberFormatter.formatValue(this.total, this.currency.precision)
+        NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
       ) - (this.invoice.paid_to_date ?? 0);
 
     this.invoice.total_taxes = this.totalTaxes;
@@ -243,9 +244,9 @@ export class InvoiceSumInclusive {
   // }
 
   public getBalanceDue() {
-
-    return (this.invoice.partial && this.invoice.partial > 0) ? Math.min(this.invoice.partial, this.invoice.balance) : this.invoice.balance;
-
+    return this.invoice.partial && this.invoice.partial > 0
+      ? Math.min(this.invoice.partial, this.invoice.balance)
+      : this.invoice.balance;
   }
 
   /////////////
@@ -258,7 +259,9 @@ export class InvoiceSumInclusive {
     }
 
     return parseFloat(
-      (amount * (this.invoice.discount / 100)).toFixed(this.currency.precision)
+      (amount * (this.invoice.discount / 100)).toFixed(
+        this.currency?.precision || 2
+      )
     );
   }
 
@@ -266,7 +269,7 @@ export class InvoiceSumInclusive {
     // This needs extraction in the taxer service/class.
 
     return parseFloat(
-      (amount * ((tax_rate ?? 0) / 100)).toFixed(this.currency.precision)
+      (amount * ((tax_rate ?? 0) / 100)).toFixed(this.currency?.precision || 2)
     );
   }
 
