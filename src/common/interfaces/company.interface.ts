@@ -88,6 +88,7 @@ export interface Company {
   inbound_mailbox_blacklist?: string;
   inbound_mailbox_allow_unknown?: boolean;
   expense_mailbox?: string;
+  legal_entity_id: string | null;
 }
 
 export interface Settings {
@@ -333,7 +334,7 @@ export interface Settings {
   task_round_up: boolean;
   task_round_to_nearest: number;
   merge_e_invoice_to_pdf: boolean;
-  payment_flow: string;
+  payment_flow: string
 }
 
 export interface TaxData {
