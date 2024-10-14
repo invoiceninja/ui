@@ -24,6 +24,7 @@ import { Entry } from '$app/components/forms/Combobox';
 import { Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
+import reactStringReplace from 'react-string-replace';
 
 interface Props {
   resource: ProductTableResource;
@@ -49,25 +50,45 @@ export function InvoiceTotals(props: Props) {
 
   const [t] = useTranslation();
 
-  const isAnyTaxEntered = () => {
-    return (
+  const isAnyTaxHidden = () => {
+    if (
       company.enabled_tax_rates === 0 &&
       (resource?.tax_name1 || resource?.tax_name2 || resource?.tax_name3)
-    );
+    ) {
+      return true;
+    }
+
+    if (
+      company.enabled_item_tax_rates === 0 &&
+      resource?.line_items.some(
+        ({ tax_name1, tax_name2, tax_name3 }) =>
+          tax_name1 || tax_name2 || tax_name3
+      )
+    ) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
-      {isAnyTaxEntered() && (
+      {isAnyTaxHidden() && (
         <div className="flex items-center space-x-3 px-6">
           <div>
             <Icon element={MdWarning} size={20} color="orange" />
           </div>
 
           <div className="text-sm font-medium">
-            Some applied taxes are hidden due to current settings.
-            <Link to="/settings/tax_settings"> Manage tax settings</Link> to
-            view them.
+            {reactStringReplace(
+              t('hidden_taxes_warning') as string,
+              ':link',
+              () => (
+                <Link to="/settings/tax_settings">
+                  {t('manage_tax_settings')}
+                </Link>
+              )
+            )}
           </div>
         </div>
       )}
