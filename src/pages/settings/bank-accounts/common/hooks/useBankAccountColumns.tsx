@@ -64,54 +64,50 @@ export const useBankAccountColumns = () => {
     {
       id: 'bank_account_name',
       label: t('name'),
-      format: (field, bankAccount) => {
-        console.log(bankAccount);
-        return (
-          <div className="flex items-center space-x-3">
-            <Link
-              to={route('/settings/bank_accounts/:id/details', {
-                id: bankAccount?.id,
-              })}
-            >
-              {bankAccount?.bank_account_name}
-            </Link>
+      format: (field, bankAccount) => (
+        <div className="flex items-center space-x-3">
+          <Link
+            to={route('/settings/bank_accounts/:id/details', {
+              id: bankAccount?.id,
+            })}
+          >
+            {bankAccount?.bank_account_name}
+          </Link>
 
-            {(bankAccount.integration_type === IntegrationType.Nordigen ||
-              bankAccount.integration_type === IntegrationType.Yodlee) &&
-              bankAccount.disabled_upstream && (
-                <Tooltip
-                  message={t('reconnect') as string}
-                  width="auto"
-                  placement="top"
+          {(bankAccount.integration_type === IntegrationType.Nordigen ||
+            bankAccount.integration_type === IntegrationType.Yodlee) &&
+            bankAccount.disabled_upstream && (
+              <Tooltip
+                message={t('reconnect') as string}
+                width="auto"
+                placement="top"
+              >
+                <div
+                  className="cursor-pointer"
+                  onClick={(event) => {
+                    event.stopPropagation();
+
+                    if (
+                      bankAccount.integration_type === IntegrationType.Nordigen
+                    ) {
+                      handleConnectNordigen(
+                        bankAccount.nordigen_institution_id
+                      );
+                    }
+
+                    if (
+                      bankAccount.integration_type === IntegrationType.Yodlee
+                    ) {
+                      handleConnectYodlee();
+                    }
+                  }}
                 >
-                  <div
-                    className="cursor-pointer"
-                    onClick={(event) => {
-                      event.stopPropagation();
-
-                      if (
-                        bankAccount.integration_type ===
-                        IntegrationType.Nordigen
-                      ) {
-                        handleConnectNordigen(
-                          bankAccount.nordigen_institution_id
-                        );
-                      }
-
-                      if (
-                        bankAccount.integration_type === IntegrationType.Yodlee
-                      ) {
-                        handleConnectYodlee();
-                      }
-                    }}
-                  >
-                    <MdWarning color="red" size={22} />
-                  </div>
-                </Tooltip>
-              )}
-          </div>
-        );
-      },
+                  <MdWarning color="red" size={22} />
+                </div>
+              </Tooltip>
+            )}
+        </div>
+      ),
     },
     { id: 'bank_account_type', label: t('type') },
     {
