@@ -18,7 +18,10 @@ export function useBulkUpdatesColumns() {
 
   useEffect(() => {
     if (statics?.bulk_updates) {
-      setBulkUpdates(statics.bulk_updates);
+      setBulkUpdates({
+        ...statics.bulk_updates,
+        expense: ['tax_1', 'tax_2', 'tax_3'],
+      });
     }
   }, [statics]);
 
