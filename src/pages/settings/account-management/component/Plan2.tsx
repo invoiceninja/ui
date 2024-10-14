@@ -11,13 +11,28 @@
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Card } from '$app/components/cards';
-import { Button, SelectField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { Check, Plus, Trash2 } from 'react-feather';
 import mc from 'public/gateway-card-images/mastercard.png';
 import visa from 'public/gateway-card-images/visa.png';
 import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Toggle from '$app/components/forms/Toggle';
+import {
+  loadStripe,
+  Stripe,
+  StripeCardElement,
+  StripeElements,
+} from '@stripe/stripe-js';
+import { wait } from '$app/common/helpers/wait';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { AxiosResponse } from 'axios';
+import { Alert } from '$app/components/Alert';
+import toast from 'react-hot-toast';
 
 export function Plan2() {
   const accentColor = useAccentColor();
@@ -283,9 +298,107 @@ interface PopupProps {
   onClose: () => void;
 }
 
+interface Intent {
+  id: string;
+  client_secret: string;
+}
+
 function NewCreditCard() {
   const accentColor = useAccentColor();
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const queryClient = useQueryClient();
+
+  const { t } = useTranslation();
+
+  const [name, setName] = useState<string>('');
   const [isVisible, setIsVisible] = useState(false);
+  const [errors, setErrors] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [intent, setIntent] = useState<{
+    intent: string;
+    secret: string;
+  } | null>(null);
+
+  const [context, setContext] = useState<{
+    stripe: Stripe;
+    elements: StripeElements;
+    card: StripeCardElement;
+  } | null>(null);
+
+  useEffect(() => {
+    if (isVisible) {
+      wait('#card-element').then(() => {
+        loadStripe(import.meta.env.VITE_HOSTED_STRIPE_PK).then((stripe) => {
+          if (!stripe) {
+            return;
+          }
+
+          request('POST', endpoint('/api/account_management/methods/intent'))
+            .then((response: AxiosResponse<Intent>) => {
+              setIntent({
+                intent: response.data.id,
+                secret: response.data.client_secret,
+              });
+
+              const elements = stripe.elements();
+              const card = elements.create('card');
+
+              card.mount('#card-element');
+
+              setContext({ stripe, elements, card });
+            })
+            .catch(() => null);
+        });
+      });
+    }
+
+    if (!isVisible) {
+      queryClient.removeQueries({
+        queryKey: ['account_management', 'intent', company?.id],
+      });
+    }
+  }, [isVisible]);
+
+  const handleSubmit = () => {
+    if (!context || !intent) {
+      return;
+    }
+
+    setErrors(null);
+    setIsSubmitting(true);
+
+    context.stripe
+      .confirmCardSetup(intent.secret, {
+        payment_method: {
+          card: context.card,
+          billing_details: {
+            name,
+          },
+        },
+      })
+      .then((result) => {
+        if (result.error && result.error.message) {
+          setErrors(result.error.message);
+          setIsSubmitting(false);
+
+          return;
+        }
+
+        if (result.setupIntent && result.setupIntent.status === 'succeeded') {
+          request('POST', endpoint('/api/account_management/methods/confirm'), {
+            gateway_response: result.setupIntent,
+          }).then(() => {
+            toast.success('payment_method_added');
+            
+            setIsVisible(false);
+          });
+        }
+      })
+      .catch(() => {
+        setIsSubmitting(false);
+      });
+  };
 
   return (
     <>
@@ -303,9 +416,15 @@ function NewCreditCard() {
         onClose={() => setIsVisible(false)}
         title="Add new card"
       >
-        <div className="border border-dashed p-10 text-center">
-          This is placeholder for Stripe widget.
-        </div>
+        {errors && <Alert type="danger">{errors}</Alert>}
+
+        <InputField label={t('name')} onValueChange={setName} />
+
+        <div
+          id="card-element"
+          className="border p-4 rounded"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+        ></div>
 
         <div className="flex justify-end gap-2">
           <Button
@@ -319,7 +438,8 @@ function NewCreditCard() {
           <Button
             type="primary"
             behavior="button"
-            onClick={() => setIsVisible(false)}
+            onClick={handleSubmit}
+            disabled={isSubmitting}
           >
             Save card
           </Button>
