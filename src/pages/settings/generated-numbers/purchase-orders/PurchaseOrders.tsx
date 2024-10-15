@@ -77,6 +77,7 @@ export function PurchaseOrders() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.purchase_order_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

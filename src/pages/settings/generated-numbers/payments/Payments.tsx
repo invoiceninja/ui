@@ -76,6 +76,7 @@ export function Payments() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.payment_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

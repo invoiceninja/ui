@@ -28,6 +28,9 @@ import { Entry } from '$app/components/forms/Combobox';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { $help } from '$app/components/HelpWidget';
+import { HelpCircle } from 'react-feather';
 
 interface Props {
   gateway: Gateway;
@@ -81,8 +84,27 @@ export function LimitsAndFees(props: Props) {
     }
   };
 
+  const accentColor = useAccentColor();
+
   return (
-    <Card title={t('limits_and_fees')}>
+    <Card
+      title={t('limits_and_fees')}
+      topRight={
+        <button
+          style={{ color: accentColor }}
+          type="button"
+          onClick={() =>
+            $help('gateways', {
+              moveToHeading: 'Limits/Fees',
+            })
+          }
+          className="inline-flex items-center space-x-1 text-sm"
+        >
+          <HelpCircle size={18} />
+          <span>{t('documentation')}</span>
+        </button>
+      }
+    >
       <Element leftSide={t('payment_type')}>
         <SelectField
           onChange={handlePaymentTypeChange}
@@ -107,7 +129,7 @@ export function LimitsAndFees(props: Props) {
               <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    ?.min_limit
+                    ?.min_limit || ''
                 }
                 onValueChange={(value) =>
                   handleEntryChange('min_limit', parseFloat(value) || -1)
@@ -137,7 +159,7 @@ export function LimitsAndFees(props: Props) {
               <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    ?.max_limit
+                    ?.max_limit || ''
                 }
                 onValueChange={(value) =>
                   handleEntryChange('max_limit', parseFloat(value) || -1)
@@ -168,7 +190,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_percent
+                  ?.fee_percent || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_percent', parseFloat(value))
@@ -181,7 +203,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_amount
+                  ?.fee_amount || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_amount', parseFloat(value))
@@ -272,7 +294,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_cap
+                  ?.fee_cap || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_cap', parseFloat(value))

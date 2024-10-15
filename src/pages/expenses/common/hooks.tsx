@@ -125,7 +125,7 @@ export function useActions() {
     (expense) =>
       expense.should_be_invoiced === true &&
       expense.invoice_id.length === 0 && (
-        <AddToInvoiceAction expense={expense} />
+        <AddToInvoiceAction expenses={[expense]} />
       ),
     (expense) =>
       hasPermission('create_expense') && (
@@ -601,36 +601,42 @@ export function useExpenseFilters() {
       value: 'logged',
       color: 'white',
       backgroundColor: '#6B7280',
+      dropdownKey: '0',
     },
     {
       label: t('pending'),
       value: 'pending',
       color: 'white',
       backgroundColor: '#93C5FD',
+      dropdownKey: '0',
     },
     {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
       backgroundColor: statusThemeColors.$3 || '#1D4ED8',
+      dropdownKey: '0',
     },
     {
       label: t('paid'),
       value: 'paid',
       color: 'white',
       backgroundColor: statusThemeColors.$1 || '#22C55E',
+      dropdownKey: '0',
     },
     {
       label: t('unpaid'),
       value: 'unpaid',
       color: 'white',
       backgroundColor: statusThemeColors.$4 || '#e6b05c',
+      dropdownKey: '0',
     },
     {
       label: t('uncategorized'),
       value: 'uncategorized',
       color: 'white',
       backgroundColor: '#b5812c',
+      dropdownKey: '0',
     },
   ];
 

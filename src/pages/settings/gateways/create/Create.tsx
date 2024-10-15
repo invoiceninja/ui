@@ -38,6 +38,7 @@ import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import classNames from 'classnames';
+import { HelpWidget } from '$app/components/HelpWidget';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -112,7 +113,11 @@ export function Create() {
       return handleStripeSetup();
     }
 
-    if (gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' && isHosted()) {
+    if (
+      gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' &&
+      isHosted() &&
+      import.meta.env.VITE_GOCARDLESS_OAUTH_TESTING === 'true'
+    ) {
       return handleGoCardless();
     }
 
@@ -276,6 +281,11 @@ export function Create() {
       onSaveClick={() => onSave(1)}
       disableSaveButton={!gateway}
     >
+      <HelpWidget
+        id="gateways"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
+      />
+
       <TabGroup
         tabs={tabs}
         defaultTabIndex={tabIndex}

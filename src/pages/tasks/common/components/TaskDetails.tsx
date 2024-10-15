@@ -237,7 +237,7 @@ export function TaskDetails(props: Props) {
 
         <Element leftSide={t('rate')}>
           <NumberInputField
-            value={task.rate}
+            value={task.rate || ''}
             onValueChange={(value) => handleChange('rate', parseFloat(value))}
             errorMessage={errors?.errors.rate}
           />

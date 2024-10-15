@@ -14,16 +14,20 @@ import { ReactNode } from 'react';
 interface Props {
   variant: 'orange';
   children: ReactNode;
+  className?: string;
+  id?: string;
 }
 
-export function Banner({ variant, children }: Props) {
+export function Banner({ variant, children, className, id }: Props) {
   return (
     <div
+      id={id}
       className={classNames(
         'flex justify-center items-center px-3 py-2 text-xs md:px-6 md:text-sm leading-6 text-gray-900',
         {
           'bg-orange-300': variant === 'orange',
-        }
+        },
+        className
       )}
     >
       {children}

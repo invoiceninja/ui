@@ -34,10 +34,15 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import toast from 'react-hot-toast';
+import {
+  socketId,
+  useSocketEvent,
+  WithSocketId,
+} from '$app/common/queries/sockets';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { Banner } from '$app/components/Banner';
+import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
 
 dayjs.extend(utc);
 
@@ -97,9 +102,15 @@ export default function Invoice() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  useSocketEvent({
+  useSocketEvent<WithSocketId<InvoiceType>>({
     on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
-    callback: () => toast(t('invoice_status_changed'), { duration: 5000 }),
+    callback: ({ data }) => {
+      if (socketId()?.toString() !== data['x-socket-id']) {
+        document
+          .getElementById('invoiceUpdateBanner')
+          ?.classList.remove('hidden');
+      }
+    },
   });
 
   return (
@@ -123,8 +134,12 @@ export default function Invoice() {
                 cypressRef="invoiceActionDropdown"
               />
             ),
-            topRight: <CommonActions invoice={invoice} />,
           })}
+        aboveMainContainer={
+          <Banner id="invoiceUpdateBanner" className="hidden" variant="orange">
+            {t('invoice_status_changed')}
+          </Banner>
+        }
       >
         {invoice?.id === id ? (
           <div className="space-y-2">
@@ -138,7 +153,16 @@ export default function Invoice() {
             )}
 
             <div className="space-y-4">
-              <Tabs tabs={tabs} />
+              <Tabs
+                tabs={tabs}
+                rightSide={
+                  invoice && (
+                    <div className="flex items-center">
+                      <CommonActions invoice={invoice} />
+                    </div>
+                  )
+                }
+              />
 
               <Outlet
                 context={{

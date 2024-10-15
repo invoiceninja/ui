@@ -21,7 +21,7 @@ import { useResolveCountry } from './useResolveCountry';
 import { useVendorResolver } from './vendors/useVendorResolver';
 
 export function useGetCurrencySeparators(
-  setInputCurrencySeparators: React.Dispatch<
+  setInputCurrencySeparators?: React.Dispatch<
     React.SetStateAction<DecimalInputSeparators | undefined>
   >
 ) {
@@ -33,61 +33,87 @@ export function useGetCurrencySeparators(
   const currencyResolver = useCurrencyResolver();
   const resolveCountry = useResolveCountry();
 
-  return (relationId: string, relationType: RelationType) => {
+  return async (relationId: string, relationType: RelationType) => {
+    let separators: DecimalInputSeparators | undefined;
+
     if (relationId.length >= 1 && relationType === 'client_id') {
-      clientResolver.find(relationId).then((client: Client) =>
-        currencyResolver
+      await clientResolver.find(relationId).then(async (client: Client) => {
+        await currencyResolver
           .find(client.settings.currency_id || company.settings?.currency_id)
           .then((currency: Currency | undefined) => {
             const companyCountry = resolveCountry(company.settings.country_id);
 
-            currency &&
-              setInputCurrencySeparators({
-                thousandSeparator:
-                  companyCountry?.thousand_separator ||
-                  currency.thousand_separator,
-                decimalSeparator:
-                  companyCountry?.decimal_separator ||
-                  currency.decimal_separator,
-                precision: currency.precision,
-              });
-          })
-      );
+            const currentSeparators = {
+              thousandSeparator:
+                companyCountry?.thousand_separator ||
+                currency?.thousand_separator ||
+                ',',
+              decimalSeparator:
+                companyCountry?.decimal_separator ||
+                currency?.decimal_separator ||
+                '.',
+              precision: currency?.precision || 2,
+            };
+
+            if (setInputCurrencySeparators) {
+              setInputCurrencySeparators(currentSeparators);
+            } else {
+              separators = currentSeparators;
+            }
+          });
+      });
     } else if (relationId.length >= 1 && relationType === 'vendor_id') {
-      vendorResolver.find(relationId).then((vendor: Vendor) =>
-        currencyResolver
+      await vendorResolver.find(relationId).then(async (vendor: Vendor) => {
+        await currencyResolver
           .find(vendor.currency_id || company.settings?.currency_id)
           .then((currency: Currency | undefined) => {
             const companyCountry = resolveCountry(company.settings.country_id);
 
-            currency &&
-              setInputCurrencySeparators({
-                thousandSeparator:
-                  companyCountry?.thousand_separator ||
-                  currency.thousand_separator,
-                decimalSeparator:
-                  companyCountry?.decimal_separator ||
-                  currency.decimal_separator,
-                precision: currency.precision,
-              });
-          })
-      );
+            const currentSeparators = {
+              thousandSeparator:
+                companyCountry?.thousand_separator ||
+                currency?.thousand_separator ||
+                ',',
+              decimalSeparator:
+                companyCountry?.decimal_separator ||
+                currency?.decimal_separator ||
+                '.',
+              precision: currency?.precision || 2,
+            };
+
+            if (setInputCurrencySeparators) {
+              setInputCurrencySeparators(currentSeparators);
+            } else {
+              separators = currentSeparators;
+            }
+          });
+      });
     } else {
-      currencyResolver
+      await currencyResolver
         .find(company.settings?.currency_id)
         .then((currency: Currency | undefined) => {
           const companyCountry = resolveCountry(company.settings.country_id);
 
-          currency &&
-            setInputCurrencySeparators({
-              thousandSeparator:
-                companyCountry?.thousand_separator ||
-                currency.thousand_separator,
-              decimalSeparator:
-                companyCountry?.decimal_separator || currency.decimal_separator,
-              precision: currency.precision,
-            });
+          const currentSeparators = {
+            thousandSeparator:
+              companyCountry?.thousand_separator ||
+              currency?.thousand_separator ||
+              ',',
+            decimalSeparator:
+              companyCountry?.decimal_separator ||
+              currency?.decimal_separator ||
+              '.',
+            precision: currency?.precision || 2,
+          };
+
+          if (setInputCurrencySeparators) {
+            setInputCurrencySeparators(currentSeparators);
+          } else {
+            separators = currentSeparators;
+          }
         });
     }
+
+    return separators;
   };
 }

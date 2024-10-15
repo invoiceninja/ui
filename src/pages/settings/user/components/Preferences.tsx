@@ -91,7 +91,7 @@ export function Preferences() {
         >
           <NumberInputField
             precision={0}
-            value={reactSettings?.number_precision}
+            value={reactSettings?.number_precision || ''}
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.number_precision',
@@ -99,6 +99,7 @@ export function Preferences() {
               )
             }
             placeholder={t('number_precision')}
+            disablePrecision
           />
         </Element>
 

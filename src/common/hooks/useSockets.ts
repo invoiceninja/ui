@@ -45,7 +45,13 @@ export function useSockets() {
 
     setPusher(client);
 
-    return () => client.disconnect();
+    client.connection.bind('connected', () => {
+      localStorage.setItem('X-SOCKET-ID', client.connection.socket_id);
+    });
+
+    return () => {
+      client.disconnect();
+    };
   }, [company]);
 
   return pusher;

@@ -80,6 +80,7 @@ export default function Settings() {
               handleChange('exchange_rate', parseFloat(value))
             }
             errorMessage={errors?.errors.exchange_rate}
+            disablePrecision
           />
 
           <div className="lg:pt-7">

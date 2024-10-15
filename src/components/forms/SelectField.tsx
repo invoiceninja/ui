@@ -26,6 +26,7 @@ export interface SelectProps extends CommonProps {
   errorMessage?: string | string[];
   blankOptionValue?: string | number;
   customSelector?: boolean;
+  dismissable?: boolean;
 }
 
 export function SelectField(props: SelectProps) {
@@ -42,6 +43,7 @@ export function SelectField(props: SelectProps) {
     className,
     disabled,
     cypressRef,
+    dismissable = true,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -156,7 +158,7 @@ export function SelectField(props: SelectProps) {
           // @ts-ignore
           styles={customStyles}
           isSearchable={false}
-          isClearable
+          isClearable={dismissable}
           data-cy={cypressRef}
         />
       )}

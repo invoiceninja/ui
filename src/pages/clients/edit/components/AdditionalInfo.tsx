@@ -146,6 +146,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                   handleSettingsChange('payment_terms', value)
                 }
                 withBlank
+                customSelector
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
@@ -168,6 +169,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 }
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
+                customSelector
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
@@ -182,7 +184,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
           <Element leftSide={t('task_rate')}>
             <NumberInputField
-              value={client?.settings?.default_task_rate}
+              value={client?.settings?.default_task_rate || ''}
               onValueChange={(value) =>
                 handleSettingsChange('default_task_rate', parseFloat(value))
               }
@@ -200,9 +202,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                   ? 'disabled'
                   : ''
               }
-              className={
-                'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
-              }
               onValueChange={(value) =>
                 handleSettingsChange(
                   'send_reminders',
@@ -211,6 +210,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               }
               withBlank
               errorMessage={errors?.errors['settings.send_reminders']}
+              customSelector
             >
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>
@@ -243,6 +243,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 onValueChange={(value) => handleChange('size_id', value)}
                 errorMessage={errors?.errors.size_id}
                 withBlank
+                customSelector
               >
                 {statics?.sizes.map(
                   (size: { id: string; name: string }, index: number) => (
@@ -263,6 +264,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 errorMessage={errors?.errors.industry_id}
                 onValueChange={(value) => handleChange('industry_id', value)}
                 withBlank
+                customSelector
               >
                 {statics?.industries.map(
                   (size: { id: string; name: string }, index: number) => (

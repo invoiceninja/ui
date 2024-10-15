@@ -68,6 +68,8 @@ export interface SocketEventProps<T> {
   callback: (options: CallbackOptions<T>) => unknown;
 }
 
+export type WithSocketId<T> = T & { 'x-socket-id': string };
+
 export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
   useEffect(() => {
     const controller = new AbortController();
@@ -108,4 +110,12 @@ export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
       controller.abort();
     };
   }, [on, callback]);
+}
+
+export function socketId() {
+  if (localStorage.getItem('X-SOCKET-ID')) {
+    return parseFloat(localStorage.getItem('X-SOCKET-ID') as string);
+  }
+
+  return null;
 }

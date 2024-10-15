@@ -91,8 +91,8 @@ export function TransactionForm(props: Props) {
           border
           precision={props.currencySeparators.precision}
           className="auto"
-          value={props.transaction.amount.toString()}
-          onChange={(value: string) =>
+          value={props.transaction.amount || ''}
+          onValueChange={(value: string) =>
             props.handleChange('amount', Number(value))
           }
           errorMessage={props.errors?.errors.amount}

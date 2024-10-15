@@ -233,7 +233,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={recurringExpense.tax_amount1}
+                  value={recurringExpense.tax_amount1 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount1', parseFloat(value))
                   }
@@ -285,7 +285,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={recurringExpense.tax_amount2}
+                  value={recurringExpense.tax_amount2 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount2', parseFloat(value))
                   }
@@ -336,7 +336,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={recurringExpense.tax_amount3}
+                  value={recurringExpense.tax_amount3 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount3', parseFloat(value))
                   }
@@ -349,7 +349,7 @@ export function Details(props: Props) {
         {recurringExpense && (
           <Element leftSide={t('amount')}>
             <NumberInputField
-              value={recurringExpense.amount}
+              value={recurringExpense.amount || ''}
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value) || 0)
               }
