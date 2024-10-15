@@ -26,20 +26,63 @@ import {
 } from '@stripe/stripe-js';
 import { wait } from '$app/common/helpers/wait';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { AxiosResponse } from 'axios';
 import { Alert } from '$app/components/Alert';
 import toast from 'react-hot-toast';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+
+export interface CompanyGateway {
+  id: number;
+  company_id: number;
+  client_id: number;
+  token: string;
+  routing_number: null;
+  company_gateway_id: number;
+  gateway_customer_reference: string;
+  gateway_type_id: number;
+  is_default: number;
+  deleted_at: null;
+  created_at: number;
+  updated_at: number;
+  is_deleted: number;
+  hashed_id: string;
+  gateway_type: {
+    id: string;
+    alias: string;
+    name: string;
+  };
+  meta: {
+    exp_month: string;
+    exp_year: string;
+    brand: string;
+    last4: string;
+    type: number;
+  };
+}
 
 export function Plan2() {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
+  const account = useCurrentAccount();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [deletePopupVisible, setDeletePopupVisible] = useState(false);
+
+  const { data: methods } = useQuery({
+    queryKey: ['/api/account_management/methods', account?.id],
+    queryFn: () =>
+      request('POST', endpoint('/api/account_management/methods'), {
+        account_key: account.key,
+      }).then((response: AxiosResponse<CompanyGateway[]>) => response.data),
+  });
+
+  const [selectedGateway, setSelectedGateway] = useState<CompanyGateway | null>(
+    null
+  );
 
   return (
     <div className="space-y-4">
@@ -105,19 +148,16 @@ export function Plan2() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <CreditCard
-              name="Visa"
-              card={visa}
-              onDelete={() => setDeletePopupVisible(true)}
-              current
-            />
-
-            <CreditCard
-              name="Mastercard"
-              card={mc}
-              onDelete={() => setDeletePopupVisible(true)}
-              current={false}
-            />
+            {methods?.map((method) => (
+              <CreditCard
+                key={method.id}
+                onDelete={() => {
+                  setSelectedGateway(method);
+                  setDeletePopupVisible(true);
+                }}
+                gateway={method}
+              />
+            ))}
           </div>
         </div>
       </Card>
@@ -125,8 +165,12 @@ export function Plan2() {
       <Popup visible={popupVisible} onClose={() => setPopupVisible(false)} />
 
       <DeleteCreditCard
+        gateway={selectedGateway}
         visible={deletePopupVisible}
-        onClose={() => setDeletePopupVisible(false)}
+        onClose={() => {
+          setSelectedGateway(null);
+          setDeletePopupVisible(false);
+        }}
       />
     </div>
   );
@@ -251,23 +295,34 @@ function PremiumBusinessPlus() {
 }
 
 interface CreditCardProps {
-  name: string;
-  card: string;
-  current: boolean;
+  gateway: CompanyGateway;
   onDelete: () => void;
 }
 
-function CreditCard({ name, card, current, onDelete }: CreditCardProps) {
+function CreditCard({ gateway, onDelete }: CreditCardProps) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
+  const { t } = useTranslation();
+
+  const image = () => {
+    console.log(gateway.meta.brand);
+
+    if (gateway.meta.brand === 'visa') {
+      return visa;
+    }
+
+    if (gateway.meta.brand === 'mastercard') {
+      return mc;
+    }
+  };
 
   return (
     <div
       className="flex flex-col w-72 p-4 rounded border"
-      style={{ borderColor: current ? accentColor : colors.$11 }}
+      style={{ borderColor: gateway.is_default ? accentColor : colors.$11 }}
     >
       <div className="flex justify-between items-center">
-        <img src={card} alt={name} className="h-10" />
+        <img src={image()} alt={gateway.meta.brand} className="h-10" />
 
         <button
           type="button"
@@ -282,12 +337,14 @@ function CreditCard({ name, card, current, onDelete }: CreditCardProps) {
         <span>****</span>
         <span>****</span>
         <span>****</span>
-        <span>3456</span>
+        <span>{gateway.meta.last4}</span>
       </div>
 
       <div className="flex items-center justify-between text-sm">
         <p>Valid through</p>
-        <p>12/26</p>
+        <p>
+          {gateway.meta.exp_month}/{gateway.meta.exp_year}
+        </p>
       </div>
     </div>
   );
@@ -308,6 +365,7 @@ function NewCreditCard() {
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const queryClient = useQueryClient();
+  const account = useCurrentAccount();
 
   const { t } = useTranslation();
 
@@ -334,7 +392,9 @@ function NewCreditCard() {
             return;
           }
 
-          request('POST', endpoint('/api/account_management/methods/intent'))
+          request('POST', endpoint('/api/account_management/methods/intent'), {
+            account_key: account.key,
+          })
             .then((response: AxiosResponse<Intent>) => {
               setIntent({
                 intent: response.data.id,
@@ -356,6 +416,10 @@ function NewCreditCard() {
     if (!isVisible) {
       queryClient.removeQueries({
         queryKey: ['account_management', 'intent', company?.id],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['/api/account_management/methods'],
       });
     }
   }, [isVisible]);
@@ -387,10 +451,12 @@ function NewCreditCard() {
 
         if (result.setupIntent && result.setupIntent.status === 'succeeded') {
           request('POST', endpoint('/api/account_management/methods/confirm'), {
+            account_key: account.key,
             gateway_response: result.setupIntent,
           }).then(() => {
-            toast.success('payment_method_added');
-            
+            toast.success(t('payment_method_added'));
+
+            setIsSubmitting(false);
             setIsVisible(false);
           });
         }
@@ -450,11 +516,42 @@ function NewCreditCard() {
 }
 
 interface DeleteCreditCardProps {
+  gateway: CompanyGateway | null;
   visible: boolean;
   onClose: () => void;
 }
 
-function DeleteCreditCard({ visible, onClose }: DeleteCreditCardProps) {
+function DeleteCreditCard({
+  gateway,
+  visible,
+  onClose,
+}: DeleteCreditCardProps) {
+  const { t } = useTranslation();
+  const account = useCurrentAccount();
+  const queryClient = useQueryClient();
+
+  const destroy = () => {
+    if (!gateway) {
+      return;
+    }
+
+    request(
+      'DELETE',
+      endpoint(`/api/account_management/methods/${gateway.id}`),
+      {
+        account_key: account.key,
+      }
+    ).then(() => {
+      toast.success(t('payment_method_removed'));
+
+      queryClient.invalidateQueries({
+        queryKey: ['/api/account_management/methods', account?.id],
+      });
+
+      onClose();
+    });
+  };
+
   return (
     <Modal visible={visible} onClose={onClose}>
       <div className="px-5 text-center space-y-4 mb-4">
@@ -470,7 +567,7 @@ function DeleteCreditCard({ visible, onClose }: DeleteCreditCardProps) {
           Cancel
         </Button>
 
-        <Button type="primary" behavior="button" onClick={() => onClose()}>
+        <Button type="primary" behavior="button" onClick={destroy}>
           Delete
         </Button>
       </div>
