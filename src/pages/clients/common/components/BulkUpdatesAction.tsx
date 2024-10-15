@@ -11,6 +11,8 @@
 import { useBulkUpdatesColumns } from '$app/common/hooks/useBulkUpdatesColumns';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useBulk as useBulkClients } from '$app/common/queries/clients';
+import { useBulk as useBulkExpenses } from '$app/common/queries/expenses';
+import { useBulkAction as useBulkRecurringInvoices } from '$app/pages/recurring-invoices/common/queries';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { CustomField } from '$app/components/CustomField';
@@ -25,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { MdCached } from 'react-icons/md';
 
 interface Props {
-  entity: 'client' | 'expense';
+  entity: 'client' | 'expense' | 'recurring_invoice';
   resourceIds: string[];
   setSelected: Dispatch<SetStateAction<string[]>>;
 }
@@ -61,6 +63,8 @@ export function BulkUpdatesAction(props: Props) {
   const { setSelected, resourceIds } = props;
 
   const bulkClients = useBulkClients();
+  const bulkExpenses = useBulkExpenses();
+  const bulkRecurringInvoices = useBulkRecurringInvoices();
 
   const { data: statics } = useStaticsQuery();
 
@@ -93,15 +97,20 @@ export function BulkUpdatesAction(props: Props) {
     if (columnKey.startsWith('tax')) {
       const taxNumber = Number(columnKey.split('_')[1]);
 
+      const enabledTaxRates =
+        props.entity === 'expense'
+          ? company.enabled_expense_tax_rates
+          : company.enabled_tax_rates;
+
       if (taxNumber === 1) {
-        return Boolean(company.enabled_tax_rates > 0);
+        return Boolean(enabledTaxRates > 0);
       }
 
       if (taxNumber === 2) {
-        return Boolean(company.enabled_tax_rates > 1);
+        return Boolean(enabledTaxRates > 1);
       }
 
-      return Boolean(company.enabled_item_tax_rates > 2);
+      return Boolean(enabledTaxRates > 2);
     }
 
     return true;
@@ -111,7 +120,30 @@ export function BulkUpdatesAction(props: Props) {
     return column.replace('custom_value', props.entity);
   };
 
-  console.log(bulkUpdatesColumns);
+  const handleUpdate = () => {
+    if (props.entity === 'client') {
+      bulkClients(resourceIds, 'bulk_update', {
+        column,
+        newValue: newColumnValue,
+      }).then(() => handleOnClose());
+    }
+
+    if (props.entity === 'expense') {
+      bulkExpenses(resourceIds, 'bulk_update', {
+        column,
+        newValue: newColumnValue,
+      }).then(() => handleOnClose());
+    }
+
+    if (props.entity === 'recurring_invoice') {
+      bulkRecurringInvoices(resourceIds, 'bulk_update', {
+        column,
+        newValue: newColumnValue,
+      }).then(() => handleOnClose());
+    }
+
+    setSelected([]);
+  };
 
   return (
     <>
@@ -156,12 +188,19 @@ export function BulkUpdatesAction(props: Props) {
 
             {getFieldType() === 'taxSelector' && (
               <TaxRateSelector
-                defaultValue={newColumnValue as string}
+                defaultValue={
+                  newColumnValue
+                    ? (newColumnValue as string).split('||')[0]
+                    : ''
+                }
                 onChange={(value) =>
                   value?.resource &&
                   setNewColumnValue(
                     `${value.resource.name}||${value.resource.rate}`
                   )
+                }
+                onTaxCreated={(taxRate) =>
+                  setNewColumnValue(`${taxRate.name}||${taxRate.rate}`)
                 }
                 onClearButtonClick={() => setNewColumnValue('')}
               />
@@ -229,14 +268,7 @@ export function BulkUpdatesAction(props: Props) {
           <div className="flex self-end">
             <Button
               behavior="button"
-              onClick={() => {
-                bulkClients(resourceIds, 'bulk_update', {
-                  column,
-                  newValue: newColumnValue,
-                }).then(() => handleOnClose());
-
-                setSelected([]);
-              }}
+              onClick={handleUpdate}
               disabled={!column}
               disableWithoutIcon
             >
