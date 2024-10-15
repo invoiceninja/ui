@@ -21,6 +21,11 @@ import { endpoint } from '$app/common/helpers';
 import { MdWarning } from 'react-icons/md';
 import { Tooltip } from '$app/components/Tooltip';
 
+enum IntegrationType {
+  Yodlee = 'YODLEE',
+  Nordigen = 'NORDIGEN',
+}
+
 export const useBankAccountColumns = () => {
   const { t } = useTranslation();
   const company = useCurrentCompany();
@@ -42,6 +47,19 @@ export const useBankAccountColumns = () => {
     });
   };
 
+  const handleConnectYodlee = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'yodlee',
+      platform: 'react',
+    }).then((tokenResponse) => {
+      window.open(
+        route('https://invoicing.co/yodlee/onboard/:hash', {
+          hash: tokenResponse?.data?.hash,
+        })
+      );
+    });
+  };
+
   const columns: DataTableColumns<BankAccount> = [
     {
       id: 'bank_account_name',
@@ -56,23 +74,38 @@ export const useBankAccountColumns = () => {
             {bankAccount?.bank_account_name}
           </Link>
 
-          {bankAccount.disabled_upstream && (
-            <Tooltip
-              message={t('reconnect') as string}
-              width="auto"
-              placement="top"
-            >
-              <div
-                className="cursor-pointer"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleConnectNordigen(bankAccount.nordigen_institution_id);
-                }}
+          {(bankAccount.integration_type === IntegrationType.Nordigen ||
+            bankAccount.integration_type === IntegrationType.Yodlee) &&
+            bankAccount.disabled_upstream && (
+              <Tooltip
+                message={t('reconnect') as string}
+                width="auto"
+                placement="top"
               >
-                <MdWarning color="red" size={22} />
-              </div>
-            </Tooltip>
-          )}
+                <div
+                  className="cursor-pointer"
+                  onClick={(event) => {
+                    event.stopPropagation();
+
+                    if (
+                      bankAccount.integration_type === IntegrationType.Nordigen
+                    ) {
+                      handleConnectNordigen(
+                        bankAccount.nordigen_institution_id
+                      );
+                    }
+
+                    if (
+                      bankAccount.integration_type === IntegrationType.Yodlee
+                    ) {
+                      handleConnectYodlee();
+                    }
+                  }}
+                >
+                  <MdWarning color="red" size={22} />
+                </div>
+              </Tooltip>
+            )}
         </div>
       ),
     },

@@ -62,7 +62,7 @@ interface SaveOptions {
 }
 
 export function usePreferences() {
-  const user = useInjectUserChanges();
+  const user = useInjectUserChanges({ overwrite: false });
 
   const [t] = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
@@ -121,6 +121,7 @@ export function usePreferences() {
               visible={isVisible}
               onClose={setIsVisible}
               title={t('preferences')}
+              overflowVisible
             >
               {children}
 
