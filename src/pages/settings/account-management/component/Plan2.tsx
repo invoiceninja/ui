@@ -309,7 +309,6 @@ interface CreditCardProps {
 function CreditCard({ gateway, onDelete }: CreditCardProps) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
-  const { t } = useTranslation();
 
   const image = () => {
     if (gateway.meta.brand === 'visa') {
