@@ -11,7 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Card } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField, Radio, SelectField } from '$app/components/forms';
 import { Check, Plus, Trash2 } from 'react-feather';
 import mc from 'public/gateway-card-images/mastercard.png';
 import visa from 'public/gateway-card-images/visa.png';
@@ -34,6 +34,8 @@ import { AxiosResponse } from 'axios';
 import { Alert } from '$app/components/Alert';
 import toast from 'react-hot-toast';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import collect from 'collect.js';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 export interface CompanyGateway {
   id: number;
@@ -86,10 +88,15 @@ export function Plan2() {
 
   return (
     <div className="space-y-4">
+      {import.meta.env.DEV ? (
+        <span>DEBUG: Current plan: {account.plan}</span>
+      ) : null}
+
       <Card>
         <div className="px-7 py-3 space-y-4">
           <div className="flex justify-between items-center">
             <h4 className="text-lg font-semibold">Your Plan</h4>
+
             <button
               style={{ color: accentColor }}
               className="text-sm hover:underline"
@@ -305,8 +312,6 @@ function CreditCard({ gateway, onDelete }: CreditCardProps) {
   const { t } = useTranslation();
 
   const image = () => {
-    console.log(gateway.meta.brand);
-
     if (gateway.meta.brand === 'visa') {
       return visa;
     }
@@ -575,153 +580,291 @@ function DeleteCreditCard({
   );
 }
 
+export type Plan =
+  | 'free'
+  | 'ninja_pro'
+  | 'enterprise'
+  | 'premium_business_plus';
+
 function Popup({ visible, onClose }: PopupProps) {
   const [pricing, setPricing] = useState<'monthly' | 'annually'>('monthly');
 
   const accentColor = useAccentColor();
   const colors = useColorScheme();
+  const account = useCurrentAccount();
+
+  const [changePlanVisible, setChangePlanVisible] = useState(false);
+  const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
+
+  useEffect(() => {
+    if (changePlanVisible) {
+      onClose();
+    }
+  }, [changePlanVisible]);
+
+  function label(plan: Plan) {
+    const currentPlan = account.plan as Plan;
+    const plans: Plan[] = [
+      'free',
+      'ninja_pro',
+      'enterprise',
+      'premium_business_plus',
+    ];
+
+    const current = plans.indexOf(currentPlan);
+    const target = plans.indexOf(plan);
+
+    if (current === target) {
+      return 'current_plan';
+    }
+
+    if (current > target) {
+      return 'downgrade_plan';
+    }
+
+    return 'upgrade_plan';
+  }
 
   return (
-    <Modal visible={visible} onClose={onClose} size="large">
-      <div className="-mt-16 py-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-semibold">More than invoicing</h1>
-          <h2 className="text-2xl mt-2">Simple Pricing. Advanced Features.</h2>
-        </div>
+    <>
+      <Modal
+        title="Change plan"
+        visible={changePlanVisible}
+        onClose={() => setChangePlanVisible(false)}
+      >
+        {targetPlan ? <ChangePlan plan={targetPlan} /> : null}
+      </Modal>
 
-        <div className="flex justify-center mt-6">
-          <div className="flex items-center space-x-2">
-            <span>Monthly</span>
-
-            <Toggle
-              checked={pricing === 'annually'}
-              onValueChange={() =>
-                setPricing((c) => (c === 'monthly' ? 'annually' : 'monthly'))
-              }
-            />
-            <span>Annual</span>
+      <Modal visible={visible} onClose={onClose} size="large">
+        <div className="-mt-16 py-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-semibold">More than invoicing</h1>
+            <h2 className="text-2xl mt-2">
+              Simple Pricing. Advanced Features.
+            </h2>
           </div>
-        </div>
 
-        <div className="flex flex-col 2xl:flex-row gap-4 mt-6">
-          <div className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8">
-            <div className="h-72 flex flex-col justify-between">
-              <div>
-                <h3 className="font-semibold text-2xl">Free!</h3>
-                <p className="my-4">Yes, it’s really free 🙂</p>
+          <div className="flex justify-center mt-6">
+            <div className="flex items-center space-x-2">
+              <span>Monthly</span>
 
-                <div>
-                  <div className="flex items-end space-x-2">
-                    <h2 className="text-3xl font-semibold">$0</h2>
-                    <span>Per year</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="border py-3 px-4 rounded"
-                style={{ color: accentColor }}
-              >
-                Downgrade Plan
-              </button>
+              <Toggle
+                checked={pricing === 'annually'}
+                onValueChange={() =>
+                  setPricing((c) => (c === 'monthly' ? 'annually' : 'monthly'))
+                }
+              />
+              <span>Annual</span>
             </div>
           </div>
 
-          <div
-            className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
-            style={{ borderColor: '#5EC16A' }}
-          >
-            <div className="h-72 flex flex-col justify-between">
-              <div>
-                <h3 className="font-semibold text-2xl">Ninja Pro</h3>
-                <p className="my-4">Pay annually for 10 months + 2 free!</p>
-
+          <div className="flex flex-col 2xl:flex-row gap-4 mt-6">
+            <div className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8">
+              <div className="h-72 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-end space-x-2">
-                    <h2 className="text-3xl font-semibold">$120</h2>
-                    <span>Per year</span>
+                  <h3 className="font-semibold text-2xl">Free!</h3>
+                  <p className="my-4">Yes, it’s really free 🙂</p>
+
+                  <div>
+                    <div className="flex items-end space-x-2">
+                      <h2 className="text-3xl font-semibold">$0</h2>
+                      <span>Per year</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <button
-                type="button"
-                className="border py-3 px-4 rounded"
-                style={{ backgroundColor: colors.$5 }}
-                disabled
-              >
-                Current plan
-              </button>
-            </div>
-          </div>
-
-          <div
-            className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
-            style={{ borderColor: accentColor }}
-          >
-            <div className="h-72 flex flex-col justify-between">
-              <div>
-                <h3 className="font-semibold text-2xl">Enterprise</h3>
-                <p className="my-4">Pay annually for 10 months + 2 free!</p>
-
-                <div>
-                  <div className="flex items-end space-x-2">
-                    <h2 className="text-3xl font-semibold">$160</h2>
-                    <span>Per year</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col space-y-3">
-                <SelectField label="Plan selected">
-                  <option value="1">1-2 users</option>
-                </SelectField>
 
                 <button
                   type="button"
                   className="border py-3 px-4 rounded"
-                  style={{ backgroundColor: accentColor, color: colors.$1 }}
-                  disabled
+                  style={{ color: accentColor }}
+                  onClick={() => {
+                    setTargetPlan('free');
+                    setChangePlanVisible(true);
+                  }}
                 >
-                  Upgrade Plan
+                  {label('free')}
                 </button>
               </div>
             </div>
-          </div>
 
-          <div
-            className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
-            style={{ borderColor: '#FFCB00' }}
-          >
-            <div className="h-72 flex flex-col justify-between">
-              <div>
-                <h3 className="font-semibold text-2xl">Premium Business+ </h3>
-                <p className="my-4">
-                  Pro + Enterprise + Premium Business Concierge
-                </p>
-
+            <div
+              className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
+              style={{ borderColor: '#5EC16A' }}
+            >
+              <div className="h-72 flex flex-col justify-between">
                 <div>
-                  <h2 className="text-3xl font-semibold">
-                    Pricing? <br /> Let&apos;s talk!
-                  </h2>
-                </div>
-              </div>
+                  <h3 className="font-semibold text-2xl">Ninja Pro</h3>
+                  <p className="my-4">Pay annually for 10 months + 2 free!</p>
 
-              <div className="flex flex-col space-y-3">
+                  <div>
+                    <div className="flex items-end space-x-2">
+                      <h2 className="text-3xl font-semibold">$120</h2>
+                      <span>Per year</span>
+                    </div>
+                  </div>
+                </div>
+
                 <button
                   type="button"
                   className="border py-3 px-4 rounded"
-                  style={{ backgroundColor: accentColor, color: colors.$1 }}
-                  disabled
+                  style={{ backgroundColor: colors.$5 }}
+                  onClick={() => {
+                    setTargetPlan('ninja_pro');
+                    setChangePlanVisible(true);
+                  }}
                 >
-                  Upgrade Plan
+                  {label('ninja_pro')}
                 </button>
+              </div>
+            </div>
+
+            <div
+              className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
+              style={{ borderColor: accentColor }}
+            >
+              <div className="h-72 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-semibold text-2xl">Enterprise</h3>
+                  <p className="my-4">Pay annually for 10 months + 2 free!</p>
+
+                  <div>
+                    <div className="flex items-end space-x-2">
+                      <h2 className="text-3xl font-semibold">$160</h2>
+                      <span>Per year</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-3">
+                  <SelectField label="Plan selected">
+                    <option value="1">1-2 users</option>
+                  </SelectField>
+
+                  <button
+                    type="button"
+                    className="border py-3 px-4 rounded"
+                    style={{ backgroundColor: accentColor, color: colors.$1 }}
+                    onClick={() => {
+                      setTargetPlan('enterprise');
+                      setChangePlanVisible(true);
+                    }}
+                  >
+                    {label('enterprise')}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
+              style={{ borderColor: '#FFCB00' }}
+            >
+              <div className="h-72 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-semibold text-2xl">Premium Business+</h3>
+                  <p className="my-4">
+                    Pro + Enterprise + Premium Business Concierge
+                  </p>
+
+                  <div>
+                    <h2 className="text-3xl font-semibold">
+                      Pricing? <br /> Let&apos;s talk!
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-3">
+                  <button
+                    type="button"
+                    className="border py-3 px-4 rounded"
+                    style={{ backgroundColor: accentColor, color: colors.$1 }}
+                    onClick={() => {
+                      setTargetPlan('premium_business_plus');
+                      setChangePlanVisible(true);
+                    }}
+                  >
+                    {label('premium_business_plus')}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </Modal>
+    </>
+  );
+}
+
+interface ChangePlanProps {
+  plan: Plan;
+}
+
+function ChangePlan({ plan }: ChangePlanProps) {
+  const { t } = useTranslation();
+
+  const account = useCurrentAccount();
+  const queryClient = useQueryClient();
+  const refresh = useRefreshCompanyUsers();
+
+  const { data: methods } = useQuery({
+    queryKey: ['/api/account_management/methods', account?.id],
+    queryFn: () =>
+      request('POST', endpoint('/api/account_management/methods'), {
+        account_key: account.key,
+      }).then((response: AxiosResponse<CompanyGateway[]>) => response.data),
+  });
+
+  const list = collect(methods ?? [])
+    .map((method) => ({
+      id: `card-${method.id}`,
+      title: `**** ${method.meta.last4}`,
+      value: method.id.toString(),
+    }))
+    .toArray();
+
+  const [token, setToken] = useState<string>('true');
+
+  const changePlan = () => {
+    request('POST', endpoint('/api/account_management/upgrade'), {
+      account_key: account.key,
+      plan,
+      token,
+    }).then(() => {
+      toast.success(t('plan_changed'));
+
+      queryClient.invalidateQueries({
+        queryKey: ['/api/account_management/methods', account?.id],
+      });
+
+      refresh();
+    });
+  };
+
+  return (
+    <div>
+      <p>Changing plan to: {plan}</p>
+
+      <div className="my-3">
+        <Radio
+          name="empty_columns"
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          options={list}
+          onValueChange={setToken}
+          defaultSelected={token}
+        />
       </div>
-    </Modal>
+
+      <div className="flex justify-end">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            changePlan();
+          }}
+        >
+          <Button>{t('continue')}</Button>
+        </form>
+      </div>
+    </div>
   );
 }
