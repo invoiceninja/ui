@@ -243,7 +243,7 @@ export function LimitsAndFees(props: Props) {
                   ':link',
                   () => (
                     <Link to="/settings/tax_settings">
-                      {t('manage_tax_settings')}
+                      {t('settings')}
                     </Link>
                   )
                 )}

@@ -219,7 +219,7 @@ export function Details(props: Props) {
                 ':link',
                 () => (
                   <LinkBase to="/settings/tax_settings">
-                    {t('manage_tax_settings')}
+                    {t('settings')}
                   </LinkBase>
                 )
               )}
