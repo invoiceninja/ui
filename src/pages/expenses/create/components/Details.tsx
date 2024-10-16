@@ -48,7 +48,7 @@ interface Props extends ExpenseCardProps {
   pageType: 'create' | 'edit';
 }
 
-const TAXES = ['tax_name1', 'tax_name2', 'tax_name3'];
+const TAXES: (keyof Expense)[] = ['tax_name1', 'tax_name2', 'tax_name3'];
 
 export function Details(props: Props) {
   const [t] = useTranslation();
@@ -65,25 +65,20 @@ export function Details(props: Props) {
   const getNonExistingTaxes = () => {
     if (taxes && expense) {
       return TAXES.map((tax) => {
+        const taxRateProp = tax.replace('name', 'rate') as keyof Expense;
+        const taxAmountProp = tax.replace('name', 'amount') as keyof Expense;
+
         if (
-          expense[tax as keyof typeof expense] &&
+          (expense[taxRateProp] || expense[taxAmountProp]) &&
           !taxes.data.data.some(
             (taxRate: TaxRate) =>
-              taxRate.name === expense[tax as keyof typeof expense]
+              taxRate.rate === expense[taxRateProp] ||
+              taxRate.rate === expense[taxAmountProp]
           )
         ) {
-          const taxRateProp = tax.replace(
-            'name',
-            'rate'
-          ) as keyof typeof expense;
-          const taxAmountProp = tax.replace(
-            'name',
-            'amount'
-          ) as keyof typeof expense;
-
           const taxRate = expense[taxRateProp] || expense[taxAmountProp];
 
-          return `${expense[tax as keyof typeof expense]}||${taxRate}%`;
+          return `${expense[tax]}||${taxRate}%`;
         }
 
         return '';
@@ -227,7 +222,7 @@ export function Details(props: Props) {
           <Element leftSide={t('taxes')}>
             {getNonExistingTaxes().map((tax) => (
               <div key={tax} className="flex items-center space-x-2">
-                <span className="font-medium">{tax.split('||')[0]}</span>
+                {tax.split('||')[0] && <span>{tax.split('||')[0]}</span>}
 
                 <span>{tax.split('||')[1]}</span>
               </div>
