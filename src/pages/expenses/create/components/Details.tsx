@@ -31,7 +31,6 @@ import { route } from '$app/common/helpers/route';
 import { Link } from 'react-router-dom';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useEffect } from 'react';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 
@@ -63,14 +62,6 @@ export function Details(props: Props) {
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
 
-  const areTaxesExistInCompany = () => {
-    if (taxes && expense) {
-      return TAXES.every((tax) =>
-        taxes.data.data.some((taxRate: TaxRate) => taxRate.name === tax)
-      );
-    }
-  };
-
   const getNonExistingTaxes = () => {
     if (taxes && expense) {
       return TAXES.map((tax) => {
@@ -96,21 +87,11 @@ export function Details(props: Props) {
         }
 
         return '';
-      });
+      }).filter((tax) => tax);
     }
 
     return [];
   };
-
-  useEffect(() => {
-    if (expense) {
-      expense.tax_name1 = 'VAT';
-      expense.tax_rate1 = 19;
-
-      expense.tax_name2 = 'Random Tax';
-      expense.tax_rate2 = 5;
-    }
-  }, [expense]);
 
   return (
     <div className="flex flex-col space-y-4">
@@ -242,18 +223,15 @@ export function Details(props: Props) {
           </Element>
         )}
 
-        {!areTaxesExistInCompany() && (
+        {Boolean(getNonExistingTaxes().length) && (
           <Element leftSide={t('taxes')}>
-            {getNonExistingTaxes().map(
-              (tax) =>
-                tax && (
-                  <div key={tax} className="flex items-center space-x-2">
-                    <span className="font-medium">{tax.split('||')[0]}</span>
+            {getNonExistingTaxes().map((tax) => (
+              <div key={tax} className="flex items-center space-x-2">
+                <span className="font-medium">{tax.split('||')[0]}</span>
 
-                    <span>{tax.split('||')[1]}</span>
-                  </div>
-                )
-            )}
+                <span>{tax.split('||')[1]}</span>
+              </div>
+            ))}
           </Element>
         )}
 
