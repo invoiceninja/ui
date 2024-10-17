@@ -372,6 +372,13 @@ export function Default(props: Props) {
   useSocketEvent<Invoice>({
     on: ['App\\Events\\Invoice\\InvoiceWasViewed'],
     callback: ({ data }) => {
+      if (
+        !companyUser?.notifications.email.includes('invoice_viewed') ||
+        !companyUser?.notifications.email.includes('invoice_viewed_user')
+      ) {
+        return;
+      }
+
       toast(
         <div className="flex flex-col gap-2">
           <span className="flex items-center gap-1">
