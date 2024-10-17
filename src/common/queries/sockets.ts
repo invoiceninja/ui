@@ -17,6 +17,7 @@ import { useCurrentCompany } from '../hooks/useCurrentCompany';
 export const events = [
   'App\\Events\\Invoice\\InvoiceWasPaid',
   'App\\Events\\Payment\\PaymentWasUpdated',
+  'App\\Events\\Credit\\CreditWasCreated',
 ] as const;
 
 export type Event = (typeof events)[number];
@@ -30,6 +31,7 @@ export function useGlobalSocketEvents() {
   const callbacks: Callbacks = {
     'App\\Events\\Invoice\\InvoiceWasPaid': () => {},
     'App\\Events\\Payment\\PaymentWasUpdated': () => {},
+    'App\\Events\\Credit\\CreditWasCreated': () => {},
   };
 
   useEffect(() => {
