@@ -26,11 +26,13 @@ import { CustomField } from '$app/components/CustomField';
 import { useCalculateExpenseAmount } from '../../common/hooks/useCalculateExpenseAmount';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Icon } from '$app/components/icons/Icon';
-import { MdLaunch } from 'react-icons/md';
+import { MdLaunch, MdWarning } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { Link } from 'react-router-dom';
+import { Link as LinkBase } from '$app/components/forms';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import reactStringReplace from 'react-string-replace';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 
@@ -61,6 +63,17 @@ export function Details(props: Props) {
 
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
+
+  const isAnyTaxHidden = () => {
+    if (
+      company.enabled_expense_tax_rates === 0 &&
+      (expense?.tax_name1 || expense?.tax_name2 || expense?.tax_name3)
+    ) {
+      return true;
+    }
+
+    return false;
+  };
 
   const getNonExistingTaxes = () => {
     if (taxes && expense) {
@@ -216,6 +229,26 @@ export function Details(props: Props) {
               errorMessage={errors?.errors.assigned_user_id}
             />
           </Element>
+        )}
+
+        {isAnyTaxHidden() && (
+          <div className="flex items-center space-x-3 px-6">
+            <div>
+              <Icon element={MdWarning} size={20} color="orange" />
+            </div>
+
+            <div className="text-sm font-medium">
+              {reactStringReplace(
+                t('hidden_taxes_warning') as string,
+                ':link',
+                () => (
+                  <LinkBase to="/settings/tax_settings">
+                    {t('settings')}
+                  </LinkBase>
+                )
+              )}
+            </div>
+          </div>
         )}
 
         {Boolean(getNonExistingTaxes().length) && (
