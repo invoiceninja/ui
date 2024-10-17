@@ -43,7 +43,9 @@ export const IncreasePricesAction = (props: Props) => {
   const { selectedIds, setSelected } = props;
 
   const handleSave = () => {
-    bulk(selectedIds, 'increase_prices', increasingPercent);
+    bulk(selectedIds, 'increase_prices', {
+      percentage_increase: increasingPercent,
+    });
 
     setSelected?.([]);
   };
