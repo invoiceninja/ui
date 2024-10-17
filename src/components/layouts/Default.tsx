@@ -23,11 +23,12 @@ import {
   Briefcase,
   Clock,
   PieChart,
+  Info,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { Button } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
@@ -36,7 +37,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
-import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
+import { isDemo, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -57,6 +58,9 @@ import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Notifications } from '../Notifications';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { Invoice } from '$app/common/interfaces/invoice';
+import toast from 'react-hot-toast';
 
 export interface SaveOption {
   label: string;
@@ -364,6 +368,41 @@ export function Default(props: Props) {
 
   const saveBtn = useAtomValue(saveBtnAtom);
   const navigationTopRightElement = useNavigationTopRightElement();
+
+  useSocketEvent<Invoice>({
+    on: ['App\\Events\\Invoice\\InvoiceWasViewed'],
+    callback: ({ data }) => {
+      if (
+        !companyUser?.notifications.email.includes('invoice_viewed') ||
+        !companyUser?.notifications.email.includes('invoice_viewed_user')
+      ) {
+        return;
+      }
+
+      toast(
+        <div className="flex flex-col gap-2">
+          <span className="flex items-center gap-1">
+            <Info size={18} />
+            <span>
+              {trans('notification_invoice_viewed_subject', {
+                invoice: data.number,
+                client: data.client?.display_name,
+              })}
+              .
+            </span>
+          </span>
+
+          <div className="flex justify-center">
+            <Link to={`/invoices/${data.id}/edit`}>{t('view_invoice')}</Link>
+          </div>
+        </div>,
+        {
+          duration: 8000,
+          position: 'top-center',
+        }
+      );
+    },
+  });
 
   return (
     <div>
