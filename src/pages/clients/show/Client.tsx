@@ -92,6 +92,11 @@ export default function Client() {
     callback: () => $refetch(['invoices']),
   });
 
+  useSocketEvent({
+    on: 'App\\Events\\Payment\\PaymentWasUpdated',
+    callback: () => $refetch(['payments']),
+  });
+
   return (
     <Default
       title={documentTitle}
