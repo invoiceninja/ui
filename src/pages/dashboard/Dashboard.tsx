@@ -21,12 +21,19 @@ import { UpcomingQuotes } from './components/UpcomingQuotes';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '../settings';
 import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Dashboard() {
   const [t] = useTranslation();
   useTitle('dashboard');
 
   const enabled = useEnabled();
+
+  useSocketEvent({
+    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
+    callback: () => $refetch(['invoices']),
+  });
 
   return (
     <Default title={t('dashboard')} breadcrumbs={[]}>

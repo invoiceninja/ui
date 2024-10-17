@@ -728,7 +728,7 @@ export function useQuoteColumns() {
             {field}
           </DynamicLink>
 
-          <CopyToClipboardIconOnly text={quote.number} stopPropagation />
+          <CopyToClipboardIconOnly text={quote.number} />
         </div>
       ),
     },

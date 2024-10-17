@@ -233,10 +233,7 @@ export function usePurchaseOrderColumns() {
               {field}
             </DynamicLink>
 
-            <CopyToClipboardIconOnly
-              text={purchaseOrder.number}
-              stopPropagation
-            />
+            <CopyToClipboardIconOnly text={purchaseOrder.number} />
           </div>
         ),
       },
