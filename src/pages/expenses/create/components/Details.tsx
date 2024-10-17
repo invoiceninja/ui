@@ -35,6 +35,8 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import reactStringReplace from 'react-string-replace';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { useEffect } from 'react';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -75,6 +77,12 @@ export function Details(props: Props) {
     return false;
   };
 
+  useEffect(() => {
+    if (expense) {
+      expense.tax_name1 = 'VAT';
+    }
+  }, [expense]);
+
   const getNonExistingTaxes = () => {
     if (taxes && expense) {
       return TAXES.map((tax) => {
@@ -82,11 +90,12 @@ export function Details(props: Props) {
         const taxAmountProp = tax.replace('name', 'amount') as keyof Expense;
 
         if (
-          (expense[taxRateProp] || expense[taxAmountProp]) &&
+          expense[tax] &&
           !taxes.data.data.some(
             (taxRate: TaxRate) =>
-              taxRate.rate === expense[taxRateProp] ||
-              taxRate.rate === expense[taxAmountProp]
+              (taxRate.rate === expense[taxRateProp] ||
+                taxRate.rate === expense[taxAmountProp]) &&
+              taxRate.name === expense[tax]
           )
         ) {
           const taxRate = expense[taxRateProp] || expense[taxAmountProp];
@@ -269,7 +278,7 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={expense.tax_name1}
+                defaultValue={getTaxRateComboValue(expense, 'tax_name1')}
                 onClearButtonClick={() => {
                   handleChange('tax_name1', '');
                   handleChange('tax_rate1', 0);
@@ -321,7 +330,7 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={expense.tax_name2}
+                defaultValue={getTaxRateComboValue(expense, 'tax_name2')}
                 onClearButtonClick={() => {
                   handleChange('tax_name2', '');
                   handleChange('tax_rate2', 0);
@@ -373,7 +382,7 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={expense.tax_name3}
+                defaultValue={getTaxRateComboValue(expense, 'tax_name3')}
                 onClearButtonClick={() => {
                   handleChange('tax_name3', '');
                   handleChange('tax_rate3', 0);
