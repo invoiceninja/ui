@@ -14,7 +14,10 @@ import { useCurrentCompany } from '../hooks/useCurrentCompany';
 
 // This file defines global events system for query invalidation.
 
-export const events = ['App\\Events\\Invoice\\InvoiceWasPaid'] as const;
+export const events = [
+  'App\\Events\\Invoice\\InvoiceWasPaid',
+  'App\\Events\\Payment\\PaymentWasUpdated',
+] as const;
 
 export type Event = (typeof events)[number];
 
@@ -26,6 +29,7 @@ export function useGlobalSocketEvents() {
 
   const callbacks: Callbacks = {
     'App\\Events\\Invoice\\InvoiceWasPaid': () => {},
+    'App\\Events\\Payment\\PaymentWasUpdated': () => {},
   };
 
   useEffect(() => {
