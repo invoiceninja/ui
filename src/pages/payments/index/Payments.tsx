@@ -40,6 +40,8 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { EntityState } from '$app/common/enums/entity-state';
 import { getEntityState } from '$app/common/helpers';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Payments() {
   useTitle('payments');
@@ -83,6 +85,11 @@ export default function Payments() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+
+  useSocketEvent({
+    on: 'App\\Events\\Payment\\PaymentWasUpdated',
+    callback: () => $refetch(['payments']),
+  });
 
   return (
     <Default title={t('payments')} breadcrumbs={pages} docsLink="en/payments/">
