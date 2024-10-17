@@ -29,6 +29,8 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Credit } from '$app/common/interfaces/credit';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Credits() {
   useTitle('credits');
@@ -50,6 +52,11 @@ export default function Credits() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+
+  useSocketEvent({
+    on: 'App\\Events\\Credit\\CreditWasCreated',
+    callback: () => $refetch(['credits']),
+  });
 
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="en/credits/">
