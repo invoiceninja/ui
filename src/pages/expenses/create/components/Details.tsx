@@ -35,7 +35,6 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import reactStringReplace from 'react-string-replace';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { useEffect } from 'react';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 export interface ExpenseCardProps {
@@ -76,12 +75,6 @@ export function Details(props: Props) {
 
     return false;
   };
-
-  useEffect(() => {
-    if (expense) {
-      expense.tax_name1 = 'VAT';
-    }
-  }, [expense]);
 
   const getNonExistingTaxes = () => {
     if (taxes && expense) {
