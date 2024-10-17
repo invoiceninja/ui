@@ -98,7 +98,10 @@ export default function Client() {
   });
 
   useSocketEvent({
-    on: 'App\\Events\\Credit\\CreditWasCreated',
+    on: [
+      'App\\Events\\Credit\\CreditWasCreated',
+      'App\\Events\\Credit\\CreditWasUpdated',
+    ],
     callback: () => $refetch(['credits']),
   });
 

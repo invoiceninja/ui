@@ -18,6 +18,7 @@ export const events = [
   'App\\Events\\Invoice\\InvoiceWasPaid',
   'App\\Events\\Payment\\PaymentWasUpdated',
   'App\\Events\\Credit\\CreditWasCreated',
+  'App\\Events\\Credit\\CreditWasUpdated',
 ] as const;
 
 export type Event = (typeof events)[number];
@@ -32,6 +33,7 @@ export function useGlobalSocketEvents() {
     'App\\Events\\Invoice\\InvoiceWasPaid': () => {},
     'App\\Events\\Payment\\PaymentWasUpdated': () => {},
     'App\\Events\\Credit\\CreditWasCreated': () => {},
+    'App\\Events\\Credit\\CreditWasUpdated': () => {},
   };
 
   useEffect(() => {

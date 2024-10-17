@@ -54,7 +54,10 @@ export default function Credits() {
   } = useChangeTemplate();
 
   useSocketEvent({
-    on: 'App\\Events\\Credit\\CreditWasCreated',
+    on: [
+      'App\\Events\\Credit\\CreditWasCreated',
+      'App\\Events\\Credit\\CreditWasUpdated',
+    ],
     callback: () => $refetch(['credits']),
   });
 
