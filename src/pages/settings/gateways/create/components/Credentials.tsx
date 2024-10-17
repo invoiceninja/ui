@@ -32,6 +32,7 @@ import { useLocation } from 'react-router-dom';
 import { $help } from '$app/components/HelpWidget';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { HelpCircle } from 'react-feather';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   gateway: Gateway;
@@ -62,11 +63,13 @@ export function Credentials(props: Props) {
 
   const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
+  const company = useCurrentCompany();
+
   if (
     isHosted() &&
     props.gateway.key === GOCARDLESS &&
     config('oauth2') === true &&
-    import.meta.env.VITE_GOCARDLESS_OAUTH_TESTING === 'true'
+    import.meta.env.VITE_GOCARDLESS_TESTING_COMPANY === company?.id
   ) {
     hostedGateways.push(GOCARDLESS);
   }
@@ -170,7 +173,7 @@ export function Credentials(props: Props) {
           props.gateway.key === GOCARDLESS &&
           isHosted() &&
           config('oauth2') !== true &&
-          import.meta.env.VITE_GOCARDLESS_OAUTH_TESTING === 'true' && (
+          import.meta.env.VITE_GOCARDLESS_TESTING_COMPANY === company?.id && (
             <Element leftSide={t('OAuth 2.0')}>
               <Button
                 behavior="button"

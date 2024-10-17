@@ -155,7 +155,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
             {value}
           </DynamicLink>
 
-          <CopyToClipboardIconOnly text={invoice.number} stopPropagation />
+          <CopyToClipboardIconOnly text={invoice.number} />
         </div>
       ),
     },
