@@ -35,6 +35,7 @@ import { Link as LinkBase } from '$app/components/forms';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import reactStringReplace from 'react-string-replace';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -233,7 +234,10 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={recurringExpense.tax_name1}
+                defaultValue={getTaxRateComboValue(
+                  recurringExpense,
+                  'tax_name1'
+                )}
                 onClearButtonClick={() => {
                   handleChange('tax_name1', '');
                   handleChange('tax_rate1', 0);
@@ -285,7 +289,10 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={recurringExpense.tax_name2}
+                defaultValue={getTaxRateComboValue(
+                  recurringExpense,
+                  'tax_name2'
+                )}
                 onClearButtonClick={() => {
                   handleChange('tax_name2', '');
                   handleChange('tax_rate2', 0);
@@ -337,7 +344,10 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={recurringExpense.tax_name3}
+                defaultValue={getTaxRateComboValue(
+                  recurringExpense,
+                  'tax_name3'
+                )}
                 onClearButtonClick={() => {
                   handleChange('tax_name3', '');
                   handleChange('tax_rate3', 0);

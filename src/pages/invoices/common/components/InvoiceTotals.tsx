@@ -25,6 +25,7 @@ import { Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 interface Props {
   resource: ProductTableResource;
@@ -84,9 +85,7 @@ export function InvoiceTotals(props: Props) {
               t('hidden_taxes_warning') as string,
               ':link',
               () => (
-                <Link to="/settings/tax_settings">
-                  {t('settings')}
-                </Link>
+                <Link to="/settings/tax_settings">{t('settings')}</Link>
               )
             )}
           </div>
@@ -103,7 +102,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_name1}
+            defaultValue={getTaxRateComboValue(resource, 'tax_name1')}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
@@ -125,7 +124,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_name2}
+            defaultValue={getTaxRateComboValue(resource, 'tax_name2')}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
@@ -147,7 +146,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_name3}
+            defaultValue={getTaxRateComboValue(resource, 'tax_name3')}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);

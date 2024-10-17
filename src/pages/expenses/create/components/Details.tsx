@@ -33,6 +33,9 @@ import { Link as LinkBase } from '$app/components/forms';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import reactStringReplace from 'react-string-replace';
+import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -48,12 +51,16 @@ interface Props extends ExpenseCardProps {
   pageType: 'create' | 'edit';
 }
 
+const TAXES: (keyof Expense)[] = ['tax_name1', 'tax_name2', 'tax_name3'];
+
 export function Details(props: Props) {
   const [t] = useTranslation();
 
   const { expense, handleChange, taxInputType, pageType, errors } = props;
 
   const company = useCurrentCompany();
+
+  const { data: taxes } = useTaxRatesQuery({ status: ['active'] });
 
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
@@ -67,6 +74,33 @@ export function Details(props: Props) {
     }
 
     return false;
+  };
+
+  const getNonExistingTaxes = () => {
+    if (taxes && expense) {
+      return TAXES.map((tax) => {
+        const taxRateProp = tax.replace('name', 'rate') as keyof Expense;
+        const taxAmountProp = tax.replace('name', 'amount') as keyof Expense;
+
+        if (
+          expense[tax] &&
+          !taxes.data.data.some(
+            (taxRate: TaxRate) =>
+              (taxRate.rate === expense[taxRateProp] ||
+                taxRate.rate === expense[taxAmountProp]) &&
+              taxRate.name === expense[tax]
+          )
+        ) {
+          const taxRate = expense[taxRateProp] || expense[taxAmountProp];
+
+          return `${expense[tax]}||${taxRate}%`;
+        }
+
+        return '';
+      }).filter((tax) => tax);
+    }
+
+    return [];
   };
 
   return (
@@ -219,13 +253,25 @@ export function Details(props: Props) {
           </div>
         )}
 
+        {Boolean(getNonExistingTaxes().length) && (
+          <Element leftSide={t('taxes')}>
+            {getNonExistingTaxes().map((tax) => (
+              <div key={tax} className="flex items-center space-x-2">
+                {tax.split('||')[0] && <span>{tax.split('||')[0]}</span>}
+
+                <span>{tax.split('||')[1]}</span>
+              </div>
+            ))}
+          </Element>
+        )}
+
         {/* Tax 1 */}
         {expense &&
           company?.enabled_expense_tax_rates > 0 &&
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={expense.tax_name1}
+                defaultValue={getTaxRateComboValue(expense, 'tax_name1')}
                 onClearButtonClick={() => {
                   handleChange('tax_name1', '');
                   handleChange('tax_rate1', 0);
@@ -277,7 +323,7 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={expense.tax_name2}
+                defaultValue={getTaxRateComboValue(expense, 'tax_name2')}
                 onClearButtonClick={() => {
                   handleChange('tax_name2', '');
                   handleChange('tax_rate2', 0);
@@ -329,7 +375,7 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={expense.tax_name3}
+                defaultValue={getTaxRateComboValue(expense, 'tax_name3')}
                 onClearButtonClick={() => {
                   handleChange('tax_name3', '');
                   handleChange('tax_rate3', 0);

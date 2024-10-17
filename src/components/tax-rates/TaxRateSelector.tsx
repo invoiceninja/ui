@@ -52,6 +52,7 @@ export function TaxRateSelector(props: Props) {
           id: 'id',
           value: 'name',
           label: 'name',
+          customValue: (taxRate) => `${taxRate.name}||${taxRate.rate}`,
           inputLabelFn: (taxRate) =>
             taxRate
               ? resourceTaxName === taxRate.name
@@ -65,6 +66,7 @@ export function TaxRateSelector(props: Props) {
         }}
         sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
+        compareOnlyByValue
       />
 
       <TaxCreate
