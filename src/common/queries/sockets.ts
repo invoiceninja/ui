@@ -16,6 +16,7 @@ import { useCurrentCompany } from '../hooks/useCurrentCompany';
 
 export const events = [
   'App\\Events\\Invoice\\InvoiceWasPaid',
+  'App\\Events\\Invoice\\InvoiceWasViewed',
   'App\\Events\\Payment\\PaymentWasUpdated',
   'App\\Events\\Credit\\CreditWasCreated',
   'App\\Events\\Credit\\CreditWasUpdated',
@@ -31,6 +32,7 @@ export function useGlobalSocketEvents() {
 
   const callbacks: Callbacks = {
     'App\\Events\\Invoice\\InvoiceWasPaid': () => {},
+    'App\\Events\\Invoice\\InvoiceWasViewed': () => {},
     'App\\Events\\Payment\\PaymentWasUpdated': () => {},
     'App\\Events\\Credit\\CreditWasCreated': () => {},
     'App\\Events\\Credit\\CreditWasUpdated': () => {},
