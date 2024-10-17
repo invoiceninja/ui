@@ -8,11 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
 import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { EInvoiceComponent } from '$app/pages/settings';
+import { ValidationAlert } from '$app/pages/settings/e-invoice/common/components/ValidationAlert';
 import { Dispatch, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
@@ -26,25 +28,35 @@ export interface Context {
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
   eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
+  isEInvoiceValid: boolean;
 }
 export default function EInvoice() {
   const [t] = useTranslation();
 
   const context: Context = useOutletContext();
 
-  const { invoice, setInvoice, eInvoiceRef } = context;
+  const { invoice, setInvoice, eInvoiceRef, isEInvoiceValid } = context;
 
   return (
-    <Card title={t('e_invoice')}>
-      {invoice?.e_invoice && (
-        <EInvoiceGenerator
-          ref={eInvoiceRef}
-          entityLevel
-          currentEInvoice={invoice.e_invoice}
-          invoice={invoice}
-          setInvoice={setInvoice}
+    <>
+      {!isEInvoiceValid && (
+        <ValidationAlert
+          to={route('/clients/:id/edit', { id: invoice?.id })}
+          entity="client"
         />
       )}
-    </Card>
+
+      <Card title={t('e_invoice')}>
+        {invoice?.e_invoice && (
+          <EInvoiceGenerator
+            ref={eInvoiceRef}
+            entityLevel
+            currentEInvoice={invoice.e_invoice}
+            invoice={invoice}
+            setInvoice={setInvoice}
+          />
+        )}
+      </Card>
+    </>
   );
 }

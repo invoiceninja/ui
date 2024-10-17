@@ -11,7 +11,6 @@
 import { useTranslation } from 'react-i18next';
 import { Settings } from '$app/components/layouts/Settings';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
@@ -36,6 +35,10 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
+import { ValidationAlert } from './common/components/ValidationAlert';
+import { useCheckEInvoiceValidation } from './common/hooks/useCheckEInvoiceValidation';
+import { route } from '$app/common/helpers/route';
+import { PaymentMeansForm } from '$app/components/e-invoice/PaymentMeansForm';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -44,11 +47,11 @@ export type EInvoiceType = {
 export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
+
+const PEPPOL_COUNTRIES = ['276', '724', '756'];
+
 export function EInvoice() {
   const [t] = useTranslation();
-
-  const isPeppolStandardEnabled =
-    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true';
 
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
@@ -66,6 +69,15 @@ export function EInvoice() {
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const company = useInjectCompanyChanges();
+  const { isValid } = useCheckEInvoiceValidation({
+    entity: isCompanySettingsActive ? 'companies' : 'clients',
+    entity_id: (isCompanySettingsActive
+      ? company?.id
+      : company?.settings.id) as string,
+    enableQuery:
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.settings.enable_e_invoice,
+  });
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
@@ -153,15 +165,41 @@ export function EInvoice() {
       title={t('e_invoice')}
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
-      onSaveClick={() => {
-        if (eInvoiceRef?.current?.saveEInvoice()) {
-          handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
-        }
+      // onSaveClick={() => {
+      //   if (eInvoiceRef?.current?.saveEInvoice()) {
+      //     handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
+      //   } else {
+      //     handleChange('e_invoice', {});
+      //   }
 
-        setSaveChanges(true);
+      //   setSaveChanges(true);
+      // }}
+      onSaveClick={() => {
+        eInvoiceRef?.current?.saveEInvoice();
+        onSave();
       }}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={
+        showPlanAlert ||
+        (company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          !isValid)
+      }
     >
+      {Boolean(
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          !isValid
+      ) && (
+        <ValidationAlert
+          to={
+            isCompanySettingsActive
+              ? '/settings/company_details'
+              : route('/clients/:id/edit', { id: company?.settings.id })
+          }
+          entity={isCompanySettingsActive ? 'company' : 'client'}
+        />
+      )}
+
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('e_invoice')}>
@@ -181,7 +219,9 @@ export function EInvoice() {
             }
             disabled={disableSettingsField('e_invoice_type')}
           >
-            {isPeppolStandardEnabled && <option value="PEPPOL">PEPPOL</option>}
+            {PEPPOL_COUNTRIES.includes(company?.settings.country_id || '') && (
+              <option value="PEPPOL">PEPPOL</option>
+            )}
             <option value="FACT1">FACT1</option>
             <option value="EN16931">EN16931</option>
             <option value="XInvoice_3_0">XInvoice_3.0</option>
@@ -200,31 +240,42 @@ export function EInvoice() {
           </SelectField>
         </Element>
 
-        {company?.settings.e_invoice_type === 'PEPPOL' &&
-        isPeppolStandardEnabled ? (
-          <EInvoiceGenerator
-            ref={eInvoiceRef}
-            currentEInvoice={company?.e_invoice || {}}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="enable_e_invoice"
+              labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
+            />
+          }
+        >
+          <Toggle
+            checked={Boolean(company?.settings.enable_e_invoice)}
+            onValueChange={(value) =>
+              handleChange('settings.enable_e_invoice', value)
+            }
+            disabled={disableSettingsField('enable_e_invoice')}
           />
+        </Element>
+
+        {company?.settings.e_invoice_type === 'PEPPOL' ? (
+          <>
+            {/* {company?.settings.enable_e_invoice && (
+              <EInvoiceGenerator
+                ref={eInvoiceRef}
+                currentEInvoice={company?.e_invoice || {}}
+              />
+            )} */}
+
+            {company?.settings.enable_e_invoice && (
+              <PaymentMeansForm
+                ref={eInvoiceRef}
+                currentEInvoice={company?.e_invoice || {}}
+                entity="company"
+              />
+            )}
+          </>
         ) : (
           <>
-            <Element
-              leftSide={
-                <PropertyCheckbox
-                  propertyKey="enable_e_invoice"
-                  labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
-                />
-              }
-            >
-              <Toggle
-                checked={Boolean(company?.settings.enable_e_invoice)}
-                onValueChange={(value) =>
-                  handleChange('settings.enable_e_invoice', value)
-                }
-                disabled={disableSettingsField('enable_e_invoice')}
-              />
-            </Element>
-
             {company?.settings.enable_e_invoice ? (
               <>
                 <Element

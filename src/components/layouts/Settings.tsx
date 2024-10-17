@@ -37,6 +37,7 @@ interface Props {
   docsLink?: string;
   navigationTopRight?: ReactNode;
   disableSaveButton?: boolean;
+  aboveMainContainer?: ReactNode;
 }
 
 const LinkStyled = styled(Link)`
@@ -76,6 +77,7 @@ export function Settings(props: Props) {
       navigationTopRight={props.navigationTopRight}
       disableSaveButton={props.disableSaveButton}
       breadcrumbs={[]}
+      aboveMainContainer={props.aboveMainContainer}
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">

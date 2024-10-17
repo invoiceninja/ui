@@ -24,6 +24,9 @@ const Create = lazy(() => import('$app/pages/invoices/create/Create'));
 const Edit = lazy(() => import('$app/pages/invoices/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/invoices/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/invoices/email/Email'));
+const EInvoice = lazy(
+  () => import('$app/pages/invoices/edit/components/EInvoice')
+);
 const Documents = lazy(
   () => import('$app/pages/invoices/edit/components/Documents')
 );
@@ -108,6 +111,7 @@ export const invoiceRoutes = (
       }
     >
       <Route path="edit" element={<Edit />} />
+      <Route path="e_invoice" element={<EInvoice />} />
       <Route path="documents" element={<Documents />} />
       <Route path="settings" element={<Settings />} />
       <Route path="activity" element={<Activities />} />
