@@ -21,6 +21,7 @@ import { ClickableElement } from './cards';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { NonClickableElement } from './cards/NonClickableElement';
+import classNames from 'classnames';
 
 export interface Notification {
   label: string;
@@ -70,7 +71,12 @@ export function Notifications() {
   return (
     <>
       <div className="relative mt-2 mr-1">
-        <button onClick={() => setIsVisible(!isVisible)}>
+        <button
+          onClick={() => setIsVisible(!isVisible)}
+          className={classNames({
+            'animate-jiggle': notifications.length > 0,
+          })}
+        >
           <Bell size={20} />
 
           {notifications.length > 0 ? (
