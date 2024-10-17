@@ -9,6 +9,7 @@
  */
 
 import { toast } from '$app/common/helpers/toast/toast';
+import { MouseEvent } from 'react';
 import { MdOutlineContentCopy } from 'react-icons/md';
 
 interface Props {
@@ -20,9 +21,10 @@ interface Props {
 export function CopyToClipboard(props: Props) {
   const value = props.text || '';
 
-  const handleClick = () => {
-    navigator.clipboard.writeText(value);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
 
+    navigator.clipboard.writeText(value);
     toast.success('copied_to_clipboard', { value: '' });
   };
 
