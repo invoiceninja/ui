@@ -21,7 +21,7 @@ import {
 import { Modal } from './Modal';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button } from './forms';
 import { request } from '$app/common/helpers/request';
 import { endpoint, isSelfHosted } from '$app/common/helpers';
@@ -32,7 +32,7 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
@@ -83,6 +83,8 @@ export function AboutModal(props: Props) {
 
   const colors = useColorScheme();
 
+  const queryClient = useQueryClient();
+
   const { isAboutVisible, setIsAboutVisible } = props;
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
@@ -98,6 +100,21 @@ export function AboutModal(props: Props) {
     useState<boolean>(false);
 
   const [systemInfo, setSystemInfo] = useState<SystemInfo>();
+
+  useEffect(() => {
+    (async () => {
+      const res = await queryClient.fetchQuery(
+        ['/pdf.invoicing.co/api/version'],
+        () =>
+          request('GET', 'https://pdf.invoicing.co/api/version').then(
+            (response) => response.data
+          ),
+        { staleTime: Infinity }
+      );
+
+      console.log(res);
+    })();
+  }, []);
 
   const { data: latestVersion } = useQuery({
     queryKey: ['/api/v1/self-update/check_version'],
@@ -527,9 +544,7 @@ export function AboutModal(props: Props) {
         onClose={() => {}}
         disableClosing
       >
-        <span className="text-center py-3 font-medium">
-          {t('in_progress')}
-        </span>
+        <span className="text-center py-3 font-medium">{t('in_progress')}</span>
       </Modal>
 
       <PasswordConfirmation
