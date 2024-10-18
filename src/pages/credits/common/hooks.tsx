@@ -654,7 +654,7 @@ export function useCreditColumns() {
             {value}
           </DynamicLink>
 
-          <CopyToClipboardIconOnly text={credit.number} stopPropagation />
+          <CopyToClipboardIconOnly text={credit.number} />
         </div>
       ),
     },

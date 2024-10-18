@@ -19,6 +19,7 @@ import { useBulkAction } from '$app/common/queries/vendor';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { MergeVendorsAction } from '../components/MergeVendorsAction';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -42,6 +43,7 @@ export function useActions() {
         }
       />
     ),
+    (vendor) => vendor && <MergeVendorsAction mergeFromVendorId={vendor.id} />,
     (vendor) =>
       isEditOrShowPage &&
       getEntityState(vendor) === EntityState.Active && (

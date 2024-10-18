@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
+import { Link, SelectField } from '$app/components/forms';
 import {
   CompanyGateway,
   FeesAndLimitsEntry,
@@ -28,6 +28,12 @@ import { Entry } from '$app/components/forms/Combobox';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { $help } from '$app/components/HelpWidget';
+import { HelpCircle } from 'react-feather';
+import { Icon } from '$app/components/icons/Icon';
+import { MdWarning } from 'react-icons/md';
+import reactStringReplace from 'react-string-replace';
 
 interface Props {
   gateway: Gateway;
@@ -81,8 +87,43 @@ export function LimitsAndFees(props: Props) {
     }
   };
 
+  const isAnyTaxHidden = () => {
+    if (currentGatewayTypeId) {
+      const { fee_tax_name1, fee_tax_name2, fee_tax_name3 } =
+        props.companyGateway?.fees_and_limits?.[currentGatewayTypeId] || {};
+
+      if (
+        company.enabled_item_tax_rates === 0 &&
+        (fee_tax_name1 || fee_tax_name2 || fee_tax_name3)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const accentColor = useAccentColor();
+
   return (
-    <Card title={t('limits_and_fees')}>
+    <Card
+      title={t('limits_and_fees')}
+      topRight={
+        <button
+          style={{ color: accentColor }}
+          type="button"
+          onClick={() =>
+            $help('gateways', {
+              moveToHeading: 'Limits/Fees',
+            })
+          }
+          className="inline-flex items-center space-x-1 text-sm"
+        >
+          <HelpCircle size={18} />
+          <span>{t('documentation')}</span>
+        </button>
+      }
+    >
       <Element leftSide={t('payment_type')}>
         <SelectField
           onChange={handlePaymentTypeChange}
@@ -189,6 +230,26 @@ export function LimitsAndFees(props: Props) {
               errorMessage={props.errors?.errors.fee_amount}
             />
           </Element>
+
+          {isAnyTaxHidden() && (
+            <div className="flex items-center space-x-3 px-6 py-2">
+              <div>
+                <Icon element={MdWarning} size={20} color="orange" />
+              </div>
+
+              <div className="text-sm font-medium">
+                {reactStringReplace(
+                  t('hidden_taxes_warning') as string,
+                  ':link',
+                  () => (
+                    <Link to="/settings/tax_settings">
+                      {t('settings')}
+                    </Link>
+                  )
+                )}
+              </div>
+            </div>
+          )}
 
           {company && company.enabled_item_tax_rates > 0 && (
             <Element leftSide={t('tax')}>
