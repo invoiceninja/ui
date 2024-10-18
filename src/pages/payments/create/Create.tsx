@@ -376,6 +376,14 @@ export default function Create() {
             </Element>
           )}
 
+          {errors?.errors.invoices && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.invoices}
+              </Alert>
+            </div>
+          )}
+
           {payment?.client_id && <Divider />}
 
           {payment &&
@@ -488,6 +496,14 @@ export default function Create() {
                 clearInputAfterSelection
               />
             </Element>
+          )}
+
+          {errors?.errors.credits && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.credits}
+              </Alert>
+            </div>
           )}
 
           {payment?.client_id && <Divider />}
