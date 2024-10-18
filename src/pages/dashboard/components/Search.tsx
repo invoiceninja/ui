@@ -24,6 +24,7 @@ import { useClickAway } from 'react-use';
 import collect from 'collect.js';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { debounce } from 'lodash';
+import { Spinner } from '$app/components/Spinner';
 
 const ComboboxOption = styled(Combobox.Option)`
   color: ${(props) => props.theme.color};
@@ -41,25 +42,31 @@ export function Search$() {
   const comboboxRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const { data, refetch } = useQuery(
+  const { data, refetch, isFetching } = useQuery(
     ['/api/v1/search'],
     () => {
-      const $endpoint = query.length === 0 ? '/api/v1/search' : `/api/v1/search?search=${query}`;
+      const $endpoint =
+        query.length === 0
+          ? '/api/v1/search'
+          : `/api/v1/search?search=${query}`;
+
       return request('POST', endpoint($endpoint)).then(
         (response: AxiosResponse<SearchResponse>) => {
           const formatted: Entry<SearchRecord>[] = [];
-          Object.entries(response.data).forEach(([key, value]: [string, SearchRecord[]]) => {
-            value.forEach((record: SearchRecord) => {
-              formatted.push({
-                id: v4(),
-                label: record.name,
-                value: record.id,
-                resource: record,
-                searchable: `${t(key)}: ${record.name}`,
-                eventType: 'external',
+          Object.entries(response.data).forEach(
+            ([key, value]: [string, SearchRecord[]]) => {
+              value.forEach((record: SearchRecord) => {
+                formatted.push({
+                  id: v4(),
+                  label: record.name,
+                  value: record.id,
+                  resource: record,
+                  searchable: `${t(key)}: ${record.name}`,
+                  eventType: 'external',
+                });
               });
-            });
-          });
+            }
+          );
           return formatted;
         }
       );
@@ -122,28 +129,39 @@ export function Search$() {
       ref={comboboxRef}
     >
       <div className="relative mt-2">
-        <Combobox.Input
-          className="border-transparent focus:border-transparent focus:ring-0 w-full"
-          onChange={handleChange}
-          ref={inputRef}
-          onFocus={() => setIsVisible(true)}
-          placeholder={`${t('search')}... (Ctrl K)`}
-          style={{ backgroundColor: colors.$1, color: colors.$3 }}
-        />
+        <div className="flex items-center">
+          <span
+            className={classNames({
+              block: isFetching,
+              hidden: !isFetching,
+            })}
+          >
+            <Spinner />
+          </span>
+
+          <Combobox.Input
+            className="border-transparent focus:border-transparent focus:ring-0 w-full"
+            onChange={handleChange}
+            ref={inputRef}
+            onFocus={() => setIsVisible(true)}
+            placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
+            style={{ backgroundColor: colors.$1, color: colors.$3 }}
+          />
+        </div>
 
         <Combobox.Options
           className={classNames(
-            'absolute border rounded max-h-72 overflow-y-auto shadow-lg',
+            'absolute border rounded-lg max-h-72 overflow-y-auto shadow-xl',
             'min-w-full w-max',
             {
               hidden: !isVisible,
             }
           )}
-          style={{ 
-            backgroundColor: colors.$1, 
-            borderColor: colors.$4, 
+          style={{
+            backgroundColor: colors.$1,
+            borderColor: colors.$5,
             minWidth: '33vw',
-            maxWidth: 'max(100%, 33vw)'
+            maxWidth: 'max(100%, 33vw)',
           }}
           static={true}
         >
