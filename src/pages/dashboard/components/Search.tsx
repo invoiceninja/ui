@@ -144,7 +144,7 @@ export function Search$() {
             onChange={handleChange}
             ref={inputRef}
             onFocus={() => setIsVisible(true)}
-            placeholder={`${t('Find invoices, clients and more')}. (Ctrl+K)`}
+            placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
             style={{ backgroundColor: colors.$1, color: colors.$3 }}
           />
         </div>
