@@ -90,23 +90,36 @@ export function useExpensesQuery(params: ExpensesParams) {
   );
 }
 
+const successMessages = {
+  bulk_update: 'updated_records',
+};
+
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (
+  return async (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'bulk_categorize',
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'bulk_categorize'
+      | 'bulk_update',
     rest?: Record<string, unknown>
   ) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/expenses/bulk'), {
+    return request('POST', endpoint('/api/v1/expenses/bulk'), {
       action,
       ids,
       ...rest,
     }).then(() => {
-      toast.success(`${action}d_expense`);
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_expense`;
+
+      toast.success(message);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

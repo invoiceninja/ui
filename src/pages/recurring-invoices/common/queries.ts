@@ -71,13 +71,15 @@ type Action =
   | 'start'
   | 'stop'
   | 'update_prices'
-  | 'increase_prices';
+  | 'increase_prices'
+  | 'bulk_update';
 
 const successMessages = {
   start: 'started_recurring_invoice',
   stop: 'stopped_recurring_invoice',
   update_prices: 'updated_prices',
   increase_prices: 'updated_prices',
+  bulk_update: 'updated_records',
 };
 
 interface Params {
@@ -91,15 +93,17 @@ export function useBulkAction(params?: Params) {
 
   const { onSuccess, setErrors } = params || {};
 
-  return (ids: string[], action: Action, increasePercentage?: number) => {
+  return async (
+    ids: string[],
+    action: Action,
+    rest?: Record<string, unknown>
+  ) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
+    return request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
       action,
       ids,
-      ...(typeof increasePercentage === 'number' && {
-        percentage_increase: increasePercentage,
-      }),
+      ...rest,
     })
       .then(() => {
         const message =
