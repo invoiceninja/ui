@@ -157,7 +157,7 @@ export function SelectField(props: SelectProps) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           styles={customStyles}
-          isSearchable={false}
+          isSearchable
           isClearable={dismissable}
           data-cy={cypressRef}
         />
