@@ -63,9 +63,9 @@ const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'custom_value2', type: 'customField' },
   { key: 'custom_value3', type: 'customField' },
   { key: 'custom_value4', type: 'customField' },
-  { key: 'tax_name1', type: 'taxSelector' },
-  { key: 'tax_name2', type: 'taxSelector' },
-  { key: 'tax_name3', type: 'taxSelector' },
+  { key: 'tax1', type: 'taxSelector' },
+  { key: 'tax2', type: 'taxSelector' },
+  { key: 'tax3', type: 'taxSelector' },
   { key: 'should_be_invoiced', type: 'toggle' },
   { key: 'uses_inclusive_taxes', type: 'toggle' },
 ];
@@ -115,8 +115,8 @@ export function BulkUpdatesAction(props: Props) {
       );
     }
 
-    if (columnKey.startsWith('tax_name')) {
-      const taxNumber = Number(columnKey.split('tax_name')[1]);
+    if (columnKey.startsWith('tax')) {
+      const taxNumber = Number(columnKey.split('tax')[1]);
 
       const enabledTaxRates =
         props.entity === 'expense'
@@ -138,12 +138,6 @@ export function BulkUpdatesAction(props: Props) {
   };
 
   const getColumnTranslation = (currentColumn: string) => {
-    if (currentColumn.includes('tax_name')) {
-      const taxNumber = Number(currentColumn.split('tax_name')[1]);
-
-      return t(`tax_${taxNumber}`);
-    }
-
     if (currentColumn.startsWith('custom_value')) {
       return company.custom_fields[
         currentColumn.replace('custom_value', props.entity)
