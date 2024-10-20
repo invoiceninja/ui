@@ -158,7 +158,7 @@ export function SelectField(props: SelectProps) {
           // @ts-ignore
           styles={customStyles}
           isSearchable
-          isClearable={dismissable}
+          isClearable={Boolean(dismissable && selectedEntry?.value)}
           data-cy={cypressRef}
         />
       )}
