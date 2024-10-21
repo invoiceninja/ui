@@ -520,11 +520,11 @@ export default function Create() {
 
           <Element leftSide={t('payment_type')}>
             <SelectField
-              id="type_id"
               value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
+              customSelector
             >
               {paymentTypes.map(([key, value], index) => (
                 <option value={key} key={index}>
