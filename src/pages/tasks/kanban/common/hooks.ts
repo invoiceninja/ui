@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from '$app/common/helpers';
+import { date, useFormatTime } from '$app/common/helpers';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { useSetAtom } from 'jotai';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
@@ -33,14 +33,16 @@ export function useHandleCurrentTask(id: string | undefined) {
 export function useFormatTimeLog() {
   const { t } = useTranslation();
 
+  const formatTime = useFormatTime();
+
   return (log: string) => {
     const logs: string[][] = [];
 
     parseTimeLog(log).map(([start, end]) => {
       logs.push([
         date(start, 'YYYY-MM-DD'),
-        new Date(start * 1000).toLocaleTimeString(),
-        end === 0 ? t('now') : new Date(end * 1000).toLocaleTimeString(),
+        formatTime(start),
+        end === 0 ? t('now') : formatTime(end),
       ]);
     });
 
