@@ -236,7 +236,7 @@ test('deleting transaction with edit_bank_transaction', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .click();
 
     await page.getByText('Delete').click();
@@ -287,7 +287,7 @@ test('archiving transaction withe edit_bank_transaction', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -328,7 +328,7 @@ test('Create expense bulk action', async ({ page }) => {
   await page.locator('[data-cy="dataTableCheckbox"]').last().click();
 
   await page
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .first()
     .click();
 
