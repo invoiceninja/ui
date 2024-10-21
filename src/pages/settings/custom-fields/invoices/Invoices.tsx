@@ -80,11 +80,13 @@ export function Invoices() {
                 />
               }
             >
-              <Toggle
-                label={t('charge_taxes')}
-                checked={surchargeValue(index)}
-                onChange={() => setSurchargeTaxValue(index)}
-              />
+              {Boolean(company?.enabled_tax_rates) && (
+                <Toggle
+                  label={t('charge_taxes')}
+                  checked={surchargeValue(index)}
+                  onChange={() => setSurchargeTaxValue(index)}
+                />
+              )}
             </Element>
           )
         )}
