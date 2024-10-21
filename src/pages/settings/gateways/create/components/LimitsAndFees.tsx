@@ -34,6 +34,7 @@ import { HelpCircle } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 interface Props {
   gateway: Gateway;
@@ -242,9 +243,7 @@ export function LimitsAndFees(props: Props) {
                   t('hidden_taxes_warning') as string,
                   ':link',
                   () => (
-                    <Link to="/settings/tax_settings">
-                      {t('settings')}
-                    </Link>
+                    <Link to="/settings/tax_settings">{t('settings')}</Link>
                   )
                 )}
               </div>
@@ -254,10 +253,10 @@ export function LimitsAndFees(props: Props) {
           {company && company.enabled_item_tax_rates > 0 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={
-                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
-                    ?.fee_tax_name1 || ''
-                }
+                defaultValue={getTaxRateComboValue(
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId],
+                  'fee_tax_name1'
+                )}
                 onChange={(value: Entry<TaxRate>) => {
                   handleEntryChange(
                     'fee_tax_name1',
@@ -280,10 +279,10 @@ export function LimitsAndFees(props: Props) {
           {company && company.enabled_item_tax_rates > 1 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={
-                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
-                    ?.fee_tax_name2 || ''
-                }
+                defaultValue={getTaxRateComboValue(
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId],
+                  'fee_tax_name2'
+                )}
                 onChange={(value: Entry<TaxRate>) => {
                   handleEntryChange(
                     'fee_tax_name2',
@@ -306,10 +305,10 @@ export function LimitsAndFees(props: Props) {
           {company && company.enabled_item_tax_rates > 2 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={
-                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
-                    ?.fee_tax_name3 || ''
-                }
+                defaultValue={getTaxRateComboValue(
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId],
+                  'fee_tax_name3'
+                )}
                 onChange={(value: Entry<TaxRate>) => {
                   handleEntryChange(
                     'fee_tax_name3',

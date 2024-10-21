@@ -363,7 +363,7 @@ test('deleting project with edit_project', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+      .filter({ has: page.getByText('Actions') });
 
     await moreActionsButton.click();
 
@@ -415,7 +415,7 @@ test('archiving project withe edit_project', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -454,7 +454,7 @@ test('project documents preview with edit_project', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -501,7 +501,7 @@ test('project documents uploading with edit_project', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -617,7 +617,7 @@ test('cloning project', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
