@@ -335,7 +335,7 @@ test('deleting recurring expense with edit_recurring_expense', async ({
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -387,7 +387,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -431,7 +431,7 @@ test('recurring expense documents preview with edit_recurring_expense', async ({
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -483,7 +483,7 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -612,7 +612,7 @@ test('cloning recurring expense', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
   }
@@ -802,7 +802,7 @@ test('Checking the gross amount by rate', async ({ page }) => {
 
   await tableRow
     .getByRole('button')
-    .filter({ has: page.getByText('More Actions') })
+    .filter({ has: page.getByText('Actions') })
     .first()
     .click();
 
@@ -853,7 +853,7 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await tableRow
     .getByRole('button')
-    .filter({ has: page.getByText('More Actions') })
+    .filter({ has: page.getByText('Actions') })
     .first()
     .click();
 
@@ -894,7 +894,7 @@ test('Checking the gross amount by amount', async ({ page }) => {
 
   await tableRow
     .getByRole('button')
-    .filter({ has: page.getByText('More Actions') })
+    .filter({ has: page.getByText('Actions') })
     .first()
     .click();
 
