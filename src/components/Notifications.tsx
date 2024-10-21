@@ -22,6 +22,7 @@ import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { NonClickableElement } from './cards/NonClickableElement';
 import classNames from 'classnames';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export interface Notification {
   label: string;
@@ -37,6 +38,8 @@ export const notificationsAtom = atomWithStorage<Notification[]>(
 
 export function Notifications() {
   const { t } = useTranslation();
+
+  const { timeFormat } = useCompanyTimeFormat();
 
   const [isVisible, setIsVisible] = useState(false);
   const [notifications, setNotifications] = useAtom(notificationsAtom);
@@ -101,7 +104,10 @@ export function Notifications() {
             <div>
               <p>{notification.label}</p>
               <p className="text-xs">
-                {date(notification.date, `${dateFormat.dateFormat} hh:mm:ss`)}
+                {date(
+                  notification.date,
+                  `${dateFormat.dateFormat} ${timeFormat}`
+                )}
               </p>
             </div>
           </ClickableElement>
