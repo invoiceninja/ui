@@ -16,7 +16,7 @@ test('Activity report test', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await page
@@ -98,7 +98,7 @@ test('Invoice report test', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await page
@@ -188,7 +188,7 @@ test('Profit and loss report test', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await page
@@ -282,7 +282,7 @@ test('Product sales report test', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await page
@@ -370,7 +370,7 @@ test('Expense report test', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await page
@@ -478,7 +478,7 @@ test('Expense report test with clients, project and categories selectors', async
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await page
@@ -597,7 +597,7 @@ test('Product sales report test with filtering products', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await page

@@ -91,12 +91,12 @@ export default function Edit() {
 
       <Element leftSide={t('payment_type')}>
         <SelectField
-          style={{ color: colors.$3, colorScheme: colors.$0 }}
-          id="type_id"
           value={payment?.type_id}
           onValueChange={(value) => handleChange('type_id', value)}
           errorMessage={errors?.errors.type_id}
           withBlank
+          customSelector
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
         >
           {paymentTypes.map(([key, value], index) => (
             <option value={key} key={index}>
