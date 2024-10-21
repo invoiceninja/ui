@@ -162,14 +162,14 @@ export function BulkUpdatesAction(props: Props) {
     if (props.entity === 'expense') {
       bulkExpenses(resourceIds, 'bulk_update', {
         column,
-        newValue: newColumnValue,
+        new_value: newColumnValue,
       }).then(() => handleOnClose());
     }
 
     if (props.entity === 'recurring_invoice') {
       bulkRecurringInvoices(resourceIds, 'bulk_update', {
         column,
-        newValue: newColumnValue,
+        new_value: newColumnValue,
       }).then(() => handleOnClose());
     }
 
