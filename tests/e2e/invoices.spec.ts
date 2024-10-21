@@ -378,7 +378,7 @@ test('deleting invoice with edit_invoice', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+      .filter({ has: page.getByText('Actions') });
 
     await moreActionsButton.click();
 
@@ -430,7 +430,7 @@ test('archiving invoice withe edit_invoice', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -471,7 +471,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -520,7 +520,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -655,7 +655,7 @@ test('cloning invoice', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -786,7 +786,7 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page
     .locator("[data-cy='dataTable']")
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .first()
     .click();
 
@@ -845,7 +845,7 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page
     .locator("[data-cy='dataTable']")
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .first()
     .click();
 

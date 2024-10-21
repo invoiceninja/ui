@@ -54,7 +54,7 @@ const checkEditPage = async (
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Actions', exact: true })
     ).toBeVisible();
   } else {
     await expect(
@@ -66,7 +66,7 @@ const checkEditPage = async (
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Actions', exact: true })
     ).not.toBeVisible();
   }
 
@@ -237,7 +237,7 @@ test('deleting payment with edit_payment', async ({ page }) => {
 
     const moreActionsButton = page
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -252,7 +252,7 @@ test('deleting payment with edit_payment', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+      .filter({ has: page.getByText('Actions') });
 
     await moreActionsButton.click();
 
@@ -290,7 +290,7 @@ test('archiving payment with edit_payment', async ({ page }) => {
 
     const moreActionsButton = page
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -305,7 +305,7 @@ test('archiving payment with edit_payment', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -344,7 +344,7 @@ test('payment documents preview with edit_payment', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -393,7 +393,7 @@ test('payment documents uploading with edit_payment', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();

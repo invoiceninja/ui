@@ -16,8 +16,11 @@ test('test appropriate invalidation of clients', async ({ page }) => {
     .getByRole('link', { name: 'New Client', exact: true })
     .first()
     .click();
-  await page.locator('#name').click();
-  await page.locator('#name').fill('hello dear');
+
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').click()
+  
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill('hello dear')
+
   await page.getByRole('button', { name: 'Save' }).click();
   await page
     .getByRole('link', { name: 'New Invoice', exact: true })
@@ -32,22 +35,29 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await page.locator('#notes').click();
   await page.locator('#notes').fill('something fancy');
   await page.locator('#notes').press('Tab');
-  await page.locator('#cost').fill('1');
-  await page.locator('#cost').press('Tab');
-  await page.locator('#quantity').fill('1');
-  await page.locator('#quantity').press('Tab');
+  await page.getByRole('row', { name: 'something fancy 1 $' }).getByRole('textbox').nth(2).fill('1');
+  // await page.locator('#cost').fill('1');
+  // await page.locator('#cost').press('Tab');
+  
+  await page.getByRole('row', { name: 'something fancy 1 1 $' }).getByRole('textbox').nth(3).fill('1');
+  await page.getByRole('row', { name: 'something fancy 1 1 $' }).getByRole('textbox').nth(3).press('Tab');
+  // await page.locator('#quantity').fill('1');
+  // await page.locator('#quantity').press('Tab');
   await page.getByRole('cell', { name: '$ 1.00' }).getByRole('button').click();
   await page.getByRole('button', { name: 'Save' }).click();
   // await page.getByRole('button', { name: 'Mark Sent' }).click();
 
-  await page
-    .locator('div')
-    .filter({ hasText: /^Purchase White LabelBackSave$/ })
-    .getByRole('button')
-    .nth(3)
-    .click();
-  await page.getByRole('button', { name: 'Mark Sent' }).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+  // await page
+  //   .locator('div')
+  //   .filter({ hasText: /^Purchase White LabelSave$/ })
+  //   .getByRole('button')
+  //   .nth(3)
+  //   .click();
 
+  await page.locator('div').filter({ hasText: /^Purchase White LabelSave$/ }).getByRole('button').nth(2).click();
+
+  await page.getByRole('button', { name: 'Mark Sent' }).click();
   await page.getByRole('link', { name: 'View Client' }).click();
   await expect(
     page
@@ -80,17 +90,19 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await page.locator('#notes').click();
   await page.locator('#notes').fill('something fancy');
   await page.locator('#notes').press('Tab');
-  await page.locator('#cost').fill('10');
-  await page.locator('#cost').press('Tab');
-  await page.locator('#quantity').fill('10');
-  await page.locator('#quantity').press('Tab');
+  
+  await page.getByRole('row', { name: 'something fancy 1 $' }).getByRole('textbox').nth(2).fill('10');
+  await page.getByRole('cell', { name: '10' }).getByRole('textbox').press('Tab');
+
+  // await page.locator('#cost').fill('10');
+  // await page.locator('#cost').press('Tab');
+  // await page.locator('#quantity').fill('10');
+  await page.getByRole('cell', { name: '1', exact: true }).getByRole('textbox').fill('10');
+  await page.getByRole('row', { name: 'something fancy 10 10 $' }).getByRole('textbox').nth(3).press('Tab');
+
+  // await page.locator('#quantity').press('Tab');
   await page.getByRole('button', { name: 'Save' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Purchase White LabelBackSave$/ })
-    .getByRole('button')
-    .nth(3)
-    .click();
+  await page.locator('div').filter({ hasText: /^Purchase White LabelSave$/ }).getByRole('button').nth(2).click();
   await page.getByRole('button', { name: 'Mark Sent' }).click();
   await page.getByRole('link', { name: 'View Client' }).click();
 
@@ -113,8 +125,9 @@ test('test appropriate invalidation of clients', async ({ page }) => {
       .getByRole('definition')
   ).toBeVisible();
 
-  // await page.getByRole('cell', { name: 'More Actions' }).getByRole('button').first().click();
-  await page.getByRole('button', { name: 'More Actions' }).nth(2).click();
+  // await page.getByRole('cell', { name: 'Actions' }).getByRole('button').first().click();
+  await page.getByRole('button', { name: 'Actions' }).nth(3).first().click();
+  // await page.getByRole('cell', { name: 'Actions' }).getByRole('button').click();
   await page.getByRole('button', { name: 'Mark Paid' }).click();
 
   await expect(
@@ -139,7 +152,7 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await page.getByRole('row').first().getByRole('checkbox').click();
   await page
     .locator('div')
-    .filter({ hasText: /^More ActionsActive$/ })
+    .filter({ hasText: /^ActionsActive$/ })
     .locator('button')
     .click();
   await page.getByRole('button', { name: 'Delete' }).click();
@@ -148,7 +161,7 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await page.getByRole('row').first().getByRole('checkbox').first().click();
   await page
     .locator('div')
-    .filter({ hasText: /^More ActionsActive$/ })
+    .filter({ hasText: /^ActionsActive$/ })
     .locator('button')
     .click();
   await page.getByRole('button', { name: 'Delete' }).click();
