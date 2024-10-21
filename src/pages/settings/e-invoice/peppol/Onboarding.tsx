@@ -18,10 +18,12 @@ import {
   useIsWhitelabelled,
 } from '$app/common/hooks/usePaidOrSelfhost';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { Button, InputField, Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +44,7 @@ export function Onboarding() {
   const [step, setStep] = useState<Step>('plan_check');
   const [steps, setSteps] = useState<Step[]>([
     'plan_check',
-    'token',
+    // 'token',
     'buy_credits',
     'form',
     'completed',
@@ -52,7 +54,7 @@ export function Onboarding() {
     if (step === 'completed') {
       setIsVisible(false);
 
-      toast.success('Successfully configured PEPPOL');
+      toast.success(t('peppol_successfully_configured')!);
     }
   }, [step]);
 
@@ -256,6 +258,8 @@ function Form({ onContinue }: StepProps) {
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
 
+  const [errors, setErrors] = useState<ValidationBag | null>(null);
+
   const form = useFormik({
     initialValues: {
       party_name: company?.settings?.name || '',
@@ -266,8 +270,10 @@ function Form({ onContinue }: StepProps) {
       zip: company?.settings?.postal_code || '',
       country: company?.settings?.country_id || '',
     },
-    onSubmit: (values) => {
+    onSubmit: (values, { setSubmitting }) => {
       toast.processing();
+
+      setErrors(null);
 
       request('POST', endpoint('/api/v1/einvoice/peppol/setup'), values)
         .then(() => {
@@ -277,7 +283,20 @@ function Form({ onContinue }: StepProps) {
 
           refresh();
         })
-        .catch((e) => console.error(e));
+        .catch((e: AxiosError<ValidationBag>) => {
+          console.error(e);
+
+          if (e.response?.status === 422) {
+            setErrors(e.response.data);
+
+            toast.dismiss();
+
+            return;
+          }
+
+          toast.error();
+        })
+        .finally(() => setSubmitting(false));
     },
   });
 
@@ -288,7 +307,8 @@ function Form({ onContinue }: StepProps) {
           label={t('company_name')}
           value={form.values.party_name}
           onChange={form.handleChange}
-          id="company_name"
+          id="party_name"
+          errorMessage={errors?.errors.party_name}
         />
 
         <InputField
@@ -301,6 +321,7 @@ function Form({ onContinue }: StepProps) {
           value={form.values.country}
           label={t('country')}
           onChange={(e) => form.setFieldValue('country', e)}
+          errorMessage={errors?.errors.country}
         />
 
         <InputField
@@ -308,6 +329,7 @@ function Form({ onContinue }: StepProps) {
           id="line1"
           label={t('address1')}
           onChange={form.handleChange}
+          errorMessage={errors?.errors.line1}
         />
 
         <InputField
@@ -315,6 +337,7 @@ function Form({ onContinue }: StepProps) {
           id="line2"
           label={t('address2')}
           onChange={form.handleChange}
+          errorMessage={errors?.errors.line2}
         />
 
         <InputField
@@ -322,6 +345,7 @@ function Form({ onContinue }: StepProps) {
           id="city"
           label={t('city')}
           onChange={form.handleChange}
+          errorMessage={errors?.errors.city}
         />
 
         <InputField
@@ -329,6 +353,7 @@ function Form({ onContinue }: StepProps) {
           id="county"
           label={t('state')}
           onChange={form.handleChange}
+          errorMessage={errors?.errors.county}
         />
 
         <InputField
@@ -336,12 +361,67 @@ function Form({ onContinue }: StepProps) {
           id="zip"
           label={t('postal_code')}
           onChange={form.handleChange}
+          errorMessage={errors?.errors.zip}
         />
 
         <div className="flex justify-end">
-          <Button type="primary">{t('continue')}</Button>
+          <Button type="primary" disabled={form.isSubmitting}>
+            {t('continue')}
+          </Button>
         </div>
       </form>
     </div>
+  );
+}
+
+export function Disconnect() {
+  const accentColor = useAccentColor();
+  const refresh = useRefreshCompanyUsers();
+
+  const { t } = useTranslation();
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  const disconnect = () => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/einvoice/peppol/disconnect'))
+      .then(() => {
+        toast.success('peppol_successfully_disconnected');
+      })
+      .catch(() => {
+        toast.error();
+      })
+      .finally(() => {
+        setIsVisible(false);
+
+        refresh();
+      });
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        style={{ color: accentColor }}
+        onClick={() => setIsVisible(true)}
+      >
+        {t('disconnect')}
+      </button>
+
+      <Modal
+        title={t('peppol_disconnect')}
+        visible={isVisible}
+        onClose={() => setIsVisible(false)}
+      >
+        {t('peppol_disconnect_long')}
+
+        <div className="flex justify-end">
+          <Button behavior="button" type="primary" onClick={disconnect}>
+            {t('Continue')}
+          </Button>
+        </div>
+      </Modal>
+    </>
   );
 }
