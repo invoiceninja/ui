@@ -334,13 +334,15 @@ export interface Settings {
   task_round_up: boolean;
   task_round_to_nearest: number;
   merge_e_invoice_to_pdf: boolean;
-  payment_flow: string
+  payment_flow: string;
 }
 
 export interface TaxData {
   version: string;
   seller_subregion: string;
   regions: Regions;
+  acts_as_sender: boolean;
+  acts_as_receiver: boolean;
 }
 
 export interface Regions {
