@@ -270,8 +270,8 @@ function Form({ onContinue }: StepProps) {
       county: company?.settings?.state || '',
       zip: company?.settings?.postal_code || '',
       country: company?.settings?.country_id || '',
-      act_as_sender: false,
-      act_as_receiver: false,
+      acts_as_sender: true,
+      acts_as_receiver: true,
     },
     onSubmit: (values, { setSubmitting }) => {
       toast.processing();
@@ -371,17 +371,17 @@ function Form({ onContinue }: StepProps) {
         />
 
         <Toggle
-          checked={form.values.act_as_sender}
-          label={t('act_as_sender')}
-          id="act_as_sender"
-          onChange={(v) => form.setFieldValue('act_as_sender', v)}
+          checked={form.values.acts_as_sender}
+          label={t('acts_as_sender')}
+          id="acts_as_sender"
+          onChange={(v) => form.setFieldValue('acts_as_sender', v)}
         />
 
         <Toggle
-          checked={form.values.act_as_receiver}
-          label={t('act_as_receiver')}
-          id="act_as_receiver"
-          onChange={(v) => form.setFieldValue('act_as_receiver', v)}
+          checked={form.values.acts_as_receiver}
+          label={t('acts_as_receiver')}
+          id="acts_as_receiver"
+          onChange={(v) => form.setFieldValue('acts_as_receiver', v)}
         />
 
         <div className="flex justify-end">
