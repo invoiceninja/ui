@@ -98,7 +98,7 @@ export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return async (
+  return (
     ids: string[],
     action:
       | 'archive'

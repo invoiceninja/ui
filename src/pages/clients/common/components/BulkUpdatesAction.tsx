@@ -219,11 +219,7 @@ export function BulkUpdatesAction(props: Props) {
 
             {getFieldType() === 'taxSelector' && (
               <TaxRateSelector
-                defaultValue={
-                  newColumnValue
-                    ? (newColumnValue as string).split('||')[0]
-                    : ''
-                }
+                defaultValue={newColumnValue}
                 onChange={(value) =>
                   value?.resource &&
                   setNewColumnValue(
