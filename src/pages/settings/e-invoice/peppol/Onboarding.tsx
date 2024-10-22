@@ -22,6 +22,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { Button, InputField, Link } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
@@ -269,6 +270,8 @@ function Form({ onContinue }: StepProps) {
       county: company?.settings?.state || '',
       zip: company?.settings?.postal_code || '',
       country: company?.settings?.country_id || '',
+      act_as_sender: false,
+      act_as_receiver: false,
     },
     onSubmit: (values, { setSubmitting }) => {
       toast.processing();
@@ -365,6 +368,20 @@ function Form({ onContinue }: StepProps) {
           label={t('postal_code')}
           onChange={form.handleChange}
           errorMessage={errors?.errors.zip}
+        />
+
+        <Toggle
+          checked={form.values.act_as_sender}
+          label={t('act_as_sender')}
+          id="act_as_sender"
+          onChange={(v) => form.setFieldValue('act_as_sender', v)}
+        />
+
+        <Toggle
+          checked={form.values.act_as_receiver}
+          label={t('act_as_receiver')}
+          id="act_as_receiver"
+          onChange={(v) => form.setFieldValue('act_as_receiver', v)}
         />
 
         <div className="flex justify-end">
