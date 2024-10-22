@@ -275,7 +275,10 @@ function Form({ onContinue }: StepProps) {
 
       setErrors(null);
 
-      request('POST', endpoint('/api/v1/einvoice/peppol/setup'), values)
+      request('POST', endpoint('/api/v1/einvoice/peppol/setup'), {
+        ...values,
+        tenant_id: company?.company_key,
+      })
         .then(() => {
           toast.success('peppol_successfully_configured');
 
