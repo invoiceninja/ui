@@ -39,7 +39,6 @@ export function useCheckEInvoiceValidation(params: Params) {
         { staleTime: Infinity }
       )
       .catch((error) => {
-        console.log(error);
         if (error.response?.status === 400) {
           toast.dismiss();
         }

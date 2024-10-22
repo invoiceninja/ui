@@ -414,6 +414,7 @@ export interface TaxSetting {
   tax_rate: number;
   tax_name: string;
   reduced_tax_rate: number;
+  vat_number: string;
 }
 
 export interface EURegion {

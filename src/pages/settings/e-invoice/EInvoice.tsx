@@ -41,7 +41,8 @@ import { route } from '$app/common/helpers/route';
 import { PaymentMeansForm } from '$app/components/e-invoice/PaymentMeansForm';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
-import { EURegionSelector } from './common/components/EURegionSelector';
+import { EUTaxDetails } from './common/components/EUTaxDetails';
+import { Divider } from '$app/components/cards/Divider';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -51,7 +52,7 @@ export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
 
-const PEPPOL_COUNTRIES = [
+export const PEPPOL_COUNTRIES = [
   '40',
   '56',
   '208',
@@ -293,18 +294,15 @@ export function EInvoice() {
 
             {company?.settings.enable_e_invoice && (
               <div className="flex flex-col space-y-4">
-                {PEPPOL_COUNTRIES.map((currentCountryId) => (
-                  <EURegionSelector
-                    key={currentCountryId}
-                    countryId={currentCountryId}
-                  />
-                ))}
-
                 <PaymentMeansForm
                   ref={eInvoiceRef}
                   currentEInvoice={company?.e_invoice || {}}
                   entity="company"
                 />
+
+                <Divider />
+
+                <EUTaxDetails />
               </div>
             )}
           </>
