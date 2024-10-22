@@ -36,8 +36,8 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
-import { Disconnect, Onboarding } from './peppol/Onboarding';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Onboarding } from './peppol/Onboarding';
+import { Preferences } from './peppol/Preferences';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -149,8 +149,6 @@ export function EInvoice() {
       setSaveChanges(false);
     }
   }, [saveChanges]);
-
-  const accentColor = useAccentColor();
 
   return (
     <Settings
@@ -331,18 +329,13 @@ export function EInvoice() {
             ) : null}
           </>
         )}
-
-        {company?.legal_entity_id &&
-          company?.settings.e_invoice_type === 'PEPPOL' && (
-            <Element leftSide={t('disconnect')}>
-              <div className="flex items-center gap-1">
-                <p>{t('peppol_disconnect_short')}</p>
-
-                <Disconnect />
-              </div>
-            </Element>
-          )}
       </Card>
+
+      {company?.settings.e_invoice_type === 'PEPPOL' &&
+      isPeppolStandardEnabled &&
+      company.legal_entity_id ? (
+        <Preferences />
+      ) : null}
     </Settings>
   );
 }
