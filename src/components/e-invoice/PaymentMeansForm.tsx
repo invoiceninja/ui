@@ -40,13 +40,19 @@ interface PaymentMeansFormComponent {
   saveEInvoice: () => void;
 }
 
+interface PaymentMeans {
+  code: string;
+  iban: string;
+  bic: string;
+  account_name: string;
+  information: string;
+  cardholder_name: string;
+  card_type: string;
+}
+
 interface FormDetails {
   entity: Entity;
-  payment_means: {
-    code: string;
-    iban: string;
-    bic: string;
-  };
+  payment_means: PaymentMeans[];
 }
 
 export const PaymentMeansForm = forwardRef<PaymentMeansFormComponent, Props>(
@@ -58,7 +64,17 @@ export const PaymentMeansForm = forwardRef<PaymentMeansFormComponent, Props>(
     const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
     const [formDetails, setFormDetails] = useState<FormDetails>({
       entity: props.entity,
-      payment_means: { code: '', iban: '', bic: '' },
+      payment_means: [
+        {
+          code: '',
+          iban: '',
+          bic: '',
+          account_name: '',
+          information: '',
+          cardholder_name: '',
+          card_type: '',
+        },
+      ],
     });
 
     const onChange = (value: string, property: string) => {
@@ -100,22 +116,58 @@ export const PaymentMeansForm = forwardRef<PaymentMeansFormComponent, Props>(
       <div>
         <Element leftSide="Code">
           <InputField
-            value={formDetails.payment_means.code || ''}
-            onValueChange={(value) => onChange(value, 'payment_means.code')}
+            value={formDetails.payment_means?.[0]?.code || ''}
+            onValueChange={(value) => onChange(value, 'payment_means.0.code')}
           />
         </Element>
 
         <Element leftSide="IBAN">
           <InputField
-            value={formDetails.payment_means.iban || ''}
-            onValueChange={(value) => onChange(value, 'payment_means.iban')}
+            value={formDetails.payment_means?.[0]?.iban || ''}
+            onValueChange={(value) => onChange(value, 'payment_means.0.iban')}
           />
         </Element>
 
         <Element leftSide="BIC">
           <InputField
-            value={formDetails.payment_means.bic || ''}
-            onValueChange={(value) => onChange(value, 'payment_means.bic')}
+            value={formDetails.payment_means?.[0]?.bic || ''}
+            onValueChange={(value) => onChange(value, 'payment_means.0.bic')}
+          />
+        </Element>
+
+        <Element leftSide={t('account_name')}>
+          <InputField
+            value={formDetails.payment_means?.[0]?.account_name || ''}
+            onValueChange={(value) =>
+              onChange(value, 'payment_means.0.account_name')
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('information')}>
+          <InputField
+            value={formDetails.payment_means?.[0]?.information || ''}
+            onValueChange={(value) =>
+              onChange(value, 'payment_means.0.information')
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('card_type')}>
+          <InputField
+            value={formDetails.payment_means?.[0]?.card_type || ''}
+            onValueChange={(value) =>
+              onChange(value, 'payment_means.0.card_type')
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('cardholder_name')}>
+          <InputField
+            value={formDetails.payment_means?.[0]?.cardholder_name || ''}
+            onValueChange={(value) =>
+              onChange(value, 'payment_means.0.cardholder_name')
+            }
           />
         </Element>
       </div>

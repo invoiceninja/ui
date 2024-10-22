@@ -28,7 +28,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { useFormik } from 'formik';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { updateRecord } from '$app/common/stores/slices/company-users';
@@ -39,6 +39,9 @@ import { ValidationAlert } from './common/components/ValidationAlert';
 import { useCheckEInvoiceValidation } from './common/hooks/useCheckEInvoiceValidation';
 import { route } from '$app/common/helpers/route';
 import { PaymentMeansForm } from '$app/components/e-invoice/PaymentMeansForm';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
+import { EURegionSelector } from './common/components/EURegionSelector';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -48,7 +51,19 @@ export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
 
-const PEPPOL_COUNTRIES = ['276', '724', '756'];
+const PEPPOL_COUNTRIES = [
+  '40',
+  '56',
+  '208',
+  '276',
+  '352',
+  '372',
+  '442',
+  '528',
+  '578',
+  '752',
+  '826',
+];
 
 export function EInvoice() {
   const [t] = useTranslation();
@@ -69,6 +84,7 @@ export function EInvoice() {
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const company = useInjectCompanyChanges();
+
   const { isValid } = useCheckEInvoiceValidation({
     entity: isCompanySettingsActive ? 'companies' : 'clients',
     entity_id: (isCompanySettingsActive
@@ -84,6 +100,16 @@ export function EInvoice() {
 
   const [formData, setFormData] = useState(new FormData());
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
+
+  const shouldShowPEPPOLOption = () => {
+    const isPlanActive =
+      (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
+
+    return (
+      isPlanActive &&
+      PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
+    );
+  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -218,10 +244,9 @@ export function EInvoice() {
               handleChange('settings.e_invoice_type', value)
             }
             disabled={disableSettingsField('e_invoice_type')}
+            customSelector
           >
-            {PEPPOL_COUNTRIES.includes(company?.settings.country_id || '') && (
-              <option value="PEPPOL">PEPPOL</option>
-            )}
+            {shouldShowPEPPOLOption() && <option value="PEPPOL">PEPPOL</option>}
             <option value="FACT1">FACT1</option>
             <option value="EN16931">EN16931</option>
             <option value="XInvoice_3_0">XInvoice_3.0</option>
@@ -267,11 +292,20 @@ export function EInvoice() {
             )} */}
 
             {company?.settings.enable_e_invoice && (
-              <PaymentMeansForm
-                ref={eInvoiceRef}
-                currentEInvoice={company?.e_invoice || {}}
-                entity="company"
-              />
+              <div className="flex flex-col space-y-4">
+                {PEPPOL_COUNTRIES.map((currentCountryId) => (
+                  <EURegionSelector
+                    key={currentCountryId}
+                    countryId={currentCountryId}
+                  />
+                ))}
+
+                <PaymentMeansForm
+                  ref={eInvoiceRef}
+                  currentEInvoice={company?.e_invoice || {}}
+                  entity="company"
+                />
+              </div>
             )}
           </>
         ) : (
