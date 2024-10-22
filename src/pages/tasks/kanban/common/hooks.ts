@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, useFormatTime } from '$app/common/helpers';
+import { date } from '$app/common/helpers';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { useSetAtom } from 'jotai';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentTaskAtom, isKanbanViewSliderVisibleAtom } from './atoms';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export function useHandleCurrentTask(id: string | undefined) {
   const setCurrentTask = useSetAtom(currentTaskAtom);
@@ -33,7 +34,7 @@ export function useHandleCurrentTask(id: string | undefined) {
 export function useFormatTimeLog() {
   const { t } = useTranslation();
 
-  const formatTime = useFormatTime();
+  const formatTime = useDateTime({ formatOnlyTime: true });
 
   return (log: string) => {
     const logs: string[][] = [];
