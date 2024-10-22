@@ -92,7 +92,10 @@ export default function Invoices() {
   } = useChangeTemplate();
 
   useSocketEvent({
-    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
+    on: [
+      'App\\Events\\Invoice\\InvoiceWasPaid',
+      'App\\Events\\Invoice\\InvoiceWasViewed',
+    ],
     callback: () => $refetch(['invoices']),
   });
 
