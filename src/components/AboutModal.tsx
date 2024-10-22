@@ -36,6 +36,7 @@ import { useQuery } from 'react-query';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import axios from 'axios';
 
 interface SystemInfo {
   system_health: boolean;
@@ -100,11 +101,11 @@ export function AboutModal(props: Props) {
   const [systemInfo, setSystemInfo] = useState<SystemInfo>();
 
   const { data: latestVersion } = useQuery({
-    queryKey: ['/api/v1/self-update/check_version'],
+    queryKey: ['/pdf.invoicing.co/api/version'],
     queryFn: () =>
-      request('POST', endpoint('/api/v1/self-update/check_version')).then(
-        (response) => response.data
-      ),
+      axios
+        .get('https://pdf.invoicing.co/api/version')
+        .then((response) => response.data),
     staleTime: Infinity,
   });
 
@@ -527,9 +528,7 @@ export function AboutModal(props: Props) {
         onClose={() => {}}
         disableClosing
       >
-        <span className="text-center py-3 font-medium">
-          {t('in_progress')}
-        </span>
+        <span className="text-center py-3 font-medium">{t('in_progress')}</span>
       </Modal>
 
       <PasswordConfirmation
