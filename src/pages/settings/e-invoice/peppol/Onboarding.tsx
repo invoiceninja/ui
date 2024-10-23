@@ -45,7 +45,7 @@ export function Onboarding() {
   const [step, setStep] = useState<Step>('plan_check');
   const [steps, setSteps] = useState<Step[]>([
     'plan_check',
-    // 'token',
+    'token',
     'buy_credits',
     'form',
     'completed',
@@ -200,8 +200,25 @@ function Token({ onContinue }: StepProps) {
   const { t } = useTranslation();
 
   const accentColor = useAccentColor();
+  const company = useCurrentCompany();
 
   const [isTokenGenerated, setIsTokenGenerated] = useState(false);
+
+  const generate = () => {
+    toast.processing();
+
+    request('POST', endpoint('/api/einvoice/tokens/rotate'), {
+      company_key: company.company_key,
+    })
+      .then(() => {
+        toast.success('peppol_token_generated');
+
+        setIsTokenGenerated(true);
+      })
+      .catch(() => {
+        toast.error();
+      });
+  };
 
   return (
     <div>
@@ -214,11 +231,7 @@ function Token({ onContinue }: StepProps) {
 
       <div className="flex items-center gap-1 my-3">
         <p>You need to generate a token to continue.</p>
-        <button
-          type="button"
-          style={{ color: accentColor }}
-          onClick={() => setIsTokenGenerated(true)}
-        >
+        <button type="button" style={{ color: accentColor }} onClick={generate}>
           Generate token
         </button>
       </div>
@@ -278,7 +291,11 @@ function Form({ onContinue }: StepProps) {
 
       setErrors(null);
 
-      request('POST', endpoint('/api/v1/einvoice/peppol/setup'), {
+      const onboardingUrl = isSelfHosted()
+        ? import.meta.env.VITE_HOSTED_PEPPOL_ONBOARDING_URL
+        : endpoint('/api/v1/einvoice/peppol/setup');
+
+      request('POST', onboardingUrl, {
         ...values,
         tenant_id: company?.company_key,
       })
@@ -405,7 +422,11 @@ export function Disconnect() {
   const disconnect = () => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/einvoice/peppol/disconnect'))
+    const disconnectUrl = isSelfHosted()
+      ? import.meta.env.VITE_HOSTED_PEPPOL_DISCONNECT_URL
+      : endpoint('/api/v1/einvoice/peppol/disconnect');
+
+    request('POST', disconnectUrl)
       .then(() => {
         toast.success('peppol_successfully_disconnected');
       })
