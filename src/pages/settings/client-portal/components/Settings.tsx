@@ -144,19 +144,19 @@ export function Settings() {
               />
             )}
 
-            {isHosted() && company.portal_mode === 'domain' && (
+            {Boolean(isHosted() && company.portal_mode === 'domain') && (
               <CopyToClipboard
                 text={`${company?.portal_domain}/client/login`}
               />
             )}
 
-            {isHosted() && company.portal_mode === 'subdomain' && (
+            {Boolean(isHosted() && company.portal_mode === 'subdomain') && (
               <CopyToClipboard
                 text={`${company?.subdomain}.invoicing.co/client/login`}
               />
             )}
 
-            {isHosted() && company.portal_mode === 'domain' && (
+            {Boolean(isHosted() && company.portal_mode === 'domain') && (
               <div>
                 <span>{t('app_help_link')}</span>
                 <Link
