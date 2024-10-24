@@ -835,11 +835,11 @@ export default function GeneralSettings() {
   useEffect(() => {
     if (
       company?.settings &&
-      company?.settings.company_logo_size.includes('px')
+      company?.settings.company_logo_size?.includes('px')
     ) {
       setLogoSizeType('px');
     }
-  }, [company?.settings.company_logo_size]);
+  }, [company?.settings?.company_logo_size]);
 
   useEffect(() => {
     setUpdatingRecords([]);
