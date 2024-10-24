@@ -24,7 +24,7 @@ import { CountrySelector } from '$app/components/CountrySelector';
 import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -210,10 +210,15 @@ function Token({ onContinue }: StepProps) {
     request('POST', endpoint('/api/einvoice/tokens/rotate'), {
       company_key: company.company_key,
     })
-      .then(() => {
-        toast.success('peppol_token_generated');
-
-        setIsTokenGenerated(true);
+      .then((response: AxiosResponse<{ token: string }>) => {
+        request('PUT', endpoint(`/api/v1/einvoice/token/update`), {
+          token: response.data.token,
+        })
+          .then(() => {
+            toast.success('peppol_token_generated');
+            setIsTokenGenerated(true);
+          })
+          .catch(() => toast.error());
       })
       .catch(() => {
         toast.error();
