@@ -10,25 +10,23 @@
 
 import { useResolveDateFormat } from '$app/common/helpers/dates/date-format-resolver';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
 
 export function useResolveDateAndTimeClientFormat() {
   const company = useCurrentCompany();
   const clientResolver = useClientResolver();
+  const { timeFormat } = useCompanyTimeFormat();
 
   const resolveDateFormat = useResolveDateFormat();
-
-  const getTimeFormat = (militaryTime: boolean) => {
-    return militaryTime ? 'HH:mm:ss' : 'hh:mm:ss A';
-  };
 
   return async (relationId: string) => {
     const dateFormat = resolveDateFormat(company?.settings.date_format_id);
 
     const dateTimeFormats = {
       dateFormat,
-      timeFormat: getTimeFormat(Boolean(company?.settings.military_time)),
+      timeFormat: timeFormat,
     };
 
     if (relationId.length >= 1) {
@@ -39,9 +37,7 @@ export function useResolveDateAndTimeClientFormat() {
           );
         }
 
-        dateTimeFormats.timeFormat = getTimeFormat(
-          Boolean(client.settings.military_time)
-        );
+        dateTimeFormats.timeFormat = timeFormat;
       });
     }
 
