@@ -11,7 +11,6 @@
 import { useTranslation } from 'react-i18next';
 import { Settings } from '$app/components/layouts/Settings';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
@@ -29,13 +28,21 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { useFormik } from 'formik';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
+import { ValidationAlert } from './common/components/ValidationAlert';
+import { useCheckEInvoiceValidation } from './common/hooks/useCheckEInvoiceValidation';
+import { route } from '$app/common/helpers/route';
+import { PaymentMeansForm } from '$app/components/e-invoice/PaymentMeansForm';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
+import { EUTaxDetails } from './common/components/EUTaxDetails';
+import { Divider } from '$app/components/cards/Divider';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -44,11 +51,23 @@ export type EInvoiceType = {
 export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
+
+export const PEPPOL_COUNTRIES = [
+  '40',
+  '56',
+  '208',
+  '276',
+  '352',
+  '372',
+  '442',
+  '528',
+  '578',
+  '752',
+  '826',
+];
+
 export function EInvoice() {
   const [t] = useTranslation();
-
-  const isPeppolStandardEnabled =
-    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true';
 
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
@@ -66,12 +85,32 @@ export function EInvoice() {
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const company = useInjectCompanyChanges();
+
+  const { isValid } = useCheckEInvoiceValidation({
+    entity: isCompanySettingsActive ? 'companies' : 'clients',
+    entity_id: (isCompanySettingsActive
+      ? company?.id
+      : company?.settings.id) as string,
+    enableQuery:
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.settings.enable_e_invoice,
+  });
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
 
   const [formData, setFormData] = useState(new FormData());
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
+
+  const shouldShowPEPPOLOption = () => {
+    const isPlanActive =
+      (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
+
+    return (
+      isPlanActive &&
+      PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
+    );
+  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -153,15 +192,41 @@ export function EInvoice() {
       title={t('e_invoice')}
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
-      onSaveClick={() => {
-        if (eInvoiceRef?.current?.saveEInvoice()) {
-          handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
-        }
+      // onSaveClick={() => {
+      //   if (eInvoiceRef?.current?.saveEInvoice()) {
+      //     handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
+      //   } else {
+      //     handleChange('e_invoice', {});
+      //   }
 
-        setSaveChanges(true);
+      //   setSaveChanges(true);
+      // }}
+      onSaveClick={() => {
+        eInvoiceRef?.current?.saveEInvoice();
+        onSave();
       }}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={
+        showPlanAlert ||
+        (company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          !isValid)
+      }
     >
+      {Boolean(
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          !isValid
+      ) && (
+        <ValidationAlert
+          to={
+            isCompanySettingsActive
+              ? '/settings/company_details'
+              : route('/clients/:id/edit', { id: company?.settings.id })
+          }
+          entity={isCompanySettingsActive ? 'company' : 'client'}
+        />
+      )}
+
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('e_invoice')}>
@@ -180,8 +245,9 @@ export function EInvoice() {
               handleChange('settings.e_invoice_type', value)
             }
             disabled={disableSettingsField('e_invoice_type')}
+            customSelector
           >
-            {isPeppolStandardEnabled && <option value="PEPPOL">PEPPOL</option>}
+            {shouldShowPEPPOLOption() && <option value="PEPPOL">PEPPOL</option>}
             <option value="FACT1">FACT1</option>
             <option value="EN16931">EN16931</option>
             <option value="XInvoice_3_0">XInvoice_3.0</option>
@@ -200,31 +266,48 @@ export function EInvoice() {
           </SelectField>
         </Element>
 
-        {company?.settings.e_invoice_type === 'PEPPOL' &&
-        isPeppolStandardEnabled ? (
-          <EInvoiceGenerator
-            ref={eInvoiceRef}
-            currentEInvoice={company?.e_invoice || {}}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="enable_e_invoice"
+              labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
+            />
+          }
+        >
+          <Toggle
+            checked={Boolean(company?.settings.enable_e_invoice)}
+            onValueChange={(value) =>
+              handleChange('settings.enable_e_invoice', value)
+            }
+            disabled={disableSettingsField('enable_e_invoice')}
           />
+        </Element>
+
+        {company?.settings.e_invoice_type === 'PEPPOL' ? (
+          <>
+            {/* {company?.settings.enable_e_invoice && (
+              <EInvoiceGenerator
+                ref={eInvoiceRef}
+                currentEInvoice={company?.e_invoice || {}}
+              />
+            )} */}
+
+            {company?.settings.enable_e_invoice && (
+              <div className="flex flex-col space-y-4">
+                <PaymentMeansForm
+                  ref={eInvoiceRef}
+                  currentEInvoice={company?.e_invoice || {}}
+                  entity="company"
+                />
+
+                <Divider />
+
+                <EUTaxDetails />
+              </div>
+            )}
+          </>
         ) : (
           <>
-            <Element
-              leftSide={
-                <PropertyCheckbox
-                  propertyKey="enable_e_invoice"
-                  labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
-                />
-              }
-            >
-              <Toggle
-                checked={Boolean(company?.settings.enable_e_invoice)}
-                onValueChange={(value) =>
-                  handleChange('settings.enable_e_invoice', value)
-                }
-                disabled={disableSettingsField('enable_e_invoice')}
-              />
-            </Element>
-
             {company?.settings.enable_e_invoice ? (
               <>
                 <Element

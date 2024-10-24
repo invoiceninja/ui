@@ -91,6 +91,7 @@ export interface Company {
 }
 
 export interface Settings {
+  id?: string;
   accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
   auto_bill_standard_invoices: boolean;
@@ -413,6 +414,7 @@ export interface TaxSetting {
   tax_rate: number;
   tax_name: string;
   reduced_tax_rate: number;
+  vat_number: string;
 }
 
 export interface EURegion {
