@@ -47,6 +47,7 @@ import { date as formatDate } from '$app/common/helpers';
 import { useFormatTimeLog } from '../../kanban/common/hooks';
 import { TaskClock } from '../../kanban/components/TaskClock';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -66,26 +67,24 @@ function useGenerateActivityElement() {
         </Link>
       ),
       user: activity.user?.label ?? t('system'),
-      task:
-        (
-          <Link
-            to={route('/tasks/:id/edit', {
-              id: activity.task?.hashed_id,
-            })}
-          >
-            {activity?.task?.label}
-          </Link>
-        ) ?? '',
-      contact:
-        (
-          <Link
-            to={route('/clients/:id/edit', {
-              id: activity?.contact?.hashed_id,
-            })}
-          >
-            {activity?.contact?.label}
-          </Link>
-        ) ?? '',
+      task: (
+        <Link
+          to={route('/tasks/:id/edit', {
+            id: activity.task?.hashed_id,
+          })}
+        >
+          {activity?.task?.label}
+        </Link>
+      ),
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', {
+            id: activity?.contact?.hashed_id,
+          })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      ),
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -104,8 +103,10 @@ export function TaskSlider() {
     showCommonBulkAction: true,
     showEditAction: true,
   });
-  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const { timeFormat } = useCompanyTimeFormat();
   const userNumberPrecision = useUserNumberPrecision();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
   const formatTimeLog = useFormatTimeLog();
@@ -215,7 +216,9 @@ export function TaskSlider() {
             >
               <p>{activityElement(activity)}</p>
               <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>
+                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                </p>
                 <p>&middot;</p>
                 <p>{activity.ip}</p>
               </div>
