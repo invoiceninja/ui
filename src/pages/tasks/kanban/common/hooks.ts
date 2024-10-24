@@ -15,6 +15,7 @@ import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentTaskAtom, isKanbanViewSliderVisibleAtom } from './atoms';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export function useHandleCurrentTask(id: string | undefined) {
   const setCurrentTask = useSetAtom(currentTaskAtom);
@@ -33,14 +34,16 @@ export function useHandleCurrentTask(id: string | undefined) {
 export function useFormatTimeLog() {
   const { t } = useTranslation();
 
+  const formatTime = useDateTime({ formatOnlyTime: true });
+
   return (log: string) => {
     const logs: string[][] = [];
 
     parseTimeLog(log).map(([start, end]) => {
       logs.push([
         date(start, 'YYYY-MM-DD'),
-        new Date(start * 1000).toLocaleTimeString(),
-        end === 0 ? t('now') : new Date(end * 1000).toLocaleTimeString(),
+        formatTime(start),
+        end === 0 ? t('now') : formatTime(end),
       ]);
     });
 

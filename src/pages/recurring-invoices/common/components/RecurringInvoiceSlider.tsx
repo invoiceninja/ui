@@ -51,6 +51,7 @@ import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -128,6 +129,7 @@ export const RecurringInvoiceSlider = () => {
     showEditAction: true,
   });
 
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
@@ -317,7 +319,7 @@ export const RecurringInvoiceSlider = () => {
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>{dayjs.unix(activity.created_at).fromNow()}</p>
                   </div>
@@ -378,7 +380,7 @@ export const RecurringInvoiceSlider = () => {
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>&middot;</p>
                     <p>{activity.ip}</p>

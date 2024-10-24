@@ -25,6 +25,7 @@ import { ReactNode, useState } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 const Div = styled.div`
   border-color: ${(props) => props.theme.borderColor};
@@ -35,6 +36,8 @@ const Div = styled.div`
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
+
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const generate = (activity: ActivityRecord) => {
@@ -224,7 +227,10 @@ export function useGenerateActivityElement() {
 
         <div className="flex space-x-3">
           <span className="dark:text-white text-sm">
-            {date(activity.created_at, dateFormat + ' HH:mm')}
+            {date(
+              activity.created_at,
+              `${dateFormat} ${timeFormat.replace(':ss', '')}`
+            )}
           </span>
 
           <span className="text-gray-500 text-sm">{activity.ip}</span>

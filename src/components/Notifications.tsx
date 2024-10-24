@@ -25,6 +25,7 @@ import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { Credit } from '$app/common/interfaces/credit';
 import { Payment } from '$app/common/interfaces/payment';
 import classNames from 'classnames';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export interface Notification {
   label: string;
@@ -40,6 +41,8 @@ export const notificationsAtom = atomWithStorage<Notification[]>(
 
 export function Notifications() {
   const { t } = useTranslation();
+
+  const { timeFormat } = useCompanyTimeFormat();
 
   const [isVisible, setIsVisible] = useState(false);
   const [notifications, setNotifications] = useAtom(notificationsAtom);
@@ -202,7 +205,10 @@ export function Notifications() {
             <div>
               <p>{notification.label}</p>
               <p className="text-xs">
-                {date(notification.date, `${dateFormat.dateFormat} hh:mm:ss`)}
+                {date(
+                  notification.date,
+                  `${dateFormat.dateFormat} ${timeFormat}`
+                )}
               </p>
             </div>
           </ClickableElement>
