@@ -21,6 +21,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { Card } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
 import { useGenerateActivityElement } from '../../common/components/InvoiceSlider';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export default function Activities() {
   const [t] = useTranslation();
@@ -29,6 +30,7 @@ export default function Activities() {
 
   const activityElement = useGenerateActivityElement();
 
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: activities, isLoading } = useQuery({
@@ -61,7 +63,7 @@ export default function Activities() {
         <NonClickableElement key={activity.id} className="flex flex-col">
           <p>{activityElement(activity)}</p>
           <p className="inline-flex items-center space-x-1">
-            <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+            <p>{date(activity.created_at, `${dateFormat} ${timeFormat}`)}</p>
             <p>&middot;</p>
             <p>{activity.ip}</p>
           </p>
