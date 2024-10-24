@@ -10,21 +10,30 @@
 
 import { useBulkUpdatesColumns } from '$app/common/hooks/useBulkUpdatesColumns';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useBulk } from '$app/common/queries/clients';
+import { useBulk as useBulkClients } from '$app/common/queries/clients';
+import { useBulk as useBulkExpenses } from '$app/common/queries/expenses';
+import { useBulkAction as useBulkRecurringInvoices } from '$app/pages/recurring-invoices/common/queries';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { CustomField } from '$app/components/CustomField';
 import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputLabel, SelectField } from '$app/components/forms';
+import {
+  Button,
+  InputField,
+  InputLabel,
+  SelectField,
+} from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Icon } from '$app/components/icons/Icon';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCached } from 'react-icons/md';
+import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
-  entity: 'client';
+  entity: 'client' | 'expense' | 'recurring_invoice';
   resourceIds: string[];
   setSelected: Dispatch<SetStateAction<string[]>>;
 }
@@ -36,11 +45,17 @@ interface BulkUpdateField {
     | 'industrySelector'
     | 'sizeSelector'
     | 'countrySelector'
-    | 'customField';
+    | 'customField'
+    | 'taxSelector'
+    | 'toggle'
+    | 'textarea';
 }
 
 const bulkUpdateFieldsTypes: BulkUpdateField[] = [
+  { key: 'private_notes', type: 'markdownEditor' },
   { key: 'public_notes', type: 'markdownEditor' },
+  { key: 'terms', type: 'markdownEditor' },
+  { key: 'footer', type: 'markdownEditor' },
   { key: 'industry_id', type: 'industrySelector' },
   { key: 'size_id', type: 'sizeSelector' },
   { key: 'country_id', type: 'countrySelector' },
@@ -48,6 +63,11 @@ const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'custom_value2', type: 'customField' },
   { key: 'custom_value3', type: 'customField' },
   { key: 'custom_value4', type: 'customField' },
+  { key: 'tax1', type: 'taxSelector' },
+  { key: 'tax2', type: 'taxSelector' },
+  { key: 'tax3', type: 'taxSelector' },
+  { key: 'should_be_invoiced', type: 'toggle' },
+  { key: 'uses_inclusive_taxes', type: 'toggle' },
 ];
 
 export function BulkUpdatesAction(props: Props) {
@@ -55,7 +75,9 @@ export function BulkUpdatesAction(props: Props) {
 
   const { setSelected, resourceIds } = props;
 
-  const bulk = useBulk();
+  const bulkClients = useBulkClients();
+  const bulkExpenses = useBulkExpenses();
+  const bulkRecurringInvoices = useBulkRecurringInvoices();
 
   const { data: statics } = useStaticsQuery();
 
@@ -75,21 +97,83 @@ export function BulkUpdatesAction(props: Props) {
   };
 
   const getFieldType = () => {
+    if (props.entity === 'expense' && column.includes('notes')) {
+      return 'textarea';
+    }
+
     return bulkUpdateFieldsTypes.find(({ key }) => key === column)?.type || '';
   };
 
   const showColumn = (columnKey: string) => {
+    if (columnKey.includes('rate')) {
+      return false;
+    }
+
     if (columnKey.startsWith('custom_value')) {
       return Boolean(
         company.custom_fields[columnKey.replace('custom_value', props.entity)]
       );
     }
 
+    if (columnKey.startsWith('tax')) {
+      const taxNumber = Number(columnKey.split('tax')[1]);
+
+      const enabledTaxRates =
+        props.entity === 'expense'
+          ? company.enabled_expense_tax_rates
+          : company.enabled_tax_rates;
+
+      if (taxNumber === 1) {
+        return Boolean(enabledTaxRates > 0);
+      }
+
+      if (taxNumber === 2) {
+        return Boolean(enabledTaxRates > 1);
+      }
+
+      return Boolean(enabledTaxRates > 2);
+    }
+
     return true;
+  };
+
+  const getColumnTranslation = (currentColumn: string) => {
+    if (currentColumn.startsWith('custom_value')) {
+      return company.custom_fields[
+        currentColumn.replace('custom_value', props.entity)
+      ].split('|')[0];
+    }
+
+    return t(currentColumn);
   };
 
   const getCustomFieldKey = () => {
     return column.replace('custom_value', props.entity);
+  };
+
+  const handleUpdate = () => {
+    if (props.entity === 'client') {
+      bulkClients(resourceIds, 'bulk_update', {
+        column,
+        newValue: newColumnValue,
+      }).then(() => handleOnClose());
+    }
+
+    if (props.entity === 'expense') {
+      bulkExpenses(resourceIds, 'bulk_update', {
+        column,
+        new_value: newColumnValue,
+      }).then(() => handleOnClose());
+    }
+
+    if (props.entity === 'recurring_invoice') {
+      bulkRecurringInvoices(resourceIds, 'bulk_update', {
+        column,
+        new_value: newColumnValue,
+      }).then(() => handleOnClose());
+    }
+
+    setSelected([]);
   };
 
   return (
@@ -117,20 +201,36 @@ export function BulkUpdatesAction(props: Props) {
               setNewColumnValue('');
             }}
             withBlank
+            customSelector
           >
-            {bulkUpdatesColumns?.[props.entity].map(
-              (currentColumn) =>
-                showColumn(currentColumn) && (
-                  <option key={currentColumn} value={currentColumn}>
-                    {t(currentColumn)}
-                  </option>
-                )
-            )}
+            {bulkUpdatesColumns?.[props.entity]
+              .filter((currentCol) => showColumn(currentCol))
+              .map((currentColumn) => (
+                <option key={currentColumn} value={currentColumn}>
+                  {getColumnTranslation(currentColumn)}
+                </option>
+              ))}
           </SelectField>
 
           <div className="flex flex-col">
             {Boolean(getFieldType()) && (
               <InputLabel className="mb-2">{t('value')}</InputLabel>
+            )}
+
+            {getFieldType() === 'taxSelector' && (
+              <TaxRateSelector
+                defaultValue={newColumnValue}
+                onChange={(value) =>
+                  value?.resource &&
+                  setNewColumnValue(
+                    `${value.resource.name}||${value.resource.rate}`
+                  )
+                }
+                onTaxCreated={(taxRate) =>
+                  setNewColumnValue(`${taxRate.name}||${taxRate.rate}`)
+                }
+                onClearButtonClick={() => setNewColumnValue('')}
+              />
             )}
 
             {getFieldType() === 'markdownEditor' && (
@@ -190,19 +290,27 @@ export function BulkUpdatesAction(props: Props) {
                   fieldOnly
                 />
               )}
+
+            {getFieldType() === 'toggle' && (
+              <Toggle
+                checked={newColumnValue as boolean}
+                onChange={(value) => setNewColumnValue(value)}
+              />
+            )}
+
+            {getFieldType() === 'textarea' && (
+              <InputField
+                element="textarea"
+                value={newColumnValue as string}
+                onValueChange={(value) => setNewColumnValue(value)}
+              />
+            )}
           </div>
 
           <div className="flex self-end">
             <Button
               behavior="button"
-              onClick={() => {
-                bulk(resourceIds, 'bulk_update', {
-                  column,
-                  newValue: newColumnValue,
-                }).then(() => handleOnClose());
-
-                setSelected([]);
-              }}
+              onClick={handleUpdate}
               disabled={!column}
               disableWithoutIcon
             >
