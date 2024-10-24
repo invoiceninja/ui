@@ -419,6 +419,7 @@ function Form({ onContinue }: StepProps) {
 export function Disconnect() {
   const accentColor = useAccentColor();
   const refresh = useRefreshCompanyUsers();
+  const company = useCurrentCompany();
 
   const { t } = useTranslation();
 
@@ -431,7 +432,9 @@ export function Disconnect() {
       ? import.meta.env.VITE_HOSTED_PEPPOL_DISCONNECT_URL
       : endpoint('/api/v1/einvoice/peppol/disconnect');
 
-    request('POST', disconnectUrl)
+    request('POST', disconnectUrl, {
+      company_key: company.company_key,
+    })
       .then(() => {
         toast.success('peppol_successfully_disconnected');
       })
