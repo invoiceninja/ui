@@ -13,6 +13,8 @@ interface ImportMetaEnv extends Readonly<Record<string, string>> {
   readonly VITE_IS_PRODUCTION: string;
   readonly VITE_WHITELABEL_INVOICE_URL: string;
   readonly VITE_PUSHER_APP_KEY: string;
+  readonly VITE_HOSTED_PEPPOL_ONBOARDING_URL: string;
+  readonly VITE_HOSTED_PEPPOL_DISCONNECT_URL: string;
 }
 
 interface ImportMeta {
