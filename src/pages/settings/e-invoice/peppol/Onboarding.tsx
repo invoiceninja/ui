@@ -12,6 +12,7 @@ import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import {
   useIsPaid,
@@ -24,7 +25,7 @@ import { CountrySelector } from '$app/components/CountrySelector';
 import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
-import { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +44,7 @@ export function Onboarding() {
   const [isVisible, setIsVisible] = useState(false);
 
   const [step, setStep] = useState<Step>('plan_check');
+
   const [steps, setSteps] = useState<Step[]>([
     'plan_check',
     'token',
@@ -50,6 +52,8 @@ export function Onboarding() {
     'form',
     'completed',
   ]);
+
+  const [licenseKey, setLicenseKey] = useState('');
 
   useEffect(() => {
     if (step === 'completed') {
@@ -72,6 +76,12 @@ export function Onboarding() {
       setStep(next);
     }
   };
+
+  useEffect(() => {
+    if (!isVisible) {
+      setLicenseKey('');
+    }
+  }, [isVisible]);
 
   return (
     <>
@@ -127,10 +137,16 @@ export function Onboarding() {
             </ol>
 
             {step === 'plan_check' && (
-              <PlanCheck step={step} onContinue={next} />
+              <PlanCheck
+                step={step}
+                onContinue={next}
+                setLicense={setLicenseKey}
+              />
             )}
 
-            {step === 'token' && <Token step={step} onContinue={next} />}
+            {step === 'token' && (
+              <Token step={step} onContinue={next} licenseKey={licenseKey} />
+            )}
 
             {step === 'buy_credits' && (
               <BuyCredits step={step} onContinue={next} />
@@ -149,19 +165,20 @@ interface StepProps {
   onContinue: () => void;
 }
 
-function PlanCheck({ onContinue }: StepProps) {
+type PlanCheckProps = StepProps & {
+  setLicense: (license: string) => void;
+};
+
+function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
   const isPaid = useIsPaid();
   const isWhitelabelled = useIsWhitelabelled();
+
+  const [hasValidLicense, setHasValidLicense] = useState(false);
+  const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (isSelfHosted() && isWhitelabelled) {
-      onContinue();
-
-      return;
-    }
-
     if (isHosted() && isPaid) {
       onContinue();
 
@@ -169,12 +186,65 @@ function PlanCheck({ onContinue }: StepProps) {
     }
   }, [isPaid, isWhitelabelled]);
 
+  const form = useFormik({
+    initialValues: {
+      license: '',
+    },
+    onSubmit(values, { setSubmitting }) {
+      setErrors(null);
+
+      const url = `${import.meta.env.VITE_HOSTED_PLATFORM_URL}/api/check`;
+
+      axios
+        .post(url, values)
+        .then(() => {
+          setHasValidLicense(true);
+          setLicense(values.license);
+
+          toast.success();
+        })
+        .catch((e: AxiosError<ValidationBag>) => {
+          if (e.response?.status === 422) {
+            setErrors(e.response.data);
+
+            toast.dismiss();
+
+            return;
+          }
+
+          toast.error(t('invalid_white_label_license')!);
+        })
+        .finally(() => setSubmitting(false));
+    },
+  });
+
   return (
     <div className="space-y-5">
-      {isSelfHosted() ? (
+      {isSelfHosted() && !isWhitelabelled ? (
         <div>
           {t('peppol_whitelabel_warning')} <br />
           <Link to="/settings/account_management">{t('purchase_license')}</Link>
+        </div>
+      ) : null}
+
+      {isSelfHosted() && isWhitelabelled ? (
+        <div>
+          {t('peppol_whitelabel_warning')} <br />
+          <form
+            className="mt-4"
+            id="checkLicenseForm"
+            onSubmit={form.handleSubmit}
+          >
+            <InputField
+              id="license"
+              name="license"
+              onChange={form.handleChange}
+              value={form.values.license}
+              label={t('license')}
+              errorMessage={errors?.errors.license}
+              disabled={form.isSubmitting || hasValidLicense}
+            />
+          </form>
         </div>
       ) : null}
 
@@ -188,27 +258,47 @@ function PlanCheck({ onContinue }: StepProps) {
       ) : null}
 
       <div className="flex justify-end">
-        <Button behavior="button" type="primary" onClick={() => onContinue()}>
-          {t('continue')} (in dev)
-        </Button>
+        {hasValidLicense ? (
+          <Button behavior="button" type="primary" onClick={() => onContinue()}>
+            {t('continue')}
+          </Button>
+        ) : (
+          <Button
+            form="checkLicenseForm"
+            type="primary"
+            onClick={form.submitForm}
+            disabled={form.isSubmitting}
+          >
+            {t('verify')}
+          </Button>
+        )}
       </div>
     </div>
   );
 }
 
-function Token({ onContinue }: StepProps) {
+type TokenProps = StepProps & {
+  licenseKey: string;
+};
+
+function Token({ onContinue, licenseKey }: TokenProps) {
   const { t } = useTranslation();
 
   const accentColor = useAccentColor();
-  const company = useCurrentCompany();
+  const account = useCurrentAccount();
 
   const [isTokenGenerated, setIsTokenGenerated] = useState(false);
 
   const generate = () => {
     toast.processing();
 
-    request('POST', endpoint('/api/einvoice/tokens/rotate'), {
-      company_key: company.company_key,
+    const url = `${
+      import.meta.env.VITE_HOSTED_PLATFORM_URL
+    }/api/einvoice/tokens/rotate`;
+
+    request('POST', url, {
+      account_key: account?.key,
+      license: licenseKey,
     })
       .then((response: AxiosResponse<{ token: string }>) => {
         request('PUT', endpoint(`/api/v1/einvoice/token/update`), {
@@ -228,16 +318,12 @@ function Token({ onContinue }: StepProps) {
   return (
     <div>
       <p>{t('peppol_tokens_info')}</p>
-      <p className="mt-2">
-        Token is used as another step to make sure invoices are sent securely.
-        Unlike white-label licenses, token can be rotated at any point without
-        need to wait on Invoice Ninja support.
-      </p>
+      <p className="mt-2">{t('peppol_token_description')}</p>
 
       <div className="flex items-center gap-1 my-3">
-        <p>You need to generate a token to continue.</p>
+        <p>{t('peppol_token_warning')}</p>
         <button type="button" style={{ color: accentColor }} onClick={generate}>
-          Generate token
+          {t('generate_token')}
         </button>
       </div>
 
@@ -296,11 +382,11 @@ function Form({ onContinue }: StepProps) {
 
       setErrors(null);
 
-      const onboardingUrl = isSelfHosted()
-        ? import.meta.env.VITE_HOSTED_PEPPOL_ONBOARDING_URL
-        : endpoint('/api/v1/einvoice/peppol/setup');
+      const url = `${
+        import.meta.env.VITE_HOSTED_PLATFORM_URL
+      }/api/einvoice/peppol/setup`;
 
-      request('POST', onboardingUrl, {
+      request('POST', url, {
         ...values,
         tenant_id: company?.company_key,
       })
@@ -428,11 +514,11 @@ export function Disconnect() {
   const disconnect = () => {
     toast.processing();
 
-    const disconnectUrl = isSelfHosted()
-      ? import.meta.env.VITE_HOSTED_PEPPOL_DISCONNECT_URL
-      : endpoint('/api/v1/einvoice/peppol/disconnect');
+    const url = `${
+      import.meta.env.VITE_HOSTED_PLATFORM_URL
+    }/api/einvoice/peppol/disconnect`;
 
-    request('POST', disconnectUrl, {
+    request('POST', url, {
       company_key: company.company_key,
     })
       .then(() => {
