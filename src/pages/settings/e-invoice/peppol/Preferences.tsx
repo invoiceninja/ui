@@ -36,13 +36,7 @@ export function Preferences() {
     onSubmit: (values) => {
       toast.processing();
 
-      const url = isHosted()
-        ? endpoint('/api/v1/einvoice/peppol/update')
-        : `${
-            import.meta.env.VITE_HOSTED_PLATFORM_URL
-          }/api/einvoice/peppol/update`;
-
-      request('PUT', url, values)
+      request('PUT', endpoint('/api/v1/einvoice/peppol/update'), values)
         .then(() => {
           toast.success(t('updated_settings')!);
         })
