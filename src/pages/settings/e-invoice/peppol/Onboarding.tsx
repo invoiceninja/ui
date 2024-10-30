@@ -175,7 +175,7 @@ type PlanCheckProps = StepProps & {
 };
 
 function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
-  const isPaid = useIsPaid();
+  const account = useCurrentAccount();
   const isWhitelabelled = useIsWhitelabelled();
 
   const [hasValidLicense, setHasValidLicense] = useState(false);
@@ -184,12 +184,12 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (isHosted() && isPaid) {
+    if (isHosted() && account?.plan === 'enterprise') {
       onContinue();
 
       return;
     }
-  }, [isPaid, isWhitelabelled]);
+  }, [account?.plan, isWhitelabelled]);
 
   const form = useFormik({
     initialValues: {
