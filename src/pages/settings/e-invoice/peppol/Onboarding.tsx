@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import {
+  endpoint,
+  hostedUrl,
+  isHosted,
+  isSelfHosted,
+} from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -193,7 +198,7 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
     onSubmit(values, { setSubmitting }) {
       setErrors(null);
 
-      const url = `${import.meta.env.VITE_HOSTED_PLATFORM_URL}/api/check`;
+      const url = `${hostedUrl()}/api/check`;
 
       axios
         .post(url, values)
@@ -238,7 +243,6 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
               disabled={form.isSubmitting || hasValidLicense}
             />
           </form>
-
           {!isWhitelabelled ? (
             <div className="mt-2">
               <Link to="/settings/account_management">
@@ -293,9 +297,7 @@ function Token({ onContinue, licenseKey }: TokenProps) {
   const generate = () => {
     toast.processing();
 
-    const url = `${
-      import.meta.env.VITE_HOSTED_PLATFORM_URL
-    }/api/einvoice/tokens/rotate`;
+    const url = `${hostedUrl()}/api/einvoice/tokens/rotate`;
 
     request('POST', url, {
       account_key: account?.key,
@@ -516,11 +518,7 @@ export function Disconnect() {
   const disconnect = () => {
     toast.processing();
 
-    const url = `${
-      import.meta.env.VITE_HOSTED_PLATFORM_URL
-    }/api/einvoice/peppol/disconnect`;
-
-    request('POST', url, {
+    request('POST', endpoint('/api/v1/einvoice/peppol/disconnect'), {
       company_key: company.company_key,
       legal_entity_id: company.legal_entity_id,
       tax_data: company.tax_data,
