@@ -15,24 +15,34 @@ import Toggle from '$app/components/forms/Toggle';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 
 export function Preferences() {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
+  const account = useCurrentAccount();
 
   const form = useFormik({
     initialValues: {
       acts_as_sender: company?.tax_data?.acts_as_sender,
       acts_as_receiver: company?.tax_data?.acts_as_receiver,
+      legal_entity_id: company.legal_entity_id,
+      e_invoicing_token: account?.e_invoicing_token,
     },
     onSubmit: (values) => {
       toast.processing();
 
-      request('PUT', endpoint('/api/v1/einvoice/peppol/update'), values)
+      const url = isHosted()
+        ? endpoint('/api/v1/einvoice/peppol/update')
+        : `${
+            import.meta.env.VITE_HOSTED_PLATFORM_URL
+          }/api/einvoice/peppol/update`;
+
+      request('PUT', url, values)
         .then(() => {
           toast.success(t('updated_settings')!);
         })

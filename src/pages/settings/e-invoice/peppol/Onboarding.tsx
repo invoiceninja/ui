@@ -220,14 +220,7 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
 
   return (
     <div className="space-y-5">
-      {isSelfHosted() && !isWhitelabelled ? (
-        <div>
-          {t('peppol_whitelabel_warning')} <br />
-          <Link to="/settings/account_management">{t('purchase_license')}</Link>
-        </div>
-      ) : null}
-
-      {isSelfHosted() && isWhitelabelled ? (
+      {isSelfHosted() ? (
         <div>
           {t('peppol_whitelabel_warning')} <br />
           <form
@@ -245,6 +238,14 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
               disabled={form.isSubmitting || hasValidLicense}
             />
           </form>
+
+          {!isWhitelabelled ? (
+            <div className="mt-2">
+              <Link to="/settings/account_management">
+                {t('purchase_license')}
+              </Link>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -362,6 +363,7 @@ function Form({ onContinue }: StepProps) {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
+  const account = useCurrentAccount();
 
   const [errors, setErrors] = useState<ValidationBag | null>(null);
 
@@ -382,13 +384,12 @@ function Form({ onContinue }: StepProps) {
 
       setErrors(null);
 
-      const url = `${
-        import.meta.env.VITE_HOSTED_PLATFORM_URL
-      }/api/einvoice/peppol/setup`;
-
-      request('POST', url, {
+      request('POST', endpoint('/api/v1/einvoice/peppol/setup'), {
         ...values,
         tenant_id: company?.company_key,
+        classification: company.settings.classification,
+        vat_number: company.settings.vat_number,
+        e_invoicing_token: account?.e_invoicing_token,
       })
         .then(() => {
           toast.success('peppol_successfully_configured');
@@ -506,6 +507,7 @@ export function Disconnect() {
   const accentColor = useAccentColor();
   const refresh = useRefreshCompanyUsers();
   const company = useCurrentCompany();
+  const account = useCurrentAccount();
 
   const { t } = useTranslation();
 
@@ -520,6 +522,9 @@ export function Disconnect() {
 
     request('POST', url, {
       company_key: company.company_key,
+      legal_entity_id: company.legal_entity_id,
+      tax_data: company.tax_data,
+      e_invoicing_token: account?.e_invoicing_token,
     })
       .then(() => {
         toast.success('peppol_successfully_disconnected');
