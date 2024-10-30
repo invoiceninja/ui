@@ -19,6 +19,7 @@ import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { Link } from '$app/components/forms';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -75,6 +76,17 @@ export function Preferences() {
             form.submitForm();
           }}
         />
+      </Element>
+
+      <Element leftSide={t('credits')}>
+        <div className="flex items-center gap-1">
+          <p>{t('total_credits_amount')}:</p>
+          <p>0</p>
+        </div>
+
+        <Link to="https://invoiceninja.com" external>
+          {t('buy_credits')}
+        </Link>
       </Element>
     </Card>
   );
