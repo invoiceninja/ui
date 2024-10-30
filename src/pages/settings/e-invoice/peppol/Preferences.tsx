@@ -15,7 +15,7 @@ import Toggle from '$app/components/forms/Toggle';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { request } from '$app/common/helpers/request';
-import { endpoint, isHosted } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
