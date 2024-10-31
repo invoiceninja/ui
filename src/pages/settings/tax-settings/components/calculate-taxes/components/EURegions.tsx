@@ -16,6 +16,7 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditSubRegionModal } from './EditSubRegionModal';
+import Toggle from '$app/components/forms/Toggle';
 
 export function EURegions() {
   const [t] = useTranslation();
@@ -155,6 +156,20 @@ export function EURegions() {
         subregion={subRegion}
         taxSetting={taxSetting}
       />
+
+      <Element
+        leftSide={<p className="lg:pl-5">(EU) {t('sales_above_threshold')}</p>}
+      >
+        <Toggle
+          id="tax_data.regions.EU.has_sales_above_threshold"
+          checked={
+            companyChanges?.tax_data?.regions?.EU?.has_sales_above_threshold
+          }
+          onValueChange={(v) =>
+            handleChange('tax_data.regions.EU.has_sales_above_threshold', v)
+          }
+        />
+      </Element>
     </>
   );
 }
