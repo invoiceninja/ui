@@ -20,12 +20,16 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Link } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { useState } from 'react';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 export function Preferences() {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
   const account = useCurrentAccount();
+  const accentColor = useAccentColor();
 
   const form = useFormik({
     initialValues: {
@@ -48,46 +52,80 @@ export function Preferences() {
     },
   });
 
+  const [creditsModalVisible, setCreditsModalVisible] = useState(false);
+
   return (
-    <Card title={`PEPPOL: ${t('preferences')}`}>
-      <Element leftSide={t('disconnect')}>
-        <div className="flex items-center gap-1">
-          <p>{t('peppol_disconnect_short')}</p>
+    <>
+      <Modal
+        title={t('buy_credits')}
+        visible={creditsModalVisible}
+        onClose={() => setCreditsModalVisible(false)}
+      >
+        <p>{t('peppol_credits_info')}</p>
 
-          <Disconnect />
+        <div className="py-2 flex gap-2 flex-col">
+          <Link
+            to="https://invoiceninja.invoicing.co/client/subscriptions/WJxboqNegw/purchase"
+            external
+          >
+            {t('buy')} (PEPPOL 500)
+          </Link>
+
+          <Link
+            to="https://invoiceninja.invoicing.co/client/subscriptions/k8mep0reMy/purchase"
+            external
+          >
+            {t('buy')} (PEPPOL 1000)
+          </Link>
         </div>
-      </Element>
+      </Modal>
 
-      <Element leftSide={t('act_as_sender')}>
-        <Toggle
-          checked={form.values.acts_as_sender}
-          onValueChange={(v) => {
-            form.setFieldValue('acts_as_sender', v);
-            form.submitForm();
-          }}
-        />
-      </Element>
+      <Card title={`PEPPOL: ${t('preferences')}`}>
+        <Element leftSide={t('disconnect')}>
+          <div className="flex items-center gap-1">
+            <p>{t('peppol_disconnect_short')}</p>
 
-      <Element leftSide={t('act_as_receiver')}>
-        <Toggle
-          checked={form.values.acts_as_receiver}
-          onValueChange={(v) => {
-            form.setFieldValue('acts_as_receiver', v);
-            form.submitForm();
-          }}
-        />
-      </Element>
+            <Disconnect />
+          </div>
+        </Element>
 
-      <Element leftSide={t('credits')}>
-        <div className="flex items-center gap-1">
-          <p>{t('total_credits_amount')}:</p>
-          <p>0</p>
-        </div>
+        <Element leftSide={t('act_as_sender')}>
+          <Toggle
+            checked={form.values.acts_as_sender}
+            onValueChange={(v) => {
+              form.setFieldValue('acts_as_sender', v);
+              form.submitForm();
+            }}
+          />
+        </Element>
 
-        <Link to="https://invoiceninja.com" external>
-          {t('buy_credits')}
-        </Link>
-      </Element>
-    </Card>
+        <Element leftSide={t('act_as_receiver')}>
+          <Toggle
+            checked={form.values.acts_as_receiver}
+            onValueChange={(v) => {
+              form.setFieldValue('acts_as_receiver', v);
+              form.submitForm();
+            }}
+          />
+        </Element>
+
+        <Element leftSide={t('credits')}>
+          <div className="flex items-center gap-1">
+            <p>{t('total_credits_amount')}:</p>
+            <p>{account?.e_invoice_quota}</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setCreditsModalVisible(true)}
+            style={{
+              color: accentColor,
+            }}
+          >
+            {t('buy_credits')}
+          </button>
+        </Element>
+      </Card>
+    </>
   );
 }
