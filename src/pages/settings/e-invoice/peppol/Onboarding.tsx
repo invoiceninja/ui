@@ -8,20 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  endpoint,
-  hostedUrl,
-  isHosted,
-  isSelfHosted,
-} from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import {
-  useIsWhitelabelled,
-} from '$app/common/hooks/usePaidOrSelfhost';
+import { useIsWhitelabelled } from '$app/common/hooks/usePaidOrSelfhost';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
@@ -29,7 +22,7 @@ import { CountrySelector } from '$app/components/CountrySelector';
 import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,8 +50,6 @@ export function Onboarding() {
     'completed',
   ]);
 
-  const [licenseKey, setLicenseKey] = useState('');
-
   useEffect(() => {
     if (step === 'completed') {
       setIsVisible(false);
@@ -80,12 +71,6 @@ export function Onboarding() {
       setStep(next);
     }
   };
-
-  useEffect(() => {
-    if (!isVisible) {
-      setLicenseKey('');
-    }
-  }, [isVisible]);
 
   return (
     <>
@@ -141,16 +126,10 @@ export function Onboarding() {
             </ol>
 
             {step === 'plan_check' && (
-              <PlanCheck
-                step={step}
-                onContinue={next}
-                setLicense={setLicenseKey}
-              />
+              <PlanCheck step={step} onContinue={next} />
             )}
 
-            {step === 'token' && (
-              <Token step={step} onContinue={next} licenseKey={licenseKey} />
-            )}
+            {step === 'token' && <Token step={step} onContinue={next} />}
 
             {step === 'buy_credits' && (
               <BuyCredits step={step} onContinue={next} />
@@ -169,16 +148,11 @@ interface StepProps {
   onContinue: () => void;
 }
 
-type PlanCheckProps = StepProps & {
-  setLicense: (license: string) => void;
-};
-
-function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
+function PlanCheck({ onContinue }: StepProps) {
   const account = useCurrentAccount();
   const isWhitelabelled = useIsWhitelabelled();
 
   const [hasValidLicense, setHasValidLicense] = useState(false);
-  const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const { t } = useTranslation();
 
@@ -191,30 +165,22 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
   }, [account?.plan, isWhitelabelled]);
 
   const form = useFormik({
-    initialValues: {
-      license: '',
-    },
-    onSubmit(values, { setSubmitting }) {
-      setErrors(null);
-
-      const url = `${hostedUrl()}/api/check`;
-
-      axios
-        .post(url, values)
+    initialValues: {},
+    onSubmit(_, { setSubmitting }) {
+      request('POST', endpoint('/api/v1/check_license'))
         .then(() => {
           setHasValidLicense(true);
-          setLicense(values.license);
 
           toast.success();
         })
         .catch((e: AxiosError<ValidationBag>) => {
           if (e.response?.status === 422) {
-            setErrors(e.response.data);
-
-            toast.dismiss();
+            toast.error(e.response.data.message);
 
             return;
           }
+
+          console.error(e);
 
           toast.error(t('invalid_white_label_license')!);
         })
@@ -231,17 +197,7 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
             className="mt-4"
             id="checkLicenseForm"
             onSubmit={form.handleSubmit}
-          >
-            <InputField
-              id="license"
-              name="license"
-              onChange={form.handleChange}
-              value={form.values.license}
-              label={t('license')}
-              errorMessage={errors?.errors.license}
-              disabled={form.isSubmitting || hasValidLicense}
-            />
-          </form>
+          ></form>
           {!isWhitelabelled ? (
             <div className="mt-2">
               <Link to="/settings/account_management">
@@ -281,40 +237,22 @@ function PlanCheck({ onContinue, setLicense }: PlanCheckProps) {
   );
 }
 
-type TokenProps = StepProps & {
-  licenseKey: string;
-};
-
-function Token({ onContinue, licenseKey }: TokenProps) {
+function Token({ onContinue }: StepProps) {
   const { t } = useTranslation();
 
   const accentColor = useAccentColor();
-  const account = useCurrentAccount();
 
   const [isTokenGenerated, setIsTokenGenerated] = useState(false);
 
   const generate = () => {
     toast.processing();
 
-    const url = `${hostedUrl()}/api/einvoice/tokens/rotate`;
-
-    request('POST', url, {
-      account_key: account?.key,
-      license: licenseKey,
-    })
-      .then((response: AxiosResponse<{ token: string }>) => {
-        request('PUT', endpoint(`/api/v1/einvoice/token/update`), {
-          token: response.data.token,
-        })
-          .then(() => {
-            toast.success('peppol_token_generated');
-            setIsTokenGenerated(true);
-          })
-          .catch(() => toast.error());
+    request('POST', endpoint(`/api/v1/einvoice/token/update`))
+      .then(() => {
+        toast.success('peppol_token_generated');
+        setIsTokenGenerated(true);
       })
-      .catch(() => {
-        toast.error();
-      });
+      .catch(() => toast.error());
   };
 
   return (
@@ -347,9 +285,21 @@ function BuyCredits({ onContinue }: StepProps) {
     <div>
       <p>{t('peppol_credits_info')}</p>
 
-      <Link to="https://invoiceninja.com" external>
-        {t('buy_credits')}
-      </Link>
+      <div className="py-2 flex gap-2 flex-col">
+        <Link
+          to="https://invoiceninja.invoicing.co/client/subscriptions/WJxboqNegw/purchase"
+          external
+        >
+          {t('buy')} (PEPPOL 500)
+        </Link>
+
+        <Link
+          to="https://invoiceninja.invoicing.co/client/subscriptions/k8mep0reMy/purchase"
+          external
+        >
+          {t('buy')} (PEPPOL 1000)
+        </Link>
+      </div>
 
       <div className="flex justify-end">
         <Button behavior="button" type="primary" onClick={() => onContinue()}>
