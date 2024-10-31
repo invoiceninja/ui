@@ -40,14 +40,6 @@ export function endpoint(endpoint: string, params = {}): string {
   return apiEndpoint() + route(endpoint, params);
 }
 
-export function hostedUrl(): string {
-  if (import.meta.env.VITE_HOSTED_PLATFORM_URL) {
-    return import.meta.env.VITE_HOSTED_PLATFORM_URL;
-  }
-
-  return 'https://invoicing.co';
-}
-
 export function fetcher(
   url: string,
   headers?: AxiosRequestHeaders,
