@@ -29,7 +29,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { useFormik } from 'formik';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { updateRecord } from '$app/common/stores/slices/company-users';
@@ -38,6 +38,9 @@ import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
+import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -47,10 +50,22 @@ export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
 export function EInvoice() {
+  const company = useInjectCompanyChanges();
   const [t] = useTranslation();
 
-  const isPeppolStandardEnabled =
-    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true';
+  const shouldShowPEPPOLOption = () => {
+    if (import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true') {
+      return false;
+    }
+
+    const isPlanActive =
+      (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
+
+    return (
+      isPlanActive &&
+      PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
+    );
+  };
 
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
@@ -67,7 +82,6 @@ export function EInvoice() {
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  const company = useInjectCompanyChanges();
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
@@ -183,7 +197,7 @@ export function EInvoice() {
             }
             disabled={disableSettingsField('e_invoice_type')}
           >
-            {isPeppolStandardEnabled && <option value="PEPPOL">PEPPOL</option>}
+            {shouldShowPEPPOLOption() && <option value="PEPPOL">PEPPOL</option>}
             <option value="FACT1">FACT1</option>
             <option value="EN16931">EN16931</option>
             <option value="XInvoice_3_0">XInvoice_3.0</option>
@@ -203,7 +217,7 @@ export function EInvoice() {
         </Element>
 
         {company?.settings.e_invoice_type === 'PEPPOL' &&
-        isPeppolStandardEnabled ? (
+        shouldShowPEPPOLOption() ? (
           company?.legal_entity_id ? (
             <EInvoiceGenerator
               ref={eInvoiceRef}
@@ -332,7 +346,7 @@ export function EInvoice() {
       </Card>
 
       {company?.settings.e_invoice_type === 'PEPPOL' &&
-      isPeppolStandardEnabled &&
+      shouldShowPEPPOLOption() &&
       company.legal_entity_id ? (
         <Preferences />
       ) : null}
