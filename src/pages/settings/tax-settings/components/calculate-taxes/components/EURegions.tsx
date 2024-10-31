@@ -48,6 +48,8 @@ export function EURegions() {
   };
 
   const divClickIntercept = (id: string) => {
+    console.log(id);
+
     const checkbox = document.getElementById(id.replace('.apply_tax', ''));
     checkbox?.click();
   };
@@ -95,15 +97,19 @@ export function EURegions() {
         regions?.map((value: [string, TaxSetting], index) => (
           <div
             key={index}
-            className="border py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center"
+            className="border py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center text-sm"
           >
             <div
               className="flex col-span-1 items-center justify-start pl-5"
-              onClick={() =>
+              onClick={(e) => {
+                if (e.target instanceof HTMLInputElement) {
+                  return;
+                }
+
                 divClickIntercept(
                   `tax_data.regions.EU.subregions.${value[0]}.apply_tax`
-                )
-              }
+                );
+              }}
             >
               <Checkbox
                 id={`tax_data.regions.EU.subregions.${value[0]}`}
