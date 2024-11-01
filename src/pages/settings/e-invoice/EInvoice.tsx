@@ -54,6 +54,10 @@ export function EInvoice() {
   const [t] = useTranslation();
 
   const shouldShowPEPPOLOption = () => {
+    if (import.meta.env.DEV) {
+      return true;
+    }
+
     if (import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true') {
       return false;
     }
