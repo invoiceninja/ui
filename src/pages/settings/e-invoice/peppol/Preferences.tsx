@@ -15,7 +15,7 @@ import Toggle from '$app/components/forms/Toggle';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
@@ -23,6 +23,8 @@ import { Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useQuery } from 'react-query';
+import { AxiosResponse } from 'axios';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -112,7 +114,7 @@ export function Preferences() {
         <Element leftSide={t('credits')}>
           <div className="flex items-center gap-1">
             <p>{t('total_credits_amount')}:</p>
-            <p>{account?.e_invoice_quota}</p>
+            <Quota />
           </div>
 
           <button
@@ -128,4 +130,35 @@ export function Preferences() {
       </Card>
     </>
   );
+}
+
+function Quota() {
+  const account = useCurrentAccount();
+
+  const data = useQuery({
+    queryKey: ['/api/v1/einvoice/quota'],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/einvoice/quota')).then(
+        (response: AxiosResponse<number>) => response.data
+      ),
+    enabled: isSelfHosted(),
+  });
+
+  if (isHosted()) {
+    return (
+      <div>
+        <p>{account?.e_invoice_quota}</p>
+      </div>
+    );
+  }
+
+  if (data && isSelfHosted()) {
+    return (
+      <div>
+        <p>{data.data}</p>
+      </div>
+    );
+  }
+
+  return null;
 }
