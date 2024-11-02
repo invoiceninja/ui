@@ -46,7 +46,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
-import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
+// import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import {
   useAdmin,
@@ -98,7 +98,7 @@ export function useActions(params?: Params) {
   const bulk = useBulk();
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
-  const reverseInvoice = useReverseInvoice();
+  // const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
