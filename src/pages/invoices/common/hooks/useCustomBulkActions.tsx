@@ -106,15 +106,15 @@ export const useCustomBulkActions = () => {
     );
   };
 
-  const showReverseOption = (invoices: Invoice[]) => {
-    return !invoices.some(
-      ({ status_id, is_deleted, archived_at }) =>
-        (status_id !== InvoiceStatus.Paid &&
-          status_id !== InvoiceStatus.Partial) ||
-        is_deleted ||
-        archived_at
-    );
-  };
+  // const showReverseOption = (invoices: Invoice[]) => {
+  //   return !invoices.some(
+  //     ({ status_id, is_deleted, archived_at }) =>
+  //       (status_id !== InvoiceStatus.Paid &&
+  //         status_id !== InvoiceStatus.Partial) ||
+  //       is_deleted ||
+  //       archived_at
+  //   );
+  // };
 
   const handleDownloadDocuments = (
     selectedInvoices: Invoice[],
