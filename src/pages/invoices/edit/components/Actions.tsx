@@ -360,26 +360,26 @@ export function useActions(params?: Params) {
       </EntityActionElement>
     ),
 
-    (invoice: Invoice) =>
-      (invoice.status_id === InvoiceStatus.Paid ||
-        invoice.status_id === InvoiceStatus.Partial) &&
-      !invoice.is_deleted &&
-      !invoice.archived_at &&
-      hasPermission('create_credit') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'reverse',
-          })}
-          entity="invoice"
-          actionKey="reverse"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('reverse')}
-          onClick={() => reverseInvoice(invoice)}
-          icon={MdRefresh}
-        >
-          {t('reverse')}
-        </EntityActionElement>
-      ),
+    // (invoice: Invoice) =>
+    //   (invoice.status_id === InvoiceStatus.Paid ||
+    //     invoice.status_id === InvoiceStatus.Partial) &&
+    //   !invoice.is_deleted &&
+    //   !invoice.archived_at &&
+    //   hasPermission('create_credit') && (
+    //     <EntityActionElement
+    //       {...(!dropdown && {
+    //         key: 'reverse',
+    //       })}
+    //       entity="invoice"
+    //       actionKey="reverse"
+    //       isCommonActionSection={!dropdown}
+    //       tooltipText={t('reverse')}
+    //       onClick={() => reverseInvoice(invoice)}
+    //       icon={MdRefresh}
+    //     >
+    //       {t('reverse')}
+    //     </EntityActionElement>
+    //   ),
     (invoice: Invoice) => (
       <DropdownElement
         onClick={() => {
