@@ -366,7 +366,7 @@ type FormProps = StepProps & {
   classification: string;
 };
 
-function Form({ onContinue, businessType }: FormProps) {
+function Form({ onContinue, businessType, classification }: FormProps) {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
@@ -387,6 +387,7 @@ function Form({ onContinue, businessType }: FormProps) {
       acts_as_receiver: true,
       vat_number: company?.settings?.vat_number || '',
       id_number: company?.settings.id_number || '',
+      classification
     },
     onSubmit: (values, { setSubmitting }) => {
       toast.processing();
