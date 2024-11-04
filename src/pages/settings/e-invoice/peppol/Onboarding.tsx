@@ -104,6 +104,13 @@ export function Onboarding() {
     }
   };
 
+  useEffect(() => {
+    if (!isVisible) {
+      setStep('plan_check');
+      setClassification(company?.settings?.classification ?? '');
+    }
+  }, [isVisible]);
+
   return (
     <>
       <Element>
@@ -387,7 +394,6 @@ function Form({ onContinue, businessType, classification }: FormProps) {
       acts_as_receiver: true,
       vat_number: company?.settings?.vat_number || '',
       id_number: company?.settings.id_number || '',
-      classification
     },
     onSubmit: (values, { setSubmitting }) => {
       toast.processing();
@@ -396,9 +402,8 @@ function Form({ onContinue, businessType, classification }: FormProps) {
 
       request('POST', endpoint('/api/v1/einvoice/peppol/setup'), {
         ...values,
+        classification,
         tenant_id: company?.company_key,
-        classification: company.settings.classification,
-        vat_number: company.settings.vat_number,
         e_invoicing_token: account?.e_invoicing_token,
       })
         .then(() => {
@@ -438,15 +443,19 @@ function Form({ onContinue, businessType, classification }: FormProps) {
 
         {businessType === 'business' ? (
           <InputField
-            value={company?.settings.vat_number || ''}
+            value={form.values.vat_number}
+            onChange={form.handleChange}
             label={t('vat_number')}
+            id="vat_number"
           />
         ) : null}
 
         {businessType === 'individual' ? (
           <InputField
-            value={company?.settings.id_number || ''}
+            value={form.values.id_number}
+            onChange={form.handleChange}
             label={t('id_number')}
+            id="id_number"
           />
         ) : null}
 
@@ -620,6 +629,8 @@ function Classification({
     <div>
       <p className="text-lg">Classification</p>
       <p>We&apos;ll update your company details with value provided below.</p>
+
+      <span>{classification}</span>
 
       <div className="my-3">
         <SelectField
