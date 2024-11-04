@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -19,36 +20,59 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import { CountrySelector } from '$app/components/CountrySelector';
-import { Button, InputField, Link } from '$app/components/forms';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 import { AxiosError } from 'axios';
+import classNames from 'classnames';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
+import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 
 export type Step =
   | 'plan_check'
   | 'token'
+  | 'vat_check'
+  | 'classification'
   | 'buy_credits'
   | 'form'
   | 'completed';
 
+const translations: Record<Step, string> = {
+  plan_check: 'plan',
+  token: 'token',
+  vat_check: 'vat',
+  classification: 'classification',
+  buy_credits: 'credits',
+  form: 'form',
+  completed: 'completed',
+};
+
+const defaultSteps: Step[] = [
+  'plan_check',
+  'token',
+  'vat_check',
+  'classification',
+  'buy_credits',
+  'form',
+  'completed',
+];
+
 export function Onboarding() {
   const accentColor = useAccentColor();
+  const company = useCurrentCompany();
+
   const { t } = useTranslation();
 
   const [isVisible, setIsVisible] = useState(false);
-
   const [step, setStep] = useState<Step>('plan_check');
-
-  const [steps, setSteps] = useState<Step[]>([
-    'plan_check',
-    'token',
-    'buy_credits',
-    'form',
-    'completed',
-  ]);
+  const [steps, setSteps] = useState<Step[]>(defaultSteps);
+  const [businessType, setBusinessType] = useState<'individual' | 'business'>();
+  const [classification, setClassification] = useState<string>(
+    company?.settings?.classification ?? ''
+  );
 
   useEffect(() => {
     if (step === 'completed') {
@@ -62,7 +86,15 @@ export function Onboarding() {
     if (isHosted()) {
       setSteps((c) => c.filter((s) => s !== 'token'));
     }
-  }, []);
+  }, [steps]);
+
+  useEffect(() => {
+    if (businessType === 'individual') {
+      setSteps((c) => c.filter((s) => s !== 'classification'));
+    } else {
+      setSteps(defaultSteps);
+    }
+  }, [businessType]);
 
   const next = () => {
     const next = steps[steps.indexOf(step) + 1];
@@ -100,7 +132,7 @@ export function Onboarding() {
           <div className="max-w-xl mx-auto space-y-10">
             <ol className="lg:flex items-center w-full space-y-4 lg:space-x-8 lg:space-y-0">
               {steps
-                .filter((s) => s !== 'completed')
+                .filter((s) => !['token', 'completed'].includes(s))
                 .map((s, i) => (
                   <li className="flex-1" key={i}>
                     <a
@@ -118,24 +150,50 @@ export function Onboarding() {
                         {t('step')} {i + 1}
                       </span>
                       <h4 className="text-base lg:text-lg text-gray-900">
-                        {t(s)}
+                        {t(translations[s])}
                       </h4>
                     </a>
                   </li>
                 ))}
             </ol>
 
-            {step === 'plan_check' && (
+            {step === 'plan_check' ? (
               <PlanCheck step={step} onContinue={next} />
-            )}
+            ) : null}
 
-            {step === 'token' && <Token step={step} onContinue={next} />}
+            {step === 'token' ? <Token step={step} onContinue={next} /> : null}
 
-            {step === 'buy_credits' && (
+            {step === 'vat_check' ? (
+              <VatCheck
+                businessType={businessType}
+                setBusinessType={setBusinessType}
+                onContinue={next}
+                step={step}
+              />
+            ) : null}
+
+            {step === 'classification' ? (
+              <Classification
+                businessType={businessType!}
+                onContinue={next}
+                step={step}
+                classification={classification}
+                setClassification={setClassification}
+              />
+            ) : null}
+
+            {step === 'buy_credits' ? (
               <BuyCredits step={step} onContinue={next} />
-            )}
+            ) : null}
 
-            {step === 'form' && <Form step={step} onContinue={next} />}
+            {step === 'form' ? (
+              <Form
+                step={step}
+                onContinue={next}
+                businessType={businessType!}
+                classification={classification}
+              />
+            ) : null}
           </div>
         </div>
       </Modal>
@@ -188,8 +246,14 @@ function PlanCheck({ onContinue }: StepProps) {
     },
   });
 
+  const buyWhitelabelUrl =
+    import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
+    'https://invoiceninja.invoicing.co/client/subscriptions/O5xe7Rwd7r/purchase';
+
   return (
     <div className="space-y-5">
+      <p className="text-lg">{isSelfHosted() ? t('license') : t('plan')}</p>
+
       {isSelfHosted() ? (
         <div>
           {t('peppol_whitelabel_warning')} <br />
@@ -200,7 +264,7 @@ function PlanCheck({ onContinue }: StepProps) {
           ></form>
           {!isWhitelabelled ? (
             <div className="mt-2">
-              <Link to="/settings/account_management">
+              <Link to={buyWhitelabelUrl} external>
                 {t('purchase_license')}
               </Link>
             </div>
@@ -238,67 +302,54 @@ function PlanCheck({ onContinue }: StepProps) {
 }
 
 function Token({ onContinue }: StepProps) {
-  const { t } = useTranslation();
-
-  const accentColor = useAccentColor();
-
-  const [isTokenGenerated, setIsTokenGenerated] = useState(false);
-
   const generate = () => {
-    toast.processing();
-
     request('POST', endpoint(`/api/v1/einvoice/token/update`))
       .then(() => {
-        toast.success('peppol_token_generated');
-        setIsTokenGenerated(true);
+        onContinue();
       })
       .catch(() => toast.error());
   };
 
-  return (
-    <div>
-      <p>{t('peppol_tokens_info')}</p>
-      <p className="mt-2">{t('peppol_token_description')}</p>
+  useEffect(() => {
+    generate();
+  }, []);
 
-      <div className="flex items-center gap-1 my-3">
-        <p>{t('peppol_token_warning')}</p>
-        <button type="button" style={{ color: accentColor }} onClick={generate}>
-          {t('generate_token')}
-        </button>
-      </div>
-
-      <div className="flex justify-end">
-        {isTokenGenerated ? (
-          <Button behavior="button" type="primary" onClick={() => onContinue()}>
-            {t('continue')}
-          </Button>
-        ) : null}
-      </div>
-    </div>
-  );
+  return <Spinner />;
 }
 
 function BuyCredits({ onContinue }: StepProps) {
   const { t } = useTranslation();
+  const colors = useColorScheme();
 
   return (
     <div>
+      <p className="text-lg">{t('credits')}</p>
       <p>{t('peppol_credits_info')}</p>
 
-      <div className="py-2 flex gap-2 flex-col">
-        <Link
-          to="https://invoiceninja.invoicing.co/client/subscriptions/WJxboqNegw/purchase"
-          external
+      <div className="my-3 space-y-2">
+        <a
+          href="https://invoiceninja.invoicing.co/client/subscriptions/WJxboqNegw/purchase"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded w-full p-3 text-left border flex justify-between items-center hover:underline"
+          style={{
+            backgroundColor: colors.$1,
+          }}
         >
           {t('buy')} (PEPPOL 500)
-        </Link>
+        </a>
 
-        <Link
-          to="https://invoiceninja.invoicing.co/client/subscriptions/k8mep0reMy/purchase"
-          external
+        <a
+          href="https://invoiceninja.invoicing.co/client/subscriptions/k8mep0reMy/purchase"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded w-full p-3 text-left border flex justify-between items-center hover:underline"
+          style={{
+            backgroundColor: colors.$1,
+          }}
         >
           {t('buy')} (PEPPOL 1000)
-        </Link>
+        </a>
       </div>
 
       <div className="flex justify-end">
@@ -310,7 +361,12 @@ function BuyCredits({ onContinue }: StepProps) {
   );
 }
 
-function Form({ onContinue }: StepProps) {
+type FormProps = StepProps & {
+  businessType: 'individual' | 'business';
+  classification: string;
+};
+
+function Form({ onContinue, businessType }: FormProps) {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
@@ -329,6 +385,8 @@ function Form({ onContinue }: StepProps) {
       country: company?.settings?.country_id || '',
       acts_as_sender: true,
       acts_as_receiver: true,
+      vat_number: company?.settings?.vat_number || '',
+      id_number: company?.settings.id_number || '',
     },
     onSubmit: (values, { setSubmitting }) => {
       toast.processing();
@@ -377,11 +435,19 @@ function Form({ onContinue }: StepProps) {
           errorMessage={errors?.errors.party_name}
         />
 
-        <InputField
-          value={company?.settings.vat_number || ''}
-          label={t('vat_number')}
-          disabled
-        />
+        {businessType === 'business' ? (
+          <InputField
+            value={company?.settings.vat_number || ''}
+            label={t('vat_number')}
+          />
+        ) : null}
+
+        {businessType === 'individual' ? (
+          <InputField
+            value={company?.settings.id_number || ''}
+            label={t('id_number')}
+          />
+        ) : null}
 
         <CountrySelector
           value={form.values.country}
@@ -454,6 +520,132 @@ function Form({ onContinue }: StepProps) {
   );
 }
 
+type VatCheckProps = StepProps & {
+  businessType: 'business' | 'individual' | undefined;
+  setBusinessType: (businessType: 'business' | 'individual') => void;
+};
+
+function VatCheck({
+  businessType,
+  setBusinessType,
+  onContinue,
+}: VatCheckProps) {
+  const { t } = useTranslation();
+
+  const accentColor = useAccentColor();
+  const colors = useColorScheme();
+
+  return (
+    <div>
+      <p className="text-lg">Are you registered for VAT?</p>
+
+      <div className="my-5 space-y-2">
+        <button
+          className="rounded w-full p-3 text-left border flex justify-between items-center"
+          style={{
+            backgroundColor: colors.$1,
+            borderColor: businessType === 'business' ? accentColor : colors.$5,
+          }}
+          onClick={() => setBusinessType('business')}
+        >
+          <p>Yes, I have a VAT number</p>
+
+          <Check
+            size={18}
+            color={accentColor}
+            className={classNames({
+              hidden: businessType !== 'business',
+            })}
+          />
+        </button>
+
+        <button
+          className="rounded w-full p-3 text-left border flex justify-between items-center"
+          style={{
+            backgroundColor: colors.$1,
+            borderColor:
+              businessType === 'individual' ? accentColor : colors.$5,
+          }}
+          onClick={() => setBusinessType('individual')}
+        >
+          <p>No, I am an individual</p>
+
+          <Check
+            size={18}
+            color={accentColor}
+            className={classNames({
+              hidden: businessType !== 'individual',
+            })}
+          />
+        </button>
+      </div>
+
+      <div className="flex justify-end">
+        <Button
+          behavior="button"
+          type="primary"
+          disabled={!businessType}
+          disableWithoutIcon
+          onClick={() => onContinue()}
+        >
+          {t('Continue')}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+type ClassificationProps = StepProps & {
+  businessType: 'business' | 'individual';
+  classification: string;
+  setClassification: (classification: string) => void;
+};
+
+function Classification({
+  classification,
+  setClassification,
+  businessType,
+  onContinue,
+}: ClassificationProps) {
+  useEffect(() => {
+    if (businessType === 'individual') {
+      onContinue();
+    }
+  }, []);
+
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <p className="text-lg">Classification</p>
+      <p>We&apos;ll update your company details with value provided below.</p>
+
+      <div className="my-3">
+        <SelectField
+          id="classification"
+          value={classification}
+          onValueChange={(value) => setClassification(value)}
+        >
+          <option value="individual">{t('individual')}</option>
+          <option value="business">{t('business')}</option>
+          <option value="company">{t('company')}</option>
+          <option value="partnership">{t('partnership')}</option>
+          <option value="trust">{t('trust')}</option>
+          <option value="charity">{t('charity')}</option>
+          <option value="government">{t('government')}</option>
+          <option value="other">{t('other')}</option>
+        </SelectField>
+      </div>
+
+      <div className="flex justify-end">
+        <Button behavior="button" type="primary" onClick={() => onContinue()}>
+          {t('Continue')}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function Disconnect() {
   const accentColor = useAccentColor();
   const refresh = useRefreshCompanyUsers();
@@ -505,7 +697,7 @@ export function Disconnect() {
 
         <div className="flex justify-end">
           <Button behavior="button" type="primary" onClick={disconnect}>
-            {t('Continue')}
+            {t('continue')}
           </Button>
         </div>
       </Modal>
