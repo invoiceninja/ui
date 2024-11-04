@@ -141,7 +141,7 @@ function Quota() {
       request('GET', endpoint('/api/v1/einvoice/quota')).then(
         (response: AxiosResponse<number>) => response.data
       ),
-    enabled: isSelfHosted(),
+    enabled: isSelfHosted() && import.meta.env.PROD,
   });
 
   if (isHosted()) {
