@@ -136,6 +136,8 @@ export function CreditDetails(props: Props) {
                 }
                 value={credit?.is_amount_discount.toString()}
                 errorMessage={errors?.errors.is_amount_discount}
+                customSelector
+                dismissable={false}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
