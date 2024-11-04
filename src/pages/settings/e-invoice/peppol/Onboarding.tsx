@@ -630,8 +630,6 @@ function Classification({
       <p className="text-lg">Classification</p>
       <p>We&apos;ll update your company details with value provided below.</p>
 
-      <span>{classification}</span>
-
       <div className="my-3">
         <SelectField
           id="classification"
