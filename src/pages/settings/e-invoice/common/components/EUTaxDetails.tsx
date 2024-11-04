@@ -14,11 +14,11 @@ import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
-import { PEPPOL_COUNTRIES } from '../../EInvoice';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
 import { cloneDeep } from 'lodash';
 import { Icon } from '$app/components/icons/Icon';
 import { MdClose } from 'react-icons/md';
+import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 
 export function EUTaxDetails() {
   const [t] = useTranslation();

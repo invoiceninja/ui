@@ -705,7 +705,7 @@ export function Disconnect() {
       >
         {t('peppol_disconnect_long')}
 
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-5">
           <Button behavior="button" type="primary" onClick={disconnect}>
             {t('continue')}
           </Button>

@@ -99,7 +99,8 @@ export function EInvoice() {
       : company?.settings.id) as string,
     enableQuery:
       company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.settings.enable_e_invoice,
+      company?.settings.enable_e_invoice &&
+      company?.legal_entity_id !== null,
   });
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -262,22 +263,24 @@ export function EInvoice() {
           </SelectField>
         </Element>
 
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="enable_e_invoice"
-              labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
-            />
-          }
-        >
-          <Toggle
-            checked={Boolean(company?.settings.enable_e_invoice)}
-            onValueChange={(value) =>
-              handleChange('settings.enable_e_invoice', value)
+        {company?.settings.e_invoice_type !== 'PEPPOL' ? (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="enable_e_invoice"
+                labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
+              />
             }
-            disabled={disableSettingsField('enable_e_invoice')}
-          />
-        </Element>
+          >
+            <Toggle
+              checked={Boolean(company?.settings.enable_e_invoice)}
+              onValueChange={(value) =>
+                handleChange('settings.enable_e_invoice', value)
+              }
+              disabled={disableSettingsField('enable_e_invoice')}
+            />
+          </Element>
+        ) : null}
 
         {company?.settings.e_invoice_type === 'PEPPOL' ? (
           <>
@@ -288,7 +291,7 @@ export function EInvoice() {
               />
             )} */}
 
-            {company?.settings.enable_e_invoice && (
+            {company?.settings.enable_e_invoice && company?.legal_entity_id ? (
               <div className="flex flex-col space-y-4">
                 <PaymentMeansForm
                   ref={eInvoiceRef}
@@ -300,6 +303,8 @@ export function EInvoice() {
 
                 <EUTaxDetails />
               </div>
+            ) : (
+              <Onboarding />
             )}
           </>
         ) : (
