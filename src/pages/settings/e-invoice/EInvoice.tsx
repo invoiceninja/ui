@@ -43,6 +43,9 @@ import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
 import { EUTaxDetails } from './common/components/EUTaxDetails';
 import { Divider } from '$app/components/cards/Divider';
+import { Onboarding } from './peppol/Onboarding';
+import { Preferences } from './peppol/Preferences';
+import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -52,22 +55,27 @@ export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
 
-export const PEPPOL_COUNTRIES = [
-  '40',
-  '56',
-  '208',
-  '276',
-  '352',
-  '372',
-  '442',
-  '528',
-  '578',
-  '752',
-  '826',
-];
-
 export function EInvoice() {
+  const company = useInjectCompanyChanges();
   const [t] = useTranslation();
+
+  const shouldShowPEPPOLOption = () => {
+    if (import.meta.env.DEV) {
+      return true;
+    }
+
+    if (import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true') {
+      return false;
+    }
+
+    const isPlanActive =
+      (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
+
+    return (
+      isPlanActive &&
+      PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
+    );
+  };
 
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
@@ -84,8 +92,6 @@ export function EInvoice() {
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  const company = useInjectCompanyChanges();
-
   const { isValid } = useCheckEInvoiceValidation({
     entity: isCompanySettingsActive ? 'companies' : 'clients',
     entity_id: (isCompanySettingsActive
@@ -101,16 +107,6 @@ export function EInvoice() {
 
   const [formData, setFormData] = useState(new FormData());
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
-
-  const shouldShowPEPPOLOption = () => {
-    const isPlanActive =
-      (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
-
-    return (
-      isPlanActive &&
-      PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
-    );
-  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -407,6 +403,12 @@ export function EInvoice() {
           </>
         )}
       </Card>
+
+      {company?.settings.e_invoice_type === 'PEPPOL' &&
+      shouldShowPEPPOLOption() &&
+      company.legal_entity_id ? (
+        <Preferences />
+      ) : null}
     </Settings>
   );
 }
