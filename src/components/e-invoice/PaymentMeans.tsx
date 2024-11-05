@@ -143,11 +143,11 @@ const PAYMENT_MEANS_CODE_LIST = {
 
 const PAYMENT_MEANS_FORM_ELEMENTS = {
   '1': [], // Instrument not defined
-  '2': ['iban', 'bic_swift'], // ACH credit
+  '2': ['payer_bank_account','iban', 'bic_swift'], // ACH credit
   '3': ['payer_bank_account', 'bic_swift'], // ACH debit
   '4': ['payer_bank_account', 'bic_swift'], // ACH demand debit reversal
-  '5': ['iban', 'bic_swift'], // ACH demand credit reversal
-  '6': ['iban', 'bic_swift'], // ACH demand credit
+  '5': ['payer_bank_account','iban', 'bic_swift'], // ACH demand credit reversal
+  '6': ['payer_bank_account','iban', 'bic_swift'], // ACH demand credit
   '7': ['payer_bank_account', 'bic_swift'], // ACH demand debit
   '8': [], // Hold
   '9': ['iban', 'bic_swift'], // National or regional clearing
@@ -171,8 +171,8 @@ const PAYMENT_MEANS_FORM_ELEMENTS = {
   '27': ['payer_bank_account', 'bic_swift'], // ACH demand CTP debit
   '28': ['iban', 'bic_swift'], // ACH demand CTX credit
   '29': ['payer_bank_account', 'bic_swift'], // ACH demand CTX debit
-  '30': ['iban', 'bic_swift'], // Credit transfer
-  '31': ['iban', 'bic_swift'], // Debit transfer
+  '30': ['payer_bank_account','iban', 'bic_swift'], // Credit transfer
+  '31': ['payer_bank_account','iban', 'bic_swift'], // Debit transfer
   '32': ['iban', 'bic_swift'], // ACH demand CCD+ credit
   '33': ['payer_bank_account', 'bic_swift'], // ACH demand CCD+ debit
   '34': ['iban', 'bic_swift'], // ACH PPD
