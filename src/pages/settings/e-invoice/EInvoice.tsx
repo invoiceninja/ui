@@ -38,11 +38,10 @@ import { Image } from 'react-feather';
 import { ValidationAlert } from './common/components/ValidationAlert';
 import { useCheckEInvoiceValidation } from './common/hooks/useCheckEInvoiceValidation';
 import { route } from '$app/common/helpers/route';
-import { PaymentMeansForm } from '$app/components/e-invoice/PaymentMeansForm';
+import { PaymentMeans } from '$app/components/e-invoice/PaymentMeans';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
 import { EUTaxDetails } from './common/components/EUTaxDetails';
-import { Divider } from '$app/components/cards/Divider';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
 import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
@@ -293,14 +292,6 @@ export function EInvoice() {
 
             {company?.settings.enable_e_invoice && company?.legal_entity_id ? (
               <div className="flex flex-col space-y-4">
-                <PaymentMeansForm
-                  ref={eInvoiceRef}
-                  currentEInvoice={company?.e_invoice || {}}
-                  entity="company"
-                />
-
-                <Divider />
-
                 <EUTaxDetails />
               </div>
             ) : (
@@ -413,6 +404,16 @@ export function EInvoice() {
       shouldShowPEPPOLOption() &&
       company.legal_entity_id ? (
         <Preferences />
+      ) : null}
+
+      {company?.settings.enable_e_invoice &&
+      company?.legal_entity_id &&
+      company.settings.e_invoice_type === 'PEPPOL' ? (
+        <PaymentMeans
+          ref={eInvoiceRef}
+          currentEInvoice={company?.e_invoice || {}}
+          entity="company"
+        />
       ) : null}
     </Settings>
   );
