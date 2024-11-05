@@ -227,6 +227,7 @@ const PAYMENT_MEANS_FORM_ELEMENTS = {
   ZZZ: [], // Mutually defined
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
   (props, ref) => {
     const company = useCurrentCompany();
