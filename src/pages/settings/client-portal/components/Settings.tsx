@@ -47,17 +47,17 @@ export function Settings() {
   const [subdomainValidation, setSubdomainValidation] = useState('');
 
   const checkSubdomain = (value: string) => {
+    handleChange('subdomain', value);
+
     setErrors(undefined);
     request('POST', endpoint('/api/v1/check_subdomain'), {
       subdomain: value,
     })
       .then(() => {
-        handleChange('subdomain', value);
         setSubdomainValidation('');
       })
       .catch(() => {
         setSubdomainValidation(t('subdomain_is_not_available') ?? '');
-        handleChange('subdomain', value);
       });
   };
 
@@ -138,20 +138,25 @@ export function Settings() {
           }
         >
           <div className="flex flex-col space-y-1">
-            
             {isSelfHosted() && (
-              <CopyToClipboard text={`${company?.portal_domain}/client/login?company_key=${company?.company_key}`} />
+              <CopyToClipboard
+                text={`${company?.portal_domain}/client/login?company_key=${company?.company_key}`}
+              />
             )}
 
-            {(isHosted() && company.portal_mode === 'domain') && (
-            <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+            {Boolean(isHosted() && company.portal_mode === 'domain') && (
+              <CopyToClipboard
+                text={`${company?.portal_domain}/client/login`}
+              />
             )}
 
-            {(isHosted() && company.portal_mode === 'subdomain') && (
-              <CopyToClipboard text={`${company?.subdomain}.invoicing.co/client/login`} />
+            {Boolean(isHosted() && company.portal_mode === 'subdomain') && (
+              <CopyToClipboard
+                text={`${company?.subdomain}.invoicing.co/client/login`}
+              />
             )}
 
-            {(isHosted() && company.portal_mode === 'domain') && (
+            {Boolean(isHosted() && company.portal_mode === 'domain') && (
               <div>
                 <span>{t('app_help_link')}</span>
                 <Link
