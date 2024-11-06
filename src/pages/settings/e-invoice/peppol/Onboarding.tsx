@@ -613,7 +613,7 @@ export function Disconnect() {
       e_invoicing_token: account?.e_invoicing_token,
     })
       .then(() => {
-        toast.success('peppol_successfully_disconnected');
+        toast.success('disconnected');
       })
       .catch(() => {
         toast.error();
