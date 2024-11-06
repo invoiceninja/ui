@@ -24,7 +24,7 @@ import { Modal } from '$app/components/Modal';
 import { useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useQuery } from 'react-query';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -138,10 +138,14 @@ function Quota() {
   const data = useQuery({
     queryKey: ['/api/v1/einvoice/quota'],
     queryFn: () =>
-      request('GET', endpoint('/api/v1/einvoice/quota')).then(
-        (response: AxiosResponse<number>) => response.data
-      ),
-    enabled: isSelfHosted() && import.meta.env.PROD,
+      request('GET', endpoint('/api/v1/einvoice/quota'))
+        .then((response: AxiosResponse<{ quota: string }>) => response.data)
+        .catch((error: AxiosError<{ message: string }>) => {
+          if (error.response?.status === 422) {
+            toast.error(error.response.data.message);
+          }
+        }),
+    enabled: isSelfHosted(),
   });
 
   if (isHosted()) {
@@ -155,7 +159,7 @@ function Quota() {
   if (data && isSelfHosted()) {
     return (
       <div>
-        <p>{data.data}</p>
+        <p>{data.data?.quota}</p>
       </div>
     );
   }
