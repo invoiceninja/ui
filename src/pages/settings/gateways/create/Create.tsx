@@ -39,7 +39,6 @@ import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import classNames from 'classnames';
 import { HelpWidget } from '$app/components/HelpWidget';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -103,8 +102,6 @@ export function Create() {
 
   const onSave = useHandleCreate(companyGateway, setErrors);
 
-  const company = useCurrentCompany();
-
   const handleChange = (value: string, isManualChange?: boolean) => {
     const gateway = gateways.find((gateway) => gateway.id === value);
 
@@ -118,11 +115,7 @@ export function Create() {
       return handleStripeSetup();
     }
 
-    if (
-      gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' &&
-      isHosted() &&
-      import.meta.env.VITE_GOCARDLESS_TESTING_COMPANY === company?.id
-    ) {
+    if (gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' && isHosted()) {
       return handleGoCardless();
     }
 

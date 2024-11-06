@@ -249,13 +249,13 @@ export function Form(props: Props) {
 
               <Element leftSide={t('classification')}>
                 <SelectField
-                  id="classification"
-                  defaultValue={vendor.classification ?? ''}
+                  value={vendor.classification ?? ''}
                   onValueChange={(value) =>
                     handleChange('classification', value)
                   }
                   errorMessage={errors?.errors.classification}
-                  withBlank
+                  customSelector
+                  dismissable
                 >
                   <option value="individual">{t('individual')}</option>
                   <option value="business">{t('business')}</option>
