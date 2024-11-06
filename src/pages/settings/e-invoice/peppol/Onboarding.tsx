@@ -35,7 +35,6 @@ export type Step =
   | 'plan_check'
   | 'token'
   | 'vat_check'
-  | 'classification'
   | 'buy_credits'
   | 'form'
   | 'completed';
@@ -44,7 +43,6 @@ const translations: Record<Step, string> = {
   plan_check: 'plan',
   token: 'token',
   vat_check: 'vat',
-  classification: 'classification',
   buy_credits: 'credits',
   form: 'form',
   completed: 'completed',
@@ -54,7 +52,6 @@ const defaultSteps: Step[] = [
   'plan_check',
   'token',
   'vat_check',
-  'classification',
   'buy_credits',
   'form',
   'completed',
@@ -62,7 +59,6 @@ const defaultSteps: Step[] = [
 
 export function Onboarding() {
   const accentColor = useAccentColor();
-  const company = useCurrentCompany();
 
   const { t } = useTranslation();
 
@@ -70,9 +66,6 @@ export function Onboarding() {
   const [step, setStep] = useState<Step>('plan_check');
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
   const [businessType, setBusinessType] = useState<'individual' | 'business'>();
-  const [classification, setClassification] = useState<string>(
-    company?.settings?.classification ?? ''
-  );
 
   useEffect(() => {
     if (step === 'completed') {
@@ -88,14 +81,6 @@ export function Onboarding() {
     }
   }, [steps]);
 
-  useEffect(() => {
-    if (businessType === 'individual') {
-      setSteps((c) => c.filter((s) => s !== 'classification'));
-    } else {
-      setSteps(defaultSteps);
-    }
-  }, [businessType]);
-
   const next = () => {
     const next = steps[steps.indexOf(step) + 1];
 
@@ -107,7 +92,6 @@ export function Onboarding() {
   useEffect(() => {
     if (!isVisible) {
       setStep('plan_check');
-      setClassification(company?.settings?.classification ?? '');
     }
   }, [isVisible]);
 
@@ -179,16 +163,6 @@ export function Onboarding() {
               />
             ) : null}
 
-            {step === 'classification' ? (
-              <Classification
-                businessType={businessType!}
-                onContinue={next}
-                step={step}
-                classification={classification}
-                setClassification={setClassification}
-              />
-            ) : null}
-
             {step === 'buy_credits' ? (
               <BuyCredits step={step} onContinue={next} />
             ) : null}
@@ -198,7 +172,6 @@ export function Onboarding() {
                 step={step}
                 onContinue={next}
                 businessType={businessType!}
-                classification={classification}
               />
             ) : null}
           </div>
@@ -381,10 +354,9 @@ function BuyCredits({ onContinue }: StepProps) {
 
 type FormProps = StepProps & {
   businessType: 'individual' | 'business';
-  classification: string;
 };
 
-function Form({ onContinue, businessType, classification }: FormProps) {
+function Form({ onContinue, businessType }: FormProps) {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
@@ -413,9 +385,9 @@ function Form({ onContinue, businessType, classification }: FormProps) {
 
       request('POST', endpoint('/api/v1/einvoice/peppol/setup'), {
         ...values,
-        classification,
         tenant_id: company?.company_key,
         e_invoicing_token: account?.e_invoicing_token,
+        classification: businessType,
       })
         .then(() => {
           toast.success('peppol_successfully_configured');
@@ -609,57 +581,6 @@ function VatCheck({
           disableWithoutIcon
           onClick={() => onContinue()}
         >
-          {t('Continue')}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-type ClassificationProps = StepProps & {
-  businessType: 'business' | 'individual';
-  classification: string;
-  setClassification: (classification: string) => void;
-};
-
-function Classification({
-  classification,
-  setClassification,
-  businessType,
-  onContinue,
-}: ClassificationProps) {
-  useEffect(() => {
-    if (businessType === 'individual') {
-      onContinue();
-    }
-  }, []);
-
-  const { t } = useTranslation();
-
-  return (
-    <div>
-      <p className="text-lg">Classification</p>
-      <p>We&apos;ll update your company details with value provided below.</p>
-
-      <div className="my-3">
-        <SelectField
-          id="classification"
-          value={classification}
-          onValueChange={(value) => setClassification(value)}
-        >
-          <option value="individual">{t('individual')}</option>
-          <option value="business">{t('business')}</option>
-          <option value="company">{t('company')}</option>
-          <option value="partnership">{t('partnership')}</option>
-          <option value="trust">{t('trust')}</option>
-          <option value="charity">{t('charity')}</option>
-          <option value="government">{t('government')}</option>
-          <option value="other">{t('other')}</option>
-        </SelectField>
-      </div>
-
-      <div className="flex justify-end">
-        <Button behavior="button" type="primary" onClick={() => onContinue()}>
           {t('Continue')}
         </Button>
       </div>
