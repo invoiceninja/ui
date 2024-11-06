@@ -216,6 +216,7 @@ interface StepProps {
 function PlanCheck({ onContinue }: StepProps) {
   const account = useCurrentAccount();
   const isWhitelabelled = useIsWhitelabelled();
+  const accentColor = useAccentColor();
 
   const [hasValidLicense, setHasValidLicense] = useState(false);
 
@@ -236,7 +237,7 @@ function PlanCheck({ onContinue }: StepProps) {
         .then(() => {
           setHasValidLicense(true);
 
-          toast.success();
+          onContinue();
         })
         .catch((e: AxiosError<ValidationBag>) => {
           if (e.response?.status === 422) {
@@ -263,7 +264,17 @@ function PlanCheck({ onContinue }: StepProps) {
 
       {isSelfHosted() ? (
         <div>
-          {t('peppol_whitelabel_warning')} <br />
+          {t('peppol_whitelabel_warning')} <br /> <br />
+          {t('add_license_to_env')}
+          &nbsp;
+          <a
+            href="https://invoiceninja.github.io/en/env-variables/"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: accentColor }}
+          >
+            {t('learn_more')}
+          </a>
           <form
             className="mt-4"
             id="checkLicenseForm"
