@@ -18,9 +18,10 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useIsWhitelabelled } from '$app/common/hooks/usePaidOrSelfhost';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Alert } from '$app/components/Alert';
 import { Element } from '$app/components/cards';
 import { CountrySelector } from '$app/components/CountrySelector';
-import { Button, InputField, Link, SelectField } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
@@ -415,7 +416,9 @@ function Form({ onContinue, businessType }: FormProps) {
 
   return (
     <div>
-      <form onSubmit={form.handleSubmit} className="space-y-5">
+      {errors ? <Alert type="danger">{errors.message}</Alert> : null}
+
+      <form onSubmit={form.handleSubmit} className="space-y-5 mt-4">
         <InputField
           label={t('company_name')}
           value={form.values.party_name}
@@ -430,6 +433,7 @@ function Form({ onContinue, businessType }: FormProps) {
             onChange={form.handleChange}
             label={t('vat_number')}
             id="vat_number"
+            errorMessage={errors?.errors.vat_number}
           />
         ) : null}
 
@@ -439,6 +443,7 @@ function Form({ onContinue, businessType }: FormProps) {
             onChange={form.handleChange}
             label={t('id_number')}
             id="id_number"
+            errorMessage={errors?.errors.id_number}
           />
         ) : null}
 
