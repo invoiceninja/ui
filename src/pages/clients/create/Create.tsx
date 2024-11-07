@@ -31,6 +31,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useBlankClientQuery } from '$app/common/queries/clients';
+import { EInvoiceValidationBanner } from '../common/components/EInvoiceValidationBanner';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_client');
@@ -113,7 +114,12 @@ export default function Create() {
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={onSave}
+      aboveMainContainer={<EInvoiceValidationBanner client={client} />}
+    >
       {errors ? (
         <ValidationAlert
           errors={errors}

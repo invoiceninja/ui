@@ -37,6 +37,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { EInvoiceValidationBanner } from '../common/components/EInvoiceValidationBanner';
 
 export default function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -148,6 +149,7 @@ export default function Edit() {
           />
         )
       }
+      aboveMainContainer={<EInvoiceValidationBanner client={client} />}
     >
       {isLoading && <Spinner />}
 
