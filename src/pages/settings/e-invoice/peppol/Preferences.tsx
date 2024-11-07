@@ -83,11 +83,15 @@ export function Preferences() {
       </Modal>
 
       <Card title={`PEPPOL: ${t('preferences')}`}>
-        <Element leftSide={t('disconnect')}>
-          <div className="flex items-center gap-1">
-            <p>{t('peppol_disconnect_short')}</p>
+        <Element leftSide={t('connection_status')}>
+          <div className="flex flex-col">
+            <p>
+              {t('connected')} ({company.legal_entity_id})
+            </p>
 
-            <Disconnect />
+            <div>
+              <Disconnect />
+            </div>
           </div>
         </Element>
 
