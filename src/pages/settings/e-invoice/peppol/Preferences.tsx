@@ -83,7 +83,7 @@ export function Preferences() {
       </Modal>
 
       <Card title={`PEPPOL: ${t('preferences')}`}>
-        <Element leftSide={t('connection_status')}>
+        <Element leftSide={t('status')}>
           <div className="flex flex-col">
             <p>
               {t('connected')} ({company.legal_entity_id})
