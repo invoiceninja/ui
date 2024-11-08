@@ -11,6 +11,7 @@
 import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Alert } from '$app/components/Alert';
 import { Card } from '$app/components/cards';
 import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { EInvoiceComponent } from '$app/pages/settings';
@@ -29,13 +30,21 @@ export interface Context {
   errors: ValidationBag | undefined;
   eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
   isEInvoiceValid: boolean;
+  entityValidationErrors: string[];
 }
+
 export default function EInvoice() {
   const [t] = useTranslation();
 
   const context: Context = useOutletContext();
 
-  const { invoice, setInvoice, eInvoiceRef, isEInvoiceValid } = context;
+  const {
+    invoice,
+    setInvoice,
+    eInvoiceRef,
+    isEInvoiceValid,
+    entityValidationErrors,
+  } = context;
 
   return (
     <>
@@ -44,6 +53,16 @@ export default function EInvoice() {
           to={route('/clients/:id/edit', { id: invoice?.id })}
           entity="client"
         />
+      )}
+
+      {Boolean(entityValidationErrors?.length) && (
+        <Alert className="mb-6" type="danger">
+          <ul>
+            {entityValidationErrors.map((message, index) => (
+              <li key={index}>&#8211; {message}</li>
+            ))}
+          </ul>
+        </Alert>
       )}
 
       <Card title={t('e_invoice')}>

@@ -71,13 +71,14 @@ export default function Invoice() {
 
   const actions = useActions();
 
-  const { isValid } = useCheckEInvoiceValidation({
-    entity: 'invoices',
-    entity_id: id as string,
-    enableQuery:
-      company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.settings.enable_e_invoice,
-  });
+  const { isValid, errors: entityValidationErrors } =
+    useCheckEInvoiceValidation({
+      entity: 'invoices',
+      entity_id: id as string,
+      enableQuery:
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+        company?.settings.enable_e_invoice,
+    });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
 
@@ -217,6 +218,7 @@ export default function Invoice() {
                   client,
                   eInvoiceRef,
                   isEInvoiceValid: isValid,
+                  entityValidationErrors: entityValidationErrors?.invoice,
                 }}
               />
             </div>

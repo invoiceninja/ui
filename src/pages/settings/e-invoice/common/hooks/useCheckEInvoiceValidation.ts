@@ -11,6 +11,7 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
@@ -20,12 +21,22 @@ interface Params {
   enableQuery: boolean;
 }
 
+interface ValidationEntityResponse {
+  passes: boolean;
+  invoice: string[];
+  client: string[];
+  company: string[];
+}
+
 export function useCheckEInvoiceValidation(params: Params) {
   const { entity, entity_id, enableQuery } = params;
 
   const queryClient = useQueryClient();
 
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [validationErrors, setValidationErrors] = useState<
+    ValidationEntityResponse | undefined
+  >();
 
   const handleCheckValidation = async () => {
     const response = await queryClient
@@ -38,8 +49,9 @@ export function useCheckEInvoiceValidation(params: Params) {
           }).then((response) => response),
         { staleTime: Infinity }
       )
-      .catch((error) => {
-        if (error.response?.status === 400) {
+      .catch((error: AxiosError<ValidationEntityResponse>) => {
+        if (error.response?.status === 422) {
+          setValidationErrors(error.response.data);
           toast.dismiss();
         }
       });
@@ -53,5 +65,5 @@ export function useCheckEInvoiceValidation(params: Params) {
     }
   }, [enableQuery]);
 
-  return { isValid };
+  return { isValid, errors: validationErrors };
 }

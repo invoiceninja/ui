@@ -45,6 +45,7 @@ import { EUTaxDetails } from './common/components/EUTaxDetails';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
 import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { Alert } from '$app/components/Alert';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -91,16 +92,17 @@ export function EInvoice() {
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  const { isValid } = useCheckEInvoiceValidation({
-    entity: isCompanySettingsActive ? 'companies' : 'clients',
-    entity_id: (isCompanySettingsActive
-      ? company?.id
-      : company?.settings.id) as string,
-    enableQuery:
-      company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.settings.enable_e_invoice &&
-      company?.legal_entity_id !== null,
-  });
+  const { isValid, errors: entityValidationErrors } =
+    useCheckEInvoiceValidation({
+      entity: isCompanySettingsActive ? 'companies' : 'clients',
+      entity_id: (isCompanySettingsActive
+        ? company?.id
+        : company?.settings.id) as string,
+      enableQuery:
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+        company?.settings.enable_e_invoice &&
+        company?.legal_entity_id !== null,
+    });
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
@@ -221,6 +223,21 @@ export function EInvoice() {
           }
           entity={isCompanySettingsActive ? 'company' : 'client'}
         />
+      )}
+
+      {Boolean(
+        entityValidationErrors?.[isCompanySettingsActive ? 'company' : 'client']
+          ?.length
+      ) && (
+        <Alert className="mb-6" type="danger">
+          <ul>
+            {entityValidationErrors?.[
+              isCompanySettingsActive ? 'company' : 'client'
+            ].map((message, index) => (
+              <li key={index}>&#8211; {message}</li>
+            ))}
+          </ul>
+        </Alert>
       )}
 
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
