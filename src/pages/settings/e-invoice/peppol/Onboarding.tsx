@@ -416,9 +416,14 @@ function Form({ onContinue, businessType }: FormProps) {
 
   return (
     <div>
-      {errors ? <Alert type="danger">{errors.message}</Alert> : null}
+      <p className="text-lg">{t('details')}</p>
+      <p>{t('details_update_info')}</p>
 
-      <form onSubmit={form.handleSubmit} className="space-y-5 mt-4">
+      <div className="my-4">
+        {errors ? <Alert type="danger">{errors.message}</Alert> : null}
+      </div>
+
+      <form onSubmit={form.handleSubmit} className="space-y-5">
         <InputField
           label={t('company_name')}
           value={form.values.party_name}
