@@ -122,11 +122,7 @@ export function Settings(props: Props) {
           key={index}
           leftSide={t(resolveGatewayTypeTranslation(option.gatewayTypeId))}
           leftSideHelp={t(
-            t(
-              `${resolveGatewayTypeTranslation(
-                option.gatewayTypeId
-              )}_stripe_help`
-            )
+            `${resolveGatewayTypeTranslation(option.gatewayTypeId)}_stripe_help`
           )}
         >
           <Toggle
