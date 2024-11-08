@@ -134,7 +134,7 @@ export function LimitsAndFees(props: Props) {
             .filter(([, entry]) => entry.is_enabled)
             .map(([gatewayTypeId], index) => (
               <option key={index} value={gatewayTypeId}>
-                {resolveGatewayTypeTranslation(gatewayTypeId)}
+                {t(resolveGatewayTypeTranslation(gatewayTypeId))}
               </option>
             ))}
         </SelectField>
