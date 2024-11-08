@@ -264,11 +264,7 @@ export function EInvoice() {
             customSelector
           >
             {Object.entries(INVOICE_TYPES)
-              .filter(
-                ([key]) =>
-                  (key === 'PEPPOl' && shouldShowPEPPOLOption()) ||
-                  key !== 'PEPPOL'
-              )
+              .filter(([key]) => key !== 'PEPPOL' || shouldShowPEPPOLOption())
               .map(([key, value]) => (
                 <option key={key} value={key}>
                   {value}
@@ -306,9 +302,7 @@ export function EInvoice() {
             )} */}
 
             {company?.settings.enable_e_invoice && company?.legal_entity_id ? (
-              <div className="flex flex-col space-y-4">
-                <EUTaxDetails />
-              </div>
+              <div className="flex flex-col space-y-4">{/*  */}</div>
             ) : (
               <Onboarding />
             )}
@@ -429,6 +423,10 @@ export function EInvoice() {
           currentEInvoice={company?.e_invoice || {}}
           entity="company"
         />
+      ) : null}
+
+      {company?.settings.enable_e_invoice && company?.legal_entity_id ? (
+        <EUTaxDetails />
       ) : null}
     </Settings>
   );
