@@ -13,6 +13,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
 import { Banner } from '$app/components/Banner';
 import { Icon } from '$app/components/icons/Icon';
+import { useTranslation } from 'react-i18next';
 import { MdLocationOff } from 'react-icons/md';
 
 interface Props {
@@ -20,6 +21,8 @@ interface Props {
 }
 
 export function EInvoiceValidationBanner(props: Props) {
+  const [t] = useTranslation();
+
   const { client } = props;
 
   const colors = useColorScheme();
@@ -43,10 +46,7 @@ export function EInvoiceValidationBanner(props: Props) {
       <div className="flex items-center w-full space-x-3 py-1">
         <Icon element={MdLocationOff} color={colors.$1} size={25} />
 
-        <span style={{ color: colors.$1 }}>
-          Please complete the client&apos;s location details to proceed with
-          E-Invoicing.
-        </span>
+        <span style={{ color: colors.$1 }}>{t('client_address_required')}</span>
       </div>
     </Banner>
   );
