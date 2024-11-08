@@ -54,6 +54,25 @@ export interface EInvoiceComponent {
   saveEInvoice: () => EInvoiceType | undefined;
 }
 
+const INVOICE_TYPES = {
+  PEPPOL: 'PEPPOL',
+  FACT1: 'FACT1',
+  EN16931: 'EN16931',
+  XInvoice_3_0: 'XInvoice_3.0',
+  XInvoice_2_3: 'XInvoice_2.3',
+  XInvoice_2_2: 'XInvoice_2.2',
+  XInvoice_2_1: 'XInvoice_2.1',
+  XInvoice_2_0: 'XInvoice_2.0',
+  XInvoice_1_0: 'XInvoice_1.0',
+  'XInvoice-Extended': 'XInvoice-Extended',
+  'XInvoice-BasicWL': 'XInvoice-BasicWL',
+  'XInvoice-Basic': 'XInvoice-Basic',
+  'Facturae_3.2.2': 'Facturae_3.2.2',
+  'Facturae_3.2.1': 'Facturae_3.2.1',
+  'Facturae_3.2': 'Facturae_3.2',
+  FatturaPA: 'FatturaPA',
+};
+
 export function EInvoice() {
   const company = useInjectCompanyChanges();
   const [t] = useTranslation();
@@ -241,24 +260,20 @@ export function EInvoice() {
               handleChange('settings.e_invoice_type', value)
             }
             disabled={disableSettingsField('e_invoice_type')}
+            dismissable={false}
             customSelector
           >
-            {shouldShowPEPPOLOption() && <option value="PEPPOL">PEPPOL</option>}
-            <option value="FACT1">FACT1</option>
-            <option value="EN16931">EN16931</option>
-            <option value="XInvoice_3_0">XInvoice_3.0</option>
-            <option value="XInvoice_2_3">XInvoice_2.3</option>
-            <option value="XInvoice_2_2">XInvoice_2.2</option>
-            <option value="XInvoice_2_1">XInvoice_2.1</option>
-            <option value="XInvoice_2_0">XInvoice_2.0</option>
-            <option value="XInvoice_1_0">XInvoice_1.0</option>
-            <option value="XInvoice-Extended">XInvoice-Extended</option>
-            <option value="XInvoice-BasicWL">XInvoice-BasicWL</option>
-            <option value="XInvoice-Basic">XInvoice-Basic</option>
-            <option value="Facturae_3.2.2">Facturae_3.2.2</option>
-            <option value="Facturae_3.2.1">Facturae_3.2.1</option>
-            <option value="Facturae_3.2">Facturae_3.2</option>
-            <option value="FatturaPA">FatturaPA</option>
+            {Object.entries(INVOICE_TYPES)
+              .filter(
+                ([key]) =>
+                  (key === 'PEPPOl' && shouldShowPEPPOLOption()) ||
+                  key !== 'PEPPOL'
+              )
+              .map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value}
+                </option>
+              ))}
           </SelectField>
         </Element>
 
