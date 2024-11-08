@@ -442,12 +442,6 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
           </SelectField>
         </Element>
 
-        {elements.length === 0 && form.values.payment_means[0].code !== '' ? (
-          <Element>
-            <p>The payment mean does not have any elements.</p>
-          </Element>
-        ) : null}
-
         {elements.includes('iban') ? (
           <Element leftSide={t('iban')} leftSideHelp={t('iban_help')}>
             <InputField
