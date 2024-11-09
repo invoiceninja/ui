@@ -171,7 +171,7 @@ const PAYMENT_MEANS_FORM_ELEMENTS = {
     '27': ['payer_bank_account', 'iban', 'bic_swift'], // ACH demand CTP debit
     '28': ['iban', 'bic_swift'], // ACH demand CTX credit
     '29': ['payer_bank_account', 'iban', 'bic_swift'], // ACH demand CTX debit
-    '30': ['payer_bank_account', 'iban', 'bic_swift'], // Credit transfer
+    '30': ['account_holder', 'iban', 'bic_swift'], // Credit transfer
     '31': ['iban', 'bic_swift'], // Debit transfer
     '32': ['iban', 'bic_swift'], // ACH demand CCD+ credit
     '33': ['payer_bank_account', 'iban', 'bic_swift'], // ACH demand CCD+ debit
