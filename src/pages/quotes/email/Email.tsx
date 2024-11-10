@@ -18,7 +18,6 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useQuoteQuery } from '../common/queries';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Email() {
   const { documentTitle } = useTitle('email_quote');
@@ -26,7 +25,6 @@ export default function Email() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-  const company = useCurrentCompany();
 
   const { data: quote } = useQuoteQuery({ id: id! });
 
@@ -34,9 +32,7 @@ export default function Email() {
 
   const list = {
     email_template_quote: 'initial_email',
-    ...(company.settings.email_quote_subject_reminder1 && {
-      email_quote_template_reminder1: 'quote_reminder1',
-    }),
+    email_quote_template_reminder1: 'reminder1',
   };
 
   const pages: Page[] = [
