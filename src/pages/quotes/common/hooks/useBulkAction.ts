@@ -25,7 +25,13 @@ const successMessages = {
   mark_sent: 'marked_quote_as_sent',
 };
 
-export const useBulkAction = () => {
+interface Params {
+  onSuccess?: () => void;
+}
+
+export const useBulkAction = (params?: Params) => {
+  const { onSuccess } = params || {};
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
@@ -40,13 +46,15 @@ export const useBulkAction = () => {
       | 'convert_to_project'
       | 'email'
       | 'approve'
-      | 'mark_sent'
+      | 'mark_sent',
+    rest?: Record<string, unknown>
   ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/quotes/bulk'), {
       action,
       ids,
+      ...rest,
     }).then((response) => {
       const message =
         successMessages[action as keyof typeof successMessages] ||
@@ -74,6 +82,8 @@ export const useBulkAction = () => {
           route('/projects/:id', { id: response.data.data[0].project_id })
         );
       }
+
+      onSuccess?.();
     });
   };
 };
