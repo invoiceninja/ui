@@ -41,7 +41,7 @@ function useAvailableTypes() {
 
   const types: Type[] = [
     { label: 'initial_email', value: 'quote' },
-    { label: 'quote_reminder1', value: 'reminder1' },
+    { label: 'reminder1', value: 'reminder1' },
   ];
 
   if (company?.settings.email_subject_custom1) {
