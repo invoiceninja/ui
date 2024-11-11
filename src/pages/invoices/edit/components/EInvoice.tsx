@@ -28,7 +28,7 @@ export interface Context {
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
   eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
-  eInvoiceValidationEntityResponse: ValidationEntityResponse;
+  eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
 }
 export default function EInvoice() {
   const [t] = useTranslation();
@@ -40,8 +40,10 @@ export default function EInvoice() {
 
   return (
     <>
-      {eInvoiceValidationEntityResponse.passes === false && (
-        <EInvoiceValidationAlert />
+      {eInvoiceValidationEntityResponse?.passes === false && (
+        <EInvoiceValidationAlert
+          validationResponse={eInvoiceValidationEntityResponse}
+        />
       )}
 
       <Card title={t('e_invoice')}>

@@ -34,14 +34,7 @@ export function useCheckEInvoiceValidation(params: Params) {
 
   const [validationEntityResponse, setValidationEntityResponse] = useState<
     ValidationEntityResponse | undefined
-  >({
-    invoice: [
-      '[BR-DEC-10]-The allowed maximum number of decimals for the Sum of allowanced on document level (BT-107) is 2.[UBL-DT-01]-Amounts shall be decimal up to two fraction digits',
-    ],
-    client: [],
-    company: [],
-    passes: false,
-  });
+  >();
 
   const handleCheckValidation = async () => {
     const response = await queryClient.fetchQuery(
