@@ -385,63 +385,66 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     useEffect(() => {
       form.setFieldValue(
         'payment_means.0.code',
-        get(company.e_invoice, 'Invoice.PaymentMeans.0.PaymentMeansCode.value')
+        get(
+          company.e_invoice,
+          'Invoice.PaymentMeans.0.PaymentMeansCode.value'
+        ) || '1'
       );
       form.setFieldValue(
         'payment_means.0.iban',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.PayeeFinancialAccount.ID.value'
-        )
+        ) || null
       );
       form.setFieldValue(
         'payment_means.0.bic_swift',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution.ID.value'
-        )
+        ) || ''
       );
       form.setFieldValue(
         'payment_means.0.account_holder',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.PayeeFinancialAccount.Name'
-        )
+        ) || ''
       );
       form.setFieldValue(
         'payment_means.0.payer_bank_account',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.PayerFinancialAccount.ID.value'
-        )
+        ) || ''
       );
       form.setFieldValue(
         'payment_means.0.bsb_sort',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.PayeeFinancialAccount.SortCode.value'
-        )
+        ) || ''
       );
       form.setFieldValue(
         'payment_means.0.card_type',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.CardAccount.NetworkID.value'
-        )
+        ) || ''
       );
       form.setFieldValue(
         'payment_means.0.card_number',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.CardAccount.PrimaryAccountNumberID.value'
-        )
+        ) || ''
       );
       form.setFieldValue(
         'payment_means.0.card_holder',
         get(
           company.e_invoice,
           'Invoice.PaymentMeans.0.CardAccount.HolderName.value'
-        )
+        ) || ''
       );
     }, [company.e_invoice]);
 
