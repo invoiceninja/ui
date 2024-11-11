@@ -171,20 +171,20 @@ const PAYMENT_MEANS_FORM_ELEMENTS = {
     '27': ['payer_bank_account', 'iban', 'bic_swift'], // ACH demand CTP debit
     '28': ['iban', 'bic_swift'], // ACH demand CTX credit
     '29': ['payer_bank_account', 'iban', 'bic_swift'], // ACH demand CTX debit
-    '30': ['payer_bank_account', 'iban', 'bic_swift'], // Credit transfer
-    '31': ['iban', 'bic_swift'], // Debit transfer
-    '32': ['iban', 'bic_swift'], // ACH demand CCD+ credit
-    '33': ['payer_bank_account', 'iban', 'bic_swift'], // ACH demand CCD+ debit
-    '34': ['iban', 'bic_swift'], // ACH PPD
-    '35': ['iban', 'bic_swift'], // ACH savings CCD credit
-    '36': ['payer_bank_account', 'iban', 'bic_swift'], // ACH savings CCD debit
-    '37': ['iban', 'bic_swift'], // ACH savings CTP credit
-    '38': ['payer_bank_account', 'iban', 'bic_swift'], // ACH savings CTP debit
-    '39': ['iban', 'bic_swift'], // ACH savings CTX credit
-    '40': ['payer_bank_account', 'iban', 'bic_swift'], // ACH savings CTX debit
-    '41': ['iban', 'bic_swift'], // ACH savings CCD+ credit
-    '42': ['iban', 'bic_swift'], // Payment to bank account
-    '43': ['payer_bank_account', 'iban', 'bic_swift'], // ACH savings CCD+ debit
+     '30': ['iban', 'bic_swift', 'account_holder'], // Credit transfer
+    '31': ['iban', 'bic_swift', 'account_holder'], // Debit transfer
+    '32': ['iban', 'bic_swift', 'account_holder'], // ACH demand CCD+ credit
+    '33': ['payer_bank_account', 'iban', 'bic_swift', 'account_holder'], // ACH demand CCD+ debit
+    '34': ['iban', 'bic_swift', 'account_holder'], // ACH PPD
+    '35': ['iban', 'bic_swift', 'account_holder'], // ACH savings CCD credit
+    '36': ['payer_bank_account', 'iban', 'bic_swift', 'account_holder'], // ACH savings CCD debit
+    '37': ['iban', 'bic_swift', 'account_holder'], // ACH savings CTP credit
+    '38': ['payer_bank_account', 'iban', 'bic_swift', 'account_holder'], // ACH savings CTP debit
+    '39': ['iban', 'bic_swift', 'account_holder'], // ACH savings CTX credit
+    '40': ['payer_bank_account', 'iban', 'bic_swift', 'account_holder'], // ACH savings CTX debit
+    '41': ['iban', 'bic_swift', 'account_holder'], // ACH savings CCD+ credit
+    '42': ['iban', 'bic_swift', 'account_holder'], // Payment to bank account
+    '43': ['payer_bank_account', 'iban', 'bic_swift', 'account_holder'], // ACH savings CCD+ debit
     '44': [], // Accepted bill of exchange
     '45': ['iban', 'bic_swift'], // Referenced home-banking credit transfer
     '46': ['iban', 'bic_swift'], // Interbank debit transfer
@@ -391,19 +391,19 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
       );
         form.setFieldValue(
         'payment_means.0.iban',
-        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.IBAN.value')
+        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.ID.value')
       );
       form.setFieldValue(
         'payment_means.0.bic_swift',
         get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution.ID.value')
       );
       form.setFieldValue(
-        'payment_means.0.payer_bank_account',
-        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayerFinancialAccount.ID.value')
+        'payment_means.0.account_holder',
+        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.Name')
       );
       form.setFieldValue(
-        'payment_means.0.account_holder',
-        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.AccountName.value')
+        'payment_means.0.payer_bank_account',
+        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayerFinancialAccount.ID.value')
       );
       form.setFieldValue(
         'payment_means.0.bsb_sort',
