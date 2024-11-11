@@ -391,19 +391,19 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
       );
         form.setFieldValue(
         'payment_means.0.iban',
-        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.IBAN.value')
+        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.ID.value')
       );
       form.setFieldValue(
         'payment_means.0.bic_swift',
         get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution.ID.value')
       );
       form.setFieldValue(
-        'payment_means.0.payer_bank_account',
-        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayerFinancialAccount.ID.value')
+        'payment_means.0.account_holder',
+        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.Name')
       );
       form.setFieldValue(
-        'payment_means.0.account_holder',
-        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.AccountName.value')
+        'payment_means.0.payer_bank_account',
+        get(company.e_invoice, 'Invoice.PaymentMeans.0.PayerFinancialAccount.ID.value')
       );
       form.setFieldValue(
         'payment_means.0.bsb_sort',
