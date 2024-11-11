@@ -120,7 +120,10 @@ export function Settings(props: Props) {
       {options.map((option, index) => (
         <Element
           key={index}
-          leftSide={resolveGatewayTypeTranslation(option.gatewayTypeId)}
+          leftSide={t(resolveGatewayTypeTranslation(option.gatewayTypeId))}
+          leftSideHelp={t(
+            `${resolveGatewayTypeTranslation(option.gatewayTypeId)}_stripe_help`
+          )}
         >
           <Toggle
             checked={isChecked(option.gatewayTypeId)}
