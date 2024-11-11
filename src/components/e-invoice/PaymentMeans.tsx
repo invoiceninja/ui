@@ -326,7 +326,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
         entity: props.entity,
         payment_means: [
           {
-            code: '',
+            code: '1',
             iban: null,
             bic_swift: '',
             payer_bank_account: '',
@@ -454,6 +454,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               form.setFieldValue('payment_means.0.code', value)
             }
             errorMessage={errors?.errors?.['payment_means.0.code']}
+            dismissable={false}
             customSelector
           >
             {Object.entries(PAYMENT_MEANS_CODE_LIST).map(([key, label]) => (
