@@ -71,7 +71,7 @@ export default function Invoice() {
 
   const actions = useActions();
 
-  const { isValid } = useCheckEInvoiceValidation({
+  const { validationResponse } = useCheckEInvoiceValidation({
     entity: 'invoices',
     entity_id: id as string,
     enableQuery:
@@ -169,7 +169,8 @@ export default function Invoice() {
                   invoice &&
                   (invoice.status_id === InvoiceStatus.Cancelled ||
                     invoice.is_deleted ||
-                    (!isValid && location.pathname.endsWith('/e_invoice')))
+                    (validationResponse?.passes === false &&
+                      location.pathname.endsWith('/e_invoice')))
                 }
                 disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"
@@ -216,7 +217,7 @@ export default function Invoice() {
                   setIsDefaultFooter,
                   client,
                   eInvoiceRef,
-                  isEInvoiceValid: isValid,
+                  eInvoiceValidationEntityResponse: validationResponse,
                 }}
               />
             </div>

@@ -10,7 +10,7 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
+import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
@@ -20,31 +20,47 @@ interface Params {
   enableQuery: boolean;
 }
 
+export interface ValidationEntityResponse {
+  passes: boolean;
+  invoice: string[];
+  client: string[];
+  company: string[];
+}
+
 export function useCheckEInvoiceValidation(params: Params) {
   const { entity, entity_id, enableQuery } = params;
 
   const queryClient = useQueryClient();
 
-  const [isValid, setIsValid] = useState<boolean>(false);
+  const [validationEntityResponse, setValidationEntityResponse] = useState<
+    ValidationEntityResponse | undefined
+  >({
+    invoice: [
+      '[BR-DEC-10]-The allowed maximum number of decimals for the Sum of allowanced on document level (BT-107) is 2.[UBL-DT-01]-Amounts shall be decimal up to two fraction digits',
+    ],
+    client: [],
+    company: [],
+    passes: false,
+  });
 
   const handleCheckValidation = async () => {
-    const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/einvoice/validateEntity', entity_id],
-        () =>
-          request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
-            entity,
-            entity_id,
-          }).then((response) => response),
-        { staleTime: Infinity }
-      )
-      .catch((error) => {
-        if (error.response?.status === 400) {
-          toast.dismiss();
-        }
-      });
+    const response = await queryClient.fetchQuery(
+      ['/api/v1/einvoice/validateEntity', entity_id],
+      () =>
+        request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
+          entity,
+          entity_id,
+        }).then(
+          (response: AxiosResponse<ValidationEntityResponse>) => response
+        ),
+      { staleTime: Infinity }
+    );
 
-    setIsValid(Boolean(response));
+    if (response.status === 200) {
+      if (!response.data.passes) {
+        setValidationEntityResponse(response.data);
+      }
+    }
   };
 
   useEffect(() => {
@@ -53,5 +69,5 @@ export function useCheckEInvoiceValidation(params: Params) {
     }
   }, [enableQuery]);
 
-  return { isValid };
+  return { validationResponse: validationEntityResponse };
 }
