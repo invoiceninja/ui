@@ -417,7 +417,8 @@ export function EInvoice() {
 
       {company?.settings.enable_e_invoice &&
       company?.legal_entity_id &&
-      company.settings.e_invoice_type === 'PEPPOL' ? (
+      company.settings.e_invoice_type === 'PEPPOL' &&
+      shouldShowPEPPOLOption() ? (
         <PaymentMeans
           ref={eInvoiceRef}
           currentEInvoice={company?.e_invoice || {}}
@@ -425,7 +426,9 @@ export function EInvoice() {
         />
       ) : null}
 
-      {company?.settings.enable_e_invoice && company?.legal_entity_id ? (
+      {company?.settings.enable_e_invoice &&
+      company?.legal_entity_id &&
+      shouldShowPEPPOLOption() ? (
         <EUTaxDetails />
       ) : null}
     </Settings>
