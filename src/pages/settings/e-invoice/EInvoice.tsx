@@ -266,7 +266,7 @@ export function EInvoice() {
             {Object.entries(INVOICE_TYPES)
               .filter(
                 ([key]) =>
-                  (key === 'PEPPOl' && shouldShowPEPPOLOption()) ||
+                  (key === 'PEPPOL' && shouldShowPEPPOLOption()) ||
                   key !== 'PEPPOL'
               )
               .map(([key, value]) => (
