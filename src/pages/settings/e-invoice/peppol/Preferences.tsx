@@ -21,10 +21,11 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useQuery } from 'react-query';
 import { AxiosError, AxiosResponse } from 'axios';
+import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -32,6 +33,7 @@ export function Preferences() {
   const refresh = useRefreshCompanyUsers();
   const account = useCurrentAccount();
   const accentColor = useAccentColor();
+  const statics = useStaticsQuery();
 
   const form = useFormik({
     initialValues: {
@@ -56,6 +58,16 @@ export function Preferences() {
 
   const [creditsModalVisible, setCreditsModalVisible] = useState(false);
 
+  const [isLicensePresent] = useState(
+    statics.data?.license_key !== undefined && statics.data?.license_key !== ''
+  );
+
+  useEffect(() => {
+    if (isSelfHosted() && !isLicensePresent && creditsModalVisible) {
+      toast.error(t('white_label_license_not_present')!);
+    }
+  }, [creditsModalVisible]);
+
   return (
     <>
       <Modal
@@ -66,19 +78,41 @@ export function Preferences() {
         <p>{t('peppol_credits_info')}</p>
 
         <div className="py-2 flex gap-2 flex-col">
-          <Link
-            to="https://invoiceninja.invoicing.co/client/subscriptions/WJxboqNegw/purchase"
-            external
-          >
-            {t('buy')} (PEPPOL 500)
-          </Link>
+          {isHosted() ? (
+            <Link
+              to={`https://invoiceninja.invoicing.co/client/subscriptions/WJxboqNegw/purchase?account_key=${account?.key}`}
+              external
+            >
+              {t('buy')} (PEPPOL 500)
+            </Link>
+          ) : null}
 
-          <Link
-            to="https://invoiceninja.invoicing.co/client/subscriptions/k8mep0reMy/purchase"
-            external
-          >
-            {t('buy')} (PEPPOL 1000)
-          </Link>
+          {isSelfHosted() && isLicensePresent ? (
+            <Link
+              to={`https://invoiceninja.invoicing.co/client/subscriptions/WJxboqNegw/purchase?license_key=${statics.data?.license_key}`}
+              external
+            >
+              {t('buy')} (PEPPOL 500)
+            </Link>
+          ) : null}
+
+          {isHosted() ? (
+            <Link
+              to={`https://invoiceninja.invoicing.co/client/subscriptions/k8mep0reMy/purchase?account_key=${account?.key}`}
+              external
+            >
+              {t('buy')} (PEPPOL 1000)
+            </Link>
+          ) : null}
+
+          {isSelfHosted() && isLicensePresent ? (
+            <Link
+              to={`https://invoiceninja.invoicing.co/client/subscriptions/k8mep0reMy/purchase?license_key=${statics.data?.license_key}`}
+              external
+            >
+              {t('buy')} (PEPPOL 1000)
+            </Link>
+          ) : null}
         </div>
       </Modal>
 

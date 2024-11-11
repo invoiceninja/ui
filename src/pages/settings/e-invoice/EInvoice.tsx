@@ -225,170 +225,177 @@ export function EInvoice() {
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
-      <Card title={t('e_invoice')}>
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="e_invoice_type"
-              labelElement={<SettingsLabel label={t('e_invoice_type')} />}
-              defaultValue="EN16931"
-            />
-          }
-        >
-          <SelectField
-            value={company?.settings.e_invoice_type || 'EN16931'}
-            onValueChange={(value) =>
-              handleChange('settings.e_invoice_type', value)
-            }
-            disabled={disableSettingsField('e_invoice_type')}
-            dismissable={false}
-            customSelector
-          >
-            {Object.entries(INVOICE_TYPES)
-              .filter(([key]) => key !== 'PEPPOL' || shouldShowPEPPOLOption())
-              .map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value}
-                </option>
-              ))}
-          </SelectField>
-        </Element>
-
-        {company?.settings.e_invoice_type !== 'PEPPOL' ? (
+      {Boolean(!company?.legal_entity_id) && (
+        <Card title={t('e_invoice')}>
           <Element
             leftSide={
               <PropertyCheckbox
-                propertyKey="enable_e_invoice"
-                labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
+                propertyKey="e_invoice_type"
+                labelElement={<SettingsLabel label={t('e_invoice_type')} />}
+                defaultValue="EN16931"
               />
             }
           >
-            <Toggle
-              checked={Boolean(company?.settings.enable_e_invoice)}
+            <SelectField
+              value={company?.settings.e_invoice_type || 'EN16931'}
               onValueChange={(value) =>
-                handleChange('settings.enable_e_invoice', value)
+                handleChange('settings.e_invoice_type', value)
               }
-              disabled={disableSettingsField('enable_e_invoice')}
-            />
+              disabled={disableSettingsField('e_invoice_type')}
+              dismissable={false}
+              customSelector
+            >
+              {Object.entries(INVOICE_TYPES)
+                .filter(([key]) => key !== 'PEPPOL' || shouldShowPEPPOLOption())
+                .map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+            </SelectField>
           </Element>
-        ) : null}
 
-        {company?.settings.e_invoice_type === 'PEPPOL' ? (
-          <>
-            {/* {company?.settings.enable_e_invoice && (
+          {company?.settings.e_invoice_type !== 'PEPPOL' ? (
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="enable_e_invoice"
+                  labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
+                />
+              }
+            >
+              <Toggle
+                checked={Boolean(company?.settings.enable_e_invoice)}
+                onValueChange={(value) =>
+                  handleChange('settings.enable_e_invoice', value)
+                }
+                disabled={disableSettingsField('enable_e_invoice')}
+              />
+            </Element>
+          ) : null}
+
+          {company?.settings.e_invoice_type === 'PEPPOL' ? (
+            <>
+              {/* {company?.settings.enable_e_invoice && (
               <EInvoiceGenerator
                 ref={eInvoiceRef}
                 currentEInvoice={company?.e_invoice || {}}
               />
             )} */}
 
-            {company?.settings.enable_e_invoice && company?.legal_entity_id ? (
-              <div className="flex flex-col space-y-4">{/*  */}</div>
-            ) : (
-              <Onboarding />
-            )}
-          </>
-        ) : (
-          <>
-            {company?.settings.enable_e_invoice ? (
-              <>
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey="merge_e_invoice_to_pdf"
-                      labelElement={
-                        <SettingsLabel label={t('merge_e_invoice_to_pdf')} />
-                      }
-                    />
-                  }
-                >
-                  <Toggle
-                    checked={Boolean(company?.settings.merge_e_invoice_to_pdf)}
-                    onValueChange={(value) =>
-                      handleChange('settings.merge_e_invoice_to_pdf', value)
-                    }
-                    disabled={disableSettingsField('merge_e_invoice_to_pdf')}
-                  />
-                </Element>
-
-                {isCompanySettingsActive && (
+              {company?.settings.enable_e_invoice &&
+              company?.legal_entity_id ? (
+                <div className="flex flex-col space-y-4">{/*  */}</div>
+              ) : (
+                <Onboarding />
+              )}
+            </>
+          ) : (
+            <>
+              {company?.settings.enable_e_invoice ? (
+                <>
                   <Element
-                    leftSide={t('upload_certificate')}
-                    leftSideHelp={
-                      company?.has_e_invoice_certificate
-                        ? t('certificate_set')
-                        : t('certificate_not_set')
+                    leftSide={
+                      <PropertyCheckbox
+                        propertyKey="merge_e_invoice_to_pdf"
+                        labelElement={
+                          <SettingsLabel label={t('merge_e_invoice_to_pdf')} />
+                        }
+                      />
                     }
                   >
-                    <div
-                      {...getRootProps()}
-                      className="flex flex-col md:flex-row md:items-center"
-                    >
-                      <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <input {...getInputProps()} />
-                        <Image className="mx-auto h-12 w-12 text-gray-400" />
-                        <span className="mt-2 block text-sm font-medium text-gray-900">
-                          {isDragActive
-                            ? 'drop_your_logo_here'
-                            : t('dropzone_default_message')}
-                        </span>
-                      </div>
-                    </div>
-                  </Element>
-                )}
-
-                {isCompanySettingsActive && (
-                  <Element
-                    leftSide={t('certificate_passphrase')}
-                    leftSideHelp={
-                      company?.has_e_invoice_certificate_passphrase
-                        ? t('passphrase_set')
-                        : t('passphrase_not_set')
-                    }
-                  >
-                    <InputField
-                      value=""
-                      id="password"
-                      type="password"
+                    <Toggle
+                      checked={Boolean(
+                        company?.settings.merge_e_invoice_to_pdf
+                      )}
                       onValueChange={(value) =>
-                        handleChange(
-                          'has_e_invoice_certificate_passphrase',
-                          value
-                        )
+                        handleChange('settings.merge_e_invoice_to_pdf', value)
                       }
-                      errorMessage={
-                        errors?.errors.has_e_invoice_certificate_passphrase
-                      }
+                      disabled={disableSettingsField('merge_e_invoice_to_pdf')}
                     />
                   </Element>
-                )}
 
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey="e_quote_type"
-                      labelElement={<SettingsLabel label={t('e_quote_type')} />}
-                      defaultValue="OrderX_Comfort"
-                    />
-                  }
-                >
-                  <SelectField
-                    value={company?.settings.e_quote_type || 'OrderX_Comfort'}
-                    onValueChange={(value) =>
-                      handleChange('settings.e_quote_type', value)
+                  {isCompanySettingsActive && (
+                    <Element
+                      leftSide={t('upload_certificate')}
+                      leftSideHelp={
+                        company?.has_e_invoice_certificate
+                          ? t('certificate_set')
+                          : t('certificate_not_set')
+                      }
+                    >
+                      <div
+                        {...getRootProps()}
+                        className="flex flex-col md:flex-row md:items-center"
+                      >
+                        <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                          <input {...getInputProps()} />
+                          <Image className="mx-auto h-12 w-12 text-gray-400" />
+                          <span className="mt-2 block text-sm font-medium text-gray-900">
+                            {isDragActive
+                              ? 'drop_your_logo_here'
+                              : t('dropzone_default_message')}
+                          </span>
+                        </div>
+                      </div>
+                    </Element>
+                  )}
+
+                  {isCompanySettingsActive && (
+                    <Element
+                      leftSide={t('certificate_passphrase')}
+                      leftSideHelp={
+                        company?.has_e_invoice_certificate_passphrase
+                          ? t('passphrase_set')
+                          : t('passphrase_not_set')
+                      }
+                    >
+                      <InputField
+                        value=""
+                        id="password"
+                        type="password"
+                        onValueChange={(value) =>
+                          handleChange(
+                            'has_e_invoice_certificate_passphrase',
+                            value
+                          )
+                        }
+                        errorMessage={
+                          errors?.errors.has_e_invoice_certificate_passphrase
+                        }
+                      />
+                    </Element>
+                  )}
+
+                  <Element
+                    leftSide={
+                      <PropertyCheckbox
+                        propertyKey="e_quote_type"
+                        labelElement={
+                          <SettingsLabel label={t('e_quote_type')} />
+                        }
+                        defaultValue="OrderX_Comfort"
+                      />
                     }
-                    disabled={disableSettingsField('e_quote_type')}
                   >
-                    <option value="OrderX_Comfort">OrderX_Comfort</option>
-                    <option value="OrderX_Basic">OrderX_Basic</option>
-                    <option value="OrderX_Extended">OrderX_Extended</option>
-                  </SelectField>
-                </Element>
-              </>
-            ) : null}
-          </>
-        )}
-      </Card>
+                    <SelectField
+                      value={company?.settings.e_quote_type || 'OrderX_Comfort'}
+                      onValueChange={(value) =>
+                        handleChange('settings.e_quote_type', value)
+                      }
+                      disabled={disableSettingsField('e_quote_type')}
+                    >
+                      <option value="OrderX_Comfort">OrderX_Comfort</option>
+                      <option value="OrderX_Basic">OrderX_Basic</option>
+                      <option value="OrderX_Extended">OrderX_Extended</option>
+                    </SelectField>
+                  </Element>
+                </>
+              ) : null}
+            </>
+          )}
+        </Card>
+      )}
 
       {company?.settings.e_invoice_type === 'PEPPOL' &&
       shouldShowPEPPOLOption() &&
