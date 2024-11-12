@@ -12,7 +12,7 @@ import classNames from 'classnames';
 import { ReactNode } from 'react';
 
 interface Props {
-  variant: 'orange';
+  variant: 'orange' | 'red';
   children: ReactNode;
   className?: string;
   id?: string;
@@ -26,6 +26,7 @@ export function Banner({ variant, children, className, id }: Props) {
         'flex justify-center items-center px-3 py-2 text-xs md:px-6 md:text-sm leading-6 text-gray-900',
         {
           'bg-orange-300': variant === 'orange',
+          'bg-red-300': variant === 'red',
         },
         className
       )}
