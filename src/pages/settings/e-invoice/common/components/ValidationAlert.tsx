@@ -31,16 +31,10 @@ export function ValidationAlert(props: Props) {
         <div className="flex items-center space-x-2">
           <Icon element={MdWarning} size={20} color="#eab308" />
 
-          {entity === 'company' && (
-            <span>{t('Company details are invalid or missing.')}</span>
-          )}
-
           {entity === 'client' && (
             <span>{t('Client details are invalid or missing.')}</span>
           )}
         </div>
-
-        {entity === 'company' && <Link to={to}>{t('Edit Company')}</Link>}
 
         {entity === 'client' && <Link to={to}>{t('Edit Client')}</Link>}
       </div>
