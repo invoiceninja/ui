@@ -121,9 +121,14 @@ export function Settings(props: Props) {
         <Element
           key={index}
           leftSide={t(resolveGatewayTypeTranslation(option.gatewayTypeId))}
-          leftSideHelp={t(
-            `${resolveGatewayTypeTranslation(option.gatewayTypeId)}_stripe_help`
-          )}
+          {...((gateway?.key === 'd14dd26a37cecc30fdd65700bfb55b23' ||
+            gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') && {
+            leftSideHelp: t(
+              `${resolveGatewayTypeTranslation(
+                option.gatewayTypeId
+              )}_stripe_help`
+            ),
+          })}
         >
           <Toggle
             checked={isChecked(option.gatewayTypeId)}
