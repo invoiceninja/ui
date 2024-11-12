@@ -49,7 +49,7 @@ export function useCheckEInvoiceValidation(params: Params) {
       { staleTime: Infinity }
     );
 
-    if (response.status === 200) {
+    if (response?.status === 200) {
       if (!response.data.passes) {
         setValidationEntityResponse(response.data);
       }
