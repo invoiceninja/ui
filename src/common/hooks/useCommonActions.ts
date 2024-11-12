@@ -40,7 +40,25 @@ export function useAllCommonActions() {
       { value: 'restore', label: t('restore') },
       { value: 'delete', label: t('delete') },
     ],
-    credit: [{ value: 'email_credit', label: t('email_credit') }],
+    credit: [
+      { value: 'email_credit', label: t('email_credit') },
+      { value: 'view_pdf', label: t('view_pdf') },
+      { value: 'print_pdf', label: t('print_pdf') },
+      { value: 'download_pdf', label: t('download_pdf') },
+      { value: 'download_e_credit', label: t('download_e_credit') },
+      { value: 'schedule', label: t('schedule') },
+      { value: 'add_comment', label: t('add_comment') },
+      { value: 'client_portal', label: t('client_portal') },
+      { value: 'apply_credit', label: t('apply_credit') },
+      { value: 'mark_sent', label: t('mark_sent') },
+      { value: 'mark_paid', label: t('mark_paid') },
+      { value: 'run_template', label: t('run_template') },
+      { value: 'clone_to_credit', label: t('clone_to_credit') },
+      { value: 'clone_to_other', label: t('clone_to_other') },
+      { value: 'archive', label: t('archive') },
+      { value: 'restore', label: t('restore') },
+      { value: 'delete', label: t('delete') },
+    ],
   };
 
   return actions;
