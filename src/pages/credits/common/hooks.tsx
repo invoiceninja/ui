@@ -339,7 +339,7 @@ export function useActions(params?: Params) {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
 
-  const { dropdown } = params || {};
+  const { dropdown = true } = params || {};
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
