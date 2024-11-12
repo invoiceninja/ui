@@ -40,6 +40,7 @@ export function useAllCommonActions() {
       { value: 'restore', label: t('restore') },
       { value: 'delete', label: t('delete') },
     ],
+    credit: [{ value: 'email_credit', label: t('email_credit') }],
   };
 
   return actions;
@@ -52,6 +53,10 @@ export function useDefaultCommonActions() {
     invoice: [
       { value: 'mark_sent', label: t('mark_sent') },
       { value: 'email_invoice', label: t('email_invoice') },
+    ],
+    credit: [
+      { value: 'mark_sent', label: t('mark_sent') },
+      { value: 'email_credit', label: t('email_credit') },
     ],
   };
 

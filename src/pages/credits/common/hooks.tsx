@@ -330,11 +330,18 @@ export function useSave(props: CreateProps) {
   };
 }
 
-export function useActions() {
+interface Params {
+  dropdown?: boolean;
+}
+
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { dropdown } = params || {};
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
