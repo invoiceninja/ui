@@ -422,10 +422,7 @@ export function EInvoice() {
         <Preferences />
       ) : null}
 
-      {company?.settings.enable_e_invoice &&
-      company?.legal_entity_id &&
-      company.settings.e_invoice_type === 'PEPPOL' &&
-      shouldShowPEPPOLOption() ? (
+      {company?.settings.enable_e_invoice ? (
         <PaymentMeans
           ref={eInvoiceRef}
           currentEInvoice={company?.e_invoice || {}}
