@@ -88,9 +88,11 @@ export interface Company {
   inbound_mailbox_blacklist?: string;
   inbound_mailbox_allow_unknown?: boolean;
   expense_mailbox?: string;
+  legal_entity_id: string | null;
 }
 
 export interface Settings {
+  id?: string;
   accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
   auto_bill_standard_invoices: boolean;
@@ -340,6 +342,8 @@ export interface TaxData {
   version: string;
   seller_subregion: string;
   regions: Regions;
+  acts_as_sender: boolean;
+  acts_as_receiver: boolean;
 }
 
 export interface Regions {
@@ -413,6 +417,7 @@ export interface TaxSetting {
   tax_rate: number;
   tax_name: string;
   reduced_tax_rate: number;
+  vat_number: string;
 }
 
 export interface EURegion {

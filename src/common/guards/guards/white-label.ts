@@ -8,10 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import gatewayType from '$app/common/constants/gateway-type';
+import { store } from '$app/common/stores/store';
 
-export function useResolveGatewayTypeTranslation() {
-  return (id: string) => {
-    return gatewayType[id as keyof typeof gatewayType] || 'other';
-  };
+export function whiteLabelPlan() {
+  return Boolean(
+    store.getState().companyUsers.api?.[
+      store.getState().companyUsers.currentIndex
+    ]?.account.plan === 'white_label'
+  );
 }
