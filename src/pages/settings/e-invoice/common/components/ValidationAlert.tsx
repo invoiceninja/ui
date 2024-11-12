@@ -17,7 +17,7 @@ import { MdWarning } from 'react-icons/md';
 interface Props {
   className?: string;
   to: string;
-  entity: 'company' | 'client';
+  entity: 'client';
 }
 
 export function ValidationAlert(props: Props) {
