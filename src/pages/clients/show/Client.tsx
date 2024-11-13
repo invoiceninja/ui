@@ -131,7 +131,7 @@ export default function Client() {
             <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
-            {client.gateway_tokens.length > 0 && <Gateways client={client} />}
+            <Gateways client={client} />
             <EmailHistory />
             <ClientPublicNotes client={client} />
             <ClientPrivateNotes client={client} />
