@@ -95,6 +95,8 @@ function Configure() {
           refresh();
 
           setIsVisible(false);
+
+          form.resetForm();
         })
         .catch((e: AxiosError<ValidationBag>) => {
           if (e.response?.status === 422) {

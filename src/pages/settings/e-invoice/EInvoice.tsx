@@ -223,6 +223,17 @@ export function EInvoice() {
           company?.settings.enable_e_invoice)
       }
     >
+      {Boolean(
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          !isValid
+      ) && (
+        <ValidationAlert
+          to={route('/clients/:id/edit', { id: company?.settings.id })}
+          entity="client"
+        />
+      )}
+
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       {Boolean(!company?.legal_entity_id) && (
