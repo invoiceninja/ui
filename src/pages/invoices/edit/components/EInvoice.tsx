@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
 import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { InvoiceEntityValidationButton } from './InvoiceEntityValidationButton';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -46,7 +47,10 @@ export default function EInvoice() {
         />
       )}
 
-      <Card title={t('e_invoice')}>
+      <Card
+        title={t('e_invoice')}
+        topRight={<InvoiceEntityValidationButton id={invoice?.id} />}
+      >
         {invoice?.e_invoice && (
           <EInvoiceGenerator
             ref={eInvoiceRef}

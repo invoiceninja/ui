@@ -20,6 +20,9 @@ export const keys = {
       '/api/v1/activities/entity',
       '/api/v1/activities',
       '/api/v1/documents',
+      '/api/v1/einvoice/validateEntity-invoice',
+      '/api/v1/einvoice/validateEntity-company',
+      '/api/v1/einvoice/validateEntity-client',
     ],
   },
   designs: {

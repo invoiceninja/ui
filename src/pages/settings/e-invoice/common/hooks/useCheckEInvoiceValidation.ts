@@ -10,15 +10,19 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
 interface Params {
   entityId: string;
   enableQuery: boolean;
-  clientId: string;
-  companyId: string;
+  clientId?: string;
+  companyId?: string;
   checkInvoiceOnly?: boolean;
+  withToaster?: boolean;
+  onFinished?: () => void;
 }
 
 export interface EntityError {
@@ -34,21 +38,26 @@ export interface ValidationEntityResponse {
 }
 
 export function useCheckEInvoiceValidation(params: Params) {
-  const { clientId, companyId, entityId, enableQuery, checkInvoiceOnly } =
-    params;
+  const {
+    clientId,
+    companyId,
+    entityId,
+    enableQuery,
+    checkInvoiceOnly,
+    withToaster,
+    onFinished,
+  } = params;
 
   const queryClient = useQueryClient();
 
-  const [validationEntityResponse, setValidationEntityResponse] =
-    useState<ValidationEntityResponse>({
-      passes: true,
-      invoice: [],
-      client: [],
-      company: [],
-    });
+  const [validationEntityResponse, setValidationEntityResponse] = useState<
+    ValidationEntityResponse | undefined
+  >();
 
   const handleCheckValidation = async () => {
-    if (!checkInvoiceOnly) {
+    withToaster && toast.processing();
+
+    if (!checkInvoiceOnly && clientId && companyId) {
       const clientValidationResponse = await queryClient.fetchQuery(
         ['/api/v1/einvoice/validateEntity-client', entityId],
         () =>
@@ -91,31 +100,40 @@ export function useCheckEInvoiceValidation(params: Params) {
         };
       }
 
-      setValidationEntityResponse((current) => ({
-        ...current,
+      setValidationEntityResponse(() => ({
+        invoice: [],
         ...currentValidationResult,
       }));
     } else {
-      const invoiceValidationResponse = await queryClient.fetchQuery(
-        ['/api/v1/einvoice/validateEntity-invoice', entityId],
-        () =>
-          request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
-            entity: 'invoices',
-            entity_id: entityId,
-          })
-            .then((response) => response)
-            .catch((error) => error.response),
-        { staleTime: Infinity }
-      );
+      if (entityId) {
+        const invoiceValidationResponse = await queryClient.fetchQuery(
+          ['/api/v1/einvoice/validateEntity-invoice', entityId],
+          () =>
+            request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
+              entity: 'invoices',
+              entity_id: entityId,
+            })
+              .then((response) => response)
+              .catch((error) => error.response),
+          { staleTime: Infinity }
+        );
 
-      if (invoiceValidationResponse?.status === 422) {
-        setValidationEntityResponse((current) => ({
-          ...current,
-          invoice: invoiceValidationResponse.data.invoice,
-          passes: false,
-        }));
+        withToaster && toast.dismiss();
+
+        if (invoiceValidationResponse?.status === 422) {
+          setValidationEntityResponse(() =>
+            cloneDeep({
+              client: [],
+              company: [],
+              invoice: invoiceValidationResponse.data.invoice,
+              passes: false,
+            })
+          );
+        }
       }
     }
+
+    onFinished?.();
   };
 
   useEffect(() => {
