@@ -70,13 +70,18 @@ export default function Invoice() {
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const { validationResponse } = useCheckEInvoiceValidation({
-    entity: 'invoices',
-    entity_id: id as string,
-    enableQuery:
+    entityId: id as string,
+    enableQuery: Boolean(
       company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.settings.enable_e_invoice,
+        company?.settings.enable_e_invoice &&
+        invoice?.client_id.length &&
+        id?.length
+    ),
+    clientId: invoice?.client_id as string,
+    companyId: company?.id,
   });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
@@ -84,8 +89,6 @@ export default function Invoice() {
   const [client, setClient] = useState<Client | undefined>();
 
   const { calculateInvoiceSum } = useInvoiceUtilities({ client });
-
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [saveChanges, setSaveChanges] = useState<boolean>(false);

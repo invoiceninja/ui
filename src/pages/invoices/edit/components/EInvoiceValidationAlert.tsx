@@ -9,7 +9,10 @@
  */
 
 import { Alert } from '$app/components/Alert';
-import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import {
+  EntityError,
+  ValidationEntityResponse,
+} from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -47,10 +50,10 @@ export function EInvoiceValidationAlert(props: Props) {
               {(
                 validationResponse[
                   entity as keyof ValidationEntityResponse
-                ] as Array<string>
+                ] as Array<EntityError>
               ).map((message, index) => (
                 <div key={index} className="flex flex-col space-y-1">
-                  <span>{message}</span>
+                  <span>{message.label || message.field}</span>
                 </div>
               ))}
             </div>
