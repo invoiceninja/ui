@@ -207,6 +207,14 @@ function PlanCheck({ onContinue }: StepProps) {
   const form = useFormik({
     initialValues: {},
     onSubmit(_, { setSubmitting }) {
+      if (import.meta.env.DEV) {
+        setHasValidLicense(true);
+
+        onContinue();
+
+        return;
+      }
+
       request('POST', endpoint('/api/v1/check_license'))
         .then(() => {
           setHasValidLicense(true);
