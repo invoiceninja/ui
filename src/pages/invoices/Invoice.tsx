@@ -97,7 +97,10 @@ export default function Invoice() {
 
   const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
-  const tabs = useTabs({ invoice });
+  const tabs = useTabs({
+    invoice,
+    eInvoiceValidationResponse: validationResponse,
+  });
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
