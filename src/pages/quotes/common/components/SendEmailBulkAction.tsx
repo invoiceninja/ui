@@ -15,9 +15,10 @@ import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { useBulkAction } from '../hooks/useBulkAction';
 import { Quote } from '$app/common/interfaces/quote';
-import { toast } from '$app/common/helpers/toast/toast';
+import { useNavigate } from 'react-router-dom';
+import { route } from '$app/common/helpers/route';
+import { SendEmailModal } from './SendEmailModal';
 
 interface Props {
   selectedIds: string[];
@@ -25,53 +26,69 @@ interface Props {
   setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const SendEmailBulkAction = (props: Props) => {
+  const { selectedQuotes, setSelected } = props;
+
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
-  const { selectedIds, selectedQuotes, setSelected } = props;
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isContactEmailOpen, setContactEmailOpen] = useState<boolean>(false);
 
-  const bulk = useBulkAction();
-
-  const handleOpenModal = () => {
-    const clientHasContacts = selectedQuotes.some(
-      ({ client }) => client?.contacts.some(({ email }) => email),
-      1
+  const haveClientsEmailContacts = () => {
+    return selectedQuotes.every(({ client }) =>
+      client?.contacts.some(({ email }) => email)
     );
+  };
 
-    if (!clientHasContacts) {
-      return toast.error('client_email_not_set');
-    }
-
-    setIsModalOpen(true);
+  const getQuoteWithoutClientContacts = () => {
+    return selectedQuotes.find(
+      ({ client }) => !client?.contacts.some(({ email }) => email)
+    );
   };
 
   return (
     <>
+      <SendEmailModal
+        visible={isModalVisible}
+        setVisible={setIsModalVisible}
+        quoteIds={selectedQuotes.map(({ id }) => id)}
+        setSelected={setSelected}
+      />
+
       <DropdownElement
-        onClick={handleOpenModal}
+        onClick={() =>
+          haveClientsEmailContacts()
+            ? setIsModalVisible(true)
+            : setContactEmailOpen(true)
+        }
         icon={<Icon element={MdSend} />}
       >
         {t('send_email')}
       </DropdownElement>
 
       <Modal
-        title={t('bulk_email_quotes')}
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        title={t('contact_email')}
+        visible={isContactEmailOpen}
+        onClose={() => setContactEmailOpen(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <div className="flex flex-col items-center space-y-4">
+          <span className="text-base font-medium">
+            {t('client_email_not_set')}.
+          </span>
 
-        <div className="flex justify-end space-x-4 mt-5">
           <Button
-            behavior="button"
+            className="self-end"
             onClick={() => {
-              bulk(selectedIds, 'email');
-              setSelected([]);
-              setIsModalOpen(false);
+              navigate(
+                route('/clients/:id/edit', {
+                  id: getQuoteWithoutClientContacts()?.client_id,
+                })
+              );
+              setContactEmailOpen(false);
             }}
           >
-            <span className="text-base mx-3">{t('yes')}</span>
+            {t('edit_client')}
           </Button>
         </div>
       </Modal>
