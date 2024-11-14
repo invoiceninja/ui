@@ -76,9 +76,7 @@ export default function Invoice() {
     resource: invoice,
     enableQuery: Boolean(
       company?.settings.e_invoice_type === 'PEPPOL' &&
-        company?.settings.enable_e_invoice &&
-        invoice?.client_id.length &&
-        id?.length
+        company?.settings.enable_e_invoice
     ),
     companyId: company?.id,
   });

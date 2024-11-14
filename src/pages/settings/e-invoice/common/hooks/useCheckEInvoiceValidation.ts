@@ -15,7 +15,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { useParams } from 'react-router-dom';
 
 interface Params {
   resource: Invoice | undefined;
@@ -48,7 +47,6 @@ export function useCheckEInvoiceValidation(params: Params) {
     onFinished,
   } = params;
 
-  const { id } = useParams();
   const queryClient = useQueryClient();
 
   const [validationEntityResponse, setValidationEntityResponse] = useState<
@@ -58,7 +56,7 @@ export function useCheckEInvoiceValidation(params: Params) {
   const handleCheckValidation = async () => {
     withToaster && toast.processing();
 
-    if (!checkInvoiceOnly && resource?.client_id && companyId) {
+    if (!checkInvoiceOnly) {
       const clientValidationResponse = await queryClient.fetchQuery(
         ['/api/v1/einvoice/validateEntity-client', resource?.client_id],
         () =>
@@ -136,7 +134,7 @@ export function useCheckEInvoiceValidation(params: Params) {
   };
 
   useEffect(() => {
-    if (enableQuery && id === resource?.id) {
+    if (enableQuery && resource) {
       handleCheckValidation();
     }
   }, [enableQuery, resource]);
