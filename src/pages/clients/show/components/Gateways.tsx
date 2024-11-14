@@ -17,8 +17,12 @@ import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { Button, Link } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
+import { useColorScheme } from '$app/common/colors';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props {
   client: Client;
@@ -27,8 +31,10 @@ interface Props {
 export function Gateways(props: Props) {
   const [t] = useTranslation();
 
-  const { data: companyGatewaysResponse } = useCompanyGatewaysQuery();
   const { client } = props;
+
+  const colors = useColorScheme();
+  const { data: companyGatewaysResponse } = useCompanyGatewaysQuery();
 
   const [companyGateways, setCompanyGateways] = useState<CompanyGateway[]>();
 
@@ -36,7 +42,6 @@ export function Gateways(props: Props) {
     return companyGateways?.find(({ id }) => id === gatewayId);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isStripeGateway = (gatewayKey: string | undefined) => {
     return Boolean(
       gatewayKey &&
@@ -45,73 +50,20 @@ export function Gateways(props: Props) {
     );
   };
 
+  const handleSetDefault = (id: string) => {
+    request(
+      'POST',
+      endpoint('/api/v1/client_gateway_tokens/:id/setAsDefault', { id })
+    ).then(() => {
+      toast.success('success');
+    });
+  };
+
   useEffect(() => {
     if (companyGatewaysResponse) {
       setCompanyGateways(companyGatewaysResponse.data.data);
     }
   }, [companyGatewaysResponse]);
-
-  client.gateway_tokens = [
-    {
-      id: 't7kd92je1p3m',
-      archived_at: 0,
-      company_gateway_id: 'cg_8392jd82',
-      created_at: 1699892400, // Nov 13, 2023
-      gateway_customer_reference: 'cus_JK39d8H2',
-      gateway_type_id: 'd791gw',
-      meta: {
-        brand: 'visa',
-        last4: '4242',
-        exp_month: '11',
-        exp_year: '2025',
-        type: 1,
-      },
-      is_default: true,
-      is_deleted: false,
-      token: 'tok_visa_4242',
-      updated_at: 1699892400,
-    },
-    {
-      id: 'p9mw73kf4n2q',
-      archived_at: 0,
-      company_gateway_id: 'cg_8392jd82',
-      created_at: 1698682800, // Oct 30, 2023
-      gateway_customer_reference: 'cus_JK39d8H2',
-      gateway_type_id: 'd791gw',
-      meta: {
-        brand: 'mastercard',
-        last4: '5555',
-        exp_month: '03',
-        exp_year: '2026',
-        type: 1,
-      },
-      is_default: false,
-      is_deleted: false,
-      token: 'tok_mc_5555',
-      updated_at: 1698682800,
-    },
-    {
-      id: 'v5hn28rs9x4t',
-      archived_at: 1697473200, // Oct 16, 2023
-      company_gateway_id: 'cg_8392jd82',
-      created_at: 1696263600, // Oct 2, 2023
-      gateway_customer_reference: 'cus_JK39d8H2',
-      gateway_type_id: 'd791gw',
-      meta: {
-        brand: 'amex',
-        last4: '0005',
-        exp_month: '08',
-        exp_year: '2024',
-        type: 1,
-      },
-      is_default: false,
-      is_deleted: true,
-      token: 'tok_amex_0005',
-      updated_at: 1697473200,
-    },
-  ];
-
-  console.log(client.gateway_tokens);
 
   return (
     <div className="col-span-12 md:col-span-6 lg:col-span-3">
@@ -122,7 +74,7 @@ export function Gateways(props: Props) {
         {client.gateway_tokens.map((token) => (
           <div
             key={token.id}
-            className="flex items-center justify-between first:mt-3 mb-7 h-12"
+            className="flex items-center justify-between first:mt-3 mb-7 h-12 space-x-4"
           >
             <div className="flex flex-col space-y-1.5">
               <div className="inline-flex items-center space-x-1">
@@ -138,8 +90,7 @@ export function Gateways(props: Props) {
                       id: token.company_gateway_id,
                     })}
                   >
-                    {getCompanyGateway(token.company_gateway_id)?.label ||
-                      'Stripe'}
+                    {getCompanyGateway(token.company_gateway_id)?.label}
                   </Link>
                 </div>
               </div>
@@ -159,21 +110,41 @@ export function Gateways(props: Props) {
             </div>
 
             <div className="flex flex-col items-end justify-between h-full">
-              <Link
-                external
-                to={route(
-                  'https://dashboard.stripe.com/customers/:customerReference',
-                  {
-                    customerReference: token.gateway_customer_reference,
-                  }
-                )}
-              >
-                <Icon element={MdLaunch} size={18} />
-              </Link>
+              {isStripeGateway(
+                getCompanyGateway(token.company_gateway_id)?.gateway_key
+              ) && (
+                <Link
+                  external
+                  to={route(
+                    'https://dashboard.stripe.com/customers/:customerReference',
+                    {
+                      customerReference: token.gateway_customer_reference,
+                    }
+                  )}
+                >
+                  <Icon element={MdLaunch} size={18} />
+                </Link>
+              )}
 
-              <div>
-                <Button type="minimal">{t('default')}</Button>
-              </div>
+              {token.is_default ? (
+                <div
+                  className="border rounded-full py-1 px-1.5 text-xs"
+                  style={{
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$5,
+                  }}
+                >
+                  {t('default')}
+                </div>
+              ) : (
+                <div
+                  className="text-xs cursor-pointer border rounded-full py-1 px-1.5"
+                  style={{ borderColor: colors.$5 }}
+                  onClick={() => handleSetDefault(token.id)}
+                >
+                  {t('set_as_default')}
+                </div>
+              )}
             </div>
           </div>
         ))}
