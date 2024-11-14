@@ -11,14 +11,15 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
+import { useParams } from 'react-router-dom';
 
 interface Params {
-  entityId: string;
+  resource: Invoice | undefined;
   enableQuery: boolean;
-  clientId?: string;
   companyId?: string;
   checkInvoiceOnly?: boolean;
   withToaster?: boolean;
@@ -39,15 +40,15 @@ export interface ValidationEntityResponse {
 
 export function useCheckEInvoiceValidation(params: Params) {
   const {
-    clientId,
     companyId,
-    entityId,
+    resource,
     enableQuery,
     checkInvoiceOnly,
     withToaster,
     onFinished,
   } = params;
 
+  const { id } = useParams();
   const queryClient = useQueryClient();
 
   const [validationEntityResponse, setValidationEntityResponse] = useState<
@@ -57,13 +58,13 @@ export function useCheckEInvoiceValidation(params: Params) {
   const handleCheckValidation = async () => {
     withToaster && toast.processing();
 
-    if (!checkInvoiceOnly && clientId && companyId) {
+    if (!checkInvoiceOnly && resource?.client_id && companyId) {
       const clientValidationResponse = await queryClient.fetchQuery(
-        ['/api/v1/einvoice/validateEntity-client', entityId],
+        ['/api/v1/einvoice/validateEntity-client', resource?.client_id],
         () =>
           request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
             entity: 'clients',
-            entity_id: clientId,
+            entity_id: resource?.client_id,
           })
             .then((response) => response)
             .catch((error) => error.response),
@@ -71,7 +72,7 @@ export function useCheckEInvoiceValidation(params: Params) {
       );
 
       const companyValidationResponse = await queryClient.fetchQuery(
-        ['/api/v1/einvoice/validateEntity-company', entityId],
+        ['/api/v1/einvoice/validateEntity-company', companyId],
         () =>
           request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
             entity: 'companies',
@@ -105,31 +106,29 @@ export function useCheckEInvoiceValidation(params: Params) {
         ...currentValidationResult,
       }));
     } else {
-      if (entityId) {
-        const invoiceValidationResponse = await queryClient.fetchQuery(
-          ['/api/v1/einvoice/validateEntity-invoice', entityId],
-          () =>
-            request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
-              entity: 'invoices',
-              entity_id: entityId,
-            })
-              .then((response) => response)
-              .catch((error) => error.response),
-          { staleTime: Infinity }
+      const invoiceValidationResponse = await queryClient.fetchQuery(
+        ['/api/v1/einvoice/validateEntity-invoice', resource?.id],
+        () =>
+          request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
+            entity: 'invoices',
+            entity_id: resource?.id,
+          })
+            .then((response) => response)
+            .catch((error) => error.response),
+        { staleTime: Infinity }
+      );
+
+      withToaster && toast.dismiss();
+
+      if (invoiceValidationResponse?.status === 422) {
+        setValidationEntityResponse(() =>
+          cloneDeep({
+            client: [],
+            company: [],
+            invoice: invoiceValidationResponse.data.invoice,
+            passes: false,
+          })
         );
-
-        withToaster && toast.dismiss();
-
-        if (invoiceValidationResponse?.status === 422) {
-          setValidationEntityResponse(() =>
-            cloneDeep({
-              client: [],
-              company: [],
-              invoice: invoiceValidationResponse.data.invoice,
-              passes: false,
-            })
-          );
-        }
       }
     }
 
@@ -137,10 +136,10 @@ export function useCheckEInvoiceValidation(params: Params) {
   };
 
   useEffect(() => {
-    if (enableQuery) {
+    if (enableQuery && id === resource?.id) {
       handleCheckValidation();
     }
-  }, [enableQuery]);
+  }, [enableQuery, resource]);
 
   return { validationResponse: validationEntityResponse };
 }

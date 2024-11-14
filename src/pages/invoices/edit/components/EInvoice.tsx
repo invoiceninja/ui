@@ -13,7 +13,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
 import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { EInvoiceComponent } from '$app/pages/settings';
-import { Dispatch, RefObject, SetStateAction } from 'react';
+import { Dispatch, RefObject, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
@@ -39,17 +39,31 @@ export default function EInvoice() {
   const { invoice, setInvoice, eInvoiceRef, eInvoiceValidationEntityResponse } =
     context;
 
+  const [currentInvoiceErrors, setCurrentInvoiceErrors] = useState<string[]>(
+    []
+  );
+
   return (
     <>
-      {eInvoiceValidationEntityResponse?.passes === false && (
+      {Boolean(
+        eInvoiceValidationEntityResponse?.passes === false && invoice
+      ) && (
         <EInvoiceValidationAlert
           validationResponse={eInvoiceValidationEntityResponse}
+          clientId={invoice?.client_id as string}
+          currentInvoiceErrors={currentInvoiceErrors}
+          invoiceId={invoice?.id as string}
         />
       )}
 
       <Card
         title={t('e_invoice')}
-        topRight={<InvoiceEntityValidationButton id={invoice?.id} />}
+        topRight={
+          <InvoiceEntityValidationButton
+            invoice={invoice}
+            setCurrentInvoiceErrors={setCurrentInvoiceErrors}
+          />
+        }
       >
         {invoice?.e_invoice && (
           <EInvoiceGenerator

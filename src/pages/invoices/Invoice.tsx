@@ -73,14 +73,13 @@ export default function Invoice() {
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const { validationResponse } = useCheckEInvoiceValidation({
-    entityId: id as string,
+    resource: invoice,
     enableQuery: Boolean(
       company?.settings.e_invoice_type === 'PEPPOL' &&
         company?.settings.enable_e_invoice &&
         invoice?.client_id.length &&
         id?.length
     ),
-    clientId: invoice?.client_id as string,
     companyId: company?.id,
   });
 
