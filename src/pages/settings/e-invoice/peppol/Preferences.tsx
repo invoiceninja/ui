@@ -170,10 +170,10 @@ export function Preferences() {
   );
 }
 
-function Quota() {
+export function useQuota() {
   const account = useCurrentAccount();
 
-  const data = useQuery({
+  const quota = useQuery({
     queryKey: ['/api/v1/einvoice/quota'],
     queryFn: () =>
       request('GET', endpoint('/api/v1/einvoice/quota'))
@@ -186,21 +186,27 @@ function Quota() {
     enabled: isSelfHosted(),
   });
 
-  if (isHosted()) {
-    return (
-      <div>
-        <p>{account?.e_invoice_quota}</p>
-      </div>
-    );
-  }
+  const count = () => {
+    if (isHosted()) {
+      return parseInt(account?.e_invoice_quota);
+    }
 
-  if (data && isSelfHosted()) {
-    return (
-      <div>
-        <p>{data.data?.quota}</p>
-      </div>
-    );
-  }
+    if (quota) {
+      return quota.data?.quota ? parseInt(quota.data.quota) : 0;
+    }
 
-  return null;
+    return 0;
+  };
+
+  return count();
+}
+
+function Quota() {
+  const quota = useQuota();
+
+  return (
+    <div>
+      <p>{quota}</p>
+    </div>
+  );
 }
