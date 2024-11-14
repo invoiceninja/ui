@@ -61,6 +61,7 @@ import { Notifications } from '../Notifications';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
+import { EInvoiceCredits } from '../banners/EInvoiceCredits';
 
 export interface SaveOption {
   label: string;
@@ -409,6 +410,7 @@ export function Default(props: Props) {
       <ActivateCompany />
       <VerifyEmail />
       <VerifyPhone />
+      <EInvoiceCredits />
 
       <MobileSidebar
         navigation={navigation}
