@@ -93,9 +93,7 @@ export function EInvoiceValidationAlert(props: Props) {
             <div className="flex flex-1 items-center justify-between pr-4">
               <div className="flex flex-col space-y-1">
                 {currentInvoiceErrors.map((message, index) => (
-                  <div key={index} className="flex flex-col space-y-1">
-                    <span>{message}</span>
-                  </div>
+                  <span key={index}>{message}</span>
                 ))}
               </div>
 
