@@ -23,6 +23,7 @@ import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
+import classNames from 'classnames';
 
 interface Props {
   client: Client;
@@ -74,7 +75,7 @@ export function Gateways(props: Props) {
         {client.gateway_tokens.map((token) => (
           <div
             key={token.id}
-            className="flex items-center justify-between first:mt-3 mb-7 h-12 space-x-4"
+            className="flex items-center justify-between first:mt-3 mb-7 h-12"
           >
             <div className="flex flex-col space-y-1.5">
               <div className="inline-flex items-center space-x-1">
@@ -109,7 +110,16 @@ export function Gateways(props: Props) {
               </div>
             </div>
 
-            <div className="flex flex-col items-end justify-between h-full">
+            <div
+              className={classNames('flex flex-col items-end h-full', {
+                'justify-center': !isStripeGateway(
+                  getCompanyGateway(token.company_gateway_id)?.gateway_key
+                ),
+                'justify-between': isStripeGateway(
+                  getCompanyGateway(token.company_gateway_id)?.gateway_key
+                ),
+              })}
+            >
               {isStripeGateway(
                 getCompanyGateway(token.company_gateway_id)?.gateway_key
               ) && (
