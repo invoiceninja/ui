@@ -11,14 +11,19 @@
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
-import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { EInvoiceComponent } from '$app/pages/settings';
 import { Dispatch, RefObject, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
-import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
-import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import {
+  EntityError,
+  ValidationEntityResponse,
+} from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { InvoiceEntityValidationButton } from './InvoiceEntityValidationButton';
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { Icon } from '$app/components/icons/Icon';
+import { MdCheckCircle } from 'react-icons/md';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -31,31 +36,22 @@ export interface Context {
   eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
 }
+
+const VALIDATION_ENTITIES = ['client', 'company'];
+
 export default function EInvoice() {
   const [t] = useTranslation();
 
   const context: Context = useOutletContext();
 
-  const { invoice, setInvoice, eInvoiceRef, eInvoiceValidationEntityResponse } =
-    context;
+  const { invoice, eInvoiceValidationEntityResponse } = context;
 
-  const [currentInvoiceErrors, setCurrentInvoiceErrors] = useState<string[]>(
-    []
-  );
+  const [currentInvoiceErrors, setCurrentInvoiceErrors] = useState<
+    string[] | undefined
+  >();
 
   return (
     <>
-      {Boolean(
-        eInvoiceValidationEntityResponse?.passes === false && invoice
-      ) && (
-        <EInvoiceValidationAlert
-          validationResponse={eInvoiceValidationEntityResponse}
-          clientId={invoice?.client_id as string}
-          currentInvoiceErrors={currentInvoiceErrors}
-          invoiceId={invoice?.id as string}
-        />
-      )}
-
       <Card
         title={t('e_invoice')}
         topRight={
@@ -65,14 +61,110 @@ export default function EInvoice() {
           />
         }
       >
-        {invoice?.e_invoice && (
-          <EInvoiceGenerator
-            ref={eInvoiceRef}
-            entityLevel
-            currentEInvoice={invoice.e_invoice}
-            invoice={invoice}
-            setInvoice={setInvoice}
-          />
+        {typeof currentInvoiceErrors !== 'undefined' && (
+          <div className="flex text-sm px-6 mb-4">
+            {currentInvoiceErrors.length ? (
+              <div className="flex flex-1 items-center space-x-4 border-l-2 border-red-500 pl-4 py-4">
+                <div className="whitespace-nowrap font-medium w-24">
+                  {t('invoice')}:
+                </div>
+
+                <div className="flex flex-1 items-center justify-between pr-4">
+                  <div className="flex flex-col space-y-1">
+                    {currentInvoiceErrors.map((message, index) => (
+                      <span key={index}>{message}</span>
+                    ))}
+                  </div>
+
+                  <Link
+                    to={route('/invoices/:id/edit', {
+                      id: invoice?.id,
+                    })}
+                  >
+                    {t('edit_invoice')}
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4">
+                <div className="whitespace-nowrap font-medium w-24">
+                  {t('invoice')}:
+                </div>
+
+                <div>
+                  <Icon element={MdCheckCircle} size={33} color="green" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {Boolean(eInvoiceValidationEntityResponse && invoice) && (
+          <div className="flex px-6">
+            <div className="flex flex-1 flex-col space-y-4 text-sm">
+              {VALIDATION_ENTITIES.map((entity, index) =>
+                (
+                  eInvoiceValidationEntityResponse?.[
+                    entity as keyof ValidationEntityResponse
+                  ] as Array<string>
+                ).length ? (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-4 border-l-2 border-red-500 pl-4 py-4"
+                  >
+                    <div className="whitespace-nowrap font-medium w-24">
+                      {t(entity)}:
+                    </div>
+
+                    <div className="flex flex-1 items-center justify-between pr-4">
+                      <div className="flex flex-col space-y-1">
+                        {(
+                          eInvoiceValidationEntityResponse?.[
+                            entity as keyof ValidationEntityResponse
+                          ] as Array<EntityError>
+                        ).map((message, index) => (
+                          <div key={index} className="flex flex-col space-y-1">
+                            <span>
+                              {message.label
+                                ? `${message.label} (${t('required')})`
+                                : message.field}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {entity === 'client' ? (
+                        <Link
+                          to={route('/clients/:id/edit', {
+                            id: invoice?.client_id,
+                          })}
+                        >
+                          {t('edit_client')}
+                        </Link>
+                      ) : (
+                        <Link to="/settings/company_details">
+                          {t('settings')}
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4"
+                  >
+                    <div className="whitespace-nowrap font-medium w-24">
+                      {t(entity)}:
+                    </div>
+
+                    <div>
+                      <Icon element={MdCheckCircle} size={33} color="green" />
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
         )}
       </Card>
     </>

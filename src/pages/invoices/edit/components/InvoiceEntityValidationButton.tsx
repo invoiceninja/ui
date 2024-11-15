@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from '$app/common/helpers/toast/toast';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Button } from '$app/components/forms';
 import { useCheckEInvoiceValidation } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
@@ -17,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   invoice: Invoice | undefined;
-  setCurrentInvoiceErrors: Dispatch<SetStateAction<string[]>>;
+  setCurrentInvoiceErrors: Dispatch<SetStateAction<string[] | undefined>>;
 }
 
 export function InvoiceEntityValidationButton(props: Props) {
@@ -40,10 +39,6 @@ export function InvoiceEntityValidationButton(props: Props) {
   useEffect(() => {
     if (validationResponse) {
       setCurrentInvoiceErrors(validationResponse.invoice);
-
-      if (!validationResponse.invoice.length) {
-        toast.success('success');
-      }
     }
   }, [validationResponse]);
 
@@ -54,7 +49,7 @@ export function InvoiceEntityValidationButton(props: Props) {
       disabled={checkValidation}
       disableWithoutIcon
     >
-      {t('check')}
+      {t('validate')}
     </Button>
   );
 }
