@@ -23,8 +23,8 @@ import { Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useQuery } from 'react-query';
-import { AxiosError, AxiosResponse } from 'axios';
+// import { useQuery } from 'react-query';
+// import { AxiosError, AxiosResponse } from 'axios';
 import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function Preferences() {
@@ -173,32 +173,24 @@ export function Preferences() {
 export function useQuota() {
   const account = useCurrentAccount();
 
-  const quota = useQuery({
-    queryKey: ['/api/v1/einvoice/quota'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/einvoice/quota'))
-        .then((response: AxiosResponse<{ quota: string }>) => response.data)
-        .catch((error: AxiosError<{ message: string }>) => {
-          if (error.response?.status === 422) {
-            toast.error(error.response.data.message);
-          }
-        }),
-    enabled: isSelfHosted(),
-  });
+  return parseInt(account?.e_invoice_quota || '0');
 
-  const count = () => {
-    if (isHosted()) {
-      return parseInt(account?.e_invoice_quota);
-    }
+  
+  // useQuery({
+  //   queryKey: ['/api/v1/einvoice/quota'],
+  //   queryFn: () =>
+  //     request('GET', endpoint('/api/v1/einvoice/quota'))
+  //       .then((response: AxiosResponse<{ quota: string }>) => response.data)
+  //       .catch((error: AxiosError<{ message: string }>) => {
+  //         if (error.response?.status === 422) {
+  //           toast.error(error.response.data.message);
+  //         }
+  //       }),
+  //   enabled: isSelfHosted(),
+  // });
 
-    if (quota) {
-      return quota.data?.quota ? parseInt(quota.data.quota) : 0;
-    }
+  return parseInt(account?.e_invoice_quota || '0');
 
-    return 0;
-  };
-
-  return count();
 }
 
 function Quota() {

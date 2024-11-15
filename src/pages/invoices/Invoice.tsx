@@ -199,7 +199,7 @@ export default function Invoice() {
                 rightSide={
                   invoice && (
                     <div className="flex items-center">
-                      <CommonActions invoice={invoice} />
+                      <CommonActions resource={invoice} entity="invoice" />
                     </div>
                   )
                 }
