@@ -12,7 +12,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 import { Banner } from '../Banner';
 import { buttonStyles } from './VerifyEmail';
-import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
+// import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
 import { Link } from 'react-router-dom';
 
 export const EINVOICE_CREDITS_MIN_THRESHOLD = 15;
