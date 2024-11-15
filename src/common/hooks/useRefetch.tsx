@@ -223,8 +223,8 @@ export const keys = {
     dependencies: ['/api/v1/activities/entity'],
   },
   company_entity_validations: {
-    path: '/api/v1/einvoice/validateEntity',
-    dependencies: ['/api/v1/einvoice/validateEntity-company'],
+    path: '/api/v1/einvoice/validateEntity-company',
+    dependencies: [],
   },
 };
 

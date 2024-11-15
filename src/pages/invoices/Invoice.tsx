@@ -17,12 +17,7 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
-import {
-  Outlet,
-  useLocation,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { invoiceAtom } from './common/atoms';
@@ -62,7 +57,6 @@ export default function Invoice() {
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
   const { id } = useParams();
-  const location = useLocation();
   const company = useCurrentCompany();
   const [searchParams] = useSearchParams();
 
@@ -155,25 +149,11 @@ export default function Invoice() {
               <ResourceActions
                 resource={invoice}
                 actions={actions}
-                onSaveClick={() => {
-                  if (eInvoiceRef?.current?.saveEInvoice()) {
-                    setInvoice(
-                      (current) =>
-                        current && {
-                          ...current,
-                          e_invoice: eInvoiceRef?.current?.saveEInvoice(),
-                        }
-                    );
-                  }
-
-                  setSaveChanges(true);
-                }}
+                onSaveClick={() => setSaveChanges(true)}
                 disableSaveButton={
                   invoice &&
                   (invoice.status_id === InvoiceStatus.Cancelled ||
-                    invoice.is_deleted ||
-                    (validationResponse?.passes === false &&
-                      location.pathname.endsWith('/e_invoice')))
+                    invoice.is_deleted)
                 }
                 disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"

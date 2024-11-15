@@ -118,16 +118,14 @@ export function useCheckEInvoiceValidation(params: Params) {
 
       withToaster && toast.dismiss();
 
-      if (invoiceValidationResponse?.status === 422) {
-        setValidationEntityResponse(() =>
-          cloneDeep({
-            client: [],
-            company: [],
-            invoice: invoiceValidationResponse.data.invoice,
-            passes: false,
-          })
-        );
-      }
+      setValidationEntityResponse(() =>
+        cloneDeep({
+          client: [],
+          company: [],
+          invoice: invoiceValidationResponse?.data?.invoice ?? [],
+          passes: false,
+        })
+      );
     }
 
     onFinished?.();
