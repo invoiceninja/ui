@@ -95,12 +95,21 @@ function Configure() {
           refresh();
 
           setIsVisible(false);
+
+          form.resetForm();
         })
         .catch((e: AxiosError<ValidationBag>) => {
           if (e.response?.status === 422) {
-            setErrors(e.response.data);
+            if (
+              get(e.response.data, '0.source') !== '' &&
+              get(e.response.data, '0.source') !== undefined
+            ) {
+              toast.error(`Error: ${get(e.response.data, '0.details')}`);
+            } else {
+              setErrors(e.response.data);
 
-            toast.dismiss();
+              toast.dismiss();
+            }
 
             return;
           }

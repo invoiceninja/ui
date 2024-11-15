@@ -28,7 +28,6 @@ import {
 import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useSetAtom } from 'jotai';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
@@ -47,7 +46,6 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
@@ -98,6 +96,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -330,11 +329,17 @@ export function useSave(props: CreateProps) {
   };
 }
 
-export function useActions() {
+interface Params {
+  dropdown?: boolean;
+}
+
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
+
+  const { dropdown = true } = params || {};
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
@@ -385,117 +390,205 @@ export function useActions() {
 
   const actions: Action<Credit>[] = [
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="credit"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
         to={route('/credits/:id/pdf', { id: credit.id })}
-        icon={<Icon element={MdPictureAsPdf} />}
+        icon={MdPictureAsPdf}
       >
         {t('view_pdf')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (credit) =>
       getEntityState(credit) !== EntityState.Deleted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'print_pdf',
+          })}
+          entity="credit"
+          actionKey="print_pdf"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('print_pdf')}
           onClick={() => printPdf([credit.id])}
-          icon={<Icon element={MdPrint} />}
+          icon={MdPrint}
+          disablePreventNavigation
         >
           {t('print_pdf')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'download_pdf',
+        })}
+        entity="credit"
+        actionKey="download_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('download_pdf')}
         onClick={() => downloadPdf(credit)}
-        icon={<Icon element={MdDownload} />}
+        icon={MdDownload}
+        disablePreventNavigation
       >
         {t('download_pdf')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (credit) =>
       Boolean(company?.settings.enable_e_invoice) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'download_e_credit',
+          })}
+          entity="credit"
+          actionKey="download_e_credit"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('download_e_credit')}
           onClick={() => downloadECredit(credit)}
-          icon={<Icon element={MdDownload} />}
+          icon={MdDownload}
+          disablePreventNavigation
         >
           {t('download_e_credit')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) =>
       (isAdmin || isOwner) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'schedule',
+          })}
+          entity="credit"
+          actionKey="schedule"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('schedule')}
           onClick={() => scheduleEmailRecord(credit.id)}
-          icon={<Icon element={MdSchedule} />}
+          icon={MdSchedule}
         >
           {t('schedule')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) => (
       <AddActivityComment
+        {...(!dropdown && {
+          key: 'add_comment',
+        })}
         entity="credit"
         entityId={credit.id}
         label={`#${credit.number}`}
         labelElement={
-          <DropdownElement icon={<Icon element={MdComment} />}>
+          <EntityActionElement
+            entity="credit"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+          >
             {t('add_comment')}
-          </DropdownElement>
+          </EntityActionElement>
         }
       />
     ),
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'email_credit',
+        })}
+        entity="credit"
+        actionKey="email_credit"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('email_credit')}
         to={route('/credits/:id/email', { id: credit.id })}
-        icon={<Icon element={MdSend} />}
+        icon={MdSend}
       >
         {t('email_credit')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'client_portal',
+        })}
+        entity="credit"
+        actionKey="client_portal"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('client_portal')}
         onClick={() => credit && openClientPortal(credit)}
-        icon={<Icon element={MdCloudCircle} />}
+        icon={MdCloudCircle}
+        disablePreventNavigation
       >
         {t('client_portal')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (credit) =>
       credit.client_id &&
       credit.amount > 0 &&
       hasPermission('create_payment') && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'apply_credit',
+          })}
+          entity="credit"
+          actionKey="apply_credit"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('apply_credit')}
           to={route(
             '/payments/create?client=:clientId&credit=:creditId&type=1',
             { clientId: credit.client_id, creditId: credit.id }
           )}
-          icon={<Icon element={MdCreditScore} />}
+          icon={MdCreditScore}
         >
           {t('apply_credit')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) =>
       credit.status_id === CreditStatus.Draft && (
-        <div>
-          <DropdownElement
-            onClick={() => markSent(credit)}
-            icon={<Icon element={MdMarkEmailRead} />}
-          >
-            {t('mark_sent')}
-          </DropdownElement>
-        </div>
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_sent',
+          })}
+          entity="credit"
+          actionKey="mark_sent"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_sent')}
+          onClick={() => markSent(credit)}
+          icon={MdMarkEmailRead}
+          disablePreventNavigation
+        >
+          {t('mark_sent')}
+        </EntityActionElement>
       ),
     (credit) =>
       (credit.status_id === CreditStatus.Draft ||
         credit.status_id === CreditStatus.Sent ||
         credit.status_id === CreditStatus.Partial) &&
       credit.amount < 0 && (
-        <div>
-          <DropdownElement
-            onClick={() => markPaid(credit)}
-            icon={<Icon element={MdPaid} />}
-          >
-            {t('mark_paid')}
-          </DropdownElement>
-        </div>
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_paid',
+          })}
+          entity="credit"
+          actionKey="mark_paid"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_paid')}
+          onClick={() => markPaid(credit)}
+          icon={MdPaid}
+          disablePreventNavigation
+        >
+          {t('mark_paid')}
+        </EntityActionElement>
       ),
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'run_template',
+        })}
+        entity="credit"
+        actionKey="run_template"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('run_template')}
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([credit]);
@@ -504,52 +597,94 @@ export function useActions() {
             entity: 'credit',
           });
         }}
-        icon={<Icon element={MdDesignServices} />}
+        icon={MdDesignServices}
       >
         {t('run_template')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     () => <Divider withoutPadding />,
     (credit) =>
       hasPermission('create_credit') && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'clone_to_credit',
+          })}
+          entity="credit"
+          actionKey="clone_to_credit"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_credit')}
           onClick={() => cloneToCredit(credit)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={MdControlPointDuplicate}
         >
           {t('clone_to_credit')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
-    (credit) => <CloneOptionsModal credit={credit} />,
-    () => isEditPage && <Divider withoutPadding />,
+    (credit) => (
+      <CloneOptionsModal
+        {...(!dropdown && {
+          key: 'clone_to_other',
+        })}
+        dropdown={dropdown}
+        credit={credit}
+      />
+    ),
+    () => Boolean(isEditPage && dropdown) && <Divider withoutPadding />,
     (credit) =>
       isEditPage &&
       credit.archived_at === 0 && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'archive',
+          })}
+          entity="credit"
+          actionKey="archive"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('archive')}
           onClick={() => bulk([credit.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
+          icon={MdArchive}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) =>
       isEditPage &&
       credit.archived_at > 0 && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'restore',
+          })}
+          entity="credit"
+          actionKey="restore"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('restore')}
           onClick={() => bulk([credit.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
+          icon={MdRestore}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('restore')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) =>
       isEditPage &&
       !credit?.is_deleted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'delete',
+          })}
+          entity="credit"
+          actionKey="delete"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('delete')}
           onClick={() => bulk([credit.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
+          icon={MdDelete}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('delete')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
   ];
 

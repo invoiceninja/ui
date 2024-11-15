@@ -25,7 +25,7 @@ export function useCheckEInvoiceValidation(params: Params) {
 
   const queryClient = useQueryClient();
 
-  const [isValid, setIsValid] = useState<boolean>(false);
+  const [isValid, setIsValid] = useState<boolean>(true);
 
   const handleCheckValidation = async () => {
     const response = await queryClient

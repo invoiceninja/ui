@@ -120,6 +120,7 @@ export function EInvoice() {
       company?.settings.enable_e_invoice &&
       company?.legal_entity_id !== null,
   });
+
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
@@ -233,12 +234,8 @@ export function EInvoice() {
           !isValid
       ) && (
         <ValidationAlert
-          to={
-            isCompanySettingsActive
-              ? '/settings/company_details'
-              : route('/clients/:id/edit', { id: company?.settings.id })
-          }
-          entity={isCompanySettingsActive ? 'company' : 'client'}
+          to={route('/clients/:id/edit', { id: company?.settings.id })}
+          entity="client"
         />
       )}
 

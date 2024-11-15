@@ -23,8 +23,8 @@ import { Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useQuery } from 'react-query';
-import { AxiosError, AxiosResponse } from 'axios';
+// import { useQuery } from 'react-query';
+// import { AxiosError, AxiosResponse } from 'axios';
 import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function Preferences() {
@@ -170,37 +170,35 @@ export function Preferences() {
   );
 }
 
-function Quota() {
+export function useQuota() {
   const account = useCurrentAccount();
 
-  const data = useQuery({
-    queryKey: ['/api/v1/einvoice/quota'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/einvoice/quota'))
-        .then((response: AxiosResponse<{ quota: string }>) => response.data)
-        .catch((error: AxiosError<{ message: string }>) => {
-          if (error.response?.status === 422) {
-            toast.error(error.response.data.message);
-          }
-        }),
-    enabled: isSelfHosted(),
-  });
+  return parseInt(account?.e_invoice_quota || '0');
 
-  if (isHosted()) {
-    return (
-      <div>
-        <p>{account?.e_invoice_quota}</p>
-      </div>
-    );
-  }
+  
+  // useQuery({
+  //   queryKey: ['/api/v1/einvoice/quota'],
+  //   queryFn: () =>
+  //     request('GET', endpoint('/api/v1/einvoice/quota'))
+  //       .then((response: AxiosResponse<{ quota: string }>) => response.data)
+  //       .catch((error: AxiosError<{ message: string }>) => {
+  //         if (error.response?.status === 422) {
+  //           toast.error(error.response.data.message);
+  //         }
+  //       }),
+  //   enabled: isSelfHosted(),
+  // });
 
-  if (data && isSelfHosted()) {
-    return (
-      <div>
-        <p>{data.data?.quota}</p>
-      </div>
-    );
-  }
+  return parseInt(account?.e_invoice_quota || '0');
 
-  return null;
+}
+
+function Quota() {
+  const quota = useQuota();
+
+  return (
+    <div>
+      <p>{quota}</p>
+    </div>
+  );
 }
