@@ -19,7 +19,7 @@ export const EINVOICE_CREDITS_MIN_THRESHOLD = 15;
 
 export function EInvoiceCredits() {
   const company = useCurrentCompany();
-  const quota = useQuota();
+  // const quota = useQuota();
 
   const { t } = useTranslation();
 

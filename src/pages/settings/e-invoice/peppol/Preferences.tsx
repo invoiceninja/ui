@@ -173,18 +173,21 @@ export function Preferences() {
 export function useQuota() {
   const account = useCurrentAccount();
 
-  const quota = useQuery({
-    queryKey: ['/api/v1/einvoice/quota'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/einvoice/quota'))
-        .then((response: AxiosResponse<{ quota: string }>) => response.data)
-        .catch((error: AxiosError<{ message: string }>) => {
-          if (error.response?.status === 422) {
-            toast.error(error.response.data.message);
-          }
-        }),
-    enabled: isSelfHosted(),
-  });
+  return parseInt(account?.e_invoice_quota || '0');
+
+  
+  // useQuery({
+  //   queryKey: ['/api/v1/einvoice/quota'],
+  //   queryFn: () =>
+  //     request('GET', endpoint('/api/v1/einvoice/quota'))
+  //       .then((response: AxiosResponse<{ quota: string }>) => response.data)
+  //       .catch((error: AxiosError<{ message: string }>) => {
+  //         if (error.response?.status === 422) {
+  //           toast.error(error.response.data.message);
+  //         }
+  //       }),
+  //   enabled: isSelfHosted(),
+  // });
 
   const count = () => {
     if (isHosted()) {
