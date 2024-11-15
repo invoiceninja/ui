@@ -19,7 +19,7 @@ export const EINVOICE_CREDITS_MIN_THRESHOLD = 15;
 
 export function EInvoiceCredits() {
   const company = useCurrentCompany();
-  const quota = useQuota();
+  // const quota = useQuota();
 
   const { t } = useTranslation();
 
@@ -30,33 +30,33 @@ export function EInvoiceCredits() {
     return null;
   }
 
-  if (quota === 0) {
-    return (
-      <Banner variant="red">
-        <div className="flex space-x-1">
-          <span>{t('notification_no_credits')}</span>
+  // if (quota === 0) {
+  //   return (
+  //     <Banner variant="red">
+  //       <div className="flex space-x-1">
+  //         <span>{t('notification_no_credits')}</span>
 
-          <Link to="/settings/e_invoice" className={buttonStyles}>
-            {t('learn_more')}
-          </Link>
-        </div>
-      </Banner>
-    );
-  }
+  //         <Link to="/settings/e_invoice" className={buttonStyles}>
+  //           {t('learn_more')}
+  //         </Link>
+  //       </div>
+  //     </Banner>
+  //   );
+  // }
 
-  if (quota <= EINVOICE_CREDITS_MIN_THRESHOLD) {
-    return (
-      <Banner variant="orange">
-        <div className="flex space-x-1">
-          <span>{t('notification_credits_low')}</span>
+  // if (quota <= EINVOICE_CREDITS_MIN_THRESHOLD) {
+  //   return (
+  //     <Banner variant="orange">
+  //       <div className="flex space-x-1">
+  //         <span>{t('notification_credits_low')}</span>
 
-          <Link to="/settings/e_invoice" className={buttonStyles}>
-            {t('learn_more')}
-          </Link>
-        </div>
-      </Banner>
-    );
-  }
+  //         <Link to="/settings/e_invoice" className={buttonStyles}>
+  //           {t('learn_more')}
+  //         </Link>
+  //       </div>
+  //     </Banner>
+  //   );
+  // }
 
   return null;
 }
