@@ -23,8 +23,8 @@ import { Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useQuery } from 'react-query';
-import { AxiosError, AxiosResponse } from 'axios';
+// import { useQuery } from 'react-query';
+// import { AxiosError, AxiosResponse } from 'axios';
 import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function Preferences() {
@@ -189,19 +189,8 @@ export function useQuota() {
   //   enabled: isSelfHosted(),
   // });
 
-  const count = () => {
-    if (isHosted()) {
-      return parseInt(account?.e_invoice_quota);
-    }
+  return parseInt(account?.e_invoice_quota || '0');
 
-    if (quota) {
-      return quota.data?.quota ? parseInt(quota.data.quota) : 0;
-    }
-
-    return 0;
-  };
-
-  return count();
 }
 
 function Quota() {
