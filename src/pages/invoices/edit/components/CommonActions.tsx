@@ -13,60 +13,80 @@ import { CommonActionsPreferenceModal } from '$app/components/CommonActionsPrefe
 import { Icon } from '$app/components/icons/Icon';
 import { useEffect, useState } from 'react';
 import { MdSettings } from 'react-icons/md';
-import { useActions } from './Actions';
+import { useActions as useInvoiceActions } from './Actions';
 import { ResourceAction } from '$app/components/DataTable';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from '$app/components/Tooltip';
+import { Credit } from '$app/common/interfaces/credit';
+import { useActions as useCreditActions } from '$app/pages/credits/common/hooks';
+
+type Resource = Invoice | Credit;
 
 interface Props {
-  invoice: Invoice;
+  entity: 'invoice' | 'credit';
+  resource: Resource;
 }
 export function CommonActions(props: Props) {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
-  const actions = useActions({ dropdown: false });
+  const invoiceActions = useInvoiceActions({ dropdown: false });
+  const creditActions = useCreditActions({ dropdown: false });
 
-  const { invoice } = props;
+  const { resource, entity } = props;
 
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
     useState<boolean>(false);
 
   const [selectedActions, setSelectedActions] =
-    useState<ResourceAction<Invoice>[]>();
+    useState<ResourceAction<Resource>[]>();
+
+  const actions = (): ResourceAction<Resource>[] => {
+    if (entity === 'invoice') {
+      return invoiceActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    if (entity === 'credit') {
+      return creditActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    return [];
+  };
 
   useEffect(() => {
     const currentActions =
-      user?.company_user?.react_settings?.common_actions?.invoice;
+      user?.company_user?.react_settings?.common_actions?.[entity];
 
     if (currentActions) {
-      const selected = actions
+      const selected = actions()
         .filter((action) =>
-          currentActions.includes(
-            (action as ResourceAction<Invoice>)(invoice)?.key as string
-          )
+          currentActions.includes(action(resource)?.key as string)
         )
         .sort((a, b) => {
           return (
             currentActions.indexOf(
-              String((a as ResourceAction<Invoice>)(invoice)?.key) ?? ''
+              String((a as ResourceAction<Resource>)(resource)?.key) ?? ''
             ) -
             currentActions.indexOf(
-              String((b as ResourceAction<Invoice>)(invoice)?.key) ?? ''
+              String((b as ResourceAction<Resource>)(resource)?.key) ?? ''
             )
           );
         });
 
-      setSelectedActions(selected as ResourceAction<Invoice>[]);
+      setSelectedActions(selected as ResourceAction<Resource>[]);
     }
-  }, [user, invoice]);
+  }, [user, resource]);
 
   return (
     <>
       <div className="flex items-center space-x-4">
         {selectedActions?.map((action, index) => (
-          <div key={index}>{action(invoice)}</div>
+          <div key={index}>{action(resource)}</div>
         ))}
 
         <Tooltip
@@ -87,7 +107,7 @@ export function CommonActions(props: Props) {
       </div>
 
       <CommonActionsPreferenceModal
-        entity="invoice"
+        entity={entity}
         visible={isPreferenceModalOpen}
         setVisible={setIsPreferenceModalOpen}
       />
