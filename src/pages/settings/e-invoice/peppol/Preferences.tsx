@@ -189,19 +189,8 @@ export function useQuota() {
   //   enabled: isSelfHosted(),
   // });
 
-  const count = () => {
-    if (isHosted()) {
-      return parseInt(account?.e_invoice_quota);
-    }
+  return parseInt(account?.e_invoice_quota || '0');
 
-    if (quota) {
-      return quota.data?.quota ? parseInt(quota.data.quota) : 0;
-    }
-
-    return 0;
-  };
-
-  return count();
 }
 
 function Quota() {
