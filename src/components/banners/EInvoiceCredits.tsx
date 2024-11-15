@@ -44,19 +44,19 @@ export function EInvoiceCredits() {
   //   );
   // }
 
-  if (quota <= EINVOICE_CREDITS_MIN_THRESHOLD) {
-    return (
-      <Banner variant="orange">
-        <div className="flex space-x-1">
-          <span>{t('notification_credits_low')}</span>
+  // if (quota <= EINVOICE_CREDITS_MIN_THRESHOLD) {
+  //   return (
+  //     <Banner variant="orange">
+  //       <div className="flex space-x-1">
+  //         <span>{t('notification_credits_low')}</span>
 
-          <Link to="/settings/e_invoice" className={buttonStyles}>
-            {t('learn_more')}
-          </Link>
-        </div>
-      </Banner>
-    );
-  }
+  //         <Link to="/settings/e_invoice" className={buttonStyles}>
+  //           {t('learn_more')}
+  //         </Link>
+  //       </div>
+  //     </Banner>
+  //   );
+  // }
 
   return null;
 }
