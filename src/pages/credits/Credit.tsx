@@ -35,7 +35,12 @@ import { useActions, useCreditUtilities, useSave } from './common/hooks';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './common/hooks/useTabs';
 import { Banner } from '$app/components/Banner';
-import { socketId, useSocketEvent, WithSocketId } from '$app/common/queries/sockets';
+import {
+  socketId,
+  useSocketEvent,
+  WithSocketId,
+} from '$app/common/queries/sockets';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -129,7 +134,16 @@ export default function Credit() {
     >
       {credit?.id === id ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              credit && (
+                <div className="flex items-center">
+                  <CommonActions resource={credit} entity="credit" />
+                </div>
+              )
+            }
+          />
 
           <Outlet
             context={{

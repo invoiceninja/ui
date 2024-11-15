@@ -39,7 +39,7 @@ export interface CommonAction {
   label: string;
 }
 
-export type Entity = 'invoice';
+export type Entity = 'invoice' | 'credit';
 
 interface Props {
   entity: Entity;
@@ -55,7 +55,7 @@ export function CommonActionsPreferenceModal(props: Props) {
   const commonActions = useAllCommonActions();
 
   const [commonActionsPreferences, setCommonActionsPreferences] = useState<
-    Record<Entity, string[]> | undefined
+    Partial<Record<Entity, string[]>> | undefined
   >(user?.company_user?.react_settings?.common_actions);
 
   const [availableActions, setAvailableActions] = useState<CommonAction[]>([]);
@@ -102,9 +102,9 @@ export function CommonActionsPreferenceModal(props: Props) {
   };
 
   const handleRemoveAction = (actionKey: string) => {
-    const filteredCommonActions = commonActionsPreferences?.[entity].filter(
-      (value) => actionKey !== value
-    );
+    const filteredCommonActions = (
+      commonActionsPreferences?.[entity] || []
+    ).filter((value) => actionKey !== value);
 
     if (filteredCommonActions) {
       setCommonActionsPreferences(
@@ -144,7 +144,7 @@ export function CommonActionsPreferenceModal(props: Props) {
           current
             ? {
                 ...current,
-                [entity]: [...current[entity], commonAction.value],
+                [entity]: [...(current[entity] || []), commonAction.value],
               }
             : {
                 [entity]: [commonAction.value],
@@ -161,7 +161,7 @@ export function CommonActionsPreferenceModal(props: Props) {
       setAvailableActions(
         allCommonActions.filter(
           ({ value }) =>
-            !commonActionsPreferences[entity].some(
+            !(commonActionsPreferences[entity] || []).some(
               (actionKey) => actionKey === value
             )
         )
@@ -197,13 +197,13 @@ export function CommonActionsPreferenceModal(props: Props) {
           ))}
         </SearchableSelect>
 
-        {Boolean(commonActionsPreferences?.[entity].length) && (
+        {Boolean((commonActionsPreferences?.[entity] || []).length) && (
           <span className="font-medium">
             {t('selected')} {t('actions')}:
           </span>
         )}
 
-        {Boolean(commonActionsPreferences?.[entity].length) && (
+        {Boolean((commonActionsPreferences?.[entity] || []).length) && (
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable
               droppableId="preference-actions"
@@ -223,7 +223,7 @@ export function CommonActionsPreferenceModal(props: Props) {
 
                     <span className="font-medium">
                       {getActionLabel(
-                        commonActionsPreferences?.[entity][
+                        (commonActionsPreferences?.[entity] || [])[
                           rubric.source.index
                         ] as string
                       )}
@@ -246,7 +246,7 @@ export function CommonActionsPreferenceModal(props: Props) {
                   {...droppableProvided.droppableProps}
                   ref={droppableProvided.innerRef}
                 >
-                  {commonActionsPreferences?.[entity].map(
+                  {(commonActionsPreferences?.[entity] || []).map(
                     (actionKey, index) => (
                       <Draggable
                         key={index}
