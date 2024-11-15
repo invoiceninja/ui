@@ -168,6 +168,7 @@ export const keys = {
       '/api/v1/charts/chart_summary_v2',
       '/api/v1/documents',
       '/api/v1/einvoice/validateEntity-client',
+      '/api/v1/einvoice/validateEntity-invoice',
     ],
   },
   products: {
@@ -224,7 +225,7 @@ export const keys = {
   },
   company_entity_validations: {
     path: '/api/v1/einvoice/validateEntity-company',
-    dependencies: [],
+    dependencies: ['/api/v1/einvoice/validateEntity-invoice'],
   },
 };
 

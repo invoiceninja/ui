@@ -107,16 +107,6 @@ export function EInvoice() {
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  // const { validationResponse } = useCheckEInvoiceValidation({
-  //   entity: isCompanySettingsActive ? 'companies' : 'clients',
-  //   entity_id: (isCompanySettingsActive
-  //     ? company?.id
-  //     : company?.settings.id) as string,
-  //   enableQuery:
-  //     company?.settings.e_invoice_type === 'PEPPOL' &&
-  //     company?.settings.enable_e_invoice &&
-  //     company?.legal_entity_id !== null,
-  // });
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
