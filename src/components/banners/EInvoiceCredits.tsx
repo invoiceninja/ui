@@ -30,7 +30,7 @@ export function EInvoiceCredits() {
     return null;
   }
 
-  if (false) {
+  if (company.company_key === '123') {
     return (
       <Banner variant="red">
         <div className="flex space-x-1">
@@ -44,7 +44,7 @@ export function EInvoiceCredits() {
     );
   }
 
-  if (false) {
+  if (company.company_key === '123') {
     return (
       <Banner variant="orange">
         <div className="flex space-x-1">
