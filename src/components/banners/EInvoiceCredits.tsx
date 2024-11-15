@@ -14,23 +14,25 @@ import { Banner } from '../Banner';
 import { buttonStyles } from './VerifyEmail';
 // import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
 import { Link } from 'react-router-dom';
+import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
 
 export const EINVOICE_CREDITS_MIN_THRESHOLD = 15;
 
 export function EInvoiceCredits() {
   const company = useCurrentCompany();
-  // const quota = useQuota();
+  const quota = useQuota();
 
   const { t } = useTranslation();
 
   if (
     !company.legal_entity_id ||
-    company.settings.e_invoice_type !== 'PEPPOL'
+    company.settings.e_invoice_type !== 'PEPPOL' ||
+    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true'
   ) {
     return null;
   }
 
-  if (company.company_key === '123') {
+  if (quota === 0) {
     return (
       <Banner variant="red">
         <div className="flex space-x-1">
@@ -44,7 +46,7 @@ export function EInvoiceCredits() {
     );
   }
 
-  if (company.company_key === '123') {
+  if (quota !== null && quota < EINVOICE_CREDITS_MIN_THRESHOLD) {
     return (
       <Banner variant="orange">
         <div className="flex space-x-1">
