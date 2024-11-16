@@ -47,6 +47,9 @@ export function useCheckEInvoiceValidation(params: Params) {
     onFinished,
   } = params;
 
+  const isEntityValidationQueryEnabled =
+    import.meta.env.VITE_ENABLE_ENTITY_VALIDATION_QUERY === 'true';
+
   const queryClient = useQueryClient();
 
   const [validationEntityResponse, setValidationEntityResponse] = useState<
@@ -132,7 +135,7 @@ export function useCheckEInvoiceValidation(params: Params) {
   };
 
   useEffect(() => {
-    if (enableQuery && resource) {
+    if (enableQuery && resource && isEntityValidationQueryEnabled) {
       handleCheckValidation();
     }
   }, [enableQuery, resource]);
