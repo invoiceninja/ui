@@ -46,7 +46,7 @@ export function EUTaxDetails() {
   };
 
   return (
-    <Card title={t('additional_tax_identifiers')}>
+    <Card title={t('additional_tax_identifiers')} description={t('additional_tax_identifiers_help').toString()}>
       <Element leftSide={t('new_identifier')}>
         <Configure />
       </Element>
