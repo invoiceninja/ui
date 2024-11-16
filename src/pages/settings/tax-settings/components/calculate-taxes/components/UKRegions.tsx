@@ -28,7 +28,7 @@ export function UKRegions() {
     useState<boolean>(false);
 
   const regions: Array<[string, TaxSetting]> = Object.entries(
-    companyChanges.tax_data.regions.UK.subregions
+    companyChanges?.tax_data.regions.UK.subregions
   );
   const [taxSetting, setTaxSetting] = useState<TaxSetting>(regions[0][1]);
   const [subRegion, setSubRegion] = useState<string>(regions[0][0]);
@@ -116,7 +116,7 @@ export function UKRegions() {
                 value={`tax_data.regions.UK.subregions.${value[0]}.apply_tax`}
                 checked={value[1].apply_tax ? true : false}
                 className="flex justify-end h-6 w-6 rounded-half shadow"
-                disabled={companyChanges.tax_data.regions.UK.tax_all_subregions}
+                disabled={companyChanges?.tax_data?.regions?.UK?.tax_all_subregions}
                 onValueChange={(value, checked) => handleChange(value, checked)}
               ></Checkbox>
 
@@ -132,7 +132,7 @@ export function UKRegions() {
             >
               {value[1].tax_name} {value[1].tax_rate}%{' '}
               {value[1].reduced_tax_rate
-                ? ` :: ${t('reduced_rate')} ${value[1].reduced_tax_rate}%`
+                ? ` :: ${t('reduced_rate')} ${value[1]?.reduced_tax_rate}%`
                 : ''}
             </div>
 
@@ -141,7 +141,7 @@ export function UKRegions() {
                 type="primary"
                 className=""
                 disableWithoutIcon={true}
-                disabled={companyChanges.tax_data.regions.UK.tax_all_subregions}
+                disabled={companyChanges?.tax_data.regions?.UK?.tax_all_subregions}
                 onClick={(e: ChangeEvent<HTMLInputElement>) => {
                   e.preventDefault();
                   setTaxSetting(value[1]);
