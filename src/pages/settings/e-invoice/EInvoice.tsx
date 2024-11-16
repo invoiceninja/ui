@@ -118,7 +118,8 @@ export function EInvoice() {
     enableQuery:
       company?.settings.e_invoice_type === 'PEPPOL' &&
       company?.settings.enable_e_invoice &&
-      company?.legal_entity_id !== null,
+      company?.legal_entity_id !== null &&
+      import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true',
   });
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
