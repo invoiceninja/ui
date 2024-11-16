@@ -48,7 +48,7 @@ export function useCheckEInvoiceValidation(params: Params) {
   } = params;
 
   const isEntityValidationQueryEnabled =
-    import.meta.env.VITE_ENABLE_ENTITY_VALIDATION_QUERY === 'true';
+    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true';
 
   const queryClient = useQueryClient();
 
