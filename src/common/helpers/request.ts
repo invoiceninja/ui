@@ -40,7 +40,9 @@ client.interceptors.response.use(
     }
 
     if (error.response?.status === 404) {
-      window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
+      if (!error.response.config.url?.includes('einvoice')) {
+        window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
+      }
     }
 
     if (
