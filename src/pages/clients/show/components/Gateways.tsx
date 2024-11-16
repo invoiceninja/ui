@@ -152,7 +152,7 @@ export function Gateways(props: Props) {
                   style={{ borderColor: colors.$5 }}
                   onClick={() => handleSetDefault(token.id)}
                 >
-                  {t('set_as_default')}
+                  {t('save_as_default')}
                 </div>
               )}
             </div>
