@@ -70,7 +70,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Actions', exact: true })
     ).toBeVisible();
   } else {
     await expect(
@@ -82,7 +82,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Actions', exact: true })
     ).not.toBeVisible();
   }
 
@@ -243,7 +243,7 @@ test('can edit recurring invoice', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await checkDropdownActions(
@@ -287,7 +287,7 @@ test('can create a recurring invoice', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await checkDropdownActions(
@@ -345,7 +345,7 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await checkDropdownActions(
@@ -394,7 +394,7 @@ test('deleting invoice with edit_recurring_invoice', async ({ page }) => {
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
+      .getByRole('button', { name: 'Actions', exact: true })
       .first();
 
     await moreActionsButton.click();
@@ -407,7 +407,7 @@ test('deleting invoice with edit_recurring_invoice', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+      .filter({ has: page.getByText('Actions') });
 
     await moreActionsButton.click();
 
@@ -454,7 +454,7 @@ test('archiving invoice withe edit_recurring_invoice', async ({ page }) => {
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
+      .getByRole('button', { name: 'Actions', exact: true })
       .first();
 
     await moreActionsButton.click();
@@ -471,7 +471,7 @@ test('archiving invoice withe edit_recurring_invoice', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -521,7 +521,7 @@ test('invoice documents preview with edit_recurring_invoice', async ({
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -577,7 +577,7 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -627,7 +627,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await checkDropdownActions(
@@ -679,7 +679,7 @@ test('all clone actions displayed with creation permissions', async ({
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('button', { name: 'Actions', exact: true })
     .click();
 
   await checkDropdownActions(
@@ -729,13 +729,13 @@ test('cloning recurring invoice', async ({ page }) => {
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true });
+      .getByRole('button', { name: 'Actions', exact: true });
 
     await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();

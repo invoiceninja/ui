@@ -86,7 +86,10 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.id_number', value.toString())
               }
-              disabled={disableSettingsField('id_number')}
+              disabled={
+                disableSettingsField('id_number') ||
+                companyChanges?.legal_entity_id !== null
+              }
               errorMessage={errors?.errors['settings.id_number']}
             />
           </Element>
@@ -104,9 +107,16 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.vat_number', value.toString())
               }
-              disabled={disableSettingsField('vat_number')}
+              disabled={
+                disableSettingsField('vat_number') ||
+                companyChanges?.legal_entity_id !== null
+              }
               errorMessage={errors?.errors['settings.vat_number']}
             />
+
+            {companyChanges?.legal_entity_id ? (
+              <p className="mt-2">{t('changing_vat_and_id_number_note')}</p>
+            ) : null}
           </Element>
 
           <Element

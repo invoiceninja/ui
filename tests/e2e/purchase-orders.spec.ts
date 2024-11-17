@@ -396,7 +396,7 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -455,7 +455,7 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -504,7 +504,7 @@ test('purchase_order documents preview with edit_purchase_order', async ({
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -559,7 +559,7 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -699,7 +699,7 @@ test('cloning purchase_order', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
   }

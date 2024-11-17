@@ -376,6 +376,14 @@ export default function Create() {
             </Element>
           )}
 
+          {errors?.errors.invoices && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.invoices}
+              </Alert>
+            </div>
+          )}
+
           {payment?.client_id && <Divider />}
 
           {payment &&
@@ -490,6 +498,14 @@ export default function Create() {
             </Element>
           )}
 
+          {errors?.errors.credits && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.credits}
+              </Alert>
+            </div>
+          )}
+
           {payment?.client_id && <Divider />}
 
           <Element leftSide={t('payment_date')}>
@@ -504,11 +520,11 @@ export default function Create() {
 
           <Element leftSide={t('payment_type')}>
             <SelectField
-              id="type_id"
               value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
+              customSelector
             >
               {paymentTypes.map(([key, value], index) => (
                 <option value={key} key={index}>

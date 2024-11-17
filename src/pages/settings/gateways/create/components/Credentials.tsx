@@ -29,7 +29,9 @@ import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 import { useLocation } from 'react-router-dom';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $help } from '$app/components/HelpWidget';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { HelpCircle } from 'react-feather';
 
 interface Props {
   gateway: Gateway;
@@ -60,13 +62,10 @@ export function Credentials(props: Props) {
 
   const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
-  const company = useCurrentCompany();
-
   if (
     isHosted() &&
     props.gateway.key === GOCARDLESS &&
-    config('oauth2') === true &&
-    import.meta.env.VITE_GOCARDLESS_TESTING_COMPANY === company?.id
+    config('oauth2') === true
   ) {
     hostedGateways.push(GOCARDLESS);
   }
@@ -99,10 +98,28 @@ export function Credentials(props: Props) {
   };
 
   const handleGoCardless = useHandleGoCardless();
+  const accentColor = useAccentColor();
 
   return (
     <>
-      <Card title={t('credentials')}>
+      <Card
+        title={t('credentials')}
+        topRight={
+          <button
+            style={{ color: accentColor }}
+            type="button"
+            onClick={() =>
+              $help('gateways', {
+                moveToHeading: 'Credentials',
+              })
+            }
+            className="inline-flex items-center space-x-1 text-sm"
+          >
+            <HelpCircle size={18} />
+            <span>{t('documentation')}</span>
+          </button>
+        }
+      >
         {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
           <Element leftSide={t('help')}>
             <Link external to={props.gateway.site_url}>
@@ -151,8 +168,7 @@ export function Credentials(props: Props) {
         {props.gateway &&
           props.gateway.key === GOCARDLESS &&
           isHosted() &&
-          config('oauth2') !== true &&
-          import.meta.env.VITE_GOCARDLESS_TESTING_COMPANY === company?.id && (
+          config('oauth2') !== true && (
             <Element leftSide={t('OAuth 2.0')}>
               <Button
                 behavior="button"

@@ -25,6 +25,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { Spinner } from '$app/components/Spinner';
 import { QuoteContext } from '../../create/Create';
 import { Quote } from '$app/common/interfaces/quote';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 dayjs.extend(relativeTime);
 
@@ -39,6 +40,7 @@ export default function History() {
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
 
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: resource, isLoading } = useQuery({
@@ -96,7 +98,9 @@ export default function History() {
               </div>
 
               <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>
+                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                </p>
                 <p>{dayjs.unix(activity.created_at).fromNow()}</p>
               </div>
             </div>

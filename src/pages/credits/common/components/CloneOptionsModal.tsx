@@ -15,9 +15,8 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { CloneOption } from '$app/components/CloneOption';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
@@ -33,13 +32,14 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   credit: Credit;
+  dropdown?: boolean;
 }
 
 export function CloneOptionsModal(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const { credit } = props;
+  const { credit, dropdown } = props;
 
   const hasPermission = useHasPermission();
 
@@ -152,12 +152,16 @@ export function CloneOptionsModal(props: Props) {
         hasPermission('create_quote') ||
         hasPermission('create_recurring_invoice') ||
         hasPermission('create_purchase_order')) && (
-        <DropdownElement
+        <EntityActionElement
+          entity="credit"
+          actionKey="clone_to_other"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_other')}
           onClick={() => setIsModalVisible(true)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={MdControlPointDuplicate}
         >
           {t('clone_to_other')}
-        </DropdownElement>
+        </EntityActionElement>
       )}
 
       <Modal

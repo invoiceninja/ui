@@ -38,7 +38,7 @@ import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import classNames from 'classnames';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { HelpWidget } from '$app/components/HelpWidget';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -100,8 +100,6 @@ export function Create() {
 
   const onSave = useHandleCreate(companyGateway, setErrors);
 
-  const company = useCurrentCompany();
-
   const handleChange = (value: string, isManualChange?: boolean) => {
     const gateway = gateways.find((gateway) => gateway.id === value);
 
@@ -115,11 +113,7 @@ export function Create() {
       return handleStripeSetup();
     }
 
-    if (
-      gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' &&
-      isHosted() &&
-      import.meta.env.VITE_GOCARDLESS_TESTING_COMPANY === company?.id
-    ) {
+    if (gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' && isHosted()) {
       return handleGoCardless();
     }
 
@@ -283,6 +277,11 @@ export function Create() {
       onSaveClick={() => onSave(1)}
       disableSaveButton={!gateway}
     >
+      <HelpWidget
+        id="gateways"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
+      />
+
       <TabGroup
         tabs={tabs}
         defaultTabIndex={tabIndex}

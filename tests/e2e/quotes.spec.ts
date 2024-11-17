@@ -414,7 +414,7 @@ test('deleting quote with edit_quote', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+      .filter({ has: page.getByText('Actions') });
 
     await moreActionsButton.click();
 
@@ -466,7 +466,7 @@ test('archiving quote withe edit_quote', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -505,7 +505,7 @@ test('quote documents preview with edit_quote', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -552,7 +552,7 @@ test('quote documents uploading with edit_quote', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -679,13 +679,13 @@ test('cloning quote', async ({ page }) => {
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true });
+      .getByRole('button', { name: 'Actions', exact: true });
 
     await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
