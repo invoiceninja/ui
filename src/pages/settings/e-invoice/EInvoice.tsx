@@ -35,9 +35,6 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
-import { ValidationAlert } from './common/components/ValidationAlert';
-import { useCheckEInvoiceValidation } from './common/hooks/useCheckEInvoiceValidation';
-import { route } from '$app/common/helpers/route';
 import { PaymentMeans } from '$app/components/e-invoice/PaymentMeans';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
@@ -109,18 +106,6 @@ export function EInvoice() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
-
-  const { isValid } = useCheckEInvoiceValidation({
-    entity: isCompanySettingsActive ? 'companies' : 'clients',
-    entity_id: (isCompanySettingsActive
-      ? company?.id
-      : company?.settings.id) as string,
-    enableQuery:
-      company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.settings.enable_e_invoice &&
-      company?.legal_entity_id !== null &&
-      import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true',
-  });
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -225,21 +210,9 @@ export function EInvoice() {
       disableSaveButton={
         showPlanAlert ||
         (company?.settings.e_invoice_type === 'PEPPOL' &&
-          company?.settings.enable_e_invoice &&
-          !isValid)
+          company?.settings.enable_e_invoice)
       }
     >
-      {Boolean(
-        company?.settings.e_invoice_type === 'PEPPOL' &&
-          company?.settings.enable_e_invoice &&
-          !isValid
-      ) && (
-        <ValidationAlert
-          to={route('/clients/:id/edit', { id: company?.settings.id })}
-          entity="client"
-        />
-      )}
-
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       {Boolean(!company?.legal_entity_id) && (
