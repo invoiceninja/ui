@@ -15,11 +15,13 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
+import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 interface Params {
   invoice: Invoice | undefined;
+  eInvoiceValidationResponse?: ValidationEntityResponse | undefined;
 }
 export function useTabs(params: Params) {
   const [t] = useTranslation();
@@ -31,7 +33,7 @@ export function useTabs(params: Params) {
 
   const { id } = useParams();
 
-  const { invoice } = params;
+  const { invoice, eInvoiceValidationResponse } = params;
 
   const canEditAndView =
     hasPermission('view_invoice') ||
@@ -49,6 +51,23 @@ export function useTabs(params: Params) {
       enabled: Boolean(
         company?.settings.e_invoice_type === 'PEPPOL' &&
           company?.settings.enable_e_invoice
+      ),
+      formatName: () => (
+        <div className="flex space-x-1">
+          <span>{t('e_invoice')}</span>
+
+          {Boolean(
+            eInvoiceValidationResponse?.client.length ||
+              eInvoiceValidationResponse?.company.length
+          ) && (
+            <span className="font-bold">
+              (
+              {(eInvoiceValidationResponse?.client.length || 0) +
+                (eInvoiceValidationResponse?.company.length || 0)}
+              )
+            </span>
+          )}
+        </div>
       ),
     },
     {
