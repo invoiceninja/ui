@@ -38,11 +38,17 @@ export function Link(props: Props) {
     color: accentColor,
   };
 
+  const getAdjustedHref = () => {
+    return props.to.startsWith('http://') || props.to.startsWith('https://')
+      ? props.to
+      : `https://${props.to}`;
+  };
+
   if (props.external) {
     return (
       <a
         target="_blank"
-        href={props.to}
+        href={getAdjustedHref()}
         className={classNames(`text-center ${props.className}`, {
           'text-sm': !setBaseFont,
           'text-base': setBaseFont,

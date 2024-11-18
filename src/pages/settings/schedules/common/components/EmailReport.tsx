@@ -50,7 +50,8 @@ type ReportFiled =
   | 'categories'
   | 'projects'
   | 'report_keys'
-  | 'include_deleted';
+  | 'include_deleted'
+  | 'pdf_email_attachment';
 
 export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
   'send_email',
@@ -67,6 +68,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'include_deleted',
     'client',
+    'pdf_email_attachment',
   ],
   invoice_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -105,6 +107,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'status',
     'include_deleted',
     'client',
+    'pdf_email_attachment',
   ],
   quote_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -121,6 +124,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'include_deleted',
     'status',
     'client',
+    'pdf_email_attachment',
   ],
   document: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
   payment: [
@@ -161,6 +165,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'pdf_email_attachment',
   ],
   purchase_order_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -229,6 +234,20 @@ export function EmailReport(props: Props) {
               )
             }
             cypressRef="scheduleDocumentEmailAttachment"
+          />
+        </Element>
+      )}
+
+      {showReportFiled('pdf_email_attachment') && (
+        <Element leftSide={t('attach_pdf')}>
+          <Toggle
+            checked={schedule.parameters.pdf_email_attachment}
+            onValueChange={(value) =>
+              handleChange(
+                'parameters.pdf_email_attachment' as keyof Schedule,
+                value
+              )
+            }
           />
         </Element>
       )}
