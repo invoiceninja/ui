@@ -27,7 +27,6 @@ import { AxiosError } from 'axios';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Country } from '$app/common/interfaces/country';
 import { X } from 'react-feather';
-import { ValueContainer } from 'react-select/dist/declarations/src/components/containers';
 
 export function EUTaxDetails() {
   const [t] = useTranslation();
