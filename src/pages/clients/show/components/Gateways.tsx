@@ -147,7 +147,7 @@ export function Gateways(props: Props) {
 
               {token.is_default ? (
                 <div
-                  className="inline-flex items-center rounded-full py-1 px-2 text-xs"
+                  className="inline-flex items-center rounded-full py-1 px-3 text-xs"
                   style={{
                     backgroundColor: colors.$5,
                   }}
@@ -156,7 +156,7 @@ export function Gateways(props: Props) {
                 </div>
               ) : (
                 <Div
-                  className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-1.5"
+                  className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3"
                   style={{ borderColor: colors.$5 }}
                   onClick={() => handleSetDefault(token.id)}
                   theme={{ hoverBgColor: colors.$5 }}
