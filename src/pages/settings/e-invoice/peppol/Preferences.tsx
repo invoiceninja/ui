@@ -26,6 +26,8 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { useQuery } from 'react-query';
 import { AxiosError, AxiosResponse } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { get } from 'lodash';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -49,7 +51,17 @@ export function Preferences() {
         .then(() => {
           toast.success(t('updated_settings')!);
         })
-        .catch(() => {
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            if (get(error.response.data, 'errors.acts_as_receiver.0')) {
+              toast.error(get(error.response.data, 'errors.acts_as_receiver.0'));
+
+              form.resetForm();
+            }
+
+            return;
+          }
+
           toast.error();
         })
         .finally(() => refresh());
