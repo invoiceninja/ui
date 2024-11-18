@@ -33,6 +33,7 @@ export interface Parameters {
   projects: string;
   report_keys: string[];
   include_deleted?: boolean;
+  pdf_email_attachment?: boolean;
 }
 
 export interface Schedule {
