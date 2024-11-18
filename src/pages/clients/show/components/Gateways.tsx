@@ -24,10 +24,18 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import styled from 'styled-components';
 
 interface Props {
   client: Client;
 }
+
+const Div = styled.div`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverBgColor};
+  }
+`;
 
 export function Gateways(props: Props) {
   const [t] = useTranslation();
@@ -57,6 +65,7 @@ export function Gateways(props: Props) {
       endpoint('/api/v1/client_gateway_tokens/:id/setAsDefault', { id })
     ).then(() => {
       toast.success('success');
+      $refetch(['clients']);
     });
   };
 
@@ -138,22 +147,22 @@ export function Gateways(props: Props) {
 
               {token.is_default ? (
                 <div
-                  className="border rounded-full py-1 px-1.5 text-xs"
+                  className="inline-flex items-center rounded-full py-1 px-2 text-xs"
                   style={{
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$5,
+                    backgroundColor: colors.$5,
                   }}
                 >
                   {t('default')}
                 </div>
               ) : (
-                <div
-                  className="text-xs cursor-pointer border rounded-full py-1 px-1.5"
+                <Div
+                  className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-1.5"
                   style={{ borderColor: colors.$5 }}
                   onClick={() => handleSetDefault(token.id)}
+                  theme={{ hoverBgColor: colors.$5 }}
                 >
                   {t('save_as_default')}
-                </div>
+                </Div>
               )}
             </div>
           </div>
