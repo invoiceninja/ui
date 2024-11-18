@@ -22,11 +22,18 @@ type Field =
   | 'projects'
   | 'categories'
   | 'include_deleted'
-  | 'client';
+  | 'client'
+  | 'pdf_email_attachment';
 
 const ReportFields: Record<Identifier, Field[]> = {
   client: ['document_email_attachment', 'include_deleted'],
-  invoice: ['document_email_attachment', 'status', 'include_deleted', 'client'],
+  invoice: [
+    'document_email_attachment',
+    'status',
+    'include_deleted',
+    'client',
+    'pdf_email_attachment',
+  ],
   invoice_item: [
     'document_email_attachment',
     'product_key',
@@ -34,14 +41,26 @@ const ReportFields: Record<Identifier, Field[]> = {
     'status',
     'client',
   ],
-  quote: ['document_email_attachment', 'include_deleted', 'status', 'client'],
+  quote: [
+    'document_email_attachment',
+    'include_deleted',
+    'status',
+    'client',
+    'pdf_email_attachment',
+  ],
   quote_item: [
     'document_email_attachment',
     'include_deleted',
     'status',
     'client',
   ],
-  credit: ['document_email_attachment', 'include_deleted', 'status', 'client'],
+  credit: [
+    'document_email_attachment',
+    'include_deleted',
+    'status',
+    'client',
+    'pdf_email_attachment',
+  ],
   document: ['document_email_attachment'],
   payment: ['document_email_attachment', 'status', 'client'],
   expense: [
@@ -56,7 +75,12 @@ const ReportFields: Record<Identifier, Field[]> = {
   task: ['document_email_attachment', 'include_deleted', 'status', 'client'],
   product: ['document_email_attachment'],
   vendor: ['document_email_attachment'],
-  purchase_order: ['document_email_attachment', 'include_deleted', 'status'],
+  purchase_order: [
+    'document_email_attachment',
+    'include_deleted',
+    'status',
+    'pdf_email_attachment',
+  ],
   purchase_order_item: [
     'document_email_attachment',
     'include_deleted',
