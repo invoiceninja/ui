@@ -16,8 +16,9 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
-import { MdOutlineFileOpen } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
+import { Icon } from '$app/components/icons/Icon';
+import { ExternalLink } from 'react-feather';
 
 interface Props {
   payment: Payment;
@@ -43,17 +44,33 @@ export function PaymentOverviewInvoice(props: Props) {
       {props.paymentable.invoice_id && (
         <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
           <div className="flex items-center justify-center">
-            <span className="flex item-center gap-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
+            <span
+              className="flex item-center gap-2"
+              style={{ color: colors.$3, colorScheme: colors.$0 }}
+            >
               {`${t('invoice')} `}
               <Link
                 to={route('/invoices/:id/edit', {
                   id: props.paymentable.invoice_id,
                 })}
               >
-                <span className="flex items-center gap-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
-                  {setLabel(props.payment, props.paymentable)}{' '}
-                  <MdOutlineFileOpen />
-                </span>
+                <div
+                  className="flex items-center gap-2"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                >
+                  <span>{setLabel(props.payment, props.paymentable)}</span>
+
+                  <div>
+                    <Icon
+                      element={ExternalLink}
+                      style={{
+                        width: '1.1rem',
+                        height: '1.1rem',
+                        marginBottom: '0.27rem',
+                      }}
+                    />
+                  </div>
+                </div>
               </Link>
             </span>
           </div>
@@ -65,19 +82,27 @@ export function PaymentOverviewInvoice(props: Props) {
                 props.payment?.currency_id
               )}
             </span>
-            <span className="mx-5" style={{ color: colors.$3, colorScheme: colors.$0 }}>
+            <span
+              className="mx-5"
+              style={{ color: colors.$3, colorScheme: colors.$0 }}
+            >
               {formatDate(
                 new Date(props.paymentable.created_at * 1000).toString(),
                 dateFormat
               )}
             </span>
             {props.paymentable.refunded > 0 && (
-              <span className="" style={{ color: "red", colorScheme: colors.$0 }}>
-                ( {formatMoney(
+              <span
+                className=""
+                style={{ color: 'red', colorScheme: colors.$0 }}
+              >
+                ({' '}
+                {formatMoney(
                   props?.paymentable?.refunded || 0,
                   props.payment.client?.country_id,
                   props.payment?.currency_id
-                )} { t('refunded')} )
+                )}{' '}
+                {t('refunded')} )
               </span>
             )}
           </div>
@@ -105,19 +130,27 @@ export function PaymentOverviewInvoice(props: Props) {
                 props.payment?.currency_id
               )}
             </span>
-            <span className="mx-5" style={{ color: colors.$3, colorScheme: colors.$0 }}>
+            <span
+              className="mx-5"
+              style={{ color: colors.$3, colorScheme: colors.$0 }}
+            >
               {formatDate(
                 new Date(props.paymentable.created_at * 1000).toString(),
                 dateFormat
               )}
             </span>
             {props.paymentable.refunded > 0 && (
-              <span className="" style={{ color: "red", colorScheme: colors.$0 }}>
-                ( {formatMoney(
+              <span
+                className=""
+                style={{ color: 'red', colorScheme: colors.$0 }}
+              >
+                ({' '}
+                {formatMoney(
                   props?.paymentable?.refunded || 0,
                   props.payment.client?.country_id,
                   props.payment?.currency_id
-                )} {t('refunded')} )
+                )}{' '}
+                {t('refunded')} )
               </span>
             )}
           </div>
