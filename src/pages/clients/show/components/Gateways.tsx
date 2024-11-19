@@ -84,87 +84,94 @@ export function Gateways(props: Props) {
         {client.gateway_tokens.map((token) => (
           <div
             key={token.id}
-            className="flex items-center justify-between first:mt-3 mb-7 h-12"
+            className={classNames('flex flex-col first:mt-3 mb-6 space-y-1.5', {
+              'h-22': !token.is_default,
+              'h-12': token.is_default,
+            })}
           >
-            <div className="flex flex-col space-y-1.5">
-              <div className="inline-flex items-center space-x-1">
-                <div>
-                  <MdPayment fontSize={22} />
-                </div>
-                <div className="inline-flex items-center">
-                  <span>{t('gateway')}</span>
-                  <MdChevronRight size={20} />
+            <div className="flex items-center justify-between h-full">
+              <div className="flex flex-col space-y-1.5">
+                <div className="inline-flex items-center space-x-1">
+                  <div>
+                    <MdPayment fontSize={22} />
+                  </div>
+                  <div className="inline-flex items-center">
+                    <span>{t('gateway')}</span>
+                    <MdChevronRight size={20} />
 
+                    <Link
+                      to={route('/settings/gateways/:id/edit', {
+                        id: token.company_gateway_id,
+                      })}
+                    >
+                      {getCompanyGateway(token.company_gateway_id)?.label}
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <GatewayTypeIcon name={token.meta.brand as GatewayLogoName} />
+
+                  <div className="flex items-center">
+                    <span className="mt-1">****</span>
+                    <span className="ml-1">{token.meta.last4}</span>
+                  </div>
+
+                  <span>
+                    {token.meta.exp_month}/{token.meta.exp_year}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className={classNames('flex flex-col items-end h-full', {
+                  'justify-center': !isStripeGateway(
+                    getCompanyGateway(token.company_gateway_id)?.gateway_key
+                  ),
+                  'justify-between': isStripeGateway(
+                    getCompanyGateway(token.company_gateway_id)?.gateway_key
+                  ),
+                })}
+              >
+                {isStripeGateway(
+                  getCompanyGateway(token.company_gateway_id)?.gateway_key
+                ) && (
                   <Link
-                    to={route('/settings/gateways/:id/edit', {
-                      id: token.company_gateway_id,
-                    })}
+                    external
+                    to={route(
+                      'https://dashboard.stripe.com/customers/:customerReference',
+                      {
+                        customerReference: token.gateway_customer_reference,
+                      }
+                    )}
                   >
-                    {getCompanyGateway(token.company_gateway_id)?.label}
+                    <Icon element={MdLaunch} size={18} />
                   </Link>
-                </div>
-              </div>
+                )}
 
-              <div className="flex items-center space-x-2">
-                <GatewayTypeIcon name={token.meta.brand as GatewayLogoName} />
-
-                <div className="flex items-center">
-                  <span className="mt-1">****</span>
-                  <span className="ml-1">{token.meta.last4}</span>
-                </div>
-
-                <span>
-                  {token.meta.exp_month}/{token.meta.exp_year}
-                </span>
+                {token.is_default && (
+                  <div
+                    className="inline-flex items-center rounded-full py-1 px-3 text-xs"
+                    style={{
+                      backgroundColor: colors.$5,
+                    }}
+                  >
+                    {t('default')}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div
-              className={classNames('flex flex-col items-end h-full', {
-                'justify-center': !isStripeGateway(
-                  getCompanyGateway(token.company_gateway_id)?.gateway_key
-                ),
-                'justify-between': isStripeGateway(
-                  getCompanyGateway(token.company_gateway_id)?.gateway_key
-                ),
-              })}
-            >
-              {isStripeGateway(
-                getCompanyGateway(token.company_gateway_id)?.gateway_key
-              ) && (
-                <Link
-                  external
-                  to={route(
-                    'https://dashboard.stripe.com/customers/:customerReference',
-                    {
-                      customerReference: token.gateway_customer_reference,
-                    }
-                  )}
-                >
-                  <Icon element={MdLaunch} size={18} />
-                </Link>
-              )}
-
-              {token.is_default ? (
-                <div
-                  className="inline-flex items-center rounded-full py-1 px-3 text-xs"
-                  style={{
-                    backgroundColor: colors.$5,
-                  }}
-                >
-                  {t('default')}
-                </div>
-              ) : (
-                <Div
-                  className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3"
-                  style={{ borderColor: colors.$5 }}
-                  onClick={() => handleSetDefault(token.id)}
-                  theme={{ hoverBgColor: colors.$5 }}
-                >
-                  {t('save_as_default')}
-                </Div>
-              )}
-            </div>
+            {!token.is_default && (
+              <Div
+                className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3 self-start"
+                style={{ borderColor: colors.$5 }}
+                onClick={() => handleSetDefault(token.id)}
+                theme={{ hoverBgColor: colors.$5 }}
+              >
+                {t('save_as_default')}
+              </Div>
+            )}
           </div>
         ))}
       </InfoCard>
