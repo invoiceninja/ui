@@ -28,6 +28,7 @@ import { Spinner } from '$app/components/Spinner';
 import { AxiosError } from 'axios';
 import classNames from 'classnames';
 import { useFormik } from 'formik';
+import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -437,7 +438,7 @@ function Form({ onContinue, businessType }: FormProps) {
           value={form.values.party_name}
           onChange={form.handleChange}
           id="party_name"
-          errorMessage={errors?.errors.party_name}
+          errorMessage={get(errors, 'errors.party_name')}
         />
 
         {businessType === 'business' ? (
@@ -446,7 +447,7 @@ function Form({ onContinue, businessType }: FormProps) {
             onChange={form.handleChange}
             label={t('vat_number')}
             id="vat_number"
-            errorMessage={errors?.errors.vat_number}
+            errorMessage={get(errors, 'errors.vat_number')}
           />
         ) : null}
 
@@ -456,7 +457,7 @@ function Form({ onContinue, businessType }: FormProps) {
             onChange={form.handleChange}
             label={t('id_number')}
             id="id_number"
-            errorMessage={errors?.errors.id_number}
+            errorMessage={get(errors, 'errors.id_number')}
           />
         ) : null}
 
@@ -464,7 +465,7 @@ function Form({ onContinue, businessType }: FormProps) {
           value={form.values.country}
           label={t('country')}
           onChange={(e) => form.setFieldValue('country', e)}
-          errorMessage={errors?.errors.country}
+          errorMessage={get(errors, 'errors.country')}
         />
 
         <InputField
@@ -472,7 +473,7 @@ function Form({ onContinue, businessType }: FormProps) {
           id="line1"
           label={t('address1')}
           onChange={form.handleChange}
-          errorMessage={errors?.errors.line1}
+          errorMessage={get(errors, 'errors.line1')}
         />
 
         <InputField
@@ -480,7 +481,7 @@ function Form({ onContinue, businessType }: FormProps) {
           id="line2"
           label={t('address2')}
           onChange={form.handleChange}
-          errorMessage={errors?.errors.line2}
+          errorMessage={get(errors, 'errors.line2')}
         />
 
         <InputField
@@ -488,7 +489,7 @@ function Form({ onContinue, businessType }: FormProps) {
           id="city"
           label={t('city')}
           onChange={form.handleChange}
-          errorMessage={errors?.errors.city}
+          errorMessage={get(errors, 'errors.city')}
         />
 
         <InputField
@@ -496,7 +497,7 @@ function Form({ onContinue, businessType }: FormProps) {
           id="county"
           label={t('state')}
           onChange={form.handleChange}
-          errorMessage={errors?.errors.county}
+          errorMessage={get(errors, 'errors.county')}
         />
 
         <InputField
@@ -504,7 +505,7 @@ function Form({ onContinue, businessType }: FormProps) {
           id="zip"
           label={t('postal_code')}
           onChange={form.handleChange}
-          errorMessage={errors?.errors.zip}
+          errorMessage={get(errors, 'errors.zip')}
         />
 
         <Toggle
