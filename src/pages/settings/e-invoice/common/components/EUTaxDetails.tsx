@@ -135,6 +135,10 @@ function Configure() {
       return false;
     }
 
+    if (company.settings.country_id === countryId) {
+      return false;
+    }
+
     return !get(
       company.tax_data.regions.EU.subregions,
       `${iso31662}.vat_number`
