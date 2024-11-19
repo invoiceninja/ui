@@ -34,15 +34,19 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ValidationBag>) => {
+    if (error.response?.config.url?.includes('einvoice')) {
+      console.error(error);
+
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 429 || error.response?.status === 403) {
       window.location.reload();
       clearLocalStorage();
     }
 
     if (error.response?.status === 404) {
-      if (!error.response.config.url?.includes('einvoice')) {
-        window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
-      }
+      window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
     }
 
     if (
