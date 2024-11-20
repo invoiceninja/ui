@@ -19,13 +19,26 @@ import { route } from '$app/common/helpers/route';
 import { useColorScheme } from '$app/common/colors';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
+import { Credit } from '$app/common/interfaces/credit';
 
 interface Props {
   payment: Payment;
   paymentable: Paymentable;
 }
 
-export function setLabel(payment: Payment, paymentable: Paymentable): string {
+export function setLabel(
+  payment: Payment,
+  paymentable: Paymentable,
+  isCredit?: boolean
+): string {
+  if (isCredit) {
+    const credit = payment?.credits?.find(
+      (credit: Credit) => credit.id == paymentable.credit_id
+    );
+
+    return credit?.number || '';
+  }
+
   const invoice = payment?.invoices?.find(
     (invoice: Invoice) => invoice.id == paymentable.invoice_id
   );
@@ -112,13 +125,35 @@ export function PaymentOverviewInvoice(props: Props) {
       {props.paymentable.credit_id && (
         <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
           <div className="flex items-center justify-center">
-            <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
+            <span
+              className="flex item-center gap-2"
+              style={{ color: colors.$3, colorScheme: colors.$0 }}
+            >
+              {`${t('credit')} `}
               <Link
                 to={route('/credits/:id/edit', {
                   id: props.paymentable.credit_id,
                 })}
               >
-                {`${t('credit')} `}
+                <div
+                  className="flex items-center gap-2"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                >
+                  <span>
+                    {setLabel(props.payment, props.paymentable, true)}
+                  </span>
+
+                  <div>
+                    <Icon
+                      element={ExternalLink}
+                      style={{
+                        width: '1.1rem',
+                        height: '1.1rem',
+                        marginBottom: '0.27rem',
+                      }}
+                    />
+                  </div>
+                </div>
               </Link>
             </span>
           </div>
