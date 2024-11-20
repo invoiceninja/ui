@@ -105,10 +105,7 @@ export function PaymentOverviewInvoice(props: Props) {
               )}
             </span>
             {props.paymentable.refunded > 0 && (
-              <span
-                className=""
-                style={{ color: 'red', colorScheme: colors.$0 }}
-              >
+              <span style={{ color: 'red', colorScheme: colors.$0 }}>
                 ({' '}
                 {formatMoney(
                   props?.paymentable?.refunded || 0,
@@ -175,10 +172,7 @@ export function PaymentOverviewInvoice(props: Props) {
               )}
             </span>
             {props.paymentable.refunded > 0 && (
-              <span
-                className=""
-                style={{ color: 'red', colorScheme: colors.$0 }}
-              >
+              <span style={{ color: 'red', colorScheme: colors.$0 }}>
                 ({' '}
                 {formatMoney(
                   props?.paymentable?.refunded || 0,
