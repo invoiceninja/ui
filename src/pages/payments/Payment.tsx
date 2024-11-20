@@ -35,9 +35,13 @@ import {
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
+import classNames from 'classnames';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Payment() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -105,9 +109,25 @@ export default function Payment() {
           disableSaveButton: !paymentValue,
         })}
       aboveMainContainer={
-        <Banner id="paymentUpdateBanner" className="hidden" variant="orange">
-          {t('payment_status_changed')}
-        </Banner>
+        <>
+          <Banner id="paymentUpdateBanner" className="hidden" variant="orange">
+            {t('payment_status_changed')}
+          </Banner>
+
+          {Boolean(paymentValue && paymentValue.amount < 0) && (
+            <Banner
+              variant="orange"
+              className={classNames({
+                'border-t': !document
+                  .getElementById('paymentUpdateBanner')
+                  ?.classList.contains('hidden'),
+              })}
+              style={{ borderColor: colors.$5 }}
+            >
+              {t('negative_payment_warning')}
+            </Banner>
+          )}
+        </>
       }
     >
       <Container breadcrumbs={[]}>
