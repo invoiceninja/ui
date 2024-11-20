@@ -207,11 +207,6 @@ export function EInvoice() {
         eInvoiceRef?.current?.saveEInvoice();
         onSave();
       }}
-      disableSaveButton={
-        showPlanAlert ||
-        (company?.settings.e_invoice_type === 'PEPPOL' &&
-          company?.settings.enable_e_invoice)
-      }
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
