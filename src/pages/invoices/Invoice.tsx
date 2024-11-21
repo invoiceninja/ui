@@ -66,12 +66,21 @@ export default function Invoice() {
   const actions = useActions();
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
+  const [triggerValidationQuery, setTriggerValidationQuery] =
+    useState<boolean>(true);
+
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: invoice,
-    enableQuery: Boolean(
-      company?.settings.e_invoice_type === 'PEPPOL' &&
-        company?.settings.enable_e_invoice
-    ),
+    enableQuery:
+      Boolean(
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice
+      ) &&
+      triggerValidationQuery &&
+      id === invoice?.id,
+    onFinished: () => {
+      setTriggerValidationQuery(false);
+    },
   });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
@@ -200,6 +209,7 @@ export default function Invoice() {
                   client,
                   eInvoiceRef,
                   eInvoiceValidationEntityResponse: validationResponse,
+                  setTriggerValidationQuery,
                 }}
               />
             </div>

@@ -19,10 +19,11 @@ import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCheckCircle } from 'react-icons/md';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -34,6 +35,7 @@ export interface Context {
   errors: ValidationBag | undefined;
   eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
+  setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
 const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
@@ -43,11 +45,28 @@ export default function EInvoice() {
 
   const context: Context = useOutletContext();
 
-  const { invoice, eInvoiceValidationEntityResponse } = context;
+  const {
+    invoice,
+    eInvoiceValidationEntityResponse,
+    setTriggerValidationQuery,
+  } = context;
 
   return (
     <>
-      <Card title={t('e_invoice')}>
+      <Card
+        title={t('e_invoice')}
+        topRight={
+          <Button
+            behavior="button"
+            onClick={() => {
+              $refetch(['entity_validations']);
+              setTriggerValidationQuery(true);
+            }}
+          >
+            {t('validate')}
+          </Button>
+        }
+      >
         {Boolean(eInvoiceValidationEntityResponse && invoice) && (
           <div className="flex px-6">
             <div className="flex flex-1 flex-col space-y-4 text-sm">
