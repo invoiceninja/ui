@@ -44,6 +44,8 @@ import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Banner } from '$app/components/Banner';
+import { useColorScheme } from '$app/common/colors';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -74,6 +76,7 @@ export default function Create() {
     { name: t('new_payment'), href: '/payments/create' },
   ];
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const creditResolver = useCreditResolver();
   const invoiceResolver = useInvoiceResolver();
@@ -207,6 +210,13 @@ export default function Create() {
       breadcrumbs={pages}
       onSaveClick={() => onSubmit(payment as unknown as Payment, sendEmail)}
       disableSaveButton={!payment || isFormBusy}
+      aboveMainContainer={
+        Boolean(payment && payment.amount < 0) && (
+          <Banner variant="orange" style={{ borderColor: colors.$5 }}>
+            {t('negative_payment_warning')}
+          </Banner>
+        )
+      }
     >
       <Container breadcrumbs={[]}>
         <Card title={t('enter_payment')}>
@@ -252,6 +262,7 @@ export default function Create() {
                 )
               }
               errorMessage={errors?.errors.amount}
+              changeOverride
             />
           </Element>
 

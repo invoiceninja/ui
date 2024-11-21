@@ -67,6 +67,7 @@ import {
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
+import { Link } from '$app/components/forms';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -224,7 +225,7 @@ export function useAllExpenseColumns() {
     'payment_date',
     'payment_type',
     'private_notes',
-    //   'project', @Todo: Need to resolve relationship
+    'project',
     //   'recurring_expense', @Todo: Need to resolve relationship
     'should_be_invoiced',
     //   'tax_amount', @Todo: Need to calc
@@ -554,6 +555,16 @@ export function useExpenseColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'project',
+      id: 'project',
+      label: t('project'),
+      format: (_, expense) => (
+        <Link to={route('/projects/:id', { id: expense?.project?.id })}>
+          {expense?.project?.name}
+        </Link>
+      ),
     },
   ];
 
