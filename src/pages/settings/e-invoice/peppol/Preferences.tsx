@@ -55,8 +55,6 @@ export function Preferences() {
           if (error.response?.status === 422) {
             if (get(error.response.data, 'errors.acts_as_receiver.0')) {
               toast.error(get(error.response.data, 'errors.acts_as_receiver.0'));
-
-              form.resetForm();
             }
 
             return;
