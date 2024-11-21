@@ -168,6 +168,8 @@ export function Notifications() {
         <SelectField
           value={allEvents}
           onValueChange={(value) => handleAllEventsChange(value)}
+          customSelector
+          dismissable={false}
         >
           <option value="all_notifications">{t('all_records')}</option>
           <option value="all_user_notifications">{t('owned_by_user')}</option>
@@ -186,6 +188,8 @@ export function Notifications() {
                 handleNotificationChange(notification.key, value)
               }
               disabled={Boolean(allEvents) && allEvents !== 'custom'}
+              customSelector
+              dismissable={false}
             >
               <option value={`${notification.key}_all`}>
                 {t('all_records')}
