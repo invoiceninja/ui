@@ -12,14 +12,13 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
 import { EInvoiceComponent } from '$app/pages/settings';
-import { Dispatch, RefObject, SetStateAction, useState } from 'react';
+import { Dispatch, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { InvoiceEntityValidationButton } from './InvoiceEntityValidationButton';
 import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
@@ -37,7 +36,7 @@ export interface Context {
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
 }
 
-const VALIDATION_ENTITIES = ['client', 'company'];
+const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
 
 export default function EInvoice() {
   const [t] = useTranslation();
@@ -46,59 +45,9 @@ export default function EInvoice() {
 
   const { invoice, eInvoiceValidationEntityResponse } = context;
 
-  const [currentInvoiceErrors, setCurrentInvoiceErrors] = useState<
-    string[] | undefined
-  >();
-
   return (
     <>
-      <Card
-        title={t('e_invoice')}
-        topRight={
-          <InvoiceEntityValidationButton
-            invoice={invoice}
-            setCurrentInvoiceErrors={setCurrentInvoiceErrors}
-          />
-        }
-      >
-        {typeof currentInvoiceErrors !== 'undefined' && (
-          <div className="flex text-sm px-6 mb-4">
-            {currentInvoiceErrors.length ? (
-              <div className="flex flex-1 items-center space-x-4 border-l-2 border-red-500 pl-4 py-4">
-                <div className="whitespace-nowrap font-medium w-24">
-                  {t('invoice')}:
-                </div>
-
-                <div className="flex flex-1 items-center justify-between pr-4">
-                  <div className="flex flex-col space-y-1">
-                    {currentInvoiceErrors.map((message, index) => (
-                      <span key={index}>{message}</span>
-                    ))}
-                  </div>
-
-                  <Link
-                    to={route('/invoices/:id/edit', {
-                      id: invoice?.id,
-                    })}
-                  >
-                    {t('edit_invoice')}
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4">
-                <div className="whitespace-nowrap font-medium w-24">
-                  {t('invoice')}:
-                </div>
-
-                <div>
-                  <Icon element={MdCheckCircle} size={33} color="green" />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
+      <Card title={t('e_invoice')}>
         {Boolean(eInvoiceValidationEntityResponse && invoice) && (
           <div className="flex px-6">
             <div className="flex flex-1 flex-col space-y-4 text-sm">
@@ -106,7 +55,7 @@ export default function EInvoice() {
                 (
                   eInvoiceValidationEntityResponse?.[
                     entity as keyof ValidationEntityResponse
-                  ] as Array<string>
+                  ] as Array<EntityError | string>
                 ).length ? (
                   <div
                     key={index}
@@ -125,7 +74,9 @@ export default function EInvoice() {
                         ).map((message, index) => (
                           <div key={index} className="flex flex-col space-y-1">
                             <span>
-                              {message.label
+                              {entity === 'invoice'
+                                ? (message as unknown as string)
+                                : message.label
                                 ? `${message.label} (${t('required')})`
                                 : message.field}
                             </span>
@@ -133,7 +84,17 @@ export default function EInvoice() {
                         ))}
                       </div>
 
-                      {entity === 'client' ? (
+                      {entity === 'invoice' && (
+                        <Link
+                          to={route('/invoices/:id/edit', {
+                            id: invoice?.id,
+                          })}
+                        >
+                          {t('edit_invoice')}
+                        </Link>
+                      )}
+
+                      {entity === 'client' && (
                         <Link
                           to={route('/clients/:id/edit', {
                             id: invoice?.client_id,
@@ -141,7 +102,9 @@ export default function EInvoice() {
                         >
                           {t('edit_client')}
                         </Link>
-                      ) : (
+                      )}
+
+                      {entity === 'company' && (
                         <Link to="/settings/company_details">
                           {t('settings')}
                         </Link>

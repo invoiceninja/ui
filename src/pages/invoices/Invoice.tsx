@@ -72,7 +72,6 @@ export default function Invoice() {
       company?.settings.e_invoice_type === 'PEPPOL' &&
         company?.settings.enable_e_invoice
     ),
-    companyId: company?.id,
   });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
