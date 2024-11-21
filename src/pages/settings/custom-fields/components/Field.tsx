@@ -9,7 +9,7 @@
  */
 
 import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer, Element } from '../../../../components/cards';
 import { InputField, SelectField } from '../../../../components/forms';
@@ -52,7 +52,6 @@ export function Field(props: Props) {
 
   const inputRef = useRef<HTMLInputElement>();
   const dropdownInputRef = useRef<HTMLInputElement>();
-  const dropdownTypeRef = useRef<HTMLSelectElement>();
 
   useEffect(() => {
     if (props.initialValue) {
@@ -73,14 +72,20 @@ export function Field(props: Props) {
     }
   }, []);
 
-  const handleChange = () => {
+  const handleChange = (currentType?: AvailableTypes) => {
+    if (currentType) {
+      setDropdownType(currentType);
+    }
+
+    const adjustedCurrentType = currentType || dropdownType;
+
     const type =
-      dropdownTypeRef.current?.value === AvailableTypes.Dropdown
+      adjustedCurrentType === AvailableTypes.Dropdown
         ? dropdownInputRef.current?.value
             .split(',')
             .map((part) => part.trim())
             .join(',')
-        : dropdownTypeRef.current?.value;
+        : adjustedCurrentType;
 
     const currentValue =
       type === 'multi_line_text'
@@ -88,11 +93,7 @@ export function Field(props: Props) {
         : `${inputRef.current?.value || ''}|${type}`;
 
     props.onChange &&
-      props.onChange(
-        currentValue,
-        props.field,
-        dropdownTypeRef.current?.value as AvailableTypes
-      );
+      props.onChange(currentValue, props.field, adjustedCurrentType);
   };
 
   return (
@@ -101,22 +102,20 @@ export function Field(props: Props) {
         noExternalPadding={props.noExternalPadding}
         leftSide={
           <InputField
-            innerRef={inputRef}
             id={props.field}
+            innerRef={inputRef}
             placeholder={props.placeholder}
-            onChange={handleChange}
+            onValueChange={() => handleChange()}
             value={initialValue}
             disabled={disabledInputCustomFields}
           />
         }
       >
         <SelectField
-          innerRef={dropdownTypeRef}
-          onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-            setDropdownType(event.target.value as AvailableTypes);
-            handleChange();
-          }}
           value={dropdownType}
+          onValueChange={(value) => handleChange(value as AvailableTypes)}
+          dismissable={false}
+          customSelector
         >
           <option value="single_line_text">{t('single_line_text')}</option>
           <option value="multi_line_text">{t('multi_line_text')}</option>
@@ -129,11 +128,11 @@ export function Field(props: Props) {
       {dropdownType === AvailableTypes.Dropdown && (
         <CardContainer>
           <InputField
-            innerRef={dropdownInputRef}
             id="multi_line_text"
+            innerRef={dropdownInputRef}
             placeholder={t('comma_sparated_list')}
-            onChange={handleChange}
             value={dropdownInitialValue}
+            onValueChange={() => handleChange()}
           />
         </CardContainer>
       )}
