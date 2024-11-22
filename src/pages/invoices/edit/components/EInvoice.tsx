@@ -85,21 +85,19 @@ export default function EInvoice() {
                     </div>
 
                     <div className="flex flex-1 items-center justify-between pr-4">
-                      <div className="flex flex-col space-y-1">
+                      <div className="flex flex-col space-y-2.5">
                         {(
                           eInvoiceValidationEntityResponse?.[
                             entity as keyof ValidationEntityResponse
                           ] as Array<EntityError>
                         ).map((message, index) => (
-                          <div key={index} className="flex flex-col space-y-1">
-                            <span>
-                              {entity === 'invoice'
-                                ? (message as unknown as string)
-                                : message.label
-                                ? `${message.label} (${t('required')})`
-                                : message.field}
-                            </span>
-                          </div>
+                          <span key={index}>
+                            {entity === 'invoice'
+                              ? (message as unknown as string)
+                              : message.label
+                              ? `${message.label} (${t('required')})`
+                              : message.field}
+                          </span>
                         ))}
                       </div>
 
