@@ -178,6 +178,10 @@ export function TaxSettings() {
                             $handleChange('enabled_tax_rates', 0);
                             $handleChange('enabled_item_tax_rates', 1);
                             $handleChange('enabled_expense_tax_rates', 1);
+
+                            $handleChange('settings.tax_rate1', 0);
+                            $handleChange('settings.tax_rate2', 0);
+                            $handleChange('settings.tax_rate3', 0);
                           }
                         }}
                       />
@@ -209,6 +213,7 @@ export function TaxSettings() {
       {(isGroupSettingsActive || isClientSettingsActive) && (
         <Selector title="tax_settings" />
       )}
+
       <TaxRates />
 
       <HelpWidget
