@@ -38,8 +38,16 @@ export function Notifications() {
 
     const user = cloneDeep(userChanges);
 
-    const updatedAllEvents =
-      allEventsValue === 'custom' ? [] : [allEventsValue];
+    let updatedAllEvents = allEventsValue === 'custom' ? [] : [allEventsValue];
+
+    const isTaskAssignedNotificationIncluded =
+      user?.company_user?.notifications?.email?.find(
+        (key: string) => key === 'task_assigned'
+      );
+
+    if (isTaskAssignedNotificationIncluded) {
+      updatedAllEvents = [...updatedAllEvents, 'task_assigned'];
+    }
 
     set(user, 'company_user.notifications.email', updatedAllEvents);
 
