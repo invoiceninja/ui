@@ -141,23 +141,25 @@ export function TaxSettings() {
               </SelectField>
             </Element>
 
-            <Element leftSide={t('inclusive_taxes')}>
-              <div className="flex items-center space-x-7">
-                <Toggle
-                  onChange={(value: boolean) =>
-                    handleToggleChange('settings.inclusive_taxes', value)
-                  }
-                  checked={Boolean(companyChanges?.settings.inclusive_taxes)}
-                  cypressRef="inclusiveTaxToggle"
-                />
+            {companyChanges.calculate_taxes ? null : (
+              <Element leftSide={t('inclusive_taxes')}>
+                <div className="flex items-center space-x-7">
+                  <Toggle
+                    onChange={(value: boolean) =>
+                      handleToggleChange('settings.inclusive_taxes', value)
+                    }
+                    checked={Boolean(companyChanges?.settings.inclusive_taxes)}
+                    cypressRef="inclusiveTaxToggle"
+                  />
 
-                {companyChanges?.settings.inclusive_taxes ? (
-                  <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
-                ) : (
-                  <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
-                )}
-              </div>
-            </Element>
+                  {companyChanges?.settings.inclusive_taxes ? (
+                    <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
+                  ) : (
+                    <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+                  )}
+                </div>
+              </Element>
+            )}
 
             {isPaidOrSelfHost &&
               calculateTaxesRegion(companyChanges?.settings?.country_id) && (
