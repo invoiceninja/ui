@@ -186,6 +186,7 @@ export function useQuota() {
     enabled:
       isSelfHosted() && import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true',
     retry: () => false,
+    staleTime: Infinity,
   });
 
   const count = () => {
