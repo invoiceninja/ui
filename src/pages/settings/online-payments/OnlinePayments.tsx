@@ -131,7 +131,9 @@ export function OnlinePayments() {
         >
           <SelectField
             value={company?.settings.auto_bill || 'off'}
-            onValueChange={(value) => handleChangeProperty('auto_bill', value)}
+            onValueChange={(value) =>
+              handleChangeProperty('settings.auto_bill', value)
+            }
             disabled={disableSettingsField('auto_bill')}
             errorMessage={errors?.errors['settings.auto_bill']}
             customSelector
@@ -169,7 +171,7 @@ export function OnlinePayments() {
           <SelectField
             value={company?.settings.auto_bill_date || 'on_send_date'}
             onValueChange={(value) =>
-              handleChangeProperty('auto_bill_date', value)
+              handleChangeProperty('settings.auto_bill_date', value)
             }
             disabled={disableSettingsField('auto_bill_date')}
             errorMessage={errors?.errors['settings.auto_bill_date']}
@@ -198,7 +200,7 @@ export function OnlinePayments() {
           <SelectField
             value={company?.settings.use_credits_payment || 'off'}
             onValueChange={(value) =>
-              handleChangeProperty('use_credits_payment', value)
+              handleChangeProperty('settings.use_credits_payment', value)
             }
             disabled={disableSettingsField('use_credits_payment')}
             errorMessage={errors?.errors['settings.use_credits_payment']}
@@ -228,7 +230,7 @@ export function OnlinePayments() {
           <SelectField
             value={company?.settings.use_unapplied_payment || 'off'}
             onValueChange={(value) =>
-              handleChangeProperty('use_unapplied_payment', value)
+              handleChangeProperty('settings.use_unapplied_payment', value)
             }
             disabled={disableSettingsField('use_unapplied_payment')}
             errorMessage={errors?.errors['settings.use_unapplied_payment']}
@@ -259,7 +261,7 @@ export function OnlinePayments() {
               <SelectField
                 value={company?.settings?.payment_terms || ''}
                 onValueChange={(value) =>
-                  handleChangeProperty('payment_terms', value)
+                  handleChangeProperty('settings.payment_terms', value)
                 }
                 disabled={disableSettingsField('payment_terms')}
                 errorMessage={errors?.errors['settings.payment_terms']}
@@ -267,7 +269,7 @@ export function OnlinePayments() {
                 withBlank
               >
                 {paymentTerms.map((type: PaymentTerm) => (
-                  <option key={type.id} value={type.num_days}>
+                  <option key={type.id} value={type.num_days.toString()}>
                     {type.name}
                   </option>
                 ))}
@@ -298,7 +300,7 @@ export function OnlinePayments() {
           <SelectField
             value={company?.settings?.payment_type_id || '0'}
             onValueChange={(value) =>
-              handleChangeProperty('payment_type_id', value)
+              handleChangeProperty('settings.payment_type_id', value)
             }
             blankOptionValue="0"
             disabled={disableSettingsField('payment_type_id')}
@@ -332,7 +334,7 @@ export function OnlinePayments() {
           <SelectField
             value={company?.settings?.valid_until || ''}
             onValueChange={(value) =>
-              handleChangeProperty('valid_until', value)
+              handleChangeProperty('settings.valid_until', value)
             }
             disabled={disableSettingsField('valid_until')}
             withBlank
@@ -340,7 +342,7 @@ export function OnlinePayments() {
             customSelector
           >
             {paymentTerms?.map((type: PaymentTerm) => (
-              <option key={type.id} value={type.num_days}>
+              <option key={type.id} value={type.num_days.toString()}>
                 {type.name}
               </option>
             ))}
@@ -363,7 +365,10 @@ export function OnlinePayments() {
           <SelectField
             value={company?.settings?.default_expense_payment_type_id || ''}
             onValueChange={(value) =>
-              handleChangeProperty('default_expense_payment_type_id', value)
+              handleChangeProperty(
+                'settings.default_expense_payment_type_id',
+                value
+              )
             }
             disabled={disableSettingsField('default_expense_payment_type_id')}
             blankOptionValue="0"

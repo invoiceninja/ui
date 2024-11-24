@@ -293,6 +293,7 @@ export function Create() {
               onValueChange={(value) => handleChange(value, true)}
               value={gateway?.id}
               errorMessage={errors?.errors.gateway_key}
+              customSelector
               withBlank
             >
               {filteredGateways.map((gateway, index) => (

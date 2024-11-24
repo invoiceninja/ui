@@ -106,11 +106,12 @@ export function useResolveInputField(
     if (typeof value === 'object') {
       return (
         <SelectField
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            handleChange(property as keyof Field, event.target.value)
-          }
           value={resolveConfigValue(property)}
+          onValueChange={(value) =>
+            handleChange(property as keyof Field, value)
+          }
           errorMessage={errors?.errors[property]}
+          customSelector
         >
           {value.map((option, index) => (
             <option key={index} value={option}>

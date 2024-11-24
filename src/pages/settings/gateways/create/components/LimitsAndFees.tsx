@@ -18,7 +18,7 @@ import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
@@ -75,8 +75,8 @@ export function LimitsAndFees(props: Props) {
       : setCurrentGatewayTypeId(undefined);
   }, [props.companyGateway]);
 
-  const handlePaymentTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setCurrentGatewayTypeId(event.target.value);
+  const handlePaymentTypeChange = (value: string) => {
+    setCurrentGatewayTypeId(value);
   };
 
   const handleEntryChange = (
@@ -127,8 +127,9 @@ export function LimitsAndFees(props: Props) {
     >
       <Element leftSide={t('payment_type')}>
         <SelectField
-          onChange={handlePaymentTypeChange}
+          onValueChange={(value) => handlePaymentTypeChange(value)}
           errorMessage={props.errors?.errors.gatewayTypeId}
+          customSelector
         >
           {Object.entries(props.companyGateway.fees_and_limits)
             .filter(([, entry]) => entry.is_enabled)
