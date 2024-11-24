@@ -174,7 +174,7 @@ export function InvoiceDetails(props: Props) {
 
         <Element leftSide={t('auto_bill')}>
           <SelectField
-            value={recurringInvoice?.auto_bill || false}
+            value={recurringInvoice?.auto_bill || 'always'}
             onValueChange={(value) => handleChange('auto_bill', value)}
             errorMessage={props.errors?.errors.auto_bill}
             customSelector
