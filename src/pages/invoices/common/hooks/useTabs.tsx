@@ -58,12 +58,14 @@ export function useTabs(params: Params) {
 
           {Boolean(
             eInvoiceValidationResponse?.client.length ||
-              eInvoiceValidationResponse?.company.length
+              eInvoiceValidationResponse?.company.length ||
+              eInvoiceValidationResponse?.invoice.length
           ) && (
             <span className="font-bold">
               (
               {(eInvoiceValidationResponse?.client.length || 0) +
-                (eInvoiceValidationResponse?.company.length || 0)}
+                (eInvoiceValidationResponse?.company.length || 0) +
+                (eInvoiceValidationResponse?.invoice.length || 0)}
               )
             </span>
           )}
