@@ -82,6 +82,8 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -533,9 +535,11 @@ export function useRecurringInvoiceColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const dateTime = useDateTime();
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
   const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
+  const dateTime = useDateTime({ withTimezone: true });
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
@@ -610,7 +614,14 @@ export function useRecurringInvoiceColumns() {
       column: 'next_send_date',
       id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => dateTime(value),
+      format: (value, recurringInvoice) =>
+        dateTime(
+          value,
+          '',
+          '',
+          getTimezone(getSetting(recurringInvoice.client, 'timezone_id'))
+            .timeZone
+        ),
     },
     {
       column: 'frequency',

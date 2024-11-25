@@ -18,12 +18,17 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useTranslation } from 'react-i18next';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 
 export function UpcomingRecurringInvoices() {
   const [t] = useTranslation();
-  const dateTime = useDateTime();
+
+  const getSetting = useGetSetting();
   const formatMoney = useFormatMoney();
+  const getTimezone = useGetTimezone();
   const disableNavigation = useDisableNavigation();
+  const dateTime = useDateTime({ withTimezone: true });
 
   const columns: DataTableColumns<RecurringInvoice> = [
     {
@@ -60,7 +65,14 @@ export function UpcomingRecurringInvoices() {
     {
       id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => dateTime(value),
+      format: (value, recurringInvoice) =>
+        dateTime(
+          value,
+          '',
+          '',
+          getTimezone(getSetting(recurringInvoice.client, 'timezone_id'))
+            .timeZone
+        ),
     },
     {
       id: 'balance',

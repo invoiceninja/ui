@@ -11,18 +11,31 @@
 import dayjs from 'dayjs';
 import { useCompanyTimeFormat } from './useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from './useCurrentCompanyDateFormats';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import { useCompanyTimeZone } from './useCompanyTimeZone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface Params {
   formatOnlyTime?: boolean;
+  withTimezone?: boolean;
 }
 
 export function useDateTime(params?: Params) {
-  const { formatOnlyTime = false } = params || {};
+  const { formatOnlyTime = false, withTimezone = false } = params || {};
 
+  const { timeZone: companyTimeZone } = useCompanyTimeZone();
   const { timeFormat: companyTimeFormat } = useCompanyTimeFormat();
   const { dateFormat: companyDateFormat } = useCurrentCompanyDateFormats();
 
-  return (date: number | string, dateFormat?: string, timeFormat?: string) => {
+  return (
+    date: number | string,
+    dateFormat?: string,
+    timeFormat?: string,
+    timeZone?: string
+  ) => {
     if (date === 0 || date === '' || date === undefined) {
       return '';
     }
@@ -39,10 +52,17 @@ export function useDateTime(params?: Params) {
       return dayjs(date).format(timeFormat || companyTimeFormat);
     }
 
-    if (typeof date === 'number') {
+    if (typeof date === 'number' && !withTimezone) {
       return dayjs.unix(date).format(finalFormat);
     }
 
-    return dayjs(date).format(finalFormat);
+    if (typeof date !== 'number' && !withTimezone) {
+      return dayjs(date).format(finalFormat);
+    }
+
+    return dayjs
+      .utc(date)
+      .tz(timeZone || companyTimeZone)
+      .format(finalFormat);
   };
 }
