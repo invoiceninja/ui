@@ -75,8 +75,6 @@ export function useHandleCompanySave() {
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
-        $refetch(['company_entity_validations']);
-
         !adjustedExcludeToaster && toast.dismiss();
 
         if (hasLanguageChanged) {

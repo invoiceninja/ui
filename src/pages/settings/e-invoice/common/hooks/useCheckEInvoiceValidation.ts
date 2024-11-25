@@ -10,7 +10,6 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -19,9 +18,6 @@ import { useQueryClient } from 'react-query';
 interface Params {
   resource: Invoice | undefined;
   enableQuery: boolean;
-  companyId?: string;
-  checkInvoiceOnly?: boolean;
-  withToaster?: boolean;
   onFinished?: () => void;
 }
 
@@ -38,14 +34,7 @@ export interface ValidationEntityResponse {
 }
 
 export function useCheckEInvoiceValidation(params: Params) {
-  const {
-    companyId,
-    resource,
-    enableQuery,
-    checkInvoiceOnly,
-    withToaster,
-    onFinished,
-  } = params;
+  const { resource, enableQuery, onFinished } = params;
 
   const isEntityValidationQueryEnabled =
     import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true';
@@ -57,79 +46,35 @@ export function useCheckEInvoiceValidation(params: Params) {
   >();
 
   const handleCheckValidation = async () => {
-    withToaster && toast.processing();
-
-    if (!checkInvoiceOnly) {
-      const clientValidationResponse = await queryClient.fetchQuery(
-        ['/api/v1/einvoice/validateEntity-client', resource?.client_id],
-        () =>
-          request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
-            entity: 'clients',
-            entity_id: resource?.client_id,
-          })
-            .then((response) => response)
-            .catch((error) => error.response),
-        { staleTime: Infinity }
-      );
-
-      const companyValidationResponse = await queryClient.fetchQuery(
-        ['/api/v1/einvoice/validateEntity-company', companyId],
-        () =>
-          request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
-            entity: 'companies',
-            entity_id: companyId,
-          })
-            .then((response) => response)
-            .catch((error) => error.response),
-        { staleTime: Infinity }
-      );
-
-      let currentValidationResult = { client: [], company: [], passes: true };
-
-      if (clientValidationResponse?.status === 422) {
-        currentValidationResult = {
-          company: [],
-          client: clientValidationResponse.data.client,
-          passes: false,
-        };
-      }
-
-      if (companyValidationResponse?.status === 422) {
-        currentValidationResult = {
-          ...currentValidationResult,
-          company: companyValidationResponse.data.company,
-          passes: false,
-        };
-      }
-
-      setValidationEntityResponse(() => ({
-        invoice: [],
-        ...currentValidationResult,
-      }));
-    } else {
-      const invoiceValidationResponse = await queryClient.fetchQuery(
-        ['/api/v1/einvoice/validateEntity-invoice', resource?.id],
-        () =>
-          request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
-            entity: 'invoices',
-            entity_id: resource?.id,
-          })
-            .then((response) => response)
-            .catch((error) => error.response),
-        { staleTime: Infinity }
-      );
-
-      withToaster && toast.dismiss();
-
-      setValidationEntityResponse(() =>
-        cloneDeep({
-          client: [],
-          company: [],
-          invoice: invoiceValidationResponse?.data?.invoice ?? [],
-          passes: false,
+    const validationResponse = await queryClient.fetchQuery(
+      ['/api/v1/einvoice/validateEntity', resource?.id],
+      () =>
+        request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
+          entity: 'invoices',
+          entity_id: resource?.id,
         })
-      );
+          .then((response) => response)
+          .catch((error) => error.response),
+      { staleTime: Infinity }
+    );
+
+    let currentValidationResult = {
+      client: [],
+      company: [],
+      invoice: [],
+      passes: true,
+    };
+
+    if (validationResponse?.status === 422) {
+      currentValidationResult = {
+        company: validationResponse.data.company ?? [],
+        client: validationResponse.data.client ?? [],
+        invoice: validationResponse.data.invoice ?? [],
+        passes: false,
+      };
     }
+
+    setValidationEntityResponse(cloneDeep(currentValidationResult));
 
     onFinished?.();
   };
