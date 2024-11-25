@@ -11,11 +11,19 @@
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
-import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { EInvoiceComponent } from '$app/pages/settings';
 import { Dispatch, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
+import {
+  EntityError,
+  ValidationEntityResponse,
+} from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { Button, Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { Icon } from '$app/components/icons/Icon';
+import { MdCheckCircle } from 'react-icons/md';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -26,25 +34,119 @@ export interface Context {
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
   eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
+  eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
+  setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
+
+const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
+
 export default function EInvoice() {
   const [t] = useTranslation();
 
   const context: Context = useOutletContext();
 
-  const { invoice, setInvoice, eInvoiceRef } = context;
+  const {
+    invoice,
+    eInvoiceValidationEntityResponse,
+    setTriggerValidationQuery,
+  } = context;
 
   return (
-    <Card title={t('e_invoice')}>
-      {invoice?.e_invoice && (
-        <EInvoiceGenerator
-          ref={eInvoiceRef}
-          entityLevel
-          currentEInvoice={invoice.e_invoice}
-          invoice={invoice}
-          setInvoice={setInvoice}
-        />
-      )}
-    </Card>
+    <>
+      <Card
+        title={t('e_invoice')}
+        topRight={
+          <Button
+            behavior="button"
+            onClick={() => {
+              $refetch(['entity_validations']);
+              setTriggerValidationQuery(true);
+            }}
+          >
+            {t('validate')}
+          </Button>
+        }
+      >
+        {Boolean(eInvoiceValidationEntityResponse && invoice) && (
+          <div className="flex px-6">
+            <div className="flex flex-1 flex-col space-y-4 text-sm">
+              {VALIDATION_ENTITIES.map((entity, index) =>
+                (
+                  eInvoiceValidationEntityResponse?.[
+                    entity as keyof ValidationEntityResponse
+                  ] as Array<EntityError | string>
+                ).length ? (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-4 border-l-2 border-red-500 pl-4 py-4"
+                  >
+                    <div className="whitespace-nowrap font-medium w-24">
+                      {t(entity)}:
+                    </div>
+
+                    <div className="flex flex-1 items-center justify-between pr-4">
+                      <div className="flex flex-col space-y-2.5">
+                        {(
+                          eInvoiceValidationEntityResponse?.[
+                            entity as keyof ValidationEntityResponse
+                          ] as Array<EntityError>
+                        ).map((message, index) => (
+                          <span key={index}>
+                            {entity === 'invoice'
+                              ? (message as unknown as string)
+                              : message.label
+                              ? `${message.label} (${t('required')})`
+                              : message.field}
+                          </span>
+                        ))}
+                      </div>
+
+                      {entity === 'invoice' && (
+                        <Link
+                          to={route('/invoices/:id/edit', {
+                            id: invoice?.id,
+                          })}
+                        >
+                          {t('edit_invoice')}
+                        </Link>
+                      )}
+
+                      {entity === 'client' && (
+                        <Link
+                          to={route('/clients/:id/edit', {
+                            id: invoice?.client_id,
+                          })}
+                        >
+                          {t('edit_client')}
+                        </Link>
+                      )}
+
+                      {entity === 'company' && (
+                        <Link to="/settings/company_details">
+                          {t('settings')}
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4"
+                  >
+                    <div className="whitespace-nowrap font-medium w-24">
+                      {t(entity)}:
+                    </div>
+
+                    <div>
+                      <Icon element={MdCheckCircle} size={33} color="green" />
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        )}
+      </Card>
+    </>
   );
 }

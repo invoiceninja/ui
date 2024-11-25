@@ -85,7 +85,8 @@ const createClient = async (params: CreateParams) => {
 
   await page.waitForTimeout(200);
 
-  await page.locator('#name').fill(clientName || 'Company Name');
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(clientName || 'CompanyName');
+  // await page.locator('#name').fill(clientName || 'Company Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill(email || 'first@example.com');
@@ -161,7 +162,7 @@ const checkEditPage = async (page: Page) => {
   await expect(
     page
       .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
+      .getByRole('button', { name: 'Save', exact: true })
   ).toBeVisible();
 
   await expect(
@@ -435,7 +436,7 @@ test('deleting client with edit_client', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+      .filter({ has: page.getByText('Actions') });
 
     await moreActionsButton.click();
 
@@ -483,7 +484,7 @@ test('archiving client withe edit_client', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -597,7 +598,7 @@ test('client documents preview with edit_client', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();
@@ -649,7 +650,7 @@ test('client documents uploading with edit_client', async ({ page }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first();
 
     await moreActionsButton.click();

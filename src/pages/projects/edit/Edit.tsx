@@ -105,7 +105,7 @@ export default function Edit() {
 
       <Element leftSide={t('budgeted_hours')}>
         <NumberInputField
-          value={project?.budgeted_hours}
+          value={project?.budgeted_hours || ''}
           onValueChange={(value) =>
             handleChange('budgeted_hours', parseFloat(value))
           }
@@ -115,7 +115,7 @@ export default function Edit() {
 
       <Element leftSide={t('task_rate')}>
         <NumberInputField
-          value={project?.task_rate}
+          value={project?.task_rate || ''}
           onValueChange={(value) =>
             handleChange('task_rate', parseFloat(value))
           }

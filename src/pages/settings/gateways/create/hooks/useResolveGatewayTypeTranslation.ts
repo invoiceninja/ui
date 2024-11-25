@@ -9,14 +9,9 @@
  */
 
 import gatewayType from '$app/common/constants/gateway-type';
-import { useTranslation } from 'react-i18next';
 
 export function useResolveGatewayTypeTranslation() {
-  const [t] = useTranslation();
-
   return (id: string) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return t(gatewayType[id] || 'other');
+    return gatewayType[id as keyof typeof gatewayType] || 'other';
   };
 }

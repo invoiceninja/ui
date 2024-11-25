@@ -27,6 +27,7 @@ export interface SelectProps extends CommonProps {
   blankOptionValue?: string | number;
   customSelector?: boolean;
   dismissable?: boolean;
+  clearAfterSelection?: boolean;
 }
 
 export function SelectField(props: SelectProps) {
@@ -44,6 +45,7 @@ export function SelectField(props: SelectProps) {
     disabled,
     cypressRef,
     dismissable = true,
+    clearAfterSelection,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -79,6 +81,7 @@ export function SelectField(props: SelectProps) {
       minWidth: '100%',
       backgroundColor: colors.$4,
       borderColor: colors.$4,
+      zIndex: 50,
     }),
     control: (base, { isDisabled }) => ({
       ...base,
@@ -145,7 +148,7 @@ export function SelectField(props: SelectProps) {
           // @ts-ignore
           options={$entries}
           defaultValue={defaultEntry}
-          value={selectedEntry}
+          value={clearAfterSelection ? { label: '', value: '' } : selectedEntry}
           onChange={(v) => {
             if (v === null) {
               return onValueChange?.((blankOptionValue as string) ?? '');
@@ -157,8 +160,8 @@ export function SelectField(props: SelectProps) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           styles={customStyles}
-          isSearchable={false}
-          isClearable={dismissable}
+          isSearchable
+          isClearable={Boolean(dismissable && selectedEntry?.value)}
           data-cy={cypressRef}
         />
       )}

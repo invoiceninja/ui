@@ -165,12 +165,17 @@ export function NumberInputField(props: Props) {
           placeholder={props.placeholder ?? undefined}
           onChange={(event) => {
             if (props.onValueChange && props.changeOverride) {
-              const formattedValue = event.target.value
-                ? currency(event.target.value, {
+              const enteredValue = event.target.value;
+
+              const formattedValue = enteredValue
+                ? currency(enteredValue, {
                     separator: getThousandSeparator(),
                     decimal: getDecimalSeparator(),
                     symbol: '',
-                    precision: getNumberPrecision(event.target.value),
+                    precision:
+                      getNumberPrecision(enteredValue) === undefined
+                        ? 0
+                        : getNumberPrecision(enteredValue),
                   }).value
                 : undefined;
 
@@ -179,18 +184,23 @@ export function NumberInputField(props: Props) {
           }}
           onBlur={(event) => {
             if (props.onValueChange && !props.changeOverride) {
-              props.onValueChange(
-                event.target.value
-                  ? String(
-                      currency(event.target.value, {
-                        separator: getThousandSeparator(),
-                        decimal: getDecimalSeparator(),
-                        symbol: '',
-                        precision: getNumberPrecision(event.target.value),
-                      }).value
-                    )
-                  : ''
-              );
+              const enteredValue = event.target.value;
+
+              const formattedValue = enteredValue
+                ? String(
+                    currency(enteredValue, {
+                      separator: getThousandSeparator(),
+                      decimal: getDecimalSeparator(),
+                      symbol: '',
+                      precision:
+                        getNumberPrecision(enteredValue) === undefined
+                          ? 0
+                          : getNumberPrecision(enteredValue),
+                    }).value
+                  )
+                : '0';
+
+              props.onValueChange(formattedValue);
             }
           }}
           thousandSeparator={getThousandSeparator()}

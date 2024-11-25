@@ -86,7 +86,10 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.id_number', value.toString())
               }
-              disabled={disableSettingsField('id_number')}
+              disabled={
+                disableSettingsField('id_number') ||
+                companyChanges?.legal_entity_id !== null
+              }
               errorMessage={errors?.errors['settings.id_number']}
             />
           </Element>
@@ -104,9 +107,16 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.vat_number', value.toString())
               }
-              disabled={disableSettingsField('vat_number')}
+              disabled={
+                disableSettingsField('vat_number') ||
+                companyChanges?.legal_entity_id !== null
+              }
               errorMessage={errors?.errors['settings.vat_number']}
             />
+
+            {companyChanges?.legal_entity_id ? (
+              <p className="mt-2">{t('changing_vat_and_id_number_note')}</p>
+            ) : null}
           </Element>
 
           <Element
@@ -215,6 +225,8 @@ export function Details() {
                   handleChange('size_id', value.toString())
                 }
                 errorMessage={errors?.errors.size_id}
+                customSelector
+                dismissable={false}
               >
                 {statics?.sizes.map((size: { id: string; name: string }) => (
                   <option key={size.id} value={size.id}>
@@ -233,6 +245,8 @@ export function Details() {
                   handleChange('industry_id', value.toString())
                 }
                 errorMessage={errors?.errors.industry_id}
+                customSelector
+                dismissable={false}
               >
                 {statics?.industries.map(
                   (industry: { id: string; name: string }) => (
@@ -254,13 +268,13 @@ export function Details() {
             }
           >
             <SelectField
-              id="classification"
               value={companyChanges?.settings?.classification ?? ''}
               onValueChange={(value) =>
                 handleChange('settings.classification', value.toString())
               }
               disabled={disableSettingsField('classification')}
               withBlank
+              customSelector
             >
               <option value="individual">{t('individual')}</option>
               <option value="business">{t('business')}</option>

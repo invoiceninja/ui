@@ -26,6 +26,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCategory, MdDownload } from 'react-icons/md';
 import { AddToInvoiceAction } from '../components/AddToInvoiceAction';
+import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 
 interface Props {
   isVisible: boolean;
@@ -184,6 +185,13 @@ export const useCustomBulkActions = () => {
           {t('change')} {t('category')}
         </DropdownElement>
       </>
+    ),
+    ({ selectedIds, setSelected }) => (
+      <BulkUpdatesAction
+        entity="expense"
+        resourceIds={selectedIds}
+        setSelected={setSelected}
+      />
     ),
   ];
 

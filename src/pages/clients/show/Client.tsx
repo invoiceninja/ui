@@ -36,6 +36,8 @@ import {
 import { Client as IClient } from '$app/common/interfaces/client';
 import { ClientPublicNotes } from './components/ClientPublicNotes';
 import { ClientPrivateNotes } from './components/ClientPrivateNotes';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -84,6 +86,24 @@ export default function Client() {
     changeTemplateResources,
     changeTemplateEntityContext,
   } = useChangeTemplate();
+
+  useSocketEvent({
+    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
+    callback: () => $refetch(['invoices']),
+  });
+
+  useSocketEvent({
+    on: 'App\\Events\\Payment\\PaymentWasUpdated',
+    callback: () => $refetch(['payments']),
+  });
+
+  useSocketEvent({
+    on: [
+      'App\\Events\\Credit\\CreditWasCreated',
+      'App\\Events\\Credit\\CreditWasUpdated',
+    ],
+    callback: () => $refetch(['credits']),
+  });
 
   return (
     <Default

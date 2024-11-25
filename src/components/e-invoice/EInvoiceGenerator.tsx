@@ -722,6 +722,79 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return '';
     };
 
+    const renderComponentResourceField = (
+      componentName: string,
+      componentPath: string
+    ) => {
+      if (!Number.isNaN(Number(componentName))) {
+        return null;
+      }
+
+      let componentElement = null;
+
+      Object.values(components).forEach((component) => {
+        if (component?.elements[componentName]) {
+          componentElement = component?.elements[componentName];
+        }
+      });
+
+      if (
+        componentElement &&
+        typeof (componentElement as ElementType).resource === 'object' &&
+        !Array.isArray((componentElement as ElementType).resource) &&
+        Object.keys((componentElement as ElementType).resource).length
+      ) {
+        const fieldName = Object.keys(
+          (componentElement as ElementType).resource
+        )[0];
+
+        const fieldKey = `${componentPath}|${fieldName}`;
+
+        return (
+          <Element
+            key={fieldKey}
+            leftSide={
+              <EInvoiceFieldCheckbox
+                fieldKey={fieldKey}
+                fieldType="string"
+                payload={payload}
+                setPayload={setPayload}
+                label={fieldName}
+                helpLabel=""
+                isOptionalField={
+                  (componentElement as ElementType).min_occurs === 0
+                }
+                requiredField={false}
+                invoice={invoice}
+                setInvoice={setInvoice}
+              />
+            }
+            noExternalPadding
+          >
+            <SelectField
+              value={payload[fieldKey] || ''}
+              onValueChange={(value) => handleChange(fieldKey, value)}
+              disabled={payload[fieldKey] === undefined}
+              withBlank
+            >
+              {Object.entries(
+                (
+                  (componentElement as ElementType)
+                    .resource as unknown as Record<string, string>
+                )[fieldName]
+              ).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value || key}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
+        );
+      }
+
+      return null;
+    };
+
     const renderComponent = (
       component: Component,
       componentIndex: number,
@@ -731,6 +804,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       isComponentMultiSelectionComplexType: boolean
     ) => {
       const componentKey = `${componentPath}|${component.type}`;
+
+      const componentName =
+        componentPath.split('|')[componentPath.split('|').length - 1];
 
       const currentGroupsList = isInitial
         ? availableGroups
@@ -761,6 +837,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             className="flex flex-1 flex-col"
             renderFragment={!shouldBeRendered}
           >
+            {renderComponentResourceField(componentName, componentPath)}
+
             {(shouldBeRendered || isFirstLevelComponent) &&
               Boolean(component.choices?.length) && (
                 <Element
@@ -1206,7 +1284,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           }
         });
 
-        if (payload[key] !== undefined) {
+        if (payload[key] !== undefined && payload[key] !== null) {
           const updatedPath = key
             .split('|')
             .filter((currentKey) => !currentKey.endsWith('Type'))
@@ -1265,8 +1343,14 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 (element) => element.base_type === component?.type
               )
             );
+          const isIndividualComponent = !Object.values(components).some(
+            (currentComponent) =>
+              Object.values(currentComponent?.elements || {}).some(
+                (element) => element.base_type === component?.type
+              )
+          );
 
-          if (index === 0 || !isAlreadyRendered) {
+          if (index === 0 || (!isAlreadyRendered && isIndividualComponent)) {
             return (
               component &&
               renderComponent(

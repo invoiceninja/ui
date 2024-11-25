@@ -335,7 +335,7 @@ test('deleting task with edit_task', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -387,7 +387,7 @@ test('archiving task withe edit_task', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -425,7 +425,7 @@ test('task documents preview with edit_task', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -473,7 +473,7 @@ test('task documents uploading with edit_task', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -590,7 +590,7 @@ test('cloning task', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
   }

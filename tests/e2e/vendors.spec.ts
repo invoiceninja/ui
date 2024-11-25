@@ -364,7 +364,7 @@ test('deleting vendor with edit_vendor', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 
@@ -412,7 +412,7 @@ test('archiving vendor withe edit_vendor', async ({ page }) => {
   } else {
     await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .filter({ has: page.getByText('Actions') })
       .first()
       .click();
 

@@ -62,7 +62,6 @@ export function XMLImport(props: Props) {
 
       return request('POST', endpoint('/api/v1/edocument/upload'), formData)
         .then((response) => {
-          console.log(response);
           toast.success(response?.data?.message ?? 'success');
         })
         .catch((error: AxiosError<ValidationBag>) => {

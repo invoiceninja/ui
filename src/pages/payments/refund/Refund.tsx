@@ -241,7 +241,8 @@ export default function Refund() {
                     <div className="flex items-center space-x-2">
                       <NumberInputField
                         value={
-                          (formik.values.invoices[index] as Invoice).amount
+                          (formik.values.invoices[index] as Invoice).amount ||
+                          ''
                         }
                         onValueChange={(value) =>
                           formik.setFieldValue(

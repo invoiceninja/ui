@@ -218,6 +218,10 @@ export const keys = {
     path: '/api/v1/activities',
     dependencies: ['/api/v1/activities/entity'],
   },
+  entity_validations: {
+    path: '/api/v1/einvoice/validateEntity',
+    dependencies: [],
+  },
 };
 
 export function useRefetch() {

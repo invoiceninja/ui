@@ -45,6 +45,10 @@ import { useLocation } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import {
+  getTaxRateComboValue,
+  TaxNamePropertyType,
+} from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 const numberInputs = [
   'discount',
@@ -255,11 +259,10 @@ export function useResolveInputField(props: Props) {
               onTaxCreated={(taxRate) =>
                 handleTaxRateChange(property, index, taxRate)
               }
-              defaultValue={
-                resource?.line_items[index][
-                  property.replace('rate', 'name') as keyof InvoiceItem
-                ]
-              }
+              defaultValue={getTaxRateComboValue(
+                resource?.line_items[index],
+                property.replace('rate', 'name') as TaxNamePropertyType
+              )}
               onClearButtonClick={() => handleTaxRateChange(property, index)}
             />
 
@@ -305,11 +308,10 @@ export function useResolveInputField(props: Props) {
         onTaxCreated={(taxRate) =>
           handleTaxRateChange(property, index, taxRate)
         }
-        defaultValue={
-          resource?.line_items[index][
-            property.replace('rate', 'name') as keyof InvoiceItem
-          ]
-        }
+        defaultValue={getTaxRateComboValue(
+          resource?.line_items[index],
+          property.replace('rate', 'name') as TaxNamePropertyType
+        )}
         onClearButtonClick={() => handleTaxRateChange(property, index)}
       />
     );
@@ -368,7 +370,7 @@ export function useResolveInputField(props: Props) {
                 : inputCurrencySeparators?.precision || 2
             }
             id={property}
-            value={resource?.line_items[index][property] as string}
+            value={resource?.line_items[index][property] || ''}
             className="auto"
             onValueChange={(value: string) => {
               onChange(

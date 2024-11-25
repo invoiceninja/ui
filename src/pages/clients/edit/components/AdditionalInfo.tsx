@@ -140,7 +140,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('payment_terms')}>
               <SelectField
                 id="settings.payment_terms"
-                defaultValue={client?.settings?.payment_terms || ''}
+                value={client?.settings?.payment_terms || ''}
                 errorMessage={errors?.errors['settings.payment_terms']}
                 onValueChange={(value) =>
                   handleSettingsChange('payment_terms', value)
@@ -150,7 +150,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
+                    <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -163,7 +163,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
                 id="settings.valid_until"
-                defaultValue={client?.settings?.valid_until || ''}
+                value={client?.settings?.valid_until || ''}
                 onValueChange={(value) =>
                   handleSettingsChange('valid_until', value)
                 }
@@ -173,7 +173,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
+                    <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -184,7 +184,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
           <Element leftSide={t('task_rate')}>
             <NumberInputField
-              value={client?.settings?.default_task_rate}
+              value={client?.settings?.default_task_rate || ''}
               onValueChange={(value) =>
                 handleSettingsChange('default_task_rate', parseFloat(value))
               }
@@ -195,7 +195,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           <Element leftSide={t('send_reminders')}>
             <SelectField
               id="settings.send_reminders"
-              defaultValue={
+              value={
                 client?.settings?.send_reminders === true
                   ? 'enabled'
                   : client?.settings?.send_reminders === false
@@ -239,7 +239,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('size_id')}>
               <SelectField
                 id="size_id"
-                defaultValue={client?.size_id || ''}
+                value={client?.size_id || ''}
                 onValueChange={(value) => handleChange('size_id', value)}
                 errorMessage={errors?.errors.size_id}
                 withBlank
@@ -260,7 +260,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('industry')}>
               <SelectField
                 id="industry_id"
-                defaultValue={client?.industry_id || ''}
+                value={client?.industry_id || ''}
                 errorMessage={errors?.errors.industry_id}
                 onValueChange={(value) => handleChange('industry_id', value)}
                 withBlank
