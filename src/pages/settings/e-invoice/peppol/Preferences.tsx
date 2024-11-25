@@ -54,7 +54,9 @@ export function Preferences() {
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             if (get(error.response.data, 'errors.acts_as_receiver.0')) {
-              toast.error(get(error.response.data, 'errors.acts_as_receiver.0'));
+              toast.error(
+                get(error.response.data, 'errors.acts_as_receiver.0')
+              );
             }
 
             return;
@@ -205,7 +207,9 @@ export function useQuota() {
     }
 
     if (quota) {
-      return quota.data?.quota ? parseInt(quota.data.quota) : null;
+      return typeof quota.data?.quota === 'number'
+        ? parseInt(quota.data.quota)
+        : null;
     }
 
     return null;
