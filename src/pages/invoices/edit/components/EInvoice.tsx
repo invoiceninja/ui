@@ -12,9 +12,15 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
 import { EInvoiceComponent } from '$app/pages/settings';
-import { Dispatch, RefObject, SetStateAction } from 'react';
+import {
+  Dispatch,
+  ReactNode,
+  RefObject,
+  SetStateAction,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import {
   EntityError,
   ValidationEntityResponse,
@@ -24,6 +30,15 @@ import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCheckCircle } from 'react-icons/md';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { toast } from '$app/common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { endpoint, trans } from '$app/common/helpers';
+import { AxiosResponse } from 'axios';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
+import { useQuery } from 'react-query';
+import reactStringReplace from 'react-string-replace';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -43,6 +58,8 @@ const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
 export default function EInvoice() {
   const [t] = useTranslation();
 
+  const location = useLocation();
+
   const context: Context = useOutletContext();
 
   const {
@@ -50,6 +67,66 @@ export default function EInvoice() {
     eInvoiceValidationEntityResponse,
     setTriggerValidationQuery,
   } = context;
+
+  const { data: activities } = useQuery({
+    queryKey: ['/api/v1/activities/entity', invoice?.id],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/activities/entity'), {
+        entity: 'invoice',
+        entity_id: invoice?.id,
+      }).then(
+        (response: AxiosResponse<GenericManyResponse<InvoiceActivity>>) =>
+          response.data.data
+      ),
+    enabled:
+      invoice !== null &&
+      location.pathname.includes('e_invoice') &&
+      Boolean(invoice?.status_id === InvoiceStatus.Sent && invoice?.backup),
+    staleTime: Infinity,
+  });
+
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  const handleRetry = () => {
+    if (!isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
+
+      request(
+        'PUT',
+        endpoint('/api/v1/invoices/:id/retry_e_send', { id: invoice?.id })
+      )
+        .then(() => {
+          $refetch(['invoices']);
+          toast.success('success');
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  const getActivityText = () => {
+    let text = trans('activity_147', {}) as unknown as ReactNode[];
+
+    const invoiceElement = (
+      <Link to={route('/invoices/:id/edit', { id: invoice?.id })}>
+        {invoice?.number}
+      </Link>
+    );
+
+    const clientElement = (
+      <Link to={route('/clients/:id', { id: invoice?.client_id })}>
+        {invoice?.client?.display_name}
+      </Link>
+    );
+
+    const notesElement = '';
+
+    text = reactStringReplace(text, `:invoice`, () => invoiceElement);
+    text = reactStringReplace(text, `:client`, () => clientElement);
+    text = reactStringReplace(text, `:notes`, () => notesElement);
+
+    return text;
+  };
 
   return (
     <>
@@ -147,6 +224,41 @@ export default function EInvoice() {
           </div>
         )}
       </Card>
+
+      {Boolean(invoice?.status_id === InvoiceStatus.Sent) && (
+        <Card title={t('backup')}>
+          <div className="flex px-6 text-sm">
+            <div className="flex items-center space-x-4 border-l-2 border-gray-500 pl-4 py-4">
+              <div className="whitespace-nowrap font-medium w-24">
+                {t(invoice?.backup ? 'guide' : 'backup')}:
+              </div>
+
+              {invoice?.backup ? (
+                <div className="flex flex-col space-y-2.5">
+                  {Object.values(JSON.parse(invoice.backup)).map(
+                    (errorMessage, index) => (
+                      <span key={index}>{errorMessage as string}</span>
+                    )
+                  )}
+
+                  {activities?.find(
+                    (activity) => activity.activity_type_id === 147
+                  ) && <div>{getActivityText()}</div>}
+                </div>
+              ) : (
+                <Button
+                  behavior="button"
+                  onClick={handleRetry}
+                  disabled={isFormBusy}
+                  disableWithoutIcon
+                >
+                  {t('retry')}
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
     </>
   );
 }
