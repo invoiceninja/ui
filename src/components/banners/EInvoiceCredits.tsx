@@ -36,7 +36,7 @@ export function EInvoiceCredits() {
     return null;
   }
 
-  if (quota === 0) {
+  if (quota !== null && quota <= 0) {
     return (
       <>
         <Dialog
