@@ -21,10 +21,15 @@ dayjs.extend(timezone);
 interface Params {
   formatOnlyTime?: boolean;
   withTimezone?: boolean;
+  formatOnlyDate?: boolean;
 }
 
 export function useDateTime(params?: Params) {
-  const { formatOnlyTime = false, withTimezone = false } = params || {};
+  const {
+    formatOnlyTime = false,
+    withTimezone = false,
+    formatOnlyDate = false,
+  } = params || {};
 
   const { timeZone: companyTimeZone } = useCompanyTimeZone();
   const { timeFormat: companyTimeFormat } = useCompanyTimeFormat();
@@ -40,16 +45,16 @@ export function useDateTime(params?: Params) {
       return '';
     }
 
-    const finalFormat = `${dateFormat || companyDateFormat} ${
+    let finalFormat = `${dateFormat || companyDateFormat} ${
       timeFormat || companyTimeFormat
     }`;
 
-    if (formatOnlyTime && typeof date === 'number') {
-      return dayjs.unix(date).format(timeFormat || companyTimeFormat);
+    if (formatOnlyDate) {
+      finalFormat = dateFormat || companyDateFormat;
     }
 
-    if (formatOnlyTime && typeof date !== 'number') {
-      return dayjs(date).format(timeFormat || companyTimeFormat);
+    if (formatOnlyTime) {
+      finalFormat = timeFormat || companyTimeFormat;
     }
 
     if (typeof date === 'number' && !withTimezone) {
