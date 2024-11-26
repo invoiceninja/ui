@@ -583,7 +583,23 @@ function DeleteCreditCard({
   );
 }
 
-export type Plan = 'free' | 'pro' | 'enterprise' | 'premium_business_plus';
+export type Plan =
+  | 'free'
+  | 'pro_plan'
+  | 'pro_plan_annual'
+  | 'enterprise_plan'
+  | 'enterprise_plan_5'
+  | 'enterprise_plan_10'
+  | 'enterprise_plan_20'
+  | 'enterprise_plan_30'
+  | 'enterprise_plan_50'
+  | 'enterprise_plan_annual'
+  | 'enterprise_plan_annual_5'
+  | 'enterprise_plan_annual_10'
+  | 'enterprise_plan_annual_20'
+  | 'enterprise_plan_annual_30'
+  | 'enterprise_plan_annual_50'
+  | 'premium_business_plan';
 
 function Popup({ visible, onClose }: PopupProps) {
   const [pricing, setPricing] = useState<'monthly' | 'annually'>('monthly');
@@ -594,8 +610,7 @@ function Popup({ visible, onClose }: PopupProps) {
 
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
-  const [enterprisePlan, setEnterprisePlan] =
-    useState<string>('enterprise_plan');
+  const [enterprisePlan, setEnterprisePlan] = useState<Plan>('enterprise_plan');
 
   useEffect(() => {
     if (changePlanVisible) {
@@ -608,15 +623,27 @@ function Popup({ visible, onClose }: PopupProps) {
 
     const plans: Plan[] = [
       'free',
-      'pro',
-      'enterprise',
-      'premium_business_plus',
+      'pro_plan',
+      'pro_plan_annual',
+      'enterprise_plan',
+      'enterprise_plan_5',
+      'enterprise_plan_10',
+      'enterprise_plan_20',
+      'enterprise_plan_30',
+      'enterprise_plan_50',
+      'enterprise_plan_annual',
+      'enterprise_plan_annual_5',
+      'enterprise_plan_annual_10',
+      'enterprise_plan_annual_20',
+      'enterprise_plan_annual_30',
+      'enterprise_plan_annual_50',
+      'premium_business_plan',
     ];
 
     const current = plans.indexOf(currentPlan);
     const target = plans.indexOf(plan);
 
-    if (current === target) {
+    if (current === target && current !== -1 && target !== -1) {
       return 'current_plan';
     }
 
@@ -734,12 +761,14 @@ function Popup({ visible, onClose }: PopupProps) {
                   className="border py-3 px-4 rounded"
                   style={{ backgroundColor: colors.$5 }}
                   onClick={() => {
-                    setTargetPlan('pro');
+                    setTargetPlan(
+                      pricing === 'monthly' ? 'pro_plan' : 'pro_plan_annual'
+                    );
                     setChangePlanVisible(true);
                   }}
-                  disabled={account.plan === 'pro'}
+                  disabled={account.plan === 'pro_plan'}
                 >
-                  {label('pro')}
+                  {label('pro_plan')}
                 </button>
               </div>
             </div>
@@ -756,9 +785,13 @@ function Popup({ visible, onClose }: PopupProps) {
                   <div>
                     <div className="flex items-end space-x-2">
                       <h2 className="text-3xl font-semibold">
-                        ${pricing === 'monthly'
+                        $
+                        {pricing === 'monthly'
                           ? get(plans, enterprisePlan)
-                          : get(plans, `${enterprisePlan.replace('plan', 'plan_annual')}`)}
+                          : get(
+                              plans,
+                              `${enterprisePlan.replace('plan', 'plan_annual')}`
+                            )}
                       </h2>
                       <span>
                         {pricing === 'monthly' ? t('per_month') : t('per_year')}
@@ -771,7 +804,7 @@ function Popup({ visible, onClose }: PopupProps) {
                   <SelectField
                     label="Plan selected"
                     value={enterprisePlan}
-                    onValueChange={setEnterprisePlan}
+                    onValueChange={(v) => setEnterprisePlan(v as Plan)}
                   >
                     <option value="enterprise_plan">1-2 users</option>
                     <option value="enterprise_plan_5">3-5 users</option>
@@ -786,12 +819,12 @@ function Popup({ visible, onClose }: PopupProps) {
                     className="border py-3 px-4 rounded"
                     style={{ backgroundColor: accentColor, color: colors.$1 }}
                     onClick={() => {
-                      setTargetPlan('enterprise');
+                      setTargetPlan(enterprisePlan);
                       setChangePlanVisible(true);
                     }}
-                    disabled={account.plan === 'enterprise'}
+                    disabled={account.plan === enterprisePlan}
                   >
-                    {label('enterprise')}
+                    {label(enterprisePlan)}
                   </button>
                 </div>
               </div>
@@ -821,12 +854,12 @@ function Popup({ visible, onClose }: PopupProps) {
                     className="border py-3 px-4 rounded"
                     style={{ backgroundColor: accentColor, color: colors.$1 }}
                     onClick={() => {
-                      setTargetPlan('premium_business_plus');
+                      setTargetPlan('premium_business_plan');
                       setChangePlanVisible(true);
                     }}
-                    disabled={account.plan === 'premium_business_plus'}
+                    disabled={account.plan === 'premium_business_plan'}
                   >
-                    {label('premium_business_plus')}
+                    {label('premium_business_plan')}
                   </button>
                 </div>
               </div>
