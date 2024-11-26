@@ -37,6 +37,7 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import collect from 'collect.js';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { get } from 'lodash';
 
 export interface CompanyGateway {
   id: number;
@@ -88,6 +89,15 @@ export function Plan2() {
     null
   );
 
+  const { data: plans } = useQuery({
+    queryKey: ['plans'],
+    queryFn: () =>
+      request('GET', endpoint('/api/account_management/plans')).then(
+        (response: AxiosResponse<string[]>) => response.data
+      ),
+    staleTime: Infinity,
+  });
+
   return (
     <div className="space-y-4">
       <Card>
@@ -111,7 +121,7 @@ export function Plan2() {
             <Plan
               title="Enterprise"
               color={accentColor}
-              price="$160"
+              price="todo"
               trial={account.trial_days_left}
               custom={false}
             />
@@ -121,7 +131,7 @@ export function Plan2() {
             <Plan
               title="Ninja Pro"
               color="#5EC16A"
-              price="$120"
+              price={get(plans, 'pro_plan_annual')!}
               trial={account.trial_days_left}
               custom={false}
             />
@@ -131,9 +141,9 @@ export function Plan2() {
             <Plan
               title="Premium Business+"
               color="#FFCB00"
-              price="Pricing? Let's talk!"
+              price="todo"
               trial={account.trial_days_left}
-              custom
+              custom={false}
             />
           ) : null}
 
@@ -266,7 +276,7 @@ function Plan({ title, color, trial, price, custom }: PlanProps) {
           <b>{price}</b>
         ) : (
           <p>
-            {trial ? 'Free trial, then' : null} <b> {price} /</b> year
+            {trial ? 'Free trial, then' : null} <b> ${price} /</b> year
           </p>
         )}
       </div>
