@@ -347,13 +347,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'last_sent_date',
       id: 'last_sent_date',
       label: t('last_sent_date'),
-      format: (value, invoice) =>
-        dateTime(
-          value,
-          '',
-          '',
-          getTimezone(getSetting(invoice.client, 'timezone_id')).timeZone
-        ),
+      format: (value) => date(value, dateFormat),
     },
     {
       column: 'last_sent_template',
