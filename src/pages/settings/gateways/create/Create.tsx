@@ -117,7 +117,7 @@ export function Create() {
       return handleGoCardless();
     }
 
-    if (isManualChange) {
+    if (isManualChange && value) {
       setTabIndex(1);
     }
   };
@@ -290,8 +290,8 @@ export function Create() {
         <Card title={t('add_gateway')}>
           <Element leftSide={t('payment_provider')}>
             <SelectField
-              onValueChange={(value) => handleChange(value, true)}
               value={gateway?.id}
+              onValueChange={(value) => handleChange(value, true)}
               errorMessage={errors?.errors.gateway_key}
               customSelector
               withBlank
