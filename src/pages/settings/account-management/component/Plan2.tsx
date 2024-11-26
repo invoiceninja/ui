@@ -390,7 +390,6 @@ interface NewCardProps {
 }
 
 function NewCreditCard({ visible, onClose }: NewCardProps) {
-  const accentColor = useAccentColor();
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const queryClient = useQueryClient();
@@ -595,6 +594,8 @@ function Popup({ visible, onClose }: PopupProps) {
 
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
+  const [enterprisePlan, setEnterprisePlan] =
+    useState<string>('enterprise_plan');
 
   useEffect(() => {
     if (changePlanVisible) {
@@ -625,6 +626,18 @@ function Popup({ visible, onClose }: PopupProps) {
 
     return 'upgrade_plan';
   }
+
+  const { data: plans } = useQuery({
+    queryKey: ['plans'],
+    queryFn: () =>
+      request('GET', endpoint('/api/account_management/plans')).then(
+        (response: AxiosResponse<string[]>) => response.data
+      ),
+    staleTime: Infinity,
+    enabled: visible,
+  });
+
+  const { t } = useTranslation();
 
   return (
     <>
@@ -669,7 +682,9 @@ function Popup({ visible, onClose }: PopupProps) {
                   <div>
                     <div className="flex items-end space-x-2">
                       <h2 className="text-3xl font-semibold">$0</h2>
-                      <span>Per year</span>
+                      <span>
+                        {pricing === 'monthly' ? t('per_month') : t('per_year')}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -700,8 +715,16 @@ function Popup({ visible, onClose }: PopupProps) {
 
                   <div>
                     <div className="flex items-end space-x-2">
-                      <h2 className="text-3xl font-semibold">$120</h2>
-                      <span>Per year</span>
+                      <h2 className="text-3xl font-semibold">
+                        $
+                        {pricing === 'monthly'
+                          ? get(plans, 'pro_plan')
+                          : get(plans, 'pro_plan_annual')}
+                      </h2>
+
+                      <span>
+                        {pricing === 'monthly' ? t('per_month') : t('per_year')}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -732,15 +755,30 @@ function Popup({ visible, onClose }: PopupProps) {
 
                   <div>
                     <div className="flex items-end space-x-2">
-                      <h2 className="text-3xl font-semibold">$160</h2>
-                      <span>Per year</span>
+                      <h2 className="text-3xl font-semibold">
+                        ${pricing === 'monthly'
+                          ? get(plans, enterprisePlan)
+                          : get(plans, `${enterprisePlan.replace('plan', 'plan_annual')}`)}
+                      </h2>
+                      <span>
+                        {pricing === 'monthly' ? t('per_month') : t('per_year')}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col space-y-3">
-                  <SelectField label="Plan selected">
-                    <option value="1">1-2 users</option>
+                  <SelectField
+                    label="Plan selected"
+                    value={enterprisePlan}
+                    onValueChange={setEnterprisePlan}
+                  >
+                    <option value="enterprise_plan">1-2 users</option>
+                    <option value="enterprise_plan_5">3-5 users</option>
+                    <option value="enterprise_plan_10">6-10 users</option>
+                    <option value="enterprise_plan_20">11-20 users</option>
+                    <option value="enterprise_plan_30">21-30 users</option>
+                    <option value="enterprise_plan_50">31-50 users</option>
                   </SelectField>
 
                   <button
