@@ -79,9 +79,7 @@ export function HelpSidebarIcons(props: Props) {
         (response) => response.data
       ),
     staleTime: Infinity,
-    enabled:
-      isSelfHosted() &&
-      !(import.meta.env.VITE_API_URL as string).includes('staging'), // Note: The staging API helped me test this functionality, but the health_check endpoint is not available on the staging API.
+    enabled: isSelfHosted(),
   });
 
   const [isContactVisible, setIsContactVisible] = useState<boolean>(false);
