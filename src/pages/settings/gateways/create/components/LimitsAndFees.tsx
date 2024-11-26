@@ -127,9 +127,11 @@ export function LimitsAndFees(props: Props) {
     >
       <Element leftSide={t('payment_type')}>
         <SelectField
+          value={currentGatewayTypeId}
           onValueChange={(value) => handlePaymentTypeChange(value)}
           errorMessage={props.errors?.errors.gatewayTypeId}
           customSelector
+          dismissable={false}
         >
           {Object.entries(props.companyGateway.fees_and_limits)
             .filter(([, entry]) => entry.is_enabled)
