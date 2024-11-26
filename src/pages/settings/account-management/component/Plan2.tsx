@@ -29,13 +29,14 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { AxiosResponse } from 'axios';
 import { Alert } from '$app/components/Alert';
 import toast from 'react-hot-toast';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import collect from 'collect.js';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export interface CompanyGateway {
   id: number;
@@ -73,6 +74,7 @@ export function Plan2() {
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [deletePopupVisible, setDeletePopupVisible] = useState(false);
+  const [createPopupVisible, setCreatePopupVisible] = useState(false);
 
   const { data: methods } = useQuery({
     queryKey: ['/api/account_management/methods', account?.id],
@@ -88,10 +90,6 @@ export function Plan2() {
 
   return (
     <div className="space-y-4">
-      {import.meta.env.DEV ? (
-        <span>DEBUG: Current plan: {account.plan}</span>
-      ) : null}
-
       <Card>
         <div className="px-7 py-3 space-y-4">
           <div className="flex justify-between items-center">
@@ -107,11 +105,37 @@ export function Plan2() {
             </button>
           </div>
 
-          <Free />
-          <Trial />
-          <Pro />
-          <Enterprise />
-          <PremiumBusinessPlus />
+          {account.plan === '' ? <Free /> : null}
+
+          {account.plan === 'enterprise' ? (
+            <Plan
+              title="Enterprise"
+              color={accentColor}
+              price="$160"
+              trial={account.trial_days_left}
+              custom={false}
+            />
+          ) : null}
+
+          {account.plan === 'pro' ? (
+            <Plan
+              title="Ninja Pro"
+              color="#5EC16A"
+              price="$120"
+              trial={account.trial_days_left}
+              custom={false}
+            />
+          ) : null}
+
+          {account.plan === 'premium_business_plus' ? (
+            <Plan
+              title="Premium Business+"
+              color="#FFCB00"
+              price="Pricing? Let's talk!"
+              trial={account.trial_days_left}
+              custom
+            />
+          ) : null}
 
           <div
             className="rounded p-4 flex flex-col 2xl:flex-row justify-between items-center space-y-5 2xl:space-y-0"
@@ -151,10 +175,35 @@ export function Plan2() {
         <div className="px-7 py-3 space-y-4">
           <div className="flex justify-between items-center">
             <h4 className="text-lg font-semibold">Payment method</h4>
-            <NewCreditCard />
+
+            <button
+              type="button"
+              style={{ color: accentColor }}
+              className="text-sm hover:underline flex items-center space-x-1"
+              onClick={() => setCreatePopupVisible(true)}
+            >
+              <Plus size={18} /> <span>Add new card</span>
+            </button>
+
+            <NewCreditCard
+              visible={createPopupVisible}
+              onClose={() => setCreatePopupVisible(false)}
+            />
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              className="flex items-center flex-col w-full lg:w-72 p-8 rounded border"
+              style={{ borderColor: colors.$11.toString() }}
+              onClick={() => setCreatePopupVisible(true)}
+            >
+              <div className="flex flex-col items-center justify-center space-y-3">
+                <Plus size={48} />
+                <p>Add new card</p>
+              </div>
+            </button>
+
             {methods?.map((method) => (
               <CreditCard
                 key={method.id}
@@ -183,6 +232,71 @@ export function Plan2() {
   );
 }
 
+interface PlanProps {
+  title: string;
+  color: string;
+  trial: boolean;
+  price: string;
+  custom: boolean;
+}
+
+function Plan({ title, color, trial, price, custom }: PlanProps) {
+  const scheme = useColorScheme();
+  const account = useCurrentAccount();
+
+  const width = () => {
+    const percentage = (account.trial_days_left / 14) * 100;
+
+    return Math.min(Math.max(percentage, 0), 100) + '%';
+  };
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  return (
+    <div
+      className="border border-l-8 rounded p-4 flex flex-col space-y-4"
+      style={{ borderColor: color }}
+    >
+      <div className="flex justify-between items-center">
+        <p className="font-semibold">{title}</p>
+
+        {custom ? (
+          <b>{price}</b>
+        ) : (
+          <p>
+            {trial ? 'Free trial, then' : null} <b> {price} /</b> year
+          </p>
+        )}
+      </div>
+
+      {trial ? (
+        <div className="flex justify-between items-center">
+          <p>{account.trial_days_left} days left</p>
+          <p>14 days trial</p>
+        </div>
+      ) : (
+        <div className="flex justify-between items-center">
+          <p>
+            Expires on <b>{date(account.plan_expires, dateFormat)}</b>
+          </p>
+        </div>
+      )}
+
+      {trial ? (
+        <div
+          className="w-full rounded-full h-2.5"
+          style={{ backgroundColor: scheme.$2 }}
+        >
+          <div
+            className="h-2.5 rounded-full"
+            style={{ width: width(), background: color }}
+          ></div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function Free() {
   return (
     <div className="border rounded p-4 flex justify-between items-center">
@@ -191,112 +305,6 @@ function Free() {
       <p>
         <b>$0 /</b> year
       </p>
-    </div>
-  );
-}
-
-function Trial() {
-  const accentColor = useAccentColor();
-  const scheme = useColorScheme();
-
-  return (
-    <div
-      className="border border-l-8 rounded p-4 flex flex-col space-y-4"
-      style={{ borderColor: accentColor }}
-    >
-      <div className="flex justify-between items-center">
-        <p className="font-semibold">Enterprise</p>
-
-        <p>
-          Free trial, then<b> $160 /</b> year
-        </p>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <p>13 days left</p>
-        <p>14 days trial</p>
-      </div>
-
-      <div
-        className="w-full rounded-full h-2.5"
-        style={{ backgroundColor: scheme.$2 }}
-      >
-        <div
-          className="h-2.5 rounded-full"
-          style={{ width: '90%', background: accentColor }}
-        ></div>
-      </div>
-    </div>
-  );
-}
-
-function Enterprise() {
-  const accentColor = useAccentColor();
-
-  return (
-    <div
-      className="border border-l-8 rounded p-4 flex flex-col space-y-4"
-      style={{ borderColor: accentColor }}
-    >
-      <div className="flex justify-between items-center">
-        <p className="font-semibold">Enterprise</p>
-
-        <p>
-          <b>$160 /</b> year
-        </p>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <p>
-          Expires on <b>31-Dec-2025</b>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function Pro() {
-  return (
-    <div
-      className="border border-l-8 rounded p-4 flex flex-col space-y-4"
-      style={{ borderColor: '#5EC16A' }}
-    >
-      <div className="flex justify-between items-center">
-        <p className="font-semibold">Ninja Pro</p>
-
-        <p>
-          <b>$120 /</b> year
-        </p>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <p>
-          Expires on <b>31-Dec-2025</b>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function PremiumBusinessPlus() {
-  return (
-    <div
-      className="border border-l-8 rounded p-4 flex flex-col space-y-4"
-      style={{ borderColor: '#FFCB00' }}
-    >
-      <div className="flex justify-between items-center">
-        <p className="font-semibold">Premium Business+</p>
-
-        <p>
-          <b>$160 /</b> year
-        </p>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <p>
-          Expires on <b>31-Dec-2025</b>
-        </p>
-      </div>
     </div>
   );
 }
@@ -322,7 +330,7 @@ function CreditCard({ gateway, onDelete }: CreditCardProps) {
 
   return (
     <div
-      className="flex flex-col w-72 p-4 rounded border"
+      className="flex flex-col w-full lg:w-72 p-4 rounded border"
       style={{ borderColor: gateway.is_default ? accentColor : colors.$11 }}
     >
       <div className="flex justify-between items-center">
@@ -364,7 +372,12 @@ interface Intent {
   client_secret: string;
 }
 
-function NewCreditCard() {
+interface NewCardProps {
+  visible: boolean;
+  onClose: () => void;
+}
+
+function NewCreditCard({ visible, onClose }: NewCardProps) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
   const company = useCurrentCompany();
@@ -374,7 +387,6 @@ function NewCreditCard() {
   const { t } = useTranslation();
 
   const [name, setName] = useState<string>('');
-  const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [intent, setIntent] = useState<{
@@ -389,7 +401,7 @@ function NewCreditCard() {
   } | null>(null);
 
   useEffect(() => {
-    if (isVisible) {
+    if (visible) {
       wait('#card-element').then(() => {
         loadStripe(import.meta.env.VITE_HOSTED_STRIPE_PK).then((stripe) => {
           if (!stripe) {
@@ -417,7 +429,7 @@ function NewCreditCard() {
       });
     }
 
-    if (!isVisible) {
+    if (!visible) {
       queryClient.removeQueries({
         queryKey: ['account_management', 'intent', company?.id],
       });
@@ -426,7 +438,7 @@ function NewCreditCard() {
         queryKey: ['/api/account_management/methods'],
       });
     }
-  }, [isVisible]);
+  }, [visible]);
 
   const handleSubmit = () => {
     if (!context || !intent) {
@@ -461,7 +473,7 @@ function NewCreditCard() {
             toast.success(t('payment_method_added'));
 
             setIsSubmitting(false);
-            setIsVisible(false);
+            onClose();
           });
         }
       })
@@ -471,51 +483,32 @@ function NewCreditCard() {
   };
 
   return (
-    <>
-      <button
-        type="button"
-        style={{ color: accentColor }}
-        className="text-sm hover:underline flex items-center space-x-1"
-        onClick={() => setIsVisible(true)}
-      >
-        <Plus size={18} /> <span>Add new card</span>
-      </button>
+    <Modal visible={visible} onClose={onClose} title="Add new card">
+      {errors && <Alert type="danger">{errors}</Alert>}
 
-      <Modal
-        visible={isVisible}
-        onClose={() => setIsVisible(false)}
-        title="Add new card"
-      >
-        {errors && <Alert type="danger">{errors}</Alert>}
+      <InputField label={t('name')} onValueChange={setName} />
 
-        <InputField label={t('name')} onValueChange={setName} />
+      <div
+        id="card-element"
+        className="border p-4 rounded"
+        style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+      ></div>
 
-        <div
-          id="card-element"
-          className="border p-4 rounded"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
-        ></div>
+      <div className="flex justify-end gap-2">
+        <Button type="secondary" behavior="button" onClick={onClose}>
+          Cancel
+        </Button>
 
-        <div className="flex justify-end gap-2">
-          <Button
-            type="secondary"
-            behavior="button"
-            onClick={() => setIsVisible(false)}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            type="primary"
-            behavior="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            Save card
-          </Button>
-        </div>
-      </Modal>
-    </>
+        <Button
+          type="primary"
+          behavior="button"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
+          Save card
+        </Button>
+      </div>
+    </Modal>
   );
 }
 
@@ -581,7 +574,7 @@ function DeleteCreditCard({
 
 export type Plan =
   | 'free'
-  | 'ninja_pro'
+  | 'pro'
   | 'enterprise'
   | 'premium_business_plus';
 
@@ -603,9 +596,10 @@ function Popup({ visible, onClose }: PopupProps) {
 
   function label(plan: Plan) {
     const currentPlan = account.plan as Plan;
+
     const plans: Plan[] = [
       'free',
-      'ninja_pro',
+      'pro',
       'enterprise',
       'premium_business_plus',
     ];
@@ -680,6 +674,7 @@ function Popup({ visible, onClose }: PopupProps) {
                     setTargetPlan('free');
                     setChangePlanVisible(true);
                   }}
+                  disabled={account.plan === ''}
                 >
                   {label('free')}
                 </button>
@@ -708,11 +703,12 @@ function Popup({ visible, onClose }: PopupProps) {
                   className="border py-3 px-4 rounded"
                   style={{ backgroundColor: colors.$5 }}
                   onClick={() => {
-                    setTargetPlan('ninja_pro');
+                    setTargetPlan('pro');
                     setChangePlanVisible(true);
                   }}
+                  disabled={account.plan === 'pro'}
                 >
-                  {label('ninja_pro')}
+                  {label('pro')}
                 </button>
               </div>
             </div>
@@ -747,6 +743,7 @@ function Popup({ visible, onClose }: PopupProps) {
                       setTargetPlan('enterprise');
                       setChangePlanVisible(true);
                     }}
+                    disabled={account.plan === 'enterprise'}
                   >
                     {label('enterprise')}
                   </button>
@@ -781,6 +778,7 @@ function Popup({ visible, onClose }: PopupProps) {
                       setTargetPlan('premium_business_plus');
                       setChangePlanVisible(true);
                     }}
+                    disabled={account.plan === 'premium_business_plus'}
                   >
                     {label('premium_business_plus')}
                   </button>
