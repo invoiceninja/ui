@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Timezone } from '../interfaces/statics';
 import { useStaticsQuery } from '../queries/statics';
 
 export function useGetTimezone() {
@@ -16,7 +17,7 @@ export function useGetTimezone() {
   return (timeZoneId: string | undefined) => {
     if (statics?.timezones && timeZoneId) {
       const result = statics.timezones.find(
-        (format: any) => format.id === timeZoneId
+        (currentTimeZone: Timezone) => currentTimeZone.id === timeZoneId
       );
 
       if (result) {
@@ -28,8 +29,8 @@ export function useGetTimezone() {
     }
 
     return {
-      timeZoneId: '1',
-      timeZone: 'America/Tijuana',
+      timeZoneId: '32',
+      timeZone: 'Europe/Lisbon',
     };
   };
 }
