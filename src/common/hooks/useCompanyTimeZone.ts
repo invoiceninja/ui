@@ -24,8 +24,8 @@ export function useCompanyTimeZone() {
   useEffect(() => {
     if (statics?.timezones) {
       const result = statics.timezones.find(
-        (currentTimeZone: Timezone) =>
-          currentTimeZone.id === company?.settings?.timezone_id ?? '1'
+        (currentTimezone: Timezone) =>
+          currentTimezone.id === company?.settings?.timezone_id ?? '1'
       );
 
       if (result) {

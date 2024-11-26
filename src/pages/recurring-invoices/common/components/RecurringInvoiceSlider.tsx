@@ -52,6 +52,8 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -117,11 +119,13 @@ export const RecurringInvoiceSlider = () => {
 
   const colors = useColorScheme();
 
-  const dateTime = useDateTime();
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
+  const dateTime = useDateTime({ withTimezone: true });
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -217,7 +221,14 @@ export const RecurringInvoiceSlider = () => {
             {recurringInvoice && recurringInvoice.next_send_date ? (
               <Element leftSide={t('next_send_date')}>
                 {recurringInvoice
-                  ? dateTime(recurringInvoice.next_send_datetime)
+                  ? dateTime(
+                      recurringInvoice.next_send_datetime,
+                      '',
+                      '',
+                      getTimezone(
+                        getSetting(recurringInvoice.client, 'timezone_id')
+                      ).timeZone
+                    )
                   : null}
               </Element>
             ) : null}
