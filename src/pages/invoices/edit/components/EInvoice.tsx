@@ -39,6 +39,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { useQuery } from 'react-query';
 import reactStringReplace from 'react-string-replace';
+import { useColorScheme } from '$app/common/colors';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -59,6 +60,7 @@ export default function EInvoice() {
   const [t] = useTranslation();
 
   const location = useLocation();
+  const colors = useColorScheme();
 
   const context: Context = useOutletContext();
 
@@ -228,22 +230,39 @@ export default function EInvoice() {
       {Boolean(invoice?.status_id === InvoiceStatus.Sent) && (
         <Card title={t('backup')}>
           <div className="flex px-6 text-sm">
-            <div className="flex items-center space-x-4 border-l-2 border-gray-500 pl-4 py-4">
-              <div className="whitespace-nowrap font-medium w-24">
-                {t(invoice?.backup ? 'guide' : 'backup')}:
-              </div>
+            <div
+              className="flex items-center space-x-4 border-l-2 pl-4 py-4"
+              style={{
+                borderColor: colors.$5,
+              }}
+            >
+              {!invoice?.backup && (
+                <div className="whitespace-nowrap font-medium w-24">
+                  {t('backup')}:
+                </div>
+              )}
 
               {invoice?.backup ? (
                 <div className="flex flex-col space-y-2.5">
-                  {Object.values(JSON.parse(invoice.backup)).map(
-                    (errorMessage, index) => (
-                      <span key={index}>{errorMessage as string}</span>
+                  {Object.entries(JSON.parse(invoice.backup)).map(
+                    ([key, value], index) => (
+                      <div key={index} className="flex items-center space-x-4">
+                        <span className="font-medium">{t(key)}:</span>
+
+                        <span>{value as string}</span>
+                      </div>
                     )
                   )}
 
                   {activities?.find(
                     (activity) => activity.activity_type_id === 147
-                  ) && <div>{getActivityText()}</div>}
+                  ) && (
+                    <div className="flex items-center space-x-4">
+                      <span className="font-medium">{t('error')}:</span>
+
+                      <div>{getActivityText()}</div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Button
