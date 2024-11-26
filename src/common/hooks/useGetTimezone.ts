@@ -17,7 +17,7 @@ export function useGetTimezone() {
   return (timeZoneId: string | undefined) => {
     if (statics?.timezones && timeZoneId) {
       const result = statics.timezones.find(
-        (currentTimeZone: Timezone) => currentTimeZone.id === timeZoneId
+        (currentTimezone: Timezone) => currentTimezone.id === timeZoneId
       );
 
       if (result) {

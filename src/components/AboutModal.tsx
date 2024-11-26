@@ -32,11 +32,9 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
-import { useQuery } from 'react-query';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
-import axios from 'axios';
 
 interface SystemInfo {
   system_health: boolean;
@@ -69,6 +67,8 @@ interface SystemInfo {
 interface Props {
   isAboutVisible: boolean;
   setIsAboutVisible: Dispatch<SetStateAction<boolean>>;
+  currentSystemInfo: SystemInfo | undefined;
+  latestVersion: string | undefined;
 }
 
 const Div = styled.div`
@@ -84,7 +84,12 @@ export function AboutModal(props: Props) {
 
   const colors = useColorScheme();
 
-  const { isAboutVisible, setIsAboutVisible } = props;
+  const {
+    isAboutVisible,
+    setIsAboutVisible,
+    currentSystemInfo,
+    latestVersion,
+  } = props;
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
@@ -98,28 +103,9 @@ export function AboutModal(props: Props) {
   const [isUpgradeLoadingModalOpen, setIsUpgradeLoadingModalOpen] =
     useState<boolean>(false);
 
-  const [systemInfo, setSystemInfo] = useState<SystemInfo>();
-
-  const { data: latestVersion } = useQuery({
-    queryKey: ['/pdf.invoicing.co/api/version'],
-    queryFn: () =>
-      axios
-        .get('https://pdf.invoicing.co/api/version')
-        .then((response) => response.data),
-    staleTime: Infinity,
-  });
-
-  const { data: currentSystemInfo } = useQuery({
-    queryKey: ['/api/v1/health_check'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/health_check')).then(
-        (response) => response.data
-      ),
-    staleTime: Infinity,
-    enabled:
-      isSelfHosted() &&
-      !(import.meta.env.VITE_API_URL as string).includes('staging'), // Note: The staging API helped me test this functionality, but the health_check endpoint is not available on the staging API.
-  });
+  const [systemInfo, setSystemInfo] = useState<SystemInfo | undefined>(
+    currentSystemInfo
+  );
 
   const handleHealthCheck = (allowAction?: boolean) => {
     if (!isFormBusy || allowAction) {
