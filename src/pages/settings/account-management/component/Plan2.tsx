@@ -192,17 +192,19 @@ export function Plan2() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              className="flex items-center flex-col w-full lg:w-72 p-8 rounded border"
-              style={{ borderColor: colors.$11.toString() }}
-              onClick={() => setCreatePopupVisible(true)}
-            >
-              <div className="flex flex-col items-center justify-center space-y-3">
-                <Plus size={48} />
-                <p>Add new card</p>
-              </div>
-            </button>
+            {methods?.length === 0 ? (
+              <button
+                type="button"
+                className="flex items-center flex-col w-full lg:w-72 p-8 rounded border"
+                style={{ borderColor: colors.$11.toString() }}
+                onClick={() => setCreatePopupVisible(true)}
+              >
+                <div className="flex flex-col items-center justify-center space-y-3">
+                  <Plus size={48} />
+                  <p>Add new card</p>
+                </div>
+              </button>
+            ) : null}
 
             {methods?.map((method) => (
               <CreditCard
@@ -572,11 +574,7 @@ function DeleteCreditCard({
   );
 }
 
-export type Plan =
-  | 'free'
-  | 'pro'
-  | 'enterprise'
-  | 'premium_business_plus';
+export type Plan = 'free' | 'pro' | 'enterprise' | 'premium_business_plus';
 
 function Popup({ visible, onClose }: PopupProps) {
   const [pricing, setPricing] = useState<'monthly' | 'annually'>('monthly');
