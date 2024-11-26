@@ -106,7 +106,7 @@ export function useResolveInputField(
     if (typeof value === 'object') {
       return (
         <SelectField
-          value={resolveConfigValue(property)}
+          value={resolveConfigValue(property)?.toString()}
           onValueChange={(value) =>
             handleChange(property as keyof Field, value)
           }
@@ -114,7 +114,7 @@ export function useResolveInputField(
           customSelector
         >
           {value.map((option, index) => (
-            <option key={index} value={option}>
+            <option key={index} value={option?.toString()}>
               {option}
             </option>
           ))}
