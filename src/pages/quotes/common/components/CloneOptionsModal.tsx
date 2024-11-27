@@ -31,14 +31,14 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   quote: Quote;
-  dropdown?: boolean;
+  dropdown: boolean;
 }
 
 export function CloneOptionsModal(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const { quote, dropdown = false } = props;
+  const { quote, dropdown } = props;
 
   const hasPermission = useHasPermission();
 
