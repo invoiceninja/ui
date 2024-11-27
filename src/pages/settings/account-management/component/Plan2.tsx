@@ -38,6 +38,12 @@ import collect from 'collect.js';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { get } from 'lodash';
+import {
+  FaCheck,
+  FaCheckCircle,
+  FaCheckDouble,
+  FaCheckSquare,
+} from 'react-icons/fa';
 
 export interface CompanyGateway {
   id: number;
@@ -658,7 +664,12 @@ function Popup({ visible, onClose }: PopupProps) {
     queryKey: ['plans'],
     queryFn: () =>
       request('GET', endpoint('/api/account_management/plans')).then(
-        (response: AxiosResponse<string[]>) => response.data
+        (
+          response: AxiosResponse<{
+            plans: string[];
+            features: Record<Plan, string[]>;
+          }>
+        ) => response.data
       ),
     staleTime: Infinity,
     enabled: visible,
@@ -729,6 +740,26 @@ function Popup({ visible, onClose }: PopupProps) {
                   {label('free')}
                 </button>
               </div>
+
+              <div
+                className="w-full p-[0.1px] my-5"
+                style={{ backgroundColor: colors.$5 }}
+              ></div>
+
+              <p className="font-semibold uppercase">Free plan includes</p>
+
+              <div className="my-3 space-y-3">
+                {plans?.features.free.map((feature, i) => (
+                  <div key={`free-${i}`} className="flex items-center gap-3">
+                    <FaCheckCircle
+                      color={accentColor}
+                      size={14}
+                      className="flex-shrink-0"
+                    />
+                    <p>{feature}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div
@@ -745,8 +776,8 @@ function Popup({ visible, onClose }: PopupProps) {
                       <h2 className="text-3xl font-semibold">
                         $
                         {pricing === 'monthly'
-                          ? get(plans, 'pro_plan')
-                          : get(plans, 'pro_plan_annual')}
+                          ? get(plans?.plans, 'pro_plan')
+                          : get(plans?.plans, 'pro_plan_annual')}
                       </h2>
 
                       <span>
@@ -771,6 +802,26 @@ function Popup({ visible, onClose }: PopupProps) {
                   {label('pro_plan')}
                 </button>
               </div>
+
+              <div
+                className="w-full p-[0.1px] my-5"
+                style={{ backgroundColor: colors.$5 }}
+              ></div>
+
+              <p className="font-semibold uppercase">All free features +</p>
+
+              <div className="my-3 space-y-3">
+                {plans?.features.pro_plan.map((feature, i) => (
+                  <div key={`pro-${i}`} className="flex items-center gap-3">
+                    <FaCheck
+                      color={accentColor}
+                      size={14}
+                      className="flex-shrink-0"
+                    />
+                    <p>{feature}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div
@@ -787,9 +838,9 @@ function Popup({ visible, onClose }: PopupProps) {
                       <h2 className="text-3xl font-semibold">
                         $
                         {pricing === 'monthly'
-                          ? get(plans, enterprisePlan)
+                          ? get(plans?.plans, enterprisePlan)
                           : get(
-                              plans,
+                              plans?.plans,
                               `${enterprisePlan.replace('plan', 'plan_annual')}`
                             )}
                       </h2>
@@ -828,6 +879,29 @@ function Popup({ visible, onClose }: PopupProps) {
                   </button>
                 </div>
               </div>
+
+              <div
+                className="w-full p-[0.1px] my-5"
+                style={{ backgroundColor: colors.$5 }}
+              ></div>
+
+              <p className="font-semibold uppercase">All pro features +</p>
+
+              <div className="my-3 space-y-3">
+                {plans?.features.enterprise_plan.map((feature, i) => (
+                  <div
+                    key={`enterprise-${i}`}
+                    className="flex items-center gap-3"
+                  >
+                    <FaCheckDouble
+                      color={accentColor}
+                      size={14}
+                      className="flex-shrink-0"
+                    />
+                    <p>{feature}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div
@@ -860,6 +934,29 @@ function Popup({ visible, onClose }: PopupProps) {
                     Contact us!
                   </a>
                 </div>
+              </div>
+
+              <div
+                className="w-full p-[0.1px] my-5"
+                style={{ backgroundColor: colors.$5 }}
+              ></div>
+
+              <p className="font-semibold uppercase">All features +</p>
+
+              <div className="my-3 space-y-3">
+                {plans?.features.premium_business_plan.map((feature, i) => (
+                  <div
+                    key={`premium_business-${i}`}
+                    className="flex items-center gap-3"
+                  >
+                    <FaCheckSquare
+                      color={accentColor}
+                      size={14}
+                      className="flex-shrink-0"
+                    />
+                    <p>{feature}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
