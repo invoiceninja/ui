@@ -32,7 +32,6 @@ import { request } from '$app/common/helpers/request';
 import { date, endpoint } from '$app/common/helpers';
 import { AxiosResponse } from 'axios';
 import { Alert } from '$app/components/Alert';
-import toast from 'react-hot-toast';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import collect from 'collect.js';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
@@ -44,6 +43,9 @@ import {
   FaCheckDouble,
   FaCheckSquare,
 } from 'react-icons/fa';
+import { Badge } from '$app/components/Badge';
+import { useFormik } from 'formik';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export interface CompanyGateway {
   id: number;
@@ -335,6 +337,8 @@ interface CreditCardProps {
 function CreditCard({ gateway, onDelete }: CreditCardProps) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
+  const account = useCurrentAccount();
+  const queryClient = useQueryClient();
 
   const image = () => {
     if (gateway.meta.brand === 'visa') {
@@ -346,37 +350,104 @@ function CreditCard({ gateway, onDelete }: CreditCardProps) {
     }
   };
 
+  const { t } = useTranslation();
+
+  const [defaultPopupVisible, setDefaultPopupVisible] = useState(false);
+
+  const form = useFormik({
+    initialValues: {},
+    onSubmit: (_, { setSubmitting }) => {
+      toast.processing();
+
+      request(
+        'POST',
+        endpoint(`/api/account_management/methods/${gateway.id}/default`),
+        {
+          account_key: account.key,
+        }
+      )
+        .then(() => {
+          toast.success();
+
+          queryClient.invalidateQueries({
+            queryKey: ['/api/account_management/methods', account?.id],
+          });
+
+          setDefaultPopupVisible(false);
+        })
+        .finally(() => setSubmitting(false));
+    },
+  });
+
   return (
-    <div
-      className="flex flex-col w-full lg:w-72 p-4 rounded border"
-      style={{ borderColor: gateway.is_default ? accentColor : colors.$11 }}
-    >
-      <div className="flex justify-between items-center">
-        <img src={image()} alt={gateway.meta.brand} className="h-10" />
+    <>
+      <Modal
+        title={t('default_payment_method_label')}
+        visible={defaultPopupVisible}
+        onClose={() => setDefaultPopupVisible(false)}
+      >
+        <p>{t('default_payment_method')}</p>
 
-        <button
-          type="button"
-          className="bg-white p-1 rounded-full cursor-pointer"
-          onClick={onDelete}
-        >
-          <Trash2 size={18} />
-        </button>
-      </div>
+        <div className="flex justify-end gap-2">
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={() => setDefaultPopupVisible(false)}
+          >
+            {t('cancel')}
+          </Button>
 
-      <div className="space-x-1 flex items-center my-4 font-bold">
-        <span>****</span>
-        <span>****</span>
-        <span>****</span>
-        <span>{gateway.meta.last4}</span>
-      </div>
+          <form onSubmit={form.handleSubmit}>
+            <Button type="primary">{t('continue')}</Button>
+          </form>
+        </div>
+      </Modal>
 
-      <div className="flex items-center justify-between text-sm">
-        <p>Valid through</p>
-        <p>
-          {gateway.meta.exp_month}/{gateway.meta.exp_year}
-        </p>
+      <div
+        className="flex flex-col w-full lg:w-72 p-4 rounded border"
+        style={{ borderColor: gateway.is_default ? accentColor : colors.$11 }}
+      >
+        <div className="flex justify-between items-center">
+          <img src={image()} alt={gateway.meta.brand} className="h-10" />
+
+          <div className="flex items-center gap-2">
+            {gateway.is_default ? (
+              <Badge variant="primary">Default</Badge>
+            ) : (
+              <button
+                type="button"
+                className="bg-white p-1 rounded-full cursor-pointer"
+                onClick={() => setDefaultPopupVisible(true)}
+              >
+                <Check size={18} />
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="bg-white p-1 rounded-full cursor-pointer"
+              onClick={onDelete}
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-x-1 flex items-center my-4 font-bold">
+          <span>****</span>
+          <span>****</span>
+          <span>****</span>
+          <span>{gateway.meta.last4}</span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <p>Valid through</p>
+          <p>
+            {gateway.meta.exp_month}/{gateway.meta.exp_year}
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -487,7 +558,7 @@ function NewCreditCard({ visible, onClose }: NewCardProps) {
             account_key: account.key,
             gateway_response: result.setupIntent,
           }).then(() => {
-            toast.success(t('payment_method_added'));
+            toast.success(t('payment_method_added')!);
 
             setIsSubmitting(false);
             onClose();
@@ -556,7 +627,7 @@ function DeleteCreditCard({
         account_key: account.key,
       }
     ).then(() => {
-      toast.success(t('payment_method_removed'));
+      toast.success(t('payment_method_removed')!);
 
       queryClient.invalidateQueries({
         queryKey: ['/api/account_management/methods', account?.id],
@@ -1001,7 +1072,7 @@ function ChangePlan({ plan }: ChangePlanProps) {
       plan,
       token,
     }).then(() => {
-      toast.success(t('plan_changed'));
+      toast.success(t('plan_changed')!);
 
       queryClient.invalidateQueries({
         queryKey: ['/api/account_management/methods', account?.id],
