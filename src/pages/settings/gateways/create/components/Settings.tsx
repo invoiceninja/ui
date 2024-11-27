@@ -106,6 +106,8 @@ export function Settings(props: Props) {
             value={props.companyGateway.token_billing || 'off'}
             onValueChange={(value) => handleChange('token_billing', value)}
             errorMessage={props.errors?.errors.token_billing}
+            customSelector
+            dismissable={false}
           >
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('auto_bill_help_optout')}</option>
