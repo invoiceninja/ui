@@ -849,18 +849,16 @@ function Popup({ visible, onClose }: PopupProps) {
                 </div>
 
                 <div className="flex flex-col space-y-3">
-                  <button
+                  <a
+                    href="mailto:concierge@invoiceninja.com"
                     type="button"
-                    className="border py-3 px-4 rounded"
+                    className="border py-3 px-4 rounded text-center"
                     style={{ backgroundColor: accentColor, color: colors.$1 }}
-                    onClick={() => {
-                      setTargetPlan('premium_business_plan');
-                      setChangePlanVisible(true);
-                    }}
-                    disabled={account.plan === 'premium_business_plan'}
+                    target="_blank"
+                    rel="noreferrer"
                   >
-                    {label('premium_business_plan')}
-                  </button>
+                    Contact us!
+                  </a>
                 </div>
               </div>
             </div>
