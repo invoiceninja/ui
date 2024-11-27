@@ -32,6 +32,9 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -118,14 +121,19 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const invoiceColumns = useAllInvoiceColumns();
   type InvoiceColumns = (typeof invoiceColumns)[number];
 
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
+  const reactSettings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
 
   const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
-  const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
@@ -351,7 +359,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'next_send_date',
       id: 'next_send_date',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value, invoice) =>
+        dateTime(
+          value,
+          '',
+          '',
+          getTimezone(getSetting(invoice.client, 'timezone_id')).timeZone
+        ),
     },
     {
       column: 'partial_due',
