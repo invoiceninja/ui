@@ -67,6 +67,7 @@ export function useAllCommonActions() {
       { value: 'schedule', label: t('schedule') },
       { value: 'add_comment', label: t('add_comment') },
       { value: 'client_portal', label: t('client_portal') },
+      { value: 'download_e_quote', label: t('download_e_quote') },
       { value: 'approve', label: t('approve') },
       { value: 'run_template', label: t('run_template') },
       { value: 'clone_to_quote', label: t('clone_to_quote') },
