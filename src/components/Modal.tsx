@@ -132,7 +132,7 @@ export function Modal(props: Props) {
                   colorScheme: colors.$0,
                 }}
               >
-                <div className="flex w-full justify-between">
+                <div className="flex w-full justify-between isolate">
                   <Dialog.Title
                     as="h3"
                     className="text-lg leading-6 font-medium"
