@@ -341,7 +341,7 @@ export function useActions(params?: Params) {
   const {
     showCommonBulkAction,
     showEditAction,
-    dropdown = false,
+    dropdown = true,
   } = params || {};
 
   const setQuote = useSetAtom(quoteAtom);
@@ -601,8 +601,12 @@ export function useActions(params?: Params) {
       !quote.project_id &&
       hasPermission('create_project') && (
         <ConvertToProjectBulkAction
+          {...(!dropdown && {
+            key: 'convert_to_project',
+          })}
           selectedIds={[quote.id]}
           disablePreventNavigation
+          dropdown={dropdown}
         />
       ),
     (quote) => (

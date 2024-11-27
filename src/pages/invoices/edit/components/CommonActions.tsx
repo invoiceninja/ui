@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip } from '$app/components/Tooltip';
 import { Credit } from '$app/common/interfaces/credit';
 import { useActions as useCreditActions } from '$app/pages/credits/common/hooks';
+import { useActions as useQuoteActions } from '$app/pages/quotes/common/hooks';
 import { Quote } from '$app/common/interfaces/quote';
 
 type Resource = Invoice | Credit | Quote;
@@ -37,6 +38,7 @@ export function CommonActions(props: Props) {
   const user = useCurrentUser();
   const invoiceActions = useInvoiceActions({ dropdown: false });
   const creditActions = useCreditActions({ dropdown: false });
+  const quoteActions = useQuoteActions({ dropdown: false });
 
   const { resource, entity } = props;
 
@@ -55,6 +57,12 @@ export function CommonActions(props: Props) {
 
     if (entity === 'credit') {
       return creditActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    if (entity === 'quote') {
+      return quoteActions.filter(
         (action) => typeof action === 'function'
       ) as ResourceAction<Resource>[];
     }
