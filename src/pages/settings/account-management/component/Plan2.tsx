@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import Toggle from '$app/components/forms/Toggle';
 import {
   loadStripe,
+  SetupIntent,
   Stripe,
   StripeCardElement,
   StripeElements,
@@ -46,6 +47,7 @@ import {
 import { Badge } from '$app/components/Badge';
 import { useFormik } from 'formik';
 import { toast } from '$app/common/helpers/toast/toast';
+import gatewayType from '$app/common/constants/gateway-type';
 
 export interface CompanyGateway {
   id: number;
@@ -1047,6 +1049,7 @@ function ChangePlan({ plan }: ChangePlanProps) {
   const account = useCurrentAccount();
   const queryClient = useQueryClient();
   const refresh = useRefreshCompanyUsers();
+  const colors = useColorScheme();
 
   const { data: methods } = useQuery({
     queryKey: ['/api/account_management/methods', account?.id],
@@ -1062,50 +1065,171 @@ function ChangePlan({ plan }: ChangePlanProps) {
       title: `**** ${method.meta.last4}`,
       value: method.id.toString(),
     }))
-    .toArray();
-
-  const [token, setToken] = useState<string>('true');
-
-  const changePlan = () => {
-    request('POST', endpoint('/api/account_management/upgrade'), {
-      account_key: account.key,
-      plan,
-      token,
-    }).then(() => {
-      toast.success(t('plan_changed')!);
-
-      queryClient.invalidateQueries({
-        queryKey: ['/api/account_management/methods', account?.id],
-      });
-
-      refresh();
+    .push({
+      id: 'card-new',
+      title: 'New card',
+      value: '',
     });
-  };
+
+  const [token, setToken] = useState<string>(() => {
+    if (list.first().value !== '') {
+      return list.first().value;
+    }
+
+    return '';
+  });
+
+  const [name, setName] = useState('');
+  const [errors, setErrors] = useState<string | null>(null);
+  const [gatewayResponse, setGatewayResponse] = useState<SetupIntent | null>(
+    null
+  );
+
+  const [intent, setIntent] = useState<{
+    intent: string;
+    secret: string;
+  } | null>(null);
+
+  const [context, setContext] = useState<{
+    stripe: Stripe;
+    elements: StripeElements;
+    card: StripeCardElement;
+  } | null>(null);
+
+  useEffect(() => {
+    if (token !== '') {
+      return;
+    }
+
+    wait('#card-element').then(() => {
+      loadStripe(import.meta.env.VITE_HOSTED_STRIPE_PK).then((stripe) => {
+        if (!stripe) {
+          return;
+        }
+
+        request('POST', endpoint('/api/account_management/upgrade/intent'), {
+          account_key: account.key,
+          plan,
+        })
+          .then((response: AxiosResponse<Intent>) => {
+            setIntent({
+              intent: response.data.id,
+              secret: response.data.client_secret,
+            });
+
+            const elements = stripe.elements();
+            const card = elements.create('card');
+
+            card.mount('#card-element');
+
+            setContext({ stripe, elements, card });
+          })
+          .catch(() => null);
+      });
+    });
+  }, [token]);
+
+  const form = useFormik({
+    initialValues: {},
+    onSubmit: (_, { setSubmitting }) => {
+      setErrors(null);
+
+      if (token === '' && !gatewayResponse) {
+        if (!context || !intent) {
+          toast.error();
+
+          return;
+        }
+
+        context.stripe
+          .confirmCardSetup(intent.secret, {
+            payment_method: {
+              card: context.card,
+              billing_details: {
+                name,
+              },
+            },
+          })
+          .then((result) => {
+            if (result.error && result.error.message) {
+              setErrors(result.error.message);
+              setSubmitting(false);
+
+              return;
+            }
+
+            if (
+              result.setupIntent &&
+              result.setupIntent.status === 'succeeded'
+            ) {
+              request('POST', endpoint('/api/account_management/upgrade'), {
+                gateway_response: result.setupIntent,
+                account_key: account.key,
+                plan,
+                token: null,
+              })
+                .then(() => toast.success())
+                .catch((e) => toast.error())
+                .finally(() => setSubmitting(false));
+            }
+          })
+          .catch(() => {
+            setSubmitting(false);
+          })
+          .finally(() => setSubmitting(false));
+
+        return;
+      }
+
+      if (token) {
+        request('POST', endpoint('/api/account_management/upgrade'), {
+          gateway_response: null,
+          account_key: account.key,
+          plan,
+          token,
+        })
+          .then(() => toast.success())
+          .catch((e) => toast.error())
+          .finally(() => setSubmitting(false));
+
+        return;
+      }
+    },
+  });
 
   return (
     <div>
-      <p>Changing plan to: {plan}</p>
+      <p className="mb-3">Changing plan to: <b>{t(plan)}</b></p>
 
-      <div className="my-3">
+      {errors && <Alert type="danger">{errors}</Alert>}
+
+      <form className="my-5" onSubmit={form.handleSubmit}>
         <Radio
           name="empty_columns"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          options={list}
+          options={list.toArray()}
           onValueChange={setToken}
           defaultSelected={token}
         />
-      </div>
+
+        {token === '' ? (
+          <div className="my-3 space-y-3">
+            <InputField label={t('name')} onValueChange={setName} />
+
+            <div
+              id="card-element"
+              className="border p-4 rounded"
+              style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+            ></div>
+          </div>
+        ) : null}
+      </form>
 
       <div className="flex justify-end">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            changePlan();
-          }}
-        >
-          <Button>{t('continue')}</Button>
-        </form>
+        <Button onClick={() => form.submitForm()} disabled={form.isSubmitting}>
+          {t('continue')}
+        </Button>
       </div>
     </div>
   );
