@@ -12,7 +12,7 @@ import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdSwitchRight } from 'react-icons/md';
+import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useBulkAction } from '../hooks/useBulkAction';
 import { useColorScheme } from '$app/common/colors';
 import { EntityActionElement } from '$app/components/EntityActionElement';
@@ -40,7 +40,7 @@ export const ConvertToProjectBulkAction = (props: Props) => {
         isCommonActionSection={!dropdown}
         tooltipText={t('convert_to_project')}
         onClick={() => setIsModalOpen(true)}
-        icon={MdSwitchRight}
+        icon={MdOutlineCreateNewFolder}
         disablePreventNavigation={props.disablePreventNavigation}
       >
         {t('convert_to_project')}

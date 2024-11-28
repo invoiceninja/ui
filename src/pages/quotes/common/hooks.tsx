@@ -64,7 +64,6 @@ import {
   MdRestore,
   MdSchedule,
   MdSend,
-  MdSwitchRight,
   MdTextSnippet,
 } from 'react-icons/md';
 import { SelectOption } from '$app/components/datatables/Actions';
@@ -104,6 +103,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { AiOutlineFileText } from 'react-icons/ai';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -591,7 +591,7 @@ export function useActions(params?: Params) {
           isCommonActionSection={!dropdown}
           tooltipText={t('convert_to_invoice')}
           onClick={() => bulk([quote.id], 'convert_to_invoice')}
-          icon={MdSwitchRight}
+          icon={AiOutlineFileText}
           disablePreventNavigation
         >
           {t('convert_to_invoice')}
