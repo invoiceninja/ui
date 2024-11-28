@@ -89,15 +89,15 @@ export default function EInvoice() {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const handleRetry = () => {
+  const handleSend = () => {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
 
-      request(
-        'PUT',
-        endpoint('/api/v1/invoices/:id/retry_e_send', { id: invoice?.id })
-      )
+      request('POST', endpoint('/api/v1/einvoice/peppol/send'), {
+        entity: 'invoice',
+        entity_id: invoice?.id,
+      })
         .then(() => {
           $refetch(['invoices']);
           toast.success('success');
@@ -228,7 +228,7 @@ export default function EInvoice() {
       </Card>
 
       {Boolean(invoice?.status_id === InvoiceStatus.Sent) && (
-        <Card title={t('backup')}>
+        <Card title={t('status')}>
           <div className="flex px-6 text-sm">
             <div
               className="flex items-center space-x-4 border-l-2 pl-4 py-4"
@@ -238,13 +238,13 @@ export default function EInvoice() {
             >
               {!invoice?.backup && (
                 <div className="whitespace-nowrap font-medium w-24">
-                  {t('backup')}:
+                  {t('reference')}:
                 </div>
               )}
 
-              {invoice?.backup ? (
+              {JSON.parse(invoice?.backup ?? '{}')?.guid ? (
                 <div className="flex flex-col space-y-2.5">
-                  {Object.entries(JSON.parse(invoice.backup)).map(
+                  {Object.entries(JSON.parse(invoice?.backup ?? '{}')).map(
                     ([key, value], index) => (
                       <div key={index} className="flex items-center space-x-4">
                         <span className="font-medium">{t(key)}:</span>
@@ -267,11 +267,11 @@ export default function EInvoice() {
               ) : (
                 <Button
                   behavior="button"
-                  onClick={handleRetry}
+                  onClick={handleSend}
                   disabled={isFormBusy}
                   disableWithoutIcon
                 >
-                  {t('retry')}
+                  {t('send')}
                 </Button>
               )}
             </div>
