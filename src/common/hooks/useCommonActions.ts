@@ -59,6 +59,21 @@ export function useAllCommonActions() {
       { value: 'restore', label: t('restore') },
       { value: 'delete', label: t('delete') },
     ],
+
+    recurring_invoice: [
+      { value: 'view_pdf', label: t('view_pdf') },
+      { value: 'start', label: t('start') },
+      { value: 'stop', label: t('stop') },
+      { value: 'update_prices', label: t('update_prices') },
+      { value: 'increase_prices', label: t('increase_prices') },
+
+      { value: 'add_comment', label: t('add_comment') },
+      { value: 'clone_to_recurring', label: t('clone_to_recurring') },
+      { value: 'clone_to_other', label: t('clone_to_other') },
+      { value: 'archive', label: t('archive') },
+      { value: 'restore', label: t('restore') },
+      { value: 'delete', label: t('delete') },
+    ],
   };
 
   return actions;
@@ -75,6 +90,10 @@ export function useDefaultCommonActions() {
     credit: [
       { value: 'mark_sent', label: t('mark_sent') },
       { value: 'email_credit', label: t('email_credit') },
+    ],
+    recurring_invoice: [
+      { value: 'start', label: t('start') },
+      { value: 'view_pdf', label: t('view_pdf') },
     ],
   };
 

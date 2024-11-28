@@ -39,7 +39,7 @@ export interface CommonAction {
   label: string;
 }
 
-export type Entity = 'invoice' | 'credit';
+export type Entity = 'invoice' | 'credit' | 'recurring_invoice';
 
 interface Props {
   entity: Entity;
