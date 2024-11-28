@@ -135,11 +135,11 @@ export function Plan2() {
             />
           ) : null}
 
-          {account.plan === 'pro' ? (
+          {account.plan === 'pro_plan' ? (
             <Plan
               title="Ninja Pro"
               color="#5EC16A"
-              price={get(plans, 'pro_plan_annual')!}
+              price={get(plans, 'plans.pro_plan_annual')!}
               trial={account.trial_days_left}
               custom={false}
             />
