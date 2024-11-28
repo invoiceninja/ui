@@ -236,30 +236,24 @@ export default function EInvoice() {
                 borderColor: colors.$5,
               }}
             >
-              {!invoice?.backup && (
+              {invoice?.backup?.guid && (
                 <div className="whitespace-nowrap font-medium w-24">
                   {t('reference')}:
                 </div>
               )}
 
-              {JSON.parse(invoice?.backup ?? '{}')?.guid ? (
+              {invoice?.backup?.guid ? (
                 <div className="flex flex-col space-y-2.5">
-                  {Object.entries(JSON.parse(invoice?.backup ?? '{}')).map(
-                    ([key, value], index) => (
-                      <div key={index} className="flex items-center space-x-4">
-                        <span className="font-medium">{t(key)}:</span>
-
-                        <span>{value as string}</span>
-                      </div>
-                    )
-                  )}
+                  <div className="flex items-center space-x-4">
+                    <span className="font-medium"></span>
+                    <span>{invoice?.backup?.guid}</span>
+                  </div>
 
                   {activities?.find(
                     (activity) => activity.activity_type_id === 147
                   ) && (
                     <div className="flex items-center space-x-4">
                       <span className="font-medium">{t('error')}:</span>
-
                       <div>{getActivityText()}</div>
                     </div>
                   )}
