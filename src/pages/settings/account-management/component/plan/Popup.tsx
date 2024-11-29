@@ -8,22 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from "$app/common/colors";
-import { endpoint } from "$app/common/helpers";
-import { request } from "$app/common/helpers/request";
-import { useAccentColor } from "$app/common/hooks/useAccentColor";
-import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
-import { SelectField } from "$app/components/forms";
-import Toggle from "$app/components/forms/Toggle";
-import { Modal } from "$app/components/Modal";
-import { AxiosResponse } from "axios";
-import { get } from "lodash";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FaCheck, FaCheckCircle, FaCheckDouble, FaCheckSquare } from "react-icons/fa";
-import { useQuery } from "react-query";
-import { ChangePlan } from "./ChangePlan";
-import { PopupProps } from "./NewCreditCard";
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Modal } from '$app/components/Modal';
+import { AxiosResponse } from 'axios';
+import { get } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  FaCheck,
+  FaCheckCircle,
+  FaCheckDouble,
+  FaCheckSquare,
+} from 'react-icons/fa';
+import { useQuery } from 'react-query';
+import { ChangePlan } from './ChangePlan';
+import { PopupProps } from './NewCreditCard';
 
 export type Plan =
   | 'free'
@@ -119,8 +124,9 @@ export function Popup({ visible, onClose }: PopupProps) {
         title="Change plan"
         visible={changePlanVisible}
         onClose={() => setChangePlanVisible(false)}
+        size="regular"
       >
-        {targetPlan ? <ChangePlan plan={targetPlan} /> : null}
+        {targetPlan ? <ChangePlan plan={targetPlan} cycle={pricing} /> : null}
       </Modal>
 
       <Modal visible={visible} onClose={onClose} size="large">
