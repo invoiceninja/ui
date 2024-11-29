@@ -470,6 +470,8 @@ export function useActions(params?: Params) {
           tooltipText={t('archive')}
           onClick={() => bulk([recurringInvoice.id], 'archive')}
           icon={MdArchive}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
         </EntityActionElement>
@@ -488,6 +490,8 @@ export function useActions(params?: Params) {
           tooltipText={t('restore')}
           onClick={() => bulk([recurringInvoice.id], 'restore')}
           icon={MdRestore}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('restore')}
         </EntityActionElement>
@@ -506,6 +510,8 @@ export function useActions(params?: Params) {
           tooltipText={t('delete')}
           onClick={() => bulk([recurringInvoice.id], 'delete')}
           icon={MdDelete}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('delete')}
         </EntityActionElement>
