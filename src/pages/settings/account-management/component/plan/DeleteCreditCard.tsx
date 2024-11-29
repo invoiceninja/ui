@@ -12,6 +12,7 @@ import { endpoint } from "$app/common/helpers";
 import { request } from "$app/common/helpers/request";
 import { toast } from "$app/common/helpers/toast/toast";
 import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
+import { CompanyGateway } from "$app/common/interfaces/company-gateway";
 import { Button } from "$app/components/forms";
 import { Modal } from "$app/components/Modal";
 import { useTranslation } from "react-i18next";

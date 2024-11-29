@@ -24,6 +24,7 @@ import { Check, Trash2 } from "react-feather";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "react-query";
 import visa from '~/public/gateway-card-images/visa.png';
+import mc from '~/public/gateway-card-images/mastercard.png';
 
 interface CreditCardProps {
   gateway: CompanyGateway;
