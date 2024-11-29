@@ -182,9 +182,18 @@ export function SignatureDnd() {
             onResizeStop={(e, direction, ref, delta, position) =>
               handleResizeStop(e, direction, ref, delta, position)
             }
-            className={`bg-red-300/25 border ${
-              focusedId === rect.id ? 'border-red-800' : 'border-gray-500'
-            } existing-rectangle`}
+            style={{
+              backgroundColor:
+                focusedId === rect.id
+                  ? 'rgba(255, 0, 0, 0.4)'
+                  : 'rgba(255, 0, 0, 0.2)',
+              zIndex: focusedId === rect.id ? 10 : 1,
+              border:
+                focusedId === rect.id
+                  ? '1px solid #8B0000'
+                  : '1px solid #808080',
+            }}
+            className="existing-rectangle"
             onMouseDown={(e) => {
               e.stopPropagation();
               setFocusedId(rect.id);
@@ -208,7 +217,6 @@ export function SignatureDnd() {
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-red-800 rounded-full transform translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
                 </>
               )}
-
               <div className="text-center text-sm text-red-800 font-semibold">
                 <FaSignature size={24} />
               </div>
