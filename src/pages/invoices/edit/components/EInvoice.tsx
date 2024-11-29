@@ -84,7 +84,9 @@ export default function EInvoice() {
     enabled:
       invoice !== null &&
       location.pathname.includes('e_invoice') &&
-      Boolean(invoice?.status_id === InvoiceStatus.Sent && invoice?.backup),
+      Boolean(
+        invoice?.status_id === InvoiceStatus.Sent && invoice?.backup?.guid
+      ),
     staleTime: Infinity,
   });
 
