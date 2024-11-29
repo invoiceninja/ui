@@ -1,18 +1,18 @@
 /**
-* Invoice Ninja (https://invoiceninja.com).
-*
-* @link https://github.com/invoiceninja/invoiceninja source repository
-*
-* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
-*
-* @license https://www.elastic.co/licensing/elastic-license
-*/
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 
 import React, { useState, useEffect } from 'react';
 import { X } from 'react-feather';
 import { FaSignature } from 'react-icons/fa';
 import { Document, Page } from 'react-pdf';
-import { Rnd, RndDragCallback, RndResizeCallback } from 'react-rnd';
+import { Rnd, RndDragCallback } from 'react-rnd';
 
 interface Rectangle {
   id: string;
@@ -21,6 +21,15 @@ interface Rectangle {
   width: number;
   height: number;
 }
+
+type ResizeStopHandler = (
+  e: MouseEvent | TouchEvent,
+  direction: string,
+  ref: HTMLElement,
+  delta: { width: number; height: number },
+  position: { x: number; y: number },
+  uuid: string
+) => void;
 
 export function SignatureDnd() {
   const [rectangles, setRectangles] = useState<Rectangle[]>([]);
@@ -116,17 +125,17 @@ export function SignatureDnd() {
     );
   };
 
-  const handleResizeStop: RndResizeCallback = (
+  const handleResizeStop: ResizeStopHandler = (
     e,
     direction,
     ref,
     delta,
-    position
+    position,
+    uuid: string
   ) => {
-    const id = (e.target as HTMLElement).dataset.id!;
-    setRectangles((prev) =>
-      prev.map((rect) =>
-        rect.id === id
+    setRectangles((prev) => {
+      const updatedRectangles = prev.map((rect) =>
+        rect.id === uuid
           ? {
               ...rect,
               width: ref.offsetWidth,
@@ -135,8 +144,10 @@ export function SignatureDnd() {
               y: position.y,
             }
           : rect
-      )
-    );
+      );
+
+      return updatedRectangles;
+    });
   };
 
   useEffect(() => {
@@ -154,6 +165,8 @@ export function SignatureDnd() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  console.log(rectangles);
 
   return (
     <div className="flex items-start gap-5 p-5">
@@ -190,7 +203,7 @@ export function SignatureDnd() {
             enableResizing={focusedId === rect.id}
             onDragStop={(e, data) => handleDragStop(e, data)}
             onResizeStop={(e, direction, ref, delta, position) =>
-              handleResizeStop(e, direction, ref, delta, position)
+              handleResizeStop(e, direction, ref, delta, position, rect.id)
             }
             style={{
               backgroundColor:
@@ -208,6 +221,7 @@ export function SignatureDnd() {
               e.stopPropagation();
               setFocusedId(rect.id);
             }}
+            data-id={rect.id}
           >
             <div
               className="relative h-full flex items-center justify-center"
