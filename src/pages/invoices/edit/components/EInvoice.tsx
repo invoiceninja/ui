@@ -107,8 +107,11 @@ export default function EInvoice() {
     }
   };
 
-  const getActivityText = (activity: InvoiceActivity) => {
-    let text = trans(`activity_${activity.activity_type_id}`, {}) as unknown as ReactNode[];
+  const getActivityText = (activityTypeId: number) => {
+    let text = trans(
+      `activity_${activityTypeId}`,
+      {}
+    ) as unknown as ReactNode[];
     const invoiceElement = (
       <Link to={route('/invoices/:id/edit', { id: invoice?.id })}>
         {invoice?.number}
@@ -237,37 +240,41 @@ export default function EInvoice() {
               }}
             >
               {invoice?.backup?.guid && (
-                <div className="whitespace-nowrap font-medium w-24">
+                <span className="whitespace-nowrap font-medium">
                   {t('reference')}:
-                </div>
+                </span>
               )}
 
-            {invoice?.backup?.guid ? (
-              <div className="flex flex-col space-y-2.5">
-                <div className="flex items-center space-x-4">
-                  <span className="font-medium"></span>
+              {invoice?.backup?.guid ? (
+                <div className="flex flex-col space-y-2.5">
                   <span>{invoice?.backup?.guid}</span>
-                </div>
 
-                {activities?.filter((activity) => {
-                  return EINVOICE_ACTIVITY_TYPES.includes(activity.activity_type_id)
-                  }).map((activity) => (
-                  <div key={activity.id} className="flex items-center space-x-4">
-                    <span className="font-medium">{t('message')}:</span>
-                    <div>{getActivityText(activity)}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <Button
-                behavior="button"
-                onClick={handleSend}
-                disabled={isFormBusy}
-                disableWithoutIcon
-              >
-                {t('send')}
-              </Button>
-            )}
+                  {activities
+                    ?.filter((activity) =>
+                      EINVOICE_ACTIVITY_TYPES.includes(
+                        activity.activity_type_id
+                      )
+                    )
+                    .map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center space-x-4"
+                      >
+                        <span className="font-medium">{t('message')}:</span>
+                        <div>{getActivityText(activity.activity_type_id)}</div>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <Button
+                  behavior="button"
+                  onClick={handleSend}
+                  disabled={isFormBusy}
+                  disableWithoutIcon
+                >
+                  {t('send')}
+                </Button>
+              )}
             </div>
           </div>
         </Card>
