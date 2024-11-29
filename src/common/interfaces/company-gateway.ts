@@ -38,6 +38,14 @@ export interface CompanyGateway {
   token_billing: string;
   test_mode: boolean;
   always_show_required_fields: boolean;
+  is_default: boolean,
+  meta: {
+    exp_month: string;
+    exp_year: string;
+    brand: string;
+    last4: string;
+    type: number;
+  }; 
 }
 
 export interface FeesAndLimitsEntry {
