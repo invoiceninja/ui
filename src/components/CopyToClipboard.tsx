@@ -41,7 +41,7 @@ export function CopyToClipboard(props: Props) {
           : value}
       </span>
 
-      {value.length > 0 && navigator.clipboard && !window.isSecureContext ? (
+      {value.length > 0 && navigator.clipboard && window.isSecureContext ? (
         <button type="button" onClick={handleClick}>
           <MdOutlineContentCopy size={18} />
         </button>
