@@ -1,3 +1,13 @@
+/**
+* Invoice Ninja (https://invoiceninja.com).
+*
+* @link https://github.com/invoiceninja/invoiceninja source repository
+*
+* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+*
+* @license https://www.elastic.co/licensing/elastic-license
+*/
+
 import React, { useState, useEffect } from 'react';
 import { X } from 'react-feather';
 import { FaSignature } from 'react-icons/fa';
@@ -240,10 +250,10 @@ export function SignatureDnd() {
         )}
       </div>
 
-      <div className="w-auto bg-white border p-5 overflow-auto">
+      <div className="w-full bg-white border p-5 overflow-auto">
         <h3 className="text-lg font-semibold">Signatures</h3>
         {rectangles.map((rect) => (
-          <div key={rect.id} className="py-2">
+          <div key={rect.id} className="py-2 border-b last:border-b-0">
             <div>
               <strong>ID:</strong> {rect.id}
             </div>
@@ -258,6 +268,22 @@ export function SignatureDnd() {
             </div>
             <div>
               <strong>Height:</strong> {rect.height}
+            </div>
+
+            <div className="my-5">
+              <strong>HTML:</strong>
+              <pre className="bg-gray-100 p-2 rounded text-sm overflow-x-auto mt-2">
+                {`<div 
+    style="position: absolute;
+        left: ${rect.x}px;
+        top: ${rect.y}px;
+        width: ${rect.width}px;
+        height: ${rect.height}px;
+        background-color: rgba(255, 0, 0, 0.2);
+        border: 1px solid red;
+    ">
+</div>`}
+              </pre>
             </div>
           </div>
         ))}
