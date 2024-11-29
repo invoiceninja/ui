@@ -13,6 +13,7 @@ import { MouseEvent, useState } from 'react';
 import { MdOutlineContentCopy } from 'react-icons/md';
 import { AiFillEyeInvisible } from 'react-icons/ai';
 import { AiFillEye } from 'react-icons/ai';
+import { Icon } from './icons/Icon';
 
 interface Props {
   text: string;
@@ -49,15 +50,13 @@ export function CopyToClipboard(props: Props) {
           {props.secure && (
             <div className="inline-flex items-center cursor-pointer">
               {isSecureVisible ? (
-                <AiFillEye
-                  className="text-gray-400"
-                  fontSize={19}
+                <Icon
+                  element={AiFillEye}
                   onClick={() => setIsSecureVisible(false)}
                 />
               ) : (
-                <AiFillEyeInvisible
-                  className="text-gray-400"
-                  fontSize={19}
+                <Icon
+                  element={AiFillEyeInvisible}
                   onClick={() => setIsSecureVisible(true)}
                 />
               )}
