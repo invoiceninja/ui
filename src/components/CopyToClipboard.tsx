@@ -48,17 +48,17 @@ export function CopyToClipboard(props: Props) {
       ) : (
         <>
           {Boolean(props.secure) && (
-            <div className="inline-flex items-center cursor-pointer">
+            <div
+              className="inline-flex items-center cursor-pointer"
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsSecureVisible((current) => !current);
+              }}
+            >
               {isSecureVisible ? (
-                <Icon
-                  element={AiFillEye}
-                  onClick={() => setIsSecureVisible(false)}
-                />
+                <Icon element={AiFillEye} />
               ) : (
-                <Icon
-                  element={AiFillEyeInvisible}
-                  onClick={() => setIsSecureVisible(true)}
-                />
+                <Icon element={AiFillEyeInvisible} />
               )}
             </div>
           )}
