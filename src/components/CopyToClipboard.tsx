@@ -47,7 +47,7 @@ export function CopyToClipboard(props: Props) {
         </button>
       ) : (
         <>
-          {props.secure && (
+          {Boolean(props.secure) && (
             <div className="inline-flex items-center cursor-pointer">
               {isSecureVisible ? (
                 <Icon
