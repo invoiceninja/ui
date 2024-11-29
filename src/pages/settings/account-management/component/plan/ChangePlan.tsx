@@ -8,30 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from "$app/common/colors";
-import { endpoint } from "$app/common/helpers";
-import { request } from "$app/common/helpers/request";
-import { toast } from "$app/common/helpers/toast/toast";
-import { wait } from "$app/common/helpers/wait";
-import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
-import { CompanyGateway } from "$app/common/interfaces/company-gateway";
-import { Alert } from "$app/components/Alert";
-import { Button, Radio } from "$app/components/forms";
-import { loadStripe, Stripe, StripeCardElement, StripeElements } from "@stripe/stripe-js";
-import { AxiosResponse } from "axios";
-import collect from "collect.js";
-import { useFormik } from "formik";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
-import { Intent } from "./NewCreditCard";
-import { Plan } from "./Popup";
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { wait } from '$app/common/helpers/wait';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Alert } from '$app/components/Alert';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { Button, Radio } from '$app/components/forms';
+import {
+  loadStripe,
+  Stripe,
+  StripeCardElement,
+  StripeElements,
+} from '@stripe/stripe-js';
+import { AxiosResponse } from 'axios';
+import collect from 'collect.js';
+import { useFormik } from 'formik';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery } from 'react-query';
+import { Intent } from './NewCreditCard';
+import { Plan } from './Popup';
 
 interface ChangePlanProps {
   plan: Plan;
+  cycle: 'monthly' | 'annually';
 }
 
-export function ChangePlan({ plan }: ChangePlanProps) {
+interface PlanDescription {
+  description: string;
+  price: number;
+}
+
+export function ChangePlan({ plan, cycle }: ChangePlanProps) {
   const { t } = useTranslation();
 
   const account = useCurrentAccount();
@@ -43,6 +55,16 @@ export function ChangePlan({ plan }: ChangePlanProps) {
       request('POST', endpoint('/api/account_management/methods'), {
         account_key: account.key,
       }).then((response: AxiosResponse<CompanyGateway[]>) => response.data),
+  });
+
+  const { data: planDescription } = useQuery({
+    queryKey: ['/api/account_management/upgrade/description', plan],
+    queryFn: () =>
+      request('POST', endpoint('/api/account_management/upgrade/description'), {
+        cycle,
+        plan,
+        account_key: account.key,
+      }).then((response: AxiosResponse<PlanDescription>) => response.data),
   });
 
   const list = collect(methods ?? [])
@@ -145,6 +167,7 @@ export function ChangePlan({ plan }: ChangePlanProps) {
                 gateway_response: result.setupIntent,
                 account_key: account.key,
                 plan,
+                cycle,
                 token: null,
               })
                 .then(() => toast.success())
@@ -166,6 +189,7 @@ export function ChangePlan({ plan }: ChangePlanProps) {
           account_key: account.key,
           plan,
           token,
+          cycle,
         })
           .then(() => toast.success())
           .catch(() => toast.error())
@@ -178,11 +202,27 @@ export function ChangePlan({ plan }: ChangePlanProps) {
 
   return (
     <div>
-      <p className="mb-3">Changing plan to: <b>{t(plan)}</b></p>
+      <p className="mb-3">
+        Changing plan to: <b>{t(plan)}</b>
+      </p>
 
       {errors && <Alert type="danger">{errors}</Alert>}
 
-      <form className="my-5" onSubmit={form.handleSubmit}>
+      {planDescription ? (
+        <NonClickableElement
+          className="border rounded"
+          style={{ borderColor: colors.$5, backgroundColor: colors.$1 }}
+        >
+          <div className="flex items-center justify-between">
+            <p>{planDescription.description}</p>
+            <p className="font-semibold">{planDescription.price}</p>
+          </div>
+        </NonClickableElement>
+      ) : null}
+
+      <p className="mb-3 my-5">Pay with</p>
+
+      <form onSubmit={form.handleSubmit}>
         <Radio
           name="empty_columns"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -193,15 +233,15 @@ export function ChangePlan({ plan }: ChangePlanProps) {
         />
 
         {token === '' ? (
-            <div
-              id="card-element"
-              className="border p-4 rounded"
-              style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
-            ></div>
+          <div
+            id="card-element"
+            className="border p-4 rounded mt-3.5"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          ></div>
         ) : null}
       </form>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-5">
         <Button onClick={() => form.submitForm()} disabled={form.isSubmitting}>
           {t('continue')}
         </Button>
