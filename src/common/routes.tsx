@@ -34,6 +34,7 @@ import { TestingPage } from '$app/components/TestingPage';
 import { activityRoutes } from '$app/pages/activities/routes';
 import { Guard } from './guards/Guard';
 import { permission } from './guards/guards/permission';
+import { SignatureDnd } from '$app/pages/SignatureDnd';
 
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
 const NotFound = lazy(() => import('$app/components/NotFound'));
@@ -73,6 +74,7 @@ export const routes = (
         <Route path="/testing" element={<TestingPage />} />
       </Route>
     </Route>
+    <Route path="/signature-dnd" element={<SignatureDnd />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
