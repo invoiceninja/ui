@@ -204,6 +204,7 @@ export function useCustomBulkActions() {
         <ConvertToProjectBulkAction
           selectedIds={selectedIds}
           setSelected={setSelected}
+          dropdown
         />
       ),
     ({ selectedResources }) => (
