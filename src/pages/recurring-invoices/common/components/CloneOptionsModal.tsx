@@ -16,9 +16,8 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { CloneOption } from '$app/components/CloneOption';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { creditAtom } from '$app/pages/credits/common/atoms';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
@@ -34,13 +33,14 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   recurringInvoice: RecurringInvoice;
+  dropdown: boolean;
 }
 
 export function CloneOptionsModal(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const { recurringInvoice } = props;
+  const { recurringInvoice, dropdown } = props;
 
   const hasPermission = useHasPermission();
 
@@ -69,7 +69,6 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       design_id: company.settings.invoice_design_id,
-
     });
 
     navigate('/invoices/create?action=clone');
@@ -91,7 +90,6 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       design_id: company.settings.quote_design_id,
-
     });
 
     navigate('/quotes/create?action=clone');
@@ -114,7 +112,6 @@ export function CloneOptionsModal(props: Props) {
       due_date: '',
       partial_due_date: '',
       design_id: company.settings.credit_design_id,
-
     });
 
     navigate('/credits/create?action=clone');
@@ -149,12 +146,16 @@ export function CloneOptionsModal(props: Props) {
         hasPermission('create_quote') ||
         hasPermission('create_credit') ||
         hasPermission('create_purchase_order')) && (
-        <DropdownElement
+        <EntityActionElement
+          entity="recurring_invoice"
+          actionKey="clone_to_other"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_other')}
           onClick={() => setIsModalVisible(true)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={MdControlPointDuplicate}
         >
           {t('clone_to_other')}
-        </DropdownElement>
+        </EntityActionElement>
       )}
 
       <Modal
