@@ -59,6 +59,27 @@ export function useAllCommonActions() {
       { value: 'restore', label: t('restore') },
       { value: 'delete', label: t('delete') },
     ],
+    quote: [
+      { value: 'view_pdf', label: t('view_pdf') },
+      { value: 'print_pdf', label: t('print_pdf') },
+      { value: 'download_pdf', label: t('download_pdf') },
+      { value: 'download_e_quote', label: t('download_e_quote') },
+      { value: 'schedule', label: t('schedule') },
+      { value: 'add_comment', label: t('add_comment') },
+      { value: 'email_quote', label: t('email_quote') },
+      { value: 'client_portal', label: t('client_portal') },
+      { value: 'mark_sent', label: t('mark_sent') },
+      { value: 'approve', label: t('approve') },
+      { value: 'convert_to_invoice', label: t('convert_to_invoice') },
+      { value: 'convert_to_project', label: t('convert_to_project') },
+      { value: 'run_template', label: t('run_template') },
+      { value: 'clone_to_quote', label: t('clone_to_quote') },
+      { value: 'clone_to_other', label: t('clone_to_other') },
+
+      { value: 'archive', label: t('archive') },
+      { value: 'restore', label: t('restore') },
+      { value: 'delete', label: t('delete') },
+    ],
   };
 
   return actions;
@@ -75,6 +96,10 @@ export function useDefaultCommonActions() {
     credit: [
       { value: 'mark_sent', label: t('mark_sent') },
       { value: 'email_credit', label: t('email_credit') },
+    ],
+    quote: [
+      { value: 'mark_sent', label: t('mark_sent') },
+      { value: 'email_quote', label: t('email_quote') },
     ],
   };
 
