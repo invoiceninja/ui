@@ -25,8 +25,11 @@ import { Credit } from '$app/common/interfaces/credit';
 import { useActions as useCreditActions } from '$app/pages/credits/common/hooks';
 import { useActions as useQuoteActions } from '$app/pages/quotes/common/hooks';
 import { Quote } from '$app/common/interfaces/quote';
+import { useActions as useRecurringInvoiceActions } from '$app/pages/recurring-invoices/common/hooks';
 
-type Resource = Invoice | Credit | Quote;
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+
+type Resource = Invoice | Credit | Quote | RecurringInvoice;
 
 interface Props {
   entity: EntityType;
@@ -39,6 +42,9 @@ export function CommonActions(props: Props) {
   const invoiceActions = useInvoiceActions({ dropdown: false });
   const creditActions = useCreditActions({ dropdown: false });
   const quoteActions = useQuoteActions({ dropdown: false });
+  const recurringInvoiceActions = useRecurringInvoiceActions({
+    dropdown: false,
+  });
 
   const { resource, entity } = props;
 
@@ -63,6 +69,12 @@ export function CommonActions(props: Props) {
 
     if (entity === 'quote') {
       return quoteActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    if (entity === 'recurring_invoice') {
+      return recurringInvoiceActions.filter(
         (action) => typeof action === 'function'
       ) as ResourceAction<Resource>[];
     }
