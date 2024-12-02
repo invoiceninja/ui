@@ -39,6 +39,68 @@ export function SignatureDnd() {
   );
   const [currentRect, setCurrentRect] = useState<Rectangle | null>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
+  
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (
+      e.target instanceof HTMLElement &&
+      (e.target.closest('.existing-rectangle') ||
+        e.target.closest('.close-button'))
+    ) {
+      return;
+    }
+  
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+  
+    setStartPoint({ x, y });
+    setCurrentRect({ id: '', x, y, width: 0, height: 0 });
+    setIsDrawing(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isDrawing || !startPoint) return;
+  
+    // For touch events, we get the first touch point
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+  
+    const width = x - startPoint.x;
+    const height = y - startPoint.y;
+  
+    setCurrentRect({
+      id: '',
+      x: width < 0 ? x : startPoint.x,
+      y: height < 0 ? y : startPoint.y,
+      width: Math.abs(width),
+      height: Math.abs(height),
+    });
+  };
+
+  const handleTouchEnd = () => {
+    const minWidth = 20;
+    const minHeight = 20;
+
+    if (
+      currentRect &&
+      Math.abs(currentRect.width) >= minWidth &&
+      Math.abs(currentRect.height) >= minHeight
+    ) {
+      const newRectangle: Rectangle = {
+        ...currentRect,
+        id: 'test'
+      };
+
+      setRectangles((prev) => [...prev, newRectangle]);
+    }
+
+    setIsDrawing(false);
+    setStartPoint(null);
+    setCurrentRect(null);
+  };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (
@@ -56,7 +118,7 @@ export function SignatureDnd() {
     setStartPoint({ x, y });
     setCurrentRect({ id: '', x, y, width: 0, height: 0 });
     setIsDrawing(true);
-    setFocusedId(null);
+    // setFocusedId(null);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -106,7 +168,7 @@ export function SignatureDnd() {
     e.stopPropagation();
     setRectangles((prev) => prev.filter((rect) => rect.id !== id));
     if (focusedId === id) {
-      setFocusedId(null);
+      // setFocusedId(null);
     }
   };
 
@@ -156,7 +218,7 @@ export function SignatureDnd() {
         !(e.target instanceof HTMLElement) ||
         !e.target.closest('.relative')
       ) {
-        setFocusedId(null);
+        // setFocusedId(null);
       }
     };
 
@@ -177,6 +239,9 @@ export function SignatureDnd() {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onTouchMove={handleTouchMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <Document
           file="https://pdfobject.com/pdf/sample.pdf"
@@ -186,7 +251,7 @@ export function SignatureDnd() {
             pageNumber={1}
             renderTextLayer={false}
             renderAnnotationLayer={false}
-            scale={1.5}
+            scale={1}
           />
         </Document>
 
@@ -218,7 +283,10 @@ export function SignatureDnd() {
             }}
             className="existing-rectangle"
             onMouseDown={(e) => {
-              e.stopPropagation();
+              if (e instanceof MouseEvent) {
+                e.stopPropagation();
+              }
+
               setFocusedId(rect.id);
             }}
             data-id={rect.id}
