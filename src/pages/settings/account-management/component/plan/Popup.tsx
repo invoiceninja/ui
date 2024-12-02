@@ -20,20 +20,18 @@ import { AxiosResponse } from 'axios';
 import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  FaCheck,
-  FaCheckCircle,
-  FaCheckDouble,
-  FaCheckSquare,
-} from 'react-icons/fa';
+import { FaCheck, FaCheckDouble, FaCheckSquare } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import { ChangePlan } from './ChangePlan';
 import { PopupProps } from './NewCreditCard';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 export type Plan =
-  | 'free'
+  | '' // Free
+  | 'pro'
   | 'pro_plan'
   | 'pro_plan_annual'
+  | 'enterprise'
   | 'enterprise_plan'
   | 'enterprise_plan_5'
   | 'enterprise_plan_10'
@@ -49,11 +47,19 @@ export type Plan =
   | 'premium_business_plan';
 
 export function Popup({ visible, onClose }: PopupProps) {
-  const [pricing, setPricing] = useState<'monthly' | 'annually'>('monthly');
+  const account = useCurrentAccount();
 
   const accentColor = useAccentColor();
   const colors = useColorScheme();
-  const account = useCurrentAccount();
+  const refresh = useRefreshCompanyUsers();
+
+  const [pricing, setPricing] = useState<'monthly' | 'annually'>(() => {
+    if (account.plan_term === 'month') {
+      return 'monthly';
+    }
+
+    return 'annually';
+  });
 
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
@@ -65,40 +71,15 @@ export function Popup({ visible, onClose }: PopupProps) {
     }
   }, [changePlanVisible]);
 
-  function label(plan: Plan) {
+  function isPlanVisible(plan: Plan) {
     const currentPlan = account.plan as Plan;
 
-    const plans: Plan[] = [
-      'free',
-      'pro_plan',
-      'pro_plan_annual',
-      'enterprise_plan',
-      'enterprise_plan_5',
-      'enterprise_plan_10',
-      'enterprise_plan_20',
-      'enterprise_plan_30',
-      'enterprise_plan_50',
-      'enterprise_plan_annual',
-      'enterprise_plan_annual_5',
-      'enterprise_plan_annual_10',
-      'enterprise_plan_annual_20',
-      'enterprise_plan_annual_30',
-      'enterprise_plan_annual_50',
-      'premium_business_plan',
-    ];
+    const plans: Plan[] = ['', 'pro', 'enterprise'];
 
     const current = plans.indexOf(currentPlan);
     const target = plans.indexOf(plan);
 
-    if (current === target && current !== -1 && target !== -1) {
-      return 'current_plan';
-    }
-
-    if (current > target) {
-      return 'downgrade_plan';
-    }
-
-    return 'upgrade_plan';
+    return current < target;
   }
 
   const { data: plans } = useQuery({
@@ -126,7 +107,17 @@ export function Popup({ visible, onClose }: PopupProps) {
         onClose={() => setChangePlanVisible(false)}
         size="regular"
       >
-        {targetPlan ? <ChangePlan plan={targetPlan} cycle={pricing} /> : null}
+        {targetPlan ? (
+          <ChangePlan
+            plan={targetPlan}
+            cycle={pricing}
+            onSuccess={() => {
+              setChangePlanVisible(false);
+              setTargetPlan(null);
+              refresh();
+            }}
+          />
+        ) : null}
       </Modal>
 
       <Modal visible={visible} onClose={onClose} size="large">
@@ -138,136 +129,93 @@ export function Popup({ visible, onClose }: PopupProps) {
             </h2>
           </div>
 
-          <div className="flex justify-center mt-6">
-            <div className="flex items-center space-x-2">
-              <span>Monthly</span>
+          {account.plan_term === '' ? (
+            <div className="flex justify-center mt-6">
+              <div className="flex items-center space-x-2">
+                <span>Monthly</span>
 
-              <Toggle
-                checked={pricing === 'annually'}
-                onValueChange={() =>
-                  setPricing((c) => (c === 'monthly' ? 'annually' : 'monthly'))
-                }
-              />
-              <span>Annual</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col 2xl:flex-row gap-4 mt-6">
-            <div className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8">
-              <div className="h-72 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-semibold text-2xl">Free!</h3>
-                  <p className="my-4">Yes, it’s really free 🙂</p>
-
-                  <div>
-                    <div className="flex items-end space-x-2">
-                      <h2 className="text-3xl font-semibold">$0</h2>
-                      <span>
-                        {pricing === 'monthly' ? t('per_month') : t('per_year')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="border py-3 px-4 rounded"
-                  style={{ color: accentColor }}
-                  onClick={() => {
-                    setTargetPlan('free');
-                    setChangePlanVisible(true);
-                  }}
-                  disabled={account.plan === ''}
-                >
-                  {label('free')}
-                </button>
+                <Toggle
+                  checked={pricing === 'annually'}
+                  onValueChange={() =>
+                    setPricing((c) =>
+                      c === 'monthly' ? 'annually' : 'monthly'
+                    )
+                  }
+                />
+                <span>Annual</span>
               </div>
+            </div>
+          ) : null}
 
+          <div className="flex justify-center flex-col 2xl:flex-row gap-4 mt-6">
+            {isPlanVisible('pro') ? (
               <div
-                className="w-full p-[0.1px] my-5"
-                style={{ backgroundColor: colors.$5 }}
-              ></div>
-
-              <p className="font-semibold uppercase">Free plan includes</p>
-
-              <div className="my-3 space-y-3">
-                {plans?.features.free.map((feature, i) => (
-                  <div key={`free-${i}`} className="flex items-center gap-3">
-                    <FaCheckCircle
-                      color={accentColor}
-                      size={14}
-                      className="flex-shrink-0"
-                    />
-                    <p>{feature}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div
-              className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
-              style={{ borderColor: '#5EC16A' }}
-            >
-              <div className="h-72 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-semibold text-2xl">Ninja Pro</h3>
-                  <p className="my-4">Pay annually for 10 months + 2 free!</p>
-
+                className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"
+                style={{ borderColor: '#5EC16A' }}
+              >
+                <div className="h-72 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-end space-x-2">
-                      <h2 className="text-3xl font-semibold">
-                        $
-                        {pricing === 'monthly'
-                          ? get(plans?.plans, 'pro_plan')
-                          : get(plans?.plans, 'pro_plan_annual')}
-                      </h2>
+                    <h3 className="font-semibold text-2xl">Ninja Pro</h3>
+                    <p className="my-4">Pay annually for 10 months + 2 free!</p>
 
-                      <span>
-                        {pricing === 'monthly' ? t('per_month') : t('per_year')}
-                      </span>
+                    <div>
+                      <div className="flex items-end space-x-2">
+                        <h2 className="text-3xl font-semibold">
+                          $
+                          {pricing === 'monthly'
+                            ? get(plans?.plans, 'pro_plan')
+                            : get(plans?.plans, 'pro_plan_annual')}
+                        </h2>
+
+                        <span>
+                          {pricing === 'monthly'
+                            ? t('per_month')
+                            : t('per_year')}
+                        </span>
+                      </div>
                     </div>
                   </div>
+
+                  <button
+                    type="button"
+                    className="border py-3 px-4 rounded"
+                    style={{ backgroundColor: accentColor, color: colors.$1 }}
+                    onClick={() => {
+                      setTargetPlan(
+                        pricing === 'monthly' ? 'pro_plan' : 'pro_plan_annual'
+                      );
+                      setChangePlanVisible(true);
+                    }}
+                    disabled={account.plan === 'pro'}
+                  >
+                    Upgrade plan
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  className="border py-3 px-4 rounded"
+                <div
+                  className="w-full p-[0.1px] my-5"
                   style={{ backgroundColor: colors.$5 }}
-                  onClick={() => {
-                    setTargetPlan(
-                      pricing === 'monthly' ? 'pro_plan' : 'pro_plan_annual'
-                    );
-                    setChangePlanVisible(true);
-                  }}
-                  disabled={account.plan === 'pro_plan'}
-                >
-                  {label('pro_plan')}
-                </button>
+                ></div>
+
+                <p className="font-semibold uppercase">All free features +</p>
+
+                <div className="my-3 space-y-3">
+                  {plans?.features.pro_plan.map((feature, i) => (
+                    <div key={`pro-${i}`} className="flex items-center gap-3">
+                      <FaCheck
+                        color={accentColor}
+                        size={14}
+                        className="flex-shrink-0"
+                      />
+                      <p>{feature}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              <div
-                className="w-full p-[0.1px] my-5"
-                style={{ backgroundColor: colors.$5 }}
-              ></div>
-
-              <p className="font-semibold uppercase">All free features +</p>
-
-              <div className="my-3 space-y-3">
-                {plans?.features.pro_plan.map((feature, i) => (
-                  <div key={`pro-${i}`} className="flex items-center gap-3">
-                    <FaCheck
-                      color={accentColor}
-                      size={14}
-                      className="flex-shrink-0"
-                    />
-                    <p>{feature}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ) : null}
 
             <div
-              className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
+              className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"
               style={{ borderColor: accentColor }}
             >
               <div className="h-72 flex flex-col justify-between">
@@ -317,7 +265,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                     }}
                     disabled={account.plan === enterprisePlan}
                   >
-                    {label(enterprisePlan)}
+                    Upgrade plan
                   </button>
                 </div>
               </div>
@@ -347,7 +295,7 @@ export function Popup({ visible, onClose }: PopupProps) {
             </div>
 
             <div
-              className="w-full 2xl:w-1/4 border py-8 px-7 rounded border-t-8"
+              className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"
               style={{ borderColor: '#FFCB00' }}
             >
               <div className="h-72 flex flex-col justify-between">

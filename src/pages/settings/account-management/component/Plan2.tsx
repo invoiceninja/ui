@@ -67,15 +67,6 @@ export function Plan2() {
         <div className="px-7 py-3 space-y-4">
           <div className="flex justify-between items-center">
             <h4 className="text-lg font-semibold">Your Plan</h4>
-
-            <button
-              style={{ color: accentColor }}
-              className="text-sm hover:underline"
-              type="button"
-              onClick={() => setPopupVisible(true)}
-            >
-              Compare plans
-            </button>
           </div>
 
           {account.plan === '' ? <Free /> : null}
@@ -87,6 +78,7 @@ export function Plan2() {
               price="todo"
               trial={account.trial_days_left}
               custom={false}
+              term={account.plan_term === 'month' ? 'month' : 'year'}
             />
           ) : null}
 
@@ -101,6 +93,7 @@ export function Plan2() {
               }
               trial={account.trial_days_left}
               custom={false}
+              term={account.plan_term === 'month' ? 'month' : 'year'}
             />
           ) : null}
 
@@ -111,6 +104,7 @@ export function Plan2() {
               price="todo"
               trial={account.trial_days_left}
               custom={false}
+              term={account.plan_term === 'month' ? 'month' : 'year'}
             />
           ) : null}
 
@@ -210,5 +204,3 @@ export function Plan2() {
     </div>
   );
 }
-
-

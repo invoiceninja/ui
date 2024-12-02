@@ -29,6 +29,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 interface ChangePlanProps {
   plan: Plan;
   cycle: 'monthly' | 'annually';
+  onSuccess: () => void;
 }
 
 interface PlanDescription {
@@ -37,7 +38,7 @@ interface PlanDescription {
   pro_rata: string;
 }
 
-export function ChangePlan({ plan, cycle }: ChangePlanProps) {
+export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
   const { t } = useTranslation();
 
   const account = useCurrentAccount();
@@ -75,6 +76,10 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
   }));
 
   const [token, setToken] = useState<string>(() => {
+    if (list.isEmpty()) {
+      return '';
+    }
+
     if (list.first().value !== '') {
       return list.first().value;
     }
@@ -97,7 +102,11 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
           token,
           cycle,
         })
-          .then(() => toast.success())
+          .then(() => {
+            toast.success();
+
+            onSuccess();
+          })
           .catch(() => toast.error())
           .finally(() => setSubmitting(false));
 
@@ -126,24 +135,33 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
         </NonClickableElement>
       ) : null}
 
-      <p className="mb-3 my-5">Pay with</p>
+      {list.isEmpty() ? (
+        <p className="my-5">{t('missing_payment_method')}</p>
+      ) : (
+        <div>
+          <p className="mb-3 my-5">Pay with</p>
 
-      <form onSubmit={form.handleSubmit}>
-        <Radio
-          name="empty_columns"
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          options={list.toArray()}
-          onValueChange={setToken}
-          defaultSelected={token}
-        />
-      </form>
+          <form onSubmit={form.handleSubmit}>
+            <Radio
+              name="empty_columns"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              options={list.toArray()}
+              onValueChange={setToken}
+              defaultSelected={token}
+            />
+          </form>
 
-      <div className="flex justify-end mt-5">
-        <Button onClick={() => form.submitForm()} disabled={form.isSubmitting}>
-          {t('pay_now')} ({planDescription?.pro_rata})
-        </Button>
-      </div>
+          <div className="flex justify-end mt-5">
+            <Button
+              onClick={() => form.submitForm()}
+              disabled={form.isSubmitting}
+            >
+              {t('pay_now')} ({planDescription?.pro_rata})
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

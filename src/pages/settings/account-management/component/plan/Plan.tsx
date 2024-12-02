@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from "$app/common/colors";
-import { date } from "$app/common/helpers";
-import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
-import { useCurrentCompanyDateFormats } from "$app/common/hooks/useCurrentCompanyDateFormats";
+import { useColorScheme } from '$app/common/colors';
+import { date } from '$app/common/helpers';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useTranslation } from 'react-i18next';
 
 export interface PlanProps {
   title: string;
@@ -19,9 +20,10 @@ export interface PlanProps {
   trial: boolean;
   price: string;
   custom: boolean;
+  term: 'month' | 'year';
 }
 
-export function Plan({ title, color, trial, price, custom }: PlanProps) {
+export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
   const scheme = useColorScheme();
   const account = useCurrentAccount();
 
@@ -32,6 +34,7 @@ export function Plan({ title, color, trial, price, custom }: PlanProps) {
   };
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -45,7 +48,7 @@ export function Plan({ title, color, trial, price, custom }: PlanProps) {
           <b>{price}</b>
         ) : (
           <p>
-            {trial ? 'Free trial, then' : null} <b> ${price} /</b> year
+            {trial ? 'Free trial, then' : null} <b> ${price} /</b> <span className='lowercase'>{t(term)}</span>
           </p>
         )}
       </div>
@@ -84,7 +87,7 @@ export function Free() {
       <p className="font-semibold">Free</p>
 
       <p>
-        <b>$0 /</b> year
+        <b>$0</b>
       </p>
     </div>
   );
