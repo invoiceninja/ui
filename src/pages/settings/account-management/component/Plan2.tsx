@@ -42,7 +42,10 @@ export function Plan2() {
     queryFn: () =>
       request('POST', endpoint('/api/client/account_management/methods'), {
         account_key: account.key,
-      }).then((response: AxiosResponse<GenericManyResponse<CompanyGateway>>) => response.data.data),
+      }).then(
+        (response: AxiosResponse<GenericManyResponse<CompanyGateway>>) =>
+          response.data.data
+      ),
   });
 
   const [selectedGateway, setSelectedGateway] = useState<CompanyGateway | null>(
@@ -87,11 +90,15 @@ export function Plan2() {
             />
           ) : null}
 
-          {account.plan === 'pro_plan' ? (
+          {account.plan === 'pro' ? (
             <Plan
               title="Ninja Pro"
               color="#5EC16A"
-              price={get(plans, 'plans.pro_plan_annual')!}
+              price={
+                account.plan_term === 'month'
+                  ? get(plans, 'plans.pro_plan')!
+                  : get(plans, 'plans.pro_plan_annual')!
+              }
               trial={account.trial_days_left}
               custom={false}
             />
