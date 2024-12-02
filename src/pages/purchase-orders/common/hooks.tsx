@@ -520,6 +520,7 @@ export function useActions(params: ActionsParams = {}) {
           tooltipText={t('print_pdf')}
           onClick={() => printPdf([purchaseOrder.id])}
           icon={MdPrint}
+          disablePreventNavigation
         >
           {t('print_pdf')}
         </EntityActionElement>
@@ -573,6 +574,7 @@ export function useActions(params: ActionsParams = {}) {
         tooltipText={t('download')}
         onClick={() => downloadPdf(purchaseOrder)}
         icon={MdDownload}
+        disablePreventNavigation
       >
         {t('download')}
       </EntityActionElement>
@@ -589,6 +591,7 @@ export function useActions(params: ActionsParams = {}) {
           tooltipText={t('download_e_purchase_order')}
           onClick={() => downloadEPurchaseOrder(purchaseOrder)}
           icon={MdDownload}
+          disablePreventNavigation
         >
           {t('download_e_purchase_order')}
         </EntityActionElement>
@@ -605,6 +608,7 @@ export function useActions(params: ActionsParams = {}) {
           tooltipText={t('mark_sent')}
           onClick={() => markSent(purchaseOrder)}
           icon={MdMarkEmailRead}
+          disablePreventNavigation
         >
           {t('mark_sent')}
         </EntityActionElement>
@@ -621,6 +625,7 @@ export function useActions(params: ActionsParams = {}) {
           tooltipText={t('convert_to_expense')}
           onClick={() => bulk([purchaseOrder.id], 'expense')}
           icon={MdSwitchRight}
+          disablePreventNavigation
         >
           {t('convert_to_expense')}
         </EntityActionElement>
@@ -637,6 +642,7 @@ export function useActions(params: ActionsParams = {}) {
           tooltipText={t('add_to_inventory')}
           onClick={() => bulk([purchaseOrder.id], 'add_to_inventory')}
           icon={MdInventory}
+          disablePreventNavigation
         >
           {t('add_to_inventory')}
         </EntityActionElement>
@@ -673,6 +679,7 @@ export function useActions(params: ActionsParams = {}) {
         tooltipText={t('vendor_portal')}
         onClick={() => openClientPortal(purchaseOrder)}
         icon={MdCloudCircle}
+        disablePreventNavigation
       >
         {t('vendor_portal')}
       </EntityActionElement>
