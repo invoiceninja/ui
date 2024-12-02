@@ -30,6 +30,7 @@ import { route } from '$app/common/helpers/route';
 import { Page } from '$app/components/Breadcrumbs';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -52,6 +53,8 @@ export default function InvoiceDesign() {
     useCurrentSettingsLevel();
   const displaySaveButtonAndPreview =
     !location.pathname.includes('custom_designs');
+
+  const activeSettingsValue = useAtomValue(activeSettingsAtom);
 
   const onSave = useHandleCompanySave();
 
@@ -100,8 +103,10 @@ export default function InvoiceDesign() {
           design_id,
           entity,
           settings_level: activeSettings.level,
-          ...(isClientSettingsActive && { client_id: company?.id }),
-          ...(isGroupSettingsActive && { group_settings_id: company?.id }),
+          ...(isClientSettingsActive && { client_id: company?.settings?.id }),
+          ...(isGroupSettingsActive && {
+            group_settings_id: activeSettingsValue?.id,
+          }),
         })
       );
     });
