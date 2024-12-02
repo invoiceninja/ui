@@ -8,21 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from "$app/common/colors";
-import { endpoint } from "$app/common/helpers";
-import { request } from "$app/common/helpers/request";
-import { toast } from "$app/common/helpers/toast/toast";
-import { wait } from "$app/common/helpers/wait";
-import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
-import { useCurrentCompany } from "$app/common/hooks/useCurrentCompany";
-import { Alert } from "$app/components/Alert";
-import { Button } from "$app/components/forms";
-import { Modal } from "$app/components/Modal";
-import { loadStripe, Stripe, StripeCardElement, StripeElements } from "@stripe/stripe-js";
-import { AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useQueryClient } from "react-query";
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { wait } from '$app/common/helpers/wait';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Alert } from '$app/components/Alert';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import {
+  loadStripe,
+  Stripe,
+  StripeCardElement,
+  StripeElements,
+} from '@stripe/stripe-js';
+import { AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 
 export interface PopupProps {
   visible: boolean;
@@ -68,9 +73,13 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
             return;
           }
 
-          request('POST', endpoint('/api/client/account_management/methods/intent'), {
-            account_key: account.key,
-          })
+          request(
+            'POST',
+            endpoint('/api/client/account_management/methods/intent'),
+            {
+              account_key: account.key,
+            }
+          )
             .then((response: AxiosResponse<Intent>) => {
               setIntent({
                 intent: response.data.id,
@@ -123,10 +132,14 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
         }
 
         if (result.setupIntent && result.setupIntent.status === 'succeeded') {
-          request('POST', endpoint('/api/client/account_management/methods/confirm'), {
-            account_key: account.key,
-            gateway_response: result.setupIntent,
-          }).then(() => {
+          request(
+            'POST',
+            endpoint('/api/client/account_management/methods/confirm'),
+            {
+              account_key: account.key,
+              gateway_response: result.setupIntent,
+            }
+          ).then(() => {
             toast.success(t('payment_method_added')!);
 
             setIsSubmitting(false);
@@ -140,17 +153,28 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
   };
 
   return (
-    <Modal visible={visible} onClose={onClose} title="Add new card">
+    <Modal
+      visible={visible}
+      onClose={onClose}
+      title="Add new card"
+      disableClosing={isSubmitting}
+    >
       {errors && <Alert type="danger">{errors}</Alert>}
 
       <div
         id="card-element"
-        className="border p-4 rounded"
+        className="border p-4 rounded my-5"
         style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
       ></div>
 
       <div className="flex justify-end gap-2">
-        <Button type="secondary" behavior="button" onClick={onClose}>
+        <Button
+          type="secondary"
+          behavior="button"
+          onClick={onClose}
+          disabled={isSubmitting}
+          disableWithoutIcon
+        >
           Cancel
         </Button>
 
