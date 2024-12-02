@@ -39,7 +39,7 @@ export function SignatureDnd() {
   );
   const [currentRect, setCurrentRect] = useState<Rectangle | null>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
-  
+
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (
       e.target instanceof HTMLElement &&
@@ -48,12 +48,12 @@ export function SignatureDnd() {
     ) {
       return;
     }
-  
+
     const touch = e.touches[0];
     const rect = e.currentTarget.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-  
+
     setStartPoint({ x, y });
     setCurrentRect({ id: '', x, y, width: 0, height: 0 });
     setIsDrawing(true);
@@ -61,16 +61,16 @@ export function SignatureDnd() {
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!isDrawing || !startPoint) return;
-  
+
     // For touch events, we get the first touch point
     const touch = e.touches[0];
     const rect = e.currentTarget.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-  
+
     const width = x - startPoint.x;
     const height = y - startPoint.y;
-  
+
     setCurrentRect({
       id: '',
       x: width < 0 ? x : startPoint.x,
@@ -91,7 +91,7 @@ export function SignatureDnd() {
     ) {
       const newRectangle: Rectangle = {
         ...currentRect,
-        id: 'test'
+        id: crypto.randomUUID(),
       };
 
       setRectangles((prev) => [...prev, newRectangle]);
