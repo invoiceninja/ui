@@ -26,6 +26,7 @@ import { NewCreditCard } from './plan/NewCreditCard';
 import { DeleteCreditCard } from './plan/DeleteCreditCard';
 import { Popup } from './plan/Popup';
 import { CreditCard } from './plan/CreditCard';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 
 export function Plan2() {
   const accentColor = useAccentColor();
@@ -41,7 +42,7 @@ export function Plan2() {
     queryFn: () =>
       request('POST', endpoint('/api/client/account_management/methods'), {
         account_key: account.key,
-      }).then((response: AxiosResponse<CompanyGateway[]>) => response.data),
+      }).then((response: AxiosResponse<GenericManyResponse<CompanyGateway>>) => response.data.data),
   });
 
   const [selectedGateway, setSelectedGateway] = useState<CompanyGateway | null>(

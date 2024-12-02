@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { Intent } from './NewCreditCard';
 import { Plan } from './Popup';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 
 interface ChangePlanProps {
   plan: Plan;
@@ -54,17 +55,24 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
     queryFn: () =>
       request('POST', endpoint('/api/client/account_management/methods'), {
         account_key: account.key,
-      }).then((response: AxiosResponse<CompanyGateway[]>) => response.data),
+      }).then(
+        (response: AxiosResponse<GenericManyResponse<CompanyGateway>>) =>
+          response.data.data
+      ),
   });
 
   const { data: planDescription } = useQuery({
     queryKey: ['/api/client/account_management/upgrade/description', plan],
     queryFn: () =>
-      request('POST', endpoint('/api/client/account_management/upgrade/description'), {
-        cycle,
-        plan,
-        account_key: account.key,
-      }).then((response: AxiosResponse<PlanDescription>) => response.data),
+      request(
+        'POST',
+        endpoint('/api/client/account_management/upgrade/description'),
+        {
+          cycle,
+          plan,
+          account_key: account.key,
+        }
+      ).then((response: AxiosResponse<PlanDescription>) => response.data),
   });
 
   const list = collect(methods ?? [])
@@ -111,10 +119,14 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
           return;
         }
 
-        request('POST', endpoint('/api/client/account_management/upgrade/intent'), {
-          account_key: account.key,
-          plan,
-        })
+        request(
+          'POST',
+          endpoint('/api/client/account_management/upgrade/intent'),
+          {
+            account_key: account.key,
+            plan,
+          }
+        )
           .then((response: AxiosResponse<Intent>) => {
             setIntent({
               intent: response.data.id,
@@ -163,13 +175,17 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
               result.setupIntent &&
               result.setupIntent.status === 'succeeded'
             ) {
-              request('POST', endpoint('/api/client/account_management/upgrade'), {
-                gateway_response: result.setupIntent,
-                account_key: account.key,
-                plan,
-                cycle,
-                token: null,
-              })
+              request(
+                'POST',
+                endpoint('/api/client/account_management/upgrade'),
+                {
+                  gateway_response: result.setupIntent,
+                  account_key: account.key,
+                  plan,
+                  cycle,
+                  token: null,
+                }
+              )
                 .then(() => toast.success())
                 .catch(() => toast.error())
                 .finally(() => setSubmitting(false));
