@@ -28,6 +28,8 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { Page } from '$app/components/Breadcrumbs';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -45,6 +47,9 @@ export default function InvoiceDesign() {
   const tabs = useTabs();
   const location = useLocation();
   const company = useCompanyChanges();
+  const activeSettings = useActiveSettingsDetails();
+  const { isClientSettingsActive, isGroupSettingsActive } =
+    useCurrentSettingsLevel();
   const displaySaveButtonAndPreview =
     !location.pathname.includes('custom_designs');
 
@@ -94,6 +99,9 @@ export default function InvoiceDesign() {
         request('POST', endpoint('/api/v1/designs/set/default'), {
           design_id,
           entity,
+          settings_level: activeSettings.level,
+          ...(isClientSettingsActive && { client_id: company?.id }),
+          ...(isGroupSettingsActive && { group_settings_id: company?.id }),
         })
       );
     });
