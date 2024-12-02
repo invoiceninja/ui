@@ -104,7 +104,7 @@ export function Popup({ visible, onClose }: PopupProps) {
   const { data: plans } = useQuery({
     queryKey: ['plans'],
     queryFn: () =>
-      request('GET', endpoint('/api/account_management/plans')).then(
+      request('GET', endpoint('/api/client/account_management/plans')).then(
         (
           response: AxiosResponse<{
             plans: string[];

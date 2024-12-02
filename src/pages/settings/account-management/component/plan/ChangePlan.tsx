@@ -50,17 +50,17 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
   const colors = useColorScheme();
 
   const { data: methods } = useQuery({
-    queryKey: ['/api/account_management/methods', account?.id],
+    queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
-      request('POST', endpoint('/api/account_management/methods'), {
+      request('POST', endpoint('/api/client/account_management/methods'), {
         account_key: account.key,
       }).then((response: AxiosResponse<CompanyGateway[]>) => response.data),
   });
 
   const { data: planDescription } = useQuery({
-    queryKey: ['/api/account_management/upgrade/description', plan],
+    queryKey: ['/api/client/account_management/upgrade/description', plan],
     queryFn: () =>
-      request('POST', endpoint('/api/account_management/upgrade/description'), {
+      request('POST', endpoint('/api/client/account_management/upgrade/description'), {
         cycle,
         plan,
         account_key: account.key,
@@ -111,7 +111,7 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
           return;
         }
 
-        request('POST', endpoint('/api/account_management/upgrade/intent'), {
+        request('POST', endpoint('/api/client/account_management/upgrade/intent'), {
           account_key: account.key,
           plan,
         })
@@ -163,7 +163,7 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
               result.setupIntent &&
               result.setupIntent.status === 'succeeded'
             ) {
-              request('POST', endpoint('/api/account_management/upgrade'), {
+              request('POST', endpoint('/api/client/account_management/upgrade'), {
                 gateway_response: result.setupIntent,
                 account_key: account.key,
                 plan,
@@ -184,7 +184,7 @@ export function ChangePlan({ plan, cycle }: ChangePlanProps) {
       }
 
       if (token) {
-        request('POST', endpoint('/api/account_management/upgrade'), {
+        request('POST', endpoint('/api/client/account_management/upgrade'), {
           gateway_response: null,
           account_key: account.key,
           plan,

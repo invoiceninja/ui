@@ -40,7 +40,7 @@ export function DeleteCreditCard({
 
     request(
       'DELETE',
-      endpoint(`/api/account_management/methods/${gateway.id}`),
+      endpoint(`/api/client/account_management/methods/${gateway.id}`),
       {
         account_key: account.key,
       }
@@ -48,7 +48,7 @@ export function DeleteCreditCard({
       toast.success(t('payment_method_removed')!);
 
       queryClient.invalidateQueries({
-        queryKey: ['/api/account_management/methods', account?.id],
+        queryKey: ['/api/client/account_management/methods', account?.id],
       });
 
       onClose();

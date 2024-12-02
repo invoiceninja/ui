@@ -58,7 +58,7 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
 
       request(
         'POST',
-        endpoint(`/api/account_management/methods/${gateway.id}/default`),
+        endpoint(`/api/client/account_management/methods/${gateway.id}/default`),
         {
           account_key: account.key,
         }
@@ -67,7 +67,7 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
           toast.success();
 
           queryClient.invalidateQueries({
-            queryKey: ['/api/account_management/methods', account?.id],
+            queryKey: ['/api/client/account_management/methods', account?.id],
           });
 
           setDefaultPopupVisible(false);

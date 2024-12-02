@@ -68,7 +68,7 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
             return;
           }
 
-          request('POST', endpoint('/api/account_management/methods/intent'), {
+          request('POST', endpoint('/api/client/account_management/methods/intent'), {
             account_key: account.key,
           })
             .then((response: AxiosResponse<Intent>) => {
@@ -95,7 +95,7 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['/api/account_management/methods'],
+        queryKey: ['/api/client/account_management/methods'],
       });
     }
   }, [visible]);
@@ -123,7 +123,7 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
         }
 
         if (result.setupIntent && result.setupIntent.status === 'succeeded') {
-          request('POST', endpoint('/api/account_management/methods/confirm'), {
+          request('POST', endpoint('/api/client/account_management/methods/confirm'), {
             account_key: account.key,
             gateway_response: result.setupIntent,
           }).then(() => {

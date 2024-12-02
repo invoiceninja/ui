@@ -37,9 +37,9 @@ export function Plan2() {
   const [createPopupVisible, setCreatePopupVisible] = useState(false);
 
   const { data: methods } = useQuery({
-    queryKey: ['/api/account_management/methods', account?.id],
+    queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
-      request('POST', endpoint('/api/account_management/methods'), {
+      request('POST', endpoint('/api/client/account_management/methods'), {
         account_key: account.key,
       }).then((response: AxiosResponse<CompanyGateway[]>) => response.data),
   });
@@ -51,7 +51,7 @@ export function Plan2() {
   const { data: plans } = useQuery({
     queryKey: ['plans'],
     queryFn: () =>
-      request('GET', endpoint('/api/account_management/plans')).then(
+      request('GET', endpoint('/api/client/account_management/plans')).then(
         (response: AxiosResponse<string[]>) => response.data
       ),
     staleTime: Infinity,
