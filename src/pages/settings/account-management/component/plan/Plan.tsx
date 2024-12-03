@@ -12,10 +12,11 @@ import { useColorScheme } from '$app/common/colors';
 import { date } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface PlanProps {
-  title: string;
+  title: ReactNode;
   color: string;
   trial: boolean;
   price: string;
@@ -48,7 +49,8 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
           <b>{price}</b>
         ) : (
           <p>
-            {trial ? 'Free trial, then' : null} <b> ${price} /</b> <span className='lowercase'>{t(term)}</span>
+            {trial ? 'Free trial, then' : null} <b> ${price} /</b>{' '}
+            <span className="lowercase">{t(term)}</span>
           </p>
         )}
       </div>
