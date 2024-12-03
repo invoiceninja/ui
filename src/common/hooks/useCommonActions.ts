@@ -95,6 +95,30 @@ export function useAllCommonActions() {
       { value: 'restore', label: t('restore') },
       { value: 'delete', label: t('delete') },
     ],
+
+    purchase_order: [
+      { value: 'send_email', label: t('send_email') },
+      { value: 'view_pdf', label: t('view_pdf') },
+      { value: 'print_pdf', label: t('print_pdf') },
+      { value: 'schedule', label: t('schedule') },
+      { value: 'add_comment', label: t('add_comment') },
+      { value: 'download', label: t('download') },
+      {
+        value: 'download_e_purchase_order',
+        label: t('download_e_purchase_order'),
+      },
+      { value: 'mark_sent', label: t('mark_sent') },
+      { value: 'convert_to_expense', label: t('convert_to_expense') },
+      { value: 'add_to_inventory', label: t('add_to_inventory') },
+      { value: 'view_expense', label: `${t('view')} ${t('expense')}` },
+      { value: 'vendor_portal', label: t('vendor_portal') },
+      { value: 'clone_to_purchase_order', label: t('clone_to_purchase_order') },
+      { value: 'clone_to_other', label: t('clone_to_other') },
+      { value: 'run_template', label: t('run_template') },
+      { value: 'archive', label: t('archive') },
+      { value: 'restore', label: t('restore') },
+      { value: 'delete', label: t('delete') },
+    ],
   };
 
   return actions;
@@ -119,6 +143,10 @@ export function useDefaultCommonActions() {
     recurring_invoice: [
       { value: 'start', label: t('start') },
       { value: 'view_pdf', label: t('view_pdf') },
+    ],
+    purchase_order: [
+      { value: 'send_email', label: t('send_email') },
+      { value: 'mark_sent', label: t('mark_sent') },
     ],
   };
 
