@@ -38,6 +38,7 @@ import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 import { useSockets } from './common/hooks/useSockets';
 import { useGlobalSocketEvents } from './common/queries/sockets';
+import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 
 export function App() {
   const [t] = useTranslation();
@@ -52,6 +53,8 @@ export function App() {
   const user = useCurrentUser();
   const location = useLocation();
   const company = useCurrentCompany();
+
+  useWebSessionTimeout();
   useAddPreventNavigationEvents();
 
   const refetch = useRefetch();
@@ -193,7 +196,7 @@ export function App() {
   }, [location, user]);
 
   const sockets = useSockets();
-  
+
   useGlobalSocketEvents();
 
   useEffect(() => {

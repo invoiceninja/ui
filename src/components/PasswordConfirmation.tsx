@@ -52,12 +52,19 @@ export function isPasswordRequired() {
   const company = useCurrentCompany();
   const lastPwdTimeDiff = dayjs().unix() - lastPasswordEntryTime;
 
+  // Password timeout is now disabled and web session is used instead. Code is kept for potential future use
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isPasswordTimeoutExpired =
     lastPwdTimeDiff > company.default_password_timeout / 1000 &&
     company.default_password_timeout > 0;
 
+  // return {
+  //   required: () => lastPasswordEntryTime === 0 || isPasswordTimeoutExpired,
+  // };
+
   return {
-    required: () => lastPasswordEntryTime === 0 || isPasswordTimeoutExpired,
+    required: () => false,
   };
 }
 
@@ -77,11 +84,16 @@ export function PasswordConfirmation(props: Props) {
     lastPasswordEntryTimeAtom
   );
 
+  // Password timeout is now disabled and web session is used instead. Code is kept for potential future use
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const lastPwdTimeDiff = dayjs().unix() - lastPasswordEntryTime;
 
-  const isPasswordTimeoutExpired =
-    lastPwdTimeDiff > company.default_password_timeout / 1000 &&
-    company.default_password_timeout > 0;
+  // const isPasswordTimeoutExpired =
+  //   lastPwdTimeDiff > company.default_password_timeout / 1000 &&
+  //   company.default_password_timeout > 0;
+
+  const isPasswordTimeoutExpired = false;
 
   useEffect(() => {
     setIsModalOpen(props.show as boolean);
