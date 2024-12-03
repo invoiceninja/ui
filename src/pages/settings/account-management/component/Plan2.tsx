@@ -28,6 +28,7 @@ import { Popup } from './plan/Popup';
 import { CreditCard } from './plan/CreditCard';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { usePlansQuery } from '$app/common/queries/plans';
+import { useTranslation } from 'react-i18next';
 
 export function Plan2() {
   const accentColor = useAccentColor();
@@ -71,7 +72,7 @@ export function Plan2() {
 
           {account.plan === 'enterprise' && enterprisePrice ? (
             <Plan
-              title="Enterprise"
+              title={<EnterpriseLabel />}
               color={accentColor}
               price={enterprisePrice.price!}
               trial={account.trial_days_left}
@@ -256,4 +257,42 @@ export function useCalculateEnterprisePrice({
         ? get(plans, `plans.${key}`)
         : get(plans, `plans.${key.replace('_plan', '_plan_annual')}`),
   };
+}
+
+function EnterpriseLabel() {
+  const { t } = useTranslation();
+  const account = useCurrentAccount();
+
+  const label = () => {
+    if (account.num_users <= 2) {
+      return '1-2';
+    }
+
+    if (account.num_users <= 5) {
+      return '2-5';
+    }
+
+    if (account.num_users <= 10) {
+      return '6-10';
+    }
+
+    if (account.num_users <= 20) {
+      return '11-20';
+    }
+
+    if (account.num_users <= 30) {
+      return '21-30';
+    }
+
+    if (account.num_users <= 50) {
+      return '31-50';
+    }
+  };
+
+  return (
+    <p>
+      {t('enterprise')} ({label()}{' '}
+      <span className="lowercase">{t('users')}</span>)
+    </p>
+  );
 }
