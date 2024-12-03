@@ -39,6 +39,7 @@ export function useAllCommonActions() {
       { value: 'archive', label: t('archive') },
       { value: 'restore', label: t('restore') },
       { value: 'delete', label: t('delete') },
+      { value: 'run_template', label: t('run_template') },
     ],
     credit: [
       { value: 'email_credit', label: t('email_credit') },
