@@ -102,7 +102,9 @@ export default function InvoiceDesign() {
         request('POST', endpoint('/api/v1/designs/set/default'), {
           design_id,
           entity,
-          settings_level: activeSettings.level,
+          settings_level: isGroupSettingsActive
+            ? 'group_settings'
+            : activeSettings.level,
           ...(isClientSettingsActive && { client_id: company?.settings?.id }),
           ...(isGroupSettingsActive && {
             group_settings_id: activeSettingsValue?.id,
