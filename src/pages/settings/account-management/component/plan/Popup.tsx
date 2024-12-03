@@ -25,6 +25,7 @@ import { useQuery } from 'react-query';
 import { ChangePlan } from './ChangePlan';
 import { PopupProps } from './NewCreditCard';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useCalculateEnterprisePrice } from '../Plan2';
 
 export type Plan =
   | '' // Free
@@ -61,9 +62,17 @@ export function Popup({ visible, onClose }: PopupProps) {
     return 'annually';
   });
 
+  const enterprisePrice = useCalculateEnterprisePrice({ strategy: 'next' });
+
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
-  const [enterprisePlan, setEnterprisePlan] = useState<Plan>('enterprise_plan');
+  const [enterprisePlan, setEnterprisePlan] = useState<Plan>(() => {
+    if (enterprisePrice !== null) {
+      return enterprisePrice.key as Plan;
+    }
+
+    return 'enterprise_plan';
+  });
 
   useEffect(() => {
     if (changePlanVisible) {
@@ -71,12 +80,48 @@ export function Popup({ visible, onClose }: PopupProps) {
     }
   }, [changePlanVisible]);
 
+  const currentEnterprisePrice = useCalculateEnterprisePrice({
+    strategy: 'current',
+  });
+
   function isPlanVisible(plan: Plan) {
     const currentPlan = account.plan as Plan;
 
     const plans: Plan[] = ['', 'pro', 'enterprise'];
 
     const current = plans.indexOf(currentPlan);
+    const target = plans.indexOf(plan);
+
+    if (
+      plan === 'enterprise' &&
+      currentPlan === 'enterprise' &&
+      enterprisePrice !== null
+    ) {
+      return true;
+    }
+
+    return current < target;
+  }
+
+  function isEnterprisePlanVisible(plan: Plan) {
+    if (account.plan !== 'enterprise') {
+      return true;
+    }
+
+    if (currentEnterprisePrice === null) {
+      return false;
+    }
+
+    const plans: Plan[] = [
+      'enterprise_plan',
+      'enterprise_plan_5',
+      'enterprise_plan_10',
+      'enterprise_plan_20',
+      'enterprise_plan_30',
+      'enterprise_plan_50',
+    ];
+
+    const current = plans.indexOf(currentEnterprisePrice.key as Plan);
     const target = plans.indexOf(plan);
 
     return current < target;
@@ -99,6 +144,18 @@ export function Popup({ visible, onClose }: PopupProps) {
 
   const { t } = useTranslation();
 
+  function isToggleVisible() {
+    if (isPlanVisible('pro')) {
+      return true;
+    }
+
+    if (isPlanVisible('enterprise') && enterprisePrice !== null) {
+      return true;
+    }
+
+    return false;
+  }
+
   return (
     <>
       <Modal
@@ -114,6 +171,13 @@ export function Popup({ visible, onClose }: PopupProps) {
             onSuccess={() => {
               setChangePlanVisible(false);
               setTargetPlan(null);
+              setEnterprisePlan(() => {
+                if (enterprisePrice !== null) {
+                  return enterprisePrice.key as Plan;
+                }
+
+                return 'enterprise_plan';
+              });
               refresh();
             }}
           />
@@ -129,7 +193,8 @@ export function Popup({ visible, onClose }: PopupProps) {
             </h2>
           </div>
 
-          {account.plan_term === '' ? (
+          {account.plan_term === '' ||
+          (account.plan_term === 'month' && isToggleVisible()) ? (
             <div className="flex justify-center mt-6">
               <div className="flex items-center space-x-2">
                 <span>Monthly</span>
@@ -214,85 +279,109 @@ export function Popup({ visible, onClose }: PopupProps) {
               </div>
             ) : null}
 
-            <div
-              className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"
-              style={{ borderColor: accentColor }}
-            >
-              <div className="h-72 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-semibold text-2xl">Enterprise</h3>
-                  <p className="my-4">Pay annually for 10 months + 2 free!</p>
-
+            {isPlanVisible('enterprise') ? (
+              <div
+                className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"
+                style={{ borderColor: accentColor }}
+              >
+                <div className="h-72 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-end space-x-2">
-                      <h2 className="text-3xl font-semibold">
-                        $
-                        {pricing === 'monthly'
-                          ? get(plans?.plans, enterprisePlan)
-                          : get(
-                              plans?.plans,
-                              `${enterprisePlan.replace('plan', 'plan_annual')}`
-                            )}
-                      </h2>
-                      <span>
-                        {pricing === 'monthly' ? t('per_month') : t('per_year')}
-                      </span>
+                    <h3 className="font-semibold text-2xl">Enterprise</h3>
+                    <p className="my-4">Pay annually for 10 months + 2 free!</p>
+
+                    <div>
+                      <div className="flex items-end space-x-2">
+                        <h2 className="text-3xl font-semibold">
+                          $
+                          {pricing === 'monthly'
+                            ? get(plans?.plans, enterprisePlan)
+                            : get(
+                                plans?.plans,
+                                `${enterprisePlan.replace(
+                                  'plan',
+                                  'plan_annual'
+                                )}`
+                              )}
+                        </h2>
+                        <span>
+                          {pricing === 'monthly'
+                            ? t('per_month')
+                            : t('per_year')}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex flex-col space-y-3">
-                  <SelectField
-                    label="Plan selected"
-                    value={enterprisePlan}
-                    onValueChange={(v) => setEnterprisePlan(v as Plan)}
-                  >
-                    <option value="enterprise_plan">1-2 users</option>
-                    <option value="enterprise_plan_5">3-5 users</option>
-                    <option value="enterprise_plan_10">6-10 users</option>
-                    <option value="enterprise_plan_20">11-20 users</option>
-                    <option value="enterprise_plan_30">21-30 users</option>
-                    <option value="enterprise_plan_50">31-50 users</option>
-                  </SelectField>
+                  <div className="flex flex-col space-y-3">
+                    <SelectField
+                      label="Plan selected"
+                      value={enterprisePlan}
+                      onValueChange={(v) => setEnterprisePlan(v as Plan)}
+                    >
+                      {isEnterprisePlanVisible('enterprise_plan') ? (
+                        <option value="enterprise_plan">1-2 users</option>
+                      ) : null}
 
-                  <button
-                    type="button"
-                    className="border py-3 px-4 rounded"
-                    style={{ backgroundColor: accentColor, color: colors.$1 }}
-                    onClick={() => {
-                      setTargetPlan(enterprisePlan);
-                      setChangePlanVisible(true);
-                    }}
-                    disabled={account.plan === enterprisePlan}
-                  >
-                    Upgrade plan
-                  </button>
-                </div>
-              </div>
+                      {isEnterprisePlanVisible('enterprise_plan_5') ? (
+                        <option value="enterprise_plan_5">3-5 users</option>
+                      ) : null}
 
-              <div
-                className="w-full p-[0.1px] my-5"
-                style={{ backgroundColor: colors.$5 }}
-              ></div>
+                      {isEnterprisePlanVisible('enterprise_plan_10') ? (
+                        <option value="enterprise_plan_10">6-10 users</option>
+                      ) : null}
 
-              <p className="font-semibold uppercase">All pro features +</p>
+                      {isEnterprisePlanVisible('enterprise_plan_20') ? (
+                        <option value="enterprise_plan_20">11-20 users</option>
+                      ) : null}
 
-              <div className="my-3 space-y-3">
-                {plans?.features.enterprise_plan.map((feature, i) => (
-                  <div
-                    key={`enterprise-${i}`}
-                    className="flex items-center gap-3"
-                  >
-                    <FaCheckDouble
-                      color={accentColor}
-                      size={14}
-                      className="flex-shrink-0"
-                    />
-                    <p>{feature}</p>
+                      {isEnterprisePlanVisible('enterprise_plan_30') ? (
+                        <option value="enterprise_plan_30">21-30 users</option>
+                      ) : null}
+
+                      {isEnterprisePlanVisible('enterprise_plan_50') ? (
+                        <option value="enterprise_plan_50">31-50 users</option>
+                      ) : null}
+                    </SelectField>
+
+                    <button
+                      type="button"
+                      className="border py-3 px-4 rounded"
+                      style={{ backgroundColor: accentColor, color: colors.$1 }}
+                      onClick={() => {
+                        setTargetPlan(enterprisePlan);
+                        setChangePlanVisible(true);
+                      }}
+                      disabled={account.plan === enterprisePlan}
+                    >
+                      Upgrade plan
+                    </button>
                   </div>
-                ))}
+                </div>
+
+                <div
+                  className="w-full p-[0.1px] my-5"
+                  style={{ backgroundColor: colors.$5 }}
+                ></div>
+
+                <p className="font-semibold uppercase">All pro features +</p>
+
+                <div className="my-3 space-y-3">
+                  {plans?.features.enterprise_plan.map((feature, i) => (
+                    <div
+                      key={`enterprise-${i}`}
+                      className="flex items-center gap-3"
+                    >
+                      <FaCheckDouble
+                        color={accentColor}
+                        size={14}
+                        className="flex-shrink-0"
+                      />
+                      <p>{feature}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
 
             <div
               className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"
