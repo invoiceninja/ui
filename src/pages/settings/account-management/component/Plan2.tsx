@@ -27,6 +27,7 @@ import { DeleteCreditCard } from './plan/DeleteCreditCard';
 import { Popup } from './plan/Popup';
 import { CreditCard } from './plan/CreditCard';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { usePlansQuery } from '$app/common/queries/plans';
 
 export function Plan2() {
   const accentColor = useAccentColor();
@@ -52,13 +53,10 @@ export function Plan2() {
     null
   );
 
-  const { data: plans } = useQuery({
-    queryKey: ['plans'],
-    queryFn: () =>
-      request('GET', endpoint('/api/client/account_management/plans')).then(
-        (response: AxiosResponse<string[]>) => response.data
-      ),
-    staleTime: Infinity,
+  const { data: plans } = usePlansQuery();
+
+  const enterprisePrice = useCalculateEnterprisePrice({
+    strategy: 'current',
   });
 
   return (
@@ -71,11 +69,11 @@ export function Plan2() {
 
           {account.plan === '' ? <Free /> : null}
 
-          {account.plan === 'enterprise' ? (
+          {account.plan === 'enterprise' && enterprisePrice ? (
             <Plan
               title="Enterprise"
               color={accentColor}
-              price="todo"
+              price={enterprisePrice.price!}
               trial={account.trial_days_left}
               custom={false}
               term={account.plan_term === 'month' ? 'month' : 'year'}
@@ -101,7 +99,7 @@ export function Plan2() {
             <Plan
               title="Premium Business+"
               color="#FFCB00"
-              price="todo"
+              price=""
               trial={account.trial_days_left}
               custom={false}
               term={account.plan_term === 'month' ? 'month' : 'year'}
@@ -203,4 +201,59 @@ export function Plan2() {
       />
     </div>
   );
+}
+
+export interface CalculateEnterprisePriceProps {
+  strategy: 'current' | 'next';
+}
+
+export function useCalculateEnterprisePrice({
+  strategy,
+}: CalculateEnterprisePriceProps) {
+  const account = useCurrentAccount();
+  const { data: plans } = usePlansQuery();
+
+  if (account.plan !== 'enterprise' && strategy !== 'next') {
+    return null;
+  }
+
+  const maxUsers = {
+    2: 'enterprise_plan',
+    5: 'enterprise_plan_5',
+    10: 'enterprise_plan_10',
+    20: 'enterprise_plan_20',
+    30: 'enterprise_plan_30',
+    50: 'enterprise_plan_50',
+  };
+
+  let closest: number | undefined;
+
+  const users = parseInt(account.num_users);
+  const keys = Object.keys(maxUsers).map((key) => parseInt(key));
+
+  if (strategy === 'current') {
+    closest = keys.find((key) => key >= users);
+  }
+
+  if (strategy === 'next') {
+    closest = keys.find((key) => key > users);
+  }
+
+  if (!closest) {
+    return null;
+  }
+
+  const key = get(maxUsers, closest.toString()) as string | undefined;
+
+  if (!key) {
+    return null;
+  }
+
+  return {
+    key,
+    price:
+      account.plan_term === 'month'
+        ? get(plans, `plans.${key}`)
+        : get(plans, `plans.${key.replace('_plan', '_plan_annual')}`),
+  };
 }
