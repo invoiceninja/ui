@@ -381,7 +381,14 @@ export function useActions(params?: Params) {
     //     </EntityActionElement>
     //   ),
     (invoice: Invoice) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'run_template',
+        })}
+        entity="invoice"
+        actionKey="run_template"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('run_template')}
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([invoice]);
@@ -390,10 +397,10 @@ export function useActions(params?: Params) {
             entity: 'invoice',
           });
         }}
-        icon={<Icon element={MdDesignServices} />}
+        icon={MdDesignServices}
       >
         {t('run_template')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
