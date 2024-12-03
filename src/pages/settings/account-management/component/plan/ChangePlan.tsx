@@ -130,7 +130,7 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
         >
           <div className="flex items-center justify-between">
             <p>{planDescription.description}</p>
-            <p className="font-semibold">{planDescription.price}</p>
+            <p className="font-semibold">{planDescription.pro_rata}</p>
           </div>
         </NonClickableElement>
       ) : null}
