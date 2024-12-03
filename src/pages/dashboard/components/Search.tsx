@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -16,15 +17,15 @@ import { Entry } from '$app/components/forms/Combobox';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
+import { memo, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { Combobox } from '@headlessui/react';
 import { useClickAway } from 'react-use';
 import collect from 'collect.js';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { debounce } from 'lodash';
-import { Spinner } from '$app/components/Spinner';
+import { InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 const ComboboxOption = styled(Combobox.Option)`
   color: ${(props) => props.theme.color};
@@ -33,10 +34,18 @@ const ComboboxOption = styled(Combobox.Option)`
   }
 `;
 
+const Div = styled.div`
+  color: ${(props) => props.theme.color};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
 export function Search$() {
   const [t] = useTranslation();
-  const [query, setQuery] = useState('');
-  const [isVisible, setIsVisible] = useState(false);
+  const [query, setQuery] = useState<string>('');
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const preventNavigation = usePreventNavigation();
   const colors = useColorScheme();
   const comboboxRef = useRef<HTMLDivElement | null>(null);
@@ -102,10 +111,7 @@ export function Search$() {
 
   useClickAway(comboboxRef, () => setIsVisible(false));
 
-  const handleChange = debounce(
-    (event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value),
-    500
-  );
+  const handleChange = debounce((value: string) => setQuery(value), 500);
 
   const options = filtered.count() === 0 ? collect(data) : filtered;
 
@@ -116,102 +122,132 @@ export function Search$() {
   }, [query]);
 
   return (
-    <Combobox
-      as="div"
-      onChange={(value: Entry<SearchRecord>) =>
-        value.resource
-          ? preventNavigation({
-              url: value.resource.path,
-            })
-          : null
-      }
-      className="relative w-full max-w-[70%]"
-      ref={comboboxRef}
-    >
-      <div className="relative mt-2">
-        <div className="flex items-center">
-          <span
-            className={classNames({
-              block: isFetching,
-              hidden: !isFetching,
-            })}
+    <>
+      <InputField
+        className="border-transparent focus:border-transparent focus:ring-0 w-full"
+        value={query}
+        onValueChange={(value) => handleChange(value)}
+        onClick={() => setIsModalOpen(true)}
+        placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
+        style={{ backgroundColor: colors.$1, color: colors.$3 }}
+      />
+
+      <Modal visible={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {options?.map((entry) => (
+          <Div
+            key={entry.id}
+            theme={{ color: colors.$3, hoverColor: colors.$2 }}
+            className="cursor-pointer rounded px-4 py-2 active:font-semibold"
           >
-            <Spinner />
-          </span>
+            <span>
+              <div>
+                <p className="text-xs font-semibold">
+                  {entry.resource?.heading}
+                </p>
+                <p>{entry.label}</p>
+              </div>
+            </span>
+          </Div>
+        ))}
+      </Modal>
 
-          <Combobox.Input
-            className="border-transparent focus:border-transparent focus:ring-0 w-full"
-            onChange={handleChange}
-            ref={inputRef}
-            onFocus={() => setIsVisible(true)}
-            placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
-            style={{ backgroundColor: colors.$1, color: colors.$3 }}
-          />
+      {/* <Combobox
+        as="div"
+        onChange={(value: Entry<SearchRecord>) =>
+          value.resource
+            ? preventNavigation({
+                url: value.resource.path,
+              })
+            : null
+        }
+        className="relative w-full max-w-[70%]"
+        ref={comboboxRef}
+      >
+        <div className="relative mt-2">
+          <div className="flex items-center">
+            <span
+              className={classNames({
+                block: isFetching,
+                hidden: !isFetching,
+              })}
+            >
+              <Spinner />
+            </span>
+
+            <Combobox.Input
+              className="border-transparent focus:border-transparent focus:ring-0 w-full"
+              onChange={handleChange}
+              ref={inputRef}
+              onFocus={() => setIsVisible(true)}
+              placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
+              style={{ backgroundColor: colors.$1, color: colors.$3 }}
+            />
+          </div>
+
+          <Combobox.Options
+            className={classNames(
+              'absolute border rounded-lg max-h-72 overflow-y-auto shadow-xl',
+              'min-w-full w-max',
+              {
+                hidden: !isVisible,
+              }
+            )}
+            style={{
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+              minWidth: '33vw',
+              maxWidth: 'max(100%, 33vw)',
+            }}
+            static={true}
+          >
+            {options?.map((entry) => (
+              <ComboboxOption
+                key={entry.id}
+                value={entry}
+                theme={{ color: colors.$3, hoverColor: colors.$2 }}
+                className="cursor-pointer rounded px-4 py-2 active:font-semibold"
+              >
+                {({ active }) => (
+                  <span
+                    className={classNames(
+                      'block truncate space-x-1',
+                      active && 'font-semibold'
+                    )}
+                  >
+                    <div>
+                      <p className="text-xs font-semibold">
+                        {entry.resource?.heading}
+                      </p>
+                      <p>{entry.label}</p>
+                    </div>
+                  </span>
+                )}
+              </ComboboxOption>
+            ))}
+
+            {options.count() === 0 && (
+              <ComboboxOption
+                value={null}
+                theme={{ color: colors.$3, hoverColor: colors.$2 }}
+                className="cursor-not-allowed rounded px-4 py-2 active:font-semibold"
+                disabled
+              >
+                {({ active }) => (
+                  <span
+                    className={classNames(
+                      'block truncate space-x-1',
+                      active && 'font-semibold'
+                    )}
+                  >
+                    <p className="text-sm">{t('no_match_found')}</p>
+                  </span>
+                )}
+              </ComboboxOption>
+            )}
+          </Combobox.Options>
         </div>
-
-        <Combobox.Options
-          className={classNames(
-            'absolute border rounded-lg max-h-72 overflow-y-auto shadow-xl',
-            'min-w-full w-max',
-            {
-              hidden: !isVisible,
-            }
-          )}
-          style={{
-            backgroundColor: colors.$1,
-            borderColor: colors.$5,
-            minWidth: '33vw',
-            maxWidth: 'max(100%, 33vw)',
-          }}
-          static={true}
-        >
-          {options?.map((entry) => (
-            <ComboboxOption
-              key={entry.id}
-              value={entry}
-              theme={{ color: colors.$3, hoverColor: colors.$2 }}
-              className="cursor-pointer rounded px-4 py-2 active:font-semibold"
-            >
-              {({ active }) => (
-                <span
-                  className={classNames(
-                    'block truncate space-x-1',
-                    active && 'font-semibold'
-                  )}
-                >
-                  <div>
-                    <p className="text-xs font-semibold">
-                      {entry.resource?.heading}
-                    </p>
-                    <p>{entry.label}</p>
-                  </div>
-                </span>
-              )}
-            </ComboboxOption>
-          ))}
-
-          {options.count() === 0 && (
-            <ComboboxOption
-              value={null}
-              theme={{ color: colors.$3, hoverColor: colors.$2 }}
-              className="cursor-not-allowed rounded px-4 py-2 active:font-semibold"
-              disabled
-            >
-              {({ active }) => (
-                <span
-                  className={classNames(
-                    'block truncate space-x-1',
-                    active && 'font-semibold'
-                  )}
-                >
-                  <p className="text-sm">{t('no_match_found')}</p>
-                </span>
-              )}
-            </ComboboxOption>
-          )}
-        </Combobox.Options>
-      </div>
-    </Combobox>
+      </Combobox> */}
+    </>
   );
 }
 
