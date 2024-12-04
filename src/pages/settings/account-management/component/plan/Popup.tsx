@@ -66,7 +66,7 @@ export function Popup({ visible, onClose }: PopupProps) {
 
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
-  const [enterprisePlan, setEnterprisePlan] = useState<Plan | null>(() => {
+  const [enterprisePlan, setEnterprisePlan] = useState<Plan>(() => {
     if (enterprisePrice !== null) {
       return enterprisePrice.key as Plan;
     }
