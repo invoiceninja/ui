@@ -113,6 +113,10 @@ export function AddToInvoiceAction(props: Props) {
                 expense.tax_amount3,
                 expense.tax_rate3
               ),
+              custom_value1: expense.custom_value1,
+              custom_value2: expense.custom_value2,
+              custom_value3: expense.custom_value3,
+              custom_value4: expense.custom_value4,
             })),
           ],
         }
