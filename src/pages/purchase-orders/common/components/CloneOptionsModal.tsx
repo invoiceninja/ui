@@ -16,9 +16,8 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { CloneOption } from '$app/components/CloneOption';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { creditAtom } from '$app/pages/credits/common/atoms';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
@@ -33,13 +32,14 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   purchaseOrder: PurchaseOrder;
+  dropdown: boolean;
 }
 
 export function CloneOptionsModal(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const { purchaseOrder } = props;
+  const { purchaseOrder, dropdown } = props;
 
   const hasPermission = useHasPermission();
 
@@ -70,7 +70,6 @@ export function CloneOptionsModal(props: Props) {
       paid_to_date: 0,
       po_number: purchaseOrder.number,
       design_id: company.settings.invoice_design_id,
-
     });
 
     navigate('/invoices/create?action=clone');
@@ -95,7 +94,6 @@ export function CloneOptionsModal(props: Props) {
       paid_to_date: 0,
       po_number: purchaseOrder.number,
       design_id: company.settings.quote_design_id,
-
     });
 
     navigate('/quotes/create?action=clone');
@@ -120,7 +118,6 @@ export function CloneOptionsModal(props: Props) {
       partial_due_date: '',
       po_number: purchaseOrder.number,
       design_id: company.settings.invoice_design_id,
-
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -156,12 +153,16 @@ export function CloneOptionsModal(props: Props) {
         hasPermission('create_quote') ||
         hasPermission('create_recurring_invoice') ||
         hasPermission('create_credit')) && (
-        <DropdownElement
+        <EntityActionElement
+          entity="purchase_order"
+          actionKey="clone_to_other"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_other')}
           onClick={() => setIsModalVisible(true)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={MdControlPointDuplicate}
         >
           {t('clone_to_other')}
-        </DropdownElement>
+        </EntityActionElement>
       )}
 
       <Modal
