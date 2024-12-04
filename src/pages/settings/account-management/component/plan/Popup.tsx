@@ -66,7 +66,7 @@ export function Popup({ visible, onClose }: PopupProps) {
 
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
-  const [enterprisePlan, setEnterprisePlan] = useState<Plan>(() => {
+  const [enterprisePlan, setEnterprisePlan] = useState<Plan | null>(() => {
     if (enterprisePrice !== null) {
       return enterprisePrice.key as Plan;
     }
@@ -156,6 +156,16 @@ export function Popup({ visible, onClose }: PopupProps) {
     return false;
   }
 
+  useEffect(() => {
+    setEnterprisePlan(() => {
+      if (enterprisePrice !== null) {
+        return enterprisePrice.key as Plan;
+      }
+
+      return 'enterprise_plan';
+    });
+  }, [account]);
+
   return (
     <>
       <Modal
@@ -169,16 +179,10 @@ export function Popup({ visible, onClose }: PopupProps) {
             plan={targetPlan}
             cycle={pricing}
             onSuccess={() => {
+              refresh();
+
               setChangePlanVisible(false);
               setTargetPlan(null);
-              setEnterprisePlan(() => {
-                if (enterprisePrice !== null) {
-                  return enterprisePrice.key as Plan;
-                }
-
-                return 'enterprise_plan';
-              });
-              refresh();
             }}
           />
         ) : null}
