@@ -22,9 +22,7 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useSetAtom } from 'jotai';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
@@ -79,6 +77,7 @@ import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -420,7 +419,13 @@ export function usePurchaseOrderFilters() {
   return filters;
 }
 
-export function useActions() {
+interface ActionsParams {
+  dropdown?: boolean;
+}
+
+export function useActions(params: ActionsParams = {}) {
+  const { dropdown = true } = params;
+
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
@@ -474,137 +479,246 @@ export function useActions() {
 
   const actions: Action<PurchaseOrder>[] = [
     (purchaseOrder) => (
-      <DropdownElement
-        onClick={() =>
-          navigate(
-            route('/purchase_orders/:id/email', { id: purchaseOrder.id })
-          )
-        }
-        icon={<Icon element={MdSend} />}
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'send_email',
+        })}
+        entity="purchase_order"
+        actionKey="send_email"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('send_email')}
+        to={route('/purchase_orders/:id/email', { id: purchaseOrder.id })}
+        icon={MdSend}
       >
         {t('send_email')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (purchaseOrder) => (
-      <DropdownElement
-        onClick={() =>
-          navigate(route('/purchase_orders/:id/pdf', { id: purchaseOrder.id }))
-        }
-        icon={<Icon element={MdPictureAsPdf} />}
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="purchase_order"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
+        to={route('/purchase_orders/:id/pdf', { id: purchaseOrder.id })}
+        icon={MdPictureAsPdf}
       >
         {t('view_pdf')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (purchaseOrder) =>
       getEntityState(purchaseOrder) !== EntityState.Deleted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'print_pdf',
+          })}
+          entity="purchase_order"
+          actionKey="print_pdf"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('print_pdf')}
           onClick={() => printPdf([purchaseOrder.id])}
-          icon={<Icon element={MdPrint} />}
+          icon={MdPrint}
+          disablePreventNavigation
         >
           {t('print_pdf')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) =>
       purchaseOrder.status_id !== PurchaseOrderStatus.Accepted &&
       (isAdmin || isOwner) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'schedule',
+          })}
+          entity="purchase_order"
+          actionKey="schedule"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('schedule')}
           onClick={() => scheduleEmailRecord(purchaseOrder.id)}
-          icon={<Icon element={MdSchedule} />}
+          icon={MdSchedule}
         >
           {t('schedule')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) => (
       <AddActivityComment
+        {...(!dropdown && {
+          key: 'add_comment',
+        })}
         entity="purchase_order"
         entityId={purchaseOrder.id}
         label={`#${purchaseOrder.number}`}
         labelElement={
-          <DropdownElement icon={<Icon element={MdComment} />}>
+          <EntityActionElement
+            entity="purchase_order"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+          >
             {t('add_comment')}
-          </DropdownElement>
+          </EntityActionElement>
         }
       />
     ),
     (purchaseOrder) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'download',
+        })}
+        entity="purchase_order"
+        actionKey="download"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('download')}
         onClick={() => downloadPdf(purchaseOrder)}
-        icon={<Icon element={MdDownload} />}
+        icon={MdDownload}
+        disablePreventNavigation
       >
         {t('download')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (purchaseOrder) =>
       Boolean(company?.settings.enable_e_invoice) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'download_e_purchase_order',
+          })}
+          entity="purchase_order"
+          actionKey="download_e_purchase_order"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('download_e_purchase_order')}
           onClick={() => downloadEPurchaseOrder(purchaseOrder)}
-          icon={<Icon element={MdDownload} />}
+          icon={MdDownload}
+          disablePreventNavigation
         >
           {t('download_e_purchase_order')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) =>
       purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_sent',
+          })}
+          entity="purchase_order"
+          actionKey="mark_sent"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_sent')}
           onClick={() => markSent(purchaseOrder)}
-          icon={<Icon element={MdMarkEmailRead} />}
+          icon={MdMarkEmailRead}
+          disablePreventNavigation
         >
           {t('mark_sent')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) =>
       Boolean(!purchaseOrder.expense_id.length) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'convert_to_expense',
+          })}
+          entity="purchase_order"
+          actionKey="convert_to_expense"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('convert_to_expense')}
           onClick={() => bulk([purchaseOrder.id], 'expense')}
-          icon={<Icon element={MdSwitchRight} />}
+          icon={MdSwitchRight}
+          disablePreventNavigation
         >
           {t('convert_to_expense')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) =>
       purchaseOrder.status_id === PurchaseOrderStatus.Accepted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'add_to_inventory',
+          })}
+          entity="purchase_order"
+          actionKey="add_to_inventory"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('add_to_inventory')}
           onClick={() => bulk([purchaseOrder.id], 'add_to_inventory')}
-          icon={<Icon element={MdInventory} />}
+          icon={MdInventory}
+          disablePreventNavigation
         >
           {t('add_to_inventory')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) =>
       Boolean(purchaseOrder.expense_id.length) &&
       !disableNavigation('expense', purchaseOrder.expense) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'view_expense',
+          })}
+          entity="purchase_order"
+          actionKey="view_expense"
+          isCommonActionSection={!dropdown}
+          tooltipText={`${t('view')} ${t('expense')}`}
           onClick={() =>
             navigate(
               route('/expenses/:id/edit', { id: purchaseOrder.expense_id })
             )
           }
-          icon={<Icon element={MdPageview} />}
+          icon={MdPageview}
         >
           {`${t('view')} ${t('expense')}`}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'vendor_portal',
+        })}
+        entity="purchase_order"
+        actionKey="vendor_portal"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('vendor_portal')}
         onClick={() => openClientPortal(purchaseOrder)}
-        icon={<Icon element={MdCloudCircle} />}
+        icon={MdCloudCircle}
+        disablePreventNavigation
       >
         {t('vendor_portal')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     () => <Divider withoutPadding />,
     (purchaseOrder) =>
       hasPermission('create_purchase_order') && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'clone_to_purchase_order',
+          })}
+          entity="purchase_order"
+          actionKey="clone_to_purchase_order"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_purchase_order')}
           onClick={() => cloneToPurchaseOrder(purchaseOrder)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={MdControlPointDuplicate}
         >
           {t('clone_to_purchase_order')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
-    (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
     (purchaseOrder) => (
-      <DropdownElement
+      <CloneOptionsModal
+        {...(!dropdown && {
+          key: 'clone_to_other',
+        })}
+        purchaseOrder={purchaseOrder}
+        dropdown={dropdown}
+      />
+    ),
+    (purchaseOrder) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'run_template',
+        })}
+        entity="purchase_order"
+        actionKey="run_template"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('run_template')}
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([purchaseOrder]);
@@ -613,41 +727,68 @@ export function useActions() {
             entity: 'purchase_order',
           });
         }}
-        icon={<Icon element={MdDesignServices} />}
+        icon={MdDesignServices}
       >
         {t('run_template')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&
       isEditPage && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'archive',
+          })}
+          entity="purchase_order"
+          actionKey="archive"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('archive')}
           onClick={() => bulk([purchaseOrder.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
+          icon={MdArchive}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) =>
       Boolean(purchaseOrder.archived_at) &&
       isEditPage && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'restore',
+          })}
+          entity="purchase_order"
+          actionKey="restore"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('restore')}
           onClick={() => bulk([purchaseOrder.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
+          icon={MdRestore}
+          disablePreventNavigation
+          excludePreferences
         >
           {t('restore')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (purchaseOrder) =>
       !purchaseOrder.is_deleted &&
       isEditPage && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'delete',
+          })}
+          entity="purchase_order"
+          actionKey="delete"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('delete')}
           onClick={() => bulk([purchaseOrder.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
+          icon={MdDelete}
+          disablePreventNavigation
+          excludePreferences
         >
           {t('delete')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
   ];
 

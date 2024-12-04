@@ -35,6 +35,7 @@ import { useTabs } from './edit/hooks/useTabs';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useCalculateInvoiceSum } from './edit/hooks/useCalculateInvoiceSum';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
 
 export default function PurchaseOrder() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -113,7 +114,19 @@ export default function PurchaseOrder() {
     >
       {purchaseOrder?.id === id ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              purchaseOrder && (
+                <div className="flex items-center">
+                  <CommonActions
+                    resource={purchaseOrder}
+                    entity="purchase_order"
+                  />
+                </div>
+              )
+            }
+          />
 
           <Outlet
             context={{
