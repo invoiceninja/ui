@@ -44,6 +44,16 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
   const account = useCurrentAccount();
   const colors = useColorScheme();
 
+  const [$plan] = useState(() => {
+    let p = plan;
+
+    if (cycle === 'annually' && !p.includes('annual')) {
+      p = plan.replace('plan', 'plan_annual') as Plan;
+    }
+
+    return p;
+  });
+
   const { data: methods } = useQuery({
     queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
@@ -63,7 +73,7 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
         endpoint('/api/client/account_management/upgrade/description'),
         {
           cycle,
-          plan,
+          plan: $plan,
           account_key: account.key,
         }
       ).then((response: AxiosResponse<PlanDescription>) => response.data),
@@ -98,9 +108,8 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
         request('POST', endpoint('/api/client/account_management/upgrade'), {
           gateway_response: null,
           account_key: account.key,
-          plan,
+          plan: $plan,
           token,
-          cycle,
         })
           .then(() => {
             toast.success();
@@ -117,10 +126,6 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
 
   return (
     <div>
-      <p className="mb-3">
-        Changing plan to: <b>{t(plan)}</b>
-      </p>
-
       {errors && <Alert type="danger">{errors}</Alert>}
 
       {planDescription ? (
