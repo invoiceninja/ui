@@ -26,10 +26,11 @@ import { useActions as useCreditActions } from '$app/pages/credits/common/hooks'
 import { useActions as useQuoteActions } from '$app/pages/quotes/common/hooks';
 import { Quote } from '$app/common/interfaces/quote';
 import { useActions as useRecurringInvoiceActions } from '$app/pages/recurring-invoices/common/hooks';
-
+import { useActions as usePurchaseOrderActions } from '$app/pages/purchase-orders/common/hooks';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
-type Resource = Invoice | Credit | Quote | RecurringInvoice;
+type Resource = Invoice | Credit | Quote | RecurringInvoice | PurchaseOrder;
 
 interface Props {
   entity: EntityType;
@@ -45,7 +46,7 @@ export function CommonActions(props: Props) {
   const recurringInvoiceActions = useRecurringInvoiceActions({
     dropdown: false,
   });
-
+  const purchaseOrderActions = usePurchaseOrderActions({ dropdown: false });
   const { resource, entity } = props;
 
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
@@ -75,6 +76,12 @@ export function CommonActions(props: Props) {
 
     if (entity === 'recurring_invoice') {
       return recurringInvoiceActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    if (entity === 'purchase_order') {
+      return purchaseOrderActions.filter(
         (action) => typeof action === 'function'
       ) as ResourceAction<Resource>[];
     }
