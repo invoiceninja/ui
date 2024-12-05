@@ -14,9 +14,8 @@ import { useQuery } from 'react-query';
 import { GenericQueryOptions } from './invoices';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '../atoms/password-confirmation';
 import { useRefetch } from '../hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '../hooks/useOnWrongPasswordEnter';
 
 export function useUsersQuery() {
   return useQuery(
@@ -53,14 +52,15 @@ export function useBlankUserQuery() {
 }
 
 export function useBulk() {
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const $refetch = useRefetch();
 
   return (
     ids: string[],
     action: 'archive' | 'restore' | 'delete',
-    password: string
+    password: string,
+    isPasswordRequired: boolean
   ) => {
     toast.processing();
 
@@ -80,8 +80,7 @@ export function useBulk() {
       })
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
         }
       });
   };

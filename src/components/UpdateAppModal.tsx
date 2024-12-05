@@ -14,10 +14,8 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { Button } from './forms';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
-import { toast } from '$app/common/helpers/toast/toast';
 import { PasswordConfirmation } from './PasswordConfirmation';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Props {
   isVisible: boolean;
@@ -31,7 +29,7 @@ export function UpdateAppModal(props: Props) {
 
   const { isVisible, setIsVisible, installedVersion, latestVersion } = props;
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isUpgradeLoadingModalOpen, setIsUpgradeLoadingModalOpen] =
@@ -39,7 +37,7 @@ export function UpdateAppModal(props: Props) {
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState<boolean>(false);
 
-  const handleUpdateApp = (password: string) => {
+  const handleUpdateApp = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       setIsFormBusy(true);
       setIsUpgradeLoadingModalOpen(true);
@@ -53,8 +51,7 @@ export function UpdateAppModal(props: Props) {
         .then(() => window.location.reload())
         .catch((error) => {
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
           }
         })
         .finally(() => {

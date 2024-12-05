@@ -43,7 +43,9 @@ export function PurgeClientAction(props: Props) {
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}
-        onSave={(password) => handlePurgeClient(password, client.id)}
+        onSave={(password, isPasswordRequired) =>
+          handlePurgeClient(password, client.id, isPasswordRequired)
+        }
       />
     </>
   );

@@ -26,9 +26,8 @@ import { useBlankApiTokenQuery } from '$app/common/queries/api-tokens';
 import { useHandleChange } from './common/hooks/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 export function Create() {
   const [t] = useTranslation();
@@ -47,7 +46,7 @@ export function Create() {
 
   const { data: blankApiToken } = useBlankApiTokenQuery();
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState<boolean>(false);
@@ -58,7 +57,7 @@ export function Create() {
 
   const handleChange = useHandleChange({ setApiToken, setErrors });
 
-  const handleSave = (password: string) => {
+  const handleSave = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       setErrors(undefined);
       toast.processing();
@@ -85,8 +84,7 @@ export function Create() {
           }
 
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
           }
         })
         .finally(() => setIsFormBusy(false));

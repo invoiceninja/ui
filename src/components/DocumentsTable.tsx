@@ -29,14 +29,13 @@ import { FileIcon } from './FileIcon';
 import { Icon } from './icons/Icon';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useQueryClient } from 'react-query';
 import { Spinner } from './Spinner';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AxiosResponse } from 'axios';
 import { useSetDocumentVisibility } from '$app/common/queries/documents';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Props {
   documents: Document[];
@@ -55,12 +54,11 @@ export function DocumentsTable(props: Props) {
 
   const { disableEditableOptions = false } = props;
 
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
   const setDocumentVisibility = useSetDocumentVisibility();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
-
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const [documentId, setDocumentId] = useState<string>();
 
@@ -116,7 +114,7 @@ export function DocumentsTable(props: Props) {
       });
   };
 
-  const destroy = (password: string) => {
+  const destroy = (password: string, isPasswordRequired: boolean) => {
     toast.processing();
 
     request(
@@ -131,8 +129,7 @@ export function DocumentsTable(props: Props) {
       })
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
         }
       });
   };

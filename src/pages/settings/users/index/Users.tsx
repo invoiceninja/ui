@@ -81,7 +81,9 @@ export function Users() {
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
-        onSave={(password) => action && bulk(selectedUserIds, action, password)}
+        onSave={(password, isPasswordRequired) =>
+          action && bulk(selectedUserIds, action, password, isPasswordRequired)
+        }
         tableActions
       />
     </>

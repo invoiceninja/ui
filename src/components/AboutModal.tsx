@@ -33,8 +33,7 @@ import { useColorScheme } from '$app/common/colors';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { PasswordConfirmation } from './PasswordConfirmation';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface SystemInfo {
   system_health: boolean;
@@ -84,14 +83,14 @@ export function AboutModal(props: Props) {
 
   const colors = useColorScheme();
 
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
+
   const {
     isAboutVisible,
     setIsAboutVisible,
     currentSystemInfo,
     latestVersion,
   } = props;
-
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isHealthCheckModalOpen, setIsHealthCheckModalOpen] =
@@ -141,7 +140,7 @@ export function AboutModal(props: Props) {
     }
   };
 
-  const handleUpdateApp = (password: string) => {
+  const handleUpdateApp = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       setIsFormBusy(true);
       setIsUpgradeLoadingModalOpen(true);
@@ -155,8 +154,7 @@ export function AboutModal(props: Props) {
         .then(() => window.location.reload())
         .catch((error) => {
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
           }
         })
         .finally(() => {
