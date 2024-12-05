@@ -39,6 +39,7 @@ import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavig
 import { useSockets } from './common/hooks/useSockets';
 import { useGlobalSocketEvents } from './common/queries/sockets';
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
+import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 
 export function App() {
   const [t] = useTranslation();
@@ -65,6 +66,7 @@ export function App() {
   const switchToCompanySettings = useSwitchToCompanySettings();
 
   const colorScheme = useAtomValue(colorSchemeAtom);
+  const setIsPasswordRequired = useSetAtom(isPasswordRequiredAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
@@ -138,6 +140,10 @@ export function App() {
     window.addEventListener('navigate.invalid.page', () =>
       navigate('/not_found')
     );
+
+    window.addEventListener('reset.password.required', () => {
+      setIsPasswordRequired(false);
+    });
 
     window.addEventListener('refetch', (event) => {
       const { property } = (event as CustomEvent).detail;
