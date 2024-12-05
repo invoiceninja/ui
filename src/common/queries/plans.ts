@@ -13,12 +13,22 @@ import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
 import { AxiosResponse } from 'axios';
 
+interface Plans {
+  features: {
+    enterprise_plan: string[];
+    free: string[];
+    premium_business_plan: string[];
+    pro_plan: string[];
+  };
+  plans: Record<string, number>;
+}
+
 export function usePlansQuery() {
   return useQuery({
     queryKey: ['plans'],
     queryFn: () =>
       request('GET', endpoint('/api/client/account_management/plans')).then(
-        (response: AxiosResponse<string[]>) => response.data
+        (response: AxiosResponse<Plans>) => response.data
       ),
     staleTime: Infinity,
   });
