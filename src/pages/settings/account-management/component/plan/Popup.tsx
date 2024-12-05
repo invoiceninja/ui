@@ -25,7 +25,7 @@ import { useQuery } from 'react-query';
 import { ChangePlan } from './ChangePlan';
 import { PopupProps } from './NewCreditCard';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useCalculateEnterprisePrice } from '../Plan2';
+import { useEnterpriseUtils } from '../../common/hooks/useEnterpriseUtils';
 
 export type Plan =
   | '' // Free
@@ -53,79 +53,28 @@ export function Popup({ visible, onClose }: PopupProps) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
   const refresh = useRefreshCompanyUsers();
+  const { getFirstAvailableEnterprise, isEnterprisePlanVisible } =
+    useEnterpriseUtils();
 
   const [pricing, setPricing] = useState<'monthly' | 'annually'>(() => {
-    if (account.plan_term === 'month') {
-      return 'monthly';
+    if (account.plan_term === 'year') {
+      return 'annually';
     }
 
-    return 'annually';
+    return 'monthly';
   });
-
-  const enterprisePrice = useCalculateEnterprisePrice({ strategy: 'next' });
 
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
-  const [enterprisePlan, setEnterprisePlan] = useState<Plan>(() => {
-    if (enterprisePrice !== null) {
-      return enterprisePrice.key as Plan;
-    }
-
-    return 'enterprise_plan';
-  });
+  const [enterprisePlan, setEnterprisePlan] = useState<Plan>(
+    getFirstAvailableEnterprise()
+  );
 
   useEffect(() => {
     if (changePlanVisible) {
       onClose();
     }
   }, [changePlanVisible]);
-
-  const currentEnterprisePrice = useCalculateEnterprisePrice({
-    strategy: 'current',
-  });
-
-  function isPlanVisible(plan: Plan) {
-    const currentPlan = account.plan as Plan;
-
-    const plans: Plan[] = ['', 'pro', 'enterprise'];
-
-    const current = plans.indexOf(currentPlan);
-    const target = plans.indexOf(plan);
-
-    if (
-      plan === 'enterprise' &&
-      currentPlan === 'enterprise' &&
-      enterprisePrice !== null
-    ) {
-      return true;
-    }
-
-    return current < target;
-  }
-
-  function isEnterprisePlanVisible(plan: Plan) {
-    if (account.plan !== 'enterprise') {
-      return true;
-    }
-
-    if (currentEnterprisePrice === null) {
-      return false;
-    }
-
-    const plans: Plan[] = [
-      'enterprise_plan',
-      'enterprise_plan_5',
-      'enterprise_plan_10',
-      'enterprise_plan_20',
-      'enterprise_plan_30',
-      'enterprise_plan_50',
-    ];
-
-    const current = plans.indexOf(currentEnterprisePrice.key as Plan);
-    const target = plans.indexOf(plan);
-
-    return current < target;
-  }
 
   const { data: plans } = useQuery({
     queryKey: ['plans'],
@@ -144,27 +93,41 @@ export function Popup({ visible, onClose }: PopupProps) {
 
   const { t } = useTranslation();
 
-  function isToggleVisible() {
-    if (isPlanVisible('pro')) {
+  function isPlanVisible(plan: 'pro' | 'enterprise') {
+    if (plan === 'pro' && account.plan === '') {
       return true;
     }
 
-    if (isPlanVisible('enterprise') && enterprisePrice !== null) {
-      return true;
+    if (plan === 'enterprise') {
+      return (
+        isEnterprisePlanVisible('enterprise_plan') ||
+        isEnterprisePlanVisible('enterprise_plan_10') ||
+        isEnterprisePlanVisible('enterprise_plan_20') ||
+        isEnterprisePlanVisible('enterprise_plan_30') ||
+        isEnterprisePlanVisible('enterprise_plan_50')
+      );
     }
 
     return false;
   }
 
   useEffect(() => {
-    setEnterprisePlan(() => {
-      if (enterprisePrice !== null) {
-        return enterprisePrice.key as Plan;
+    if (!account) {
+      return;
+    }
+
+    setEnterprisePlan(getFirstAvailableEnterprise());
+    
+    setPricing(() => {
+      if (account.plan_term === 'year') {
+        return 'annually';
       }
 
-      return 'enterprise_plan';
+      return 'monthly';
     });
-  }, [account]);
+  }, [account?.num_users, account.plan_term]);
+
+  console.log('first available', getFirstAvailableEnterprise());
 
   return (
     <>
@@ -197,8 +160,7 @@ export function Popup({ visible, onClose }: PopupProps) {
             </h2>
           </div>
 
-          {account.plan_term === '' ||
-          (account.plan_term === 'month' && isToggleVisible()) ? (
+          {account.plan_term === '' || account.plan_term === 'month' ? (
             <div className="flex justify-center mt-6">
               <div className="flex items-center space-x-2">
                 <span>Monthly</span>
