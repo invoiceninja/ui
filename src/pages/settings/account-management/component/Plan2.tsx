@@ -29,6 +29,8 @@ import { CreditCard } from './plan/CreditCard';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { usePlansQuery } from '$app/common/queries/plans';
 import { useTranslation } from 'react-i18next';
+import { useEnterpriseUtils } from '../common/hooks/useEnterpriseUtils';
+import { Downgrade } from './plan/Downgrade';
 
 export function Plan2() {
   const accentColor = useAccentColor();
@@ -55,10 +57,9 @@ export function Plan2() {
   );
 
   const { data: plans } = usePlansQuery();
+  const { calculatePrice } = useEnterpriseUtils();
 
-  const enterprisePrice = useCalculateEnterprisePrice({
-    strategy: 'current',
-  });
+  console.log(account);
 
   return (
     <div className="space-y-4">
@@ -70,11 +71,11 @@ export function Plan2() {
 
           {account.plan === '' ? <Free /> : null}
 
-          {account.plan === 'enterprise' && enterprisePrice ? (
+          {account.plan === 'enterprise' ? (
             <Plan
               title={<EnterpriseLabel />}
               color={accentColor}
-              price={enterprisePrice.price!}
+              price={calculatePrice().toString()}
               trial={account.trial_days_left}
               custom={false}
               term={account.plan_term === 'month' ? 'month' : 'year'}
@@ -87,8 +88,8 @@ export function Plan2() {
               color="#5EC16A"
               price={
                 account.plan_term === 'month'
-                  ? get(plans, 'plans.pro_plan')!
-                  : get(plans, 'plans.pro_plan_annual')!
+                  ? get(plans, 'plans.pro_plan')!.toString()
+                  : get(plans, 'plans.pro_plan_annual')!.toString()
               }
               trial={account.trial_days_left}
               custom={false}
@@ -190,6 +191,8 @@ export function Plan2() {
         </div>
       </Card>
 
+      {account.plan !== '' ? <Downgrade /> : null}
+
       <Popup visible={popupVisible} onClose={() => setPopupVisible(false)} />
 
       <DeleteCreditCard
@@ -202,61 +205,6 @@ export function Plan2() {
       />
     </div>
   );
-}
-
-export interface CalculateEnterprisePriceProps {
-  strategy: 'current' | 'next';
-}
-
-export function useCalculateEnterprisePrice({
-  strategy,
-}: CalculateEnterprisePriceProps) {
-  const account = useCurrentAccount();
-  const { data: plans } = usePlansQuery();
-
-  if (account.plan !== 'enterprise' && strategy !== 'next') {
-    return null;
-  }
-
-  const maxUsers = {
-    2: 'enterprise_plan',
-    5: 'enterprise_plan_5',
-    10: 'enterprise_plan_10',
-    20: 'enterprise_plan_20',
-    30: 'enterprise_plan_30',
-    50: 'enterprise_plan_50',
-  };
-
-  let closest: number | undefined;
-
-  const users = parseInt(account.num_users);
-  const keys = Object.keys(maxUsers).map((key) => parseInt(key));
-
-  if (strategy === 'current') {
-    closest = keys.find((key) => key >= users);
-  }
-
-  if (strategy === 'next') {
-    closest = keys.find((key) => key > users);
-  }
-
-  if (!closest) {
-    return null;
-  }
-
-  const key = get(maxUsers, closest.toString()) as string | undefined;
-
-  if (!key) {
-    return null;
-  }
-
-  return {
-    key,
-    price:
-      account.plan_term === 'month'
-        ? get(plans, `plans.${key}`)
-        : get(plans, `plans.${key.replace('_plan', '_plan_annual')}`),
-  };
 }
 
 function EnterpriseLabel() {
