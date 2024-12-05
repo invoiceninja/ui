@@ -118,6 +118,7 @@ export function Edit() {
       .catch((error: AxiosError) => {
         if (error.response?.status === 412) {
           onWrongPasswordEnter(isPasswordRequired);
+          setPasswordValidated(false);
         }
       });
   };

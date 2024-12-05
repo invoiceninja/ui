@@ -93,6 +93,7 @@ export function MergeClientModal(props: Props) {
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
             onWrongPasswordEnter(isPasswordRequired);
+            setPasswordConfirmModalOpen(true);
           }
 
           setIsPurgeOrMergeActionCalled?.(false);

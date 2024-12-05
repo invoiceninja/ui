@@ -16,6 +16,7 @@ import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
 import { useRefetch } from '../hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '../hooks/useOnWrongPasswordEnter';
+import { Dispatch, SetStateAction } from 'react';
 
 export function useUsersQuery() {
   return useQuery(
@@ -51,10 +52,16 @@ export function useBlankUserQuery() {
   );
 }
 
-export function useBulk() {
+interface Params {
+  setIsPasswordConfirmModalOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export function useBulk(params: Params) {
+  const $refetch = useRefetch();
+
   const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
-  const $refetch = useRefetch();
+  const { setIsPasswordConfirmModalOpen } = params;
 
   return (
     ids: string[],
@@ -81,6 +88,7 @@ export function useBulk() {
       .catch((error) => {
         if (error.response?.status === 412) {
           onWrongPasswordEnter(isPasswordRequired);
+          setIsPasswordConfirmModalOpen(true);
         }
       });
   };

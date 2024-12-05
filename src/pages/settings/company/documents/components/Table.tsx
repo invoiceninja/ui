@@ -63,7 +63,7 @@ export function Table() {
   const [perPage, setPerPage] = useState<string>('10');
   const [documentId, setDocumentId] = useState('');
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   const [documentsUrls, setDocumentsUrls] = useState<DocumentUrl[]>([]);
 
@@ -136,6 +136,7 @@ export function Table() {
       .catch((error) => {
         if (error.response?.status === 412) {
           onWrongPasswordEnter(isPasswordRequired);
+          setPasswordConfirmModalOpen(true);
         }
       })
       .finally(() => invalidateDocumentsQuery());

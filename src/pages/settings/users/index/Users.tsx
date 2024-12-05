@@ -32,7 +32,7 @@ export function Users() {
   const [action, setAction] = useState<'archive' | 'restore' | 'delete'>();
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
-  const bulk = useBulk();
+  const bulk = useBulk({ setIsPasswordConfirmModalOpen });
 
   const pages = [
     { name: t('settings'), href: '/settings' },

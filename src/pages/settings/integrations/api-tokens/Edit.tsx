@@ -91,6 +91,7 @@ export function Edit() {
 
           if (error.response?.status === 412) {
             onWrongPasswordEnter(isPasswordRequired);
+            setIsPasswordConfirmModalOpen(true);
           }
         })
         .finally(() => setIsFormBusy(false));

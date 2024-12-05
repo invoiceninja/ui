@@ -71,6 +71,7 @@ export function MergeVendorsAction(props: Props) {
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
             onWrongPasswordEnter(isPasswordRequired);
+            setPasswordConfirmModalOpen(true);
           }
         })
         .finally(() => setIsFormBusy(false));

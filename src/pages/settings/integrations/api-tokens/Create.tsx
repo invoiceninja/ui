@@ -85,6 +85,7 @@ export function Create() {
 
           if (error.response?.status === 412) {
             onWrongPasswordEnter(isPasswordRequired);
+            setIsPasswordConfirmModalOpen(true);
           }
         })
         .finally(() => setIsFormBusy(false));

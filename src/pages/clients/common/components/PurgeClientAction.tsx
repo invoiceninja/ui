@@ -26,10 +26,13 @@ export function PurgeClientAction(props: Props) {
 
   const { client, setIsPurgeOrMergeActionCalled } = props;
 
-  const handlePurgeClient = usePurgeClient({ setIsPurgeOrMergeActionCalled });
-
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState<boolean>(false);
+
+  const handlePurgeClient = usePurgeClient({
+    setIsPurgeOrMergeActionCalled,
+    setPasswordConfirmModalOpen,
+  });
 
   return (
     <>

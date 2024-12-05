@@ -18,12 +18,13 @@ import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnt
 
 interface Params {
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
+  setPasswordConfirmModalOpen: Dispatch<SetStateAction<boolean>>;
 }
-export function usePurgeClient(params?: Params) {
+export function usePurgeClient(params: Params) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { setIsPurgeOrMergeActionCalled } = params || {};
+  const { setIsPurgeOrMergeActionCalled, setPasswordConfirmModalOpen } = params;
 
   const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
@@ -47,6 +48,7 @@ export function usePurgeClient(params?: Params) {
       .catch((error: AxiosError) => {
         if (error.response?.status === 412) {
           onWrongPasswordEnter(isPasswordRequired);
+          setPasswordConfirmModalOpen(true);
         }
 
         setIsPurgeOrMergeActionCalled?.(false);

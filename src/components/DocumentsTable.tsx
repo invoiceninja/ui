@@ -58,7 +58,7 @@ export function DocumentsTable(props: Props) {
   const setDocumentVisibility = useSetDocumentVisibility();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   const [documentId, setDocumentId] = useState<string>();
 
@@ -130,6 +130,7 @@ export function DocumentsTable(props: Props) {
       .catch((error) => {
         if (error.response?.status === 412) {
           onWrongPasswordEnter(isPasswordRequired);
+          setIsPasswordConfirmModalOpen(true);
         }
       });
   };
