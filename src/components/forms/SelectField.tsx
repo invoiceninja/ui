@@ -81,6 +81,7 @@ export function SelectField(props: SelectProps) {
       minWidth: '100%',
       backgroundColor: colors.$4,
       borderColor: colors.$4,
+      zIndex: 50,
     }),
     control: (base, { isDisabled }) => ({
       ...base,
@@ -160,7 +161,11 @@ export function SelectField(props: SelectProps) {
           // @ts-ignore
           styles={customStyles}
           isSearchable
-          isClearable={Boolean(dismissable && selectedEntry?.value)}
+          isClearable={Boolean(
+            dismissable &&
+              selectedEntry?.value &&
+              selectedEntry?.value !== blankOptionValue
+          )}
           data-cy={cypressRef}
         />
       )}

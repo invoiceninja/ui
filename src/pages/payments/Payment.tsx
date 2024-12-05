@@ -44,7 +44,7 @@ export default function Payment() {
 
   const { id } = useParams();
 
-  const { data } = usePaymentQuery({ id });
+  const { data } = usePaymentQuery({ id, include: 'credits' });
 
   const [paymentValue, setPaymentValue] = useState<PaymentEntity>();
 

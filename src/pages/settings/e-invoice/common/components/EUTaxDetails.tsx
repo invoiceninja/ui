@@ -25,6 +25,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { AxiosError } from 'axios';
 import { toast } from '$app/common/helpers/toast/toast';
+import { Country } from '$app/common/interfaces/country';
+import { X } from 'react-feather';
 
 export function EUTaxDetails() {
   const [t] = useTranslation();
@@ -55,10 +57,83 @@ export function EUTaxDetails() {
         displayCountryOption(currentCountryId)
       ).map((countryId) => (
         <Element key={countryId} leftSide={resolveCountry(countryId)?.name}>
-          {displayCountryOption(countryId)}
+          {resolveCountry(countryId) ? (
+            <Identifier
+              country={resolveCountry(countryId)!}
+              vat={displayCountryOption(countryId) as unknown as string}
+            />
+          ) : null}
         </Element>
       ))}
     </Card>
+  );
+}
+
+interface IdentifierProps {
+  country: Country;
+  vat: string;
+}
+
+function Identifier({ country, vat }: IdentifierProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const { t } = useTranslation();
+
+  const accentColor = useAccentColor();
+  const refresh = useRefreshCompanyUsers();
+
+  const form = useFormik({
+    initialValues: {
+      country: country.iso_3166_2,
+      vat_number: vat,
+    },
+    onSubmit(values, { setSubmitting }) {
+      toast.processing();
+
+      request(
+        'DELETE',
+        endpoint('/api/v1/einvoice/peppol/remove_additional_legal_identifier'),
+        values
+      )
+        .then(() => {
+           toast.success();
+
+           refresh();
+
+           setIsVisible(false);
+        })
+        .catch(() => toast.error())
+        .finally(() => setSubmitting(false));
+    },
+  });
+
+  return (
+    <>
+      <Modal
+        visible={isVisible}
+        onClose={() => setIsVisible(false)}
+        title={t('delete_identifier')}
+      >
+        <p>{t('delete_identifier_description')}</p>
+
+        <form onSubmit={form.handleSubmit}>
+          <div className="flex justify-end">
+            <Button disabled={form.isSubmitting}>{t('continue')}</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <div className="flex items-center gap-2">
+        {vat}
+
+        <button
+          type="button"
+          style={{ color: accentColor }}
+          onClick={() => setIsVisible(true)}
+        >
+          <X size={18} />
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -132,6 +207,10 @@ function Configure() {
     const iso31662 = resolveCountry(countryId)?.iso_3166_2;
 
     if (!iso31662) {
+      return false;
+    }
+
+    if (company.settings.country_id === countryId) {
       return false;
     }
 

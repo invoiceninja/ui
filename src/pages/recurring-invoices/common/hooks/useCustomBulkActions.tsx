@@ -111,6 +111,7 @@ export const useCustomBulkActions = () => {
         <UpdatePricesAction
           selectedIds={selectedIds}
           setSelected={setSelected}
+          dropdown
         />
       ),
     ({ selectedIds, selectedResources, setSelected }) =>
@@ -119,6 +120,7 @@ export const useCustomBulkActions = () => {
         <IncreasePricesAction
           selectedIds={selectedIds}
           setSelected={setSelected}
+          dropdown
         />
       ),
     ({ selectedResources, setSelected }) =>

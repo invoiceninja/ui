@@ -404,6 +404,23 @@ export default function Reports() {
             </Element>
           )}
 
+          {showReportField('pdf_email_attachment') && (
+            <Element leftSide={t('attach_pdf')}>
+              <Toggle
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+                checked={report.payload.pdf_email_attachment}
+                onValueChange={(value) =>
+                  handlePayloadChange('pdf_email_attachment', value)
+                }
+              />
+            </Element>
+          )}
+
           {showReportField('is_expense_billed') && (
             <Element leftSide={t('expense_paid_report')}>
               <Toggle

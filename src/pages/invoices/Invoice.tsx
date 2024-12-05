@@ -17,12 +17,7 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
-import {
-  Outlet,
-  useLocation,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { invoiceAtom } from './common/atoms';
@@ -62,7 +57,6 @@ export default function Invoice() {
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
   const { id } = useParams();
-  const location = useLocation();
   const company = useCurrentCompany();
   const [searchParams] = useSearchParams();
 
@@ -70,13 +64,22 @@ export default function Invoice() {
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
 
-  const { isValid } = useCheckEInvoiceValidation({
-    entity: 'invoices',
-    entity_id: id as string,
+  const [triggerValidationQuery, setTriggerValidationQuery] =
+    useState<boolean>(true);
+
+  const { validationResponse } = useCheckEInvoiceValidation({
+    resource: invoice,
     enableQuery:
       company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.settings.enable_e_invoice,
+      company?.settings.enable_e_invoice &&
+      company?.tax_data?.acts_as_sender &&
+      triggerValidationQuery &&
+      id === invoice?.id,
+    onFinished: () => {
+      setTriggerValidationQuery(false);
+    },
   });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
@@ -85,8 +88,6 @@ export default function Invoice() {
 
   const { calculateInvoiceSum } = useInvoiceUtilities({ client });
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
-
   const [errors, setErrors] = useState<ValidationBag>();
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
@@ -94,7 +95,10 @@ export default function Invoice() {
 
   const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
-  const tabs = useTabs({ invoice });
+  const tabs = useTabs({
+    invoice,
+    eInvoiceValidationResponse: validationResponse,
+  });
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -152,24 +156,11 @@ export default function Invoice() {
               <ResourceActions
                 resource={invoice}
                 actions={actions}
-                onSaveClick={() => {
-                  if (eInvoiceRef?.current?.saveEInvoice()) {
-                    setInvoice(
-                      (current) =>
-                        current && {
-                          ...current,
-                          e_invoice: eInvoiceRef?.current?.saveEInvoice(),
-                        }
-                    );
-                  }
-
-                  setSaveChanges(true);
-                }}
+                onSaveClick={() => setSaveChanges(true)}
                 disableSaveButton={
                   invoice &&
                   (invoice.status_id === InvoiceStatus.Cancelled ||
-                    invoice.is_deleted ||
-                    (!isValid && location.pathname.endsWith('/e_invoice')))
+                    invoice.is_deleted)
                 }
                 disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"
@@ -216,7 +207,8 @@ export default function Invoice() {
                   setIsDefaultFooter,
                   client,
                   eInvoiceRef,
-                  isEInvoiceValid: isValid,
+                  eInvoiceValidationEntityResponse: validationResponse,
+                  setTriggerValidationQuery,
                 }}
               />
             </div>

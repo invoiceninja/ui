@@ -84,6 +84,11 @@ export interface Invoice {
   reminder_schedule?: string;
   e_invoice?: EInvoiceType;
   is_locked?: boolean;
+  backup?: Backup;
+}
+
+export interface Backup {
+  guid?: string;
 }
 
 export interface Activity {

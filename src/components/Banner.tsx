@@ -9,16 +9,17 @@
  */
 
 import classNames from 'classnames';
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 interface Props {
   variant: 'orange' | 'red';
   children: ReactNode;
   className?: string;
   id?: string;
+  style?: CSSProperties;
 }
 
-export function Banner({ variant, children, className, id }: Props) {
+export function Banner({ variant, children, className, id, style }: Props) {
   return (
     <div
       id={id}
@@ -30,6 +31,7 @@ export function Banner({ variant, children, className, id }: Props) {
         },
         className
       )}
+      style={style}
     >
       {children}
     </div>

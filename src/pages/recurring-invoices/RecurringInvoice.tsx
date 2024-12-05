@@ -42,6 +42,7 @@ import {
 import { RecurringInvoice as RecurringInvoiceType } from '$app/common/interfaces/recurring-invoice';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -151,7 +152,19 @@ export default function RecurringInvoice() {
     >
       {recurringInvoice?.id === id ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              recurringInvoice && (
+                <div className="flex items-center">
+                  <CommonActions
+                    resource={recurringInvoice}
+                    entity="recurring_invoice"
+                  />
+                </div>
+              )
+            }
+          />
 
           <Outlet
             context={{

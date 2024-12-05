@@ -23,9 +23,11 @@ import { Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-// import { useQuery } from 'react-query';
-// import { AxiosError, AxiosResponse } from 'axios';
 import { useStaticsQuery } from '$app/common/queries/statics';
+import { useQuery } from 'react-query';
+import { AxiosError, AxiosResponse } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { get } from 'lodash';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -49,7 +51,17 @@ export function Preferences() {
         .then(() => {
           toast.success(t('updated_settings')!);
         })
-        .catch(() => {
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            if (get(error.response.data, 'errors.acts_as_receiver.0')) {
+              toast.error(
+                get(error.response.data, 'errors.acts_as_receiver.0')
+              );
+            }
+
+            return;
+          }
+
           toast.error();
         })
         .finally(() => refresh());
@@ -173,24 +185,37 @@ export function Preferences() {
 export function useQuota() {
   const account = useCurrentAccount();
 
-  return parseInt(account?.e_invoice_quota || '0');
+  const quota = useQuery({
+    queryKey: ['/api/v1/einvoice/quota'],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/einvoice/quota'))
+        .then((response: AxiosResponse<{ quota: string }>) => response.data)
+        .catch((error: AxiosError<{ message: string }>) => {
+          if (error.response?.status === 422) {
+            toast.error(error.response.data.message);
+          }
+        }),
+    enabled:
+      isSelfHosted() && import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true',
+    retry: () => false,
+    staleTime: Infinity,
+  });
 
-  
-  // useQuery({
-  //   queryKey: ['/api/v1/einvoice/quota'],
-  //   queryFn: () =>
-  //     request('GET', endpoint('/api/v1/einvoice/quota'))
-  //       .then((response: AxiosResponse<{ quota: string }>) => response.data)
-  //       .catch((error: AxiosError<{ message: string }>) => {
-  //         if (error.response?.status === 422) {
-  //           toast.error(error.response.data.message);
-  //         }
-  //       }),
-  //   enabled: isSelfHosted(),
-  // });
+  const count = () => {
+    if (isHosted()) {
+      return parseInt(account?.e_invoice_quota);
+    }
 
-  return parseInt(account?.e_invoice_quota || '0');
+    if (quota) {
+      return typeof quota.data?.quota === 'number'
+        ? parseInt(quota.data.quota)
+        : null;
+    }
 
+    return null;
+  };
+
+  return count();
 }
 
 function Quota() {
