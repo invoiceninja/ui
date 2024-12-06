@@ -45,11 +45,12 @@ export function Plan2() {
     queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
       request('POST', endpoint('/api/client/account_management/methods'), {
-        account_key: account.key,
+        account_key: account?.key,
       }).then(
         (response: AxiosResponse<GenericManyResponse<CompanyGateway>>) =>
           response.data.data
       ),
+      enabled: Boolean(account),
   });
 
   const [selectedGateway, setSelectedGateway] = useState<CompanyGateway | null>(
@@ -59,7 +60,9 @@ export function Plan2() {
   const { data: plans } = usePlansQuery();
   const { calculatePrice } = useEnterpriseUtils();
 
-  console.log(account);
+  if (!account || !plans) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">
