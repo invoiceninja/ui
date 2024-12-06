@@ -44,6 +44,10 @@ export function useCalculateTaxesRegion() {
     'SE', // Sweden
     'SI', // Slovenia
     'SK', // Slovakia
+    'GB', // Great Britain
+    'NO', // Norway - EEA
+    'IS', // Iceland - EEA
+    'LI', // Liechtenstein - EEA
   ];
 
   const resolveCountry = useResolveCountry();

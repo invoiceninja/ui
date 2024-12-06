@@ -350,6 +350,7 @@ export interface Regions {
   US: USRegion;
   EU: EURegion;
   AU: AURegion;
+  UK: UKRegion;
 }
 
 export interface USRegion {
@@ -420,11 +421,23 @@ export interface TaxSetting {
   vat_number: string;
 }
 
+export interface UKRegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: UKSubregions;
+}
 export interface EURegion {
   has_sales_above_threshold: boolean;
   tax_all_subregions: boolean;
   tax_threshold: number;
   subregions: EUSubregions;
+}
+
+export interface UKSubregions {
+  GB: TaxSetting;
+  'GB-NIR': TaxSetting;
+  IM: TaxSetting;
 }
 
 export interface EUSubregions {
@@ -443,12 +456,15 @@ export interface EUSubregions {
   HR: TaxSetting;
   HU: TaxSetting;
   IE: TaxSetting;
+  IS: TaxSetting;
   IT: TaxSetting;
+  LI: TaxSetting;
   LT: TaxSetting;
   LU: TaxSetting;
   LV: TaxSetting;
   MT: TaxSetting;
   NL: TaxSetting;
+  NO: TaxSetting;
   PT: TaxSetting;
   RO: TaxSetting;
   SE: TaxSetting;
