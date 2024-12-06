@@ -12,73 +12,148 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { usePlansQuery } from '$app/common/queries/plans';
 import { get } from 'lodash';
 import { Plan } from '../../component/plan/Popup';
+import { Account } from '$app/common/interfaces/account';
+
+interface Rules {
+  [key: string]: {
+    term: 'month' | 'year';
+    condition: (account: Account) => boolean;
+  }[];
+}
+
+const rules: Rules = {
+  enterprise_plan: [
+    {
+      term: 'month',
+      condition: (account) => account.num_users < 2,
+    },
+    {
+      term: 'year',
+      condition: (account) => account.num_users < 2,
+    },
+    {
+      term: 'year',
+      condition: (account) =>
+        account.plan === 'enterprise' &&
+        account.num_users === 2 &&
+        account.plan_term === 'month',
+    },
+  ],
+  enterprise_plan_5: [
+    {
+      term: 'month',
+      condition: (account) => account.num_users < 5,
+    },
+    {
+      term: 'year',
+      condition: (account) => account.num_users < 5,
+    },
+    {
+      term: 'year',
+      condition: (account) =>
+        account.plan === 'enterprise' &&
+        account.num_users === 5 &&
+        account.plan_term === 'month',
+    },
+  ],
+  enterprise_plan_10: [
+    {
+      term: 'month',
+      condition: (account) => account.num_users < 10,
+    },
+    {
+      term: 'year',
+      condition: (account) => account.num_users < 10,
+    },
+    {
+      term: 'year',
+      condition: (account) =>
+        account.plan === 'enterprise' &&
+        account.num_users === 10 &&
+        account.plan_term === 'month',
+    },
+  ],
+  enterprise_plan_20: [
+    {
+      term: 'month',
+      condition: (account) => account.num_users < 20,
+    },
+    {
+      term: 'year',
+      condition: (account) => account.num_users < 20,
+    },
+    {
+      term: 'year',
+      condition: (account) =>
+        account.plan === 'enterprise' &&
+        account.num_users === 20 &&
+        account.plan_term === 'month',
+    },
+  ],
+  enterprise_plan_50: [
+    {
+      term: 'month',
+      condition: (account) => account.num_users < 50,
+    },
+    {
+      term: 'year',
+      condition: (account) => account.num_users < 50,
+    },
+    {
+      term: 'year',
+      condition: (account) =>
+        account.plan === 'enterprise' &&
+        account.num_users === 50 &&
+        account.plan_term === 'month',
+    },
+  ],
+};
 
 export function useEnterpriseUtils() {
   const account = useCurrentAccount();
   const { data: plans } = usePlansQuery();
 
-  function isEnterprisePlanVisible(plan: Plan) {
+  function isEnterprisePlanVisible(plan: Plan, term: 'month' | 'year') {
     if (account.plan === '' || account.plan === 'pro') {
       return true;
     }
 
-    if (account.plan === 'enterprise') {
-      console.log(account.num_users)
+    const planRules = rules[plan];
 
-      if (plan === 'enterprise_plan' && account.num_users < 2) {
-        return true;
-      }
-
-      if (plan === 'enterprise_plan_5' && account.num_users < 5) {
-        return true;
-      }
-
-      if (plan === 'enterprise_plan_10' && account.num_users < 10) {
-        return true;
-      }
-
-      if (plan === 'enterprise_plan_20' && account.num_users < 20) {
-        return true;
-      }
-
-      if (plan === 'enterprise_plan_30' && account.num_users < 30) {
-        return true;
-      }
-
-      if (plan === 'enterprise_plan_50' && account.num_users < 50) {
-        return true;
+    if (planRules && account) {
+      for (const rule of planRules) {
+        if (rule.term === term && rule.condition(account)) {
+          return true;
+        }
       }
     }
 
     return false;
   }
 
-  function getFirstAvailableEnterprise() {
-    if (account.num_users < 2) {
-      return 'enterprise_plan';
+  function getFirstAvailableEnterprise(term: 'month' | 'year') {
+    const available: Plan[] = [
+      'enterprise_plan',
+      'enterprise_plan_5',
+      'enterprise_plan_10',
+      'enterprise_plan_20',
+      'enterprise_plan_30',
+      'enterprise_plan_50',
+    ];
+
+    for (const plan of available) {
+      const planRules = rules[plan];
+
+      if (planRules && account) {
+        for (const rule of planRules) {
+          if (rule.term === term && rule.condition(account)) {
+            return plan;
+          }
+        }
+      }
     }
 
-    if (account.num_users < 5) {
-      return 'enterprise_plan_5';
-    }
-
-    if (account.num_users < 10) {
-      return 'enterprise_plan_10';
-    }
-
-    if (account.num_users < 20) {
-      return 'enterprise_plan_20';
-    }
-
-    if (account.num_users < 30) {
-      return 'enterprise_plan_30';
-    }
-
-    if (account.num_users < 50) {
-      return 'enterprise_plan_50';
-    }
-
-    return 'enterprise_plan';
+    return null;
   }
 
   function calculatePrice() {

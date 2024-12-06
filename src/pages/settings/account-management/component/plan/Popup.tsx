@@ -56,18 +56,18 @@ export function Popup({ visible, onClose }: PopupProps) {
   const { getFirstAvailableEnterprise, isEnterprisePlanVisible } =
     useEnterpriseUtils();
 
-  const [pricing, setPricing] = useState<'monthly' | 'annually'>(() => {
+  const [pricing, setPricing] = useState<'month' | 'year'>(() => {
     if (account.plan_term === 'year') {
-      return 'annually';
+      return 'year';
     }
 
-    return 'monthly';
+    return 'month';
   });
 
   const [changePlanVisible, setChangePlanVisible] = useState(false);
   const [targetPlan, setTargetPlan] = useState<Plan | null>(null);
-  const [enterprisePlan, setEnterprisePlan] = useState<Plan>(
-    getFirstAvailableEnterprise()
+  const [enterprisePlan, setEnterprisePlan] = useState<Plan | null>(
+    getFirstAvailableEnterprise(pricing)
   );
 
   useEffect(() => {
@@ -93,18 +93,30 @@ export function Popup({ visible, onClose }: PopupProps) {
 
   const { t } = useTranslation();
 
-  function isPlanVisible(plan: 'pro' | 'enterprise') {
+  function isPlanVisible(
+    plan: 'pro' | 'pro_annual' | 'enterprise' | 'enterprise_annual'
+  ) {
     if (plan === 'pro' && account.plan === '') {
+      return true;
+    }
+
+    if (
+      plan === 'pro_annual' &&
+      (account.plan === '' || account.plan === 'pro') &&
+      account.plan_term === 'month' &&
+      pricing === 'year'
+    ) {
       return true;
     }
 
     if (plan === 'enterprise') {
       return (
-        isEnterprisePlanVisible('enterprise_plan') ||
-        isEnterprisePlanVisible('enterprise_plan_10') ||
-        isEnterprisePlanVisible('enterprise_plan_20') ||
-        isEnterprisePlanVisible('enterprise_plan_30') ||
-        isEnterprisePlanVisible('enterprise_plan_50')
+        isEnterprisePlanVisible('enterprise_plan', pricing) ||
+        isEnterprisePlanVisible('enterprise_plan_5', pricing) ||
+        isEnterprisePlanVisible('enterprise_plan_10', pricing) ||
+        isEnterprisePlanVisible('enterprise_plan_20', pricing) ||
+        isEnterprisePlanVisible('enterprise_plan_30', pricing) ||
+        isEnterprisePlanVisible('enterprise_plan_50', pricing)
       );
     }
 
@@ -116,18 +128,20 @@ export function Popup({ visible, onClose }: PopupProps) {
       return;
     }
 
-    setEnterprisePlan(getFirstAvailableEnterprise());
-    
+    setEnterprisePlan(getFirstAvailableEnterprise(pricing));
+
     setPricing(() => {
       if (account.plan_term === 'year') {
-        return 'annually';
+        return 'year';
       }
 
-      return 'monthly';
+      return 'month';
     });
   }, [account?.num_users, account.plan_term]);
 
-  console.log('first available', getFirstAvailableEnterprise());
+  useEffect(() => {
+    setEnterprisePlan(getFirstAvailableEnterprise(pricing));
+  }, [pricing])
 
   return (
     <>
@@ -140,7 +154,7 @@ export function Popup({ visible, onClose }: PopupProps) {
         {targetPlan ? (
           <ChangePlan
             plan={targetPlan}
-            cycle={pricing}
+            cycle={pricing === 'month' ? 'monthly' : 'annually'}
             onSuccess={() => {
               refresh();
 
@@ -163,17 +177,15 @@ export function Popup({ visible, onClose }: PopupProps) {
           {account.plan_term === '' || account.plan_term === 'month' ? (
             <div className="flex justify-center mt-6">
               <div className="flex items-center space-x-2">
-                <span>Monthly</span>
+                <span>{t('monthly')}</span>
 
                 <Toggle
-                  checked={pricing === 'annually'}
+                  checked={pricing === 'year'}
                   onValueChange={() =>
-                    setPricing((c) =>
-                      c === 'monthly' ? 'annually' : 'monthly'
-                    )
+                    setPricing((c) => (c === 'month' ? 'year' : 'month'))
                   }
                 />
-                <span>Annual</span>
+                <span>{t('annual')}</span>
               </div>
             </div>
           ) : null}
@@ -187,21 +199,19 @@ export function Popup({ visible, onClose }: PopupProps) {
                 <div className="h-72 flex flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-2xl">Ninja Pro</h3>
-                    <p className="my-4">Pay annually for 10 months + 2 free!</p>
+                    <p className="my-4">Pay year for 10 months + 2 free!</p>
 
                     <div>
                       <div className="flex items-end space-x-2">
                         <h2 className="text-3xl font-semibold">
                           $
-                          {pricing === 'monthly'
+                          {pricing === 'month'
                             ? get(plans?.plans, 'pro_plan')
                             : get(plans?.plans, 'pro_plan_annual')}
                         </h2>
 
                         <span>
-                          {pricing === 'monthly'
-                            ? t('per_month')
-                            : t('per_year')}
+                          {pricing === 'month' ? t('per_month') : t('per_year')}
                         </span>
                       </div>
                     </div>
@@ -213,11 +223,73 @@ export function Popup({ visible, onClose }: PopupProps) {
                     style={{ backgroundColor: accentColor, color: colors.$1 }}
                     onClick={() => {
                       setTargetPlan(
-                        pricing === 'monthly' ? 'pro_plan' : 'pro_plan_annual'
+                        pricing === 'month' ? 'pro_plan' : 'pro_plan_annual'
                       );
                       setChangePlanVisible(true);
                     }}
-                    disabled={account.plan === 'pro'}
+                  >
+                    Upgrade plan
+                  </button>
+                </div>
+
+                <div
+                  className="w-full p-[0.1px] my-5"
+                  style={{ backgroundColor: colors.$5 }}
+                ></div>
+
+                <p className="font-semibold uppercase">All free features +</p>
+
+                <div className="my-3 space-y-3">
+                  {plans?.features.pro_plan.map((feature, i) => (
+                    <div key={`pro-${i}`} className="flex items-center gap-3">
+                      <FaCheck
+                        color={accentColor}
+                        size={14}
+                        className="flex-shrink-0"
+                      />
+                      <p>{feature}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {isPlanVisible('pro_annual') ? (
+              <div
+                className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"
+                style={{ borderColor: '#5EC16A' }}
+              >
+                <div className="h-72 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-semibold text-2xl">Ninja Pro</h3>
+                    <p className="my-4">Pay year for 10 months + 2 free!</p>
+
+                    <div>
+                      <div className="flex items-end space-x-2">
+                        <h2 className="text-3xl font-semibold">
+                          $
+                          {pricing === 'month'
+                            ? get(plans?.plans, 'pro_plan')
+                            : get(plans?.plans, 'pro_plan_annual')}
+                        </h2>
+
+                        <span>
+                          {pricing === 'month' ? t('per_month') : t('per_year')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="border py-3 px-4 rounded"
+                    style={{ backgroundColor: accentColor, color: colors.$1 }}
+                    onClick={() => {
+                      setTargetPlan(
+                        pricing === 'month' ? 'pro_plan' : 'pro_plan_annual'
+                      );
+                      setChangePlanVisible(true);
+                    }}
                   >
                     Upgrade plan
                   </button>
@@ -253,26 +325,27 @@ export function Popup({ visible, onClose }: PopupProps) {
                 <div className="h-72 flex flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-2xl">Enterprise</h3>
-                    <p className="my-4">Pay annually for 10 months + 2 free!</p>
+                    <p className="my-4">Pay year for 10 months + 2 free!</p>
 
                     <div>
                       <div className="flex items-end space-x-2">
-                        <h2 className="text-3xl font-semibold">
-                          $
-                          {pricing === 'monthly'
-                            ? get(plans?.plans, enterprisePlan)
-                            : get(
-                                plans?.plans,
-                                `${enterprisePlan.replace(
-                                  'plan',
-                                  'plan_annual'
-                                )}`
-                              )}
-                        </h2>
+                        {enterprisePlan ? (
+                          <h2 className="text-3xl font-semibold">
+                            $
+                            {pricing === 'month'
+                              ? get(plans?.plans, enterprisePlan)
+                              : get(
+                                  plans?.plans,
+                                  `${enterprisePlan.replace(
+                                    'plan',
+                                    'plan_annual'
+                                  )}`
+                                )}
+                          </h2>
+                        ) : null}
+
                         <span>
-                          {pricing === 'monthly'
-                            ? t('per_month')
-                            : t('per_year')}
+                          {pricing === 'month' ? t('per_month') : t('per_year')}
                         </span>
                       </div>
                     </div>
@@ -284,27 +357,39 @@ export function Popup({ visible, onClose }: PopupProps) {
                       value={enterprisePlan}
                       onValueChange={(v) => setEnterprisePlan(v as Plan)}
                     >
-                      {isEnterprisePlanVisible('enterprise_plan') ? (
+                      {isEnterprisePlanVisible('enterprise_plan', pricing) ? (
                         <option value="enterprise_plan">1-2 users</option>
                       ) : null}
 
-                      {isEnterprisePlanVisible('enterprise_plan_5') ? (
+                      {isEnterprisePlanVisible('enterprise_plan_5', pricing) ? (
                         <option value="enterprise_plan_5">3-5 users</option>
                       ) : null}
 
-                      {isEnterprisePlanVisible('enterprise_plan_10') ? (
+                      {isEnterprisePlanVisible(
+                        'enterprise_plan_10',
+                        pricing
+                      ) ? (
                         <option value="enterprise_plan_10">6-10 users</option>
                       ) : null}
 
-                      {isEnterprisePlanVisible('enterprise_plan_20') ? (
+                      {isEnterprisePlanVisible(
+                        'enterprise_plan_20',
+                        pricing
+                      ) ? (
                         <option value="enterprise_plan_20">11-20 users</option>
                       ) : null}
 
-                      {isEnterprisePlanVisible('enterprise_plan_30') ? (
+                      {isEnterprisePlanVisible(
+                        'enterprise_plan_30',
+                        pricing
+                      ) ? (
                         <option value="enterprise_plan_30">21-30 users</option>
                       ) : null}
 
-                      {isEnterprisePlanVisible('enterprise_plan_50') ? (
+                      {isEnterprisePlanVisible(
+                        'enterprise_plan_50',
+                        pricing
+                      ) ? (
                         <option value="enterprise_plan_50">31-50 users</option>
                       ) : null}
                     </SelectField>
@@ -317,7 +402,6 @@ export function Popup({ visible, onClose }: PopupProps) {
                         setTargetPlan(enterprisePlan);
                         setChangePlanVisible(true);
                       }}
-                      disabled={account.plan === enterprisePlan}
                     >
                       Upgrade plan
                     </button>

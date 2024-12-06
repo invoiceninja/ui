@@ -220,7 +220,7 @@ function EnterpriseLabel() {
     }
 
     if (account.num_users <= 5) {
-      return '2-5';
+      return '3-5';
     }
 
     if (account.num_users <= 10) {

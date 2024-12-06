@@ -74,16 +74,6 @@ export function DeleteCreditCard({
       </div>
 
       <form className="flex justify-end gap-2" onSubmit={form.handleSubmit}>
-        <Button
-          type="secondary"
-          behavior="button"
-          onClick={() => onClose()}
-          disabled={form.isSubmitting}
-          disableWithoutIcon
-        >
-          Cancel
-        </Button>
-
         <Button type="primary" disabled={form.isSubmitting}>
           Delete
         </Button>
