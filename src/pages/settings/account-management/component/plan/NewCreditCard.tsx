@@ -168,15 +168,17 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
       ></div>
 
       <div className="flex justify-end gap-2">
-        <Button
-          type="secondary"
-          behavior="button"
-          onClick={onClose}
-          disabled={isSubmitting}
-          disableWithoutIcon
-        >
-          Cancel
-        </Button>
+        {isSubmitting ? null : (
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={onClose}
+            disabled={isSubmitting}
+            disableWithoutIcon
+          >
+            Cancel
+          </Button>
+        )}
 
         <Button
           type="primary"
