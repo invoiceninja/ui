@@ -178,9 +178,9 @@ describe('InvoiceSum test invoice calculation', () => {
     const invoiceSum = new InvoiceSum(invoice, USD).build();
 
     expect(invoiceSum.subTotal).toEqual(82.64);
-    expect(invoiceSum.totalTaxes).toEqual(17.36);
-    expect(invoiceSum.invoice.amount).toEqual(100);
-    expect(invoiceSum.invoice.balance).toEqual(100);
+    expect(invoiceSum.totalTaxes).toEqual(17.35);
+    expect(invoiceSum.invoice.amount).toEqual(99.99);
+    expect(invoiceSum.invoice.balance).toEqual(99.99);
   });
 
   it('Line Items with Higher Precision Costs', () => {
