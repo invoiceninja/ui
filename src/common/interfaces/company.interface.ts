@@ -89,6 +89,7 @@ export interface Company {
   inbound_mailbox_allow_unknown?: boolean;
   expense_mailbox?: string;
   legal_entity_id: string | null;
+  session_timeout?: number;
 }
 
 export interface Settings {

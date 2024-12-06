@@ -32,7 +32,7 @@ export function Users() {
   const [action, setAction] = useState<'archive' | 'restore' | 'delete'>();
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
-  const bulk = useBulk();
+  const bulk = useBulk({ setIsPasswordConfirmModalOpen });
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -81,7 +81,9 @@ export function Users() {
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
-        onSave={(password) => action && bulk(selectedUserIds, action, password)}
+        onSave={(password, isPasswordRequired) =>
+          action && bulk(selectedUserIds, action, password, isPasswordRequired)
+        }
         tableActions
       />
     </>

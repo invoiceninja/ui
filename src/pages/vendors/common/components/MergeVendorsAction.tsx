@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
@@ -20,7 +20,6 @@ import { Modal } from '$app/components/Modal';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { AxiosError } from 'axios';
-import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiGitMerge } from 'react-icons/bi';
@@ -34,7 +33,7 @@ export function MergeVendorsAction(props: Props) {
 
   const { mergeFromVendorId } = props;
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -47,7 +46,7 @@ export function MergeVendorsAction(props: Props) {
     setMergeIntoVendorId('');
   };
 
-  const handleMergeVendor = (password: string) => {
+  const handleMergeVendor = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
@@ -71,8 +70,8 @@ export function MergeVendorsAction(props: Props) {
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
+            setPasswordConfirmModalOpen(true);
           }
         })
         .finally(() => setIsFormBusy(false));
