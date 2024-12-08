@@ -184,6 +184,7 @@ export function Preferences() {
 
 export function useQuota() {
   const account = useCurrentAccount();
+  const company = useCurrentCompany();
 
   const quota = useQuery({
     queryKey: ['/api/v1/einvoice/quota'],
@@ -196,7 +197,11 @@ export function useQuota() {
           }
         }),
     enabled:
-      isSelfHosted() && import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true',
+      isSelfHosted() &&
+      import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true' &&
+      Boolean(company) &&
+      company?.settings.enable_e_invoice &&
+      company?.settings.e_invoice_type === 'PEPPOL',
     retry: () => false,
     staleTime: Infinity,
   });
