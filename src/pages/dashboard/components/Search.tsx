@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -8,7 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { classNames, endpoint } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { useTranslation } from 'react-i18next';
@@ -17,38 +16,43 @@ import { Entry } from '$app/components/forms/Combobox';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { Fragment, memo, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useState, useRef } from 'react';
 import { styled } from 'styled-components';
-import { Combobox, Popover, Transition } from '@headlessui/react';
-import { useClickAway } from 'react-use';
 import collect from 'collect.js';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import {
+  isNavigationModalVisibleAtom,
+  usePreventNavigation,
+} from '$app/common/hooks/usePreventNavigation';
 import { debounce } from 'lodash';
 import { InputField } from '$app/components/forms';
-
-const ComboboxOption = styled(Combobox.Option)`
-  color: ${(props) => props.theme.color};
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
-`;
+import { Modal } from '$app/components/Modal';
+import { Icon } from '$app/components/icons/Icon';
+import { LuArrowUpDown, LuCornerDownLeft } from 'react-icons/lu';
+import { Spinner } from '$app/components/Spinner';
+import { useAtomValue } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 
 const Div = styled.div`
   color: ${(props) => props.theme.color};
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
+  background-color: ${(props) => props.theme.backgroundColor};
 `;
 
 export function Search$() {
   const [t] = useTranslation();
-  const [query, setQuery] = useState<string>('');
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const navigate = useNavigate();
   const preventNavigation = usePreventNavigation();
+
   const colors = useColorScheme();
-  const comboboxRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const optionsContainerRef = useRef<HTMLDivElement>(null);
+
+  const [query, setQuery] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+
+  const isNavigationModalVisible = useAtomValue(isNavigationModalVisibleAtom);
 
   const { data, refetch, isFetching } = useQuery(
     ['/api/v1/search'],
@@ -91,191 +95,201 @@ export function Search$() {
     )
     .take(100);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === 'k') {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  useEffect(() => {
-    if (isVisible === false) {
-      setQuery('');
-    }
-  }, [isVisible]);
-
-  useClickAway(comboboxRef, () => setIsVisible(false));
-
+  const options = filtered.count() === 0 ? collect(data) : filtered;
   const handleChange = debounce((value: string) => setQuery(value), 500);
 
-  const options = filtered.count() === 0 ? collect(data) : filtered;
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'k') {
+      event.preventDefault();
+      setIsModalOpen(true);
+
+      return;
+    }
+
+    const optionsLength = options?.count() || 0;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        setSelectedIndex((prev) => {
+          if (prev >= optionsLength - 1) return 0;
+
+          return prev + 1;
+        });
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+        setSelectedIndex((prev) => {
+          if (prev <= 0) return optionsLength - 1;
+          return prev - 1;
+        });
+        break;
+
+      case 'Enter':
+        event.preventDefault();
+
+        if (selectedIndex >= 0 && options) {
+          const selectedOption = options.get(selectedIndex);
+          preventNavigation({
+            fn: () => {
+              if (selectedOption?.resource) {
+                navigate(selectedOption.resource.path);
+                setIsModalOpen(false);
+              }
+            },
+          });
+        }
+        break;
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+
+    if (selectedIndex !== -1 && optionsContainerRef.current) {
+      const container = optionsContainerRef.current;
+      const selectedElement = container.children[selectedIndex] as HTMLElement;
+
+      if (selectedElement) {
+        selectedElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
+      }
+    }
+
+    if (selectedIndex !== -1) {
+      inputRef.current?.blur();
+    }
+
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIndex]);
+
+  useEffect(() => {
+    if (isModalOpen === false) {
+      setQuery('');
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (query && filtered.count() === 0) {
       refetch();
     }
+
+    setSelectedIndex(-1);
   }, [query]);
 
   return (
     <>
-      <Popover className="relative mt-2">
-        {() => (
-          <>
-            <Popover.Button
-              style={{ backgroundColor: colors.$1, color: colors.$3 }}
-              className={classNames(
-                'group inline-flex items-center rounded text-base font-medium  focus:outline-none'
-              )}
-            >
+      <InputField
+        className="border-transparent focus:border-transparent focus:ring-0"
+        onClick={() => setIsModalOpen(true)}
+        placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
+        style={{ backgroundColor: colors.$1, color: colors.$3, width: '21rem' }}
+      />
+
+      <Modal
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        disableClosing
+        enableCloseOnClickAway={!isNavigationModalVisible}
+        withoutPadding
+        size="regular"
+      >
+        {isFetching ? (
+          <div className="flex items-center justify-center h-full">
+            <Spinner />
+          </div>
+        ) : (
+          <div
+            className="flex flex-col pt-3"
+            style={{ backgroundColor: colors.$1 }}
+          >
+            <div className="flex flex-col space-y-5 px-3 pb-3">
               <InputField
-                className="border-transparent focus:border-transparent focus:ring-0 w-full"
+                innerRef={inputRef}
                 value={query}
                 onValueChange={(value) => handleChange(value)}
-                onClick={() => setIsModalOpen(true)}
-                placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
+                onClick={() => setSelectedIndex(-1)}
+                placeholder={`${t('search')}...`}
+                changeOverride
                 style={{ backgroundColor: colors.$1, color: colors.$3 }}
               />
-            </Popover.Button>
 
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-200"
-              enterFrom="opacity-0 translate-y-1"
-              enterTo="opacity-100 translate-y-0"
-              leave="transition ease-in duration-150"
-              leaveFrom="opacity-100 translate-y-0"
-              leaveTo="opacity-0 translate-y-1"
+              <div
+                ref={optionsContainerRef}
+                className="overflow-y-auto max-h-96"
+                onMouseLeave={() =>
+                  selectedIndex !== -1 && setSelectedIndex(-1)
+                }
+              >
+                {options?.map((entry, index) => (
+                  <Div
+                    key={entry.id}
+                    theme={{
+                      backgroundColor:
+                        index === selectedIndex ? colors.$5 : 'transparent',
+                      color: colors.$3,
+                    }}
+                    className="cursor-pointer pl-2 py-2.5 active:font-semibold search-option"
+                    onClick={() => {
+                      if (entry.resource) {
+                        preventNavigation({
+                          fn: () => {
+                            if (entry.resource) {
+                              navigate(entry.resource.path);
+                              setIsModalOpen(false);
+                            }
+                          },
+                        });
+                      }
+                    }}
+                    onMouseMove={() =>
+                      selectedIndex !== index &&
+                      setTimeout(() => setSelectedIndex(index), 20)
+                    }
+                  >
+                    <span>
+                      <div>
+                        <p className="text-xs font-semibold">
+                          {entry.resource?.heading}
+                        </p>
+                        <p>{entry.label}</p>
+                      </div>
+                    </span>
+                  </Div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              className="flex items-center py-2 space-x-4 px-3"
+              style={{ backgroundColor: colors.$5 }}
             >
-              <Popover.Panel className="absolute m-auto left-0 right-0 z-10">
-                <div
-                  className="overflow-y-auto max-h-72"
-                  style={{ backgroundColor: colors.$1 }}
-                >
-                  {options?.map((entry) => (
-                    <Div
-                      key={entry.id}
-                      theme={{ color: colors.$3, hoverColor: colors.$2 }}
-                      className="cursor-pointer rounded px-4 py-2 active:font-semibold"
-                    >
-                      <span>
-                        <div>
-                          <p className="text-xs font-semibold">
-                            {entry.resource?.heading}
-                          </p>
-                          <p>{entry.label}</p>
-                        </div>
-                      </span>
-                    </Div>
-                  ))}
+              <div className="flex items-center space-x-2 text-sm">
+                <div>
+                  <Icon element={LuArrowUpDown} color={colors.$3} />
                 </div>
-              </Popover.Panel>
-            </Transition>
-          </>
-        )}
-      </Popover>
 
-      {/* <Combobox
-        as="div"
-        onChange={(value: Entry<SearchRecord>) =>
-          value.resource
-            ? preventNavigation({
-                url: value.resource.path,
-              })
-            : null
-        }
-        className="relative w-full max-w-[70%]"
-        ref={comboboxRef}
-      >
-        <div className="relative mt-2">
-          <div className="flex items-center">
-            <span
-              className={classNames({
-                block: isFetching,
-                hidden: !isFetching,
-              })}
-            >
-              <Spinner />
-            </span>
+                <span className="mb-0.5" style={{ color: colors.$3 }}>
+                  {t('navigate')}
+                </span>
+              </div>
 
-            <Combobox.Input
-              className="border-transparent focus:border-transparent focus:ring-0 w-full"
-              onChange={handleChange}
-              ref={inputRef}
-              onFocus={() => setIsVisible(true)}
-              placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
-              style={{ backgroundColor: colors.$1, color: colors.$3 }}
-            />
+              <div className="flex items-center space-x-2 text-sm px-3">
+                <div>
+                  <Icon element={LuCornerDownLeft} color={colors.$3} />
+                </div>
+
+                <span className="mb-0.5" style={{ color: colors.$3 }}>
+                  {t('select')}
+                </span>
+              </div>
+            </div>
           </div>
-
-          <Combobox.Options
-            className={classNames(
-              'absolute border rounded-lg max-h-72 overflow-y-auto shadow-xl',
-              'min-w-full w-max',
-              {
-                hidden: !isVisible,
-              }
-            )}
-            style={{
-              backgroundColor: colors.$1,
-              borderColor: colors.$5,
-              minWidth: '33vw',
-              maxWidth: 'max(100%, 33vw)',
-            }}
-            static={true}
-          >
-            {options?.map((entry) => (
-              <ComboboxOption
-                key={entry.id}
-                value={entry}
-                theme={{ color: colors.$3, hoverColor: colors.$2 }}
-                className="cursor-pointer rounded px-4 py-2 active:font-semibold"
-              >
-                {({ active }) => (
-                  <span
-                    className={classNames(
-                      'block truncate space-x-1',
-                      active && 'font-semibold'
-                    )}
-                  >
-                    <div>
-                      <p className="text-xs font-semibold">
-                        {entry.resource?.heading}
-                      </p>
-                      <p>{entry.label}</p>
-                    </div>
-                  </span>
-                )}
-              </ComboboxOption>
-            ))}
-
-            {options.count() === 0 && (
-              <ComboboxOption
-                value={null}
-                theme={{ color: colors.$3, hoverColor: colors.$2 }}
-                className="cursor-not-allowed rounded px-4 py-2 active:font-semibold"
-                disabled
-              >
-                {({ active }) => (
-                  <span
-                    className={classNames(
-                      'block truncate space-x-1',
-                      active && 'font-semibold'
-                    )}
-                  >
-                    <p className="text-sm">{t('no_match_found')}</p>
-                  </span>
-                )}
-              </ComboboxOption>
-            )}
-          </Combobox.Options>
-        </div>
-      </Combobox> */}
+        )}
+      </Modal>
     </>
   );
 }
-
-export const Search = memo(Search$);
