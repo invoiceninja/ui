@@ -9,7 +9,10 @@
  */
 
 import { Invoice } from '$app/common/interfaces/invoice';
-import { CommonActionsPreferenceModal } from '$app/components/CommonActionsPreferenceModal';
+import {
+  CommonActionsPreferenceModal,
+  Entity as EntityType,
+} from '$app/components/CommonActionsPreferenceModal';
 import { Icon } from '$app/components/icons/Icon';
 import { useEffect, useState } from 'react';
 import { MdSettings } from 'react-icons/md';
@@ -20,11 +23,17 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip } from '$app/components/Tooltip';
 import { Credit } from '$app/common/interfaces/credit';
 import { useActions as useCreditActions } from '$app/pages/credits/common/hooks';
+import { useActions as useQuoteActions } from '$app/pages/quotes/common/hooks';
+import { Quote } from '$app/common/interfaces/quote';
+import { useActions as useRecurringInvoiceActions } from '$app/pages/recurring-invoices/common/hooks';
+import { useActions as usePurchaseOrderActions } from '$app/pages/purchase-orders/common/hooks';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
-type Resource = Invoice | Credit;
+type Resource = Invoice | Credit | Quote | RecurringInvoice | PurchaseOrder;
 
 interface Props {
-  entity: 'invoice' | 'credit';
+  entity: EntityType;
   resource: Resource;
 }
 export function CommonActions(props: Props) {
@@ -33,7 +42,11 @@ export function CommonActions(props: Props) {
   const user = useCurrentUser();
   const invoiceActions = useInvoiceActions({ dropdown: false });
   const creditActions = useCreditActions({ dropdown: false });
-
+  const quoteActions = useQuoteActions({ dropdown: false });
+  const recurringInvoiceActions = useRecurringInvoiceActions({
+    dropdown: false,
+  });
+  const purchaseOrderActions = usePurchaseOrderActions({ dropdown: false });
   const { resource, entity } = props;
 
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
@@ -51,6 +64,24 @@ export function CommonActions(props: Props) {
 
     if (entity === 'credit') {
       return creditActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    if (entity === 'quote') {
+      return quoteActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    if (entity === 'recurring_invoice') {
+      return recurringInvoiceActions.filter(
+        (action) => typeof action === 'function'
+      ) as ResourceAction<Resource>[];
+    }
+
+    if (entity === 'purchase_order') {
+      return purchaseOrderActions.filter(
         (action) => typeof action === 'function'
       ) as ResourceAction<Resource>[];
     }

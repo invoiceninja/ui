@@ -50,7 +50,8 @@ export function useTabs(params: Params) {
       href: route('/invoices/:id/e_invoice', { id }),
       enabled: Boolean(
         company?.settings.e_invoice_type === 'PEPPOL' &&
-          company?.settings.enable_e_invoice
+          company?.settings.enable_e_invoice &&
+          company?.tax_data?.acts_as_sender
       ),
       formatName: () => (
         <div className="flex space-x-1">
@@ -58,12 +59,14 @@ export function useTabs(params: Params) {
 
           {Boolean(
             eInvoiceValidationResponse?.client.length ||
-              eInvoiceValidationResponse?.company.length
+              eInvoiceValidationResponse?.company.length ||
+              eInvoiceValidationResponse?.invoice.length
           ) && (
             <span className="font-bold">
               (
               {(eInvoiceValidationResponse?.client.length || 0) +
-                (eInvoiceValidationResponse?.company.length || 0)}
+                (eInvoiceValidationResponse?.company.length || 0) +
+                (eInvoiceValidationResponse?.invoice.length || 0)}
               )
             </span>
           )}

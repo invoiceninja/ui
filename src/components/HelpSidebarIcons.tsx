@@ -39,6 +39,10 @@ import classNames from 'classnames';
 import { AboutModal } from './AboutModal';
 import { Icon } from './icons/Icon';
 import { FaSlack } from 'react-icons/fa';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import { MdWarning } from 'react-icons/md';
+import { UpdateAppModal } from './UpdateAppModal';
 
 interface Props {
   docsLink?: string;
@@ -59,15 +63,43 @@ export function HelpSidebarIcons(props: Props) {
   const updateCompanyUser = useUpdateCompanyUser();
   const handleUserChange = useHandleCurrentUserChangeProperty();
 
+  const { data: latestVersion } = useQuery({
+    queryKey: ['/pdf.invoicing.co/api/version'],
+    queryFn: () =>
+      axios
+        .get('https://pdf.invoicing.co/api/version')
+        .then((response) => response.data),
+    staleTime: Infinity,
+  });
+
+  const { data: currentSystemInfo } = useQuery({
+    queryKey: ['/api/v1/health_check'],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/health_check')).then(
+        (response) => response.data
+      ),
+    staleTime: Infinity,
+    enabled: isSelfHosted(),
+  });
+
   const [isContactVisible, setIsContactVisible] = useState<boolean>(false);
   const [isAboutVisible, setIsAboutVisible] = useState<boolean>(false);
   const [cronsNotEnabledModal, setCronsNotEnabledModal] =
     useState<boolean>(false);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] =
+    useState<boolean>(false);
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
+
+  const isUpdateAvailable =
+    isSelfHosted() &&
+    latestVersion &&
+    currentSystemInfo?.api_version &&
+    currentSystemInfo.api_version !== latestVersion &&
+    !currentSystemInfo?.is_docker;
 
   const formik = useFormik({
     initialValues: {
@@ -145,6 +177,7 @@ export function HelpSidebarIcons(props: Props) {
           {t('send')}
         </Button>
       </Modal>
+
       <Modal
         title={t('crons_not_enabled')}
         visible={cronsNotEnabledModal}
@@ -172,23 +205,50 @@ export function HelpSidebarIcons(props: Props) {
         </Button>
       </Modal>
 
+      <UpdateAppModal
+        isVisible={isUpdateModalVisible}
+        setIsVisible={setIsUpdateModalVisible}
+        installedVersion={currentSystemInfo?.api_version}
+        latestVersion={latestVersion}
+      />
+
       <AboutModal
         isAboutVisible={isAboutVisible}
         setIsAboutVisible={setIsAboutVisible}
+        currentSystemInfo={currentSystemInfo}
+        latestVersion={latestVersion}
       />
 
       <nav
         style={{ borderColor: colors.$5 }}
-        className={classNames('flex p-2 text-white border-t', {
+        className={classNames('flex py-4 text-white border-t', {
           'justify-end': mobileNavbar,
           'justify-around': !mobileNavbar,
+          'px-2': !isUpdateAvailable,
         })}
       >
         {!isMiniSidebar && !mobileNavbar && (
           <>
+            {isUpdateAvailable && (
+              <div
+                className="cursor-pointer"
+                onClick={() => setIsUpdateModalVisible(true)}
+              >
+                <Tippy
+                  duration={0}
+                  content={t('update_available')}
+                  className="text-white rounded text-xs mb-2"
+                >
+                  <div>
+                    <Icon element={MdWarning} color="white" size={23.5} />
+                  </div>
+                </Tippy>
+              </div>
+            )}
+
             {isSelfHosted() && account && !account.is_scheduler_running && (
               <button
-                className="p-2 hover:bg-ninja-gray-darker rounded-full"
+                className="hover:bg-ninja-gray-darker rounded-full"
                 onClick={() => setCronsNotEnabledModal(true)}
               >
                 <Tippy
@@ -201,7 +261,7 @@ export function HelpSidebarIcons(props: Props) {
               </button>
             )}
 
-            <div className="flex p-2">
+            <div className="flex">
               <Tippy
                 duration={0}
                 content={t('contact_us')}
@@ -230,7 +290,7 @@ export function HelpSidebarIcons(props: Props) {
             <a
               href="https://forum.invoiceninja.com"
               target="_blank"
-              className="p-2 hover:bg-ninja-gray-darker rounded-full"
+              className="hover:bg-ninja-gray-darker rounded-full"
               rel="noreferrer"
             >
               <Tippy
@@ -249,7 +309,7 @@ export function HelpSidebarIcons(props: Props) {
                 'https://invoiceninja.github.io'
               }
               target="_blank"
-              className="p-2 hover:bg-ninja-gray-darker rounded-full"
+              className="hover:bg-ninja-gray-darker rounded-full"
               rel="noreferrer"
             >
               <Tippy
@@ -262,7 +322,7 @@ export function HelpSidebarIcons(props: Props) {
             </a>
 
             <button
-              className="p-2 hover:bg-ninja-gray-darker rounded-full overflow-visible"
+              className="hover:bg-ninja-gray-darker rounded-full overflow-visible"
               onClick={() => setIsAboutVisible(true)}
             >
               <Tippy
@@ -277,7 +337,7 @@ export function HelpSidebarIcons(props: Props) {
         )}
 
         <button
-          className="p-2 rounded-full"
+          className="rounded-full"
           onClick={() =>
             handleUserChange(
               'company_user.react_settings.show_mini_sidebar',

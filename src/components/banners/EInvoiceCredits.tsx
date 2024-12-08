@@ -12,15 +12,19 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 import { Banner } from '../Banner';
 import { buttonStyles } from './VerifyEmail';
-// import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
+import { Modal } from '../Modal';
+import { useEffect, useState } from 'react';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 export const EINVOICE_CREDITS_MIN_THRESHOLD = 15;
 
 export function EInvoiceCredits() {
   const company = useCurrentCompany();
   const quota = useQuota();
+
+  const [isVisible, setVisible] = useState(false);
 
   const { t } = useTranslation();
 
@@ -32,33 +36,85 @@ export function EInvoiceCredits() {
     return null;
   }
 
-  if (quota === 0) {
+  if (quota !== null && quota <= 0) {
     return (
-      <Banner variant="red">
-        <div className="flex space-x-1">
-          <span>{t('notification_no_credits')}</span>
+      <>
+        <Dialog
+          isVisible={isVisible}
+          setVisible={setVisible}
+          text={t('notification_no_credits')}
+        />
 
-          <Link to="/settings/e_invoice" className={buttonStyles}>
-            {t('learn_more')}
-          </Link>
-        </div>
-      </Banner>
+        <Banner variant="red">
+          <div className="flex space-x-1">
+            <span>{t('notification_no_credits')}</span>
+
+            <span className={buttonStyles} onClick={() => setVisible(true)}>
+              {t('learn_more')}
+            </span>
+          </div>
+        </Banner>
+      </>
     );
   }
 
   if (quota !== null && quota < EINVOICE_CREDITS_MIN_THRESHOLD) {
     return (
-      <Banner variant="orange">
-        <div className="flex space-x-1">
-          <span>{t('notification_credits_low')}</span>
+      <>
+        <Dialog
+          isVisible={isVisible}
+          setVisible={setVisible}
+          text={t('notification_credits_low')}
+        />
 
-          <Link to="/settings/e_invoice" className={buttonStyles}>
-            {t('learn_more')}
-          </Link>
-        </div>
-      </Banner>
+        <Banner variant="orange">
+          <div className="flex space-x-1">
+            <span>{t('notification_credits_low')}</span>
+
+            <span className={buttonStyles} onClick={() => setVisible(true)}>
+              {t('learn_more')}
+            </span>
+          </div>
+        </Banner>
+      </>
     );
   }
 
   return null;
+}
+
+interface DialogProps {
+  isVisible: boolean;
+  setVisible: (visible: boolean) => void;
+  text: string;
+}
+
+function Dialog({ isVisible, setVisible, text }: DialogProps) {
+  const { t } = useTranslation();
+
+  const accentColor = useAccentColor();
+  const quota = useQuota();
+  const location = useLocation();
+
+  useEffect(() => {
+    setVisible(false);
+  }, [location.pathname]);
+
+  return (
+    <Modal
+      visible={isVisible}
+      onClose={() => setVisible(false)}
+      title={t('credits')}
+    >
+      <p>{t('peppol_credits_info')}</p>
+      <p>{text}</p>
+      <p className="font-medium">
+        {t('total_credits_amount')}: {quota}
+      </p>
+
+      <Link to="/settings/e_invoice" style={{ color: accentColor }}>
+        {t('view_settings')}
+      </Link>
+    </Modal>
+  );
 }

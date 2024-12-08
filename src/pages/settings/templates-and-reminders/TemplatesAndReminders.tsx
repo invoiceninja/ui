@@ -363,6 +363,8 @@ export function TemplatesAndReminders() {
               !isCompanySettingsActive && setTemplateBody(undefined);
             }}
             cypressRef="templateSelector"
+            customSelector
+            dismissable={false}
           >
             {statics &&
               Object.keys(statics.templates).map((template, index) => (
@@ -371,7 +373,10 @@ export function TemplatesAndReminders() {
                 </option>
               ))}
 
-            <option value="payment_failed">{t('payment_failed')}</option>
+            <option value="credit">{t('credit')}</option>
+            <option value="purchase_order">{t('purchase_order')}</option>
+
+            <option value="partial_payment">{t('partial_payment')}</option>
 
             <option value="custom1">{t('first_custom')}</option>
             <option value="custom2">{t('second_custom')}</option>

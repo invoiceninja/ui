@@ -63,6 +63,15 @@ export function SellerSubregion() {
           value={'AU'}
         />
       )}
+      {resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2 ===
+        'GB' && (
+        <InputField
+          type="text"
+          disabled={true}
+          name="tax_data.seller_subregion"
+          value={'GB'}
+        />
+      )}
     </Element>
   );
 }

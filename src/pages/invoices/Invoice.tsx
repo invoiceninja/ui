@@ -66,13 +66,20 @@ export default function Invoice() {
   const actions = useActions();
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
+  const [triggerValidationQuery, setTriggerValidationQuery] =
+    useState<boolean>(true);
+
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: invoice,
-    enableQuery: Boolean(
+    enableQuery:
       company?.settings.e_invoice_type === 'PEPPOL' &&
-        company?.settings.enable_e_invoice
-    ),
-    companyId: company?.id,
+      company?.settings.enable_e_invoice &&
+      company?.tax_data?.acts_as_sender &&
+      triggerValidationQuery &&
+      id === invoice?.id,
+    onFinished: () => {
+      setTriggerValidationQuery(false);
+    },
   });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
@@ -201,6 +208,7 @@ export default function Invoice() {
                   client,
                   eInvoiceRef,
                   eInvoiceValidationEntityResponse: validationResponse,
+                  setTriggerValidationQuery,
                 }}
               />
             </div>
