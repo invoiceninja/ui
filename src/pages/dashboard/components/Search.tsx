@@ -16,7 +16,7 @@ import { Entry } from '$app/components/forms/Combobox';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { Fragment, useEffect, useState, useRef } from 'react';
+import { Fragment, useEffect, useState, useRef, memo } from 'react';
 import { styled } from 'styled-components';
 import collect from 'collect.js';
 import {
@@ -292,3 +292,5 @@ export function Search$() {
     </>
   );
 }
+
+export const Search = memo(Search$);
