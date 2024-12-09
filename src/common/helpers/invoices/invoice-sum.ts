@@ -76,7 +76,31 @@ export class InvoiceSum {
     return this;
   }
 
+  protected peppolSurchargeTaxes() {
+      const invoice_item = this.invoice.line_items[0];
+      const name = invoice_item?.tax_name1;
+      const rate = invoice_item?.tax_rate1 ?? 0;
+      const amount = this.invoice.custom_surcharge1+this.invoice.custom_surcharge2+this.invoice.custom_surcharge3+this.invoice.custom_surcharge4;
+      
+      if(rate > 0 && amount != 0){
+
+        const total = Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
+
+        let group = {};
+
+        const key = name + rate.toString().replace(' ', ''); // 'Tax Rate' + '5' => 'TaxRate5'
+
+        group = { key, total, name: `${name} ${parseFloat(rate.toString())} %` }; // 'Tax Rate 5.00%'
+
+        this.invoiceItems.taxCollection.push(collect(group));
+      
+      }
+      
+      return this;
+  }
+
   protected calculateInvoiceTaxes() {
+
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
 
@@ -184,6 +208,10 @@ export class InvoiceSum {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
       this.invoice.line_items = this.invoiceItems.lineItems;
+    }
+    
+    if(this.invoice.tax_name1.length == 0 && this.invoice.custom_surcharge1 !=0 && this.invoice.custom_surcharge_tax1){
+      this.peppolSurchargeTaxes();
     }
 
     this.taxMap = collect();
