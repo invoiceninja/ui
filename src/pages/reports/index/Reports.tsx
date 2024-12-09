@@ -295,7 +295,34 @@ export default function Reports() {
           .then((response) => {
             const { columns, ...rows } = response;
 
-            setPreview({ columns, rows: Object.values(rows) });
+            setPreview({
+              columns,
+              rows: Object.values(rows).map((row) =>
+                row.map((cell) => {
+                  const currentNumberDisplayValue =
+                    typeof parseFloat(cell.display_value.toString()) ===
+                    'number'
+                      ? parseFloat(
+                          cell.display_value
+                            .toString()
+                            .replace(/\./g, '')
+                            .replace(',', '.')
+                        )
+                      : cell.display_value;
+
+                  return {
+                    ...cell,
+                    display_value:
+                      typeof cell.display_value === 'string'
+                        ? typeof currentNumberDisplayValue === 'number' &&
+                          currentNumberDisplayValue >= 0
+                          ? currentNumberDisplayValue
+                          : cell.display_value
+                        : cell.display_value,
+                  };
+                })
+              ),
+            });
 
             toast.success();
           });
