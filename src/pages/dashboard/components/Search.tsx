@@ -221,7 +221,7 @@ export function Search$() {
 
             <div
               ref={optionsContainerRef}
-              className="overflow-y-auto max-h-96"
+              className="overflow-y-auto h-96"
               onMouseLeave={() => selectedIndex !== -1 && setSelectedIndex(-1)}
             >
               {options?.map((entry, index) => (
