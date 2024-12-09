@@ -10,4 +10,4 @@
 
 import { atom } from 'jotai';
 
-export const lastPasswordEntryTimeAtom = atom<number>(0);
+export const isPasswordRequiredAtom = atom<boolean>(false);

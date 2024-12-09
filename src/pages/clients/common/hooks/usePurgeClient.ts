@@ -11,24 +11,24 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useSetAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { Dispatch, SetStateAction } from 'react';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Params {
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
+  setPasswordConfirmModalOpen: Dispatch<SetStateAction<boolean>>;
 }
-export function usePurgeClient(params?: Params) {
+export function usePurgeClient(params: Params) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { setIsPurgeOrMergeActionCalled } = params || {};
+  const { setIsPurgeOrMergeActionCalled, setPasswordConfirmModalOpen } = params;
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
-  return (password: string, clientId: string) => {
+  return (password: string, clientId: string, isPasswordRequired: boolean) => {
     toast.processing();
     setIsPurgeOrMergeActionCalled?.(true);
 
@@ -47,8 +47,8 @@ export function usePurgeClient(params?: Params) {
       })
       .catch((error: AxiosError) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
+          setPasswordConfirmModalOpen(true);
         }
 
         setIsPurgeOrMergeActionCalled?.(false);

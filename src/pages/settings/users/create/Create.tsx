@@ -28,9 +28,8 @@ import { useNavigate } from 'react-router-dom';
 import { Details } from '../edit/components/Details';
 import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 export function Create() {
   useTitle('new_user');
@@ -45,7 +44,7 @@ export function Create() {
 
   const tabs: string[] = [t('details'), t('notifications'), t('permissions')];
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const { data: response } = useBlankUserQuery();
   const [user, setUser] = useState<User>();
@@ -82,7 +81,7 @@ export function Create() {
     });
   }, [response?.data.data]);
 
-  const onSave = (password: string) => {
+  const onSave = (password: string, isPasswordRequired: boolean) => {
     toast.processing();
 
     setIsPasswordConfirmModalOpen(false);
@@ -103,8 +102,8 @@ export function Create() {
       })
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
+          setIsPasswordConfirmModalOpen(true);
         } else if (error.response?.status === 422) {
           const errorMessages = error.response.data;
 

@@ -32,22 +32,27 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtom, useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { useAtom } from 'jotai';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 export function UserDetails() {
   useTitle('user_details');
 
   const [t] = useTranslation();
+  const dispatch = useDispatch();
 
+  const user = useCurrentUser();
+  const { isAdmin } = useAdmin();
   const tabs = useUserDetailsTabs();
+  const company = useInjectCompanyChanges();
+
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [errors, setErrors] = useState<ValidationBag>();
-
   const [checkVerification, setCheckVerification] = useState<boolean>(false);
 
   const pages = [
@@ -59,23 +64,13 @@ export function UserDetails() {
     hasLanguageChangedAtom
   );
 
-  const user = useCurrentUser();
-
-  const dispatch = useDispatch();
-
-  const company = useInjectCompanyChanges();
-
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
-
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   const userState = useSelector((state: RootState) => state.user);
 
-  const { isAdmin } = useAdmin();
   const { save } = usePreferences();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
     toast.processing();
     setErrors(undefined);
@@ -130,8 +125,8 @@ export function UserDetails() {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(passwordIsRequired);
+          setPasswordConfirmModalOpen(true);
         }
 
         if (error.response?.status == 422) {

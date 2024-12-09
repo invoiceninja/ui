@@ -120,10 +120,6 @@ export default function Edit() {
           toast.dismiss();
           setErrors(error.response.data);
         }
-
-        if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-        }
       });
   };
 
