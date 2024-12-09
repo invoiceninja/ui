@@ -28,9 +28,9 @@ import { InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { Icon } from '$app/components/icons/Icon';
 import { LuArrowUpDown, LuCornerDownLeft } from 'react-icons/lu';
-import { Spinner } from '$app/components/Spinner';
 import { useAtomValue } from 'jotai';
 import { useNavigate } from 'react-router-dom';
+import { Spinner } from '$app/components/Spinner';
 
 const Div = styled.div`
   color: ${(props) => props.theme.color};
@@ -183,7 +183,7 @@ export function Search$() {
   return (
     <>
       <InputField
-        className="border-transparent focus:border-transparent focus:ring-0"
+        className="border-transparent focus:border-transparent focus:ring-0 border-0"
         onClick={() => setIsModalOpen(true)}
         placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
         style={{ backgroundColor: colors.$1, color: colors.$3, width: '21rem' }}
@@ -197,98 +197,97 @@ export function Search$() {
         withoutPadding
         size="regular"
       >
-        {isFetching ? (
-          <div className="flex items-center justify-center h-full">
-            <Spinner />
-          </div>
-        ) : (
-          <div
-            className="flex flex-col pt-3"
-            style={{ backgroundColor: colors.$1 }}
-          >
-            <div className="flex flex-col space-y-5 px-3 pb-3">
-              <InputField
-                innerRef={inputRef}
-                value={query}
-                onValueChange={(value) => handleChange(value)}
-                onClick={() => setSelectedIndex(-1)}
-                placeholder={`${t('search')}...`}
-                changeOverride
-                style={{ backgroundColor: colors.$1, color: colors.$3 }}
-              />
-
-              <div
-                ref={optionsContainerRef}
-                className="overflow-y-auto max-h-96"
-                onMouseLeave={() =>
-                  selectedIndex !== -1 && setSelectedIndex(-1)
-                }
-              >
-                {options?.map((entry, index) => (
-                  <Div
-                    key={entry.id}
-                    theme={{
-                      backgroundColor:
-                        index === selectedIndex ? colors.$5 : 'transparent',
-                      color: colors.$3,
-                    }}
-                    className="cursor-pointer pl-2 py-2.5 active:font-semibold search-option"
-                    onClick={() => {
-                      if (entry.resource) {
-                        preventNavigation({
-                          fn: () => {
-                            if (entry.resource) {
-                              navigate(entry.resource.path);
-                              setIsModalOpen(false);
-                            }
-                          },
-                        });
-                      }
-                    }}
-                    onMouseMove={() =>
-                      selectedIndex !== index &&
-                      setTimeout(() => setSelectedIndex(index), 20)
-                    }
-                  >
-                    <span>
-                      <div>
-                        <p className="text-xs font-semibold">
-                          {entry.resource?.heading}
-                        </p>
-                        <p>{entry.label}</p>
-                      </div>
-                    </span>
-                  </Div>
-                ))}
+        <div
+          className="flex flex-col pt-3"
+          style={{ backgroundColor: colors.$1 }}
+        >
+          <div className="flex flex-col space-y-5 px-3 pb-3">
+            <div className="flex items-center space-x-3">
+              <div className="flex-1">
+                <InputField
+                  className="focus:ring-0"
+                  innerRef={inputRef}
+                  value={query}
+                  onValueChange={(value) => handleChange(value)}
+                  onClick={() => setSelectedIndex(-1)}
+                  placeholder={`${t('search')}...`}
+                  changeOverride
+                  style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                />
               </div>
+
+              {isFetching && <Spinner />}
             </div>
 
             <div
-              className="flex items-center py-2 space-x-4 px-3"
-              style={{ backgroundColor: colors.$5 }}
+              ref={optionsContainerRef}
+              className="overflow-y-auto max-h-96"
+              onMouseLeave={() => selectedIndex !== -1 && setSelectedIndex(-1)}
             >
-              <div className="flex items-center space-x-2 text-sm">
-                <div>
-                  <Icon element={LuArrowUpDown} color={colors.$3} />
-                </div>
-
-                <span className="mb-0.5" style={{ color: colors.$3 }}>
-                  {t('navigate')}
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2 text-sm px-3">
-                <div>
-                  <Icon element={LuCornerDownLeft} color={colors.$3} />
-                </div>
-
-                <span className="mb-0.5" style={{ color: colors.$3 }}>
-                  {t('select')}
-                </span>
-              </div>
+              {options?.map((entry, index) => (
+                <Div
+                  key={entry.id}
+                  theme={{
+                    backgroundColor:
+                      index === selectedIndex ? colors.$5 : 'transparent',
+                    color: colors.$3,
+                  }}
+                  className="cursor-pointer pl-2 py-2.5 active:font-semibold search-option"
+                  onClick={() => {
+                    if (entry.resource) {
+                      preventNavigation({
+                        fn: () => {
+                          if (entry.resource) {
+                            navigate(entry.resource.path);
+                            setIsModalOpen(false);
+                          }
+                        },
+                      });
+                    }
+                  }}
+                  onMouseMove={() =>
+                    selectedIndex !== index &&
+                    setTimeout(() => setSelectedIndex(index), 20)
+                  }
+                >
+                  <span>
+                    <div>
+                      <p className="text-xs font-semibold">
+                        {entry.resource?.heading}
+                      </p>
+                      <p>{entry.label}</p>
+                    </div>
+                  </span>
+                </Div>
+              ))}
             </div>
           </div>
-        )}
+
+          <div
+            className="flex items-center py-2 space-x-4 px-3"
+            style={{ backgroundColor: colors.$5 }}
+          >
+            <div className="flex items-center space-x-2 text-sm">
+              <div>
+                <Icon element={LuArrowUpDown} color={colors.$3} />
+              </div>
+
+              <span className="mb-0.5" style={{ color: colors.$3 }}>
+                {t('navigate')}
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2 text-sm px-3">
+              <div>
+                <Icon element={LuCornerDownLeft} color={colors.$3} />
+              </div>
+
+              <span className="mb-0.5" style={{ color: colors.$3 }}>
+                {t('select')}
+              </span>
+            </div>
+          </div>
+        </div>
       </Modal>
     </>
   );
