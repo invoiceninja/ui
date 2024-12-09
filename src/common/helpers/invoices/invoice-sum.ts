@@ -84,7 +84,7 @@ export class InvoiceSum {
       
       if(rate > 0 && amount != 0){
 
-        let total = Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
+        const total = Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
 
         let group = {};
 
