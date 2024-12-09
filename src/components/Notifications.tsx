@@ -10,11 +10,11 @@
 
 import { Bell, Trash } from 'react-feather';
 import { Slider } from './cards/Slider';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
-import { useSocketEvent } from '$app/common/queries/sockets';
+import { GenericMessage, useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
 import { ClickableElement } from './cards';
@@ -26,11 +26,12 @@ import { Credit } from '$app/common/interfaces/credit';
 import { Payment } from '$app/common/interfaces/payment';
 import classNames from 'classnames';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useSockets } from '$app/common/hooks/useSockets';
 
 export interface Notification {
   label: string;
   date: string;
-  link: string;
+  link: string | null;
   readAt: string | null;
 }
 
@@ -170,7 +171,32 @@ export function Notifications() {
     },
   });
 
+  const sockets = useSockets();
   const dateFormat = useCurrentCompanyDateFormats();
+
+  useEffect(() => {
+    if (sockets) {
+      const channel = sockets.subscribe(`general`);
+
+      channel.bind(
+        'App\\Events\\General\\GenericMessage',
+        (message: GenericMessage) => {
+          const notification = {
+            label: message.message,
+            date: new Date().toString(),
+            link: message.link,
+            readAt: null,
+          };
+
+          setNotifications((notifications) => [...notifications, notification]);
+        }
+      );
+
+      return () => {
+        sockets.channel('general').unsubscribe();
+      };
+    }
+  }, [sockets]);
 
   return (
     <>
@@ -200,9 +226,21 @@ export function Notifications() {
           </button>
         }
       >
-        {notifications.map((notification, i) => (
-          <ClickableElement key={i} to={notification.link}>
-            <div>
+        {notifications.map((notification, i) =>
+          notification.link ? (
+            <ClickableElement key={i} to={notification.link}>
+              <div>
+                <p>{notification.label}</p>
+                <p className="text-xs">
+                  {date(
+                    notification.date,
+                    `${dateFormat.dateFormat} ${timeFormat}`
+                  )}
+                </p>
+              </div>
+            </ClickableElement>
+          ) : (
+            <NonClickableElement key={i}>
               <p>{notification.label}</p>
               <p className="text-xs">
                 {date(
@@ -210,9 +248,9 @@ export function Notifications() {
                   `${dateFormat.dateFormat} ${timeFormat}`
                 )}
               </p>
-            </div>
-          </ClickableElement>
-        ))}
+            </NonClickableElement>
+          )
+        )}
 
         {notifications.length === 0 ? (
           <NonClickableElement>
