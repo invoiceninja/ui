@@ -129,3 +129,8 @@ export function socketId() {
 
   return null;
 }
+
+export interface GenericMessage {
+  message: string;
+  link: string | null;
+}
