@@ -255,6 +255,24 @@ export default function Reports() {
 
   const [preview, setPreview] = useAtom(previewAtom);
 
+  const adjustCellValue = (
+    currentCellDisplayValue: string | number | JSX.Element
+  ) => {
+    if (typeof currentCellDisplayValue !== 'string') {
+      return currentCellDisplayValue;
+    }
+
+    const parsedDisplayValue = parseFloat(currentCellDisplayValue.toString());
+
+    if (!isNaN(parsedDisplayValue) && typeof parsedDisplayValue === 'number') {
+      return parseFloat(
+        currentCellDisplayValue.toString().replace(/\./g, '').replace(',', '.')
+      );
+    }
+
+    return currentCellDisplayValue;
+  };
+
   const handlePreview = async () => {
     setErrors(undefined);
     setPreview(null);
@@ -298,29 +316,10 @@ export default function Reports() {
             setPreview({
               columns,
               rows: Object.values(rows).map((row) =>
-                row.map((cell) => {
-                  const currentNumberDisplayValue =
-                    typeof parseFloat(cell.display_value.toString()) ===
-                    'number'
-                      ? parseFloat(
-                          cell.display_value
-                            .toString()
-                            .replace(/\./g, '')
-                            .replace(',', '.')
-                        )
-                      : cell.display_value;
-
-                  return {
-                    ...cell,
-                    display_value:
-                      typeof cell.display_value === 'string'
-                        ? typeof currentNumberDisplayValue === 'number' &&
-                          currentNumberDisplayValue >= 0
-                          ? currentNumberDisplayValue
-                          : cell.display_value
-                        : cell.display_value,
-                  };
-                })
+                row.map((cell) => ({
+                  ...cell,
+                  display_value: adjustCellValue(cell.display_value),
+                }))
               ),
             });
 
