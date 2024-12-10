@@ -85,10 +85,10 @@ export function PublicNotificationsModal() {
         </p>
         <p>
           This means you will be connected to the official Invoice Ninja
-          servers, so we'd like to ask for your preference.
+          servers, so we&apos;d like to ask for your preference.
         </p>
         <p>
-          Please note, you'll only see this modal once. If you'd like to change
+          Please note, you&apos;ll only see this modal once. If you&apos;d like to change
           your settings, you can do so in settings menu.
         </p>
 
