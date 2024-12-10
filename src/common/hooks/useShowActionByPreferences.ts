@@ -34,7 +34,10 @@ export function useShowActionByPreferences(params: Params) {
     const commonActionsPreferences =
       user?.company_user?.react_settings.common_actions;
 
-    if (!commonActionsPreferences) {
+    if (
+      !commonActionsPreferences &&
+      !defaultCommonActions[entity].some(({ value }) => value === actionKey)
+    ) {
       return true;
     }
 
@@ -54,7 +57,7 @@ export function useShowActionByPreferences(params: Params) {
       return true;
     }
 
-    if (commonActionsPreferences && commonActionsSection) {
+    if (commonActionsPreferences?.[entity] && commonActionsSection) {
       return commonActionsPreferences[entity]?.includes(actionKey);
     }
 
