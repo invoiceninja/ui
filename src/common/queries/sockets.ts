@@ -11,6 +11,7 @@
 import { useSockets } from '../hooks/useSockets';
 import { useEffect } from 'react';
 import { useCurrentCompany } from '../hooks/useCurrentCompany';
+import { isHosted } from '../helpers';
 
 // This file defines global events system for query invalidation.
 
@@ -26,7 +27,7 @@ export type Event = (typeof events)[number];
 
 export type Callbacks = Record<Event, (data: unknown) => unknown>;
 
-export function useGlobalSocketEvents() {
+export function usePrivateSocketEvents() {
   const sockets = useSockets();
   const company = useCurrentCompany();
 
@@ -39,9 +40,11 @@ export function useGlobalSocketEvents() {
   };
 
   useEffect(() => {
-    if (!sockets || !company) {
+    if (!sockets || !company || !isHosted()) {
       return;
     }
+
+    console.log(`Subscribing to private-company-${company.company_key}`);
 
     const channel = sockets.subscribe(`private-company-${company.company_key}`);
 
@@ -82,6 +85,10 @@ export type WithSocketId<T> = T & { 'x-socket-id': string };
 
 export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
   useEffect(() => {
+    if (!isHosted()) {
+      return;
+    }
+
     const controller = new AbortController();
     const signal = controller.signal;
 
