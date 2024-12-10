@@ -18,9 +18,10 @@ export const confirmActionModalAtom = atom(false);
 
 interface Props {
   onClick: () => void;
+  onClose?: () => void;
 }
 
-export function ConfirmActionModal({ onClick }: Props) {
+export function ConfirmActionModal({ onClick, onClose }: Props) {
   const [t] = useTranslation();
   const [isModalVisible, setIsModalVisible] = useAtom(confirmActionModalAtom);
 
@@ -34,9 +35,14 @@ export function ConfirmActionModal({ onClick }: Props) {
     <Modal
       title={t('are_you_sure')}
       visible={isModalVisible}
-      onClose={() => setIsModalVisible(false)}
+      onClose={() => {
+        setIsModalVisible(false);
+        onClose?.();
+      }}
     >
-      <Button onClick={() => onClick()}>{t('continue')}</Button>
+      <Button behavior="button" onClick={() => onClick()}>
+        {t('continue')}
+      </Button>
     </Modal>
   );
 }
