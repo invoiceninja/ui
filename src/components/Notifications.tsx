@@ -18,7 +18,7 @@ import { GenericMessage, useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
 import { ClickableElement } from './cards';
-import { date, trans } from '$app/common/helpers';
+import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { NonClickableElement } from './cards/NonClickableElement';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -27,6 +27,7 @@ import { Payment } from '$app/common/interfaces/payment';
 import classNames from 'classnames';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useSockets } from '$app/common/hooks/useSockets';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export interface Notification {
   label: string;
@@ -173,10 +174,19 @@ export function Notifications() {
 
   const sockets = useSockets();
   const dateFormat = useCurrentCompanyDateFormats();
+  const reactSettings = useReactSettings();
 
   useEffect(() => {
+    if (
+      isSelfHosted() &&
+      !reactSettings.preferences.enable_public_notifications
+    ) {
+      return;
+    }
+
     if (sockets) {
-      const channel = sockets.subscribe(`general`);
+      const channelName = isHosted() ? 'general_hosted' : 'general_selfhosted';
+      const channel = sockets.subscribe(channelName);
 
       channel.bind(
         'App\\Events\\General\\GenericMessage',
@@ -193,10 +203,17 @@ export function Notifications() {
       );
 
       return () => {
-        sockets.channel('general').unsubscribe();
+        sockets.channel(channelName).unsubscribe();
       };
     }
-  }, [sockets]);
+  }, [sockets, reactSettings.preferences.enable_public_notifications]);
+
+  if (
+    isSelfHosted() &&
+    !reactSettings.preferences.enable_public_notifications
+  ) {
+    return null;
+  }
 
   return (
     <>
