@@ -37,7 +37,8 @@ import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 import { useSockets } from './common/hooks/useSockets';
-import { useGlobalSocketEvents } from './common/queries/sockets';
+import { usePrivateSocketEvents } from './common/queries/sockets';
+import { PublicNotificationsModal } from './components/PublicNotificationsModal';
 
 export function App() {
   const [t] = useTranslation();
@@ -193,8 +194,8 @@ export function App() {
   }, [location, user]);
 
   const sockets = useSockets();
-  
-  useGlobalSocketEvents();
+
+  usePrivateSocketEvents();
 
   useEffect(() => {
     if (company && sockets) {
@@ -229,6 +230,7 @@ export function App() {
       />
 
       <PreventNavigationModal />
+      <PublicNotificationsModal />
     </>
   );
 }
