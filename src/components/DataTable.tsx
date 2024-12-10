@@ -427,16 +427,14 @@ export function DataTable<T extends object>(props: Props<T>) {
 
       setSelectedResources(filteredSelectedResources);
 
-      if (data.data.data.length) {
-        const shouldDeselectMainCheckbox = data.data.data.some(
-          (resource: any) => !selected.includes(resource.id)
-        );
+      const shouldDeselectMainCheckbox = data.data.data.some(
+        (resource: any) => !selected.includes(resource.id)
+      );
 
-        if (shouldDeselectMainCheckbox && mainCheckbox.current) {
-          mainCheckbox.current.checked = false;
-        } else if (mainCheckbox.current) {
-          mainCheckbox.current.checked = true;
-        }
+      if (shouldDeselectMainCheckbox && mainCheckbox.current) {
+        mainCheckbox.current.checked = false;
+      } else if (mainCheckbox.current && data.data.data.length) {
+        mainCheckbox.current.checked = true;
       }
     }
   }, [selected]);
