@@ -22,10 +22,9 @@ import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Props {
   visible: boolean;
@@ -45,7 +44,7 @@ export function MergeClientModal(props: Props) {
 
   const { setIsPurgeOrMergeActionCalled } = props;
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [mergeIntoClientId, setMergeIntoClientId] = useState<string>('');
 
@@ -54,7 +53,7 @@ export function MergeClientModal(props: Props) {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const handleMergeClient = (password: string) => {
+  const handleMergeClient = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
@@ -93,8 +92,8 @@ export function MergeClientModal(props: Props) {
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
+            setPasswordConfirmModalOpen(true);
           }
 
           setIsPurgeOrMergeActionCalled?.(false);
