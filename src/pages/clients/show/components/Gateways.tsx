@@ -11,7 +11,7 @@
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { MdChevronRight, MdDelete, MdLaunch, MdPayment } from 'react-icons/md';
+import { MdChevronRight, MdLaunch, MdPayment } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
@@ -55,6 +55,7 @@ export function Gateways(props: Props) {
 
   const [companyGateways, setCompanyGateways] = useState<CompanyGateway[]>();
 
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [deleteGatewayTokenId, setDeleteGatewayTokenId] = useState<string>('');
 
   const setIsConfirmationVisible = useSetAtom(confirmActionModalAtom);
@@ -72,18 +73,24 @@ export function Gateways(props: Props) {
   };
 
   const handleDeleteGatewayToken = () => {
-    if (deleteGatewayTokenId) {
+    if (deleteGatewayTokenId && !isFormBusy) {
       toast.processing();
+      setIsFormBusy(true);
 
       request(
         'DELETE',
         endpoint('/api/v1/client_gateway_tokens/:id', {
           id: deleteGatewayTokenId,
         })
-      ).then(() => {
-        toast.success('success');
-        $refetch(['clients']);
-      });
+      )
+        .then(() => {
+          toast.success('success');
+          $refetch(['clients']);
+
+          setDeleteGatewayTokenId('');
+          setIsConfirmationVisible(false);
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 
@@ -116,6 +123,7 @@ export function Gateways(props: Props) {
       <ConfirmActionModal
         onClick={() => handleDeleteGatewayToken()}
         onClose={() => setDeleteGatewayTokenId('')}
+        disabledButton={isFormBusy}
       />
 
       <div className="col-span-12 md:col-span-6 lg:col-span-3">
@@ -146,8 +154,7 @@ export function Gateways(props: Props) {
                           id: token.company_gateway_id,
                         })}
                       >
-                        {getCompanyGateway(token.company_gateway_id)?.label ||
-                          'Stripe'}
+                        {getCompanyGateway(token.company_gateway_id)?.label}
                       </Link>
                     </div>
                   </div>
@@ -170,25 +177,31 @@ export function Gateways(props: Props) {
 
                 <div
                   className={classNames('flex flex-col items-end h-full', {
-                    'justify-center': !isStripeGateway(
-                      getCompanyGateway(token.company_gateway_id)?.gateway_key
-                    ),
-                    'justify-between': isStripeGateway(
-                      getCompanyGateway(token.company_gateway_id)?.gateway_key
-                    ),
+                    'justify-center':
+                      !isStripeGateway(
+                        getCompanyGateway(token.company_gateway_id)?.gateway_key
+                      ) || token.is_default,
+                    'justify-between':
+                      isStripeGateway(
+                        getCompanyGateway(token.company_gateway_id)?.gateway_key
+                      ) && token.is_default,
                   })}
                 >
-                  <Link
-                    external
-                    to={route(
-                      'https://dashboard.stripe.com/customers/:customerReference',
-                      {
-                        customerReference: token.gateway_customer_reference,
-                      }
-                    )}
-                  >
-                    <Icon element={MdLaunch} size={18} />
-                  </Link>
+                  {isStripeGateway(
+                    getCompanyGateway(token.company_gateway_id)?.gateway_key
+                  ) && (
+                    <Link
+                      external
+                      to={route(
+                        'https://dashboard.stripe.com/customers/:customerReference',
+                        {
+                          customerReference: token.gateway_customer_reference,
+                        }
+                      )}
+                    >
+                      <Icon element={MdLaunch} size={18} />
+                    </Link>
+                  )}
 
                   {token.is_default && (
                     <div
@@ -206,9 +219,8 @@ export function Gateways(props: Props) {
               {(!token.is_default || isAdmin) && (
                 <div
                   className={classNames('flex items-center', {
-                    'justify-start': !isAdmin && !token.is_default,
+                    'justify-start': !isAdmin || !token.is_default,
                     'justify-between': isAdmin && !token.is_default,
-                    'justify-end': isAdmin && token.is_default,
                   })}
                 >
                   {!token.is_default && (
@@ -224,10 +236,11 @@ export function Gateways(props: Props) {
 
                   {isAdmin && (
                     <div
-                      className="cursor-pointer"
+                      className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3 self-start bg-red-600 hover:bg-opacity-80 text-white"
+                      style={{ borderColor: colors.$5 }}
                       onClick={() => setDeleteGatewayTokenId(token.id)}
                     >
-                      <Icon element={MdDelete} size={25} color="red" />
+                      {t('delete')}
                     </div>
                   )}
                 </div>
