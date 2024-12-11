@@ -36,9 +36,8 @@ client.interceptors.response.use(
   },
   (error: AxiosError<ValidationBag>) => {
     if (
-      (error.response?.config.url?.includes('einvoice') &&
-        error.response?.status === 401) ||
-      error.response?.status === 403
+      error.response?.config.url?.includes('einvoice') &&
+      (error.response?.status === 401 || error.response?.status === 403)
     ) {
       console.error(error);
 
