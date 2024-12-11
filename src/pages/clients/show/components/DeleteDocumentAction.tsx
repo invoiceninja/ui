@@ -14,13 +14,12 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { MdDelete } from 'react-icons/md';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { useState } from 'react';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { endpoint } from '$app/common/helpers';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Props {
   document: Document;
@@ -31,13 +30,16 @@ export function DeleteDocumentAction(props: Props) {
 
   const { document } = props;
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [documentId, setDocumentId] = useState<string>('');
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState<boolean>(false);
 
-  const handleDeleteDocument = (password: string) => {
+  const handleDeleteDocument = (
+    password: string,
+    isPasswordRequired: boolean
+  ) => {
     toast.processing();
 
     request(
@@ -52,8 +54,8 @@ export function DeleteDocumentAction(props: Props) {
       })
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
+          setIsPasswordConfirmModalOpen(true);
         }
       });
   };
