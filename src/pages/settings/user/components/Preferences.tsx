@@ -144,6 +144,23 @@ export function Preferences() {
           />
         </Element>
 
+        <Element
+          leftSide={t('enable_public_notifications')}
+          leftSideHelp={t('enable_public_notifications_help')}
+        >
+          <Toggle
+            checked={Boolean(
+              reactSettings.preferences.enable_public_notifications
+            )}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.enable_public_notifications',
+                value
+              )
+            }
+          />
+        </Element>
+
         <StatusColorTheme />
       </Card>
 
