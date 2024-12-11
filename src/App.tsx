@@ -39,6 +39,7 @@ import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavig
 import { useSockets } from './common/hooks/useSockets';
 import { usePrivateSocketEvents } from './common/queries/sockets';
 import { PublicNotificationsModal } from './components/PublicNotificationsModal';
+import { isSelfHosted } from './common/helpers';
 
 export function App() {
   const [t] = useTranslation();
@@ -230,7 +231,7 @@ export function App() {
       />
 
       <PreventNavigationModal />
-      <PublicNotificationsModal />
+      {isSelfHosted() ? <PublicNotificationsModal /> : null}
     </>
   );
 }
