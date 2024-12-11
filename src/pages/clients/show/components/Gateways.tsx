@@ -95,8 +95,6 @@ export function Gateways(props: Props) {
   };
 
   const handleSetDefault = (id: string) => {
-    toast.processing();
-
     request(
       'POST',
       endpoint('/api/v1/client_gateway_tokens/:id/setAsDefault', { id })
