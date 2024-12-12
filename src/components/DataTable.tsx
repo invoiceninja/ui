@@ -433,7 +433,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
       if (shouldDeselectMainCheckbox && mainCheckbox.current) {
         mainCheckbox.current.checked = false;
-      } else if (mainCheckbox.current) {
+      } else if (mainCheckbox.current && data.data.data.length) {
         mainCheckbox.current.checked = true;
       }
     }
