@@ -40,6 +40,7 @@ import { useSockets } from './common/hooks/useSockets';
 import { useGlobalSocketEvents } from './common/queries/sockets';
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
+import { useSystemFonts } from './common/hooks/useSystemFonts';
 
 export function App() {
   const [t] = useTranslation();
@@ -224,6 +225,8 @@ export function App() {
       }
     };
   }, [company?.company_key]);
+
+  useSystemFonts();
 
   return (
     <>
