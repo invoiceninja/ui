@@ -11,7 +11,7 @@
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { MdChevronRight, MdLaunch, MdPayment } from 'react-icons/md';
+import { MdChevronRight, MdDelete, MdLaunch, MdPayment } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
@@ -32,6 +32,9 @@ import {
   confirmActionModalAtom,
 } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { useSetAtom } from 'jotai';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { ChevronDown } from 'react-feather';
 
 interface Props {
   client: Client;
@@ -133,8 +136,8 @@ export function Gateways(props: Props) {
             <div
               key={token.id}
               className={classNames('flex flex-col space-y-1.5 border-b py-4', {
-                'h-22': !token.is_default || (token.is_default && isAdmin),
-                'h-12': token.is_default && !isAdmin,
+                'h-22': !token.is_default,
+                'h-20': token.is_default,
               })}
             >
               <div className="flex items-center justify-between h-12">
@@ -203,44 +206,73 @@ export function Gateways(props: Props) {
 
                   {token.is_default && (
                     <div
-                      className="inline-flex items-center rounded-full py-1 px-3 text-xs"
+                      className="inline-flex items-center rounded-full py-1 px-3 text-xs space-x-1"
                       style={{
                         backgroundColor: colors.$5,
                       }}
                     >
-                      {t('default')}
+                      <span>{t('default')}</span>
+
+                      {isAdmin && (
+                        <Dropdown
+                          className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                          customLabel={
+                            <div className="cursor-pointer">
+                              <Icon
+                                element={ChevronDown}
+                                style={{ width: '1.1rem', height: '1.1rem' }}
+                              />
+                            </div>
+                          }
+                          minWidth="9rem"
+                          maxWidth="11rem"
+                        >
+                          <DropdownElement
+                            icon={<Icon element={MdDelete} />}
+                            onClick={() => setDeleteGatewayTokenId(token.id)}
+                          >
+                            {t('delete')}
+                          </DropdownElement>
+                        </Dropdown>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
 
-              {(!token.is_default || isAdmin) && (
-                <div
-                  className={classNames('flex items-center', {
-                    'justify-start': !isAdmin || !token.is_default,
-                    'justify-between': isAdmin && !token.is_default,
-                  })}
-                >
-                  {!token.is_default && (
-                    <Div
-                      className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3 self-start"
-                      style={{ borderColor: colors.$5 }}
-                      onClick={() => handleSetDefault(token.id)}
-                      theme={{ hoverBgColor: colors.$5 }}
-                    >
-                      {t('save_as_default')}
-                    </Div>
-                  )}
+              {!token.is_default && (
+                <div className="flex items-center justify-start">
+                  <Div
+                    className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3 self-start space-x-1"
+                    style={{ borderColor: colors.$5 }}
+                    onClick={() => handleSetDefault(token.id)}
+                    theme={{ hoverBgColor: colors.$5 }}
+                  >
+                    <span>{t('save_as_default')}</span>
 
-                  {isAdmin && (
-                    <div
-                      className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3 self-start bg-red-600 hover:bg-opacity-80 text-white"
-                      style={{ borderColor: colors.$5 }}
-                      onClick={() => setDeleteGatewayTokenId(token.id)}
-                    >
-                      {t('delete')}
-                    </div>
-                  )}
+                    {isAdmin && (
+                      <Dropdown
+                        className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                        customLabel={
+                          <div className="cursor-pointer">
+                            <Icon
+                              element={ChevronDown}
+                              style={{ width: '1.1rem', height: '1.1rem' }}
+                            />
+                          </div>
+                        }
+                        minWidth="9rem"
+                        maxWidth="11rem"
+                      >
+                        <DropdownElement
+                          icon={<Icon element={MdDelete} />}
+                          onClick={() => setDeleteGatewayTokenId(token.id)}
+                        >
+                          {t('delete')}
+                        </DropdownElement>
+                      </Dropdown>
+                    )}
+                  </Div>
                 </div>
               )}
             </div>
