@@ -44,6 +44,7 @@ export interface Preferences {
     columns: Record<string, ClientMapRecord[][]>;
   };
   auto_expand_product_table_notes: boolean;
+  use_system_fonts: boolean;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
@@ -99,6 +100,7 @@ export const preferencesDefaults: Preferences = {
     columns: {},
   },
   auto_expand_product_table_notes: false,
+  use_system_fonts: false,
 };
 
 interface Options {
