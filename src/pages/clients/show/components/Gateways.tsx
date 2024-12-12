@@ -181,7 +181,7 @@ export function Gateways(props: Props) {
                     'justify-center':
                       !isStripeGateway(
                         getCompanyGateway(token.company_gateway_id)?.gateway_key
-                      ) || token.is_default,
+                      ) && token.is_default,
                     'justify-between':
                       isStripeGateway(
                         getCompanyGateway(token.company_gateway_id)?.gateway_key
