@@ -111,19 +111,32 @@ export function Search$() {
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        setSelectedIndex((prev) => {
-          if (prev >= optionsLength - 1) return 0;
-
-          return prev + 1;
-        });
+        if (document.activeElement === inputRef.current) {
+          setSelectedIndex(0);
+          inputRef.current?.blur();
+        } else {
+          setSelectedIndex((prev) => {
+            if (prev >= optionsLength - 1) return 0;
+            return prev + 1;
+          });
+        }
         break;
 
       case 'ArrowUp':
         event.preventDefault();
-        setSelectedIndex((prev) => {
-          if (prev <= 0) return optionsLength - 1;
-          return prev - 1;
-        });
+
+        if (document.activeElement === inputRef.current) {
+          setSelectedIndex(0);
+          inputRef.current?.blur();
+        } else if (selectedIndex === 0) {
+          inputRef.current?.focus();
+          setSelectedIndex(-1);
+        } else {
+          setSelectedIndex((prev) => {
+            if (prev <= 0) return optionsLength - 1;
+            return prev - 1;
+          });
+        }
         break;
 
       case 'Enter':
