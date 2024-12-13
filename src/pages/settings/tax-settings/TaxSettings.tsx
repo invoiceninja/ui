@@ -184,6 +184,8 @@ export function TaxSettings() {
                             $handleChange('settings.tax_rate1', 0);
                             $handleChange('settings.tax_rate2', 0);
                             $handleChange('settings.tax_rate3', 0);
+
+                            handleToggleChange('settings.inclusive_taxes', false);
                           }
                         }}
                       />
