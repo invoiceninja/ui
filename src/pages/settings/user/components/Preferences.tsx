@@ -146,7 +146,6 @@ export function Preferences() {
 
         <Element
           leftSide={t('enable_public_notifications')}
-          leftSideHelp={t('enable_public_notifications_help')}
         >
           <Toggle
             checked={Boolean(

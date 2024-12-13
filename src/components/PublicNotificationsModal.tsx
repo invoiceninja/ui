@@ -63,7 +63,7 @@ export function PublicNotificationsModal() {
   return (
     <>
       <Modal
-        title="Notifications"
+        title={t('notifications')}
         visible={isVisible}
         onClose={() => {
           setIsVisible(false);
@@ -80,20 +80,12 @@ export function PublicNotificationsModal() {
         }}
         size="small"
       >
-        <p>
-          Hello! You can now receive real-time notifications from Invoice Ninja!
-        </p>
-        <p>
-          This means you will be connected to the official Invoice Ninja
-          servers, so we&apos;d like to ask for your preference.
-        </p>
-        <p>
-          Please note, you&apos;ll only see this modal once. If you&apos;d like to change
-          your settings, you can do so in settings menu.
-        </p>
+        <p>{t('enable_public_notifications_1')}</p>
+        <p>{t('enable_public_notifications_2')}</p>
+        <p>{t('enable_public_notifications_3')}</p>
 
         <Toggle
-          label="Enable notifications"
+          label={t('enable_notifications')}
           checked={Boolean(reactSettings?.dark_mode)}
           onChange={(value) =>
             dispatch(
