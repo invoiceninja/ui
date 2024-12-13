@@ -45,6 +45,7 @@ export interface Preferences {
   };
   auto_expand_product_table_notes: boolean;
   enable_public_notifications: boolean | null;
+  use_system_fonts: boolean;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
@@ -101,6 +102,7 @@ export const preferencesDefaults: Preferences = {
   },
   auto_expand_product_table_notes: false,
   enable_public_notifications: null,
+  use_system_fonts: false,
 };
 
 interface Options {

@@ -40,6 +40,9 @@ import { useSockets } from './common/hooks/useSockets';
 import { usePrivateSocketEvents } from './common/queries/sockets';
 import { PublicNotificationsModal } from './components/PublicNotificationsModal';
 import { isSelfHosted } from './common/helpers';
+import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
+import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
+import { useSystemFonts } from './common/hooks/useSystemFonts';
 
 export function App() {
   const [t] = useTranslation();
@@ -54,6 +57,8 @@ export function App() {
   const user = useCurrentUser();
   const location = useLocation();
   const company = useCurrentCompany();
+
+  useWebSessionTimeout();
   useAddPreventNavigationEvents();
 
   const refetch = useRefetch();
@@ -64,6 +69,7 @@ export function App() {
   const switchToCompanySettings = useSwitchToCompanySettings();
 
   const colorScheme = useAtomValue(colorSchemeAtom);
+  const setIsPasswordRequired = useSetAtom(isPasswordRequiredAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
@@ -137,6 +143,10 @@ export function App() {
     window.addEventListener('navigate.invalid.page', () =>
       navigate('/not_found')
     );
+
+    window.addEventListener('reset.password.required', () => {
+      setIsPasswordRequired(false);
+    });
 
     window.addEventListener('refetch', (event) => {
       const { property } = (event as CustomEvent).detail;
@@ -217,6 +227,8 @@ export function App() {
       }
     };
   }, [company?.company_key]);
+
+  useSystemFonts();
 
   return (
     <>

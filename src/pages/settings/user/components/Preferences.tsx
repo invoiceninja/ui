@@ -144,9 +144,7 @@ export function Preferences() {
           />
         </Element>
 
-        <Element
-          leftSide={t('enable_public_notifications')}
-        >
+        <Element leftSide={t('enable_public_notifications')}>
           <Toggle
             checked={Boolean(
               reactSettings.preferences.enable_public_notifications
@@ -154,6 +152,21 @@ export function Preferences() {
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.preferences.enable_public_notifications',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('use_system_fonts')}
+          leftSideHelp={t('use_system_fonts_help')}
+        >
+          <Toggle
+            checked={Boolean(reactSettings.preferences.use_system_fonts)}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.use_system_fonts',
                 value
               )
             }

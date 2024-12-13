@@ -24,6 +24,10 @@ client.interceptors.response.use(
     const payload = checkJsonObject(response.config.data);
     const requestMethod = response.config.method;
 
+    if (response.config?.headers?.['X-Api-Password'] !== undefined) {
+      window.dispatchEvent(new CustomEvent('reset.password.required'));
+    }
+
     if (
       requestMethod === 'put' ||
       (requestMethod === 'post' && payload?.action === 'delete') ||
@@ -36,9 +40,8 @@ client.interceptors.response.use(
   },
   (error: AxiosError<ValidationBag>) => {
     if (
-      (error.response?.config.url?.includes('einvoice') &&
-        error.response?.status === 401) ||
-      error.response?.status === 403
+      error.response?.config.url?.includes('einvoice') &&
+      (error.response?.status === 401 || error.response?.status === 403)
     ) {
       console.error(error);
 
