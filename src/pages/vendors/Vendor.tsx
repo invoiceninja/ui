@@ -152,7 +152,7 @@ export default function Vendor() {
 
       <Tabs tabs={tabs} className="my-6" />
 
-      <Outlet />
+      <Outlet context={{ displayName: vendor?.name || '' }} />
     </Default>
   );
 }
