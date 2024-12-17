@@ -47,10 +47,13 @@ export function Search$() {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const optionsContainerRef = useRef<HTMLDivElement>(null);
+  const containerScrollTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [query, setQuery] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [isContainerScrolling, setIsContainerScrolling] =
+    useState<boolean>(false);
 
   const isNavigationModalVisible = useAtomValue(isNavigationModalVisibleAtom);
 
@@ -236,6 +239,17 @@ export function Search$() {
               ref={optionsContainerRef}
               className="overflow-y-auto h-96"
               onMouseLeave={() => selectedIndex !== -1 && setSelectedIndex(-1)}
+              onScroll={() => {
+                setIsContainerScrolling(true);
+
+                if (containerScrollTimeout.current) {
+                  clearTimeout(containerScrollTimeout.current);
+                }
+
+                containerScrollTimeout.current = setTimeout(() => {
+                  setIsContainerScrolling(false);
+                }, 50);
+              }}
             >
               {options?.map((entry, index) => (
                 <Div
@@ -258,10 +272,11 @@ export function Search$() {
                       });
                     }
                   }}
-                  onMouseMove={() =>
-                    selectedIndex !== index &&
-                    setTimeout(() => setSelectedIndex(index), 20)
-                  }
+                  onMouseMove={() => {
+                    if (!isContainerScrolling && selectedIndex !== index) {
+                      setTimeout(() => setSelectedIndex(index), 20);
+                    }
+                  }}
                 >
                   <span>
                     <div>
