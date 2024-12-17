@@ -37,7 +37,9 @@ import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 import { useSockets } from './common/hooks/useSockets';
-import { useGlobalSocketEvents } from './common/queries/sockets';
+import { usePrivateSocketEvents } from './common/queries/sockets';
+import { PublicNotificationsModal } from './components/PublicNotificationsModal';
+import { isSelfHosted } from './common/helpers';
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
@@ -204,7 +206,7 @@ export function App() {
 
   const sockets = useSockets();
 
-  useGlobalSocketEvents();
+  usePrivateSocketEvents();
 
   useEffect(() => {
     if (company && sockets) {
@@ -241,6 +243,7 @@ export function App() {
       />
 
       <PreventNavigationModal />
+      {isSelfHosted() ? <PublicNotificationsModal /> : null}
     </>
   );
 }
