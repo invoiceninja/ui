@@ -39,15 +39,19 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ValidationBag>) => {
+    const url = error.response?.config.url;
+
     if (
-      error.response?.config.url?.includes('einvoice') &&
+      url?.includes('einvoice') &&
       (error.response?.status === 401 || error.response?.status === 403)
     ) {
       console.error(error);
 
-      $toast.error(trans('einvoice_something_went_wrong', {}), {
-        duration: 10_000,
-      });
+      if (!url.includes('quota')) {
+        $toast.error(trans('einvoice_something_went_wrong', {}), {
+          duration: 10_000,
+        });
+      }
 
       return Promise.reject(error);
     }
