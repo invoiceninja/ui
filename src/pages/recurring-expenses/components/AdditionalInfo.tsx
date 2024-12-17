@@ -94,20 +94,23 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
     if (recurringExpense) {
       handleChange('invoice_currency_id', recurringExpense.invoice_currency_id);
 
-      if (recurringExpense.invoice_currency_id) {
+      if (
+        recurringExpense.invoice_currency_id &&
+        recurringExpense?.currency_id
+      ) {
         const resolveConvertCurrency = resolveCurrency(
           recurringExpense.invoice_currency_id
         );
+        const recurringExpenseCurrency = resolveCurrency(
+          recurringExpense.currency_id
+        );
 
-        if (resolveConvertCurrency) {
-          handleChange('exchange_rate', resolveConvertCurrency.exchange_rate);
+        if (resolveConvertCurrency && recurringExpenseCurrency) {
+          const currentExchangeRate =
+            resolveConvertCurrency.exchange_rate /
+            recurringExpenseCurrency.exchange_rate;
 
-          if (recurringExpense.amount) {
-            handleChange(
-              'foreign_amount',
-              recurringExpense.amount * resolveConvertCurrency.exchange_rate
-            );
-          }
+          handleChange('exchange_rate', currentExchangeRate);
         }
       } else {
         handleChange('foreign_amount', 0);
@@ -117,9 +120,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
       handleChange('foreign_amount', 0);
       handleChange('exchange_rate', 1);
     }
-  }, [recurringExpense?.invoice_currency_id]);
 
-  useEffect(() => {
     if (recurringExpense?.invoice_currency_id) {
       const resolvedCurrencySeparators = resolveCurrencySeparator(
         recurringExpense.invoice_currency_id
@@ -129,12 +130,10 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
         setCurrencySeparators(resolvedCurrencySeparators);
       }
     }
-  }, [recurringExpense?.invoice_currency_id]);
+  }, [recurringExpense?.invoice_currency_id, recurringExpense?.currency_id]);
 
   useEffect(() => {
     if (recurringExpense && recurringExpense.exchange_rate) {
-      handleChange('exchange_rate', recurringExpense.exchange_rate);
-
       if (recurringExpense.amount && recurringExpense.invoice_currency_id) {
         handleChange(
           'foreign_amount',
@@ -240,11 +239,12 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
 
           <Element leftSide={t('exchange_rate')}>
             <NumberInputField
-              value={recurringExpense.exchange_rate}
+              value={recurringExpense.exchange_rate || ''}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
               errorMessage={errors?.errors.exchange_rate}
+              disablePrecision
             />
           </Element>
 
@@ -264,6 +264,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
                 onConvertedAmountChange(parseFloat(value))
               }
               errorMessage={errors?.errors.foreign_amount}
+              disablePrecision
             />
           </Element>
         </>

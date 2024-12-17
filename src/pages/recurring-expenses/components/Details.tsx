@@ -29,10 +29,13 @@ import { CustomField } from '$app/components/CustomField';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
 import { Icon } from '$app/components/icons/Icon';
-import { MdLaunch } from 'react-icons/md';
+import { MdLaunch, MdWarning } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
+import { Link as LinkBase } from '$app/components/forms';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import reactStringReplace from 'react-string-replace';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -59,6 +62,19 @@ export function Details(props: Props) {
 
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
+
+  const isAnyTaxHidden = () => {
+    if (
+      company.enabled_expense_tax_rates === 0 &&
+      (recurringExpense?.tax_name1 ||
+        recurringExpense?.tax_name2 ||
+        recurringExpense?.tax_name3)
+    ) {
+      return true;
+    }
+
+    return false;
+  };
 
   return (
     <div className="flex flex-col space-y-4">
@@ -192,13 +208,36 @@ export function Details(props: Props) {
           </Element>
         )}
 
+        {isAnyTaxHidden() && (
+          <div className="flex items-center space-x-3 px-6">
+            <div>
+              <Icon element={MdWarning} size={20} color="orange" />
+            </div>
+
+            <div className="text-sm font-medium">
+              {reactStringReplace(
+                t('hidden_taxes_warning') as string,
+                ':link',
+                () => (
+                  <LinkBase to="/settings/tax_settings">
+                    {t('settings')}
+                  </LinkBase>
+                )
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Tax 1 */}
         {recurringExpense &&
           company?.enabled_expense_tax_rates > 0 &&
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={recurringExpense.tax_name1}
+                defaultValue={getTaxRateComboValue(
+                  recurringExpense,
+                  'tax_name1'
+                )}
                 onClearButtonClick={() => {
                   handleChange('tax_name1', '');
                   handleChange('tax_rate1', 0);
@@ -233,7 +272,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={recurringExpense.tax_amount1}
+                  value={recurringExpense.tax_amount1 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount1', parseFloat(value))
                   }
@@ -250,7 +289,10 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={recurringExpense.tax_name2}
+                defaultValue={getTaxRateComboValue(
+                  recurringExpense,
+                  'tax_name2'
+                )}
                 onClearButtonClick={() => {
                   handleChange('tax_name2', '');
                   handleChange('tax_rate2', 0);
@@ -285,7 +327,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={recurringExpense.tax_amount2}
+                  value={recurringExpense.tax_amount2 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount2', parseFloat(value))
                   }
@@ -302,7 +344,10 @@ export function Details(props: Props) {
           taxInputType === 'by_rate' && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={recurringExpense.tax_name3}
+                defaultValue={getTaxRateComboValue(
+                  recurringExpense,
+                  'tax_name3'
+                )}
                 onClearButtonClick={() => {
                   handleChange('tax_name3', '');
                   handleChange('tax_rate3', 0);
@@ -336,7 +381,7 @@ export function Details(props: Props) {
                 />
                 <NumberInputField
                   label={t('tax_amount')}
-                  value={recurringExpense.tax_amount3}
+                  value={recurringExpense.tax_amount3 || ''}
                   onValueChange={(value) =>
                     handleChange('tax_amount3', parseFloat(value))
                   }
@@ -349,7 +394,7 @@ export function Details(props: Props) {
         {recurringExpense && (
           <Element leftSide={t('amount')}>
             <NumberInputField
-              value={recurringExpense.amount}
+              value={recurringExpense.amount || ''}
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value) || 0)
               }

@@ -30,6 +30,8 @@ import { RootState } from '../stores/store';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
 import { $refetch } from './useRefetch';
+import { useCurrentUser } from './useCurrentUser';
+import { isEqual } from 'lodash';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix
@@ -62,9 +64,11 @@ interface SaveOptions {
 }
 
 export function usePreferences() {
-  const user = useInjectUserChanges();
+  const currentUser = useCurrentUser();
+  const user = useInjectUserChanges({ overwrite: false });
 
   const [t] = useTranslation();
+
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
 
@@ -82,6 +86,15 @@ export function usePreferences() {
   const { getState } = useStore<RootState>();
 
   const save = async ({ silent }: SaveOptions) => {
+    if (
+      isEqual(
+        currentUser?.company_user?.react_settings,
+        getState().user.changes.company_user.react_settings
+      )
+    ) {
+      return;
+    }
+
     !silent && toast.processing();
 
     request(
@@ -121,6 +134,7 @@ export function usePreferences() {
               visible={isVisible}
               onClose={setIsVisible}
               title={t('preferences')}
+              overflowVisible
             >
               {children}
 

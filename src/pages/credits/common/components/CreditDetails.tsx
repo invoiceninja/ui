@@ -120,12 +120,11 @@ export function CreditDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <InputField
-                type="number"
+              <NumberInputField
+                value={credit?.discount || ''}
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value))
                 }
-                value={credit?.discount || ''}
                 errorMessage={errors?.errors.discount}
               />
             </div>
@@ -137,6 +136,8 @@ export function CreditDetails(props: Props) {
                 }
                 value={credit?.is_amount_discount.toString()}
                 errorMessage={errors?.errors.is_amount_discount}
+                customSelector
+                dismissable={false}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>

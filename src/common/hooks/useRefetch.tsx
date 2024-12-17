@@ -135,6 +135,7 @@ export const keys = {
       '/api/v1/expenses',
       '/api/v1/recurring_expenses',
       '/api/v1/purchase_orders',
+      '/api/v1/activities/entity',
     ],
   },
   users: {
@@ -226,6 +227,10 @@ export const keys = {
   activities: {
     path: '/api/v1/activities',
     dependencies: ['/api/v1/activities/entity'],
+  },
+  entity_validations: {
+    path: '/api/v1/einvoice/validateEntity',
+    dependencies: [],
   },
 };
 

@@ -7,8 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-
-import { endpoint, isHosted } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +24,7 @@ import { useClickAway } from 'react-use';
 import collect from 'collect.js';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { debounce } from 'lodash';
+import { Spinner } from '$app/components/Spinner';
 
 const ComboboxOption = styled(Combobox.Option)`
   color: ${(props) => props.theme.color};
@@ -35,13 +35,14 @@ const ComboboxOption = styled(Combobox.Option)`
 
 export function Search$() {
   const [t] = useTranslation();
-
   const [query, setQuery] = useState('');
   const [isVisible, setIsVisible] = useState(false);
-
   const preventNavigation = usePreventNavigation();
+  const colors = useColorScheme();
+  const comboboxRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const { data, refetch } = useQuery(
+  const { data, refetch, isFetching } = useQuery(
     ['/api/v1/search'],
     () => {
       const $endpoint =
@@ -52,7 +53,6 @@ export function Search$() {
       return request('POST', endpoint($endpoint)).then(
         (response: AxiosResponse<SearchResponse>) => {
           const formatted: Entry<SearchRecord>[] = [];
-
           Object.entries(response.data).forEach(
             ([key, value]: [string, SearchRecord[]]) => {
               value.forEach((record: SearchRecord) => {
@@ -67,20 +67,12 @@ export function Search$() {
               });
             }
           );
-
           return formatted;
         }
       );
     },
-    {
-      staleTime: Infinity,
-    }
+    { staleTime: Infinity }
   );
-
-  const colors = useColorScheme();
-
-  const comboboxRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const filtered = collect(data)
     .filter(
@@ -95,16 +87,11 @@ export function Search$() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === 'k') {
         event.preventDefault();
-
         inputRef.current?.focus();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -123,7 +110,7 @@ export function Search$() {
   const options = filtered.count() === 0 ? collect(data) : filtered;
 
   useEffect(() => {
-    if (query && filtered.count() === 0 && isHosted()) {
+    if (query && filtered.count() === 0) {
       refetch();
     }
   }, [query]);
@@ -138,27 +125,44 @@ export function Search$() {
             })
           : null
       }
-      style={{ width: '70%' }}
+      className="relative w-full max-w-[70%]"
       ref={comboboxRef}
     >
       <div className="relative mt-2">
-        <Combobox.Input
-          className="border-transparent focus:border-transparent focus:ring-0 w-full"
-          onChange={handleChange}
-          ref={inputRef}
-          onFocus={() => setIsVisible(true)}
-          placeholder={`${t('search')}... (Ctrl K)`}
-          style={{ backgroundColor: colors.$1, color: colors.$3 }}
-        />
+        <div className="flex items-center">
+          <span
+            className={classNames({
+              block: isFetching,
+              hidden: !isFetching,
+            })}
+          >
+            <Spinner />
+          </span>
+
+          <Combobox.Input
+            className="border-transparent focus:border-transparent focus:ring-0 w-full"
+            onChange={handleChange}
+            ref={inputRef}
+            onFocus={() => setIsVisible(true)}
+            placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
+            style={{ backgroundColor: colors.$1, color: colors.$3 }}
+          />
+        </div>
 
         <Combobox.Options
           className={classNames(
-            'absolute border rounded w-96 max-h-72 overflow-y-auto shadow-lg',
+            'absolute border rounded-lg max-h-72 overflow-y-auto shadow-xl',
+            'min-w-full w-max',
             {
               hidden: !isVisible,
             }
           )}
-          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          style={{
+            backgroundColor: colors.$1,
+            borderColor: colors.$5,
+            minWidth: '33vw',
+            maxWidth: 'max(100%, 33vw)',
+          }}
           static={true}
         >
           {options?.map((entry) => (
@@ -179,7 +183,6 @@ export function Search$() {
                     <p className="text-xs font-semibold">
                       {entry.resource?.heading}
                     </p>
-
                     <p>{entry.label}</p>
                   </div>
                 </span>

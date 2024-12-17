@@ -87,17 +87,19 @@ export function useAtomWithPrevent<T extends Entity>(
         )
       );
 
+      const updatedEntity = cloneDeep(entity) as T;
+
       currentPathsForExcluding.forEach((path) => {
         if (!path.includes('.')) {
-          delete entity[path as unknown as keyof Entity];
+          delete updatedEntity[path as unknown as keyof Entity];
           delete currentInitialValue[path as unknown as keyof Entity];
         }
       });
 
-      const currentPreventValue = isEqual(entity, currentInitialValue);
+      const currentPreventValue = isEqual(updatedEntity, currentInitialValue);
 
       if (isTrackingChangesEnabled) {
-        setChanges(diff(currentInitialValue, entity));
+        setChanges(diff(currentInitialValue, updatedEntity));
       }
 
       const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;

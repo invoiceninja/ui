@@ -88,9 +88,12 @@ export interface Company {
   inbound_mailbox_blacklist?: string;
   inbound_mailbox_allow_unknown?: boolean;
   expense_mailbox?: string;
+  legal_entity_id: string | null;
+  session_timeout?: number;
 }
 
 export interface Settings {
+  id?: string;
   accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
   auto_bill_standard_invoices: boolean;
@@ -340,12 +343,15 @@ export interface TaxData {
   version: string;
   seller_subregion: string;
   regions: Regions;
+  acts_as_sender: boolean;
+  acts_as_receiver: boolean;
 }
 
 export interface Regions {
   US: USRegion;
   EU: EURegion;
   AU: AURegion;
+  UK: UKRegion;
 }
 
 export interface USRegion {
@@ -413,13 +419,26 @@ export interface TaxSetting {
   tax_rate: number;
   tax_name: string;
   reduced_tax_rate: number;
+  vat_number: string;
 }
 
+export interface UKRegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: UKSubregions;
+}
 export interface EURegion {
   has_sales_above_threshold: boolean;
   tax_all_subregions: boolean;
   tax_threshold: number;
   subregions: EUSubregions;
+}
+
+export interface UKSubregions {
+  GB: TaxSetting;
+  'GB-NIR': TaxSetting;
+  IM: TaxSetting;
 }
 
 export interface EUSubregions {
@@ -438,12 +457,15 @@ export interface EUSubregions {
   HR: TaxSetting;
   HU: TaxSetting;
   IE: TaxSetting;
+  IS: TaxSetting;
   IT: TaxSetting;
+  LI: TaxSetting;
   LT: TaxSetting;
   LU: TaxSetting;
   LV: TaxSetting;
   MT: TaxSetting;
   NL: TaxSetting;
+  NO: TaxSetting;
   PT: TaxSetting;
   RO: TaxSetting;
   SE: TaxSetting;

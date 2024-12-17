@@ -58,13 +58,14 @@ export interface ComboboxStaticProps<T = any> {
   includeByLabel?: boolean;
   action?: Action;
   onChange: (entry: Entry<T>) => unknown;
-  onEmptyValues: (query: string) => unknown;
+  onEmptyValues?: (query: string) => unknown;
   onDismiss?: () => unknown;
   onFocus?: () => any;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
   isDataLoading?: boolean;
   onInputValueChange?: (value: string) => void;
+  compareOnlyByValue?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -259,7 +260,11 @@ export function Combobox<T = any>({
   useClickAway(comboboxRef, () => {
     setIsOpen(false);
 
-    if (selectedOption && selectedOption.value) {
+    if (
+      selectedOption &&
+      selectedOption.value &&
+      inputValue === selectedOption.value
+    ) {
       return;
     }
 
@@ -286,6 +291,10 @@ export function Combobox<T = any>({
 
   useDebounce(
     () => {
+      if (!onEmptyValues) {
+        return;
+      }
+
       if (inputValue === '' && filteredOptions.length > 0) {
         return onEmptyValues(inputValue);
       }
@@ -461,6 +470,7 @@ export function ComboboxStatic<T = any>({
   errorMessage,
   clearInputAfterSelection,
   isDataLoading,
+  compareOnlyByValue,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -499,6 +509,10 @@ export function ComboboxStatic<T = any>({
 
   useDebounce(
     () => {
+      if (!onEmptyValues) {
+        return;
+      }
+
       if (query === '' && filteredValues.length > 0) {
         return onEmptyValues(query);
       }
@@ -539,9 +553,11 @@ export function ComboboxStatic<T = any>({
   }, [selectedValue]);
 
   useEffect(() => {
-    const entry = entries.find(
-      (entry) =>
-        entry.value === inputOptions.value || entry.label === inputOptions.value
+    const entry = entries.find((entry) =>
+      compareOnlyByValue
+        ? entry.value === inputOptions.value
+        : entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
     );
 
     entry
@@ -770,6 +786,7 @@ interface EntryOptions<T = any> {
   dropdownLabelFn?: (resource: T) => string | JSX.Element;
   inputLabelFn?: (resource?: T) => string;
   customSearchableValue?: (resource: T) => string;
+  customValue?: (entry: T) => string;
 }
 
 export interface ComboboxAsyncProps<T> {
@@ -792,6 +809,7 @@ export interface ComboboxAsyncProps<T> {
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
   onInputValueChange?: (value: string) => void;
+  compareOnlyByValue?: boolean;
 }
 
 export function ComboboxAsync<T = any>({
@@ -813,6 +831,7 @@ export function ComboboxAsync<T = any>({
   errorMessage,
   clearInputAfterSelection,
   onInputValueChange,
+  compareOnlyByValue,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -849,7 +868,9 @@ export function ComboboxAsync<T = any>({
             data.push({
               id: entry[entryOptions.id],
               label: entry[entryOptions.label],
-              value: entry[entryOptions.value],
+              value: entryOptions.customValue
+                ? entryOptions.customValue(entry)
+                : entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
               searchable:
@@ -965,7 +986,6 @@ export function ComboboxAsync<T = any>({
         inputOptions={inputOptions}
         readonly={readonly}
         onChange={onChange}
-        onEmptyValues={onEmptyValues}
         onDismiss={onDismiss}
         initiallyVisible={initiallyVisible}
         exclude={exclude}
@@ -979,6 +999,8 @@ export function ComboboxAsync<T = any>({
         isDataLoading={isLoading}
         onFocus={() => setEnableQuery(true)}
         onInputValueChange={onInputValueChange}
+        onEmptyValues={onEmptyValues}
+        compareOnlyByValue={compareOnlyByValue}
       />
     );
   }
@@ -1002,6 +1024,7 @@ export function ComboboxAsync<T = any>({
       clearInputAfterSelection={clearInputAfterSelection}
       isDataLoading={isLoading}
       onInputValueChange={onInputValueChange}
+      compareOnlyByValue={compareOnlyByValue}
     />
   );
 }

@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
+import { Link, SelectField } from '$app/components/forms';
 import {
   CompanyGateway,
   FeesAndLimitsEntry,
@@ -18,7 +18,7 @@ import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
@@ -28,6 +28,13 @@ import { Entry } from '$app/components/forms/Combobox';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { $help } from '$app/components/HelpWidget';
+import { HelpCircle } from 'react-feather';
+import { Icon } from '$app/components/icons/Icon';
+import { MdWarning } from 'react-icons/md';
+import reactStringReplace from 'react-string-replace';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 interface Props {
   gateway: Gateway;
@@ -68,8 +75,8 @@ export function LimitsAndFees(props: Props) {
       : setCurrentGatewayTypeId(undefined);
   }, [props.companyGateway]);
 
-  const handlePaymentTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setCurrentGatewayTypeId(event.target.value);
+  const handlePaymentTypeChange = (value: string) => {
+    setCurrentGatewayTypeId(value);
   };
 
   const handleEntryChange = (
@@ -81,18 +88,56 @@ export function LimitsAndFees(props: Props) {
     }
   };
 
+  const isAnyTaxHidden = () => {
+    if (currentGatewayTypeId) {
+      const { fee_tax_name1, fee_tax_name2, fee_tax_name3 } =
+        props.companyGateway?.fees_and_limits?.[currentGatewayTypeId] || {};
+
+      if (
+        company.enabled_item_tax_rates === 0 &&
+        (fee_tax_name1 || fee_tax_name2 || fee_tax_name3)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const accentColor = useAccentColor();
+
   return (
-    <Card title={t('limits_and_fees')}>
+    <Card
+      title={t('limits_and_fees')}
+      topRight={
+        <button
+          style={{ color: accentColor }}
+          type="button"
+          onClick={() =>
+            $help('gateways', {
+              moveToHeading: 'Limits/Fees',
+            })
+          }
+          className="inline-flex items-center space-x-1 text-sm"
+        >
+          <HelpCircle size={18} />
+          <span>{t('documentation')}</span>
+        </button>
+      }
+    >
       <Element leftSide={t('payment_type')}>
         <SelectField
-          onChange={handlePaymentTypeChange}
+          value={currentGatewayTypeId}
+          onValueChange={(value) => handlePaymentTypeChange(value)}
           errorMessage={props.errors?.errors.gatewayTypeId}
+          customSelector
+          dismissable={false}
         >
           {Object.entries(props.companyGateway.fees_and_limits)
             .filter(([, entry]) => entry.is_enabled)
             .map(([gatewayTypeId], index) => (
               <option key={index} value={gatewayTypeId}>
-                {resolveGatewayTypeTranslation(gatewayTypeId)}
+                {t(resolveGatewayTypeTranslation(gatewayTypeId))}
               </option>
             ))}
         </SelectField>
@@ -107,7 +152,7 @@ export function LimitsAndFees(props: Props) {
               <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    ?.min_limit
+                    ?.min_limit || ''
                 }
                 onValueChange={(value) =>
                   handleEntryChange('min_limit', parseFloat(value) || -1)
@@ -137,7 +182,7 @@ export function LimitsAndFees(props: Props) {
               <NumberInputField
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    ?.max_limit
+                    ?.max_limit || ''
                 }
                 onValueChange={(value) =>
                   handleEntryChange('max_limit', parseFloat(value) || -1)
@@ -168,7 +213,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_percent
+                  ?.fee_percent || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_percent', parseFloat(value))
@@ -181,7 +226,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_amount
+                  ?.fee_amount || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_amount', parseFloat(value))
@@ -190,13 +235,31 @@ export function LimitsAndFees(props: Props) {
             />
           </Element>
 
+          {isAnyTaxHidden() && (
+            <div className="flex items-center space-x-3 px-6 py-2">
+              <div>
+                <Icon element={MdWarning} size={20} color="orange" />
+              </div>
+
+              <div className="text-sm font-medium">
+                {reactStringReplace(
+                  t('hidden_taxes_warning') as string,
+                  ':link',
+                  () => (
+                    <Link to="/settings/tax_settings">{t('settings')}</Link>
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
           {company && company.enabled_item_tax_rates > 0 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={
-                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
-                    ?.fee_tax_name1 || ''
-                }
+                defaultValue={getTaxRateComboValue(
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId],
+                  'fee_tax_name1'
+                )}
                 onChange={(value: Entry<TaxRate>) => {
                   handleEntryChange(
                     'fee_tax_name1',
@@ -219,10 +282,10 @@ export function LimitsAndFees(props: Props) {
           {company && company.enabled_item_tax_rates > 1 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={
-                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
-                    ?.fee_tax_name2 || ''
-                }
+                defaultValue={getTaxRateComboValue(
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId],
+                  'fee_tax_name2'
+                )}
                 onChange={(value: Entry<TaxRate>) => {
                   handleEntryChange(
                     'fee_tax_name2',
@@ -245,10 +308,10 @@ export function LimitsAndFees(props: Props) {
           {company && company.enabled_item_tax_rates > 2 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
-                defaultValue={
-                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
-                    ?.fee_tax_name3 || ''
-                }
+                defaultValue={getTaxRateComboValue(
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId],
+                  'fee_tax_name3'
+                )}
                 onChange={(value: Entry<TaxRate>) => {
                   handleEntryChange(
                     'fee_tax_name3',
@@ -272,7 +335,7 @@ export function LimitsAndFees(props: Props) {
             <NumberInputField
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  ?.fee_cap
+                  ?.fee_cap || ''
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_cap', parseFloat(value))

@@ -91,7 +91,7 @@ export function Preferences() {
         >
           <NumberInputField
             precision={0}
-            value={reactSettings?.number_precision}
+            value={reactSettings?.number_precision || ''}
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.number_precision',
@@ -99,6 +99,7 @@ export function Preferences() {
               )
             }
             placeholder={t('number_precision')}
+            disablePrecision
           />
         </Element>
 
@@ -137,6 +138,35 @@ export function Preferences() {
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.preferences.auto_expand_product_table_notes',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('enable_public_notifications')}>
+          <Toggle
+            checked={Boolean(
+              reactSettings.preferences.enable_public_notifications
+            )}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.enable_public_notifications',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('use_system_fonts')}
+          leftSideHelp={t('use_system_fonts_help')}
+        >
+          <Toggle
+            checked={Boolean(reactSettings.preferences.use_system_fonts)}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.use_system_fonts',
                 value
               )
             }

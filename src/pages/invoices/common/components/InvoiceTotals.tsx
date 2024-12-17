@@ -21,6 +21,11 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { ProductTableResource, RelationType } from './ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Entry } from '$app/components/forms/Combobox';
+import { Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { MdWarning } from 'react-icons/md';
+import reactStringReplace from 'react-string-replace';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 interface Props {
   resource: ProductTableResource;
@@ -46,8 +51,47 @@ export function InvoiceTotals(props: Props) {
 
   const [t] = useTranslation();
 
+  const isAnyTaxHidden = () => {
+    if (
+      company.enabled_tax_rates === 0 &&
+      (resource?.tax_name1 || resource?.tax_name2 || resource?.tax_name3)
+    ) {
+      return true;
+    }
+
+    if (
+      company.enabled_item_tax_rates === 0 &&
+      resource?.line_items.some(
+        ({ tax_name1, tax_name2, tax_name3 }) =>
+          tax_name1 || tax_name2 || tax_name3
+      )
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
+      {isAnyTaxHidden() && (
+        <div className="flex items-center space-x-3 px-6">
+          <div>
+            <Icon element={MdWarning} size={20} color="orange" />
+          </div>
+
+          <div className="text-sm font-medium">
+            {reactStringReplace(
+              t('hidden_taxes_warning') as string,
+              ':link',
+              () => (
+                <Link to="/settings/tax_settings">{t('settings')}</Link>
+              )
+            )}
+          </div>
+        </div>
+      )}
+
       {variables.map(
         (variable, index) =>
           (variable === '$subtotal' || variable === '$taxes') && (
@@ -58,7 +102,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_name1}
+            defaultValue={getTaxRateComboValue(resource, 'tax_name1')}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
@@ -80,7 +124,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_name2}
+            defaultValue={getTaxRateComboValue(resource, 'tax_name2')}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
@@ -102,7 +146,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_name3}
+            defaultValue={getTaxRateComboValue(resource, 'tax_name3')}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);

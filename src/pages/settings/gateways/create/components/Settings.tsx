@@ -101,11 +101,13 @@ export function Settings(props: Props) {
       </Element>
 
       {options.some((option) => option.token_billing == true) && (
-        <Element leftSide={t('capture_card')}>
+        <Element leftSide={t('tokenize')} leftSideHelp={t('tokenize_help')}>
           <SelectField
             value={props.companyGateway.token_billing || 'off'}
             onValueChange={(value) => handleChange('token_billing', value)}
             errorMessage={props.errors?.errors.token_billing}
+            customSelector
+            dismissable={false}
           >
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('auto_bill_help_optout')}</option>
@@ -120,7 +122,15 @@ export function Settings(props: Props) {
       {options.map((option, index) => (
         <Element
           key={index}
-          leftSide={resolveGatewayTypeTranslation(option.gatewayTypeId)}
+          leftSide={t(resolveGatewayTypeTranslation(option.gatewayTypeId))}
+          {...((gateway?.key === 'd14dd26a37cecc30fdd65700bfb55b23' ||
+            gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') && {
+            leftSideHelp: t(
+              `${resolveGatewayTypeTranslation(
+                option.gatewayTypeId
+              )}_stripe_help`
+            ),
+          })}
         >
           <Toggle
             checked={isChecked(option.gatewayTypeId)}

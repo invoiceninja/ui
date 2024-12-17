@@ -30,6 +30,9 @@ import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegi
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { $help, HelpWidget } from '$app/components/HelpWidget';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -80,6 +83,9 @@ export function TaxSettings() {
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
 
+  const $handleChange = useHandleCurrentCompanyChangeProperty();
+  const accentColor = useAccentColor();
+
   return (
     <Settings
       onSaveClick={onSave}
@@ -91,19 +97,21 @@ export function TaxSettings() {
       {isCompanySettingsActive && (
         <>
           <Card title={t('tax_settings')}>
-            <Element leftSide={t('invoice_tax_rates')}>
-              <SelectField
-                id="enabled_tax_rates"
-                onChange={handleChange}
-                value={companyChanges?.enabled_tax_rates || 0}
-                errorMessage={errors?.errors.enabled_tax_rates}
-              >
-                <option value="0">{t('disabled')}</option>
-                <option value="1">{t('one_tax_rate')}</option>
-                <option value="2">{t('two_tax_rates')}</option>
-                <option value="3">{t('three_tax_rates')}</option>
-              </SelectField>
-            </Element>
+            {companyChanges.calculate_taxes ? null : (
+              <Element leftSide={t('invoice_tax_rates')}>
+                <SelectField
+                  id="enabled_tax_rates"
+                  onChange={handleChange}
+                  value={companyChanges?.enabled_tax_rates || 0}
+                  errorMessage={errors?.errors.enabled_tax_rates}
+                >
+                  <option value="0">{t('disabled')}</option>
+                  <option value="1">{t('one_tax_rate')}</option>
+                  <option value="2">{t('two_tax_rates')}</option>
+                  <option value="3">{t('three_tax_rates')}</option>
+                </SelectField>
+              </Element>
+            )}
 
             <Element leftSide={t('line_item_tax_rates')}>
               <SelectField
@@ -133,23 +141,25 @@ export function TaxSettings() {
               </SelectField>
             </Element>
 
-            <Element leftSide={t('inclusive_taxes')}>
-              <div className="flex items-center space-x-7">
-                <Toggle
-                  onChange={(value: boolean) =>
-                    handleToggleChange('settings.inclusive_taxes', value)
-                  }
-                  checked={Boolean(companyChanges?.settings.inclusive_taxes)}
-                  cypressRef="inclusiveTaxToggle"
-                />
+            {companyChanges.calculate_taxes ? null : (
+              <Element leftSide={t('inclusive_taxes')}>
+                <div className="flex items-center space-x-7">
+                  <Toggle
+                    onChange={(value: boolean) =>
+                      handleToggleChange('settings.inclusive_taxes', value)
+                    }
+                    checked={Boolean(companyChanges?.settings.inclusive_taxes)}
+                    cypressRef="inclusiveTaxToggle"
+                  />
 
-                {companyChanges?.settings.inclusive_taxes ? (
-                  <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
-                ) : (
-                  <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
-                )}
-              </div>
-            </Element>
+                  {companyChanges?.settings.inclusive_taxes ? (
+                    <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
+                  ) : (
+                    <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+                  )}
+                </div>
+              </Element>
+            )}
 
             {isPaidOrSelfHost &&
               calculateTaxesRegion(companyChanges?.settings?.country_id) && (
@@ -160,12 +170,39 @@ export function TaxSettings() {
                     leftSide={t('calculate_taxes')}
                     leftSideHelp={t('calculate_taxes_help')}
                   >
-                    <Toggle
-                      checked={Boolean(companyChanges?.calculate_taxes)}
-                      onChange={(value: boolean) =>
-                        handleToggleChange('calculate_taxes', value)
-                      }
-                    />
+                    <div className="flex items-center gap-4">
+                      <Toggle
+                        checked={Boolean(companyChanges?.calculate_taxes)}
+                        onChange={(value: boolean) => {
+                          handleToggleChange('calculate_taxes', value);
+
+                          if (value) {
+                            $handleChange('enabled_tax_rates', 0);
+                            $handleChange('enabled_item_tax_rates', 1);
+                            $handleChange('enabled_expense_tax_rates', 1);
+
+                            $handleChange('settings.tax_rate1', 0);
+                            $handleChange('settings.tax_rate2', 0);
+                            $handleChange('settings.tax_rate3', 0);
+
+                            handleToggleChange('settings.inclusive_taxes', false);
+                          }
+                        }}
+                      />
+
+                      <button
+                        type="button"
+                        style={{ color: accentColor }}
+                        onClick={() =>
+                          $help('calculate-taxes', {
+                            moveToHeading: 'Turn on Calculate Taxes',
+                          })
+                        }
+                        className="inline-flex items-center space-x-1"
+                      >
+                        <span>{t('learn_more')}</span>
+                      </button>
+                    </div>
                   </Element>
 
                   {companyChanges.calculate_taxes && <CalculateTaxes />}
@@ -180,7 +217,13 @@ export function TaxSettings() {
       {(isGroupSettingsActive || isClientSettingsActive) && (
         <Selector title="tax_settings" />
       )}
+
       <TaxRates />
+
+      <HelpWidget
+        id="calculate-taxes"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/taxes.md"
+      />
     </Settings>
   );
 }

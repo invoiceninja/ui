@@ -11,9 +11,16 @@
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Default } from '../../components/layouts/Default';
 import { ResizableDashboardCards } from './components/ResizableDashboardCards';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Dashboard() {
   const { documentTitle } = useTitle('dashboard');
+
+  useSocketEvent({
+    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
+    callback: () => $refetch(['invoices']),
+  });
 
   return (
     <Default title={documentTitle} breadcrumbs={[]}>

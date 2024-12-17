@@ -255,6 +255,24 @@ export default function Reports() {
 
   const [preview, setPreview] = useAtom(previewAtom);
 
+  const adjustCellValue = (
+    currentCellDisplayValue: string | number | JSX.Element
+  ) => {
+    if (typeof currentCellDisplayValue !== 'string') {
+      return currentCellDisplayValue;
+    }
+
+    const parsedDisplayValue = parseFloat(currentCellDisplayValue.toString());
+
+    if (!isNaN(parsedDisplayValue) && typeof parsedDisplayValue === 'number') {
+      return parseFloat(
+        currentCellDisplayValue.toString().replace(/\./g, '').replace(',', '.')
+      );
+    }
+
+    return currentCellDisplayValue;
+  };
+
   const handlePreview = async () => {
     setErrors(undefined);
     setPreview(null);
@@ -295,7 +313,15 @@ export default function Reports() {
           .then((response) => {
             const { columns, ...rows } = response;
 
-            setPreview({ columns, rows: Object.values(rows) });
+            setPreview({
+              columns,
+              rows: Object.values(rows).map((row) =>
+                row.map((cell) => ({
+                  ...cell,
+                  display_value: adjustCellValue(cell.display_value),
+                }))
+              ),
+            });
 
             toast.success();
           });
@@ -400,6 +426,23 @@ export default function Reports() {
                   handlePayloadChange('document_email_attachment', value)
                 }
                 cypressRef="scheduleDocumentEmailAttachment"
+              />
+            </Element>
+          )}
+
+          {showReportField('pdf_email_attachment') && (
+            <Element leftSide={t('attach_pdf')}>
+              <Toggle
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+                checked={report.payload.pdf_email_attachment}
+                onValueChange={(value) =>
+                  handlePayloadChange('pdf_email_attachment', value)
+                }
               />
             </Element>
           )}

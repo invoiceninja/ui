@@ -75,6 +75,7 @@ export function Clients() {
         }
       >
         <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.client_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

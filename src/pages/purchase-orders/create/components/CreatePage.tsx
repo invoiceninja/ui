@@ -36,7 +36,6 @@ export default function Create() {
     setPurchaseOrder,
     errors,
     invoiceSum,
-    setInvoiceSum,
     isDefaultFooter,
     setIsDefaultFooter,
     isDefaultTerms,
@@ -56,15 +55,10 @@ export default function Create() {
   const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
   const handleDeleteLineItem = useHandleDeleteLineItem(setPurchaseOrder);
 
-  const handleProductChange = useHandleProductChange(
-    setPurchaseOrder,
-    setInvoiceSum
-  );
+  const handleProductChange = useHandleProductChange(setPurchaseOrder);
 
-  const handleLineItemPropertyChange = useHandleLineItemPropertyChange(
-    setPurchaseOrder,
-    setInvoiceSum
-  );
+  const handleLineItemPropertyChange =
+    useHandleLineItemPropertyChange(setPurchaseOrder);
 
   return (
     <>

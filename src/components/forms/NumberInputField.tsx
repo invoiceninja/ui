@@ -33,6 +33,7 @@ interface Props extends CommonProps {
   required?: boolean;
   withoutLabelWrapping?: boolean;
   placeholder?: string | null;
+  disablePrecision?: boolean;
 }
 
 export function NumberInputField(props: Props) {
@@ -49,7 +50,33 @@ export function NumberInputField(props: Props) {
       : undefined
   );
 
-  const getNumberPrecision = () => {
+  const getDecimalSeparator = () => {
+    if (props.precision === 0) {
+      return undefined;
+    }
+
+    return company?.use_comma_as_decimal_place ? ',' : '.';
+  };
+
+  const getNumberPrecision = (enteredValue?: string) => {
+    const currentDecimalSeparator = getDecimalSeparator();
+
+    if (currentDecimalSeparator === undefined) {
+      return 0;
+    }
+
+    if (props.disablePrecision && enteredValue) {
+      if (enteredValue.includes(currentDecimalSeparator)) {
+        return enteredValue.split(currentDecimalSeparator)?.[1]?.length || 2;
+      }
+
+      return undefined;
+    }
+
+    if (props.disablePrecision) {
+      return undefined;
+    }
+
     if (typeof props.precision === 'number') {
       return props.precision;
     }
@@ -65,19 +92,19 @@ export function NumberInputField(props: Props) {
     return 2;
   };
 
-  const getDecimalSeparator = () => {
-    return company?.use_comma_as_decimal_place ? ',' : '.';
-  };
-
   const getThousandSeparator = () => {
+    if (props.precision === 0) {
+      return undefined;
+    }
+
     return company?.use_comma_as_decimal_place ? '.' : ',';
   };
 
   useDebounce(
     () => {
-      if (props.onValueChange) {
+      if (props.onValueChange && props.changeOverride) {
         props.onValueChange(
-          typeof currentValue === 'number' ? String(currentValue) : ''
+          typeof currentValue === 'number' ? String(currentValue) : '0'
         );
       }
     },
@@ -138,12 +165,17 @@ export function NumberInputField(props: Props) {
           placeholder={props.placeholder ?? undefined}
           onChange={(event) => {
             if (props.onValueChange && props.changeOverride) {
-              const formattedValue = event.target.value
-                ? currency(event.target.value, {
+              const enteredValue = event.target.value;
+
+              const formattedValue = enteredValue
+                ? currency(enteredValue, {
                     separator: getThousandSeparator(),
                     decimal: getDecimalSeparator(),
                     symbol: '',
-                    precision: getNumberPrecision(),
+                    precision:
+                      getNumberPrecision(enteredValue) === undefined
+                        ? 0
+                        : getNumberPrecision(enteredValue),
                   }).value
                 : undefined;
 
@@ -152,18 +184,23 @@ export function NumberInputField(props: Props) {
           }}
           onBlur={(event) => {
             if (props.onValueChange && !props.changeOverride) {
-              props.onValueChange(
-                event.target.value
-                  ? String(
-                      currency(event.target.value, {
-                        separator: getThousandSeparator(),
-                        decimal: getDecimalSeparator(),
-                        symbol: '',
-                        precision: getNumberPrecision(),
-                      }).value
-                    )
-                  : ''
-              );
+              const enteredValue = event.target.value;
+
+              const formattedValue = enteredValue
+                ? String(
+                    currency(enteredValue, {
+                      separator: getThousandSeparator(),
+                      decimal: getDecimalSeparator(),
+                      symbol: '',
+                      precision:
+                        getNumberPrecision(enteredValue) === undefined
+                          ? 0
+                          : getNumberPrecision(enteredValue),
+                    }).value
+                  )
+                : '0';
+
+              props.onValueChange(formattedValue);
             }
           }}
           thousandSeparator={getThousandSeparator()}

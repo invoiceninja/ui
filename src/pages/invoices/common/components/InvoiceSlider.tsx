@@ -59,6 +59,10 @@ import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
 import { ViewLineItemExpense } from './ViewLineItemExpense';
 import { ViewLineItemTask } from './ViewLineItemTask';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -79,38 +83,35 @@ export function useGenerateActivityElement() {
       ),
 
       user: activity.user?.label ?? t('system'),
-      invoice:
-        (
-          <Link
-            to={route('/invoices/:id/edit', {
-              id: activity.invoice?.hashed_id,
-            })}
-          >
-            {activity?.invoice?.label}
-          </Link>
-        ) ?? '',
+      invoice: (
+        <Link
+          to={route('/invoices/:id/edit', {
+            id: activity.invoice?.hashed_id,
+          })}
+        >
+          {activity?.invoice?.label}
+        </Link>
+      ),
 
-      recurring_invoice:
-        (
-          <Link
-            to={route('/recurring_invoices/:id/edit', {
-              id: activity?.recurring_invoice?.hashed_id,
-            })}
-          >
-            {activity?.recurring_invoice?.label}
-          </Link>
-        ) ?? '',
+      recurring_invoice: (
+        <Link
+          to={route('/recurring_invoices/:id/edit', {
+            id: activity?.recurring_invoice?.hashed_id,
+          })}
+        >
+          {activity?.recurring_invoice?.label}
+        </Link>
+      ),
 
-      contact:
-        (
-          <Link
-            to={route('/clients/:id/edit', {
-              id: activity?.contact?.hashed_id,
-            })}
-          >
-            {activity?.contact?.label}
-          </Link>
-        ) ?? '',
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', {
+            id: activity?.contact?.hashed_id,
+          })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      ),
 
       notes: activity?.notes && (
         <>
@@ -158,6 +159,10 @@ export function InvoiceSlider() {
 
   const colors = useColorScheme();
 
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
@@ -174,6 +179,7 @@ export function InvoiceSlider() {
     showEditAction: true,
   });
 
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: resource } = useQuery({
@@ -345,7 +351,15 @@ export function InvoiceSlider() {
               </Tooltip>
 
               <Element leftSide={t('next_send_date')} twoGridColumns>
-                {invoice ? date(invoice.next_send_date, dateFormat) : null}
+                {invoice
+                  ? dateTime(
+                      invoice.next_send_date,
+                      '',
+                      '',
+                      getTimezone(getSetting(invoice.client, 'timezone_id'))
+                        .timeZone
+                    )
+                  : null}
               </Element>
 
               <Element leftSide={t('reminder_last_sent')} twoGridColumns>
@@ -466,7 +480,7 @@ export function InvoiceSlider() {
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>{dayjs.unix(activity.created_at).fromNow()}</p>
                   </div>
@@ -509,7 +523,7 @@ export function InvoiceSlider() {
 
                   <p className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>&middot;</p>
                     <p>{activity.ip}</p>

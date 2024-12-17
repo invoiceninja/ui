@@ -90,7 +90,7 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
 
   const numberOfTableMoreActionDropdowns = await tableContainer
     .getByRole('button')
-    .filter({ has: page.getByText('More Actions') })
+    .filter({ has: page.getByText('Actions') })
     .count();
   const numberOfTableCheckboxes = await tableContainer
     .locator('input[type="checkbox"]')
@@ -121,7 +121,7 @@ export async function checkDropdownActions(
   if (!withOutOpening) {
     await page
       .locator(`[data-cy=${containerId || 'topNavbar'}]`)
-      .getByRole('button', { name: 'More Actions', exact: true })
+      .getByRole('button', { name: 'Actions', exact: true })
       .first()
       .click();
   }

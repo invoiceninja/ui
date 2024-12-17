@@ -21,7 +21,7 @@ import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { invoiceAtom } from './common/atoms';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CommonActions } from './edit/components/CommonActions';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -34,10 +34,18 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { useAtom } from 'jotai';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import toast from 'react-hot-toast';
+import { EInvoiceComponent } from '../settings';
+import {
+  socketId,
+  useSocketEvent,
+  WithSocketId,
+} from '$app/common/queries/sockets';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { Banner } from '$app/components/Banner';
+import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
+import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 dayjs.extend(utc);
 
@@ -46,13 +54,33 @@ export default function Invoice() {
 
   const [t] = useTranslation();
 
+  const eInvoiceRef = useRef<EInvoiceComponent>(null);
+
   const { id } = useParams();
+  const company = useCurrentCompany();
   const [searchParams] = useSearchParams();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
+
+  const [triggerValidationQuery, setTriggerValidationQuery] =
+    useState<boolean>(true);
+
+  const { validationResponse } = useCheckEInvoiceValidation({
+    resource: invoice,
+    enableQuery:
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.settings.enable_e_invoice &&
+      company?.tax_data?.acts_as_sender &&
+      triggerValidationQuery &&
+      id === invoice?.id,
+    onFinished: () => {
+      setTriggerValidationQuery(false);
+    },
+  });
 
   const { data } = useInvoiceQuery({ id, includeIsLocked: true });
 
@@ -60,15 +88,17 @@ export default function Invoice() {
 
   const { calculateInvoiceSum } = useInvoiceUtilities({ client });
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
-
   const [errors, setErrors] = useState<ValidationBag>();
+  const [saveChanges, setSaveChanges] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
-  const tabs = useTabs({ invoice });
+  const tabs = useTabs({
+    invoice,
+    eInvoiceValidationResponse: validationResponse,
+  });
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -97,9 +127,22 @@ export default function Invoice() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  useSocketEvent({
+  useEffect(() => {
+    if (saveChanges && invoice) {
+      save(invoice);
+      setSaveChanges(false);
+    }
+  }, [saveChanges]);
+
+  useSocketEvent<WithSocketId<InvoiceType>>({
     on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
-    callback: () => toast(t('invoice_status_changed'), { duration: 5000 }),
+    callback: ({ data }) => {
+      if (socketId()?.toString() !== data['x-socket-id']) {
+        document
+          .getElementById('invoiceUpdateBanner')
+          ?.classList.remove('hidden');
+      }
+    },
   });
 
   return (
@@ -113,7 +156,7 @@ export default function Invoice() {
               <ResourceActions
                 resource={invoice}
                 actions={actions}
-                onSaveClick={() => save(invoice)}
+                onSaveClick={() => setSaveChanges(true)}
                 disableSaveButton={
                   invoice &&
                   (invoice.status_id === InvoiceStatus.Cancelled ||
@@ -124,6 +167,11 @@ export default function Invoice() {
               />
             ),
           })}
+        aboveMainContainer={
+          <Banner id="invoiceUpdateBanner" className="hidden" variant="orange">
+            {t('invoice_status_changed')}
+          </Banner>
+        }
       >
         {invoice?.id === id ? (
           <div className="space-y-2">
@@ -142,7 +190,7 @@ export default function Invoice() {
                 rightSide={
                   invoice && (
                     <div className="flex items-center">
-                      <CommonActions invoice={invoice} />
+                      <CommonActions resource={invoice} entity="invoice" />
                     </div>
                   )
                 }
@@ -158,6 +206,9 @@ export default function Invoice() {
                   isDefaultFooter,
                   setIsDefaultFooter,
                   client,
+                  eInvoiceRef,
+                  eInvoiceValidationEntityResponse: validationResponse,
+                  setTriggerValidationQuery,
                 }}
               />
             </div>

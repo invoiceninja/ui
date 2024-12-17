@@ -11,27 +11,40 @@
 import { useSockets } from '../hooks/useSockets';
 import { useEffect } from 'react';
 import { useCurrentCompany } from '../hooks/useCurrentCompany';
+import { isHosted } from '../helpers';
 
 // This file defines global events system for query invalidation.
 
-export const events = ['App\\Events\\Invoice\\InvoiceWasPaid'] as const;
+export const events = [
+  'App\\Events\\Invoice\\InvoiceWasPaid',
+  'App\\Events\\Invoice\\InvoiceWasViewed',
+  'App\\Events\\Payment\\PaymentWasUpdated',
+  'App\\Events\\Credit\\CreditWasCreated',
+  'App\\Events\\Credit\\CreditWasUpdated',
+] as const;
 
 export type Event = (typeof events)[number];
 
 export type Callbacks = Record<Event, (data: unknown) => unknown>;
 
-export function useGlobalSocketEvents() {
+export function usePrivateSocketEvents() {
   const sockets = useSockets();
   const company = useCurrentCompany();
 
   const callbacks: Callbacks = {
     'App\\Events\\Invoice\\InvoiceWasPaid': () => {},
+    'App\\Events\\Invoice\\InvoiceWasViewed': () => {},
+    'App\\Events\\Payment\\PaymentWasUpdated': () => {},
+    'App\\Events\\Credit\\CreditWasCreated': () => {},
+    'App\\Events\\Credit\\CreditWasUpdated': () => {},
   };
 
   useEffect(() => {
-    if (!sockets || !company) {
+    if (!sockets || !company || !isHosted()) {
       return;
     }
+
+    console.log(`Subscribing to private-company-${company.company_key}`);
 
     const channel = sockets.subscribe(`private-company-${company.company_key}`);
 
@@ -68,8 +81,14 @@ export interface SocketEventProps<T> {
   callback: (options: CallbackOptions<T>) => unknown;
 }
 
+export type WithSocketId<T> = T & { 'x-socket-id': string };
+
 export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
   useEffect(() => {
+    if (!isHosted()) {
+      return;
+    }
+
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -108,4 +127,17 @@ export function useSocketEvent<T>({ on, callback }: SocketEventProps<T>) {
       controller.abort();
     };
   }, [on, callback]);
+}
+
+export function socketId() {
+  if (localStorage.getItem('X-SOCKET-ID')) {
+    return parseFloat(localStorage.getItem('X-SOCKET-ID') as string);
+  }
+
+  return null;
+}
+
+export interface GenericMessage {
+  message: string;
+  link: string | null;
 }

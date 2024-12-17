@@ -79,6 +79,7 @@ export function RecurringExpenses() {
         }
       >
         <NumberInputField
+          precision={0}
           value={
             companyChanges?.settings?.recurring_expense_number_counter || ''
           }

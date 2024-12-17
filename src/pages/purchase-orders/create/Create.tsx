@@ -32,6 +32,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { Tab, Tabs } from '$app/components/Tabs';
+import { useCalculateInvoiceSum } from '../edit/hooks/useCalculateInvoiceSum';
 
 export interface PurchaseOrderContext {
   purchaseOrder: PurchaseOrder | undefined;
@@ -98,6 +99,8 @@ export default function Create() {
   ) => {
     setPurchaseOrder((current) => current && { ...current, [property]: value });
   };
+
+  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
 
   const onSave = useCreate({ setErrors, isDefaultTerms, isDefaultFooter });
 
@@ -168,6 +171,10 @@ export default function Create() {
         handleChange('invitations', invitations);
       });
   }, [purchaseOrder?.vendor_id]);
+
+  useEffect(() => {
+    purchaseOrder && calculateInvoiceSum(purchaseOrder);
+  }, [purchaseOrder]);
 
   return (
     <Default

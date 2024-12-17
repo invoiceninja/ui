@@ -64,7 +64,6 @@ import {
   MdRestore,
   MdSchedule,
   MdSend,
-  MdSwitchRight,
   MdTextSnippet,
 } from 'react-icons/md';
 import { SelectOption } from '$app/components/datatables/Actions';
@@ -103,6 +102,8 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import { AiOutlineFileText } from 'react-icons/ai';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -332,11 +333,16 @@ export function useSave(props: CreateProps) {
 interface Params {
   showEditAction?: boolean;
   showCommonBulkAction?: boolean;
+  dropdown?: boolean;
 }
 export function useActions(params?: Params) {
   const [t] = useTranslation();
 
-  const { showCommonBulkAction, showEditAction } = params || {};
+  const {
+    showCommonBulkAction,
+    showEditAction,
+    dropdown = true,
+  } = params || {};
 
   const setQuote = useSetAtom(quoteAtom);
 
@@ -404,124 +410,214 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (quote) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="quote"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
         to={route('/quotes/:id/pdf', { id: quote.id })}
-        icon={<Icon element={MdPictureAsPdf} />}
+        icon={MdPictureAsPdf}
       >
         {t('view_pdf')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (quote) =>
       getEntityState(quote) !== EntityState.Deleted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'print_pdf',
+          })}
+          entity="quote"
+          actionKey="print_pdf"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('print_pdf')}
           onClick={() => printPdf([quote.id])}
-          icon={<Icon element={MdPrint} />}
+          icon={MdPrint}
           disablePreventNavigation
         >
           {t('print_pdf')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'download_pdf',
+        })}
+        entity="quote"
+        actionKey="download_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('download_pdf')}
         onClick={() => downloadPdf(quote)}
-        icon={<Icon element={MdDownload} />}
+        icon={MdDownload}
         disablePreventNavigation
       >
         {t('download_pdf')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (quote) =>
       Boolean(company?.settings.enable_e_invoice) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'download_e_quote',
+          })}
+          entity="quote"
+          actionKey="download_e_quote"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('download_e_quote')}
           onClick={() => downloadEQuote(quote)}
-          icon={<Icon element={MdDownload} />}
+          icon={MdDownload}
           disablePreventNavigation
         >
           {t('download_e_quote')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) =>
       quote.status_id !== QuoteStatus.Converted &&
       quote.status_id !== QuoteStatus.Approved &&
       (isAdmin || isOwner) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'schedule',
+          })}
+          entity="quote"
+          actionKey="schedule"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('schedule')}
           onClick={() => scheduleEmailRecord(quote.id)}
-          icon={<Icon element={MdSchedule} />}
+          icon={MdSchedule}
         >
           {t('schedule')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) => (
       <AddActivityComment
+        {...(!dropdown && {
+          key: 'add_comment',
+        })}
         entity="quote"
         entityId={quote.id}
         label={`#${quote.number}`}
         labelElement={
-          <DropdownElement icon={<Icon element={MdComment} />}>
+          <EntityActionElement
+            entity="quote"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+          >
             {t('add_comment')}
-          </DropdownElement>
+          </EntityActionElement>
         }
       />
     ),
     (quote) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'email_quote',
+        })}
+        entity="quote"
+        actionKey="email_quote"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('email_quote')}
         to={route('/quotes/:id/email', { id: quote.id })}
-        icon={<Icon element={MdSend} />}
+        icon={MdSend}
       >
         {t('email_quote')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (quote) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'client_portal',
+        })}
+        entity="quote"
+        actionKey="client_portal"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('client_portal')}
         onClick={() => quote && openClientPortal(quote)}
-        icon={<Icon element={MdCloudCircle} />}
+        icon={MdCloudCircle}
         disablePreventNavigation
       >
         {t('client_portal')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (quote) =>
       quote.status_id === QuoteStatus.Draft && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_sent',
+          })}
+          entity="quote"
+          actionKey="mark_sent"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_sent')}
           onClick={() => markSent(quote)}
-          icon={<Icon element={MdMarkEmailRead} />}
+          icon={MdMarkEmailRead}
           disablePreventNavigation
         >
           {t('mark_sent')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) =>
       (quote.status_id === QuoteStatus.Draft ||
         quote.status_id === QuoteStatus.Sent) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'approve',
+          })}
+          entity="quote"
+          actionKey="approve"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('approve')}
           onClick={() => approve(quote)}
-          icon={<Icon element={MdDone} />}
+          icon={MdDone}
           disablePreventNavigation
         >
           {t('approve')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) =>
       quote.status_id !== QuoteStatus.Converted &&
       hasPermission('create_invoice') && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'convert_to_invoice',
+          })}
+          entity="quote"
+          actionKey="convert_to_invoice"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('convert_to_invoice')}
           onClick={() => bulk([quote.id], 'convert_to_invoice')}
-          icon={<Icon element={MdSwitchRight} />}
+          icon={AiOutlineFileText}
           disablePreventNavigation
         >
           {t('convert_to_invoice')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) =>
       !quote.project_id &&
       hasPermission('create_project') && (
         <ConvertToProjectBulkAction
+          {...(!dropdown && {
+            key: 'convert_to_project',
+          })}
           selectedIds={[quote.id]}
           disablePreventNavigation
+          dropdown={dropdown}
         />
       ),
     (quote) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'run_template',
+        })}
+        entity="quote"
+        actionKey="run_template"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('run_template')}
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([quote]);
@@ -530,22 +626,37 @@ export function useActions(params?: Params) {
             entity: 'quote',
           });
         }}
-        icon={<Icon element={MdDesignServices} />}
+        icon={MdDesignServices}
       >
         {t('run_template')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     () => <Divider withoutPadding />,
     (quote) =>
       hasPermission('create_quote') && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'clone_to_quote',
+          })}
+          entity="quote"
+          actionKey="clone_to_quote"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_quote')}
           onClick={() => cloneToQuote(quote)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={MdControlPointDuplicate}
         >
           {t('clone_to_quote')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
-    (quote) => <CloneOptionsModal quote={quote} />,
+    (quote) => (
+      <CloneOptionsModal
+        {...(!dropdown && {
+          key: 'clone_to_other',
+        })}
+        dropdown={dropdown}
+        quote={quote}
+      />
+    ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) && (
         <Divider withoutPadding />
@@ -553,35 +664,59 @@ export function useActions(params?: Params) {
     (quote) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at === 0 && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'archive',
+          })}
+          entity="quote"
+          actionKey="archive"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('archive')}
           onClick={() => bulk([quote.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
+          icon={MdArchive}
+          excludePreferences
           disablePreventNavigation
         >
           {t('archive')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at > 0 && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'restore',
+          })}
+          entity="quote"
+          actionKey="restore"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('restore')}
           onClick={() => bulk([quote.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
+          icon={MdRestore}
+          excludePreferences
           disablePreventNavigation
         >
           {t('restore')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (quote) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       !quote?.is_deleted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'delete',
+          })}
+          entity="quote"
+          actionKey="delete"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('delete')}
           onClick={() => bulk([quote.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
+          icon={MdDelete}
+          excludePreferences
           disablePreventNavigation
         >
           {t('delete')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
   ];
 
@@ -728,7 +863,7 @@ export function useQuoteColumns() {
             {field}
           </DynamicLink>
 
-          <CopyToClipboardIconOnly text={quote.number} stopPropagation />
+          <CopyToClipboardIconOnly text={quote.number} />
         </div>
       ),
     },

@@ -824,9 +824,22 @@ export default function GeneralSettings() {
         ?.replaceAll('%', '')
         ?.replaceAll('px', '');
 
-      handleChange('company_logo_size', `${value}${logoSizeType}`);
+      if (value) {
+        handleChange('company_logo_size', `${value}${logoSizeType}`);
+      } else {
+        handleChange('company_logo_size', '');
+      }
     }
   }, [logoSizeType]);
+
+  useEffect(() => {
+    if (
+      company?.settings &&
+      company?.settings.company_logo_size?.includes('px')
+    ) {
+      setLogoSizeType('px');
+    }
+  }, [company?.settings?.company_logo_size]);
 
   useEffect(() => {
     setUpdatingRecords([]);
@@ -859,6 +872,8 @@ export default function GeneralSettings() {
             onValueChange={(value) => handleChange('invoice_design_id', value)}
             disabled={disableSettingsField('invoice_design_id')}
             errorMessage={errors?.errors['settings.invoice_design_id']}
+            customSelector
+            dismissable={false}
           >
             {designs &&
               designsFilter('invoice', designs).map((design: Design) => (
@@ -909,6 +924,8 @@ export default function GeneralSettings() {
             onValueChange={(value) => handleChange('quote_design_id', value)}
             disabled={disableSettingsField('quote_design_id')}
             errorMessage={errors?.errors['settings.quote_design_id']}
+            customSelector
+            dismissable={false}
           >
             {designs &&
               designsFilter('quote', designs).map((design: Design) => (
@@ -959,6 +976,8 @@ export default function GeneralSettings() {
             onValueChange={(value) => handleChange('credit_design_id', value)}
             disabled={disableSettingsField('credit_design_id')}
             errorMessage={errors?.errors['settings.credit_design_id']}
+            customSelector
+            dismissable={false}
           >
             {designs &&
               designsFilter('credit', designs).map((design: Design) => (
@@ -1011,6 +1030,8 @@ export default function GeneralSettings() {
             }
             disabled={disableSettingsField('purchase_order_design_id')}
             errorMessage={errors?.errors['settings.purchase_order_design_id']}
+            customSelector
+            dismissable={false}
           >
             {designs &&
               designsFilter('purchase_order', designs).map((design: Design) => (
@@ -1065,7 +1086,8 @@ export default function GeneralSettings() {
             }
             disabled={disableSettingsField('statement_design_id')}
             errorMessage={errors?.errors['settings.statement_design_id']}
-            withBlank={true}
+            customSelector
+            withBlank
           >
             {statementDesigns &&
               statementDesigns.map((design: Design) => (
@@ -1095,7 +1117,8 @@ export default function GeneralSettings() {
             }
             disabled={disableSettingsField('delivery_note_design_id')}
             errorMessage={errors?.errors['settings.delivery_note_design_id']}
-            withBlank={true}
+            customSelector
+            withBlank
           >
             {invoiceDesigns &&
               invoiceDesigns.map((design: Design) => (
@@ -1125,7 +1148,8 @@ export default function GeneralSettings() {
             }
             disabled={disableSettingsField('payment_receipt_design_id')}
             errorMessage={errors?.errors['settings.payment_receipt_design_id']}
-            withBlank={true}
+            customSelector
+            withBlank
           >
             {paymentDesigns &&
               paymentDesigns.map((design: Design) => (
@@ -1155,7 +1179,8 @@ export default function GeneralSettings() {
             }
             disabled={disableSettingsField('payment_refund_design_id')}
             errorMessage={errors?.errors['settings.payment_refund_design_id']}
-            withBlank={true}
+            customSelector
+            withBlank
           >
             {paymentDesigns &&
               paymentDesigns.map((design: Design) => (
@@ -1182,6 +1207,8 @@ export default function GeneralSettings() {
           onValueChange={(value) => handleChange('page_layout', value)}
           disabled={disableSettingsField('page_layout')}
           errorMessage={errors?.errors['settings.page_layout']}
+          customSelector
+          dismissable={false}
         >
           <option value="portrait">{t('portrait')}</option>
           <option value="landscape">{t('landscape')}</option>
@@ -1203,6 +1230,8 @@ export default function GeneralSettings() {
           onValueChange={(value) => handleChange('page_size', value)}
           disabled={disableSettingsField('page_size')}
           errorMessage={errors?.errors['settings.page_size']}
+          customSelector
+          dismissable={false}
         >
           <option value="A5">A5</option>
           <option value="A4">A4</option>
@@ -1232,6 +1261,8 @@ export default function GeneralSettings() {
           onValueChange={(value) => handleChange('font_size', parseInt(value))}
           disabled={disableSettingsField('font_size')}
           errorMessage={errors?.errors['settings.font_size']}
+          customSelector
+          dismissable={false}
         >
           {range(6, 41, 2).map((number) => (
             <option key={number} value={number}>
@@ -1258,7 +1289,7 @@ export default function GeneralSettings() {
               onValueChange={(value) =>
                 handleChange(
                   'company_logo_size',
-                  `${parseFloat(value) || 0}${logoSizeType}`
+                  value ? `${parseFloat(value) || 0}${logoSizeType}` : ''
                 )
               }
               disabled={disableSettingsField('company_logo_size')}
@@ -1271,6 +1302,8 @@ export default function GeneralSettings() {
               value={logoSizeType}
               onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
               disabled={disableSettingsField('company_logo_size')}
+              customSelector
+              dismissable={false}
             >
               <option value="%">{t('percent')}</option>
               <option value="px">{t('pixels')}</option>
@@ -1296,6 +1329,8 @@ export default function GeneralSettings() {
           onValueChange={(value) => handleChange('primary_font', value)}
           disabled={disableSettingsField('primary_font')}
           errorMessage={errors?.errors['settings.primary_font']}
+          customSelector
+          dismissable={false}
         >
           {fonts.map((font) => (
             <option key={font.label} value={font.value}>
@@ -1320,6 +1355,8 @@ export default function GeneralSettings() {
           onValueChange={(value) => handleChange('secondary_font', value)}
           disabled={disableSettingsField('secondary_font')}
           errorMessage={errors?.errors['settings.secondary_font']}
+          customSelector
+          dismissable={false}
         >
           {fonts.map((font) => (
             <option key={font.label} value={font.value}>
@@ -1499,6 +1536,8 @@ export default function GeneralSettings() {
             handleChange('page_numbering_alignment', value)
           }
           errorMessage={errors?.errors['settings.page_numbering_alignment']}
+          customSelector
+          dismissable={false}
         >
           <option value="C">{t('center')}</option>
           <option value="R">{t('right')}</option>

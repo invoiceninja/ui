@@ -217,7 +217,7 @@ export default function Show() {
         <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoCard title={t('summary')}>
             <p>
-              {t('tasks')}: {project.tasks?.length}
+              {t('active_tasks')}: {project.tasks?.length}
             </p>
 
             <p>

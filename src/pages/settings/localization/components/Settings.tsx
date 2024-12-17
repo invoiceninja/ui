@@ -16,10 +16,7 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import dayjs from 'dayjs';
-import {
-  useHandleCurrentCompanyChange,
-  useHandleCurrentCompanyChangeProperty,
-} from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
@@ -47,9 +44,8 @@ export function Settings() {
 
   const dispatch = useDispatch();
   const formatMoney = useFormatMoney();
-  const handleChange = useHandleCurrentCompanyChange();
   const disableSettingsField = useDisableSettingsField();
-  const handlePropertyChange = useHandleCurrentCompanyChangeProperty();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
   const setHasLanguageIdChanged = useSetAtom(hasLanguageChanged);
@@ -92,7 +88,7 @@ export function Settings() {
         >
           <CurrencySelector
             value={company?.settings.currency_id || ''}
-            onChange={(v) => handlePropertyChange('settings.currency_id', v)}
+            onChange={(v) => handleChange('settings.currency_id', v)}
             disabled={disableSettingsField('currency_id')}
             errorMessage={errors?.errors['settings.currency_id']}
           />
@@ -154,7 +150,7 @@ export function Settings() {
             <LanguageSelector
               onChange={(v) => {
                 setHasLanguageIdChanged(true);
-                handlePropertyChange('settings.language_id', v);
+                handleChange('settings.language_id', v);
               }}
               value={company?.settings?.language_id || ''}
               disabled={disableSettingsField('language_id')}
@@ -176,9 +172,7 @@ export function Settings() {
             value={company?.settings?.timezone_id || '1'}
             disabled={disableSettingsField('timezone_id')}
             errorMessage={errors?.errors['settings.timezone_id']}
-            onValueChange={(v) =>
-              handlePropertyChange('settings.timezone_id', v)
-            }
+            onValueChange={(v) => handleChange('settings.timezone_id', v)}
           >
             {statics?.timezones
               .sort((a, b) => a.name.localeCompare(b.name))
@@ -200,11 +194,14 @@ export function Settings() {
           }
         >
           <SelectField
-            onChange={handleChange}
-            id="settings.date_format_id"
             value={company?.settings?.date_format_id || '1'}
+            onValueChange={(value) =>
+              handleChange('settings.date_format_id', value)
+            }
             disabled={disableSettingsField('date_format_id')}
             errorMessage={errors?.errors['settings.date_format_id']}
+            customSelector
+            dismissable={false}
           >
             {statics?.date_formats.map((dateFormat: DateFormat) => (
               <option value={dateFormat.id} key={dateFormat.id}>
@@ -271,7 +268,7 @@ export function Settings() {
             <Toggle
               checked={Boolean(company?.use_comma_as_decimal_place)}
               onChange={(value: boolean) =>
-                handlePropertyChange('use_comma_as_decimal_place', value)
+                handleChange('use_comma_as_decimal_place', value)
               }
             />
           </Element>
@@ -282,10 +279,13 @@ export function Settings() {
         {isCompanySettingsActive && (
           <Element leftSide={t('first_month_of_the_year')}>
             <SelectField
-              id="first_month_of_year"
               value={company?.first_month_of_year || '1'}
-              onChange={handleChange}
+              onValueChange={(value) =>
+                handleChange('first_month_of_year', value)
+              }
               errorMessage={errors?.errors['settings.first_month_of_year']}
+              customSelector
+              dismissable={false}
             >
               <option value="1">{t('january')}</option>
               <option value="2">{t('february')}</option>

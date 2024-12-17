@@ -38,8 +38,16 @@ export function Notifications() {
 
     const user = cloneDeep(userChanges);
 
-    const updatedAllEvents =
-      allEventsValue === 'custom' ? [] : [allEventsValue];
+    let updatedAllEvents = allEventsValue === 'custom' ? [] : [allEventsValue];
+
+    const isTaskAssignedNotificationIncluded =
+      user?.company_user?.notifications?.email?.find(
+        (key: string) => key === 'task_assigned'
+      );
+
+    if (isTaskAssignedNotificationIncluded) {
+      updatedAllEvents = [...updatedAllEvents, 'task_assigned'];
+    }
 
     set(user, 'company_user.notifications.email', updatedAllEvents);
 
@@ -168,6 +176,8 @@ export function Notifications() {
         <SelectField
           value={allEvents}
           onValueChange={(value) => handleAllEventsChange(value)}
+          customSelector
+          dismissable={false}
         >
           <option value="all_notifications">{t('all_records')}</option>
           <option value="all_user_notifications">{t('owned_by_user')}</option>
@@ -186,6 +196,8 @@ export function Notifications() {
                 handleNotificationChange(notification.key, value)
               }
               disabled={Boolean(allEvents) && allEvents !== 'custom'}
+              customSelector
+              dismissable={false}
             >
               <option value={`${notification.key}_all`}>
                 {t('all_records')}

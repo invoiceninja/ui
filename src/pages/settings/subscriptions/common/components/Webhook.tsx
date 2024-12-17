@@ -30,7 +30,7 @@ export function Webhook(props: SubscriptionProps) {
   const [headerValue, setHeaderValue] = useState<string>('');
 
   const headers = Object.entries(
-    subscription.webhook_configuration.post_purchase_headers
+    subscription?.webhook_configuration?.post_purchase_headers ?? []
   );
 
   const handleAddHeader = () => {

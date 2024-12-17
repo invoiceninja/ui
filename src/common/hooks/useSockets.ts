@@ -11,22 +11,28 @@
 import { atom, useAtom } from 'jotai';
 import Pusher from 'pusher-js';
 import { defaultHeaders } from '../queries/common/headers';
-import { apiEndpoint, isHosted } from '../helpers';
+import { apiEndpoint, isSelfHosted } from '../helpers';
 import { useEffect } from 'react';
 import { useCurrentCompany } from './useCurrentCompany';
+import { useReactSettings } from './useReactSettings';
 
 export const pusherAtom = atom<Pusher | null>(null);
 
 export function useSockets() {
   const [pusher, setPusher] = useAtom(pusherAtom);
+
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
 
   useEffect(() => {
     if (!company) {
       return;
     }
 
-    if (!isHosted()) {
+    if (
+      isSelfHosted() &&
+      !reactSettings.preferences.enable_public_notifications
+    ) {
       return;
     }
 
@@ -45,8 +51,14 @@ export function useSockets() {
 
     setPusher(client);
 
-    return () => client.disconnect();
-  }, [company]);
+    client.connection.bind('connected', () => {
+      localStorage.setItem('X-SOCKET-ID', client.connection.socket_id);
+    });
+
+    return () => {
+      client.disconnect();
+    };
+  }, [company, reactSettings.preferences.enable_public_notifications]);
 
   return pusher;
 }

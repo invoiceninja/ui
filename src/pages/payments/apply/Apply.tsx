@@ -234,7 +234,7 @@ export default function Apply() {
               />
               <NumberInputField
                 label={t('amount_received')}
-                value={record.amount}
+                value={record.amount || ''}
                 onValueChange={(value) =>
                   formik.setFieldValue(
                     `invoices.${index}.amount`,

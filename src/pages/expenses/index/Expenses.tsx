@@ -46,14 +46,10 @@ export default function Expenses() {
   const customBulkActions = useCustomBulkActions();
 
   return (
-    <Default
-      title={t('expenses')}
-      breadcrumbs={pages}
-      docsLink="en/expenses"
-    >
+    <Default title={t('expenses')} breadcrumbs={pages} docsLink="en/expenses">
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses?include=client,vendor,category&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc"
+        endpoint="/api/v1/expenses?include=client,vendor,category,project&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc"
         columns={columns}
         bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"

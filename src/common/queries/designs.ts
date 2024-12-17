@@ -30,7 +30,7 @@ export function useDesignsQuery() {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/designs?status=active&sort=name|asc')
+        endpoint('/api/v1/designs?status=active&sort=name|asc&per_page=100')
       ).then((response: AxiosResponse<GenericManyResponse<Design>>) =>
         response.data.data.filter(
           (design) =>

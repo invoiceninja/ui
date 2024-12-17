@@ -67,6 +67,7 @@ import {
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
+import { Link } from '$app/components/forms';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -224,7 +225,7 @@ export function useAllExpenseColumns() {
     'payment_date',
     'payment_type',
     'private_notes',
-    //   'project', @Todo: Need to resolve relationship
+    'project',
     //   'recurring_expense', @Todo: Need to resolve relationship
     'should_be_invoiced',
     //   'tax_amount', @Todo: Need to calc
@@ -555,6 +556,16 @@ export function useExpenseColumns() {
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'project',
+      id: 'project',
+      label: t('project'),
+      format: (_, expense) => (
+        <Link to={route('/projects/:id', { id: expense?.project?.id })}>
+          {expense?.project?.name}
+        </Link>
+      ),
+    },
   ];
 
   const list: string[] =
@@ -601,36 +612,42 @@ export function useExpenseFilters() {
       value: 'logged',
       color: 'white',
       backgroundColor: '#6B7280',
+      dropdownKey: '0',
     },
     {
       label: t('pending'),
       value: 'pending',
       color: 'white',
       backgroundColor: '#93C5FD',
+      dropdownKey: '0',
     },
     {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
       backgroundColor: statusThemeColors.$3 || '#1D4ED8',
+      dropdownKey: '0',
     },
     {
       label: t('paid'),
       value: 'paid',
       color: 'white',
       backgroundColor: statusThemeColors.$1 || '#22C55E',
+      dropdownKey: '0',
     },
     {
       label: t('unpaid'),
       value: 'unpaid',
       color: 'white',
       backgroundColor: statusThemeColors.$4 || '#e6b05c',
+      dropdownKey: '0',
     },
     {
       label: t('uncategorized'),
       value: 'uncategorized',
       color: 'white',
       backgroundColor: '#b5812c',
+      dropdownKey: '0',
     },
   ];
 

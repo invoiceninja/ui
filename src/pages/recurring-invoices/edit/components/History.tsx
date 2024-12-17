@@ -26,6 +26,7 @@ import { Spinner } from '$app/components/Spinner';
 import { route } from '$app/common/helpers/route';
 import { RecurringInvoiceContext } from '../../create/Create';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 dayjs.extend(relativeTime);
 
@@ -35,6 +36,7 @@ export default function History() {
   const context: RecurringInvoiceContext = useOutletContext();
   const { recurringInvoice } = context;
 
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
@@ -102,7 +104,9 @@ export default function History() {
               </div>
 
               <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>
+                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                </p>
                 <p>{dayjs.unix(activity.created_at).fromNow()}</p>
               </div>
             </div>

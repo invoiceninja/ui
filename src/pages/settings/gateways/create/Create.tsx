@@ -38,6 +38,7 @@ import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import classNames from 'classnames';
+import { HelpWidget } from '$app/components/HelpWidget';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -116,7 +117,7 @@ export function Create() {
       return handleGoCardless();
     }
 
-    if (isManualChange) {
+    if (isManualChange && value) {
       setTabIndex(1);
     }
   };
@@ -269,6 +270,22 @@ export function Create() {
     }
   }, [companyGateway]);
 
+  useEffect(() => {
+    if (!filteredGateways.length) return;
+
+    const gatewayIndex = filteredGateways.findIndex(
+      (gateway) => gateway.key === 'b9886f9257f0c6ee7c302f1c74475f6c'
+    );
+
+    if (gatewayIndex === -1 || gatewayIndex === 2) return;
+
+    const updatedGateways = [...filteredGateways];
+    const [gateway] = updatedGateways.splice(gatewayIndex, 1);
+    updatedGateways.splice(2, 0, gateway);
+
+    setFilteredGateways(updatedGateways);
+  }, [filteredGateways]);
+
   return (
     <Settings
       title={documentTitle}
@@ -276,6 +293,11 @@ export function Create() {
       onSaveClick={() => onSave(1)}
       disableSaveButton={!gateway}
     >
+      <HelpWidget
+        id="gateways"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
+      />
+
       <TabGroup
         tabs={tabs}
         defaultTabIndex={tabIndex}
@@ -284,9 +306,10 @@ export function Create() {
         <Card title={t('add_gateway')}>
           <Element leftSide={t('payment_provider')}>
             <SelectField
-              onValueChange={(value) => handleChange(value, true)}
               value={gateway?.id}
+              onValueChange={(value) => handleChange(value, true)}
               errorMessage={errors?.errors.gateway_key}
+              customSelector
               withBlank
             >
               {filteredGateways.map((gateway, index) => (

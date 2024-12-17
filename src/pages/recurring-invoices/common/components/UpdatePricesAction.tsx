@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useBulkAction } from '../queries';
 import { MdSync } from 'react-icons/md';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 
 interface Props {
   selectedIds: string[];
   setSelected?: Dispatch<SetStateAction<string[]>>;
+  dropdown: boolean;
 }
 
 export const UpdatePricesAction = (props: Props) => {
@@ -33,7 +33,7 @@ export const UpdatePricesAction = (props: Props) => {
 
   const bulk = useBulkAction({ onSuccess: handleOnUpdatedPrices });
 
-  const { selectedIds, setSelected } = props;
+  const { selectedIds, setSelected, dropdown } = props;
 
   const handleSave = () => {
     bulk(selectedIds, 'update_prices');
@@ -43,12 +43,16 @@ export const UpdatePricesAction = (props: Props) => {
 
   return (
     <>
-      <DropdownElement
+      <EntityActionElement
+        entity="recurring_invoice"
+        actionKey="update_prices"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('update_prices')}
         onClick={() => setIsModalOpen(true)}
-        icon={<Icon element={MdSync} />}
+        icon={MdSync}
       >
         {t('update_prices')}
-      </DropdownElement>
+      </EntityActionElement>
 
       <Modal
         title={t('update_prices')}
