@@ -1067,6 +1067,14 @@ export function ResizableDashboardCards() {
                 title={t('account_login_text')}
                 height="full"
                 withScrollableBody
+                topRight={
+                  isEditMode && (
+                    <Button behavior="button" type="secondary">
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+                renderFromShadcn
               >
                 <div className="pb-8">
                   <div className="flex flex-col space-y-2 px-6">

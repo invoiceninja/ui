@@ -26,6 +26,8 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { useColorScheme } from '$app/common/colors';
 
+import { Button as ButtonBase } from '../../../components/ui/button';
+
 export interface ButtonOption {
   text: string;
   onClick: (event: FormEvent<HTMLFormElement>) => unknown;
@@ -56,16 +58,21 @@ interface Props {
   withoutHeaderBorder?: boolean;
   topRight?: ReactNode;
   height?: 'full';
+  renderFromShadcn?: boolean;
 }
 
 export function Card(props: Props) {
   const [t] = useTranslation();
 
-  const { padding = 'regular', height } = props;
+  const { padding = 'regular', height, renderFromShadcn } = props;
 
   const [isCollapsed, setIsCollpased] = useState(props.collapsed);
 
   const colors = useColorScheme();
+
+  if (renderFromShadcn) {
+    return <ButtonBase>asdkas dk</ButtonBase>;
+  }
 
   return (
     <div
