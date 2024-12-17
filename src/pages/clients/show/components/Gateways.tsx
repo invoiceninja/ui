@@ -127,7 +127,7 @@ export function Gateways(props: Props) {
         disabledButton={isFormBusy}
       />
 
-      <div className="col-span-12 md:col-span-6 lg:col-span-3">
+      <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4">
         <InfoCard
           title={t('payment_methods')}
           className="max-h-96 overflow-y-auto h-full"
