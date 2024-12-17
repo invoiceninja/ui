@@ -46,7 +46,6 @@ import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceP
 import { date as formatDate } from '$app/common/helpers';
 import { useFormatTimeLog } from '../../kanban/common/hooks';
 import { TaskClock } from '../../kanban/components/TaskClock';
-import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 
@@ -106,7 +105,6 @@ export function TaskSlider() {
   });
 
   const { timeFormat } = useCompanyTimeFormat();
-  const userNumberPrecision = useUserNumberPrecision();
   const { dateFormat } = useCurrentCompanyDateFormats();
   const userNumberPrecision = useUserNumberPrecision();
 

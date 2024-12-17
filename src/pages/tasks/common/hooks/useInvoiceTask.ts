@@ -32,10 +32,6 @@ import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
-import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
-import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
-import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
 
 interface Params {
   onlyAddToInvoice?: boolean;
