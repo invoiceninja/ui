@@ -44,7 +44,7 @@ export default {
   [PaymentType.LASER]: 'payment_type_Laser',
   [PaymentType.MAESTRO]: 'payment_type_Maestro',
   [PaymentType.MASTERCARD]: 'payment_type_MasterCard',
-  [PaymentType.MOLLIE_BANK_TRANSFER]: 'payment_type_Bank Transfer',
+  [PaymentType.MOLLIE_BANK_TRANSFER]: 'payment_type_Mollie Bank Transfer',
   [PaymentType.NOVA]: 'payment_type_Nova',
   [PaymentType.PAYPAL]: 'payment_type_PayPal',
   [PaymentType.PRZELEWY24]: 'przelewy24',
