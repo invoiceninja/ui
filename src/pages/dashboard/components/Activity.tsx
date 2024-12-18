@@ -37,6 +37,7 @@ export function Activity() {
       height="full"
       withoutBodyPadding
       withScrollableBody
+      renderFromShadcn
     >
       {isLoading && (
         <NonClickableElement>

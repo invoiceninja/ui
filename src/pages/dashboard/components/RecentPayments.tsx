@@ -96,6 +96,7 @@ export function RecentPayments() {
       title={t('recent_payments')}
       className="h-full relative"
       withoutBodyPadding
+      renderFromShadcn
     >
       <div className="pl-6 pr-4">
         <DataTable

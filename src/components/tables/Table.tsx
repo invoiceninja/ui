@@ -21,10 +21,11 @@ interface Props extends CommonProps {
   withoutRightBorder?: boolean;
   onVerticalOverflowChange?: (overflow: boolean) => void;
   isDataLoading?: boolean;
+  withTransparentBackground?: boolean;
 }
 
 export function Table(props: Props) {
-  const { onVerticalOverflowChange } = props;
+  const { onVerticalOverflowChange, withTransparentBackground } = props;
 
   const [tableParentHeight, setTableParentHeight] = useState<number>();
   const [tableHeight, setTableHeight] = useState<number>();
@@ -99,7 +100,9 @@ export function Table(props: Props) {
             }
           )}
           style={{
-            backgroundColor: colors.$1,
+            backgroundColor: withTransparentBackground
+              ? 'transparent'
+              : colors.$1,
             color: colors.$3,
             borderColor: colors.$4,
           }}

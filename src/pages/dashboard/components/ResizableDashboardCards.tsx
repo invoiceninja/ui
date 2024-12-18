@@ -1185,6 +1185,7 @@ export function ResizableDashboardCards() {
                 className="col-span-12 xl:col-span-8 pr-4"
                 height="full"
                 withScrollableBody
+                renderFromShadcn
               >
                 <Chart
                   chartSensitivity={chartScale}

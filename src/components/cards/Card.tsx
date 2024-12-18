@@ -26,7 +26,12 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { useColorScheme } from '$app/common/colors';
 
-import { Button as ButtonBase } from '../../../components/ui/button';
+import {
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Card as ShadcnCard,
+} from '../../../components/ui/card';
 
 export interface ButtonOption {
   text: string;
@@ -71,7 +76,31 @@ export function Card(props: Props) {
   const colors = useColorScheme();
 
   if (renderFromShadcn) {
-    return <ButtonBase>asdkas dk</ButtonBase>;
+    console.log(props.title);
+    return (
+      <ShadcnCard
+        title={props.title || undefined}
+        className={classNames(
+          `border shadow overflow-visible ${props.className}`,
+          {
+            'overflow-y-auto': props.withScrollableBody,
+            'h-full': height === 'full',
+          }
+        )}
+      >
+        {Boolean(props.title || props.description) && (
+          <CardHeader>
+            {props.title && <CardTitle>{props.title}</CardTitle>}
+
+            {props.description && (
+              <CardDescription>{props.description}</CardDescription>
+            )}
+          </CardHeader>
+        )}
+
+        {props.children}
+      </ShadcnCard>
+    );
   }
 
   return (
