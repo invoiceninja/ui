@@ -62,6 +62,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
+import { PublicNotificationsModal } from '../PublicNotificationsModal';
 
 export interface SaveOption {
   label: string;
@@ -411,6 +412,8 @@ export function Default(props: Props) {
       <VerifyEmail />
       <VerifyPhone />
       <EInvoiceCredits />
+
+      {isSelfHosted() ? <PublicNotificationsModal /> : null}
 
       <MobileSidebar
         navigation={navigation}
