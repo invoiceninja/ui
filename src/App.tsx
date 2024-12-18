@@ -38,8 +38,6 @@ import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 import { useSockets } from './common/hooks/useSockets';
 import { usePrivateSocketEvents } from './common/queries/sockets';
-import { PublicNotificationsModal } from './components/PublicNotificationsModal';
-import { isSelfHosted } from './common/helpers';
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
@@ -243,7 +241,6 @@ export function App() {
       />
 
       <PreventNavigationModal />
-      {isSelfHosted() ? <PublicNotificationsModal /> : null}
     </>
   );
 }

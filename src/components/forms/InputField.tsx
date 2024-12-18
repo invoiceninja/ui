@@ -135,6 +135,8 @@ export function InputField(props: Props) {
             }
           }}
           onClick={(event: any) => {
+            props.onClick && props.onClick();
+
             if (
               props.element === 'textarea' &&
               reactSettings.preferences.auto_expand_product_table_notes
