@@ -429,7 +429,7 @@ function Form({ onContinue, businessType }: FormProps) {
       <p>{t('details_update_info')}</p>
 
       <div className="my-4">
-        {errors ? <Alert type="danger">{errors.message}</Alert> : null}
+        {errors ? <Alert type="danger">{errors.message ?? get(errors, 'errors.0.details')}</Alert> : null}
       </div>
 
       <form onSubmit={form.handleSubmit} className="space-y-5">
