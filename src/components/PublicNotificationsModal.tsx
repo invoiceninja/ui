@@ -23,7 +23,7 @@ export function PublicNotificationsModal() {
   const reactSettings = useReactSettings();
   const dispatch = useDispatch();
 
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   const { t } = useTranslation();
   const { save } = usePreferences();
