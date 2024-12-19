@@ -73,9 +73,11 @@ export function ExpiredQuotes() {
   return (
     <Card
       title={t('expired_quotes')}
-      className="h-96 relative"
+      className="relative"
       withoutBodyPadding
       withoutHeaderBorder
+      height="full"
+      renderFromShadcn
     >
       <div className="pl-6 pr-4">
         <DataTable

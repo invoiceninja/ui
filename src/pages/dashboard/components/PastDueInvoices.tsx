@@ -80,9 +80,10 @@ export function PastDueInvoices() {
   return (
     <Card
       title={t('past_due_invoices')}
-      className="h-96 relative"
+      className="h-full relative"
       withoutBodyPadding
       withoutHeaderBorder
+      renderFromShadcn
     >
       <div className="pl-6 pr-4">
         <DataTable

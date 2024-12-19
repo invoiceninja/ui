@@ -84,8 +84,9 @@ export function UpcomingInvoices() {
   return (
     <Card
       title={t('upcoming_invoices')}
-      className="h-96 relative"
+      className="h-full relative"
       withoutBodyPadding
+      renderFromShadcn
     >
       <div className="pl-6 pr-4">
         <DataTable
