@@ -152,6 +152,7 @@ interface Props<T> extends CommonProps {
   withoutPerPageAsPreference?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
+  withTransparentBackground?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -589,6 +590,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         }
         isDataLoading={isLoading}
         style={props.style}
+        withTransparentBackground={props.withTransparentBackground}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
           {!props.withoutActions && !hideEditableOptions && (

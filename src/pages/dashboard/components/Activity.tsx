@@ -33,8 +33,11 @@ export function Activity() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-96 relative"
+      className="relative"
+      height="full"
       withoutBodyPadding
+      withScrollableBody
+      renderFromShadcn
     >
       {isLoading && (
         <NonClickableElement>
@@ -47,10 +50,7 @@ export function Activity() {
       )}
 
       <div className="pl-6 pr-4">
-        <div
-          className="flex flex-col overflow-y-auto pr-4"
-          style={{ height: '19.9rem' }}
-        >
+        <div className="flex flex-col pr-4">
           {data?.data.data &&
             data.data.data.map((record: ActivityRecord, index: number) => (
               <React.Fragment key={index}>
