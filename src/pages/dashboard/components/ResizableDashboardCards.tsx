@@ -150,7 +150,7 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 
 const initialLayouts = {
   lg: [
-    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    { i: '0', x: 30, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
     {
       i: '1',
       x: 0,
@@ -244,7 +244,17 @@ const initialLayouts = {
     },
   ],
   md: [
-    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    { i: '0', x: 30, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 6.3,
+      minH: 6.3,
+      minW: 100,
+      isResizable: false,
+    },
     {
       i: '2',
       x: 0,
@@ -337,7 +347,17 @@ const initialLayouts = {
     },
   ],
   sm: [
-    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 6.3,
+      minH: 6.3,
+      minW: 100,
+      isResizable: false,
+    },
     {
       i: '2',
       x: 0,
@@ -430,7 +450,17 @@ const initialLayouts = {
     },
   ],
   xs: [
-    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 6.3,
+      minH: 6.3,
+      minW: 100,
+      isResizable: false,
+    },
     {
       i: '2',
       x: 0,
@@ -523,7 +553,17 @@ const initialLayouts = {
     },
   ],
   xxs: [
-    { i: '1', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 100,
+      h: 6.3,
+      minH: 6.3,
+      minW: 100,
+      isResizable: false,
+    },
     {
       i: '2',
       x: 0,
@@ -728,16 +768,13 @@ export function ResizableDashboardCards() {
     if (!currentWidth) return;
 
     const cardWidth = 240;
+    const gap = 12;
     const totalCards =
       user?.company_user?.settings.dashboard_fields?.length || 0;
-    const cardsPerRow = Math.floor(
-      (currentWidth - (totalCards - 1) * 12) / cardWidth
-    );
+    const cardsPerRow = Math.floor((currentWidth + gap) / (cardWidth + gap));
     const numberOfRows = Math.ceil(
       totalCards / (totalCards ? cardsPerRow || 1 : 0)
     );
-
-    console.log(totalCards, cardsPerRow, numberOfRows);
 
     setLayouts((currentLayouts) => {
       const updatedLayouts = cloneDeep(currentLayouts);
@@ -824,11 +861,9 @@ export function ResizableDashboardCards() {
   }, [chart.data]);
 
   useEffect(() => {
-    console.log(layoutBreakpoint);
-
     if (layoutBreakpoint) {
       if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
-        //setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
+        setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
       }
 
       setIsLayoutsInitialized(true);
@@ -836,15 +871,13 @@ export function ResizableDashboardCards() {
   }, [layoutBreakpoint]);
 
   useEffect(() => {
-    if (isLayoutsInitialized) {
-      updateLayoutHeight();
-    }
-
     const handleResize = () => {
       if (isLayoutsInitialized) {
         updateLayoutHeight();
       }
     };
+
+    updateLayoutHeight();
 
     window.addEventListener('resize', handleResize);
 
@@ -1035,16 +1068,20 @@ export function ResizableDashboardCards() {
               {isEditMode && (
                 <div
                   className="flex items-center cursor-pointer"
-                  onClick={() =>
+                  onClick={() => {
                     layoutBreakpoint &&
-                    setLayouts((currentLayouts) => ({
-                      ...currentLayouts,
-                      [layoutBreakpoint]:
-                        initialLayouts[
-                          layoutBreakpoint as keyof typeof initialLayouts
-                        ],
-                    }))
-                  }
+                      setLayouts((currentLayouts) => ({
+                        ...currentLayouts,
+                        [layoutBreakpoint]:
+                          initialLayouts[
+                            layoutBreakpoint as keyof typeof initialLayouts
+                          ],
+                      }));
+
+                    setTimeout(() => {
+                      updateLayoutHeight();
+                    }, 100);
+                  }}
                 >
                   <Icon element={MdRefresh} size={23} />
                 </div>
