@@ -23,7 +23,7 @@ export function PublicNotificationsModal() {
   const reactSettings = useReactSettings();
   const dispatch = useDispatch();
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   const { t } = useTranslation();
   const { save } = usePreferences();
@@ -105,7 +105,7 @@ export function PublicNotificationsModal() {
               handleSave();
             }}
           >
-            {t('save_changes')}
+            {t('continue')}
           </Button>
         </div>
       </Modal>
