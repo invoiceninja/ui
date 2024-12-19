@@ -76,7 +76,6 @@ export function Card(props: Props) {
   const colors = useColorScheme();
 
   if (renderFromShadcn) {
-    console.log(props.title);
     return (
       <ShadcnCard
         title={props.title || undefined}

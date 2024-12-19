@@ -13,11 +13,11 @@ import { DashboardField } from '$app/common/interfaces/company-user';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FIELDS_LABELS } from './DashboardCardSelector';
-import { Card as CardElement } from '$app/components/cards';
 import { useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
+import { Card as ShadcnCard } from '../../../../components/ui/card';
 
 interface DashboardCardsProps {
   dateRange: string;
@@ -81,7 +81,7 @@ export function DashboardCard(props: CardProps) {
   }, [field]);
 
   return (
-    <CardElement className="flex px-6">
+    <ShadcnCard className="px-6 py-6 w-60">
       {isFormBusy && (
         <div className="flex items-center justify-center">
           <Spinner />
@@ -98,7 +98,7 @@ export function DashboardCard(props: CardProps) {
               : responseData}
           </span>
 
-          <span>
+          <span className="text-gray-500">
             {t(
               PERIOD_LABELS[field.period as keyof typeof PERIOD_LABELS] ??
                 field.period
@@ -106,6 +106,6 @@ export function DashboardCard(props: CardProps) {
           </span>
         </div>
       )}
-    </CardElement>
+    </ShadcnCard>
   );
 }

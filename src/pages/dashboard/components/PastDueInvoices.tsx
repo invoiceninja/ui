@@ -83,6 +83,7 @@ export function PastDueInvoices() {
       className="h-full relative"
       withoutBodyPadding
       withoutHeaderBorder
+      renderFromShadcn
     >
       <div className="pl-6 pr-4">
         <DataTable

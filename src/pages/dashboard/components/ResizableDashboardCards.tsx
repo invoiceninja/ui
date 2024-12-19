@@ -723,26 +723,31 @@ export function ResizableDashboardCards() {
   };
 
   const updateLayoutHeight = () => {
-    const currentHeight =
-      document.getElementById('cardsContainer')?.clientHeight;
+    const currentWidth = document.getElementById('cardsContainer')?.clientWidth;
+
+    if (!currentWidth) return;
+
+    const cardWidth = 240;
+    const totalCards =
+      user?.company_user?.settings.dashboard_fields?.length || 0;
+    const cardsPerRow = Math.floor(
+      (currentWidth - (totalCards - 1) * 12) / cardWidth
+    );
+    const numberOfRows = Math.ceil(
+      totalCards / (totalCards ? cardsPerRow || 1 : 0)
+    );
+
+    console.log(totalCards, cardsPerRow, numberOfRows);
 
     setLayouts((currentLayouts) => {
       const updatedLayouts = cloneDeep(currentLayouts);
-
-      const cardsNumbers =
-        user?.company_user?.settings.dashboard_fields?.length;
 
       Object.keys(updatedLayouts).forEach((breakpoint) => {
         updatedLayouts[breakpoint] = updatedLayouts[breakpoint].map((item) =>
           item.i === '1'
             ? {
                 ...item,
-                h:
-                  currentHeight && cardsNumbers
-                    ? (currentHeight + 80) / 30
-                    : cardsNumbers
-                    ? 6.3
-                    : 0,
+                h: totalCards ? numberOfRows * 7 : 0,
               }
             : item
         );
@@ -819,6 +824,8 @@ export function ResizableDashboardCards() {
   }, [chart.data]);
 
   useEffect(() => {
+    console.log(layoutBreakpoint);
+
     if (layoutBreakpoint) {
       if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
         //setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
@@ -832,6 +839,18 @@ export function ResizableDashboardCards() {
     if (isLayoutsInitialized) {
       updateLayoutHeight();
     }
+
+    const handleResize = () => {
+      if (isLayoutsInitialized) {
+        updateLayoutHeight();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, [
     user?.company_user?.settings.dashboard_fields?.length,
     isLayoutsInitialized,
@@ -1033,28 +1052,26 @@ export function ResizableDashboardCards() {
             </div>
           </div>
 
-          {Boolean(user?.company_user?.settings.dashboard_fields?.length) && (
-            <div
-              key="1"
-              id="cardsContainer"
-              className={classNames('flex flex-wrap gap-5 drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              {user?.company_user?.settings.dashboard_fields?.map(
-                (field, index) => (
-                  <DashboardCard
-                    key={(20 + index).toString()}
-                    field={field}
-                    dateRange={dateRange}
-                    startDate={dates.start_date}
-                    endDate={dates.end_date}
-                    currencyId={currency.toString()}
-                  />
-                )
-              )}
-            </div>
-          )}
+          <div
+            key="1"
+            id="cardsContainer"
+            className={classNames('flex flex-wrap gap-3 drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            {user?.company_user?.settings.dashboard_fields?.map(
+              (field, index) => (
+                <DashboardCard
+                  key={(20 + index).toString()}
+                  field={field}
+                  dateRange={dateRange}
+                  startDate={dates.start_date}
+                  endDate={dates.end_date}
+                  currencyId={currency.toString()}
+                />
+              )
+            )}
+          </div>
 
           {company && (
             <div
@@ -1077,10 +1094,12 @@ export function ResizableDashboardCards() {
                 renderFromShadcn
               >
                 <div className="pb-8">
-                  <div className="flex flex-col space-y-2 px-6">
-                    <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
+                  <div className="flex flex-col space-y-1 px-6">
+                    <span className="text-lg">{`${user?.first_name} ${user?.last_name}`}</span>
 
-                    <span className="text-sm">{t('recent_transactions')}</span>
+                    <span className="text-sm text-gray-500">
+                      {t('recent_transactions')}
+                    </span>
                   </div>
 
                   <div className="flex flex-col mt-8">
@@ -1088,10 +1107,15 @@ export function ResizableDashboardCards() {
                       style={{ borderColor: colors.$4 }}
                       className="flex justify-between items-center border-b py-3 px-6"
                     >
-                      <span>{t('invoices')}</span>
+                      <span style={{ fontSize: '0.95rem' }}>
+                        {t('invoices')}
+                      </span>
 
                       <Badge style={{ backgroundColor: TotalColors.Blue }}>
-                        <span className="mx-2 text-base">
+                        <div
+                          className="px-1.5 py-0.5"
+                          style={{ fontSize: '0.95rem' }}
+                        >
                           {formatMoney(
                             totalsData[currency]?.invoices?.invoiced_amount ||
                               0,
@@ -1099,7 +1123,7 @@ export function ResizableDashboardCards() {
                             currency.toString(),
                             2
                           )}
-                        </span>
+                        </div>
                       </Badge>
                     </div>
 
@@ -1107,16 +1131,21 @@ export function ResizableDashboardCards() {
                       style={{ borderColor: colors.$4 }}
                       className="flex justify-between items-center border-b py-3 px-6"
                     >
-                      <span>{t('payments')}</span>
+                      <span style={{ fontSize: '0.95rem' }}>
+                        {t('payments')}
+                      </span>
                       <Badge style={{ backgroundColor: TotalColors.Green }}>
-                        <span className="mx-2 text-base">
+                        <div
+                          className="px-1.5 py-0.5"
+                          style={{ fontSize: '0.95rem' }}
+                        >
                           {formatMoney(
                             totalsData[currency]?.revenue?.paid_to_date || 0,
                             company.settings.country_id,
                             currency.toString(),
                             2
                           )}
-                        </span>
+                        </div>
                       </Badge>
                     </div>
 
@@ -1124,16 +1153,21 @@ export function ResizableDashboardCards() {
                       style={{ borderColor: colors.$4 }}
                       className="flex justify-between items-center border-b py-3 px-6"
                     >
-                      <span>{t('expenses')}</span>
+                      <span style={{ fontSize: '0.95rem' }}>
+                        {t('expenses')}
+                      </span>
                       <Badge style={{ backgroundColor: TotalColors.Gray }}>
-                        <span className="mx-2 text-base">
+                        <div
+                          className="px-1.5 py-0.5"
+                          style={{ fontSize: '0.95rem' }}
+                        >
                           {formatMoney(
                             totalsData[currency]?.expenses?.amount || 0,
                             company.settings.country_id,
                             currency.toString(),
                             2
                           )}
-                        </span>
+                        </div>
                       </Badge>
                     </div>
 
@@ -1141,16 +1175,21 @@ export function ResizableDashboardCards() {
                       style={{ borderColor: colors.$4 }}
                       className="flex justify-between items-center border-b py-3 px-6"
                     >
-                      <span>{t('outstanding')}</span>
+                      <span style={{ fontSize: '0.95rem' }}>
+                        {t('outstanding')}
+                      </span>
                       <Badge style={{ backgroundColor: TotalColors.Red }}>
-                        <span className="mx-2 text-base">
+                        <div
+                          className="px-1.5 py-0.5"
+                          style={{ fontSize: '0.95rem' }}
+                        >
                           {formatMoney(
                             totalsData[currency]?.outstanding?.amount || 0,
                             company.settings.country_id,
                             currency.toString(),
                             2
                           )}
-                        </span>
+                        </div>
                       </Badge>
                     </div>
 
@@ -1158,13 +1197,18 @@ export function ResizableDashboardCards() {
                       style={{ borderColor: colors.$4 }}
                       className="flex justify-between items-center border-b py-3 px-6"
                     >
-                      <span>{t('total_invoices_outstanding')}</span>
+                      <span style={{ fontSize: '0.95rem' }}>
+                        {t('total_invoices_outstanding')}
+                      </span>
 
                       <Badge variant="white">
-                        <span className="mx-2 text-base">
+                        <div
+                          className="px-1.5 py-0.5"
+                          style={{ fontSize: '0.95rem' }}
+                        >
                           {totalsData[currency]?.outstanding
                             ?.outstanding_count || 0}
-                        </span>
+                        </div>
                       </Badge>
                     </div>
                   </div>

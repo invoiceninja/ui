@@ -77,6 +77,7 @@ export function ExpiredQuotes() {
       withoutBodyPadding
       withoutHeaderBorder
       height="full"
+      renderFromShadcn
     >
       <div className="pl-6 pr-4">
         <DataTable

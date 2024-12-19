@@ -86,6 +86,7 @@ export function UpcomingInvoices() {
       title={t('upcoming_invoices')}
       className="h-full relative"
       withoutBodyPadding
+      renderFromShadcn
     >
       <div className="pl-6 pr-4">
         <DataTable
