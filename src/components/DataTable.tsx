@@ -592,7 +592,10 @@ export function DataTable<T extends object>(props: Props<T>) {
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
           {!props.withoutActions && !hideEditableOptions && (
-            <Th className={styleOptions?.thClassName}>
+            <Th
+              className={styleOptions?.thClassName}
+              resizable={`${apiEndpoint.pathname}.leftCheckbox`}
+            >
               <Checkbox
                 innerRef={mainCheckbox}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -632,6 +635,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     setSort(data.sort);
                   }}
                   childrenClassName={styleOptions?.thChildrenClassName}
+                  resizable={`${apiEndpoint.pathname}.${column.id}`}
                 >
                   <div className="flex items-center space-x-3">
                     {dateRangeColumns.some(
