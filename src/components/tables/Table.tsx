@@ -22,6 +22,7 @@ interface Props extends CommonProps {
   onVerticalOverflowChange?: (overflow: boolean) => void;
   isDataLoading?: boolean;
   withTransparentBackground?: boolean;
+  height?: 'full';
 }
 
 export function Table(props: Props) {
@@ -83,11 +84,17 @@ export function Table(props: Props) {
       className={classNames('flex flex-col', {
         'mt-2': !props.withoutPadding,
       })}
+      style={{
+        height: props.height === 'full' ? '100%' : undefined,
+      }}
     >
       <div
         className={classNames('align-middle inline-block min-w-full', {
           'py-1.5': !props.withoutPadding,
         })}
+        style={{
+          height: props.height === 'full' ? '100%' : undefined,
+        }}
       >
         <div
           className={classNames(
@@ -105,6 +112,7 @@ export function Table(props: Props) {
               : colors.$1,
             color: colors.$3,
             borderColor: colors.$4,
+            height: props.height === 'full' ? '100%' : undefined,
           }}
         >
           <div
@@ -112,7 +120,7 @@ export function Table(props: Props) {
             className={`overflow-auto rounded ${props.className}`}
             style={{
               ...props.style,
-              height: manualTableHeight,
+              height: props.height === 'full' ? '100%' : manualTableHeight,
             }}
           >
             <table ref={handleTableHeight} className="min-w-full table-auto">

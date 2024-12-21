@@ -36,7 +36,6 @@ export function Activity() {
       className="relative"
       height="full"
       withoutBodyPadding
-      withScrollableBody
       renderFromShadcn
     >
       {isLoading && (
@@ -49,7 +48,10 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      <div className="pl-6 pr-4">
+      <div
+        className="pl-6 pr-4 overflow-y-auto"
+        style={{ height: 'calc(100% - 3.7rem)' }}
+      >
         <div className="flex flex-col pr-4">
           {data?.data.data &&
             data.data.data.map((record: ActivityRecord, index: number) => (

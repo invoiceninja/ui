@@ -98,11 +98,15 @@ export function RecentPayments() {
       withoutBodyPadding
       renderFromShadcn
     >
-      <div className="pl-6 pr-4">
+      <div
+        className="pl-6 pr-4 relative"
+        style={{ height: 'calc(100% - 3.625rem)' }}
+      >
         <DataTable
           resource="payment"
           columns={columns}
           className="pr-4"
+          height="full"
           endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&without_deleted_clients=true&page=1"
           withoutActions
           withoutPagination
@@ -119,9 +123,6 @@ export function RecentPayments() {
             tdClassName: 'first:pl-0 py-4',
             thClassName: 'first:pl-0',
             tBodyStyle: { border: 0 },
-          }}
-          style={{
-            height: '19.9rem',
           }}
         />
       </div>

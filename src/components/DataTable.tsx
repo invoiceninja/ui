@@ -153,6 +153,7 @@ interface Props<T> extends CommonProps {
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   withTransparentBackground?: boolean;
+  height?: 'full';
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -468,7 +469,12 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, []);
 
   return (
-    <div data-cy="dataTable">
+    <div
+      data-cy="dataTable"
+      style={{
+        height: props.height === 'full' ? '100%' : undefined,
+      }}
+    >
       {!props.withoutActions && (
         <Actions
           filter={filter}
@@ -590,6 +596,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         }
         isDataLoading={isLoading}
         style={props.style}
+        height={props.height}
         withTransparentBackground={props.withTransparentBackground}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>

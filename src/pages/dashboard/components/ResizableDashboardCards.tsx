@@ -157,8 +157,6 @@ const initialLayouts = {
       y: 1,
       w: 100,
       h: 6.3,
-      minH: 6.3,
-      minW: 100,
       isResizable: false,
     },
     {
@@ -167,8 +165,10 @@ const initialLayouts = {
       y: 2,
       w: 33,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 25,
+      maxH: 30,
+      maxW: 40,
     },
     {
       i: '3',
@@ -176,8 +176,10 @@ const initialLayouts = {
       y: 2,
       w: 66,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 40,
+      maxH: 30,
+      maxW: 100,
     },
     {
       i: '4',
@@ -185,8 +187,10 @@ const initialLayouts = {
       y: 3,
       w: 49.5,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 35,
+      maxH: 30,
+      maxW: 70,
     },
     {
       i: '5',
@@ -194,8 +198,10 @@ const initialLayouts = {
       y: 3,
       w: 49.5,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 35,
+      maxH: 30,
+      maxW: 70,
     },
     {
       i: '6',
@@ -203,8 +209,10 @@ const initialLayouts = {
       y: 4,
       w: 49.5,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 35,
+      maxH: 30,
+      maxW: 70,
     },
     {
       i: '7',
@@ -212,8 +220,10 @@ const initialLayouts = {
       y: 4,
       w: 49.5,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 35,
+      maxH: 30,
+      maxW: 70,
     },
     {
       i: '8',
@@ -221,8 +231,10 @@ const initialLayouts = {
       y: 5,
       w: 49.5,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 35,
+      maxH: 30,
+      maxW: 70,
     },
     {
       i: '9',
@@ -230,8 +242,10 @@ const initialLayouts = {
       y: 5,
       w: 49.5,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 35,
+      maxH: 30,
+      maxW: 70,
     },
     {
       i: '10',
@@ -239,8 +253,10 @@ const initialLayouts = {
       y: 6,
       w: 49.5,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 35,
+      maxH: 30,
+      maxW: 70,
     },
   ],
   md: [
@@ -863,7 +879,7 @@ export function ResizableDashboardCards() {
   useEffect(() => {
     if (layoutBreakpoint) {
       if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
-        setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
+        //setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
       }
 
       setIsLayoutsInitialized(true);
@@ -937,7 +953,8 @@ export function ResizableDashboardCards() {
           }
           onResizeStop={onResizeStop}
           onDragStop={onDragStop}
-          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+          //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+          resizeHandles={['se']}
         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
