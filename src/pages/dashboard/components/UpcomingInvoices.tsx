@@ -84,14 +84,19 @@ export function UpcomingInvoices() {
   return (
     <Card
       title={t('upcoming_invoices')}
-      className="h-96 relative"
+      className="h-full relative"
       withoutBodyPadding
+      renderFromShadcn
     >
-      <div className="pl-6 pr-4">
+      <div
+        className="pl-6 pr-4 relative"
+        style={{ height: 'calc(100% - 3.625rem)' }}
+      >
         <DataTable
           resource="invoice"
           columns={columns}
           className="pr-4"
+          height="full"
           endpoint="/api/v1/invoices?include=client.group_settings&upcoming=true&without_deleted_clients=true&per_page=50&page=1"
           withoutActions
           withoutPagination
@@ -108,9 +113,6 @@ export function UpcomingInvoices() {
             tdClassName: 'first:pl-0 py-4',
             thClassName: 'first:pl-0',
             tBodyStyle: { border: 0 },
-          }}
-          style={{
-            height: '19.9rem',
           }}
           withoutSortQueryParameter
         />
