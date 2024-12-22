@@ -59,6 +59,8 @@ import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { DashboardCard } from './DashboardCard';
 import { MdRefresh } from 'react-icons/md';
+import { toast } from '$app/common/helpers/toast/toast';
+import { RestoreCardsModal } from './RestoreCardsModal';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -73,6 +75,8 @@ interface Currency {
   value: string;
   label: string;
 }
+
+type CardName = 'account_login_text';
 
 export type DashboardGridLayouts = GridLayout.Layouts;
 
@@ -150,12 +154,20 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 
 const initialLayouts = {
   lg: [
-    { i: '0', x: 30, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '0',
+      x: 300,
+      y: 0,
+      w: 1000,
+      h: 2.8,
+      isResizable: false,
+      static: true,
+    },
     {
       i: '1',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 6.3,
       isResizable: false,
     },
@@ -163,512 +175,572 @@ const initialLayouts = {
       i: '2',
       x: 0,
       y: 2,
-      w: 33,
+      w: 330,
       h: 25.4,
       minH: 20,
-      minW: 25,
+      minW: 250,
       maxH: 30,
-      maxW: 40,
+      maxW: 400,
     },
     {
       i: '3',
-      x: 40,
+      x: 400,
       y: 2,
-      w: 66,
+      w: 660,
       h: 25.4,
       minH: 20,
-      minW: 40,
+      minW: 400,
       maxH: 30,
-      maxW: 100,
+      maxW: 1000,
     },
     {
       i: '4',
       x: 0,
       y: 3,
-      w: 49.5,
+      w: 495,
       h: 20,
       minH: 16,
-      minW: 35,
+      minW: 350,
       maxH: 30,
-      maxW: 70,
+      maxW: 700,
     },
     {
       i: '5',
-      x: 51,
+      x: 510,
       y: 3,
-      w: 49.5,
+      w: 495,
       h: 20,
       minH: 16,
-      minW: 35,
+      minW: 350,
       maxH: 30,
-      maxW: 70,
+      maxW: 700,
     },
     {
       i: '6',
       x: 0,
       y: 4,
-      w: 49.5,
+      w: 495,
       h: 20,
       minH: 16,
-      minW: 35,
+      minW: 350,
       maxH: 30,
-      maxW: 70,
+      maxW: 700,
     },
     {
       i: '7',
-      x: 51,
+      x: 510,
       y: 4,
-      w: 49.5,
+      w: 495,
       h: 20,
       minH: 16,
-      minW: 35,
+      minW: 350,
       maxH: 30,
-      maxW: 70,
+      maxW: 700,
     },
     {
       i: '8',
       x: 0,
       y: 5,
-      w: 49.5,
+      w: 495,
       h: 20,
       minH: 16,
-      minW: 35,
+      minW: 350,
       maxH: 30,
-      maxW: 70,
+      maxW: 700,
     },
     {
       i: '9',
-      x: 51,
+      x: 510,
       y: 5,
-      w: 49.5,
+      w: 495,
       h: 20,
       minH: 16,
-      minW: 35,
+      minW: 350,
       maxH: 30,
-      maxW: 70,
+      maxW: 700,
     },
     {
       i: '10',
       x: 0,
       y: 6,
-      w: 49.5,
+      w: 495,
       h: 20,
       minH: 16,
-      minW: 35,
+      minW: 350,
       maxH: 30,
-      maxW: 70,
+      maxW: 700,
     },
   ],
   md: [
-    { i: '0', x: 30, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '0',
+      x: 300,
+      y: 0,
+      w: 1000,
+      h: 2.8,
+      isResizable: false,
+      static: true,
+    },
     {
       i: '1',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 6.3,
-      minH: 6.3,
-      minW: 100,
       isResizable: false,
     },
     {
       i: '2',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '3',
       x: 0,
       y: 2,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '4',
       x: 0,
       y: 3,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '5',
       x: 0,
       y: 4,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '6',
       x: 0,
       y: 5,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '7',
       x: 0,
       y: 6,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '8',
       x: 0,
       y: 7,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '9',
       x: 0,
       y: 8,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '10',
       x: 0,
       y: 9,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
-    },
-    {
-      i: '11',
-      x: 0,
-      y: 1,
-      w: 40,
-      h: 30,
-      minH: 10,
-      minW: 10,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
   ],
   sm: [
-    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '0',
+      x: 300,
+      y: 0,
+      w: 1000,
+      h: 2.8,
+      isResizable: false,
+      static: true,
+    },
     {
       i: '1',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 6.3,
-      minH: 6.3,
-      minW: 100,
       isResizable: false,
     },
     {
       i: '2',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '3',
       x: 0,
       y: 2,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '4',
       x: 0,
       y: 3,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '5',
       x: 0,
       y: 4,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '6',
       x: 0,
       y: 5,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '7',
       x: 0,
       y: 6,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '8',
       x: 0,
       y: 7,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '9',
       x: 0,
       y: 8,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '10',
       x: 0,
       y: 9,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
-    },
-    {
-      i: '11',
-      x: 0,
-      y: 1,
-      w: 40,
-      h: 30,
-      minH: 10,
-      minW: 10,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
   ],
   xs: [
-    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '0',
+      x: 300,
+      y: 0,
+      w: 1000,
+      h: 2.8,
+      isResizable: false,
+      static: true,
+    },
     {
       i: '1',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 6.3,
-      minH: 6.3,
-      minW: 100,
       isResizable: false,
     },
     {
       i: '2',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '3',
       x: 0,
       y: 2,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '4',
       x: 0,
       y: 3,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '5',
       x: 0,
       y: 4,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '6',
       x: 0,
       y: 5,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '7',
       x: 0,
       y: 6,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '8',
       x: 0,
       y: 7,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '9',
       x: 0,
       y: 8,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '10',
       x: 0,
       y: 9,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
-    },
-    {
-      i: '11',
-      x: 0,
-      y: 1,
-      w: 40,
-      h: 30,
-      minH: 10,
-      minW: 10,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
   ],
   xxs: [
-    { i: '0', x: 80, y: 0, w: 100, h: 2.8, isResizable: false, static: true },
+    {
+      i: '0',
+      x: 300,
+      y: 0,
+      w: 1000,
+      h: 2.8,
+      isResizable: false,
+      static: true,
+    },
     {
       i: '1',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 6.3,
-      minH: 6.3,
-      minW: 100,
       isResizable: false,
     },
     {
       i: '2',
       x: 0,
       y: 1,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '3',
       x: 0,
       y: 2,
-      w: 100,
+      w: 1000,
       h: 25.4,
-      minH: 18.144,
-      minW: 18,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '4',
       x: 0,
       y: 3,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '5',
       x: 0,
       y: 4,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '6',
       x: 0,
       y: 5,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '7',
       x: 0,
       y: 6,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '8',
       x: 0,
       y: 7,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '9',
       x: 0,
       y: 8,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
     {
       i: '10',
       x: 0,
       y: 9,
-      w: 100,
+      w: 1000,
       h: 20,
-      minH: 18.144,
-      minW: 18,
-    },
-    {
-      i: '11',
-      x: 0,
-      y: 1,
-      w: 40,
-      h: 30,
-      minH: 10,
-      minW: 10,
+      minH: 16,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
     },
   ],
 };
@@ -694,9 +766,9 @@ export function ResizableDashboardCards() {
   const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>();
   const [layouts, setLayouts] = useState<DashboardGridLayouts>(initialLayouts);
 
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isLayoutsInitialized, setIsLayoutsInitialized] =
     useState<boolean>(false);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   const chartScale =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
@@ -822,6 +894,8 @@ export function ResizableDashboardCards() {
     // delete updatedUser.company_user.react_settings
     //   .dashboard_cards_configuration;
 
+    // delete updatedUser.company_user.react_settings.removed_dashboard_cards;
+
     request(
       'PUT',
       endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
@@ -833,6 +907,43 @@ export function ResizableDashboardCards() {
 
       dispatch(updateUser(updatedUser));
     });
+  };
+
+  const handleRemoveCard = (cardName: CardName) => {
+    toast.processing();
+
+    const updatedUser = cloneDeep(user) as User;
+
+    const removedCards =
+      settings?.removed_dashboard_cards?.[layoutBreakpoint || ''] || [];
+
+    set(
+      updatedUser,
+      `company_user.react_settings.removed_dashboard_cards.${layoutBreakpoint}`,
+      [...removedCards, cardName]
+    );
+
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+      updatedUser
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(updatedUser, 'company_user', response.data.data);
+
+      toast.success('removed');
+
+      $refetch(['company_users']);
+
+      dispatch(updateUser(updatedUser));
+    });
+  };
+
+  const isCardRemoved = (cardName: CardName) => {
+    if (!layoutBreakpoint) return false;
+
+    return settings?.removed_dashboard_cards?.[
+      layoutBreakpoint || ''
+    ]?.includes(cardName);
   };
 
   useEffect(() => {
@@ -879,10 +990,10 @@ export function ResizableDashboardCards() {
   useEffect(() => {
     if (layoutBreakpoint) {
       if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
-        //setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
-      }
+        setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
 
-      setIsLayoutsInitialized(true);
+        setIsLayoutsInitialized(true);
+      }
     }
   }, [layoutBreakpoint]);
 
@@ -941,7 +1052,7 @@ export function ResizableDashboardCards() {
             xxs: 0,
           }}
           layouts={layouts}
-          cols={{ lg: 100, md: 100, sm: 60, xs: 40, xxs: 30 }}
+          cols={{ lg: 1000, md: 1000, sm: 1000, xs: 1000, xxs: 1000 }}
           draggableHandle=".drag-handle"
           margin={[0, 20]}
           rowHeight={1}
@@ -955,6 +1066,7 @@ export function ResizableDashboardCards() {
           onDragStop={onDragStop}
           //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           resizeHandles={['se']}
+          compactType="vertical"
         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
@@ -1083,25 +1195,32 @@ export function ResizableDashboardCards() {
               </div>
 
               {isEditMode && (
-                <div
-                  className="flex items-center cursor-pointer"
-                  onClick={() => {
-                    layoutBreakpoint &&
-                      setLayouts((currentLayouts) => ({
-                        ...currentLayouts,
-                        [layoutBreakpoint]:
-                          initialLayouts[
-                            layoutBreakpoint as keyof typeof initialLayouts
-                          ],
-                      }));
+                <>
+                  <RestoreCardsModal
+                    layoutBreakpoint={layoutBreakpoint}
+                    updateLayoutHeight={updateLayoutHeight}
+                  />
 
-                    setTimeout(() => {
-                      updateLayoutHeight();
-                    }, 100);
-                  }}
-                >
-                  <Icon element={MdRefresh} size={23} />
-                </div>
+                  <div
+                    className="flex items-center cursor-pointer"
+                    onClick={() => {
+                      layoutBreakpoint &&
+                        setLayouts((currentLayouts) => ({
+                          ...currentLayouts,
+                          [layoutBreakpoint]:
+                            initialLayouts[
+                              layoutBreakpoint as keyof typeof initialLayouts
+                            ],
+                        }));
+
+                      setTimeout(() => {
+                        updateLayoutHeight();
+                      }, 100);
+                    }}
+                  >
+                    <Icon element={MdRefresh} size={23} />
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -1127,7 +1246,7 @@ export function ResizableDashboardCards() {
             )}
           </div>
 
-          {company && (
+          {company && !isCardRemoved('account_login_text') ? (
             <div
               key="2"
               className={classNames('drag-handle', {
@@ -1139,11 +1258,13 @@ export function ResizableDashboardCards() {
                 height="full"
                 withScrollableBody
                 topRight={
-                  isEditMode && (
-                    <Button behavior="button" type="secondary">
-                      {t('remove')}
-                    </Button>
-                  )
+                  <Button
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('account_login_text')}
+                  >
+                    {t('remove')}
+                  </Button>
                 }
                 renderFromShadcn
               >
@@ -1269,7 +1390,7 @@ export function ResizableDashboardCards() {
                 </div>
               </Card>
             </div>
-          )}
+          ) : null}
 
           {chartData && (
             <div

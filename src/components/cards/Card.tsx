@@ -89,11 +89,19 @@ export function Card(props: Props) {
       >
         {Boolean(props.title || props.description) && (
           <CardHeader>
-            {props.title && <CardTitle>{props.title}</CardTitle>}
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col justify-start space-y-2">
+                {props.title && <CardTitle>{props.title}</CardTitle>}
 
-            {props.description && (
-              <CardDescription>{props.description}</CardDescription>
-            )}
+                {props.description && (
+                  <CardDescription>{props.description}</CardDescription>
+                )}
+              </div>
+
+              {props.topRight && (
+                <div className="flex justify-end">{props.topRight}</div>
+              )}
+            </div>
           </CardHeader>
         )}
 

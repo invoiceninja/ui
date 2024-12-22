@@ -16,6 +16,7 @@ import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
+import { DashboardGridLayouts } from '$app/pages/dashboard/components/ResizableDashboardCards';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -52,6 +53,28 @@ export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
 
 type ColorTheme = Record<ThemeColorField, string>;
 
+export type DashboardConfigurationBreakpoint =
+  | 'xxs'
+  | 'xs'
+  | 'sm'
+  | 'md'
+  | 'lg';
+
+export interface DashboardCardConfiguration {
+  i: string;
+  h: number;
+  w: number;
+  x: number;
+  y: number;
+  minH: number;
+  minW: number;
+  maxH: number;
+  maxW: number;
+  isResizable: boolean;
+  moved: boolean;
+  static: boolean;
+}
+
 export interface ReactSettings {
   show_pdf_preview: boolean;
   react_table_columns?: Record<ReactTableColumns, string[]>;
@@ -67,7 +90,8 @@ export interface ReactSettings {
   show_table_footer?: boolean;
   dark_mode?: boolean;
   color_theme?: ColorTheme;
-  dashboard_cards_configuration?: any;
+  dashboard_cards_configuration?: DashboardGridLayouts;
+  removed_dashboard_cards?: Record<string, string[]>;
 }
 
 export type ReactTableColumns =
