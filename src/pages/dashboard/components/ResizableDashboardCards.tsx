@@ -153,6 +153,242 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 };
 
 const initialLayouts = {
+  xxl: [
+    {
+      i: '0',
+      x: 300,
+      y: 0,
+      w: 1000,
+      h: 2.8,
+      isResizable: false,
+      static: true,
+    },
+    {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 1000,
+      h: 6.3,
+      isResizable: false,
+    },
+    {
+      i: '2',
+      x: 0,
+      y: 2,
+      w: 330,
+      h: 25.4,
+      minH: 20,
+      minW: 250,
+      maxH: 30,
+      maxW: 400,
+    },
+    {
+      i: '3',
+      x: 400,
+      y: 2,
+      w: 660,
+      h: 25.4,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
+    },
+    {
+      i: '4',
+      x: 0,
+      y: 3,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '5',
+      x: 510,
+      y: 3,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '6',
+      x: 0,
+      y: 4,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '7',
+      x: 510,
+      y: 4,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '8',
+      x: 0,
+      y: 5,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '9',
+      x: 510,
+      y: 5,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '10',
+      x: 0,
+      y: 6,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+  ],
+  xl: [
+    {
+      i: '0',
+      x: 300,
+      y: 0,
+      w: 1000,
+      h: 2.8,
+      isResizable: false,
+      static: true,
+    },
+    {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 1000,
+      h: 6.3,
+      isResizable: false,
+    },
+    {
+      i: '2',
+      x: 0,
+      y: 2,
+      w: 330,
+      h: 25.4,
+      minH: 20,
+      minW: 250,
+      maxH: 30,
+      maxW: 400,
+    },
+    {
+      i: '3',
+      x: 400,
+      y: 2,
+      w: 660,
+      h: 25.4,
+      minH: 20,
+      minW: 400,
+      maxH: 30,
+      maxW: 1000,
+    },
+    {
+      i: '4',
+      x: 0,
+      y: 3,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '5',
+      x: 510,
+      y: 3,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '6',
+      x: 0,
+      y: 4,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '7',
+      x: 510,
+      y: 4,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '8',
+      x: 0,
+      y: 5,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '9',
+      x: 510,
+      y: 5,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+    {
+      i: '10',
+      x: 0,
+      y: 6,
+      w: 495,
+      h: 20,
+      minH: 16,
+      minW: 350,
+      maxH: 30,
+      maxW: 700,
+    },
+  ],
   lg: [
     {
       i: '0',
@@ -851,18 +1087,38 @@ export function ResizableDashboardCards() {
   };
 
   const updateLayoutHeight = () => {
-    const currentWidth = document.getElementById('cardsContainer')?.clientWidth;
-
-    if (!currentWidth) return;
-
-    const cardWidth = 240;
-    const gap = 12;
     const totalCards =
       user?.company_user?.settings.dashboard_fields?.length || 0;
-    const cardsPerRow = Math.floor((currentWidth + gap) / (cardWidth + gap));
-    const numberOfRows = Math.ceil(
-      totalCards / (totalCards ? cardsPerRow || 1 : 0)
-    );
+    let cardsPerRow = 0;
+
+    switch (layoutBreakpoint) {
+      case 'xxl':
+        cardsPerRow = 6;
+        break;
+      case 'xl':
+        cardsPerRow = 5;
+        break;
+      case 'lg':
+        cardsPerRow = 4;
+        break;
+      case 'md':
+        cardsPerRow = 3;
+        break;
+      case 'sm':
+        cardsPerRow = 2;
+        break;
+      case 'xs':
+        cardsPerRow = 1;
+        break;
+      case 'xxs':
+        cardsPerRow = 1;
+        break;
+      default:
+        cardsPerRow = 6;
+        break;
+    }
+
+    const numberOfRows = Math.ceil(totalCards / cardsPerRow);
 
     setLayouts((currentLayouts) => {
       const updatedLayouts = cloneDeep(currentLayouts);
@@ -994,27 +1250,10 @@ export function ResizableDashboardCards() {
 
         setIsLayoutsInitialized(true);
       }
+
+      updateLayoutHeight();
     }
   }, [layoutBreakpoint]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (isLayoutsInitialized) {
-        updateLayoutHeight();
-      }
-    };
-
-    updateLayoutHeight();
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [
-    user?.company_user?.settings.dashboard_fields?.length,
-    isLayoutsInitialized,
-  ]);
 
   useDebounce(
     () => {
@@ -1045,6 +1284,8 @@ export function ResizableDashboardCards() {
         <ResponsiveGridLayout
           className="layout"
           breakpoints={{
+            xxl: 1400,
+            xl: 1200,
             lg: 1000,
             md: 800,
             sm: 600,
@@ -1052,7 +1293,15 @@ export function ResizableDashboardCards() {
             xxs: 0,
           }}
           layouts={layouts}
-          cols={{ lg: 1000, md: 1000, sm: 1000, xs: 1000, xxs: 1000 }}
+          cols={{
+            xxl: 1000,
+            xl: 1000,
+            lg: 1000,
+            md: 1000,
+            sm: 1000,
+            xs: 1000,
+            xxs: 1000,
+          }}
           draggableHandle=".drag-handle"
           margin={[0, 20]}
           rowHeight={1}
@@ -1066,7 +1315,6 @@ export function ResizableDashboardCards() {
           onDragStop={onDragStop}
           //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           resizeHandles={['se']}
-          compactType="vertical"
         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
@@ -1228,8 +1476,12 @@ export function ResizableDashboardCards() {
           <div
             key="1"
             id="cardsContainer"
-            className={classNames('flex flex-wrap gap-3 drag-handle', {
-              'cursor-grab': isEditMode,
+            className={classNames('grid gap-3 drag-handle', {
+              'grid-cols-10': layoutBreakpoint === 'xl',
+              'grid-cols-12':
+                layoutBreakpoint === 'xxl' ||
+                (layoutBreakpoint !== 'xl' && layoutBreakpoint !== 'xxl') ||
+                !layoutBreakpoint,
             })}
           >
             {user?.company_user?.settings.dashboard_fields?.map(
@@ -1241,6 +1493,7 @@ export function ResizableDashboardCards() {
                   startDate={dates.start_date}
                   endDate={dates.end_date}
                   currencyId={currency.toString()}
+                  layoutBreakpoint={layoutBreakpoint}
                 />
               )
             )}

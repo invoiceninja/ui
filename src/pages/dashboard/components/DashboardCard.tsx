@@ -18,6 +18,7 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
 import { Card as ShadcnCard } from '../../../../components/ui/card';
+import classNames from 'classnames';
 
 interface DashboardCardsProps {
   dateRange: string;
@@ -28,6 +29,7 @@ interface DashboardCardsProps {
 
 interface CardProps extends DashboardCardsProps {
   field: DashboardField;
+  layoutBreakpoint: string | undefined;
 }
 
 export const PERIOD_LABELS = {
@@ -81,7 +83,19 @@ export function DashboardCard(props: CardProps) {
   }, [field]);
 
   return (
-    <ShadcnCard className="px-6 py-6 w-60">
+    <ShadcnCard
+      className={classNames('px-6 py-6', {
+        'col-span-2':
+          props.layoutBreakpoint === 'xxl' ||
+          props.layoutBreakpoint === 'xl' ||
+          !props.layoutBreakpoint,
+        'col-span-3': props.layoutBreakpoint === 'lg',
+        'col-span-4': props.layoutBreakpoint === 'md',
+        'col-span-6': props.layoutBreakpoint === 'sm',
+        'col-span-12':
+          props.layoutBreakpoint === 'xs' || props.layoutBreakpoint === 'xxs',
+      })}
+    >
       {isFormBusy && (
         <div className="flex items-center justify-center">
           <Spinner />
