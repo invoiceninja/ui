@@ -18,7 +18,7 @@ import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClose, MdRestorePage } from 'react-icons/md';
 import styled from 'styled-components';
@@ -29,7 +29,7 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
-import { initialLayouts } from './ResizableDashboardCards';
+import { DashboardGridLayouts } from './ResizableDashboardCards';
 
 const StyledDiv = styled.div`
   &:hover {
@@ -41,14 +41,13 @@ const StyledDiv = styled.div`
 
 interface Props {
   layoutBreakpoint: string | undefined;
-  updateLayoutHeight: () => void;
-  setLayouts: any;
+  setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
 }
 
 export function RestoreCardsModal(props: Props) {
   const [t] = useTranslation();
 
-  const { updateLayoutHeight, layoutBreakpoint } = props;
+  const { layoutBreakpoint } = props;
 
   const dispatch = useDispatch();
 
@@ -92,13 +91,12 @@ export function RestoreCardsModal(props: Props) {
 
           dispatch(updateUser(updatedUser));
 
-          setTimeout(() => {
-            props.setLayouts(cloneDeep(initialLayouts));
-          }, 200);
-
-          setTimeout(() => {
-            updateLayoutHeight();
-          }, 250);
+          props.setLayouts(
+            cloneDeep(
+              response.data.data.react_settings
+                .dashboard_cards_configuration as DashboardGridLayouts
+            )
+          );
 
           setTimeout(() => {
             handleOnClose();

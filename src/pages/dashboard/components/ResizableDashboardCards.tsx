@@ -1255,12 +1255,6 @@ export function ResizableDashboardCards() {
     }
   }, [layoutBreakpoint]);
 
-  useEffect(() => {
-    if (isLayoutsInitialized && settings?.dashboard_cards_configuration) {
-      //setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
-    }
-  }, [settings?.dashboard_cards_configuration]);
-
   useDebounce(
     () => {
       if (
@@ -1319,6 +1313,45 @@ export function ResizableDashboardCards() {
           }
           onResizeStop={onResizeStop}
           onDragStop={onDragStop}
+          onLayoutChange={(currentLayout) => {
+            if (layoutBreakpoint) {
+              let isAnyRestored = false;
+
+              setLayouts((currentLayouts) => ({
+                ...currentLayouts,
+                [layoutBreakpoint]: currentLayout.map((layoutCard) => {
+                  if (layoutCard.h === 1 && layoutCard.w === 1) {
+                    const initialCardLayout = initialLayouts[
+                      layoutBreakpoint as keyof typeof initialLayouts
+                    ]?.find((initial) => initial.i === layoutCard.i);
+
+                    if (initialCardLayout) {
+                      isAnyRestored = true;
+                    }
+
+                    return initialCardLayout
+                      ? { ...initialCardLayout, y: Infinity }
+                      : layoutCard;
+                  }
+
+                  return layoutCard;
+                }),
+              }));
+
+              setTimeout(() => {
+                updateLayoutHeight();
+              }, 100);
+
+              setTimeout(() => {
+                if (isAnyRestored) {
+                  window.scrollTo({
+                    top: 10100,
+                    behavior: 'smooth',
+                  });
+                }
+              }, 250);
+            }
+          }}
           //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           resizeHandles={['se']}
         >
@@ -1452,7 +1485,6 @@ export function ResizableDashboardCards() {
                 <>
                   <RestoreCardsModal
                     layoutBreakpoint={layoutBreakpoint}
-                    updateLayoutHeight={updateLayoutHeight}
                     setLayouts={setLayouts}
                   />
 
@@ -1480,16 +1512,16 @@ export function ResizableDashboardCards() {
             </div>
           </div>
 
-          {settings?.dashboard_cards_configuration && (
+          {user?.company_user?.settings.dashboard_fields?.length ? (
             <div
               key="1"
-              id="cardsContainer"
               className={classNames('grid gap-3 drag-handle', {
                 'grid-cols-10': layoutBreakpoint === 'xl',
                 'grid-cols-12':
                   layoutBreakpoint === 'xxl' ||
                   (layoutBreakpoint !== 'xl' && layoutBreakpoint !== 'xxl') ||
                   !layoutBreakpoint,
+                'cursor-grab': isEditMode,
               })}
             >
               {user?.company_user?.settings.dashboard_fields?.map(
@@ -1506,7 +1538,7 @@ export function ResizableDashboardCards() {
                 )
               )}
             </div>
-          )}
+          ) : null}
 
           {company && !isCardRemoved('account_login_text') ? (
             <div key="2">
