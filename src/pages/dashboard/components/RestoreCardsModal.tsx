@@ -29,6 +29,7 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
+import { initialLayouts } from './ResizableDashboardCards';
 
 const StyledDiv = styled.div`
   &:hover {
@@ -41,6 +42,7 @@ const StyledDiv = styled.div`
 interface Props {
   layoutBreakpoint: string | undefined;
   updateLayoutHeight: () => void;
+  setLayouts: any;
 }
 
 export function RestoreCardsModal(props: Props) {
@@ -91,12 +93,16 @@ export function RestoreCardsModal(props: Props) {
           dispatch(updateUser(updatedUser));
 
           setTimeout(() => {
-            handleOnClose();
-          }, 100);
+            props.setLayouts(cloneDeep(initialLayouts));
+          }, 200);
 
           setTimeout(() => {
             updateLayoutHeight();
-          }, 200);
+          }, 250);
+
+          setTimeout(() => {
+            handleOnClose();
+          }, 100);
         })
         .finally(() => setIsFormBusy(false));
     }

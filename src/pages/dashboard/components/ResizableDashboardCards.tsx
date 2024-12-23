@@ -152,7 +152,7 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
   },
 };
 
-const initialLayouts = {
+export const initialLayouts = {
   xxl: [
     {
       i: '0',
@@ -1255,6 +1255,12 @@ export function ResizableDashboardCards() {
     }
   }, [layoutBreakpoint]);
 
+  useEffect(() => {
+    if (isLayoutsInitialized && settings?.dashboard_cards_configuration) {
+      //setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
+    }
+  }, [settings?.dashboard_cards_configuration]);
+
   useDebounce(
     () => {
       if (
@@ -1447,6 +1453,7 @@ export function ResizableDashboardCards() {
                   <RestoreCardsModal
                     layoutBreakpoint={layoutBreakpoint}
                     updateLayoutHeight={updateLayoutHeight}
+                    setLayouts={setLayouts}
                   />
 
                   <div
@@ -1473,55 +1480,61 @@ export function ResizableDashboardCards() {
             </div>
           </div>
 
-          <div
-            key="1"
-            id="cardsContainer"
-            className={classNames('grid gap-3 drag-handle', {
-              'grid-cols-10': layoutBreakpoint === 'xl',
-              'grid-cols-12':
-                layoutBreakpoint === 'xxl' ||
-                (layoutBreakpoint !== 'xl' && layoutBreakpoint !== 'xxl') ||
-                !layoutBreakpoint,
-            })}
-          >
-            {user?.company_user?.settings.dashboard_fields?.map(
-              (field, index) => (
-                <DashboardCard
-                  key={(20 + index).toString()}
-                  field={field}
-                  dateRange={dateRange}
-                  startDate={dates.start_date}
-                  endDate={dates.end_date}
-                  currencyId={currency.toString()}
-                  layoutBreakpoint={layoutBreakpoint}
-                />
-              )
-            )}
-          </div>
-
-          {company && !isCardRemoved('account_login_text') ? (
+          {settings?.dashboard_cards_configuration && (
             <div
-              key="2"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
+              key="1"
+              id="cardsContainer"
+              className={classNames('grid gap-3 drag-handle', {
+                'grid-cols-10': layoutBreakpoint === 'xl',
+                'grid-cols-12':
+                  layoutBreakpoint === 'xxl' ||
+                  (layoutBreakpoint !== 'xl' && layoutBreakpoint !== 'xxl') ||
+                  !layoutBreakpoint,
               })}
             >
+              {user?.company_user?.settings.dashboard_fields?.map(
+                (field, index) => (
+                  <DashboardCard
+                    key={(20 + index).toString()}
+                    field={field}
+                    dateRange={dateRange}
+                    startDate={dates.start_date}
+                    endDate={dates.end_date}
+                    currencyId={currency.toString()}
+                    layoutBreakpoint={layoutBreakpoint}
+                  />
+                )
+              )}
+            </div>
+          )}
+
+          {company && !isCardRemoved('account_login_text') ? (
+            <div key="2">
               <Card
                 title={t('account_login_text')}
                 height="full"
+                titleDescriptionParentClassName={classNames('drag-handle', {
+                  'cursor-grab': isEditMode,
+                })}
                 withScrollableBody
                 topRight={
-                  <Button
-                    behavior="button"
-                    type="secondary"
-                    onClick={() => handleRemoveCard('account_login_text')}
-                  >
-                    {t('remove')}
-                  </Button>
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('account_login_text')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
                 }
                 renderFromShadcn
               >
-                <div className="pb-8">
+                <div
+                  className={classNames('drag-handle pb-8', {
+                    'cursor-grab': isEditMode,
+                  })}
+                >
                   <div className="flex flex-col space-y-1 px-6">
                     <span className="text-lg">{`${user?.first_name} ${user?.last_name}`}</span>
 

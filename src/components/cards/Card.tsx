@@ -64,6 +64,7 @@ interface Props {
   topRight?: ReactNode;
   height?: 'full';
   renderFromShadcn?: boolean;
+  titleDescriptionParentClassName?: string;
 }
 
 export function Card(props: Props) {
@@ -90,7 +91,12 @@ export function Card(props: Props) {
         {Boolean(props.title || props.description) && (
           <CardHeader>
             <div className="flex items-center justify-between">
-              <div className="flex flex-col justify-start space-y-2">
+              <div
+                className={classNames(
+                  'flex flex-col justify-start space-y-2',
+                  props.titleDescriptionParentClassName
+                )}
+              >
                 {props.title && <CardTitle>{props.title}</CardTitle>}
 
                 {props.description && (
