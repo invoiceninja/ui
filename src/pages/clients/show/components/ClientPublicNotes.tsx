@@ -29,7 +29,7 @@ export function ClientPublicNotes(props: Props) {
   return (
     <>
       {Boolean(client && client.public_notes) && (
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+        <div className="col-span-12 md:col-span-6 lg:col-span-6 xl:col-span-3">
           <InfoCard
             title={t('public_notes')}
             value={

@@ -105,7 +105,7 @@ export function PublicNotificationsModal() {
               handleSave();
             }}
           >
-            {t('save_changes')}
+            {t('continue')}
           </Button>
         </div>
       </Modal>
