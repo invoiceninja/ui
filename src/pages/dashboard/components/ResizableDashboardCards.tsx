@@ -58,9 +58,9 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { DashboardCard } from './DashboardCard';
-import { MdRefresh } from 'react-icons/md';
 import { toast } from '$app/common/helpers/toast/toast';
 import { RestoreCardsModal } from './RestoreCardsModal';
+import { RestoreLayoutAction } from './RestoreLayoutAction';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -76,7 +76,16 @@ interface Currency {
   label: string;
 }
 
-type CardName = 'account_login_text';
+type CardName =
+  | 'account_login_text'
+  | 'upcoming_invoices'
+  | 'upcoming_recurring_invoices'
+  | 'upcoming_quotes'
+  | 'expired_quotes'
+  | 'past_due_invoices'
+  | 'activity'
+  | 'recent_payments'
+  | 'overview';
 
 export type DashboardGridLayouts = GridLayout.Layouts;
 
@@ -1005,6 +1014,7 @@ export function ResizableDashboardCards() {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isLayoutsInitialized, setIsLayoutsInitialized] =
     useState<boolean>(false);
+  const [areCardsRestored, setAreCardsRestored] = useState<boolean>(false);
 
   const chartScale =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
@@ -1202,12 +1212,55 @@ export function ResizableDashboardCards() {
     ]?.includes(cardName);
   };
 
+  const handleOnLayoutChange = (currentLayout: GridLayout.Layout[]) => {
+    if (layoutBreakpoint) {
+      let isAnyRestored = false;
+
+      setLayouts((currentLayouts) => ({
+        ...currentLayouts,
+        [layoutBreakpoint]: currentLayout.map((layoutCard) => {
+          if (layoutCard.h === 1 && layoutCard.w === 1) {
+            const initialCardLayout = initialLayouts[
+              layoutBreakpoint as keyof typeof initialLayouts
+            ]?.find((initial) => initial.i === layoutCard.i);
+
+            if (initialCardLayout) {
+              isAnyRestored = true;
+            }
+
+            return initialCardLayout
+              ? { ...initialCardLayout, y: Infinity }
+              : layoutCard;
+          }
+
+          return layoutCard;
+        }),
+      }));
+
+      setTimeout(() => {
+        if (isAnyRestored) {
+          setAreCardsRestored(false);
+
+          window.scrollTo({
+            top:
+              document.querySelector('.responsive-grid-box')?.scrollHeight || 0,
+            behavior: 'smooth',
+          });
+        }
+      }, 450);
+    }
+  };
+
   useEffect(() => {
     setBody((current) => ({
       ...current,
       date_range: dateRange,
     }));
   }, [settings?.preferences?.dashboard_charts?.range]);
+
+  useEffect(() => {
+    updateLayoutHeight();
+  }, [user?.company_user?.settings.dashboard_fields?.length]);
 
   useEffect(() => {
     if (totals.data) {
@@ -1282,7 +1335,7 @@ export function ResizableDashboardCards() {
     <div className={classNames('w-full', { 'select-none': isEditMode })}>
       {!totals.isLoading ? (
         <ResponsiveGridLayout
-          className="layout"
+          className="layout responsive-grid-box"
           breakpoints={{
             xxl: 1400,
             xl: 1200,
@@ -1313,45 +1366,9 @@ export function ResizableDashboardCards() {
           }
           onResizeStop={onResizeStop}
           onDragStop={onDragStop}
-          onLayoutChange={(currentLayout) => {
-            if (layoutBreakpoint) {
-              let isAnyRestored = false;
-
-              setLayouts((currentLayouts) => ({
-                ...currentLayouts,
-                [layoutBreakpoint]: currentLayout.map((layoutCard) => {
-                  if (layoutCard.h === 1 && layoutCard.w === 1) {
-                    const initialCardLayout = initialLayouts[
-                      layoutBreakpoint as keyof typeof initialLayouts
-                    ]?.find((initial) => initial.i === layoutCard.i);
-
-                    if (initialCardLayout) {
-                      isAnyRestored = true;
-                    }
-
-                    return initialCardLayout
-                      ? { ...initialCardLayout, y: Infinity }
-                      : layoutCard;
-                  }
-
-                  return layoutCard;
-                }),
-              }));
-
-              setTimeout(() => {
-                updateLayoutHeight();
-              }, 100);
-
-              setTimeout(() => {
-                if (isAnyRestored) {
-                  window.scrollTo({
-                    top: 10100,
-                    behavior: 'smooth',
-                  });
-                }
-              }, 250);
-            }
-          }}
+          onLayoutChange={(current) =>
+            areCardsRestored && handleOnLayoutChange(current)
+          }
           //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           resizeHandles={['se']}
         >
@@ -1486,27 +1503,14 @@ export function ResizableDashboardCards() {
                   <RestoreCardsModal
                     layoutBreakpoint={layoutBreakpoint}
                     setLayouts={setLayouts}
+                    setAreCardsRestored={setAreCardsRestored}
                   />
 
-                  <div
-                    className="flex items-center cursor-pointer"
-                    onClick={() => {
-                      layoutBreakpoint &&
-                        setLayouts((currentLayouts) => ({
-                          ...currentLayouts,
-                          [layoutBreakpoint]:
-                            initialLayouts[
-                              layoutBreakpoint as keyof typeof initialLayouts
-                            ],
-                        }));
-
-                      setTimeout(() => {
-                        updateLayoutHeight();
-                      }, 100);
-                    }}
-                  >
-                    <Icon element={MdRefresh} size={23} />
-                  </div>
+                  <RestoreLayoutAction
+                    layoutBreakpoint={layoutBreakpoint}
+                    updateLayoutHeight={updateLayoutHeight}
+                    setLayouts={setLayouts}
+                  />
                 </>
               )}
             </div>
@@ -1690,105 +1694,210 @@ export function ResizableDashboardCards() {
             </div>
           ) : null}
 
-          {chartData && (
-            <div
-              key="3"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+          {chartData && !isCardRemoved('overview') ? (
+            <div key="3">
               <Card
                 title={t('overview')}
                 className="col-span-12 xl:col-span-8 pr-4"
                 height="full"
+                titleDescriptionParentClassName={classNames('drag-handle', {
+                  'cursor-grab': isEditMode,
+                })}
                 withScrollableBody
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('overview')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
                 renderFromShadcn
               >
-                <Chart
-                  chartSensitivity={chartScale}
-                  dates={{
-                    start_date: dates.start_date,
-                    end_date: dates.end_date,
-                  }}
-                  data={chartData[currency]}
-                  currency={currency.toString()}
-                />
+                <div
+                  className={classNames('drag-handle', {
+                    'cursor-grab': isEditMode,
+                  })}
+                >
+                  <Chart
+                    chartSensitivity={chartScale}
+                    dates={{
+                      start_date: dates.start_date,
+                      end_date: dates.end_date,
+                    }}
+                    data={chartData[currency]}
+                    currency={currency.toString()}
+                  />
+                </div>
               </Card>
             </div>
-          )}
+          ) : null}
 
-          <div
-            key="4"
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
-            <Activity />
-          </div>
+          {!isCardRemoved('activity') ? (
+            <div key="4">
+              <Activity
+                isEditMode={isEditMode}
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('activity')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+              />
+            </div>
+          ) : null}
 
-          <div
-            key="5"
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
-            <RecentPayments />
-          </div>
+          {!isCardRemoved('recent_payments') ? (
+            <div
+              key="5"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
+              <RecentPayments
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('recent_payments')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+              />
+            </div>
+          ) : null}
 
-          {enabled(ModuleBitmask.Invoices) && (
+          {enabled(ModuleBitmask.Invoices) &&
+          !isCardRemoved('upcoming_invoices') ? (
             <div
               key="6"
               className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
             >
-              <UpcomingInvoices />
+              <UpcomingInvoices
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('upcoming_invoices')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+              />
             </div>
-          )}
+          ) : null}
 
-          {enabled(ModuleBitmask.Invoices) && (
+          {enabled(ModuleBitmask.Invoices) &&
+          !isCardRemoved('past_due_invoices') ? (
             <div
               key="7"
               className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
             >
-              <PastDueInvoices />
+              <PastDueInvoices
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('past_due_invoices')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+              />
             </div>
-          )}
+          ) : null}
 
-          {enabled(ModuleBitmask.Quotes) && (
+          {enabled(ModuleBitmask.Quotes) && !isCardRemoved('expired_quotes') ? (
             <div
               key="8"
               className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
             >
-              <ExpiredQuotes />
+              <ExpiredQuotes
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('expired_quotes')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+              />
             </div>
-          )}
+          ) : null}
 
-          {enabled(ModuleBitmask.Quotes) && (
+          {enabled(ModuleBitmask.Quotes) &&
+          !isCardRemoved('upcoming_quotes') ? (
             <div
               key="9"
               className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
             >
-              <UpcomingQuotes />
+              <UpcomingQuotes
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() => handleRemoveCard('upcoming_quotes')}
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+              />
             </div>
-          )}
+          ) : null}
 
-          {enabled(ModuleBitmask.RecurringInvoices) && (
+          {enabled(ModuleBitmask.RecurringInvoices) &&
+          !isCardRemoved('upcoming_recurring_invoices') ? (
             <div
               key="10"
               className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
             >
-              <UpcomingRecurringInvoices />
+              <UpcomingRecurringInvoices
+                topRight={
+                  isEditMode && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      onClick={() =>
+                        handleRemoveCard('upcoming_recurring_invoices')
+                      }
+                    >
+                      {t('remove')}
+                    </Button>
+                  )
+                }
+              />
             </div>
-          )}
+          ) : null}
         </ResponsiveGridLayout>
       ) : (
         <div className="w-full flex justify-center">

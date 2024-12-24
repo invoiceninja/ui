@@ -20,7 +20,7 @@ import { Modal } from '$app/components/Modal';
 import { cloneDeep } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdClose, MdRestorePage } from 'react-icons/md';
+import { MdRefresh, MdRestorePage } from 'react-icons/md';
 import styled from 'styled-components';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -42,12 +42,13 @@ const StyledDiv = styled.div`
 interface Props {
   layoutBreakpoint: string | undefined;
   setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
+  setAreCardsRestored: Dispatch<SetStateAction<boolean>>;
 }
 
 export function RestoreCardsModal(props: Props) {
   const [t] = useTranslation();
 
-  const { layoutBreakpoint } = props;
+  const { layoutBreakpoint, setAreCardsRestored } = props;
 
   const dispatch = useDispatch();
 
@@ -83,24 +84,26 @@ export function RestoreCardsModal(props: Props) {
         updatedUser
       )
         .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-          set(updatedUser, 'company_user', response.data.data);
-
-          toast.success('restored');
-
-          $refetch(['company_users']);
-
-          dispatch(updateUser(updatedUser));
-
-          props.setLayouts(
-            cloneDeep(
-              response.data.data.react_settings
-                .dashboard_cards_configuration as DashboardGridLayouts
-            )
-          );
+          setAreCardsRestored(true);
 
           setTimeout(() => {
+            set(updatedUser, 'company_user', response.data.data);
+
+            toast.success('restored');
+
+            $refetch(['company_users']);
+
+            dispatch(updateUser(updatedUser));
+
+            props.setLayouts(
+              cloneDeep(
+                response.data.data.react_settings
+                  .dashboard_cards_configuration as DashboardGridLayouts
+              )
+            );
+
             handleOnClose();
-          }, 100);
+          }, 50);
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -145,7 +148,7 @@ export function RestoreCardsModal(props: Props) {
                 <span>{t(card)}</span>
 
                 <div>
-                  <Icon element={MdClose} size={23} />
+                  <Icon element={MdRefresh} size={23} />
                 </div>
               </StyledDiv>
             ))}

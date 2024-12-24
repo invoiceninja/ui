@@ -18,8 +18,13 @@ import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { ReactNode } from 'react';
 
-export function ExpiredQuotes() {
+interface Props {
+  topRight?: ReactNode;
+}
+
+export function ExpiredQuotes({ topRight }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
 
@@ -77,6 +82,7 @@ export function ExpiredQuotes() {
       withoutBodyPadding
       withoutHeaderBorder
       height="full"
+      topRight={topRight}
       renderFromShadcn
     >
       <div

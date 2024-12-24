@@ -20,8 +20,13 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
-export function RecentPayments() {
+interface Props {
+  topRight?: ReactNode;
+}
+
+export function RecentPayments({ topRight }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -96,6 +101,7 @@ export function RecentPayments() {
       title={t('recent_payments')}
       className="h-full relative"
       withoutBodyPadding
+      topRight={topRight}
       renderFromShadcn
     >
       <div

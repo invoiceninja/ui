@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { classNames, endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
@@ -17,9 +17,14 @@ import { useTranslation } from 'react-i18next';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-export function Activity() {
+interface Props {
+  isEditMode?: boolean;
+  topRight?: ReactNode;
+}
+
+export function Activity({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
 
   const { data, isLoading, isError } = useQuery(
@@ -33,9 +38,12 @@ export function Activity() {
   return (
     <Card
       title={t('recent_activity')}
-      className="relative"
+      className={classNames('relative drag-handle', {
+        'cursor-grab': isEditMode,
+      })}
       height="full"
       withoutBodyPadding
+      topRight={topRight}
       renderFromShadcn
     >
       {isLoading && (
@@ -49,8 +57,10 @@ export function Activity() {
       )}
 
       <div
-        className="pl-6 pr-4 overflow-y-auto"
-        style={{ height: 'calc(100% - 3.7rem)' }}
+        className={classNames('pl-6 pr-4 overflow-y-auto drag-handle', {
+          'cursor-grab': isEditMode,
+        })}
+        style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
       >
         <div className="flex flex-col pr-4">
           {data?.data.data &&

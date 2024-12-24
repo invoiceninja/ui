@@ -20,8 +20,10 @@ import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useTranslation } from 'react-i18next';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { ReactNode } from 'react';
 
 interface Props {
+  topRight?: ReactNode;
   className?: string;
 }
 
@@ -100,6 +102,7 @@ export function UpcomingRecurringInvoices(props: Props) {
       withoutBodyPadding
       withoutHeaderBorder
       height="full"
+      topRight={props.topRight}
       renderFromShadcn
     >
       <div

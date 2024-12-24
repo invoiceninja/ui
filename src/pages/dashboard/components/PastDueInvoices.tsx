@@ -19,8 +19,13 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
-export function PastDueInvoices() {
+interface Props {
+  topRight?: ReactNode;
+}
+
+export function PastDueInvoices({ topRight }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -83,6 +88,7 @@ export function PastDueInvoices() {
       className="h-full relative"
       withoutBodyPadding
       withoutHeaderBorder
+      topRight={topRight}
       renderFromShadcn
     >
       <div

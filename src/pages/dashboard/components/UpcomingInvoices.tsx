@@ -19,8 +19,13 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
-export function UpcomingInvoices() {
+interface Props {
+  topRight?: ReactNode;
+}
+
+export function UpcomingInvoices({ topRight }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
 
@@ -86,6 +91,7 @@ export function UpcomingInvoices() {
       title={t('upcoming_invoices')}
       className="h-full relative"
       withoutBodyPadding
+      topRight={topRight}
       renderFromShadcn
     >
       <div
