@@ -589,6 +589,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         }
         isDataLoading={isLoading}
         style={props.style}
+        resizable
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
           {!props.withoutActions && !hideEditableOptions && (
