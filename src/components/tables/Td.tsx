@@ -41,7 +41,7 @@ export function Td(props: Props) {
       colSpan={props.colSpan}
       rowSpan={props.rowSpan}
       onClick={props.onClick}
-      className={`px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm  ${props.className}`}
+      className={`px-2 lg:px-2.5 xl:px-4 py-2 text-wrap text-sm break-words ${props.className}`}
       style={{
         color: customizeTextColor
           ? adjustColorDarkness(hex, darknessAmount)
