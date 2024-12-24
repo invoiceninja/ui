@@ -21,6 +21,7 @@ interface Props extends CommonProps {
   withoutRightBorder?: boolean;
   onVerticalOverflowChange?: (overflow: boolean) => void;
   isDataLoading?: boolean;
+  resizable?: boolean;
 }
 
 export function Table(props: Props) {
@@ -106,13 +107,19 @@ export function Table(props: Props) {
         >
           <div
             ref={handleTableParentHeight}
-            className={`overflow-y-auto rounded ${props.className}`}
+            className={`overflow-y-auto min-w-full rounded ${props.className}`}
             style={{
               ...props.style,
               height: manualTableHeight,
             }}
           >
-            <table ref={handleTableHeight} className="min-w-full table-auto">
+            <table
+              ref={handleTableHeight}
+              className={classNames({
+                'min-w-full table-auto': !props.resizable,
+                'table-auto': props.resizable,
+              })}
+            >
               {props.children}
             </table>
           </div>
