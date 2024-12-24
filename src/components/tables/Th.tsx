@@ -1,17 +1,17 @@
 /**
-* Invoice Ninja (https://invoiceninja.com).
-*
-* @link https://github.com/invoiceninja/invoiceninja source repository
-*
-* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
-*
-* @license https://www.elastic.co/licensing/elastic-license
-*/
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 
 import React, { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { ChevronDown, ChevronUp } from 'react-feather';
+// import { ChevronDown, ChevronUp } from 'react-feather';
 import { useColorScheme } from '$app/common/colors';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
@@ -68,20 +68,19 @@ export function Th(props: Props) {
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (!props.resizable || e.button !== 0) return; // Only left mouse button and if resizable is true
+    if (!props.resizable || e.button !== 0) return;
 
     const thWidth = thRef.current?.offsetWidth;
     const clickPosition =
       e.clientX - thRef.current!.getBoundingClientRect().left;
 
-    const borderThreshold = 40; // Increased threshold to make the resize area larger
+    const borderThreshold = 60;
 
     if (thWidth && clickPosition > thWidth - borderThreshold) {
       setIsResizing(true);
       setStartX(e.clientX);
 
-      // Disable text selection on the table while resizing
-      const table = thRef.current?.closest('table'); // Find the closest parent table
+      const table = thRef.current?.closest('table');
       if (table) {
         table.style.userSelect = 'none';
       }
@@ -93,20 +92,21 @@ export function Th(props: Props) {
 
     const dx = e.clientX - startX;
 
-    const newWidth = currentWidth() + dx;
+    const sensitivityFactor = 0.5;
+    const newWidth = currentWidth() + dx * sensitivityFactor;
 
-    // Apply width limits (e.g., between 50px and 1000px)
-    if (newWidth > 50 && newWidth < 1000) {
+    if (newWidth >= 50 && newWidth <= 1000) {
       setCurrentWidth(newWidth);
       thRef.current.style.width = `${newWidth}px`;
     }
+
+    setStartX(e.clientX);
   };
 
   const handleMouseUp = () => {
     setIsResizing(false);
 
-    // Re-enable text selection after resizing
-    const table = thRef.current?.closest('table'); // Find the closest parent table
+    const table = thRef.current?.closest('table');
     if (table) {
       table.style.userSelect = '';
     }
@@ -127,9 +127,18 @@ export function Th(props: Props) {
     };
   }, [isResizing]);
 
-  // Handle double-click to restore the column width to original
-  const handleDoubleClick = () => {
-    if (props.resizable) {
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    const borderThreshold = 40;
+
+    const thWidth = thRef.current?.offsetWidth;
+    const clickPosition =
+      e.clientX - thRef.current!.getBoundingClientRect().left;
+
+    if (
+      props.resizable &&
+      thWidth &&
+      clickPosition > thWidth - borderThreshold
+    ) {
       setCurrentWidth(0);
       if (thRef.current) {
         thRef.current.style.width = `0px`;
@@ -147,7 +156,7 @@ export function Th(props: Props) {
     const borderThreshold = 30;
 
     if (clickPosition > thWidth - borderThreshold) {
-      return; // safe zone
+      return;
     } else {
       if (props.onColumnClick) {
         setOrder(order === 'desc' ? 'asc' : 'desc');
@@ -166,10 +175,10 @@ export function Th(props: Props) {
       const clickPosition =
         event.clientX - thRef.current!.getBoundingClientRect().left;
 
-      const borderThreshold = 40; // Increased threshold for resizing cursor
+      const borderThreshold = 40;
 
       if (thWidth && clickPosition > thWidth - borderThreshold) {
-        thRef.current!.style.cursor = 'ew-resize'; // Only set cursor if resizable
+        thRef.current!.style.cursor = 'ew-resize';
       } else {
         thRef.current!.style.cursor = '';
       }
@@ -209,21 +218,6 @@ export function Th(props: Props) {
         {props.onColumnClick ? (
           <div className="flex items-center space-x-1" onClick={handleClick}>
             <span>{props.children}</span>
-
-            <div className="flex items-center">
-              <ChevronUp
-                className={classNames('opacity-25', {
-                  'opacity-100': order === 'asc' && props.isCurrentlyUsed,
-                })}
-                size={16}
-              />
-              <ChevronDown
-                className={classNames('opacity-25', {
-                  'opacity-100': order === 'desc' && props.isCurrentlyUsed,
-                })}
-                size={16}
-              />
-            </div>
           </div>
         ) : (
           <span>{props.children}</span>
