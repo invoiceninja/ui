@@ -1756,13 +1756,9 @@ export function ResizableDashboardCards() {
           ) : null}
 
           {!isCardRemoved('recent_payments') ? (
-            <div
-              key="5"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+            <div key="5">
               <RecentPayments
+                isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
@@ -1780,13 +1776,9 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.Invoices) &&
           !isCardRemoved('upcoming_invoices') ? (
-            <div
-              key="6"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+            <div key="6">
               <UpcomingInvoices
+                isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
@@ -1804,13 +1796,9 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.Invoices) &&
           !isCardRemoved('past_due_invoices') ? (
-            <div
-              key="7"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+            <div key="7">
               <PastDueInvoices
+                isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
@@ -1827,13 +1815,9 @@ export function ResizableDashboardCards() {
           ) : null}
 
           {enabled(ModuleBitmask.Quotes) && !isCardRemoved('expired_quotes') ? (
-            <div
-              key="8"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+            <div key="8">
               <ExpiredQuotes
+                isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
@@ -1851,13 +1835,9 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.Quotes) &&
           !isCardRemoved('upcoming_quotes') ? (
-            <div
-              key="9"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+            <div key="9">
               <UpcomingQuotes
+                isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
@@ -1875,13 +1855,9 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.RecurringInvoices) &&
           !isCardRemoved('upcoming_recurring_invoices') ? (
-            <div
-              key="10"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+            <div key="10">
               <UpcomingRecurringInvoices
+                isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button

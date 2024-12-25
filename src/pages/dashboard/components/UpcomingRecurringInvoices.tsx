@@ -21,13 +21,19 @@ import { useTranslation } from 'react-i18next';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { ReactNode } from 'react';
+import classNames from 'classnames';
 
 interface Props {
   topRight?: ReactNode;
   className?: string;
+  isEditMode: boolean;
 }
 
-export function UpcomingRecurringInvoices(props: Props) {
+export function UpcomingRecurringInvoices({
+  topRight,
+  className,
+  isEditMode,
+}: Props) {
   const [t] = useTranslation();
 
   const getSetting = useGetSetting();
@@ -98,16 +104,23 @@ export function UpcomingRecurringInvoices(props: Props) {
   return (
     <Card
       title={t('upcoming_recurring_invoices')}
-      className={`relative ${props.className}`}
+      className={`relative ${className}`}
       withoutBodyPadding
       withoutHeaderBorder
       height="full"
-      topRight={props.topRight}
+      titleDescriptionParentClassName={classNames('drag-handle', {
+        'cursor-grab': isEditMode,
+      })}
+      topRight={topRight}
       renderFromShadcn
     >
       <div
-        className="pl-6 pr-4 relative"
-        style={{ height: 'calc(100% - 3.625rem)' }}
+        className={classNames('pl-6 pr-4 relative drag-handle', {
+          'cursor-grab': isEditMode,
+        })}
+        style={{
+          height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
+        }}
       >
         <DataTable
           resource="recurring_invoice"

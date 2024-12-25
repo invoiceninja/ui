@@ -19,12 +19,14 @@ import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { ReactNode } from 'react';
+import classNames from 'classnames';
 
 interface Props {
+  isEditMode: boolean;
   topRight?: ReactNode;
 }
 
-export function UpcomingQuotes({ topRight }: Props) {
+export function UpcomingQuotes({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
 
@@ -81,13 +83,20 @@ export function UpcomingQuotes({ topRight }: Props) {
       className="relative"
       withoutBodyPadding
       withoutHeaderBorder
+      titleDescriptionParentClassName={classNames('drag-handle', {
+        'cursor-grab': isEditMode,
+      })}
       height="full"
       topRight={topRight}
       renderFromShadcn
     >
       <div
-        className="pl-6 pr-4 relative"
-        style={{ height: 'calc(100% - 3.625rem)' }}
+        className={classNames('pl-6 pr-4 relative drag-handle', {
+          'cursor-grab': isEditMode,
+        })}
+        style={{
+          height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
+        }}
       >
         <DataTable
           resource="quote"

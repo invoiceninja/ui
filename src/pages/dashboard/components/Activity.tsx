@@ -38,7 +38,8 @@ export function Activity({ topRight, isEditMode }: Props) {
   return (
     <Card
       title={t('recent_activity')}
-      className={classNames('relative drag-handle', {
+      className="relative"
+      titleDescriptionParentClassName={classNames('drag-handle', {
         'cursor-grab': isEditMode,
       })}
       height="full"

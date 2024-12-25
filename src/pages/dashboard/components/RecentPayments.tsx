@@ -15,7 +15,7 @@ import { Payment } from '$app/common/interfaces/payment';
 import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
 import { Badge } from '$app/components/Badge';
-import { date } from '$app/common/helpers';
+import { classNames, date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
@@ -24,9 +24,10 @@ import { ReactNode } from 'react';
 
 interface Props {
   topRight?: ReactNode;
+  isEditMode?: boolean;
 }
 
-export function RecentPayments({ topRight }: Props) {
+export function RecentPayments({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -105,8 +106,10 @@ export function RecentPayments({ topRight }: Props) {
       renderFromShadcn
     >
       <div
-        className="pl-6 pr-4 relative"
-        style={{ height: 'calc(100% - 3.625rem)' }}
+        className={classNames('pl-6 pr-4 relative drag-handle', {
+          'cursor-grab': isEditMode,
+        })}
+        style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
       >
         <DataTable
           resource="payment"
