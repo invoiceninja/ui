@@ -13,7 +13,6 @@ import 'react-resizable/css/styles.css';
 import '$app/resources/css/gridLayout.css';
 import { Button, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
-import { Chart } from '$app/pages/dashboard/components/Chart';
 import { useEffect, useState } from 'react';
 import { Spinner } from '$app/components/Spinner';
 import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
@@ -61,6 +60,7 @@ import { DashboardCard } from './DashboardCard';
 import { toast } from '$app/common/helpers/toast/toast';
 import { RestoreCardsModal } from './RestoreCardsModal';
 import { RestoreLayoutAction } from './RestoreLayoutAction';
+import { Chart } from './Chart';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -1335,7 +1335,7 @@ export function ResizableDashboardCards() {
     <div className={classNames('w-full', { 'select-none': isEditMode })}>
       {!totals.isLoading ? (
         <ResponsiveGridLayout
-          className="layout responsive-grid-box"
+          className="layout responsive-grid-box override-grid-item"
           breakpoints={{
             xxl: 1400,
             xl: 1200,
@@ -1371,6 +1371,8 @@ export function ResizableDashboardCards() {
           }
           //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           resizeHandles={['se']}
+          draggableCancel=".cancelDraggingCards"
+          compactType="vertical"
         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
@@ -1545,17 +1547,20 @@ export function ResizableDashboardCards() {
           ) : null}
 
           {company && !isCardRemoved('account_login_text') ? (
-            <div key="2">
+            <div
+              key="2"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <Card
                 title={t('account_login_text')}
                 height="full"
-                titleDescriptionParentClassName={classNames('drag-handle', {
-                  'cursor-grab': isEditMode,
-                })}
                 withScrollableBody
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('account_login_text')}
@@ -1564,13 +1569,8 @@ export function ResizableDashboardCards() {
                     </Button>
                   )
                 }
-                renderFromShadcn
               >
-                <div
-                  className={classNames('drag-handle pb-8', {
-                    'cursor-grab': isEditMode,
-                  })}
-                >
+                <div className="pb-8">
                   <div className="flex flex-col space-y-1 px-6">
                     <span className="text-lg">{`${user?.first_name} ${user?.last_name}`}</span>
 
@@ -1695,18 +1695,21 @@ export function ResizableDashboardCards() {
           ) : null}
 
           {chartData && !isCardRemoved('overview') ? (
-            <div key="3">
+            <div
+              key="3"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <Card
                 title={t('overview')}
                 className="col-span-12 xl:col-span-8 pr-4"
                 height="full"
-                titleDescriptionParentClassName={classNames('drag-handle', {
-                  'cursor-grab': isEditMode,
-                })}
                 withScrollableBody
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('overview')}
@@ -1717,32 +1720,32 @@ export function ResizableDashboardCards() {
                 }
                 renderFromShadcn
               >
-                <div
-                  className={classNames('drag-handle', {
-                    'cursor-grab': isEditMode,
-                  })}
-                >
-                  <Chart
-                    chartSensitivity={chartScale}
-                    dates={{
-                      start_date: dates.start_date,
-                      end_date: dates.end_date,
-                    }}
-                    data={chartData[currency]}
-                    currency={currency.toString()}
-                  />
-                </div>
+                <Chart
+                  chartSensitivity={chartScale}
+                  dates={{
+                    start_date: dates.start_date,
+                    end_date: dates.end_date,
+                  }}
+                  data={chartData[currency]}
+                  currency={currency.toString()}
+                />
               </Card>
             </div>
           ) : null}
 
           {!isCardRemoved('activity') ? (
-            <div key="4">
+            <div
+              key="4"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <Activity
                 isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('activity')}
@@ -1756,12 +1759,18 @@ export function ResizableDashboardCards() {
           ) : null}
 
           {!isCardRemoved('recent_payments') ? (
-            <div key="5">
+            <div
+              key="5"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <RecentPayments
                 isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('recent_payments')}
@@ -1776,12 +1785,18 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.Invoices) &&
           !isCardRemoved('upcoming_invoices') ? (
-            <div key="6">
+            <div
+              key="6"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <UpcomingInvoices
                 isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('upcoming_invoices')}
@@ -1796,12 +1811,18 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.Invoices) &&
           !isCardRemoved('past_due_invoices') ? (
-            <div key="7">
+            <div
+              key="7"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <PastDueInvoices
                 isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('past_due_invoices')}
@@ -1815,12 +1836,18 @@ export function ResizableDashboardCards() {
           ) : null}
 
           {enabled(ModuleBitmask.Quotes) && !isCardRemoved('expired_quotes') ? (
-            <div key="8">
+            <div
+              key="8"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <ExpiredQuotes
                 isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('expired_quotes')}
@@ -1835,12 +1862,18 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.Quotes) &&
           !isCardRemoved('upcoming_quotes') ? (
-            <div key="9">
+            <div
+              key="9"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <UpcomingQuotes
                 isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() => handleRemoveCard('upcoming_quotes')}
@@ -1855,12 +1888,18 @@ export function ResizableDashboardCards() {
 
           {enabled(ModuleBitmask.RecurringInvoices) &&
           !isCardRemoved('upcoming_recurring_invoices') ? (
-            <div key="10">
+            <div
+              key="10"
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+            >
               <UpcomingRecurringInvoices
                 isEditMode={isEditMode}
                 topRight={
                   isEditMode && (
                     <Button
+                      className="cancelDraggingCards"
                       behavior="button"
                       type="secondary"
                       onClick={() =>

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { classNames, endpoint } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
@@ -39,9 +39,6 @@ export function Activity({ topRight, isEditMode }: Props) {
     <Card
       title={t('recent_activity')}
       className="relative"
-      titleDescriptionParentClassName={classNames('drag-handle', {
-        'cursor-grab': isEditMode,
-      })}
       height="full"
       withoutBodyPadding
       topRight={topRight}
@@ -58,9 +55,7 @@ export function Activity({ topRight, isEditMode }: Props) {
       )}
 
       <div
-        className={classNames('pl-6 pr-4 overflow-y-auto drag-handle', {
-          'cursor-grab': isEditMode,
-        })}
+        className="pl-6 pr-4 overflow-y-auto"
         style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
       >
         <div className="flex flex-col pr-4">

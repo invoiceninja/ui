@@ -15,7 +15,7 @@ import { Payment } from '$app/common/interfaces/payment';
 import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
 import { Badge } from '$app/components/Badge';
-import { classNames, date } from '$app/common/helpers';
+import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
@@ -106,9 +106,7 @@ export function RecentPayments({ topRight, isEditMode }: Props) {
       renderFromShadcn
     >
       <div
-        className={classNames('pl-6 pr-4 relative drag-handle', {
-          'cursor-grab': isEditMode,
-        })}
+        className="pl-6 pr-4 relative"
         style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
       >
         <DataTable

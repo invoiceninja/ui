@@ -20,7 +20,6 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
 import { ReactNode } from 'react';
-import classNames from 'classnames';
 
 interface Props {
   topRight?: ReactNode;
@@ -88,18 +87,13 @@ export function PastDueInvoices({ topRight, isEditMode }: Props) {
     <Card
       title={t('past_due_invoices')}
       className="h-full relative"
-      titleDescriptionParentClassName={classNames('drag-handle', {
-        'cursor-grab': isEditMode,
-      })}
       withoutBodyPadding
       withoutHeaderBorder
       topRight={topRight}
       renderFromShadcn
     >
       <div
-        className={classNames('pl-6 pr-4 relative drag-handle', {
-          'cursor-grab': isEditMode,
-        })}
+        className="pl-6 pr-4 relative"
         style={{
           height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
         }}

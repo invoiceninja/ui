@@ -21,7 +21,6 @@ import { useTranslation } from 'react-i18next';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { ReactNode } from 'react';
-import classNames from 'classnames';
 
 interface Props {
   topRight?: ReactNode;
@@ -108,16 +107,11 @@ export function UpcomingRecurringInvoices({
       withoutBodyPadding
       withoutHeaderBorder
       height="full"
-      titleDescriptionParentClassName={classNames('drag-handle', {
-        'cursor-grab': isEditMode,
-      })}
       topRight={topRight}
       renderFromShadcn
     >
       <div
-        className={classNames('pl-6 pr-4 relative drag-handle', {
-          'cursor-grab': isEditMode,
-        })}
+        className="pl-6 pr-4 relative"
         style={{
           height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
         }}
