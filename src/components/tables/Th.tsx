@@ -215,7 +215,7 @@ export function Th$(props: Props) {
       onMouseEnter={(e) => {
         handleMouseEnter(e);
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={() => {
         handleMouseLeave();
       }}
       onMouseDown={handleMouseDown}
