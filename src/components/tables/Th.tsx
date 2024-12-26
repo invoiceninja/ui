@@ -1,21 +1,27 @@
 /**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
+* Invoice Ninja (https://invoiceninja.com).
+*
+* @link https://github.com/invoiceninja/invoiceninja source repository
+*
+* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+*
+* @license https://www.elastic.co/licensing/elastic-license
+*/
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
-import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import { get } from 'lodash';
 import { ChevronDown, ChevronUp } from 'react-feather';
+import { atomWithStorage } from 'jotai/utils';
 
 export interface ColumnSortPayload {
   sort: string;
@@ -35,70 +41,75 @@ const defaultProps: Props = {
   isCurrentlyUsed: false,
 };
 
-const currentWidthAtom = atomWithStorage<Record<string, number>>(
-  'columnWidths',
-  {}
-);
+export const currentWidthAtom = atomWithStorage<Record<string, number>>('columnWidths', {});
 
 export function useResizeColumn(resizable: string | undefined) {
   const thRef = useRef<HTMLTableCellElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [startX, setStartX] = useState<number>(0);
+  const [startWidth, setStartWidth] = useState<number>(0);
   const [widths, setWidths] = useAtom(currentWidthAtom);
 
-  const currentWidth = () => {
+  const currentWidth = useMemo(() => {
     if (resizable) {
-      return get(widths, resizable, 0);
+      return get(widths, resizable, -1);
     }
-    return 0;
-  };
+    return -1;
+  }, [widths, resizable]);
 
-  function setCurrentWidth(width: number) {
-    if (!resizable) return;
-    setWidths((prev) => ({ ...prev, [resizable]: width }));
-  }
+  const setCurrentWidth = useCallback(
+    (width: number) => {
+      if (!resizable) return;
+      setWidths((prev) => ({ ...prev, [resizable]: width }));
+    },
+    [resizable]
+  );
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!resizable || e.button !== 0) return;
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (!resizable || e.button !== 0) return;
 
-    const thWidth = thRef.current?.offsetWidth;
-    const clickPosition =
-      e.clientX - thRef.current!.getBoundingClientRect().left;
-    const borderThreshold = 60;
+      const thWidth = thRef.current?.offsetWidth;
+      const clickPosition =
+        e.clientX - thRef.current!.getBoundingClientRect().left;
+      const borderThreshold = 60;
 
-    if (thWidth && clickPosition > thWidth - borderThreshold) {
-      setIsResizing(true);
-      setStartX(e.clientX);
-      const table = thRef.current?.closest('table');
-      if (table) {
-        table.style.userSelect = 'none';
+      if (thWidth && clickPosition > thWidth - borderThreshold) {
+        setIsResizing(true);
+        setStartX(e.clientX);
+        setStartWidth(thWidth);
+        const table = thRef.current?.closest('table');
+        if (table) {
+          table.style.userSelect = 'none';
+        }
       }
-    }
-  };
+    },
+    [resizable]
+  );
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isResizing || !thRef.current) return;
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing || !thRef.current || currentWidth === null) return;
 
-    const dx = e.clientX - startX;
-    const sensitivityFactor = 1.25;
-    const newWidth = currentWidth() + dx * sensitivityFactor;
+      const dx = e.clientX - startX;
+      const newWidth = startWidth + dx;
 
-    if (newWidth >= 50 && newWidth <= 1000) {
-      setCurrentWidth(newWidth);
-      thRef.current.style.width = `${newWidth}px`;
-    }
+      if (newWidth > 25 && newWidth <= 1000) {
+        setCurrentWidth(newWidth);
+        thRef.current.style.width = `${newWidth}px`;
+      }
+    },
+    [isResizing, startX, startWidth, currentWidth, setCurrentWidth]
+  );
 
-    setStartX(e.clientX);
-  };
-
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsResizing(false);
 
     const table = thRef.current?.closest('table');
     if (table) {
       table.style.userSelect = '';
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isResizing) {
@@ -113,40 +124,46 @@ export function useResizeColumn(resizable: string | undefined) {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isResizing]);
+  }, [isResizing, handleMouseMove, handleMouseUp]);
 
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    const borderThreshold = 40;
-    const thWidth = thRef.current?.offsetWidth;
-    const clickPosition =
-      e.clientX - thRef.current!.getBoundingClientRect().left;
-
-    if (resizable && thWidth && clickPosition > thWidth - borderThreshold) {
-      setCurrentWidth(0);
-      if (thRef.current) {
-        thRef.current.style.width = `0px`;
-      }
-    }
-  };
-
-  const handleMouseEnter = (event: React.MouseEvent) => {
-    if (resizable) {
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      const borderThreshold = 40;
       const thWidth = thRef.current?.offsetWidth;
       const clickPosition =
-        event.clientX - thRef.current!.getBoundingClientRect().left;
-      const borderThreshold = 40;
+        e.clientX - thRef.current!.getBoundingClientRect().left;
 
-      if (thWidth && clickPosition > thWidth - borderThreshold) {
-        thRef.current!.style.cursor = 'ew-resize';
-      } else {
-        thRef.current!.style.cursor = '';
+      if (resizable && thWidth && clickPosition > thWidth - borderThreshold) {
+        setCurrentWidth(-1);
+        if (thRef.current) {
+          thRef.current.style.width = `auto`;
+        }
       }
-    }
-  };
+    },
+    [resizable, setCurrentWidth]
+  );
 
-  const handleMouseLeave = () => {
+  const handleMouseEnter = useCallback(
+    (event: React.MouseEvent) => {
+      if (resizable) {
+        const thWidth = thRef.current?.offsetWidth;
+        const clickPosition =
+          event.clientX - thRef.current!.getBoundingClientRect().left;
+        const borderThreshold = 40;
+
+        if (thWidth && clickPosition > thWidth - borderThreshold) {
+          thRef.current!.style.cursor = 'ew-resize';
+        } else {
+          thRef.current!.style.cursor = '';
+        }
+      }
+    },
+    [resizable]
+  );
+
+  const handleMouseLeave = useCallback(() => {
     thRef.current!.style.cursor = '';
-  };
+  }, []);
 
   return {
     thRef,
@@ -158,10 +175,11 @@ export function useResizeColumn(resizable: string | undefined) {
     handleMouseEnter,
     handleMouseLeave,
     setCurrentWidth,
+    isResizing,
   };
 }
 
-export function Th(props: Props) {
+export function Th$(props: Props) {
   props = { ...defaultProps, ...props };
 
   const {
@@ -175,7 +193,7 @@ export function Th(props: Props) {
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  function handleClick() {
+  const handleClick = useCallback(() => {
     if (props.onColumnClick) {
       setOrder(order === 'desc' ? 'asc' : 'desc');
       props.onColumnClick({
@@ -183,7 +201,7 @@ export function Th(props: Props) {
         field: props.id,
       });
     }
-  }
+  }, [order, props.onColumnClick, props.id]);
 
   const colors = useColorScheme();
 
@@ -193,10 +211,13 @@ export function Th(props: Props) {
       style={{
         color: props.textColor || colors.$9,
         borderColor: colors.$4,
-        width: `${currentWidth()}px`,
       }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={(e) => {
+        handleMouseEnter(e);
+      }}
+      onMouseLeave={(e) => {
+        handleMouseLeave();
+      }}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       className={classNames(
@@ -210,19 +231,35 @@ export function Th(props: Props) {
     >
       <div
         className={`flex items-center space-x-1 ${props.childrenClassName} select-none`}
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
       >
         {props.onColumnClick ? (
-          <div className="flex items-center space-x-1" onClick={handleClick}>
-            <span>{props.children}</span>
+          <div
+            className="flex items-center space-x-1 overflow-hidden whitespace-nowrap text-ellipsis"
+            onClick={handleClick}
+            style={{
+              width: currentWidth !== -1 ? currentWidth : 'auto',
+            }}
+          >
+            <span className="overflow-hidden whitespace-nowrap text-ellipsis">
+              {props.children}
+            </span>
 
-            <div className="flex items-center">
+            <div
+              className={classNames('flex items-center bg-opacity-25', {
+                hidden: currentWidth === -1 ? false : currentWidth < 50,
+              })}
+            >
               <ChevronUp
                 className={classNames('opacity-25', {
                   'opacity-100': order === 'asc' && props.isCurrentlyUsed,
                 })}
                 size={16}
               />
-
               <ChevronDown
                 className={classNames('opacity-25', {
                   'opacity-100': order === 'desc' && props.isCurrentlyUsed,
@@ -238,3 +275,5 @@ export function Th(props: Props) {
     </th>
   );
 }
+
+export const Th = React.memo(Th$);
