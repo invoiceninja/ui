@@ -589,6 +589,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         }
         isDataLoading={isLoading}
         style={props.style}
+        resizable={apiEndpoint.pathname}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
           {!props.withoutActions && !hideEditableOptions && (
@@ -745,6 +746,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                               : document.getElementById(resource.id)?.click();
                           }
                         }}
+                        resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
                         {column.format
                           ? column.format(resource[column.id], resource)
