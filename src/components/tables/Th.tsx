@@ -98,7 +98,7 @@ export function useResizeColumn(resizable: string | undefined) {
       const dx = e.clientX - startX;
       const newWidth = startWidth + dx;
 
-      if (newWidth > 25 && newWidth <= 1000) {
+      if (newWidth > 5 && newWidth <= 1000) {
         setCurrentWidth(newWidth);
         thRef.current.style.width = `${newWidth}px`;
       }
