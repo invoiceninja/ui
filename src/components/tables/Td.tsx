@@ -8,7 +8,7 @@ import {
 import { useAtom } from 'jotai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { currentWidthAtom } from './Th';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 interface Props extends CommonProps {
   colSpan?: number;
@@ -29,14 +29,29 @@ export function Td$(props: Props) {
 
   const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
-  const [currentWidths] = useAtom(currentWidthAtom);
-  const [currentWidth, setCurrentWidth] = useState(-1);
+  const color = customizeTextColor
+    ? adjustColorDarkness(hex, darknessAmount)
+    : colors.$3;
 
-  const cw = currentWidths[props.resizable as unknown as number] ?? -1;
+  return <HtmlTd {...props} color={color} />;
+}
+
+interface HtmlTdProps extends Props {
+  color: string;
+}
+
+function HtmlTd(props: HtmlTdProps) {
+  const [currentWidths] = useAtom(currentWidthAtom);
+
+  const tdRef = React.useRef<HTMLTableCellElement>(null);
 
   useEffect(() => {
-    setCurrentWidth(cw);
-  }, [cw]);
+    if (tdRef.current) {
+      const cw = currentWidths[props.resizable as unknown as number] ?? -1;
+
+      tdRef.current.style.maxWidth = `${cw}px`;
+    }
+  }, [currentWidths]);
 
   return (
     <td
@@ -46,11 +61,9 @@ export function Td$(props: Props) {
       onClick={props.onClick}
       className={`px-2 lg:px-2.5 xl:px-4 py-2 text-sm break-words ${props.className} overflow-hidden whitespace-nowrap text-ellipsis`}
       style={{
-        color: customizeTextColor
-          ? adjustColorDarkness(hex, darknessAmount)
-          : colors.$3,
-        maxWidth: currentWidth,
+        color: props.color,
       }}
+      ref={tdRef}
     >
       {props.children}
     </td>
