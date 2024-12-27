@@ -1,12 +1,12 @@
 /**
-* Invoice Ninja (https://invoiceninja.com).
-*
-* @link https://github.com/invoiceninja/invoiceninja source repository
-*
-* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
-*
-* @license https://www.elastic.co/licensing/elastic-license
-*/
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 
 import React, {
   useState,
@@ -20,8 +20,8 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { useAtom } from 'jotai';
 import { get } from 'lodash';
-import { ChevronDown, ChevronUp } from 'react-feather';
 import { atomWithStorage } from 'jotai/utils';
+import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
 
 export interface ColumnSortPayload {
   sort: string;
@@ -41,7 +41,10 @@ const defaultProps: Props = {
   isCurrentlyUsed: false,
 };
 
-export const currentWidthAtom = atomWithStorage<Record<string, number>>('columnWidths', {});
+export const currentWidthAtom = atomWithStorage<Record<string, number>>(
+  'columnWidths',
+  {}
+);
 
 export function useResizeColumn(resizable: string | undefined) {
   const thRef = useRef<HTMLTableCellElement>(null);
@@ -72,7 +75,7 @@ export function useResizeColumn(resizable: string | undefined) {
       const thWidth = thRef.current?.offsetWidth;
       const clickPosition =
         e.clientX - thRef.current!.getBoundingClientRect().left;
-      const borderThreshold = 60;
+      const borderThreshold = 15;
 
       if (thWidth && clickPosition > thWidth - borderThreshold) {
         setIsResizing(true);
@@ -165,6 +168,11 @@ export function useResizeColumn(resizable: string | undefined) {
     thRef.current!.style.cursor = '';
   }, []);
 
+  const handleMouseOver = useCallback(
+    (event: React.MouseEvent) => handleMouseEnter(event),
+    [resizable]
+  );
+
   return {
     thRef,
     currentWidth,
@@ -174,6 +182,7 @@ export function useResizeColumn(resizable: string | undefined) {
     handleDoubleClick,
     handleMouseEnter,
     handleMouseLeave,
+    handleMouseOver,
     setCurrentWidth,
     isResizing,
   };
@@ -189,6 +198,7 @@ export function Th$(props: Props) {
     handleDoubleClick,
     handleMouseEnter,
     handleMouseLeave,
+    handleMouseOver,
   } = useResizeColumn(props.resizable);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -212,9 +222,7 @@ export function Th$(props: Props) {
         color: props.textColor || colors.$9,
         borderColor: colors.$4,
       }}
-      onMouseEnter={(e) => {
-        handleMouseEnter(e);
-      }}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={() => {
         handleMouseLeave();
       }}
@@ -228,6 +236,7 @@ export function Th$(props: Props) {
           'border-r': props.resizable,
         }
       )}
+      onMouseOver={handleMouseOver}
     >
       <div
         className={`flex items-center space-x-1 ${props.childrenClassName} select-none`}
@@ -254,18 +263,25 @@ export function Th$(props: Props) {
                 hidden: currentWidth === -1 ? false : currentWidth < 50,
               })}
             >
-              <ChevronUp
-                className={classNames('opacity-25', {
-                  'opacity-100': order === 'asc' && props.isCurrentlyUsed,
-                })}
-                size={16}
-              />
-              <ChevronDown
-                className={classNames('opacity-25', {
-                  'opacity-100': order === 'desc' && props.isCurrentlyUsed,
-                })}
-                size={16}
-              />
+              {props.isCurrentlyUsed ? (
+                <div className="flex flex-col items-center justify-center -space-y-4">
+                  <FaSortUp
+                    className={classNames({
+                      'opacity-30': order !== 'asc',
+                    })}
+                    size={16}
+                  />
+
+                  <FaSortDown
+                    className={classNames({
+                      'opacity-30': order !== 'desc',
+                    })}
+                    size={16}
+                  />
+                </div>
+              ) : (
+                <FaSort size={16} className="opacity-30" />
+              )}
             </div>
           </div>
         ) : (
