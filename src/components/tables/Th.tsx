@@ -48,6 +48,7 @@ export const currentWidthAtom = atomWithStorage<Record<string, number>>(
 
 export function useResizeColumn(resizable: string | undefined) {
   const thRef = useRef<HTMLTableCellElement>(null);
+
   const [isResizing, setIsResizing] = useState(false);
   const [startX, setStartX] = useState<number>(0);
   const [startWidth, setStartWidth] = useState<number>(0);
@@ -221,6 +222,7 @@ export function Th$(props: Props) {
       style={{
         color: props.textColor || colors.$9,
         borderColor: colors.$4,
+        width: currentWidth
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => {
