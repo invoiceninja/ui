@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch } from 'react';
+import { Dispatch, useState } from 'react';
 import { initialLayouts } from './ResizableDashboardCards';
 import { MdRefresh } from 'react-icons/md';
 import { DashboardGridLayouts } from './ResizableDashboardCards';
@@ -22,14 +22,15 @@ import { useSetAtom } from 'jotai';
 
 interface Props {
   layoutBreakpoint: string | undefined;
-  updateLayoutHeight: () => void;
   setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
 }
 
 export function RestoreLayoutAction(props: Props) {
-  const { layoutBreakpoint, updateLayoutHeight, setLayouts } = props;
+  const { layoutBreakpoint, setLayouts } = props;
 
   const setIsModalVisible = useSetAtom(confirmActionModalAtom);
+
+  const [isRestoring, setIsRestoring] = useState<boolean>(false);
 
   if (!layoutBreakpoint) {
     return null;
@@ -46,12 +47,14 @@ export function RestoreLayoutAction(props: Props) {
                 initialLayouts[layoutBreakpoint as keyof typeof initialLayouts],
             }));
 
-          setIsModalVisible(false);
+          setIsRestoring(true);
 
           setTimeout(() => {
-            updateLayoutHeight();
-          }, 100);
+            setIsRestoring(false);
+            setIsModalVisible(false);
+          }, 2500);
         }}
+        disabledButton={isRestoring}
       />
 
       <div

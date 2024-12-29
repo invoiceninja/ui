@@ -10,7 +10,7 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DashboardField } from '$app/common/interfaces/company-user';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 import { useQueryClient } from 'react-query';
@@ -18,7 +18,6 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
 import { Card as ShadcnCard } from '../../../../components/ui/card';
-import classNames from 'classnames';
 
 interface DashboardCardsProps {
   dateRange: string;
@@ -45,8 +44,25 @@ export function DashboardCard(props: CardProps) {
   const queryClient = useQueryClient();
   const formatMoney = useFormatMoney();
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [responseData, setResponseData] = useState<number>();
+
+  useEffect(() => {
+    if (!containerRef.current || isFormBusy) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const container = entries[0].target as HTMLDivElement;
+      const { width, height } = entries[0].contentRect;
+
+      const fontSize = (width + height) / 18;
+      container.style.fontSize = `${fontSize}px`;
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isFormBusy]);
 
   useEffect(() => {
     (async () => {
@@ -83,19 +99,7 @@ export function DashboardCard(props: CardProps) {
   }, [field]);
 
   return (
-    <ShadcnCard
-      className={classNames('px-6 py-6', {
-        'col-span-2':
-          props.layoutBreakpoint === 'xxl' ||
-          props.layoutBreakpoint === 'xl' ||
-          !props.layoutBreakpoint,
-        'col-span-3': props.layoutBreakpoint === 'lg',
-        'col-span-4': props.layoutBreakpoint === 'md',
-        'col-span-6': props.layoutBreakpoint === 'sm',
-        'col-span-12':
-          props.layoutBreakpoint === 'xs' || props.layoutBreakpoint === 'xxs',
-      })}
-    >
+    <ShadcnCard className="px-6 py-6 w-full h-full">
       {isFormBusy && (
         <div className="flex items-center justify-center">
           <Spinner />
@@ -103,7 +107,10 @@ export function DashboardCard(props: CardProps) {
       )}
 
       {!isFormBusy && (
-        <div className="flex flex-col items-center justify-center space-y-1">
+        <div
+          ref={containerRef}
+          className="flex flex-col items-center justify-center space-y-1 h-full w-full"
+        >
           <span className="font-medium">{t(FIELDS_LABELS[field.field])}</span>
 
           <span>

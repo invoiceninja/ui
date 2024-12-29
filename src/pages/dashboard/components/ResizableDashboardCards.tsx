@@ -52,7 +52,10 @@ import { diff } from 'deep-object-diff';
 import { User } from '$app/common/interfaces/user';
 import { cloneDeep, set } from 'lodash';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
+import {
+  CompanyUser,
+  DashboardField,
+} from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
@@ -171,14 +174,6 @@ export const initialLayouts = {
       h: 2.8,
       isResizable: false,
       static: true,
-    },
-    {
-      i: '1',
-      x: 0,
-      y: 1,
-      w: 1000,
-      h: 6.3,
-      isResizable: false,
     },
     {
       i: '2',
@@ -1015,6 +1010,9 @@ export function ResizableDashboardCards() {
   const [isLayoutsInitialized, setIsLayoutsInitialized] =
     useState<boolean>(false);
   const [areCardsRestored, setAreCardsRestored] = useState<boolean>(false);
+  const [currentDashboardFields, setCurrentDashboardFields] = useState<
+    DashboardField[]
+  >([]);
 
   const chartScale =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
@@ -1097,54 +1095,75 @@ export function ResizableDashboardCards() {
   };
 
   const updateLayoutHeight = () => {
+    if (!layoutBreakpoint) {
+      return;
+    }
+
     const totalCards =
-      user?.company_user?.settings.dashboard_fields?.length || 0;
-    let cardsPerRow = 0;
+      user?.company_user?.react_settings?.dashboard_fields?.length || 0;
+    let widthPerScreenSize = 0;
 
     switch (layoutBreakpoint) {
       case 'xxl':
-        cardsPerRow = 6;
+        widthPerScreenSize = 150;
         break;
       case 'xl':
-        cardsPerRow = 5;
+        widthPerScreenSize = 200;
         break;
       case 'lg':
-        cardsPerRow = 4;
+        widthPerScreenSize = 250;
         break;
       case 'md':
-        cardsPerRow = 3;
+        widthPerScreenSize = 300;
         break;
       case 'sm':
-        cardsPerRow = 2;
+        widthPerScreenSize = 350;
         break;
       case 'xs':
-        cardsPerRow = 1;
+        widthPerScreenSize = 500;
         break;
       case 'xxs':
-        cardsPerRow = 1;
+        widthPerScreenSize = 1000;
         break;
       default:
-        cardsPerRow = 6;
+        widthPerScreenSize = 200;
         break;
     }
 
-    const numberOfRows = Math.ceil(totalCards / cardsPerRow);
+    const nonExistingCards =
+      user?.company_user?.react_settings?.dashboard_fields?.filter(
+        (currentCard) =>
+          !layouts[layoutBreakpoint].some((card) => currentCard.id === card.i)
+      ) || [];
 
     setLayouts((currentLayouts) => {
       const updatedLayouts = cloneDeep(currentLayouts);
+      const cardsPerRow = Math.floor(1000 / (widthPerScreenSize + 10));
+      const rows = Math.ceil(totalCards / cardsPerRow);
+      const newCards = [];
 
-      Object.keys(updatedLayouts).forEach((breakpoint) => {
-        updatedLayouts[breakpoint] = updatedLayouts[breakpoint].map((item) =>
-          item.i === '1'
-            ? {
-                ...item,
-                h: totalCards ? numberOfRows * 7 : 0,
-              }
-            : item
-        );
-      });
+      if (nonExistingCards.length) {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cardsPerRow; j++) {
+            const card = nonExistingCards.shift();
 
-      return updatedLayouts;
+            if (card) {
+              newCards.push({
+                i: card.id,
+                x: j * (widthPerScreenSize + 10),
+                y: 0,
+                w: widthPerScreenSize,
+                h: 7.3,
+              });
+            }
+          }
+        }
+      }
+
+      return {
+        ...updatedLayouts,
+        [layoutBreakpoint]: [...updatedLayouts[layoutBreakpoint], ...newCards],
+      };
     });
   };
 
@@ -1156,6 +1175,8 @@ export function ResizableDashboardCards() {
       'company_user.react_settings.dashboard_cards_configuration',
       cloneDeep(layouts)
     );
+
+    // delete updatedUser.company_user?.react_settings?.dashboard_fields;
 
     // delete updatedUser.company_user.react_settings
     //   .dashboard_cards_configuration;
@@ -1259,8 +1280,18 @@ export function ResizableDashboardCards() {
   }, [settings?.preferences?.dashboard_charts?.range]);
 
   useEffect(() => {
-    updateLayoutHeight();
-  }, [user?.company_user?.settings.dashboard_fields?.length]);
+    setTimeout(() => {
+      updateLayoutHeight();
+    }, 50);
+  }, [currentDashboardFields]);
+
+  useEffect(() => {
+    if (user?.company_user?.react_settings?.dashboard_fields) {
+      setCurrentDashboardFields(
+        cloneDeep(user?.company_user?.react_settings?.dashboard_fields)
+      );
+    }
+  }, [user?.company_user?.react_settings?.dashboard_fields]);
 
   useEffect(() => {
     if (totals.data) {
@@ -1304,7 +1335,9 @@ export function ResizableDashboardCards() {
         setIsLayoutsInitialized(true);
       }
 
-      updateLayoutHeight();
+      setTimeout(() => {
+        updateLayoutHeight();
+      }, 75);
     }
   }, [layoutBreakpoint]);
 
@@ -1335,7 +1368,7 @@ export function ResizableDashboardCards() {
     <div className={classNames('w-full', { 'select-none': isEditMode })}>
       {!totals.isLoading ? (
         <ResponsiveGridLayout
-          className="layout responsive-grid-box override-grid-item"
+          className="layout responsive-grid-box"
           breakpoints={{
             xxl: 1400,
             xl: 1200,
@@ -1446,7 +1479,7 @@ export function ResizableDashboardCards() {
                 value={body.date_range}
               />
 
-              <DashboardCardSelector />
+              <DashboardCardSelector setLayouts={setLayouts} />
 
               <Preferences>
                 <CurrencySelector
@@ -1510,7 +1543,6 @@ export function ResizableDashboardCards() {
 
                   <RestoreLayoutAction
                     layoutBreakpoint={layoutBreakpoint}
-                    updateLayoutHeight={updateLayoutHeight}
                     setLayouts={setLayouts}
                   />
                 </>
@@ -1518,33 +1550,23 @@ export function ResizableDashboardCards() {
             </div>
           </div>
 
-          {user?.company_user?.settings.dashboard_fields?.length ? (
+          {currentDashboardFields.map((field) => (
             <div
-              key="1"
-              className={classNames('grid gap-3 drag-handle', {
-                'grid-cols-10': layoutBreakpoint === 'xl',
-                'grid-cols-12':
-                  layoutBreakpoint === 'xxl' ||
-                  (layoutBreakpoint !== 'xl' && layoutBreakpoint !== 'xxl') ||
-                  !layoutBreakpoint,
+              key={field.id}
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
             >
-              {user?.company_user?.settings.dashboard_fields?.map(
-                (field, index) => (
-                  <DashboardCard
-                    key={(20 + index).toString()}
-                    field={field}
-                    dateRange={dateRange}
-                    startDate={dates.start_date}
-                    endDate={dates.end_date}
-                    currencyId={currency.toString()}
-                    layoutBreakpoint={layoutBreakpoint}
-                  />
-                )
-              )}
+              <DashboardCard
+                field={field}
+                dateRange={dateRange}
+                startDate={dates.start_date}
+                endDate={dates.end_date}
+                currencyId={currency.toString()}
+                layoutBreakpoint={layoutBreakpoint}
+              />
             </div>
-          ) : null}
+          ))}
 
           {company && !isCardRemoved('account_login_text') ? (
             <div
