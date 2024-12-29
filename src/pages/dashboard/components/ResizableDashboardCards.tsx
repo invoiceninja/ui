@@ -50,7 +50,7 @@ import dayjs from 'dayjs';
 import { useDebounce } from 'react-use';
 import { diff } from 'deep-object-diff';
 import { User } from '$app/common/interfaces/user';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, isEqual, set } from 'lodash';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import {
   CompanyUser,
@@ -1080,18 +1080,51 @@ export function ResizableDashboardCards() {
         ...current,
         [layoutBreakpoint]: layout.map((item) => ({
           ...item,
-          h: item.y === newItem.y ? newItem.h : item.h,
+          h:
+            item.y === newItem.y &&
+            (initialLayouts[
+              layoutBreakpoint as keyof typeof initialLayouts
+            ].find((initial) => initial.i === item.i)?.minH ?? 0) <= newItem.h
+              ? newItem.h
+              : item.h,
         })),
       }));
     }
   };
 
   const onDragStop = (layout: GridLayout.Layout[]) => {
-    layoutBreakpoint &&
-      setLayouts((current) => ({
-        ...current,
-        [layoutBreakpoint]: layout,
-      }));
+    if (!layoutBreakpoint) return;
+
+    const updatedLayout = cloneDeep(layout);
+
+    const rowGroups: Record<string, GridLayout.Layout[]> = updatedLayout.reduce(
+      (groups, item) => {
+        const existingGroup = Object.keys(groups).find(
+          (y) => Math.abs(Number(y) - item.y) < 10
+        );
+
+        if (existingGroup) {
+          groups[existingGroup].push(item);
+        } else {
+          groups[item.y] = [item];
+        }
+        return groups;
+      },
+      {} as Record<string, GridLayout.Layout[]>
+    );
+
+    Object.values(rowGroups).forEach((items) => {
+      const maxHeight = Math.max(...items.map((item) => item.h));
+      items.forEach(
+        (item) =>
+          (item.h = item.i.length < 5 && item.i !== '0' ? maxHeight : item.h)
+      );
+    });
+
+    setLayouts((current) => ({
+      ...current,
+      [layoutBreakpoint]: cloneDeep(updatedLayout),
+    }));
   };
 
   const updateLayoutHeight = () => {
@@ -1099,8 +1132,7 @@ export function ResizableDashboardCards() {
       return;
     }
 
-    const totalCards =
-      user?.company_user?.react_settings?.dashboard_fields?.length || 0;
+    const totalCards = currentDashboardFields?.length || 0;
     let widthPerScreenSize = 0;
 
     switch (layoutBreakpoint) {
@@ -1130,11 +1162,10 @@ export function ResizableDashboardCards() {
         break;
     }
 
-    const nonExistingCards =
-      user?.company_user?.react_settings?.dashboard_fields?.filter(
-        (currentCard) =>
-          !layouts[layoutBreakpoint].some((card) => currentCard.id === card.i)
-      ) || [];
+    const nonExistingCards = currentDashboardFields?.filter(
+      (currentCard) =>
+        !layouts[layoutBreakpoint].some((card) => currentCard.id === card.i)
+    );
 
     setLayouts((currentLayouts) => {
       const updatedLayouts = cloneDeep(currentLayouts);
@@ -1272,6 +1303,65 @@ export function ResizableDashboardCards() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleScroll = (isDraggingDown: boolean) => {
+    const scrollAmount = 15;
+
+    const containerRect = document
+      .querySelector('.responsive-grid-box')
+      ?.getBoundingClientRect();
+    if (!containerRect) return;
+
+    if (isDraggingDown) {
+      window.scrollBy({
+        behavior: 'smooth',
+        top: scrollAmount,
+      });
+    } else {
+      window.scrollBy({
+        behavior: 'smooth',
+        top: -scrollAmount,
+      });
+    }
+  };
+
+  const handleOnDrag = (
+    layout: GridLayout.Layout[],
+    oldItem: GridLayout.Layout,
+    newItem: GridLayout.Layout,
+    placeholder: GridLayout.Layout
+  ) => {
+    const isDraggingDown = newItem.y > placeholder.y;
+
+    //handleScroll(isDraggingDown);
+
+    if (newItem.i.length > 5) return;
+
+    if (!isDraggingDown) return;
+
+    const itemsBelow = layout.filter(
+      (item) => item.y > oldItem.y && item.i !== oldItem.i
+    );
+
+    if (itemsBelow.length) {
+      const closestItem = itemsBelow.reduce((closest, current) => {
+        const isInSameColumn = Math.abs(current.x - oldItem.x) < 10;
+        const isCloserVertically = current.y < closest.y;
+
+        return isInSameColumn && isCloserVertically ? current : closest;
+      }, itemsBelow[0]);
+
+      const isDraggingTallerItem = oldItem.h > closestItem.h * 0.9;
+
+      if (newItem.y > oldItem.h / 1.2 + oldItem.y && isDraggingTallerItem) {
+        const oldX = oldItem.x;
+        const oldY = oldItem.y;
+        closestItem.x = oldX;
+        closestItem.y = oldY;
+      }
+    }
+  };
+
   useEffect(() => {
     setBody((current) => ({
       ...current,
@@ -1286,7 +1376,13 @@ export function ResizableDashboardCards() {
   }, [currentDashboardFields]);
 
   useEffect(() => {
-    if (user?.company_user?.react_settings?.dashboard_fields) {
+    if (
+      user?.company_user?.react_settings?.dashboard_fields &&
+      !isEqual(
+        user?.company_user?.react_settings?.dashboard_fields,
+        currentDashboardFields
+      )
+    ) {
       setCurrentDashboardFields(
         cloneDeep(user?.company_user?.react_settings?.dashboard_fields)
       );
@@ -1405,7 +1501,7 @@ export function ResizableDashboardCards() {
           //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           resizeHandles={['se']}
           draggableCancel=".cancelDraggingCards"
-          compactType="vertical"
+          onDrag={handleOnDrag}
         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">

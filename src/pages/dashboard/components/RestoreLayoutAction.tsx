@@ -19,6 +19,7 @@ import {
   confirmActionModalAtom,
 } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { useSetAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   layoutBreakpoint: string | undefined;
@@ -31,6 +32,8 @@ export function RestoreLayoutAction(props: Props) {
   const setIsModalVisible = useSetAtom(confirmActionModalAtom);
 
   const [isRestoring, setIsRestoring] = useState<boolean>(false);
+
+  const settings = useReactSettings();
 
   if (!layoutBreakpoint) {
     return null;
@@ -49,10 +52,13 @@ export function RestoreLayoutAction(props: Props) {
 
           setIsRestoring(true);
 
-          setTimeout(() => {
-            setIsRestoring(false);
-            setIsModalVisible(false);
-          }, 2500);
+          setTimeout(
+            () => {
+              setIsRestoring(false);
+              setIsModalVisible(false);
+            },
+            settings?.dashboard_fields?.length ? 2500 : 300
+          );
         }}
         disabledButton={isRestoring}
       />

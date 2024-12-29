@@ -79,7 +79,9 @@ export function DashboardCardSelector({ setLayouts }: Props) {
 
   const currentUser = useCurrentUser();
 
-  const [currentFields, setCurrentFields] = useState<DashboardField[]>([]);
+  const [currentFields, setCurrentFields] = useState<
+    DashboardField[] | undefined
+  >();
   const [currentField, setCurrentField] = useState<DashboardField>({
     id: v4(),
     field: '' as Field,
@@ -110,14 +112,14 @@ export function DashboardCardSelector({ setLayouts }: Props) {
 
   const handleDelete = (fieldKey: string) => {
     setCurrentFields((currentFields) =>
-      currentFields.filter((field) => field.id !== fieldKey)
+      currentFields?.filter((field) => field.id !== fieldKey)
     );
   };
 
   const handleSaveCards = () => {
     const updatedUser = cloneDeep(currentUser) as User;
 
-    if (updatedUser && !isFormBusy) {
+    if (updatedUser && !isFormBusy && currentFields) {
       toast.processing();
       setIsFormBusy(true);
 
@@ -148,7 +150,7 @@ export function DashboardCardSelector({ setLayouts }: Props) {
               updatedLayouts[screenSize] = updatedLayouts[screenSize].filter(
                 (layout) =>
                   layout.i.length <= 5 ||
-                  currentFields.some((field) => field.id === layout.i)
+                  currentFields?.some((field) => field.id === layout.i)
               );
             });
 
@@ -162,7 +164,12 @@ export function DashboardCardSelector({ setLayouts }: Props) {
   };
 
   useEffect(() => {
-    if (currentUser && Object.keys(currentUser).length && isCardsModalOpen) {
+    if (
+      currentUser &&
+      Object.keys(currentUser).length &&
+      isCardsModalOpen &&
+      !currentFields
+    ) {
       setCurrentFields(
         cloneDeep(currentUser.company_user?.react_settings?.dashboard_fields) ??
           []
@@ -186,21 +193,22 @@ export function DashboardCardSelector({ setLayouts }: Props) {
         disableClosing={isFieldsModalOpen}
       >
         <div className="flex flex-col space-y-4">
-          {!currentFields.length && (
+          {!currentFields?.length && (
             <span className="text-center font-medium">
               {t('no_records_found')}
             </span>
           )}
 
           <div className="flex flex-col space-y-3">
-            {currentFields.map((field, index) => (
+            {currentFields?.map((field, index) => (
               <div key={index} className="flex space-x-2 items-center">
-                <Icon
-                  className="cursor-pointer"
-                  element={MdClose}
-                  size={24}
-                  onClick={() => handleDelete(field.id)}
-                />
+                <div onClick={() => handleDelete(field.id)}>
+                  <Icon
+                    className="cursor-pointer"
+                    element={MdClose}
+                    size={24}
+                  />
+                </div>
 
                 <div className="flex flex-col">
                   <p>{t(FIELDS_LABELS[field.field])}</p>
@@ -318,10 +326,14 @@ export function DashboardCardSelector({ setLayouts }: Props) {
           <Button
             behavior="button"
             onClick={() => {
-              setCurrentFields((current) => [
-                ...current,
-                { ...currentField, id: v4() },
-              ]);
+              setCurrentFields((current) =>
+                current
+                  ? [
+                      ...cloneDeep(current),
+                      { ...cloneDeep(currentField), id: v4() },
+                    ]
+                  : []
+              );
               handleFieldsModalClose();
             }}
             disabled={!currentField.field}
