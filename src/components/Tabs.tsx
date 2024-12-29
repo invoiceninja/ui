@@ -105,11 +105,12 @@ export function Tabs(props: Props) {
           name="tabs"
           className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           defaultValue={props.tabs.find((tab) => tab)?.name}
+          onChange={(e) => navigate(e.currentTarget.value)}
         >
           {props.tabs.map(
             (tab) =>
               (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                <option key={tab.name}>{tab.formatName?.() || tab.name}</option>
+                <option key={tab.name} value={tab.href}>{tab.formatName?.() || tab.name}</option>
               )
           )}
         </select>
