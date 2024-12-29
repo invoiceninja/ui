@@ -1127,7 +1127,7 @@ export function ResizableDashboardCards() {
     }));
   };
 
-  const updateLayoutHeight = () => {
+  const updateLayoutHeight = (isRestoring?: boolean) => {
     if (!layoutBreakpoint) {
       return;
     }
@@ -1162,10 +1162,12 @@ export function ResizableDashboardCards() {
         break;
     }
 
-    const nonExistingCards = currentDashboardFields?.filter(
-      (currentCard) =>
-        !layouts[layoutBreakpoint].some((card) => currentCard.id === card.i)
-    );
+    const nonExistingCards = isRestoring
+      ? currentDashboardFields
+      : currentDashboardFields?.filter(
+          (currentCard) =>
+            !layouts[layoutBreakpoint].some((card) => currentCard.id === card.i)
+        );
 
     setLayouts((currentLayouts) => {
       const updatedLayouts = cloneDeep(currentLayouts);
@@ -1640,6 +1642,7 @@ export function ResizableDashboardCards() {
                   <RestoreLayoutAction
                     layoutBreakpoint={layoutBreakpoint}
                     setLayouts={setLayouts}
+                    updateLayoutHeight={updateLayoutHeight}
                   />
                 </>
               )}

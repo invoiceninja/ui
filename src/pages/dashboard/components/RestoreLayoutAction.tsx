@@ -20,14 +20,16 @@ import {
 } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { cloneDeep } from 'lodash';
 
 interface Props {
   layoutBreakpoint: string | undefined;
   setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
+  updateLayoutHeight: (isRestoring: boolean) => void;
 }
 
 export function RestoreLayoutAction(props: Props) {
-  const { layoutBreakpoint, setLayouts } = props;
+  const { layoutBreakpoint, setLayouts, updateLayoutHeight } = props;
 
   const setIsModalVisible = useSetAtom(confirmActionModalAtom);
 
@@ -44,13 +46,19 @@ export function RestoreLayoutAction(props: Props) {
       <ConfirmActionModal
         onClick={() => {
           layoutBreakpoint &&
-            setLayouts((currentLayouts) => ({
-              ...currentLayouts,
-              [layoutBreakpoint]:
-                initialLayouts[layoutBreakpoint as keyof typeof initialLayouts],
-            }));
+            setLayouts((currentLayouts) =>
+              cloneDeep({
+                ...currentLayouts,
+                [layoutBreakpoint]:
+                  initialLayouts[
+                    layoutBreakpoint as keyof typeof initialLayouts
+                  ],
+              })
+            );
 
           setIsRestoring(true);
+
+          updateLayoutHeight(true);
 
           setTimeout(
             () => {
