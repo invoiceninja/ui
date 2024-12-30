@@ -1199,7 +1199,7 @@ export function ResizableDashboardCards() {
       cloneDeep(layouts)
     );
 
-    // delete updatedUser.company_user?.react_settings?.dashboard_fields;
+    // delete updatedUser.company_user?.settings?.dashboard_fields;
 
     // delete updatedUser.company_user.react_settings
     //   .dashboard_cards_configuration;
