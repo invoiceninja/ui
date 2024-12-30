@@ -7,8 +7,8 @@ import {
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { useAtom } from 'jotai';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { currentWidthAtom } from './Th';
 import React, { useEffect } from 'react';
+import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
 
 interface Props extends CommonProps {
   colSpan?: number;
