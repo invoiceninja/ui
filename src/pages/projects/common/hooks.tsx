@@ -9,7 +9,7 @@
  */
 
 import { EntityState } from '$app/common/enums/entity-state';
-import { date, endpoint, getEntityState } from '$app/common/helpers';
+import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -30,19 +30,14 @@ import {
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { projectAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useInvoiceProject } from '$app/pages/projects/common/hooks/useInvoiceProject';
 import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Task } from '$app/common/interfaces/task';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useDocumentsBulk } from '$app/common/queries/documents';
@@ -314,8 +309,6 @@ export function useActions() {
 
   const hasPermission = useHasPermission();
 
-  const queryClient = useQueryClient();
-
   const bulk = useBulkAction();
 
   const invoiceProject = useInvoiceProject();
@@ -333,47 +326,6 @@ export function useActions() {
     navigate('/projects/create?action=clone');
   };
 
-  const handleInvoiceProject = (project: Project) => {
-    toast.processing();
-
-    queryClient
-      .fetchQuery(
-        [
-          '/api/v1/tasks',
-          'project_tasks',
-          project.id,
-          'per_page',
-          100,
-          'status',
-          'active',
-        ],
-        () =>
-          request(
-            'GET',
-            endpoint(
-              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active&without_deleted_clients=true',
-              {
-                projectId: project.id,
-              }
-            )
-          ),
-        { staleTime: Infinity }
-      )
-      .then((response: GenericSingleResourceResponse<Task[]>) => {
-        toast.dismiss();
-
-        const unInvoicedTasks = response.data.data.filter(
-          (task) => !task.invoice_id
-        );
-
-        if (!response.data.data.length) {
-          return toast.error('no_assigned_tasks');
-        }
-
-        invoiceProject(unInvoicedTasks, project.client_id, project.id);
-      });
-  };
-
   const {
     setChangeTemplateResources,
     setChangeTemplateVisible,
@@ -384,7 +336,7 @@ export function useActions() {
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement
-          onClick={() => handleInvoiceProject(project)}
+          onClick={() => invoiceProject(project.id)}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_project')}
@@ -455,31 +407,15 @@ export function useActions() {
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
   const invoiceProject = useInvoiceProject();
-  const combineProjectsTasks = useCombineProjectsTasks();
 
   const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
 
-  const handleInvoiceProjects = (
-    tasks: Task[] | null,
-    projectsIds: string[]
-  ) => {
-    if (tasks && !tasks.length) {
-      return toast.error('no_assigned_tasks');
-    }
-
-    if (!tasks) {
-      return toast.error('multiple_client_error');
-    }
-
+  const handleInvoiceProjects = (projectsIds: string[]) => {
     const projectsIdsLength = projectsIds.length;
 
-    invoiceProject(
-      tasks,
-      tasks[0].client_id,
-      projectsIds[projectsIdsLength - 1]
-    );
+    invoiceProject(projectsIds[projectsIdsLength - 1]);
   };
 
   const shouldDownloadDocuments = (projects: Project[]) => {
@@ -507,14 +443,11 @@ export const useCustomBulkActions = () => {
   } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Project>[] = [
-    ({ selectedIds, selectedResources, setSelected }) =>
+    ({ selectedIds, setSelected }) =>
       hasPermission('create_invoice') && (
         <DropdownElement
           onClick={async () => {
-            handleInvoiceProjects(
-              await combineProjectsTasks(selectedIds, selectedResources),
-              selectedIds
-            );
+            handleInvoiceProjects(selectedIds);
 
             setSelected([]);
           }}
