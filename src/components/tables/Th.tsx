@@ -41,10 +41,7 @@ export function Th$(props: Props) {
     currentWidth,
     handleMouseDown,
     handleDoubleClick,
-    handleMouseEnter,
-    handleMouseLeave,
-    handleMouseOver,
-    handleMouseMove
+    handleMouseMove,
   } = useResizeColumn(props.resizable);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -69,21 +66,15 @@ export function Th$(props: Props) {
         borderColor: colors.$4,
         width: currentWidth,
       }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={() => {
-        handleMouseLeave();
-      }}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       className={classNames(
         `px-2 lg:px-2.5 xl:px-4 py-2.5 text-left text-xs font-medium tracking-wider whitespace-nowrap ${props.className}`,
         {
-          'cursor-pointer': props.onColumnClick,
           'border-r': props.resizable,
           uppercase: !props.disableUppercase,
         }
       )}
-      onMouseOver={handleMouseOver}
       onMouseMove={handleMouseMove}
     >
       <div
