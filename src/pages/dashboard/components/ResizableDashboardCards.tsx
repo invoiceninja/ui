@@ -176,6 +176,14 @@ export const initialLayouts = {
       static: true,
     },
     {
+      i: '1',
+      x: 0,
+      y: 1,
+      w: 1000,
+      h: 6.3,
+      isResizable: false,
+    },
+    {
       i: '2',
       x: 0,
       y: 2,
@@ -1117,7 +1125,10 @@ export function ResizableDashboardCards() {
       const maxHeight = Math.max(...items.map((item) => item.h));
       items.forEach(
         (item) =>
-          (item.h = item.i.length < 5 && item.i !== '0' ? maxHeight : item.h)
+          (item.h =
+            item.i.length < 5 && item.i !== '0' && item.i !== '1'
+              ? maxHeight
+              : item.h)
       );
     });
 
@@ -1127,76 +1138,55 @@ export function ResizableDashboardCards() {
     }));
   };
 
-  const updateLayoutHeight = (isRestoring?: boolean) => {
-    if (!layoutBreakpoint) {
-      return;
-    }
-
-    const totalCards = currentDashboardFields?.length || 0;
-    let widthPerScreenSize = 0;
+  const updateLayoutHeight = () => {
+    const totalCards =
+      user?.company_user?.settings.dashboard_fields?.length || 0;
+    let cardsPerRow = 0;
 
     switch (layoutBreakpoint) {
       case 'xxl':
-        widthPerScreenSize = 150;
+        cardsPerRow = 6;
         break;
       case 'xl':
-        widthPerScreenSize = 200;
+        cardsPerRow = 5;
         break;
       case 'lg':
-        widthPerScreenSize = 250;
+        cardsPerRow = 4;
         break;
       case 'md':
-        widthPerScreenSize = 300;
+        cardsPerRow = 3;
         break;
       case 'sm':
-        widthPerScreenSize = 350;
+        cardsPerRow = 2;
         break;
       case 'xs':
-        widthPerScreenSize = 500;
+        cardsPerRow = 1;
         break;
       case 'xxs':
-        widthPerScreenSize = 1000;
+        cardsPerRow = 1;
         break;
       default:
-        widthPerScreenSize = 200;
+        cardsPerRow = 6;
         break;
     }
 
-    const nonExistingCards = isRestoring
-      ? currentDashboardFields
-      : currentDashboardFields?.filter(
-          (currentCard) =>
-            !layouts[layoutBreakpoint].some((card) => currentCard.id === card.i)
-        );
+    const numberOfRows = Math.ceil(totalCards / cardsPerRow);
 
     setLayouts((currentLayouts) => {
       const updatedLayouts = cloneDeep(currentLayouts);
-      const cardsPerRow = Math.floor(1000 / (widthPerScreenSize + 10));
-      const rows = Math.ceil(totalCards / cardsPerRow);
-      const newCards = [];
 
-      if (nonExistingCards.length) {
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cardsPerRow; j++) {
-            const card = nonExistingCards.shift();
+      Object.keys(updatedLayouts).forEach((breakpoint) => {
+        updatedLayouts[breakpoint] = updatedLayouts[breakpoint].map((item) =>
+          item.i === '1'
+            ? {
+                ...item,
+                h: totalCards ? numberOfRows * 7 : 0,
+              }
+            : item
+        );
+      });
 
-            if (card) {
-              newCards.push({
-                i: card.id,
-                x: j * (widthPerScreenSize + 10),
-                y: 0,
-                w: widthPerScreenSize,
-                h: 7.3,
-              });
-            }
-          }
-        }
-      }
-
-      return {
-        ...updatedLayouts,
-        [layoutBreakpoint]: [...updatedLayouts[layoutBreakpoint], ...newCards],
-      };
+      return updatedLayouts;
     });
   };
 
@@ -1379,17 +1369,17 @@ export function ResizableDashboardCards() {
 
   useEffect(() => {
     if (
-      user?.company_user?.react_settings?.dashboard_fields &&
+      user?.company_user?.settings?.dashboard_fields &&
       !isEqual(
-        user?.company_user?.react_settings?.dashboard_fields,
+        user?.company_user?.settings?.dashboard_fields,
         currentDashboardFields
       )
     ) {
       setCurrentDashboardFields(
-        cloneDeep(user?.company_user?.react_settings?.dashboard_fields)
+        cloneDeep(user?.company_user?.settings?.dashboard_fields)
       );
     }
-  }, [user?.company_user?.react_settings?.dashboard_fields]);
+  }, [user?.company_user?.settings?.dashboard_fields]);
 
   useEffect(() => {
     if (totals.data) {
@@ -1577,7 +1567,7 @@ export function ResizableDashboardCards() {
                 value={body.date_range}
               />
 
-              <DashboardCardSelector setLayouts={setLayouts} />
+              <DashboardCardSelector />
 
               <Preferences>
                 <CurrencySelector
@@ -1649,23 +1639,31 @@ export function ResizableDashboardCards() {
             </div>
           </div>
 
-          {currentDashboardFields.map((field) => (
+          {currentDashboardFields?.length ? (
             <div
-              key={field.id}
-              className={classNames('drag-handle', {
+              key="1"
+              className={classNames('grid gap-3 drag-handle grid-cols-12', {
+                'grid-cols-10': layoutBreakpoint === 'xl',
+                'grid-cols-12':
+                  layoutBreakpoint === 'xxl' ||
+                  (layoutBreakpoint !== 'xl' && layoutBreakpoint !== 'xxl') ||
+                  !layoutBreakpoint,
                 'cursor-grab': isEditMode,
               })}
             >
-              <DashboardCard
-                field={field}
-                dateRange={dateRange}
-                startDate={dates.start_date}
-                endDate={dates.end_date}
-                currencyId={currency.toString()}
-                layoutBreakpoint={layoutBreakpoint}
-              />
+              {currentDashboardFields.map((field, index) => (
+                <DashboardCard
+                  key={(20 + index).toString()}
+                  field={field}
+                  dateRange={dateRange}
+                  startDate={dates.start_date}
+                  endDate={dates.end_date}
+                  currencyId={currency.toString()}
+                  layoutBreakpoint={layoutBreakpoint}
+                />
+              ))}
             </div>
-          ))}
+          ) : null}
 
           {company && !isCardRemoved('account_login_text') ? (
             <div

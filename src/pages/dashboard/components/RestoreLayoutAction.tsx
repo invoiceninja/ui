@@ -19,13 +19,12 @@ import {
   confirmActionModalAtom,
 } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { useSetAtom } from 'jotai';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { cloneDeep } from 'lodash';
 
 interface Props {
   layoutBreakpoint: string | undefined;
   setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
-  updateLayoutHeight: (isRestoring: boolean) => void;
+  updateLayoutHeight: () => void;
 }
 
 export function RestoreLayoutAction(props: Props) {
@@ -34,8 +33,6 @@ export function RestoreLayoutAction(props: Props) {
   const setIsModalVisible = useSetAtom(confirmActionModalAtom);
 
   const [isRestoring, setIsRestoring] = useState<boolean>(false);
-
-  const settings = useReactSettings();
 
   if (!layoutBreakpoint) {
     return null;
@@ -58,15 +55,12 @@ export function RestoreLayoutAction(props: Props) {
 
           setIsRestoring(true);
 
-          updateLayoutHeight(true);
+          updateLayoutHeight();
 
-          setTimeout(
-            () => {
-              setIsRestoring(false);
-              setIsModalVisible(false);
-            },
-            settings?.dashboard_fields?.length ? 2500 : 300
-          );
+          setTimeout(() => {
+            setIsRestoring(false);
+            setIsModalVisible(false);
+          }, 300);
         }}
         disabledButton={isRestoring}
       />

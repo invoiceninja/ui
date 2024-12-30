@@ -51,7 +51,6 @@ export type Field =
   | 'invoice_paid_expenses';
 
 export interface DashboardField {
-  id: string;
   calculate: Calculate;
   field: Field;
   format: Format;

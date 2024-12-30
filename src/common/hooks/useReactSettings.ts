@@ -17,7 +17,6 @@ import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 import { DashboardGridLayouts } from '$app/pages/dashboard/components/ResizableDashboardCards';
-import { DashboardField } from '../interfaces/company-user';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -93,7 +92,6 @@ export interface ReactSettings {
   color_theme?: ColorTheme;
   dashboard_cards_configuration?: DashboardGridLayouts;
   removed_dashboard_cards?: Record<string, string[]>;
-  dashboard_fields?: DashboardField[];
 }
 
 export type ReactTableColumns =

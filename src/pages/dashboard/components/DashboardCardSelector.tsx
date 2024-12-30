@@ -26,16 +26,21 @@ import { User } from '$app/common/interfaces/user';
 import { Button, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
-import { cloneDeep, set } from 'lodash';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
+import { cloneDeep, isEqual, set } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgOptions } from 'react-icons/cg';
-import { MdClose } from 'react-icons/md';
+import { MdClose, MdDragHandle } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
 import { PERIOD_LABELS } from './DashboardCard';
-import { v4 } from 'uuid';
-import { DashboardGridLayouts } from './ResizableDashboardCards';
 
 const FIELDS = [
   'active_invoices',
@@ -69,21 +74,14 @@ export const FIELDS_LABELS = {
   invoice_paid_expenses: 'total_invoice_paid_expenses',
 };
 
-interface Props {
-  setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
-}
-
-export function DashboardCardSelector({ setLayouts }: Props) {
+export function DashboardCardSelector() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
   const currentUser = useCurrentUser();
 
-  const [currentFields, setCurrentFields] = useState<
-    DashboardField[] | undefined
-  >();
+  const [currentFields, setCurrentFields] = useState<DashboardField[]>([]);
   const [currentField, setCurrentField] = useState<DashboardField>({
-    id: v4(),
     field: '' as Field,
     period: 'current',
     calculate: 'sum',
@@ -102,7 +100,6 @@ export function DashboardCardSelector({ setLayouts }: Props) {
     setIsFieldsModalOpen(false);
 
     setCurrentField({
-      id: v4(),
       field: '' as Field,
       period: 'current',
       calculate: 'sum',
@@ -110,24 +107,32 @@ export function DashboardCardSelector({ setLayouts }: Props) {
     });
   };
 
-  const handleDelete = (fieldKey: string) => {
-    setCurrentFields((currentFields) =>
-      currentFields?.filter((field) => field.id !== fieldKey)
+  const onDragEnd = (result: DropResult) => {
+    const sorted = arrayMoveImmutable(
+      currentFields,
+      result.source.index,
+      result.destination?.index as unknown as number
     );
+
+    setCurrentFields(sorted);
+  };
+
+  const handleDelete = (field: DashboardField) => {
+    const updatedCurrentColumns = currentFields.filter(
+      (currentField) => !isEqual(currentField, field)
+    );
+
+    setCurrentFields(updatedCurrentColumns);
   };
 
   const handleSaveCards = () => {
     const updatedUser = cloneDeep(currentUser) as User;
 
-    if (updatedUser && !isFormBusy && currentFields) {
+    if (updatedUser && !isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
 
-      set(
-        updatedUser,
-        'company_user.react_settings.dashboard_fields',
-        cloneDeep(currentFields)
-      );
+      set(updatedUser, 'company_user.settings.dashboard_fields', currentFields);
 
       request(
         'PUT',
@@ -143,20 +148,6 @@ export function DashboardCardSelector({ setLayouts }: Props) {
 
           dispatch(updateUser(updatedUser));
 
-          setLayouts((current) => {
-            const updatedLayouts = cloneDeep(current);
-
-            Object.keys(updatedLayouts).forEach((screenSize) => {
-              updatedLayouts[screenSize] = updatedLayouts[screenSize].filter(
-                (layout) =>
-                  layout.i.length <= 5 ||
-                  currentFields?.some((field) => field.id === layout.i)
-              );
-            });
-
-            return updatedLayouts;
-          });
-
           handleCardsModalClose();
         })
         .finally(() => setIsFormBusy(false));
@@ -164,15 +155,9 @@ export function DashboardCardSelector({ setLayouts }: Props) {
   };
 
   useEffect(() => {
-    if (
-      currentUser &&
-      Object.keys(currentUser).length &&
-      isCardsModalOpen &&
-      !currentFields
-    ) {
+    if (currentUser && Object.keys(currentUser).length && isCardsModalOpen) {
       setCurrentFields(
-        cloneDeep(currentUser.company_user?.react_settings?.dashboard_fields) ??
-          []
+        currentUser.company_user?.settings.dashboard_fields ?? []
       );
     }
   }, [currentUser, isCardsModalOpen]);
@@ -193,45 +178,115 @@ export function DashboardCardSelector({ setLayouts }: Props) {
         disableClosing={isFieldsModalOpen}
       >
         <div className="flex flex-col space-y-4">
-          {!currentFields?.length && (
+          {!currentFields.length && (
             <span className="text-center font-medium">
               {t('no_records_found')}
             </span>
           )}
 
-          <div className="flex flex-col space-y-3">
-            {currentFields?.map((field, index) => (
-              <div key={index} className="flex space-x-2 items-center">
-                <div onClick={() => handleDelete(field.id)}>
-                  <Icon
-                    className="cursor-pointer"
-                    element={MdClose}
-                    size={24}
-                  />
-                </div>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable
+              droppableId="columns"
+              renderClone={(provided, _, rubric) => {
+                const dashboardField = currentFields[rubric.source.index];
 
-                <div className="flex flex-col">
-                  <p>{t(FIELDS_LABELS[field.field])}</p>
+                return (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className="flex items-center justify-between py-2 text-sm"
+                  >
+                    <div className="flex space-x-2 items-center">
+                      <Icon element={MdClose} size={24} />
 
-                  <div className="flex text-xs space-x-1">
-                    <span>
-                      {t(
-                        PERIOD_LABELS[
-                          field.period as keyof typeof PERIOD_LABELS
-                        ] ?? field.period
-                      )}
-                    </span>
-                    <span>&middot;</span>
-                    <span>
-                      {t(
-                        field.calculate === 'avg' ? 'average' : field.calculate
-                      )}
-                    </span>
+                      <div className="flex flex-col">
+                        <p>{t(FIELDS_LABELS[dashboardField.field])}</p>
+
+                        <div className="flex text-xs space-x-1">
+                          <span>
+                            {t(
+                              PERIOD_LABELS[
+                                dashboardField.period as keyof typeof PERIOD_LABELS
+                              ] ?? dashboardField.period
+                            )}
+                          </span>
+                          <span>&middot;</span>
+                          <span>
+                            {t(
+                              dashboardField.calculate === 'avg'
+                                ? 'average'
+                                : dashboardField.calculate
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div {...provided.dragHandleProps}>
+                      <Icon element={MdDragHandle} size={27} />
+                    </div>
                   </div>
+                );
+              }}
+            >
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {currentFields.map((field, index) => (
+                    <Draggable
+                      key={index}
+                      draggableId={`item-${index}`}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="flex items-center justify-between py-2"
+                        >
+                          <div className="flex space-x-2 items-center">
+                            <Icon
+                              className="cursor-pointer"
+                              element={MdClose}
+                              size={24}
+                              onClick={() => handleDelete(field)}
+                            />
+
+                            <div className="flex flex-col">
+                              <p>{t(FIELDS_LABELS[field.field])}</p>
+
+                              <div className="flex text-xs space-x-1">
+                                <span>
+                                  {t(
+                                    PERIOD_LABELS[
+                                      field.period as keyof typeof PERIOD_LABELS
+                                    ] ?? field.period
+                                  )}
+                                </span>
+                                <span>&middot;</span>
+                                <span>
+                                  {t(
+                                    field.calculate === 'avg'
+                                      ? 'average'
+                                      : field.calculate
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div {...provided.dragHandleProps}>
+                            <Icon element={MdDragHandle} size={27} />
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+
+                  {provided.placeholder}
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
 
           <Button
             behavior="button"
@@ -326,14 +381,7 @@ export function DashboardCardSelector({ setLayouts }: Props) {
           <Button
             behavior="button"
             onClick={() => {
-              setCurrentFields((current) =>
-                current
-                  ? [
-                      ...cloneDeep(current),
-                      { ...cloneDeep(currentField), id: v4() },
-                    ]
-                  : []
-              );
+              setCurrentFields((current) => [...current, currentField]);
               handleFieldsModalClose();
             }}
             disabled={!currentField.field}
