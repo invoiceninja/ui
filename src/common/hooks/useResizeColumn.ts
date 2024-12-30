@@ -73,22 +73,21 @@ export function useResizeColumn(resizable: string | undefined) {
   );
 
   const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      thRef.current!.style.cursor = inResizeZone(
-        e as unknown as React.MouseEvent
-      )
+    (e: MouseEvent | React.MouseEvent) => {
+      thRef.current!.style.cursor = inResizeZone(e as React.MouseEvent)
         ? 'ew-resize'
         : '';
 
       if (!isResizing || !thRef.current || currentWidth === null) return;
 
       const dx = e.clientX - startX;
-      const newWidth = startWidth + dx;
+      const newWidth = startWidth + dx - 35; // Safe offset for snapping to the right when starting the drag
 
-      if (newWidth > 5 && newWidth <= 1000) {
-        setCurrentWidth(newWidth);
-        thRef.current.style.width = `${newWidth}px`;
-      }
+      console.log({ dx, newWidth });
+
+      setCurrentWidth(newWidth);
+
+      thRef.current.style.width = `${newWidth}px`;
     },
     [isResizing, startX, startWidth, currentWidth, setCurrentWidth]
   );
