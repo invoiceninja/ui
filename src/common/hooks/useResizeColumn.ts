@@ -23,7 +23,7 @@ export function useResizeColumn(resizable: string | undefined) {
   const [widths, setWidths] = useAtom(currentWidthAtom);
 
   const inResizeZone = useCallback(
-    (event: React.MouseEvent) => {
+    (event: MouseEvent | React.MouseEvent) => {
       const borderThreshold = 10;
       const thWidth = thRef.current?.offsetWidth;
       const clickPosition =
@@ -74,9 +74,7 @@ export function useResizeColumn(resizable: string | undefined) {
 
   const handleMouseMove = useCallback(
     (e: MouseEvent | React.MouseEvent) => {
-      thRef.current!.style.cursor = inResizeZone(e as React.MouseEvent)
-        ? 'ew-resize'
-        : '';
+      document.body.style.cursor = inResizeZone(e) ? 'ew-resize' : '';
 
       if (!isResizing || !thRef.current || currentWidth === null) return;
 
@@ -110,6 +108,18 @@ export function useResizeColumn(resizable: string | undefined) {
       document.removeEventListener('mouseup', handleMouseUp);
     }
 
+    const table = thRef.current?.closest('table');
+
+    if (table) {
+      if (isResizing) {
+        table.classList.add('is-resizing');
+      } else {
+        table.classList.remove('is-resizing');
+      }
+    }
+
+    document.body.style.cursor = isResizing ? 'ew-resize' : '';
+
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -133,33 +143,6 @@ export function useResizeColumn(resizable: string | undefined) {
     [resizable, setCurrentWidth]
   );
 
-  const handleMouseEnter = useCallback(
-    (event: React.MouseEvent) => {
-      if (resizable) {
-        const thWidth = thRef.current?.offsetWidth;
-        const clickPosition =
-          event.clientX - thRef.current!.getBoundingClientRect().left;
-        const borderThreshold = 40;
-
-        if (thWidth && clickPosition > thWidth - borderThreshold) {
-          thRef.current!.style.cursor = 'ew-resize';
-        } else {
-          thRef.current!.style.cursor = '';
-        }
-      }
-    },
-    [resizable]
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    thRef.current!.style.cursor = '';
-  }, []);
-
-  const handleMouseOver = useCallback(
-    (event: React.MouseEvent) => handleMouseEnter(event),
-    [resizable]
-  );
-
   return {
     thRef,
     currentWidth,
@@ -167,9 +150,6 @@ export function useResizeColumn(resizable: string | undefined) {
     handleMouseMove,
     handleMouseUp,
     handleDoubleClick,
-    handleMouseEnter,
-    handleMouseLeave,
-    handleMouseOver,
     setCurrentWidth,
     isResizing,
   };
