@@ -22,14 +22,18 @@ export function useBulkAction() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (ids: string[], action: Action) => {
+  return async (ids: string[], action: Action) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/projects/bulk'), {
+    return request('POST', endpoint('/api/v1/projects/bulk'), {
       action,
       ids,
     })
-      .then(() => toast.success(`${action}d_project`))
+      .then((response) => {
+        toast.success(`${action}d_project`);
+
+        return response;
+      })
       .finally(() => {
         $refetch(['projects']);
 
