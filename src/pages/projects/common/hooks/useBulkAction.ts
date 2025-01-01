@@ -30,7 +30,9 @@ export function useBulkAction() {
       ids,
     })
       .then((response) => {
-        toast.success(`${action}d_project`);
+        if (action !== 'invoice') {
+          toast.success(`${action}d_project`);
+        }
 
         return response;
       })
