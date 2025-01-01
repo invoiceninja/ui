@@ -371,7 +371,7 @@ export function useActions() {
       getEntityState(project) === EntityState.Active &&
       isEditOrShowPage && (
         <DropdownElement
-          onClick={() => bulk(project.id, 'archive')}
+          onClick={() => bulk([project.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -382,7 +382,7 @@ export function useActions() {
         getEntityState(project) === EntityState.Deleted) &&
       isEditOrShowPage && (
         <DropdownElement
-          onClick={() => bulk(project.id, 'restore')}
+          onClick={() => bulk([project.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -393,7 +393,7 @@ export function useActions() {
         getEntityState(project) === EntityState.Archived) &&
       isEditOrShowPage && (
         <DropdownElement
-          onClick={() => bulk(project.id, 'delete')}
+          onClick={() => bulk([project.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
@@ -406,17 +406,10 @@ export function useActions() {
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
-  const invoiceProject = useInvoiceProject();
 
+  const bulk = useBulkAction();
   const hasPermission = useHasPermission();
-
   const documentsBulk = useDocumentsBulk();
-
-  const handleInvoiceProjects = (projectsIds: string[]) => {
-    const projectsIdsLength = projectsIds.length;
-
-    invoiceProject(projectsIds[projectsIdsLength - 1]);
-  };
 
   const shouldDownloadDocuments = (projects: Project[]) => {
     return projects.some(({ documents }) => documents.length);
@@ -447,7 +440,7 @@ export const useCustomBulkActions = () => {
       hasPermission('create_invoice') && (
         <DropdownElement
           onClick={async () => {
-            handleInvoiceProjects(selectedIds);
+            bulk(selectedIds, 'invoice');
 
             setSelected([]);
           }}

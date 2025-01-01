@@ -16,16 +16,18 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
+type Action = 'archive' | 'restore' | 'delete' | 'invoice';
+
 export function useBulkAction() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (ids: string[], action: Action) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/projects/bulk'), {
       action,
-      ids: [id],
+      ids,
     })
       .then(() => toast.success(`${action}d_project`))
       .finally(() => {
