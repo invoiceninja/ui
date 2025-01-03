@@ -56,4 +56,8 @@ export const enum PaymentType {
   CASH_APP = '51',
   VENMO = '25',
   IZETTLE = '23',
+  DEBIT = '3',
+  GOOGLE_WALLET = '14',
+  MONEY_ORDER = '26',
+  SWISH = '24',
 }
