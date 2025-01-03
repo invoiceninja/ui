@@ -24,12 +24,7 @@ import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 
 import { Icon } from '$app/components/icons/Icon';
-import {
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight,
-  MdNotStarted,
-  MdSend,
-} from 'react-icons/md';
+import { MdNotStarted, MdSend } from 'react-icons/md';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import {
   ConfirmActionModal,
@@ -48,6 +43,7 @@ import { RecurringInvoice as RecurringInvoiceType } from '$app/common/interfaces
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
+import { PreviousNextNavigation } from './edit/components/PreviousNextNavigation';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -154,17 +150,7 @@ export default function RecurringInvoice() {
           ),
           additionalSaveOptions: saveOptions,
         })}
-      afterBreadcrumbs={
-        <div className="flex items-center ml-9">
-          <div>
-            <Icon element={MdKeyboardArrowLeft} size={29} />
-          </div>
-
-          <div>
-            <Icon element={MdKeyboardArrowRight} size={29} />
-          </div>
-        </div>
-      }
+      afterBreadcrumbs={<PreviousNextNavigation id={recurringInvoice?.id} />}
     >
       {recurringInvoice?.id === id ? (
         <div className="space-y-4">

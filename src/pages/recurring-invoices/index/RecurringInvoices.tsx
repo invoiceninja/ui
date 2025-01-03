@@ -42,7 +42,6 @@ import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useQueryClient } from 'react-query';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -62,10 +61,6 @@ export default function RecurringInvoices() {
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
   ];
-
-  const queryClient = useQueryClient();
-
-  console.log(queryClient);
 
   const actions = useActions();
   const reactSettings = useReactSettings();
