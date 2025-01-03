@@ -15,13 +15,20 @@ import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { MdInfoOutline } from 'react-icons/md';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function PEPPOLPlanBanner() {
   const [t] = useTranslation();
 
   const currentUser = useCurrentUser();
 
-  if (enterprisePlan()) {
+  const { isAdmin, isOwner } = useAdmin();
+
+  if (
+    enterprisePlan() ||
+    !currentUser?.company_user?.ninja_portal_url ||
+    (!isAdmin && !isOwner)
+  ) {
     return null;
   }
 
