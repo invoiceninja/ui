@@ -131,7 +131,7 @@ export function Th$(props: Props) {
 
       {props.resizable ? <span
         className={classNames(
-          'column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:bg-white hover:transition duration-100',
+          'column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:bg-white hover:transition duration-50',
           {
             'bg-white': isResizing,
           }
