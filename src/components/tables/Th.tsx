@@ -42,6 +42,7 @@ export function Th$(props: Props) {
     handleMouseDown,
     handleDoubleClick,
     handleMouseMove,
+    isResizing,
   } = useResizeColumn(props.resizable);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -71,7 +72,7 @@ export function Th$(props: Props) {
       className={classNames(
         `px-2 lg:px-2.5 xl:px-4 py-2.5 text-left text-xs font-medium tracking-wider whitespace-nowrap ${props.className}`,
         {
-          'border-r': props.resizable,
+          'border-r relative': props.resizable,
           uppercase: !props.disableUppercase,
         }
       )}
@@ -127,6 +128,15 @@ export function Th$(props: Props) {
           <span>{props.children}</span>
         )}
       </div>
+
+      {props.resizable ? <span
+        className={classNames(
+          'column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:bg-white hover:transition duration-100',
+          {
+            'bg-white': isResizing,
+          }
+        )}
+      ></span>: null}
     </th>
   );
 }
