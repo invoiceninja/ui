@@ -74,7 +74,7 @@ export function useResizeColumn(resizable: string | undefined) {
 
   const handleMouseMove = useCallback(
     (e: MouseEvent | React.MouseEvent) => {
-      document.body.style.cursor = inResizeZone(e) ? 'ew-resize' : '';
+      document.body.style.cursor = inResizeZone(e) && resizable ? 'ew-resize' : '';
 
       if (!isResizing || !thRef.current || currentWidth === null) return;
 
@@ -118,7 +118,7 @@ export function useResizeColumn(resizable: string | undefined) {
       }
     }
 
-    document.body.style.cursor = isResizing ? 'ew-resize' : '';
+    document.body.style.cursor = isResizing && resizable ? 'ew-resize' : '';
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
@@ -152,5 +152,6 @@ export function useResizeColumn(resizable: string | undefined) {
     handleDoubleClick,
     setCurrentWidth,
     isResizing,
+    inResizeZone,
   };
 }
