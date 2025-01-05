@@ -14,6 +14,7 @@ import { Alert } from './Alert';
 import { Link } from './forms';
 import CommonProps from '../common/interfaces/common-props.interface';
 import { MdInfoOutline } from 'react-icons/md';
+import { Icon } from './icons/Icon';
 
 interface Props extends CommonProps {
   message?: string;
@@ -29,8 +30,11 @@ export function AdvancedSettingsPlanAlert(props: Props) {
       <div className={props.className}>
         <Alert className="mb-4" type="warning" disableClosing>
           <div className="flex items-center">
-            <MdInfoOutline className="mr-2" fontSize={20} />
-            {props.message ? props.message : t('start_free_trial_message')}
+            <Icon element={MdInfoOutline} className="mr-2" size={20} />
+
+            <span>
+              {props.message ? props.message : t('start_free_trial_message')}
+            </span>
 
             {user?.company_user && (
               <Link
