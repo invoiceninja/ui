@@ -339,6 +339,7 @@ export function TransactionMatchDetails(props: Props) {
                   setSelectedIds={setExpenseIds}
                   selectedIds={expenseIds}
                   calculateTotal
+                  addSelectAllButton
                 />
               )}
 

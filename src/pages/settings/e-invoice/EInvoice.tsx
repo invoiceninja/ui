@@ -42,6 +42,7 @@ import { EUTaxDetails } from './common/components/EUTaxDetails';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
 import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -209,6 +210,8 @@ export function EInvoice() {
       }}
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
+
+      <PEPPOLPlanBanner />
 
       {Boolean(!company?.legal_entity_id) && (
         <Card title={t('e_invoice')}>
