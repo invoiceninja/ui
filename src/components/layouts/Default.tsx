@@ -55,7 +55,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Notifications } from '../Notifications';
 import { useSocketEvent } from '$app/common/queries/sockets';
@@ -84,16 +84,18 @@ interface Props extends CommonProps {
   afterBreadcrumbs?: ReactNode;
 }
 
+export const isBreadcrumbSectionHoveredAtom = atom<boolean>(false);
+
 export function Default(props: Props) {
   const [t] = useTranslation();
 
   const location = useLocation();
-  const hasPermission = useHasPermission();
-
   const colors = useColorScheme();
-  const preventNavigation = usePreventNavigation();
 
   const enabled = useEnabled();
+  const hasPermission = useHasPermission();
+  const preventNavigation = usePreventNavigation();
+
   const user = useInjectUserChanges();
   const company = useCurrentCompany();
   const companyUser = useCurrentCompanyUser();
@@ -105,6 +107,10 @@ export function Default(props: Props) {
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+
+  const [isBreadcrumbSectionHovered, setIsBreadcrumbSectionHovered] = useAtom(
+    isBreadcrumbSectionHoveredAtom
+  );
 
   const navigation: NavigationItem[] = [
     {
@@ -547,7 +553,17 @@ export function Default(props: Props) {
         <main className="flex-1">
           {(props.breadcrumbs || props.topRight || props.afterBreadcrumbs) &&
             props.breadcrumbs.length > 0 && (
-              <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+              <div
+                className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0"
+                onMouseEnter={() =>
+                  !isBreadcrumbSectionHovered &&
+                  setIsBreadcrumbSectionHovered(true)
+                }
+                onMouseLeave={() =>
+                  isBreadcrumbSectionHovered &&
+                  setIsBreadcrumbSectionHovered(false)
+                }
+              >
                 <div className="flex items-center">
                   {props.breadcrumbs && (
                     <Breadcrumbs pages={props.breadcrumbs} />

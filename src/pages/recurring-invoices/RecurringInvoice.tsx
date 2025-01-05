@@ -43,7 +43,7 @@ import { RecurringInvoice as RecurringInvoiceType } from '$app/common/interfaces
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
-import { PreviousNextNavigation } from './edit/components/PreviousNextNavigation';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -150,7 +150,7 @@ export default function RecurringInvoice() {
           ),
           additionalSaveOptions: saveOptions,
         })}
-      afterBreadcrumbs={<PreviousNextNavigation id={recurringInvoice?.id} />}
+      afterBreadcrumbs={<PreviousNextNavigation entity="recurring_invoice" />}
     >
       {recurringInvoice?.id === id ? (
         <div className="space-y-4">

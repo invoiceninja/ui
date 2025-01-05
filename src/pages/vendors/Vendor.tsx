@@ -30,6 +30,7 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -81,6 +82,7 @@ export default function Vendor() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="vendor" />}
     >
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
         <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
