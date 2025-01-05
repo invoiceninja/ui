@@ -13,12 +13,11 @@ import dayjs from 'dayjs';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useBulkAction } from '$app/pages/projects/common/hooks/useBulkAction';
 
 export const calculateTaskHours = (timeLog: string, precision?: number) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
@@ -44,26 +43,23 @@ export const calculateTaskHours = (timeLog: string, precision?: number) => {
 export function useInvoiceProject() {
   const navigate = useNavigate();
 
+  const bulk = useBulkAction();
+
   const setInvoice = useSetAtom(invoiceAtom);
 
-  return (projectId: string) => {
+  return (projectIds: string[]) => {
     toast.processing();
 
-    request(
-      'POST',
-      endpoint('/api/v1/projects/:projectId/invoice', {
-        projectId,
-      })
-    ).then((response: GenericSingleResourceResponse<Invoice>) => {
-      toast.dismiss();
+    bulk(projectIds, 'invoice').then(
+      (response: GenericSingleResourceResponse<Invoice>) => {
+        setInvoice(response.data.data);
 
-      setInvoice(response.data.data);
-
-      navigate(
-        route(
-          '/invoices/create?table=tasks&project=true&action=invoice_project'
-        )
-      );
-    });
+        navigate(
+          route(
+            '/invoices/create?table=tasks&project=true&action=invoice_project'
+          )
+        );
+      }
+    );
   };
 }

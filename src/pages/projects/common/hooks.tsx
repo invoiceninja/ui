@@ -53,9 +53,6 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 
 export const defaultColumns: string[] = [
   'name',
@@ -339,7 +336,7 @@ export function useActions() {
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement
-          onClick={() => invoiceProject(project.id)}
+          onClick={() => invoiceProject([project.id])}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_project')}
@@ -410,12 +407,10 @@ export function useActions() {
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
-  const bulk = useBulkAction();
-  const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const documentsBulk = useDocumentsBulk();
 
-  const setInvoice = useSetAtom(invoiceAtom);
+  const invoiceProject = useInvoiceProject();
 
   const shouldDownloadDocuments = (projects: Project[]) => {
     return projects.some(({ documents }) => documents.length);
@@ -445,18 +440,8 @@ export const useCustomBulkActions = () => {
     ({ selectedIds, setSelected }) =>
       hasPermission('create_invoice') && (
         <DropdownElement
-          onClick={async () => {
-            bulk(selectedIds, 'invoice').then(
-              (response: GenericSingleResourceResponse<Invoice>) => {
-                setInvoice(response.data.data);
-
-                navigate(
-                  route(
-                    '/invoices/create?table=tasks&project=true&action=invoice_project'
-                  )
-                );
-              }
-            );
+          onClick={() => {
+            invoiceProject(selectedIds);
 
             setSelected([]);
           }}
