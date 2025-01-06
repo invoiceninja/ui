@@ -15,12 +15,10 @@ import { Project } from '$app/common/interfaces/project';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Icon } from '$app/components/icons/Icon';
 import classNames from 'classnames';
-import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { isBreadcrumbSectionHoveredAtom } from './layouts/Default';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { Product } from '$app/common/interfaces/product';
 import { Payment } from '$app/common/interfaces/payment';
@@ -32,6 +30,8 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Expense } from '$app/common/interfaces/expense';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { Transaction } from '$app/common/interfaces/transactions';
+import { Tooltip } from './Tooltip';
+import { useTranslation } from 'react-i18next';
 
 type Entity =
   | 'recurring_invoice'
@@ -83,6 +83,7 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
     return null;
   }
 
+  const [t] = useTranslation();
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
@@ -92,9 +93,6 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
   });
 
   const [currentData, setCurrentData] = useState<Resource[]>([]);
-  const isBreadcrumbSectionHovered = useAtomValue(
-    isBreadcrumbSectionHoveredAtom
-  );
 
   const getPreviousIndex = () => {
     const currentIndex = currentData.findIndex(
@@ -153,10 +151,12 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
 
   return (
     <div className="relative flex items-center ml-9">
-      <div
-        className={classNames('absolute flex items-center left-0', {
-          hidden: !isBreadcrumbSectionHovered,
-        })}
+      <Tooltip
+        message={t('previous') as string}
+        width="auto"
+        placement="bottom"
+        withoutArrow
+        withoutWrapping
       >
         <div
           className={classNames({
@@ -177,7 +177,15 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
         >
           <Icon element={MdKeyboardArrowLeft} size={29} />
         </div>
+      </Tooltip>
 
+      <Tooltip
+        message={t('next') as string}
+        width="auto"
+        placement="bottom"
+        withoutArrow
+        withoutWrapping
+      >
         <div
           className={classNames({
             'cursor-not-allowed opacity-50': getNextIndex() === null,
@@ -197,7 +205,7 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
         >
           <Icon element={MdKeyboardArrowRight} size={29} />
         </div>
-      </div>
+      </Tooltip>
     </div>
   );
 }
