@@ -850,7 +850,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.columns.map(
                 (column, index) =>
                   Boolean(!excludeColumns.includes(column.id)) && (
-                    <Td key={index} customizeTextColor>
+                    <Td key={index} customizeTextColor resizable={`${apiEndpoint.pathname}.${column.id}`}>
                       {getFooterColumn(column.id) ? (
                         <div className="flex items-center space-x-3">
                           {getFooterColumn(column.id)?.format(
