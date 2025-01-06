@@ -79,7 +79,7 @@ export function useResizeColumn(resizable: string | undefined) {
       if (!isResizing || !thRef.current || currentWidth === null) return;
 
       const dx = e.clientX - startX;
-      const newWidth = startWidth + dx - 35; // Safe offset for snapping to the right when starting the drag
+      const newWidth = startWidth + dx - 45; // Safe offset for snapping to the right when starting the drag
 
       console.log({ dx, newWidth });
 
@@ -128,7 +128,7 @@ export function useResizeColumn(resizable: string | undefined) {
 
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
-      const borderThreshold = 40;
+      const borderThreshold = 30;
       const thWidth = thRef.current?.offsetWidth;
       const clickPosition =
         e.clientX - thRef.current!.getBoundingClientRect().left;
