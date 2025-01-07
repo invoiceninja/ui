@@ -67,6 +67,7 @@ export interface ComboboxStaticProps<T = any> {
   isDataLoading?: boolean;
   onInputValueChange?: (value: string) => void;
   compareOnlyByValue?: boolean;
+  onFilter?: (entries: Entry<T>[]) => unknown;
 }
 
 export type Nullable<T> = T | null;
@@ -108,6 +109,7 @@ export function Combobox<T = any>({
   onEmptyValues,
   onFocus,
   onInputValueChange,
+  onFilter,
 }: ComboboxStaticProps<T>) {
   const [inputValue, setInputValue] = useState(
     String(inputOptions.value ?? '')
@@ -286,6 +288,10 @@ export function Combobox<T = any>({
 
   useDebounce(
     () => {
+      if (onFilter) {
+        onFilter(filteredOptions);
+      }
+
       if (!onEmptyValues) {
         return;
       }
@@ -466,6 +472,7 @@ export function ComboboxStatic<T = any>({
   clearInputAfterSelection,
   isDataLoading,
   compareOnlyByValue,
+  onFilter,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -498,6 +505,10 @@ export function ComboboxStatic<T = any>({
 
   useDebounce(
     () => {
+      if (onFilter) {
+        onFilter(filteredValues);
+      }
+
       if (!onEmptyValues) {
         return;
       }
@@ -825,6 +836,7 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
   const [enableQuery, setEnableQuery] = useState<boolean>(false);
+  const [filtered, setFiltered] = useState<Entry<T>[]>([]);
 
   useEffect(() => {
     setUrl(endpoint);
@@ -962,7 +974,11 @@ export function ComboboxAsync<T = any>({
     setUrl((c) => {
       const url = new URL(c);
 
-      url.searchParams.set('filter', query);
+      console.log({ query, filtered });
+
+      if (filtered.length === 0 || query === '') {
+        url.searchParams.set('filter', query);
+      }
 
       return url.href;
     });
@@ -990,6 +1006,7 @@ export function ComboboxAsync<T = any>({
         onInputValueChange={onInputValueChange}
         onEmptyValues={onEmptyValues}
         compareOnlyByValue={compareOnlyByValue}
+        onFilter={setFiltered}
       />
     );
   }
@@ -1014,6 +1031,7 @@ export function ComboboxAsync<T = any>({
       isDataLoading={isLoading}
       onInputValueChange={onInputValueChange}
       compareOnlyByValue={compareOnlyByValue}
+      onFilter={setFiltered}
     />
   );
 }
