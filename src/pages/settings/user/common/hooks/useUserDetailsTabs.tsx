@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isHosted } from '$app/common/helpers';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
@@ -23,6 +24,7 @@ export function useUserDetailsTabs() {
     {
       name: t('oauth_mail'),
       href: '/settings/user_details/connect',
+      enabled: isHosted(),
     },
     {
       name: t('enable_two_factor'),
