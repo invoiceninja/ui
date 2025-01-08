@@ -59,11 +59,11 @@ import {
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
-import { DashboardCard } from './DashboardCard';
 import { toast } from '$app/common/helpers/toast/toast';
 import { RestoreCardsModal } from './RestoreCardsModal';
 import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
+import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -1140,7 +1140,7 @@ export function ResizableDashboardCards() {
 
   const updateLayoutHeight = () => {
     const totalCards =
-      user?.company_user?.settings.dashboard_fields?.length || 0;
+      user?.company_user?.react_settings?.dashboard_fields?.length || 0;
     let cardsPerRow = 0;
 
     switch (layoutBreakpoint) {
@@ -1369,17 +1369,17 @@ export function ResizableDashboardCards() {
 
   useEffect(() => {
     if (
-      user?.company_user?.settings?.dashboard_fields &&
+      user?.company_user?.react_settings?.dashboard_fields &&
       !isEqual(
-        user?.company_user?.settings?.dashboard_fields,
+        user?.company_user?.react_settings?.dashboard_fields,
         currentDashboardFields
       )
     ) {
       setCurrentDashboardFields(
-        cloneDeep(user?.company_user?.settings?.dashboard_fields)
+        cloneDeep(user?.company_user?.react_settings?.dashboard_fields)
       );
     }
-  }, [user?.company_user?.settings?.dashboard_fields]);
+  }, [user?.company_user?.react_settings?.dashboard_fields]);
 
   useEffect(() => {
     if (totals.data) {
@@ -1642,26 +1642,19 @@ export function ResizableDashboardCards() {
           {currentDashboardFields?.length ? (
             <div
               key="1"
-              className={classNames('grid gap-3 drag-handle grid-cols-12', {
-                'grid-cols-10': layoutBreakpoint === 'xl',
-                'grid-cols-12':
-                  layoutBreakpoint === 'xxl' ||
-                  (layoutBreakpoint !== 'xl' && layoutBreakpoint !== 'xxl') ||
-                  !layoutBreakpoint,
+              className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
             >
-              {currentDashboardFields.map((field, index) => (
-                <DashboardCard
-                  key={(20 + index).toString()}
-                  field={field}
-                  dateRange={dateRange}
-                  startDate={dates.start_date}
-                  endDate={dates.end_date}
-                  currencyId={currency.toString()}
-                  layoutBreakpoint={layoutBreakpoint}
-                />
-              ))}
+              <PreferenceCardsGrid
+                currentDashboardFields={currentDashboardFields}
+                dateRange={dateRange}
+                startDate={dates.start_date}
+                endDate={dates.end_date}
+                currencyId={currency.toString()}
+                layoutBreakpoint={layoutBreakpoint}
+                isEditMode={isEditMode}
+              />
             </div>
           ) : null}
 
