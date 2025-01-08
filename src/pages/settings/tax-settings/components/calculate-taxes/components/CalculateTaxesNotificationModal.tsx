@@ -79,7 +79,7 @@ export function CalculateTaxesNotificationModal() {
             </Button>
 
             <Button behavior="button" onClick={() => setIsModalOpen(false)}>
-              {t('ok')}
+              {t('continue')}
             </Button>
           </div>
         </div>
