@@ -215,7 +215,7 @@ export function QuoteSlider() {
         quote &&
         (hasPermission('edit_quote') || entityAssigned(quote)) && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={quote}
             actions={actions}
           />
@@ -387,7 +387,7 @@ export function QuoteSlider() {
           )}
         </div>
 
-        <div>
+        <div className="divide-y">
           {resource?.activities &&
             resource.activities.map((activity) => (
               <ClickableElement
@@ -444,7 +444,7 @@ export function QuoteSlider() {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col divide-y">
             {activities
               ?.filter(
                 (activity) =>
@@ -470,7 +470,7 @@ export function QuoteSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col divide-y">
           {emailRecords?.map((emailRecord, index) => (
             <EmailRecord
               key={index}
