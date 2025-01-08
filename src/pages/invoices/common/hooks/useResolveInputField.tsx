@@ -325,7 +325,6 @@ export function useResolveInputField(props: Props) {
         <ProductSelector
           key={`${property}${resource?.line_items[index][property]}`}
           onChange={(value) =>
-            value.resource &&
             onProductChange(index, value.label, value.resource)
           }
           className="w-auto"
