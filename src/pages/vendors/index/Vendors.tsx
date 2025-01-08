@@ -71,6 +71,7 @@ export default function Vendors() {
         }
         linkToCreateGuards={[permission('create_vendor')]}
         hideEditableOptions={!hasPermission('edit_vendor')}
+        enableSavingFilterPreference
       />
     </Default>
   );
