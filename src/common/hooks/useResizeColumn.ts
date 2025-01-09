@@ -82,10 +82,12 @@ export function useResizeColumn(resizable: string | undefined) {
       const newWidth = startWidth + dx - 45; // Safe offset for snapping to the right when starting the drag
 
       console.log({ dx, newWidth });
-
-      setCurrentWidth(newWidth);
-
-      thRef.current.style.width = `${newWidth}px`;
+      
+      if (newWidth >= 1) {
+        setCurrentWidth(newWidth);
+        
+        thRef.current.style.width = `${newWidth}px`;
+      }
     },
     [isResizing, startX, startWidth, currentWidth, setCurrentWidth]
   );
