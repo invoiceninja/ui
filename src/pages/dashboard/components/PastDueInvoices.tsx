@@ -19,8 +19,14 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
-export function PastDueInvoices() {
+interface Props {
+  topRight?: ReactNode;
+  isEditMode: boolean;
+}
+
+export function PastDueInvoices({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -80,15 +86,23 @@ export function PastDueInvoices() {
   return (
     <Card
       title={t('past_due_invoices')}
-      className="h-96 relative"
+      className="h-full relative"
       withoutBodyPadding
       withoutHeaderBorder
+      topRight={topRight}
+      renderFromShadcn
     >
-      <div className="pl-6 pr-4">
+      <div
+        className="pl-6 pr-4 relative"
+        style={{
+          height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
+        }}
+      >
         <DataTable
           resource="invoice"
           columns={columns}
           className="pr-4"
+          height="full"
           endpoint="/api/v1/invoices?include=client.group_settings&overdue=true&without_deleted_clients=true&per_page=50&page=1&sort=due_date|asc"
           withoutActions
           withoutPagination
@@ -105,9 +119,6 @@ export function PastDueInvoices() {
             tdClassName: 'first:pl-0 py-4',
             thClassName: 'first:pl-0',
             tBodyStyle: { border: 0 },
-          }}
-          style={{
-            height: '19.9rem',
           }}
           withoutSortQueryParameter
         />

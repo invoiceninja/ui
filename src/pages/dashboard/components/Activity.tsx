@@ -17,9 +17,14 @@ import { useTranslation } from 'react-i18next';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-export function Activity() {
+interface Props {
+  isEditMode?: boolean;
+  topRight?: ReactNode;
+}
+
+export function Activity({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
 
   const { data, isLoading, isError } = useQuery(
@@ -33,8 +38,11 @@ export function Activity() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-96 relative"
+      className="relative"
+      height="full"
       withoutBodyPadding
+      topRight={topRight}
+      renderFromShadcn
     >
       {isLoading && (
         <NonClickableElement>
@@ -46,11 +54,11 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      <div className="pl-6 pr-4">
-        <div
-          className="flex flex-col overflow-y-auto pr-4"
-          style={{ height: '19.9rem' }}
-        >
+      <div
+        className="pl-6 pr-4 overflow-y-auto"
+        style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
+      >
+        <div className="flex flex-col pr-4">
           {data?.data.data &&
             data.data.data.map((record: ActivityRecord, index: number) => (
               <React.Fragment key={index}>

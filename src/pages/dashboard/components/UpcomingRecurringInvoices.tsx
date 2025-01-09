@@ -20,8 +20,19 @@ import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useTranslation } from 'react-i18next';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { ReactNode } from 'react';
 
-export function UpcomingRecurringInvoices() {
+interface Props {
+  topRight?: ReactNode;
+  className?: string;
+  isEditMode: boolean;
+}
+
+export function UpcomingRecurringInvoices({
+  topRight,
+  className,
+  isEditMode,
+}: Props) {
   const [t] = useTranslation();
 
   const getSetting = useGetSetting();
@@ -92,15 +103,24 @@ export function UpcomingRecurringInvoices() {
   return (
     <Card
       title={t('upcoming_recurring_invoices')}
-      className="h-96 relative"
+      className={`relative ${className}`}
       withoutBodyPadding
       withoutHeaderBorder
+      height="full"
+      topRight={topRight}
+      renderFromShadcn
     >
-      <div className="pl-6 pr-4">
+      <div
+        className="pl-6 pr-4 relative"
+        style={{
+          height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
+        }}
+      >
         <DataTable
           resource="recurring_invoice"
           columns={columns}
           className="pr-4"
+          height="full"
           endpoint="/api/v1/recurring_invoices?include=client&client_status=active&without_deleted_clients=true&per_page=50&page=1&sort=next_send_date_client|asc"
           withoutActions
           withoutPagination
@@ -118,9 +138,7 @@ export function UpcomingRecurringInvoices() {
             thClassName: 'first:pl-0',
             tBodyStyle: { border: 0 },
           }}
-          style={{
-            height: '19.9rem',
-          }}
+          withoutSortQueryParameter
         />
       </div>
     </Card>

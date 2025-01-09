@@ -20,8 +20,14 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
-export function RecentPayments() {
+interface Props {
+  topRight?: ReactNode;
+  isEditMode?: boolean;
+}
+
+export function RecentPayments({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -94,14 +100,20 @@ export function RecentPayments() {
   return (
     <Card
       title={t('recent_payments')}
-      className="h-96 relative"
+      className="h-full relative"
       withoutBodyPadding
+      topRight={topRight}
+      renderFromShadcn
     >
-      <div className="pl-6 pr-4">
+      <div
+        className="pl-6 pr-4 relative"
+        style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
+      >
         <DataTable
           resource="payment"
           columns={columns}
           className="pr-4"
+          height="full"
           endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&without_deleted_clients=true&page=1"
           withoutActions
           withoutPagination
@@ -118,9 +130,6 @@ export function RecentPayments() {
             tdClassName: 'first:pl-0 py-4',
             thClassName: 'first:pl-0',
             tBodyStyle: { border: 0 },
-          }}
-          style={{
-            height: '19.9rem',
           }}
         />
       </div>

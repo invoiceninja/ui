@@ -18,8 +18,14 @@ import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { ReactNode } from 'react';
 
-export function ExpiredQuotes() {
+interface Props {
+  topRight?: ReactNode;
+  isEditMode: boolean;
+}
+
+export function ExpiredQuotes({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
 
@@ -73,15 +79,24 @@ export function ExpiredQuotes() {
   return (
     <Card
       title={t('expired_quotes')}
-      className="h-96 relative"
+      className="relative"
       withoutBodyPadding
       withoutHeaderBorder
+      height="full"
+      topRight={topRight}
+      renderFromShadcn
     >
-      <div className="pl-6 pr-4">
+      <div
+        className="pl-6 pr-4 relative"
+        style={{
+          height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
+        }}
+      >
         <DataTable
           resource="quote"
           columns={columns}
           className="pr-4"
+          height="full"
           endpoint="/api/v1/quotes?include=client&client_status=expired&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
           withoutActions
           withoutPagination
@@ -99,9 +114,7 @@ export function ExpiredQuotes() {
             thClassName: 'first:pl-0',
             tBodyStyle: { border: 0 },
           }}
-          style={{
-            height: '19.9rem',
-          }}
+          withoutSortQueryParameter
         />
       </div>
     </Card>

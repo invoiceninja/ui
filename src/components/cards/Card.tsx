@@ -26,6 +26,13 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { useColorScheme } from '$app/common/colors';
 
+import {
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Card as ShadcnCard,
+} from '../../../components/ui/card';
+
 export interface ButtonOption {
   text: string;
   onClick: (event: FormEvent<HTMLFormElement>) => unknown;
@@ -56,16 +63,52 @@ interface Props {
   withoutHeaderBorder?: boolean;
   topRight?: ReactNode;
   height?: 'full';
+  renderFromShadcn?: boolean;
 }
 
 export function Card(props: Props) {
   const [t] = useTranslation();
 
-  const { padding = 'regular', height } = props;
+  const { padding = 'regular', height, renderFromShadcn } = props;
 
   const [isCollapsed, setIsCollpased] = useState(props.collapsed);
 
   const colors = useColorScheme();
+
+  if (renderFromShadcn) {
+    return (
+      <ShadcnCard
+        title={props.title || undefined}
+        className={classNames(
+          `border shadow overflow-visible ${props.className}`,
+          {
+            'overflow-y-auto': props.withScrollableBody,
+            'h-full': height === 'full',
+          }
+        )}
+      >
+        {Boolean(props.title || props.description) && (
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col justify-start space-y-2">
+                {props.title && <CardTitle>{props.title}</CardTitle>}
+
+                {props.description && (
+                  <CardDescription>{props.description}</CardDescription>
+                )}
+              </div>
+
+              {props.topRight && (
+                <div className="flex justify-end">{props.topRight}</div>
+              )}
+            </div>
+          </CardHeader>
+        )}
+
+        {props.children}
+      </ShadcnCard>
+    );
+  }
 
   return (
     <div
@@ -141,7 +184,6 @@ export function Card(props: Props) {
             'py-0': props.withoutBodyPadding,
             'py-4': padding === 'regular' && !props.withoutBodyPadding,
             'py-2': padding === 'small' && !props.withoutBodyPadding,
-            'h-full': height === 'full',
           })}
         >
           {props.isLoading && <Element leftSide={<Spinner />} />}
