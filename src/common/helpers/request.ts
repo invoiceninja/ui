@@ -24,6 +24,10 @@ client.interceptors.response.use(
     const payload = checkJsonObject(response.config.data);
     const requestMethod = response.config.method;
 
+    if (response.config?.headers?.['X-Api-Password'] !== undefined) {
+      window.dispatchEvent(new CustomEvent('reset.password.required'));
+    }
+
     if (
       requestMethod === 'put' ||
       (requestMethod === 'post' && payload?.action === 'delete') ||
@@ -35,16 +39,19 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ValidationBag>) => {
+    const url = error.response?.config.url;
+
     if (
-      (error.response?.config.url?.includes('einvoice') &&
-        error.response?.status === 401) ||
-      error.response?.status === 403
+      url?.includes('einvoice') &&
+      (error.response?.status === 401 || error.response?.status === 403)
     ) {
       console.error(error);
 
-      $toast.error(trans('einvoice_something_went_wrong', {}), {
-        duration: 10_000,
-      });
+      if (!url.includes('quota')) {
+        $toast.error(trans('einvoice_something_went_wrong', {}), {
+          duration: 10_000,
+        });
+      }
 
       return Promise.reject(error);
     }

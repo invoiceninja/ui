@@ -62,9 +62,9 @@ export function Slider(props: Props) {
                     className="py-6 px-4 sm:px-6 border-b"
                     style={{ borderColor: colors.$4 }}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <span
-                        className="text-lg font-medium"
+                        className="text-lg font-medium max-w-sm truncate"
                         style={{ color: colors.$3 }}
                       >
                         {props.title}
@@ -74,7 +74,7 @@ export function Slider(props: Props) {
                         {props.topRight}
 
                         <MdClose
-                          fontSize={24}
+                          fontSize={20}
                           className="cursor-pointer"
                           onClick={() => props.onClose()}
                           color={colors.$3}

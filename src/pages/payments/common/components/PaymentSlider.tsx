@@ -150,7 +150,7 @@ export function PaymentSlider() {
         payment &&
         (hasPermission('edit_payment') || entityAssigned(payment)) && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={payment}
             actions={actions}
           />
@@ -269,7 +269,7 @@ export function PaymentSlider() {
           </div>
         </div>
 
-        <div>
+        <div className='divide-y'>
           {activities?.map((activity) => (
             <NonClickableElement
               key={activity.id}

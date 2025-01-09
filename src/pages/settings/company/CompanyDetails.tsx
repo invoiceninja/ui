@@ -45,6 +45,7 @@ export function CompanyDetails() {
       docsLink="en/basic-settings/#company_details"
     >
       <Tabs tabs={tabs} className="mt-6" />
+      
       <div className="my-4">
         <Outlet />
       </div>

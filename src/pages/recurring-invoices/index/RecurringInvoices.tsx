@@ -151,6 +151,7 @@ export default function RecurringInvoices() {
           );
           setRecurringInvoiceSliderVisibility(true);
         }}
+        enableSavingFilterPreference
       />
 
       {!disableNavigation('recurring_invoice', recurringInvoiceSlider) && (

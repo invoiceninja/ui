@@ -21,7 +21,7 @@ export const dataTableFiltersAtom = atomWithStorage<SessionDataTableFilters>(
 );
 
 interface Params {
-  tableKey: string;
+  tableKey: string | undefined;
 }
 export function useStoreSessionTableFilters(params: Params) {
   const { tableKey } = params;
@@ -29,6 +29,10 @@ export function useStoreSessionTableFilters(params: Params) {
   const setDataTableFilters = useSetAtom(dataTableFiltersAtom);
 
   return (filter: string, currentPage: number) => {
+    if (!tableKey) {
+      return;
+    }
+
     setDataTableFilters((current) => ({
       ...current,
       [tableKey]: {

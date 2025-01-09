@@ -62,6 +62,7 @@ export function GroupSettings() {
         linkToEdit="/settings/group_settings/:id/edit"
         customActions={actions}
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

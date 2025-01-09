@@ -66,6 +66,7 @@ export default function RecurringExpenses() {
         }
         linkToCreateGuards={[permission('create_recurring_expense')]}
         hideEditableOptions={!hasPermission('edit_recurring_expense')}
+        enableSavingFilterPreference
       />
     </Default>
   );

@@ -34,6 +34,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
@@ -126,6 +127,7 @@ export default function Project() {
           />
         )
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="project" />}
     >
       <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} />

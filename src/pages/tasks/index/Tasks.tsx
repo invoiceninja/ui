@@ -135,6 +135,7 @@ export default function Tasks() {
           setSliderTaskId(quote.id);
           setTaskSliderVisibility(true);
         }}
+        enableSavingFilterPreference
       />
 
       {!disableNavigation('task', taskSlider) && <TaskSlider />}

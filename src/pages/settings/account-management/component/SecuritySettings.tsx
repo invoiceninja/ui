@@ -9,11 +9,8 @@
  */
 
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { updateChanges } from '$app/common/stores/slices/company-users';
-import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { route } from '$app/common/helpers/route';
 import { Card, Element } from '../../../../components/cards';
 import { Button, SelectField } from '../../../../components/forms';
@@ -23,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function SecuritySettings() {
   const [t] = useTranslation();
@@ -31,7 +29,8 @@ export function SecuritySettings() {
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const [isSessionsLogoutBusy, setIsSessionsLogoutBusy] =
     useState<boolean>(false);
@@ -67,24 +66,6 @@ export function SecuritySettings() {
     },
   ];
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
-
-  const handleToggleChange = (id: string, value: boolean) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: id,
-        value,
-      })
-    );
-
   const handleLogoutAllSessions = () => {
     if (!isSessionsLogoutBusy) {
       setIsSessionsLogoutBusy(true);
@@ -100,7 +81,7 @@ export function SecuritySettings() {
 
   return (
     <Card title={t('security_settings')}>
-      <Element leftSide={t('password_timeout')}>
+      {/* <Element leftSide={t('password_timeout')}>
         <SelectField
           id="default_password_timeout"
           value={companyChanges?.default_password_timeout}
@@ -113,14 +94,15 @@ export function SecuritySettings() {
             </option>
           ))}
         </SelectField>
-      </Element>
+      </Element> */}
 
       <Element leftSide={t('web_session_timeout')}>
         <SelectField
-          id="session_timeout"
           value={companyChanges?.session_timeout}
-          onChange={handleChange}
+          onValueChange={(value) => handleChange('session_timeout', value)}
           errorMessage={errors?.errors.session_timeout}
+          customSelector
+          dismissable={false}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -130,7 +112,7 @@ export function SecuritySettings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('require_password_with_social_login')}>
+      {/* <Element leftSide={t('require_password_with_social_login')}>
         <Toggle
           checked={companyChanges?.oauth_password_required}
           id="oauth_password_required"
@@ -138,7 +120,7 @@ export function SecuritySettings() {
             handleToggleChange('oauth_password_required', value)
           }
         />
-      </Element>
+      </Element> */}
 
       <Element
         leftSide={t('end_all_sessions')}

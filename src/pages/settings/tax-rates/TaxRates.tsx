@@ -41,6 +41,7 @@ export function TaxRates() {
       linkToEdit="/settings/tax_rates/:id/edit"
       withResourcefulActions
       onBulkActionSuccess={(_, action) => onBulkActionsSuccess(action)}
+      enableSavingFilterPreference
     />
   );
 }

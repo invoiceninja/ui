@@ -85,6 +85,7 @@ export default function Credits() {
         dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_credit')]}
         hideEditableOptions={!hasPermission('edit_credit')}
+        enableSavingFilterPreference
       />
 
       <ChangeTemplateModal<Credit>
