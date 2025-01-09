@@ -40,6 +40,7 @@ export function Subscriptions() {
         linkToCreate="/settings/subscriptions/create"
         linkToEdit="/settings/subscriptions/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

@@ -65,6 +65,7 @@ export function ApiTokens() {
         linkToCreate="/settings/integrations/api_tokens/create"
         linkToEdit="/settings/integrations/api_tokens/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

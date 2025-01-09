@@ -75,6 +75,7 @@ export function Users() {
             setAction(action);
             setIsPasswordConfirmModalOpen(true);
           }}
+          enableSavingFilterPreference
         />
       </Settings>
 

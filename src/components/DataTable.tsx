@@ -52,7 +52,6 @@ import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { refetchByUrl } from '$app/common/hooks/useRefetch';
-import { useLocation } from 'react-router-dom';
 import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
@@ -152,6 +151,7 @@ interface Props<T> extends CommonProps {
   withoutPerPageAsPreference?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
+  enableSavingFilterPreference?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -160,7 +160,6 @@ export type PerPage = '10' | '50' | '100';
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
-  const location = useLocation();
   const options = useDataTableOptions();
 
   const reactSettings = useReactSettings();
@@ -173,8 +172,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
-
-  const tableKey = `${location.pathname}${props.endpoint.replace('.', '')}`;
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
 
@@ -193,6 +190,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutPerPageAsPreference = false,
     withoutSortQueryParameter = false,
     showRestoreBulk,
+    enableSavingFilterPreference = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -232,9 +230,10 @@ export function DataTable<T extends object>(props: Props<T>) {
     setSort,
     setSortedBy,
     setStatus,
-    tableKey,
+    tableKey: `${props.resource}s`,
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
+    enableSavingFilterPreference,
   });
 
   const {
@@ -244,7 +243,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   } = useDataTableUtilities({
     apiEndpoint,
     isInitialConfiguration,
-    tableKey,
+    tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
   });

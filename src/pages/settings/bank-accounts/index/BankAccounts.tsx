@@ -98,6 +98,7 @@ export function BankAccounts() {
             )}
           </div>
         }
+        enableSavingFilterPreference
       />
     </Settings>
   );

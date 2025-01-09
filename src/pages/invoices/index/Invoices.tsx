@@ -151,6 +151,7 @@ export default function Invoices() {
           setInvoiceSliderVisibility(true);
         }}
         dateRangeColumns={dateRangeColumns}
+        enableSavingFilterPreference
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}

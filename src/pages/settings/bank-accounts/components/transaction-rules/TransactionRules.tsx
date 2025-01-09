@@ -44,6 +44,7 @@ export function TransactionRules() {
         linkToCreate="/settings/bank_accounts/transaction_rules/create"
         linkToEdit="/settings/bank_accounts/transaction_rules/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

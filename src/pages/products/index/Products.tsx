@@ -74,6 +74,7 @@ export default function Products() {
         }
         linkToCreateGuards={[permission('create_product')]}
         hideEditableOptions={!hasPermission('edit_product')}
+        enableSavingFilterPreference
       />
     </Default>
   );
