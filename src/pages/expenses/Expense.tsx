@@ -34,6 +34,7 @@ import { DocumentPreview } from './common/components/DocumentPreview';
 import { useMediaQuery } from 'react-responsive';
 import { Divider } from '$app/components/cards/Divider';
 import { useColorScheme } from '$app/common/colors';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -100,6 +101,7 @@ export default function Expense() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="expense" />}
     >
       {expense ? (
         <div className="space-y-4">

@@ -29,6 +29,7 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { cloneDeep, set } from 'lodash';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_vendor');
@@ -94,6 +95,7 @@ export default function Edit() {
           />
         )
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="vendor" />}
     >
       {vendor && (
         <Form
