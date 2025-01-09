@@ -588,10 +588,14 @@ export function DataTable<T extends object>(props: Props<T>) {
         }
         isDataLoading={isLoading}
         style={props.style}
+        resizable={apiEndpoint.pathname}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
           {!props.withoutActions && !hideEditableOptions && (
-            <Th className={styleOptions?.thClassName}>
+            <Th
+              className={styleOptions?.thClassName}
+              resizable={`${apiEndpoint.pathname}.leftCheckbox`}
+            >
               <Checkbox
                 innerRef={mainCheckbox}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -631,6 +635,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     setSort(data.sort);
                   }}
                   childrenClassName={styleOptions?.thChildrenClassName}
+                  resizable={`${apiEndpoint.pathname}.${column.id}`}
                 >
                   <div className="flex items-center space-x-3">
                     {dateRangeColumns.some(
@@ -740,6 +745,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                               : document.getElementById(resource.id)?.click();
                           }
                         }}
+                        resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
                         {column.format
                           ? column.format(resource[column.id], resource)
@@ -843,7 +849,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.columns.map(
                 (column, index) =>
                   Boolean(!excludeColumns.includes(column.id)) && (
-                    <Td key={index} customizeTextColor>
+                    <Td key={index} customizeTextColor resizable={`${apiEndpoint.pathname}.${column.id}`}>
                       {getFooterColumn(column.id) ? (
                         <div className="flex items-center space-x-3">
                           {getFooterColumn(column.id)?.format(
