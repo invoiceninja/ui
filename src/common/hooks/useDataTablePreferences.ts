@@ -126,7 +126,7 @@ export function useDataTablePreferences(params: Params) {
     const updatedUser = cloneDeep(user) as User;
 
     if (updatedUser) {
-      // This is a temporary solution for creating the table_filters object. It can be removed after some time.
+      // @Todo: This is a temporary solution for creating the table_filters object. It can be removed after some time.
       const tableFilters =
         updatedUser.company_user?.react_settings.table_filters || {};
 
