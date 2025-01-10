@@ -23,7 +23,7 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Country } from '$app/common/interfaces/country';
 import { X } from 'react-feather';
@@ -105,7 +105,17 @@ function Identifier({ country, vat }: IdentifierProps) {
 
           setIsVisible(false);
         })
-        .catch(() => toast.error())
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            const message = get(error.response.data, 'errors.vat_number.0');
+
+            if (message) {
+              return toast.error(message);
+            }
+          }
+
+          return toast.error();
+        })
         .finally(() => setSubmitting(false));
     },
   });
