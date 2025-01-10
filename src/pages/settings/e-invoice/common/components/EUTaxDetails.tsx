@@ -23,7 +23,7 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Country } from '$app/common/interfaces/country';
 import { X } from 'react-feather';
