@@ -93,7 +93,7 @@ export function CommonActions(props: Props) {
 
   useEffect(() => {
     const currentActions =
-      user?.company_user?.react_settings?.common_actions?.[entity] || [];
+      user?.company_user?.react_settings?.common_actions?.[entity];
 
     if (currentActions) {
       const selected = actions()
