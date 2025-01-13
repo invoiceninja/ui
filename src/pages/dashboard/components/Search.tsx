@@ -102,13 +102,6 @@ export function Search$() {
   const handleChange = debounce((value: string) => setQuery(value), 500);
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.ctrlKey && event.key === 'k') {
-      event.preventDefault();
-      setIsModalOpen(true);
-
-      return;
-    }
-
     const optionsLength = options?.count() || 0;
 
     switch (event.key) {
@@ -160,30 +153,53 @@ export function Search$() {
     }
   };
 
+  const handleOpenModalByKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'k') {
+      event.preventDefault();
+
+      setIsModalOpen((current) => !current);
+    }
+  };
+
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleOpenModalByKeyDown);
 
-    if (selectedIndex !== -1 && optionsContainerRef.current) {
-      const container = optionsContainerRef.current;
-      const selectedElement = container.children[selectedIndex] as HTMLElement;
+    return () =>
+      window.removeEventListener('keydown', handleOpenModalByKeyDown);
+  }, []);
 
-      if (selectedElement) {
-        selectedElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-        });
+  useEffect(() => {
+    const handleKeyListener = (event: KeyboardEvent) => {
+      handleKeyDown(event);
+    };
+
+    if (isModalOpen) {
+      window.addEventListener('keydown', handleKeyListener);
+
+      if (selectedIndex !== -1 && optionsContainerRef.current) {
+        const container = optionsContainerRef.current;
+        const selectedElement = container.children[
+          selectedIndex
+        ] as HTMLElement;
+
+        if (selectedElement) {
+          selectedElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }
+      }
+
+      if (selectedIndex !== -1) {
+        inputRef.current?.blur();
       }
     }
 
-    if (selectedIndex !== -1) {
-      inputRef.current?.blur();
-    }
-
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIndex]);
+    return () => window.removeEventListener('keydown', handleKeyListener);
+  }, [selectedIndex, isModalOpen]);
 
   useEffect(() => {
-    if (isModalOpen === false) {
+    if (!isModalOpen) {
       setQuery('');
     }
   }, [isModalOpen]);

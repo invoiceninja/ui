@@ -144,7 +144,7 @@ export function Preferences() {
           />
         </Element>
 
-        <Element leftSide={t('enable_public_notifications')}>
+        <Element leftSide={t('enable_public_notifications')} leftSideHelp={t('enable_public_notifications_help')}>
           <Toggle
             checked={Boolean(
               reactSettings.preferences.enable_public_notifications

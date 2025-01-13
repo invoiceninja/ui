@@ -30,9 +30,8 @@ import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegi
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { $help, HelpWidget } from '$app/components/HelpWidget';
+import { HelpWidget } from '$app/components/HelpWidget';
+import { CalculateTaxesNotificationModal } from './components/calculate-taxes/components/CalculateTaxesNotificationModal';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -82,9 +81,6 @@ export function TaxSettings() {
 
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
-
-  const $handleChange = useHandleCurrentCompanyChangeProperty();
-  const accentColor = useAccentColor();
 
   return (
     <Settings
@@ -166,44 +162,7 @@ export function TaxSettings() {
                 <>
                   <Divider />
 
-                  <Element
-                    leftSide={t('calculate_taxes')}
-                    leftSideHelp={t('calculate_taxes_help')}
-                  >
-                    <div className="flex items-center gap-4">
-                      <Toggle
-                        checked={Boolean(companyChanges?.calculate_taxes)}
-                        onChange={(value: boolean) => {
-                          handleToggleChange('calculate_taxes', value);
-
-                          if (value) {
-                            $handleChange('enabled_tax_rates', 0);
-                            $handleChange('enabled_item_tax_rates', 1);
-                            $handleChange('enabled_expense_tax_rates', 1);
-
-                            $handleChange('settings.tax_rate1', 0);
-                            $handleChange('settings.tax_rate2', 0);
-                            $handleChange('settings.tax_rate3', 0);
-
-                            handleToggleChange('settings.inclusive_taxes', false);
-                          }
-                        }}
-                      />
-
-                      <button
-                        type="button"
-                        style={{ color: accentColor }}
-                        onClick={() =>
-                          $help('calculate-taxes', {
-                            moveToHeading: 'Turn on Calculate Taxes',
-                          })
-                        }
-                        className="inline-flex items-center space-x-1"
-                      >
-                        <span>{t('learn_more')}</span>
-                      </button>
-                    </div>
-                  </Element>
+                  <CalculateTaxesNotificationModal />
 
                   {companyChanges.calculate_taxes && <CalculateTaxes />}
                 </>

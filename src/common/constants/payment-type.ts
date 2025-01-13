@@ -56,4 +56,8 @@ export default {
   [PaymentType.VENMO]: 'payment_type_Venmo',
   [PaymentType.VISA]: 'payment_type_Visa Card',
   [PaymentType.ZELLE]: 'payment_type_Zelle',
+  [PaymentType.DEBIT]: 'payment_type_Debit',
+  [PaymentType.GOOGLE_WALLET]: 'payment_type_Google Wallet',
+  [PaymentType.MONEY_ORDER]: 'payment_type_Money Order',
+  [PaymentType.SWISH]: 'payment_type_Swish',
 };

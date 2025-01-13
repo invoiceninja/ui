@@ -36,6 +36,7 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useCalculateInvoiceSum } from './edit/hooks/useCalculateInvoiceSum';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function PurchaseOrder() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -111,6 +112,7 @@ export default function PurchaseOrder() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="purchase_order" />}
     >
       {purchaseOrder?.id === id ? (
         <div className="space-y-4">

@@ -46,6 +46,7 @@ import { Banner } from '$app/components/Banner';
 import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 dayjs.extend(utc);
 
@@ -172,6 +173,7 @@ export default function Invoice() {
             {t('invoice_status_changed')}
           </Banner>
         }
+        afterBreadcrumbs={<PreviousNextNavigation entity="invoice" />}
       >
         {invoice?.id === id ? (
           <div className="space-y-2">

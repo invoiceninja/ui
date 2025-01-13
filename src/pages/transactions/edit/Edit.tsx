@@ -33,6 +33,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useCleanDescriptionText } from '../common/hooks/useCleanDescription';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -138,6 +139,12 @@ export default function Edit() {
             />
           ),
         })}
+      afterBreadcrumbs={
+        <PreviousNextNavigation
+          entity="transaction"
+          entityEndpointName="bank_transaction"
+        />
+      }
     >
       <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
