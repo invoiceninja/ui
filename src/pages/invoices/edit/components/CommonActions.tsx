@@ -29,7 +29,6 @@ import { useActions as useRecurringInvoiceActions } from '$app/pages/recurring-i
 import { useActions as usePurchaseOrderActions } from '$app/pages/purchase-orders/common/hooks';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { useDefaultCommonActions } from '$app/common/hooks/useCommonActions';
 
 type Resource = Invoice | Credit | Quote | RecurringInvoice | PurchaseOrder;
 
@@ -41,7 +40,6 @@ export function CommonActions(props: Props) {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
-  const defaultCommonActions = useDefaultCommonActions();
 
   const invoiceActions = useInvoiceActions({ dropdown: false });
   const creditActions = useCreditActions({ dropdown: false });
@@ -95,8 +93,7 @@ export function CommonActions(props: Props) {
 
   useEffect(() => {
     const currentActions =
-      user?.company_user?.react_settings?.common_actions?.[entity] ||
-      defaultCommonActions[entity].map(({ value }) => value);
+      user?.company_user?.react_settings?.common_actions?.[entity] || [];
 
     if (currentActions) {
       const selected = actions()
