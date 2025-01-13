@@ -13,7 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { Banner } from '../Banner';
 import { buttonStyles } from './VerifyEmail';
 import { Link, useLocation } from 'react-router-dom';
-import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
+import {
+  useEInvoiceHealthCheck,
+  useQuota,
+} from '$app/pages/settings/e-invoice/peppol/Preferences';
 import { Modal } from '../Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -26,6 +29,7 @@ export function EInvoiceCredits() {
 
   const [isVisible, setVisible] = useState(false);
 
+  const { data: healthcheck } = useEInvoiceHealthCheck();
   const { t } = useTranslation();
 
   if (
@@ -34,6 +38,23 @@ export function EInvoiceCredits() {
     import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true'
   ) {
     return null;
+  }
+
+  if (typeof healthcheck === 'boolean' && !healthcheck) {
+    return (
+      <Banner variant="red">
+        <div className="flex space-x-1">
+          <span>{t('einvoice_token_not_found')}</span>
+
+          <Link
+            to="/settings/e_invoice"
+            className={buttonStyles}
+          >
+            {t('learn_more')}
+          </Link>
+        </div>
+      </Banner>
+    );
   }
 
   if (quota !== null && quota <= 0) {
