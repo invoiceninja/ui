@@ -19,6 +19,7 @@ export interface Props {
   field: string;
   value: string;
   onValueChange: (value: string | number | boolean) => unknown;
+  selectMenuPosition?: 'fixed' | 'absolute';
 }
 
 export function InputCustomField(props: Props) {
@@ -88,6 +89,7 @@ export function InputCustomField(props: Props) {
           onValueChange={(currentValue) => props.onValueChange(currentValue)}
           customSelector
           withBlank
+          menuPosition={props.selectMenuPosition}
         >
           {type.split(',').map((option, index) => (
             <option key={index} value={option}>
