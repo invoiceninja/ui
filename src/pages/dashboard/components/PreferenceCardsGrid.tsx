@@ -139,10 +139,10 @@ export function PreferenceCardsGrid(props: Props) {
         }
       }
 
-      return {
+      return cloneDeep({
         ...prevLayouts,
         [layoutBreakpoint]: [...currentLayoutForBreakpoint, ...newCards],
-      };
+      });
     });
 
     setTimeout(() => {
@@ -196,12 +196,12 @@ export function PreferenceCardsGrid(props: Props) {
       return;
     }
 
-    setLayouts((prevLayouts) => {
-      return {
+    setLayouts((prevLayouts) =>
+      cloneDeep({
         ...prevLayouts,
         [layoutBreakpoint]: currentLayout,
-      };
-    });
+      })
+    );
 
     const preferenceCardBoxHeight = mainLayouts[layoutBreakpoint]?.find(
       (card) => card.i === '1'
