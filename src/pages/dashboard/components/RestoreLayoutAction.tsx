@@ -24,11 +24,11 @@ import { cloneDeep } from 'lodash';
 interface Props {
   layoutBreakpoint: string | undefined;
   setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
-  updateLayoutHeight: () => void;
+  setIsLayoutRestored: Dispatch<SetStateAction<boolean>>;
 }
 
 export function RestoreLayoutAction(props: Props) {
-  const { layoutBreakpoint, setLayouts, updateLayoutHeight } = props;
+  const { layoutBreakpoint, setLayouts, setIsLayoutRestored } = props;
 
   const setIsModalVisible = useSetAtom(confirmActionModalAtom);
 
@@ -42,24 +42,26 @@ export function RestoreLayoutAction(props: Props) {
     <>
       <ConfirmActionModal
         onClick={() => {
-          layoutBreakpoint &&
-            setLayouts((currentLayouts) =>
-              cloneDeep({
-                ...currentLayouts,
-                [layoutBreakpoint]:
-                  initialLayouts[
-                    layoutBreakpoint as keyof typeof initialLayouts
-                  ],
-              })
-            );
+          if (!layoutBreakpoint) {
+            return;
+          }
+
+          setIsLayoutRestored(true);
+
+          setLayouts((currentLayouts) =>
+            cloneDeep({
+              ...currentLayouts,
+              [layoutBreakpoint]:
+                initialLayouts[layoutBreakpoint as keyof typeof initialLayouts],
+            })
+          );
 
           setIsRestoring(true);
-
-          updateLayoutHeight();
 
           setTimeout(() => {
             setIsRestoring(false);
             setIsModalVisible(false);
+            setIsLayoutRestored(false);
           }, 300);
         }}
         disabledButton={isRestoring}

@@ -84,7 +84,7 @@ export function DashboardCard(props: CardProps) {
 
   return (
     <ShadcnCard
-      className={classNames('px-6 py-6', {
+      className={classNames('px-6 py-6 h-full', {
         'col-span-2':
           props.layoutBreakpoint === 'xxl' ||
           props.layoutBreakpoint === 'xl' ||

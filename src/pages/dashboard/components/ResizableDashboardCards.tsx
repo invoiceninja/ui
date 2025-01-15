@@ -64,6 +64,7 @@ import { RestoreCardsModal } from './RestoreCardsModal';
 import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
+import { MdDragHandle } from 'react-icons/md';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -416,7 +417,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 6.3,
+      h: 7.3,
       isResizable: false,
     },
     {
@@ -1017,7 +1018,10 @@ export function ResizableDashboardCards() {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isLayoutsInitialized, setIsLayoutsInitialized] =
     useState<boolean>(false);
+  const [isLayoutRestored, setIsLayoutRestored] = useState<boolean>(false);
   const [areCardsRestored, setAreCardsRestored] = useState<boolean>(false);
+  const [arePreferenceCardsChanged, setArePreferenceCardsChanged] =
+    useState<boolean>(false);
   const [currentDashboardFields, setCurrentDashboardFields] = useState<
     DashboardField[]
   >([]);
@@ -1138,58 +1142,6 @@ export function ResizableDashboardCards() {
     }));
   };
 
-  const updateLayoutHeight = () => {
-    const totalCards =
-      user?.company_user?.react_settings?.dashboard_fields?.length || 0;
-    let cardsPerRow = 0;
-
-    switch (layoutBreakpoint) {
-      case 'xxl':
-        cardsPerRow = 6;
-        break;
-      case 'xl':
-        cardsPerRow = 5;
-        break;
-      case 'lg':
-        cardsPerRow = 4;
-        break;
-      case 'md':
-        cardsPerRow = 3;
-        break;
-      case 'sm':
-        cardsPerRow = 2;
-        break;
-      case 'xs':
-        cardsPerRow = 1;
-        break;
-      case 'xxs':
-        cardsPerRow = 1;
-        break;
-      default:
-        cardsPerRow = 6;
-        break;
-    }
-
-    const numberOfRows = Math.ceil(totalCards / cardsPerRow);
-
-    setLayouts((currentLayouts) => {
-      const updatedLayouts = cloneDeep(currentLayouts);
-
-      Object.keys(updatedLayouts).forEach((breakpoint) => {
-        updatedLayouts[breakpoint] = updatedLayouts[breakpoint].map((item) =>
-          item.i === '1'
-            ? {
-                ...item,
-                h: totalCards ? numberOfRows * 7 : 0,
-              }
-            : item
-        );
-      });
-
-      return updatedLayouts;
-    });
-  };
-
   const handleUpdateUserPreferences = () => {
     const updatedUser = cloneDeep(user) as User;
 
@@ -1273,7 +1225,10 @@ export function ResizableDashboardCards() {
             }
 
             return initialCardLayout
-              ? { ...initialCardLayout, y: Infinity }
+              ? {
+                  ...initialCardLayout,
+                  y: initialCardLayout.i === '1' ? 1 : Infinity,
+                }
               : layoutCard;
           }
 
@@ -1281,17 +1236,22 @@ export function ResizableDashboardCards() {
         }),
       }));
 
-      setTimeout(() => {
-        if (isAnyRestored) {
-          setAreCardsRestored(false);
+      arePreferenceCardsChanged && setArePreferenceCardsChanged(false);
 
-          window.scrollTo({
-            top:
-              document.querySelector('.responsive-grid-box')?.scrollHeight || 0,
-            behavior: 'smooth',
-          });
-        }
-      }, 450);
+      if (!arePreferenceCardsChanged) {
+        setTimeout(() => {
+          if (isAnyRestored) {
+            setAreCardsRestored(false);
+
+            window.scrollTo({
+              top:
+                document.querySelector('.responsive-grid-box')?.scrollHeight ||
+                0,
+              behavior: 'smooth',
+            });
+          }
+        }, 450);
+      }
     }
   };
 
@@ -1362,9 +1322,7 @@ export function ResizableDashboardCards() {
   }, [settings?.preferences?.dashboard_charts?.range]);
 
   useEffect(() => {
-    setTimeout(() => {
-      updateLayoutHeight();
-    }, 50);
+    setArePreferenceCardsChanged(true);
   }, [currentDashboardFields]);
 
   useEffect(() => {
@@ -1422,10 +1380,6 @@ export function ResizableDashboardCards() {
 
         setIsLayoutsInitialized(true);
       }
-
-      setTimeout(() => {
-        updateLayoutHeight();
-      }, 75);
     }
   }, [layoutBreakpoint]);
 
@@ -1488,7 +1442,8 @@ export function ResizableDashboardCards() {
           onResizeStop={onResizeStop}
           onDragStop={onDragStop}
           onLayoutChange={(current) =>
-            areCardsRestored && handleOnLayoutChange(current)
+            (areCardsRestored || arePreferenceCardsChanged) &&
+            handleOnLayoutChange(current)
           }
           //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           resizeHandles={['se']}
@@ -1632,7 +1587,7 @@ export function ResizableDashboardCards() {
                   <RestoreLayoutAction
                     layoutBreakpoint={layoutBreakpoint}
                     setLayouts={setLayouts}
-                    updateLayoutHeight={updateLayoutHeight}
+                    setIsLayoutRestored={setIsLayoutRestored}
                   />
                 </>
               )}
@@ -1640,12 +1595,19 @@ export function ResizableDashboardCards() {
           </div>
 
           {currentDashboardFields?.length ? (
-            <div
-              key="1"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
+            <div key="1">
+              <div
+                className={classNames(
+                  'absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drag-handle',
+                  {
+                    'cursor-grab': isEditMode,
+                    hidden: !isEditMode,
+                  }
+                )}
+              >
+                <Icon element={MdDragHandle} size={30} />
+              </div>
+
               <PreferenceCardsGrid
                 currentDashboardFields={currentDashboardFields}
                 dateRange={dateRange}
@@ -1654,7 +1616,22 @@ export function ResizableDashboardCards() {
                 currencyId={currency.toString()}
                 layoutBreakpoint={layoutBreakpoint}
                 isEditMode={isEditMode}
+                setMainLayouts={setLayouts}
+                mainLayouts={layouts}
+                isLayoutRestored={isLayoutRestored}
               />
+
+              <div
+                className={classNames(
+                  'absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 drag-handle',
+                  {
+                    'cursor-grab': isEditMode,
+                    hidden: !isEditMode,
+                  }
+                )}
+              >
+                <Icon element={MdDragHandle} size={30} />
+              </div>
             </div>
           ) : null}
 
