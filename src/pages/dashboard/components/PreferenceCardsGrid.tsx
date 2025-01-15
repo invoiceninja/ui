@@ -398,7 +398,7 @@ export function PreferenceCardsGrid(props: Props) {
         updateLayoutHeight();
       }, 50);
     }
-  }, [layoutBreakpoint]);
+  }, [layoutBreakpoint, reactSettings]);
 
   useDebounce(
     () => {
@@ -442,8 +442,8 @@ export function PreferenceCardsGrid(props: Props) {
       draggableHandle=".preference-cards-grid-drag-handle"
       margin={[0, 20]}
       rowHeight={1}
-      isDraggable={true}
-      isDroppable={true}
+      isDraggable={isEditMode}
+      isDroppable={isEditMode}
       isResizable={false}
       onDragStart={onDragStart}
       onDragStop={onDragStop}
