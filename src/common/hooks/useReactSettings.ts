@@ -94,6 +94,7 @@ export interface ReactSettings {
   dashboard_cards_configuration?: DashboardGridLayouts;
   removed_dashboard_cards?: Record<string, string[]>;
   dashboard_fields?: DashboardField[];
+  preference_cards_configuration?: DashboardGridLayouts;
 }
 
 export type ReactTableColumns =

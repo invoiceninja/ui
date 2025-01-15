@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DashboardField } from '$app/common/interfaces/company-user';
+import {
+  CompanyUser,
+  DashboardField,
+} from '$app/common/interfaces/company-user';
 import classNames from 'classnames';
 import { DashboardCard } from './DashboardCard';
 import ReactGridLayout, { Responsive } from 'react-grid-layout';
@@ -16,6 +19,18 @@ import { WidthProvider } from 'react-grid-layout';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import collect from 'collect.js';
+import { useDebounce } from 'react-use';
+import { diff } from 'deep-object-diff';
+import { cloneDeep } from 'lodash';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { set } from 'lodash';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { updateUser } from '$app/common/stores/slices/user';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { User } from '$app/common/interfaces/user';
+import { useDispatch } from 'react-redux';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -32,1075 +47,6 @@ interface Props {
   isLayoutRestored: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const DemoCard = ({ number }: { number: number }) => (
-  <div className="bg-white p-4 rounded shadow h-full">
-    <h3 className="text-lg font-semibold">Box {number}</h3>
-    <p>Demo content for box {number}</p>
-  </div>
-);
-
-export const demoLayout = {
-  xxl: [
-    // Header box
-    {
-      i: 'box1',
-      x: 0,
-      y: 0,
-      w: 1000,
-      h: 4,
-      isResizable: false,
-    },
-    // First row - 3 boxes
-    {
-      i: 'box2',
-      x: 0,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box3',
-      x: 340,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box4',
-      x: 670,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Second row - 3 boxes
-    {
-      i: 'box5',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box6',
-      x: 340,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box7',
-      x: 670,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Third row - 3 boxes
-    {
-      i: 'box8',
-      x: 0,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box9',
-      x: 340,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box10',
-      x: 670,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fourth row - 3 boxes
-    {
-      i: 'box11',
-      x: 0,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box12',
-      x: 340,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box13',
-      x: 670,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fifth row - 3 boxes
-    {
-      i: 'box14',
-      x: 0,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box15',
-      x: 340,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box16',
-      x: 670,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-  ],
-  // Ponovite isti raspored za xl, lg, md, sm, xs i xxs breakpoints
-  xl: [
-    // Header box
-    {
-      i: 'box1',
-      x: 0,
-      y: 0,
-      w: 1000,
-      h: 4,
-      isResizable: false,
-    },
-    // First row - 3 boxes
-    {
-      i: 'box2',
-      x: 0,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box3',
-      x: 340,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box4',
-      x: 670,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Second row - 3 boxes
-    {
-      i: 'box5',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box6',
-      x: 340,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box7',
-      x: 670,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Third row - 3 boxes
-    {
-      i: 'box8',
-      x: 0,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box9',
-      x: 340,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box10',
-      x: 670,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fourth row - 3 boxes
-    {
-      i: 'box11',
-      x: 0,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box12',
-      x: 340,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box13',
-      x: 670,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fifth row - 3 boxes
-    {
-      i: 'box14',
-      x: 0,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box15',
-      x: 340,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box16',
-      x: 670,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-  ],
-  lg: [
-    // Header box
-    {
-      i: 'box1',
-      x: 0,
-      y: 0,
-      w: 1000,
-      h: 4,
-      isResizable: false,
-    },
-    // First row - 3 boxes
-    {
-      i: 'box2',
-      x: 0,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box3',
-      x: 340,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box4',
-      x: 670,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Second row - 3 boxes
-    {
-      i: 'box5',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box6',
-      x: 340,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box7',
-      x: 670,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Third row - 3 boxes
-    {
-      i: 'box8',
-      x: 0,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box9',
-      x: 340,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box10',
-      x: 670,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fourth row - 3 boxes
-    {
-      i: 'box11',
-      x: 0,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box12',
-      x: 340,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box13',
-      x: 670,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fifth row - 3 boxes
-    {
-      i: 'box14',
-      x: 0,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box15',
-      x: 340,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box16',
-      x: 670,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-  ],
-  md: [
-    // Header box
-    {
-      i: 'box1',
-      x: 0,
-      y: 0,
-      w: 1000,
-      h: 4,
-      isResizable: false,
-    },
-    // First row - 3 boxes
-    {
-      i: 'box2',
-      x: 0,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box3',
-      x: 340,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box4',
-      x: 670,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Second row - 3 boxes
-    {
-      i: 'box5',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box6',
-      x: 340,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box7',
-      x: 670,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Third row - 3 boxes
-    {
-      i: 'box8',
-      x: 0,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box9',
-      x: 340,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box10',
-      x: 670,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fourth row - 3 boxes
-    {
-      i: 'box11',
-      x: 0,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box12',
-      x: 340,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box13',
-      x: 670,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fifth row - 3 boxes
-    {
-      i: 'box14',
-      x: 0,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box15',
-      x: 340,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box16',
-      x: 670,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-  ],
-  sm: [
-    // Header box
-    {
-      i: 'box1',
-      x: 0,
-      y: 0,
-      w: 1000,
-      h: 4,
-      isResizable: false,
-    },
-    // First row - 3 boxes
-    {
-      i: 'box2',
-      x: 0,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box3',
-      x: 340,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box4',
-      x: 670,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Second row - 3 boxes
-    {
-      i: 'box5',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box6',
-      x: 340,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box7',
-      x: 670,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Third row - 3 boxes
-    {
-      i: 'box8',
-      x: 0,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box9',
-      x: 340,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box10',
-      x: 670,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fourth row - 3 boxes
-    {
-      i: 'box11',
-      x: 0,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box12',
-      x: 340,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box13',
-      x: 670,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fifth row - 3 boxes
-    {
-      i: 'box14',
-      x: 0,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box15',
-      x: 340,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box16',
-      x: 670,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-  ],
-  xs: [
-    // Header box
-    {
-      i: 'box1',
-      x: 0,
-      y: 0,
-      w: 1000,
-      h: 4,
-      isResizable: false,
-    },
-    // First row - 3 boxes
-    {
-      i: 'box2',
-      x: 0,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box3',
-      x: 340,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box4',
-      x: 670,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Second row - 3 boxes
-    {
-      i: 'box5',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box6',
-      x: 340,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box7',
-      x: 670,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Third row - 3 boxes
-    {
-      i: 'box8',
-      x: 0,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box9',
-      x: 340,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box10',
-      x: 670,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fourth row - 3 boxes
-    {
-      i: 'box11',
-      x: 0,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box12',
-      x: 340,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box13',
-      x: 670,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fifth row - 3 boxes
-    {
-      i: 'box14',
-      x: 0,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box15',
-      x: 340,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box16',
-      x: 670,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-  ],
-  xxs: [
-    // Header box
-    {
-      i: 'box1',
-      x: 0,
-      y: 0,
-      w: 1000,
-      h: 4,
-      isResizable: false,
-    },
-    // First row - 3 boxes
-    {
-      i: 'box2',
-      x: 0,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box3',
-      x: 340,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box4',
-      x: 670,
-      y: 1,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Second row - 3 boxes
-    {
-      i: 'box5',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box6',
-      x: 340,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box7',
-      x: 670,
-      y: 2,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Third row - 3 boxes
-    {
-      i: 'box8',
-      x: 0,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box9',
-      x: 340,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box10',
-      x: 670,
-      y: 3,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fourth row - 3 boxes
-    {
-      i: 'box11',
-      x: 0,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box12',
-      x: 340,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box13',
-      x: 670,
-      y: 4,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    // Fifth row - 3 boxes
-    {
-      i: 'box14',
-      x: 0,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box15',
-      x: 340,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-    {
-      i: 'box16',
-      x: 670,
-      y: 5,
-      w: 330,
-      h: 20,
-      minH: 15,
-      minW: 250,
-    },
-  ],
-};
-
 export function PreferenceCardsGrid(props: Props) {
   const {
     currentDashboardFields,
@@ -1115,6 +61,9 @@ export function PreferenceCardsGrid(props: Props) {
     isLayoutRestored,
   } = props;
 
+  const dispatch = useDispatch();
+
+  const user = useCurrentUser();
   const reactSettings = useReactSettings();
 
   const [layouts, setLayouts] = useState<ReactGridLayout.Layouts>({});
@@ -1183,8 +132,8 @@ export function PreferenceCardsGrid(props: Props) {
               i: card.id,
               x: j * (widthPerScreenSize + 20),
               y: 0,
-              w: widthPerScreenSize + 20,
-              h: 15,
+              w: widthPerScreenSize,
+              h: 7.3,
             });
           }
         }
@@ -1289,6 +238,7 @@ export function PreferenceCardsGrid(props: Props) {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOnDrag = (
     layout: ReactGridLayout.Layout[],
     oldItem: ReactGridLayout.Layout,
@@ -1296,10 +246,6 @@ export function PreferenceCardsGrid(props: Props) {
     placeholder: ReactGridLayout.Layout
   ) => {
     const isDraggingDown = newItem.y > placeholder.y;
-
-    console.log(isDraggingDown);
-
-    //handleScroll(isDraggingDown);
 
     if (!isDraggingDown) return;
 
@@ -1317,13 +263,35 @@ export function PreferenceCardsGrid(props: Props) {
 
       const isDraggingTallerItem = oldItem.h > closestItem.h * 0.9;
 
-      if (newItem.y > oldItem.h / 1.2 + oldItem.y && isDraggingTallerItem) {
+      if (newItem.y > oldItem.h / 3 + oldItem.y && isDraggingTallerItem) {
         const oldX = oldItem.x;
         const oldY = oldItem.y;
         closestItem.x = oldX;
         closestItem.y = oldY;
       }
     }
+  };
+
+  const handleUpdateUserPreferences = () => {
+    const updatedUser = cloneDeep(user) as User;
+
+    set(
+      updatedUser,
+      'company_user.react_settings.preference_cards_configuration',
+      cloneDeep(layouts)
+    );
+
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+      updatedUser
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(updatedUser, 'company_user', response.data.data);
+
+      $refetch(['company_users']);
+
+      dispatch(updateUser(updatedUser));
+    });
   };
 
   useEffect(() => {
@@ -1418,10 +386,10 @@ export function PreferenceCardsGrid(props: Props) {
   useEffect(() => {
     if (layoutBreakpoint) {
       if (
-        reactSettings?.dashboard_cards_configuration &&
+        reactSettings?.preference_cards_configuration &&
         !isLayoutsInitialized
       ) {
-        //setLayouts(cloneDeep(reactSettings?.dashboard_cards_configuration));
+        setLayouts(cloneDeep(reactSettings?.preference_cards_configuration));
 
         setIsLayoutsInitialized(true);
       }
@@ -1432,25 +400,22 @@ export function PreferenceCardsGrid(props: Props) {
     }
   }, [layoutBreakpoint]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const demoFields = [
-    { id: 'box1', number: 1 },
-    { id: 'box2', number: 2 },
-    { id: 'box3', number: 3 },
-    { id: 'box4', number: 4 },
-    { id: 'box5', number: 5 },
-    { id: 'box6', number: 6 },
-    { id: 'box7', number: 7 },
-    { id: 'box8', number: 8 },
-    { id: 'box9', number: 9 },
-    { id: 'box10', number: 10 },
-    { id: 'box11', number: 11 },
-    { id: 'box12', number: 12 },
-    { id: 'box13', number: 13 },
-    { id: 'box14', number: 14 },
-    { id: 'box15', number: 15 },
-    { id: 'box16', number: 16 },
-  ];
+  useDebounce(
+    () => {
+      if (
+        reactSettings &&
+        ((reactSettings.preference_cards_configuration &&
+          Object.keys(
+            diff(reactSettings.preference_cards_configuration, layouts)
+          ).length) ||
+          !reactSettings.preference_cards_configuration)
+      ) {
+        handleUpdateUserPreferences();
+      }
+    },
+    1500,
+    [layouts]
+  );
 
   return (
     <ResponsiveGridLayout
@@ -1464,7 +429,7 @@ export function PreferenceCardsGrid(props: Props) {
         xs: 300,
         xxs: 0,
       }}
-      layouts={demoLayout}
+      layouts={layouts}
       cols={{
         xxl: 1000,
         xl: 1000,
@@ -1482,7 +447,7 @@ export function PreferenceCardsGrid(props: Props) {
       isResizable={false}
       onDragStart={onDragStart}
       onDragStop={onDragStop}
-      onDrag={handleOnDrag}
+      //onDrag={handleOnDrag}
     >
       {currentDashboardFields.map((field) => (
         <div

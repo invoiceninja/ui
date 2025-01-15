@@ -1153,6 +1153,9 @@ export function ResizableDashboardCards() {
 
     // delete updatedUser.company_user?.settings?.dashboard_fields;
 
+    // delete updatedUser.company_user?.react_settings
+    //   ?.preference_cards_configuration;
+
     // delete updatedUser.company_user.react_settings
     //   .dashboard_cards_configuration;
 
