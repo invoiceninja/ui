@@ -318,6 +318,7 @@ export function useEInvoiceHealthCheck() {
         .then(() => true)
         .catch(() => false),
     enabled: useTriggerEInvoiceRoutes(),
+    staleTime: Infinity,
     retry: () => false,
   });
 }
