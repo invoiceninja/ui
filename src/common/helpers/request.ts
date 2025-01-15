@@ -43,7 +43,9 @@ client.interceptors.response.use(
 
     if (
       url?.includes('einvoice') &&
-      (error.response?.status === 401 || error.response?.status === 403)
+      (error.response?.status === 401 ||
+        error.response?.status === 403 ||
+        error.response?.status === 404)
     ) {
       console.error(error);
 
