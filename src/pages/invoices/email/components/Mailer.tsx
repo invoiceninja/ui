@@ -88,7 +88,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
 
   const handleSend = useHandleSend({ setErrors });
 
-  const [payloadData, setPayloadData] = useState<Record<string, string>>({
+  const [payloadData, setPayloadData] = useState({
     body: '',
     ccEmail: '',
     subject: '',
@@ -255,7 +255,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               onChange={(value) =>
                 setPayloadData((current) => ({ ...current, body: value }))
               }
-              handleManualChange={() => setTriggerTemplateGeneration(true)}
+              handleOnBlur={() => setTriggerTemplateGeneration(true)}
             />
           )}
         </Card>
