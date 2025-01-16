@@ -55,6 +55,10 @@ client.interceptors.response.use(
         });
       }
 
+      return;
+    }
+
+    if (url?.endsWith('/api/v1/einvoice/token/update') && error.response?.status === 500) {
       return Promise.reject(error);
     }
 
