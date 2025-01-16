@@ -19,7 +19,7 @@ import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { Button, Link } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -177,75 +177,7 @@ export function Preferences() {
             {t('buy_credits')}
           </button>
         </Element>
-
-        <Element leftSide={t('Token')}>
-          <RegenerateToken />
-        </Element>
       </Card>
-    </>
-  );
-}
-
-function RegenerateToken() {
-  const { t } = useTranslation();
-
-  const [tokenModalVisible, setTokenModalVisible] = useState(false);
-
-  const accentColor = useAccentColor();
-  const refresh = useRefreshCompanyUsers();
-  const queryClient = useQueryClient();
-
-  const form = useFormik({
-    initialValues: {},
-    onSubmit: (_, { setSubmitting }) => {
-      request('POST', endpoint(`/api/v1/einvoice/token/update`))
-        .then(() => {
-          toast.success(t('peppol_token_generated')!);
-
-          setTokenModalVisible(false);
-        })
-        .catch(() => toast.error())
-        .finally(() => {
-          setSubmitting(false);
-
-          queryClient.invalidateQueries({
-            queryKey: ['/api/v1/einvoice/quota'],
-          });
-
-          queryClient.invalidateQueries({
-            queryKey: ['/api/v1/einvoice/health_check'],
-          });
-
-          refresh();
-        });
-    },
-  });
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setTokenModalVisible(true)}
-        style={{
-          color: accentColor,
-        }}
-      >
-        {t('regenerate')}
-      </button>
-
-      <Modal
-        title={t('generate_token')}
-        visible={tokenModalVisible}
-        onClose={setTokenModalVisible}
-      >
-        <p>{t('peppol_token_description')}</p>
-
-        <form onSubmit={form.handleSubmit}>
-          <Button disabled={form.isSubmitting} className="w-full">
-            {t('regenerate')}
-          </Button>
-        </form>
-      </Modal>
     </>
   );
 }
