@@ -31,6 +31,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -113,7 +114,11 @@ export default function InvoiceDesign() {
       );
     });
 
-    axios.all(requests);
+    axios.all(requests).then(() => {
+      updatingRecords.forEach(({ entity }) => {
+        $refetch([`${entity}s` as RefetchKey]);
+      });
+    });
   };
 
   useEffect(() => {
