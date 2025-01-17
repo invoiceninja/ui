@@ -19,7 +19,7 @@ export interface Props {
   field: string;
   value: string;
   onValueChange: (value: string | number | boolean) => unknown;
-  selectMenuPosition?: 'fixed' | 'absolute';
+  selectMenuPosition?: 'fixed';
 }
 
 export function InputCustomField(props: Props) {

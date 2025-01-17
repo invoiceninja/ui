@@ -28,7 +28,7 @@ export interface SelectProps extends CommonProps {
   customSelector?: boolean;
   dismissable?: boolean;
   clearAfterSelection?: boolean;
-  menuPosition?: 'fixed' | 'absolute';
+  menuPosition?: 'fixed';
 }
 
 export function SelectField(props: SelectProps) {

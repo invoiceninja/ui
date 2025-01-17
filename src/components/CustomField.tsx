@@ -20,7 +20,7 @@ import { Entity } from '$app/common/hooks/useEntityCustomFields';
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
   noExternalPadding?: boolean;
-  selectMenuPosition?: 'fixed' | 'absolute';
+  selectMenuPosition?: 'fixed';
 }
 
 export function customField(value: string) {
