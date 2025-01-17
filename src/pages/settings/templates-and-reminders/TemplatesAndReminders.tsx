@@ -14,7 +14,6 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { request } from '$app/common/helpers/request';
-import { EmailTemplate } from '$app/common/hooks/emails/useResolveTemplate';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
@@ -42,6 +41,7 @@ import { cloneDeep } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { Spinner } from '$app/components/Spinner';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
