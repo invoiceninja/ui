@@ -175,14 +175,6 @@ export function useProductColumns() {
       }
     });
 
-    // In some cases, the user may add the line_total variable in a different position than the last.
-    // We want to ensure that it is completely excluded from the variables so that it can be added in the last position.
-    updatedVariables = updatedVariables.filter(
-      (variable) => variable !== '$product.line_total'
-    );
-
-    updatedVariables.push('$product.line_total');
-
     if (!company?.enable_product_quantity) {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$product.quantity'

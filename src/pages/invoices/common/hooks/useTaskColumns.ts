@@ -139,14 +139,6 @@ export function useTaskColumns() {
       }
     });
 
-    // In some cases, the user may add the line_total variable in a different position than the last.
-    // We want to ensure that it is completely excluded from the variables so that it can be added in the last position.
-    updatedVariables = updatedVariables.filter(
-      (variable) => variable !== '$task.line_total'
-    );
-
-    updatedVariables.push('$task.line_total');
-
     setColumns(updatedVariables);
   }, [company]);
 
