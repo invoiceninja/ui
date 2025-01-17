@@ -225,6 +225,8 @@ export const keys = {
   },
 };
 
+export type RefetchKey = keyof typeof keys;
+
 export function useRefetch() {
   const queryClient = useQueryClient();
 
@@ -243,7 +245,7 @@ export function useRefetch() {
   };
 }
 
-export function $refetch(property: Array<keyof typeof keys>) {
+export function $refetch(property: Array<RefetchKey>) {
   window.dispatchEvent(
     new CustomEvent('refetch', {
       detail: {

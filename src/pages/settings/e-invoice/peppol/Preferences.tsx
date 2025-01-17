@@ -24,7 +24,7 @@ import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { get } from 'lodash';
@@ -182,9 +182,21 @@ export function Preferences() {
   );
 }
 
+export function useTriggerEInvoiceRoutes() {
+  const company = useCurrentCompany();
+
+  return (
+    isSelfHosted() &&
+    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true' &&
+    Boolean(company) &&
+    company?.settings.enable_e_invoice &&
+    company?.settings.e_invoice_type === 'PEPPOL'
+  );
+}
+
 export function useQuota() {
   const account = useCurrentAccount();
-  const company = useCurrentCompany();
+  const queryClient = useQueryClient();
 
   const quota = useQuery({
     queryKey: ['/api/v1/einvoice/quota'],
@@ -197,11 +209,8 @@ export function useQuota() {
           }
         }),
     enabled:
-      isSelfHosted() &&
-      import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true' &&
-      Boolean(company) &&
-      company?.settings.enable_e_invoice &&
-      company?.settings.e_invoice_type === 'PEPPOL',
+      useTriggerEInvoiceRoutes() &&
+      queryClient.getQueryData(['/api/v1/einvoice/health_check']) !== undefined,
     retry: () => false,
     staleTime: Infinity,
   });
@@ -231,4 +240,17 @@ function Quota() {
       <p>{quota}</p>
     </div>
   );
+}
+
+export function useEInvoiceHealthCheck() {
+  return useQuery({
+    queryKey: ['/api/v1/einvoice/health_check'],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/einvoice/health_check'))
+        .then(() => true)
+        .catch(() => false),
+    enabled: useTriggerEInvoiceRoutes(),
+    staleTime: Infinity,
+    retry: () => false,
+  });
 }
