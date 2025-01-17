@@ -13,10 +13,18 @@ import { useTranslation } from 'react-i18next';
 import { Banner } from '../Banner';
 import { buttonStyles } from './VerifyEmail';
 import { Link, useLocation } from 'react-router-dom';
-import { useQuota } from '$app/pages/settings/e-invoice/peppol/Preferences';
+import {
+  useEInvoiceHealthCheck,
+  useQuota,
+} from '$app/pages/settings/e-invoice/peppol/Preferences';
 import { Modal } from '../Modal';
 import { useEffect, useState } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useQueryClient } from 'react-query';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { atom, useAtom } from 'jotai';
 
 export const EINVOICE_CREDITS_MIN_THRESHOLD = 15;
 
@@ -26,6 +34,7 @@ export function EInvoiceCredits() {
 
   const [isVisible, setVisible] = useState(false);
 
+  const { data: healthcheck } = useEInvoiceHealthCheck();
   const { t } = useTranslation();
 
   if (
@@ -34,6 +43,10 @@ export function EInvoiceCredits() {
     import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true'
   ) {
     return null;
+  }
+
+  if (typeof healthcheck === 'boolean' && !healthcheck) {
+    return <RegenerateToken />;
   }
 
   if (quota !== null && quota <= 0) {
@@ -116,5 +129,66 @@ function Dialog({ isVisible, setVisible, text }: DialogProps) {
         {t('view_settings')}
       </Link>
     </Modal>
+  );
+}
+
+const retriesAtom = atom(0);
+const statusAtom = atom<'pending' | 'error' | 'success'>('pending');
+
+function RegenerateToken() {
+  const { t } = useTranslation();
+
+  const refresh = useRefreshCompanyUsers();
+  const queryClient = useQueryClient();
+
+  const [status, setStatus] = useAtom(statusAtom);
+  const [retries, setRetries] = useAtom(retriesAtom);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (status === 'success' || status === 'error' || retries >= 3) {
+        clearInterval(interval);
+        return;
+      }
+
+      request('POST', endpoint(`/api/v1/einvoice/token/update`))
+        .then(() => {
+          queryClient.invalidateQueries({
+            queryKey: ['/api/v1/einvoice/quota'],
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ['/api/v1/einvoice/health_check'],
+          });
+
+          refresh();
+          setStatus('success');
+        })
+        .catch(() => {
+          setRetries((prevRetries) => {
+            const newRetries = prevRetries + 1;
+
+            if (newRetries >= 3) {
+              setStatus('error');
+            }
+
+            return newRetries;
+          });
+        });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [status, retries, queryClient, refresh, setStatus, setRetries]);
+
+  if (status === 'success' || status === 'pending') {
+    return null;
+  }
+
+  return (
+    <Banner variant="red">
+      <div className="flex space-x-1">
+        <span>{t('einvoice_token_not_found')}</span>
+      </div>
+    </Banner>
   );
 }
