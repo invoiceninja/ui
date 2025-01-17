@@ -13,9 +13,8 @@ import { defaultHeaders } from '$app/common/queries/common/headers';
 import { ValidationBag } from '../interfaces/validation-bag';
 import { toast } from './toast/toast';
 import { $refetch } from '../hooks/useRefetch';
-import { checkJsonObject, trans } from '../helpers';
+import { checkJsonObject } from '../helpers';
 import { clearLocalStorage } from './local-storage';
-import { toast as $toast } from 'react-hot-toast';
 
 const client = axios.create();
 
@@ -49,11 +48,11 @@ client.interceptors.response.use(
     ) {
       console.error(error);
 
-      if (!url.includes('quota')) {
-        $toast.error(trans('einvoice_something_went_wrong', {}), {
-          duration: 10_000,
-        });
-      }
+      // if (!url.includes('quota')) {
+      //   $toast.error(trans('einvoice_something_went_wrong', {}), {
+      //     duration: 10_000,
+      //   });
+      // }
 
       return;
     }
