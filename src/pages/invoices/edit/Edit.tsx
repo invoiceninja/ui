@@ -32,6 +32,7 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
@@ -44,6 +45,8 @@ import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
+import { MdAttachMoney } from 'react-icons/md';
+import { Tooltip } from '$app/components/Tooltip';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -99,7 +102,39 @@ export default function Edit() {
           {invoice && (
             <div className="flex space-x-20">
               <span className="text-sm">{t('status')}</span>
-              <InvoiceStatusBadge entity={invoice} />
+
+              <div className="flex items-center space-x-4">
+                <InvoiceStatusBadge entity={invoice} />
+
+                {invoice.status_id === InvoiceStatus.Paid && (
+                  <Tooltip
+                    message={t('reverse') as string}
+                    placement="bottom"
+                    width="auto"
+                    withoutArrow
+                  >
+                    <div
+                      className="cursor-pointer"
+                      onClick={() =>
+                        navigate(
+                          route('/payments/:id/edit', {
+                            id:
+                              invoice?.payments?.find((payment) =>
+                                payment.paymentables?.some(
+                                  (item) =>
+                                    item.invoice_id === invoice?.id &&
+                                    item.archived_at === 0
+                                )
+                              )?.id || '',
+                          })
+                        )
+                      }
+                    >
+                      <Icon element={MdAttachMoney} size={23} />
+                    </div>
+                  </Tooltip>
+                )}
+              </div>
             </div>
           )}
 
