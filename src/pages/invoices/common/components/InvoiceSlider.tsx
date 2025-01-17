@@ -246,7 +246,7 @@ export function InvoiceSlider() {
         invoice &&
         (hasPermission('edit_invoice') || entityAssigned(invoice)) ? (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={invoice}
             actions={actions}
           />
@@ -446,7 +446,7 @@ export function InvoiceSlider() {
           )}
         </div>
 
-        <div>
+        <div className="divide-y">
           {resource?.activities && resource.activities.length === 0 && (
             <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
@@ -507,7 +507,7 @@ export function InvoiceSlider() {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col divide-y">
             {activities
               ?.filter(
                 (activity) =>
@@ -533,7 +533,7 @@ export function InvoiceSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col divide-y">
           {emailRecords.map((emailRecord, index) => (
             <EmailRecord
               key={index}

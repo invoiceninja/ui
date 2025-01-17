@@ -105,6 +105,7 @@ export default function Transactions() {
           withResourcefulActions
           linkToCreateGuards={[permission('create_bank_transaction')]}
           hideEditableOptions={!hasPermission('edit_bank_transaction')}
+          enableSavingFilterPreference
         />
       </Default>
     </>

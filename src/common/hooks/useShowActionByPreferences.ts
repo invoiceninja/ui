@@ -9,7 +9,6 @@
  */
 
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
-import { useDefaultCommonActions } from './useCommonActions';
 import { useEntityPageIdentifier } from './useEntityPageIdentifier';
 import { useCurrentUser } from './useCurrentUser';
 
@@ -24,8 +23,6 @@ export function useShowActionByPreferences(params: Params) {
 
   const { isEditPage } = useEntityPageIdentifier({ entity });
 
-  const defaultCommonActions = useDefaultCommonActions();
-
   return (actionKey: string) => {
     if (!isEditPage) {
       return true;
@@ -34,7 +31,7 @@ export function useShowActionByPreferences(params: Params) {
     const commonActionsPreferences =
       user?.company_user?.react_settings.common_actions;
 
-    if (!commonActionsPreferences) {
+    if (!commonActionsSection && !commonActionsPreferences?.[entity]) {
       return true;
     }
 
@@ -46,22 +43,8 @@ export function useShowActionByPreferences(params: Params) {
       return true;
     }
 
-    if (
-      !commonActionsPreferences?.[entity] &&
-      defaultCommonActions[entity].some(({ value }) => value === actionKey) &&
-      commonActionsSection
-    ) {
-      return true;
-    }
-
-    if (commonActionsPreferences && commonActionsSection) {
+    if (commonActionsPreferences?.[entity] && commonActionsSection) {
       return commonActionsPreferences[entity]?.includes(actionKey);
-    }
-
-    if (!commonActionsPreferences?.[entity] && !commonActionsSection) {
-      return !defaultCommonActions[entity]?.some(
-        ({ value }) => value === actionKey
-      );
     }
 
     return false;

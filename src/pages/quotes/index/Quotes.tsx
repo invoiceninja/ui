@@ -143,6 +143,7 @@ export default function Quotes() {
         dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_quote')]}
         hideEditableOptions={!hasPermission('edit_quote')}
+        enableSavingFilterPreference
       />
 
       {!disableNavigation('quote', quoteSlider) && <QuoteSlider />}

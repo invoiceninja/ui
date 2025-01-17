@@ -29,6 +29,7 @@ import {
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Page } from '$app/components/Breadcrumbs';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Task() {
   const { documentTitle } = useTitle('edit_task');
@@ -102,6 +103,7 @@ export default function Task() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="task" />}
     >
       {task ? (
         <div className="space-y-4">

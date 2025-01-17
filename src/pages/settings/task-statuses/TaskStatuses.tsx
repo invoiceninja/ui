@@ -52,6 +52,7 @@ export function TaskStatuses() {
       linkToCreate="/settings/task_statuses/create"
       linkToEdit="/settings/task_statuses/:id/edit"
       withResourcefulActions
+      enableSavingFilterPreference
     />
   );
 }

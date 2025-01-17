@@ -40,6 +40,7 @@ export function CommonActions(props: Props) {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
+
   const invoiceActions = useInvoiceActions({ dropdown: false });
   const creditActions = useCreditActions({ dropdown: false });
   const quoteActions = useQuoteActions({ dropdown: false });
@@ -47,6 +48,7 @@ export function CommonActions(props: Props) {
     dropdown: false,
   });
   const purchaseOrderActions = usePurchaseOrderActions({ dropdown: false });
+
   const { resource, entity } = props;
 
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] =

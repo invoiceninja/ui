@@ -184,7 +184,7 @@ export const RecurringInvoiceSlider = () => {
         (hasPermission('edit_recurring_invoice') ||
           entityAssigned(recurringInvoice)) ? (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={recurringInvoice}
             actions={actions}
           />
@@ -293,7 +293,7 @@ export const RecurringInvoiceSlider = () => {
           </Inline>
         </div>
 
-        <div>
+        <div className="divide-y">
           {resource?.activities && resource.activities.length === 0 && (
             <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
@@ -375,7 +375,7 @@ export const RecurringInvoiceSlider = () => {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col divide-y">
             {activities
               ?.filter(
                 (activity) =>

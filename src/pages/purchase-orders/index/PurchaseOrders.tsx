@@ -79,6 +79,7 @@ export default function PurchaseOrders() {
         dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_purchase_order')]}
         hideEditableOptions={!hasPermission('edit_purchase_order')}
+        enableSavingFilterPreference
       />
 
       <ChangeTemplateModal<PurchaseOrder>

@@ -27,7 +27,7 @@ import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 interface Params {
   apiEndpoint: URL;
   customFilters?: SelectOption[];
-  tableKey: string;
+  tableKey: string | undefined;
   isInitialConfiguration: boolean;
   customFilter: string[] | undefined;
   setFilter: Dispatch<SetStateAction<string>>;
@@ -38,6 +38,7 @@ interface Params {
   setStatus: Dispatch<SetStateAction<string[]>>;
   setPerPage: Dispatch<SetStateAction<PerPage>>;
   withoutStoringPerPage: boolean;
+  enableSavingFilterPreference?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -58,6 +59,7 @@ export function useDataTablePreferences(params: Params) {
     setStatus,
     setPerPage,
     withoutStoringPerPage,
+    enableSavingFilterPreference,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -85,7 +87,7 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (!customFilter) {
+    if (!customFilter || !tableKey || !enableSavingFilterPreference) {
       return;
     }
 
@@ -124,6 +126,16 @@ export function useDataTablePreferences(params: Params) {
     const updatedUser = cloneDeep(user) as User;
 
     if (updatedUser) {
+      // @Todo: This is a temporary solution for creating the table_filters object. It can be removed after some time.
+      const tableFilters =
+        updatedUser.company_user?.react_settings.table_filters || {};
+
+      Object.keys(tableFilters).forEach((key) => {
+        if (key.includes('/')) {
+          delete tableFilters[key];
+        }
+      });
+
       set(
         updatedUser,
         `company_user.react_settings.table_filters.${tableKey}`,

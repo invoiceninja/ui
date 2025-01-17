@@ -124,6 +124,7 @@ export default function Payments() {
             (payment) => getEntityState(payment) === EntityState.Archived
           )
         }
+        enableSavingFilterPreference
       />
 
       {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}

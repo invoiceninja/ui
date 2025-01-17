@@ -124,32 +124,3 @@ export function useAllCommonActions() {
 
   return actions;
 }
-
-export function useDefaultCommonActions() {
-  const [t] = useTranslation();
-
-  const actions: Record<Entity, CommonAction[]> = {
-    invoice: [
-      { value: 'mark_sent', label: t('mark_sent') },
-      { value: 'email_invoice', label: t('email_invoice') },
-    ],
-    credit: [
-      { value: 'mark_sent', label: t('mark_sent') },
-      { value: 'email_credit', label: t('email_credit') },
-    ],
-    quote: [
-      { value: 'mark_sent', label: t('mark_sent') },
-      { value: 'email_quote', label: t('email_quote') },
-    ],
-    recurring_invoice: [
-      { value: 'start', label: t('start') },
-      { value: 'view_pdf', label: t('view_pdf') },
-    ],
-    purchase_order: [
-      { value: 'send_email', label: t('send_email') },
-      { value: 'mark_sent', label: t('mark_sent') },
-    ],
-  };
-
-  return actions;
-}
