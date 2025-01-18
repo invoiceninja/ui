@@ -141,13 +141,16 @@ export function Login() {
                 )}
               >
                 {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
-                <div
-                  className="text-sm hover:underline cursor-pointer"
-                  onClick={() => setIsDisable2faModalOpen(true)}
-                  style={{ color: accentColor }}
-                >
-                  {t('disable_2fa')}
-                </div>
+
+                {isHosted() && (
+                  <div
+                    className="text-sm hover:underline cursor-pointer"
+                    onClick={() => setIsDisable2faModalOpen(true)}
+                    style={{ color: accentColor }}
+                  >
+                    {t('disable_2fa')}
+                  </div>
+                )}
               </div>
             </div>
 
