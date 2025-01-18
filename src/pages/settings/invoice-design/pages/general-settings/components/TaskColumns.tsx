@@ -12,17 +12,21 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function TaskColumns() {
   const [t] = useTranslation();
   const customField = useCustomField();
 
-  const defaultVariables = [
+  const company = useCurrentCompany();
+
+  let defaultVariables = [
     { value: '$task.service', label: t('service') },
     { value: '$task.description', label: t('description') },
     { value: '$task.hours', label: t('hours') },
     { value: '$task.rate', label: t('rate') },
     { value: '$task.tax', label: t('tax') },
+    { value: '$task.tax_amount', label: t('tax_amount') },
     { value: '$task.discount', label: t('discount') },
     { value: '$task.line_total', label: t('line_total') },
     {
@@ -43,6 +47,13 @@ export default function TaskColumns() {
     },
     { value: '$task.gross_line_total', label: t('gross_line_total') },
   ];
+
+  if (!company?.enabled_item_tax_rates) {
+    defaultVariables = defaultVariables.filter(
+      (variable) =>
+        variable.value !== '$task.tax_amount' && variable.value !== '$task.tax'
+    );
+  }
 
   return (
     <Card title={t('task_columns')} padding="small">

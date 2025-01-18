@@ -139,6 +139,32 @@ export function useTaskColumns() {
       }
     });
 
+    // In some cases, the user may add the labels variable in a different position than the last.
+    // We want to ensure that if it is added, it is present in the last position.
+    if (updatedVariables.includes('$task.tax_amount')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$task.tax_amount'
+      );
+
+      updatedVariables.push('$task.tax_amount');
+    }
+
+    if (updatedVariables.includes('$task.gross_line_total')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$task.gross_line_total'
+      );
+
+      updatedVariables.push('$task.gross_line_total');
+    }
+
+    if (updatedVariables.includes('$task.line_total')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$task.line_total'
+      );
+
+      updatedVariables.push('$task.line_total');
+    }
+
     setColumns(updatedVariables);
   }, [company]);
 

@@ -181,6 +181,32 @@ export function useProductColumns() {
       );
     }
 
+    // In some cases, the user may add the labels variable in a different position than the last.
+    // We want to ensure that if it is added, it is present in the last position.
+    if (updatedVariables.includes('$product.tax')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$product.tax'
+      );
+
+      updatedVariables.push('$product.tax');
+    }
+
+    if (updatedVariables.includes('$product.gross_line_total')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$product.gross_line_total'
+      );
+
+      updatedVariables.push('$product.gross_line_total');
+    }
+
+    if (updatedVariables.includes('$product.line_total')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$product.line_total'
+      );
+
+      updatedVariables.push('$product.line_total');
+    }
+
     setColumns(updatedVariables);
   }, [company]);
 
