@@ -14,7 +14,7 @@ import { TableFiltersPreference } from './useReactSettings';
 import { dataTableFiltersAtom } from './useStoreSessionTableFilters';
 
 interface Params {
-  tableKey: string;
+  tableKey: string | undefined;
 }
 export function useDataTablePreference(params: Params) {
   const user = useUserChanges();
@@ -24,6 +24,10 @@ export function useDataTablePreference(params: Params) {
   const storeSessionTableFilters = useAtomValue(dataTableFiltersAtom);
 
   return (filterKey: keyof TableFiltersPreference) => {
+    if (!tableKey) {
+      return '';
+    }
+
     if (filterKey === 'filter' || filterKey === 'currentPage') {
       return storeSessionTableFilters?.[tableKey]?.[filterKey]
         ? storeSessionTableFilters[tableKey][filterKey]

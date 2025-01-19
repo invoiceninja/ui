@@ -41,6 +41,7 @@ import {
   WithSocketId,
 } from '$app/common/queries/sockets';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -131,6 +132,7 @@ export default function Credit() {
           {t('credit_status_changed')}
         </Banner>
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="credit" />}
     >
       {credit?.id === id ? (
         <div className="space-y-4">

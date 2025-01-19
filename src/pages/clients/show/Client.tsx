@@ -38,6 +38,7 @@ import { ClientPublicNotes } from './components/ClientPublicNotes';
 import { ClientPrivateNotes } from './components/ClientPrivateNotes';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -121,6 +122,7 @@ export default function Client() {
           />
         )
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="client" />}
     >
       {isLoading && <Spinner />}
 

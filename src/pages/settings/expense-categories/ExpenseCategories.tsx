@@ -49,6 +49,7 @@ export function ExpenseCategories() {
       linkToCreate="/settings/expense_categories/create"
       linkToEdit="/settings/expense_categories/:id/edit"
       withResourcefulActions
+      enableSavingFilterPreference
     />
   );
 }

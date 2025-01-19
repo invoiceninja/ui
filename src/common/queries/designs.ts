@@ -80,7 +80,7 @@ export function useBlankDesignQuery(options?: GenericQueryOptions) {
 
 export function useTemplateQuery(entity: string) {
   return useQuery<Design[]>(
-    ['/api/v1/designs?template=true&entities=' + entity],
+    ['/api/v1/designs', '?template=true&entities=', entity],
     () =>
       request(
         'GET',

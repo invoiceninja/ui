@@ -52,11 +52,7 @@ export default function Clients() {
   } = useChangeTemplate();
 
   return (
-    <Default
-      breadcrumbs={pages}
-      title={t('clients')}
-      docsLink="en/clients"
-    >
+    <Default breadcrumbs={pages} title={t('clients')} docsLink="en/clients">
       <DataTable
         resource="client"
         endpoint="/api/v1/clients?include=group_settings&sort=id|desc"
@@ -86,6 +82,7 @@ export default function Clients() {
         }
         linkToCreateGuards={[permission('create_client')]}
         hideEditableOptions={!hasPermission('edit_client')}
+        enableSavingFilterPreference
       />
 
       <ChangeTemplateModal<Client>

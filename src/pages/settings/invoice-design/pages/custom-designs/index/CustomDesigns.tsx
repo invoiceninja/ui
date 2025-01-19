@@ -40,6 +40,7 @@ export default function CustomDesigns() {
         linkToEdit="/settings/invoice_design/custom_designs/:id/edit"
         withResourcefulActions
         hideEditableOptions={!proPlan() && !enterprisePlan()}
+        enableSavingFilterPreference
       />
     </>
   );

@@ -146,7 +146,7 @@ export function TaskSlider() {
         task &&
         (hasPermission('edit_task') || entityAssigned(task)) && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={task}
             actions={actions}
           />
@@ -183,32 +183,34 @@ export function TaskSlider() {
 
           <Divider withoutPadding />
 
-          {task &&
-            currentTaskTimeLogs?.map(([date, start, end], i) => (
-              <ClickableElement key={i}>
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <p>{formatDate(date, dateFormat)}</p>
+          <div className="divide-y">
+            {task &&
+              currentTaskTimeLogs?.map(([date, start, end], i) => (
+                <ClickableElement key={i}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p>{formatDate(date, dateFormat)}</p>
 
-                    <small>
-                      {start} - {end}
-                    </small>
-                  </div>
+                      <small>
+                        {start} - {end}
+                      </small>
+                    </div>
 
-                  <div>
-                    {isTaskRunning(task) &&
-                    i === currentTaskTimeLogs.length - 1 ? (
-                      <TaskClock task={task} calculateLastTimeLog={true} />
-                    ) : (
-                      calculateDifferenceBetweenLogs(task.time_log, i)
-                    )}
+                    <div>
+                      {isTaskRunning(task) &&
+                      i === currentTaskTimeLogs.length - 1 ? (
+                        <TaskClock task={task} calculateLastTimeLog={true} />
+                      ) : (
+                        calculateDifferenceBetweenLogs(task.time_log, i)
+                      )}
+                    </div>
                   </div>
-                </div>
-              </ClickableElement>
-            ))}
+                </ClickableElement>
+              ))}
+          </div>
         </div>
 
-        <div>
+        <div className='divide-y'>
           {activities?.map((activity) => (
             <NonClickableElement
               key={activity.id}

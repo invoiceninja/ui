@@ -270,6 +270,22 @@ export function Create() {
     }
   }, [companyGateway]);
 
+  useEffect(() => {
+    if (!filteredGateways.length) return;
+
+    const gatewayIndex = filteredGateways.findIndex(
+      (gateway) => gateway.key === 'b9886f9257f0c6ee7c302f1c74475f6c'
+    );
+
+    if (gatewayIndex === -1 || gatewayIndex === 2) return;
+
+    const updatedGateways = [...filteredGateways];
+    const [gateway] = updatedGateways.splice(gatewayIndex, 1);
+    updatedGateways.splice(2, 0, gateway);
+
+    setFilteredGateways(updatedGateways);
+  }, [filteredGateways]);
+
   return (
     <Settings
       title={documentTitle}

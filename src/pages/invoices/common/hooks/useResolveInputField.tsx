@@ -417,6 +417,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          selectMenuPosition="fixed"
         />
       ) : (
         <InputField
@@ -442,6 +443,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          selectMenuPosition="fixed"
         />
       ) : (
         <InputField

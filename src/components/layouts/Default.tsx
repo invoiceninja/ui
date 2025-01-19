@@ -37,7 +37,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
-import { isDemo, isHosted, isSelfHosted, trans } from '$app/common/helpers';
+import { isDemo, isSelfHosted, trans } from '$app/common/helpers';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -81,18 +81,19 @@ interface Props extends CommonProps {
   disableSaveButton?: boolean;
   additionalSaveOptions?: SaveOption[];
   aboveMainContainer?: ReactNode;
+  afterBreadcrumbs?: ReactNode;
 }
 
 export function Default(props: Props) {
   const [t] = useTranslation();
 
   const location = useLocation();
-  const hasPermission = useHasPermission();
-
   const colors = useColorScheme();
-  const preventNavigation = usePreventNavigation();
 
   const enabled = useEnabled();
+  const hasPermission = useHasPermission();
+  const preventNavigation = usePreventNavigation();
+
   const user = useInjectUserChanges();
   const company = useCurrentCompany();
   const companyUser = useCurrentCompanyUser();
@@ -454,7 +455,7 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
-              {isHosted() ? <Notifications /> : null}
+              <Notifications />
 
               {shouldShowUnlockButton && (
                 <button
@@ -544,13 +545,15 @@ export function Default(props: Props) {
         {props.aboveMainContainer}
 
         <main className="flex-1">
-          {(props.breadcrumbs || props.topRight) &&
+          {(props.breadcrumbs || props.topRight || props.afterBreadcrumbs) &&
             props.breadcrumbs.length > 0 && (
               <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-                <div className="">
+                <div className="flex items-center">
                   {props.breadcrumbs && (
                     <Breadcrumbs pages={props.breadcrumbs} />
                   )}
+
+                  {props.afterBreadcrumbs}
                 </div>
 
                 {props.topRight && <div>{props.topRight}</div>}

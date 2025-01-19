@@ -16,31 +16,46 @@ import { Entry } from '$app/components/forms/Combobox';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
+import { Fragment, useEffect, useState, useRef, memo } from 'react';
 import { styled } from 'styled-components';
-import { Combobox } from '@headlessui/react';
-import { useClickAway } from 'react-use';
 import collect from 'collect.js';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import {
+  isNavigationModalVisibleAtom,
+  usePreventNavigation,
+} from '$app/common/hooks/usePreventNavigation';
 import { debounce } from 'lodash';
+import { InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { Icon } from '$app/components/icons/Icon';
+import { LuArrowUpDown, LuCornerDownLeft } from 'react-icons/lu';
+import { useAtomValue } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
 
-const ComboboxOption = styled(Combobox.Option)`
+const Div = styled.div`
   color: ${(props) => props.theme.color};
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
+  background-color: ${(props) => props.theme.backgroundColor};
 `;
 
 export function Search$() {
   const [t] = useTranslation();
-  const [query, setQuery] = useState('');
-  const [isVisible, setIsVisible] = useState(false);
+
+  const navigate = useNavigate();
   const preventNavigation = usePreventNavigation();
+
   const colors = useColorScheme();
-  const comboboxRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const optionsContainerRef = useRef<HTMLDivElement>(null);
+  const containerScrollTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const [query, setQuery] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [isContainerScrolling, setIsContainerScrolling] =
+    useState<boolean>(false);
+
+  const isNavigationModalVisible = useAtomValue(isNavigationModalVisibleAtom);
 
   const { data, refetch, isFetching } = useQuery(
     ['/api/v1/search'],
@@ -83,135 +98,242 @@ export function Search$() {
     )
     .take(100);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === 'k') {
+  const options = filtered.count() === 0 ? collect(data) : filtered;
+  const handleChange = debounce((value: string) => setQuery(value), 500);
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    const optionsLength = options?.count() || 0;
+
+    switch (event.key) {
+      case 'ArrowDown':
         event.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+        if (document.activeElement === inputRef.current) {
+          setSelectedIndex(0);
+          inputRef.current?.blur();
+        } else {
+          setSelectedIndex((prev) => {
+            if (prev >= optionsLength - 1) return 0;
+            return prev + 1;
+          });
+        }
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+
+        if (document.activeElement === inputRef.current) {
+          setSelectedIndex(0);
+          inputRef.current?.blur();
+        } else if (selectedIndex === 0) {
+          inputRef.current?.focus();
+          setSelectedIndex(-1);
+        } else {
+          setSelectedIndex((prev) => {
+            if (prev <= 0) return optionsLength - 1;
+            return prev - 1;
+          });
+        }
+        break;
+
+      case 'Enter':
+        event.preventDefault();
+
+        if (selectedIndex >= 0 && options) {
+          const selectedOption = options.get(selectedIndex);
+          preventNavigation({
+            fn: () => {
+              if (selectedOption?.resource) {
+                navigate(selectedOption.resource.path);
+                setIsModalOpen(false);
+              }
+            },
+          });
+        }
+        break;
+    }
+  };
+
+  const handleOpenModalByKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'k') {
+      event.preventDefault();
+
+      setIsModalOpen((current) => !current);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleOpenModalByKeyDown);
+
+    return () =>
+      window.removeEventListener('keydown', handleOpenModalByKeyDown);
   }, []);
 
   useEffect(() => {
-    if (isVisible === false) {
+    const handleKeyListener = (event: KeyboardEvent) => {
+      handleKeyDown(event);
+    };
+
+    if (isModalOpen) {
+      window.addEventListener('keydown', handleKeyListener);
+
+      if (selectedIndex !== -1 && optionsContainerRef.current) {
+        const container = optionsContainerRef.current;
+        const selectedElement = container.children[
+          selectedIndex
+        ] as HTMLElement;
+
+        if (selectedElement) {
+          selectedElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }
+      }
+
+      if (selectedIndex !== -1) {
+        inputRef.current?.blur();
+      }
+    }
+
+    return () => window.removeEventListener('keydown', handleKeyListener);
+  }, [selectedIndex, isModalOpen]);
+
+  useEffect(() => {
+    if (!isModalOpen) {
       setQuery('');
     }
-  }, [isVisible]);
-
-  useClickAway(comboboxRef, () => setIsVisible(false));
-
-  const handleChange = debounce(
-    (event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value),
-    500
-  );
-
-  const options = filtered.count() === 0 ? collect(data) : filtered;
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (query && filtered.count() === 0) {
       refetch();
     }
+
+    setSelectedIndex(-1);
   }, [query]);
 
   return (
-    <Combobox
-      as="div"
-      onChange={(value: Entry<SearchRecord>) =>
-        value.resource
-          ? preventNavigation({
-              url: value.resource.path,
-            })
-          : null
-      }
-      className="relative w-full max-w-[70%]"
-      ref={comboboxRef}
-    >
-      <div className="relative mt-2">
-        <div className="flex items-center">
-          <span
-            className={classNames({
-              block: isFetching,
-              hidden: !isFetching,
-            })}
-          >
-            <Spinner />
-          </span>
+    <>
+      <InputField
+        className="border-transparent focus:border-transparent focus:ring-0 border-0"
+        onClick={() => setIsModalOpen(true)}
+        placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
+        style={{ backgroundColor: colors.$1, color: colors.$3, width: '21rem' }}
+      />
 
-          <Combobox.Input
-            className="border-transparent focus:border-transparent focus:ring-0 w-full"
-            onChange={handleChange}
-            ref={inputRef}
-            onFocus={() => setIsVisible(true)}
-            placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
-            style={{ backgroundColor: colors.$1, color: colors.$3 }}
-          />
-        </div>
-
-        <Combobox.Options
-          className={classNames(
-            'absolute border rounded-lg max-h-72 overflow-y-auto shadow-xl',
-            'min-w-full w-max',
-            {
-              hidden: !isVisible,
-            }
-          )}
-          style={{
-            backgroundColor: colors.$1,
-            borderColor: colors.$5,
-            minWidth: '33vw',
-            maxWidth: 'max(100%, 33vw)',
-          }}
-          static={true}
+      <Modal
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        disableClosing
+        enableCloseOnClickAway={!isNavigationModalVisible}
+        withoutPadding
+        size="regular"
+      >
+        <div
+          className="flex flex-col pt-3"
+          style={{ backgroundColor: colors.$1 }}
         >
-          {options?.map((entry) => (
-            <ComboboxOption
-              key={entry.id}
-              value={entry}
-              theme={{ color: colors.$3, hoverColor: colors.$2 }}
-              className="cursor-pointer rounded px-4 py-2 active:font-semibold"
-            >
-              {({ active }) => (
-                <span
-                  className={classNames(
-                    'block truncate space-x-1',
-                    active && 'font-semibold'
-                  )}
-                >
-                  <div>
-                    <p className="text-xs font-semibold">
-                      {entry.resource?.heading}
-                    </p>
-                    <p>{entry.label}</p>
-                  </div>
-                </span>
-              )}
-            </ComboboxOption>
-          ))}
+          <div className="flex flex-col space-y-5 px-3 pb-3">
+            <div className="flex items-center space-x-3">
+              <div className="flex-1">
+                <InputField
+                  className="focus:ring-0"
+                  innerRef={inputRef}
+                  value={query}
+                  onValueChange={(value) => handleChange(value)}
+                  onClick={() => setSelectedIndex(-1)}
+                  placeholder={`${t('search')}...`}
+                  changeOverride
+                  style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                />
+              </div>
 
-          {options.count() === 0 && (
-            <ComboboxOption
-              value={null}
-              theme={{ color: colors.$3, hoverColor: colors.$2 }}
-              className="cursor-not-allowed rounded px-4 py-2 active:font-semibold"
-              disabled
+              {isFetching && <Spinner />}
+            </div>
+
+            <div
+              ref={optionsContainerRef}
+              className="overflow-y-auto h-96"
+              onMouseLeave={() => selectedIndex !== -1 && setSelectedIndex(-1)}
+              onScroll={() => {
+                setIsContainerScrolling(true);
+
+                if (containerScrollTimeout.current) {
+                  clearTimeout(containerScrollTimeout.current);
+                }
+
+                containerScrollTimeout.current = setTimeout(() => {
+                  setIsContainerScrolling(false);
+                }, 50);
+              }}
             >
-              {({ active }) => (
-                <span
-                  className={classNames(
-                    'block truncate space-x-1',
-                    active && 'font-semibold'
-                  )}
+              {options?.map((entry, index) => (
+                <Div
+                  key={entry.id}
+                  theme={{
+                    backgroundColor:
+                      index === selectedIndex ? colors.$5 : 'transparent',
+                    color: colors.$3,
+                  }}
+                  className="cursor-pointer pl-2 py-2.5 active:font-semibold search-option"
+                  onClick={() => {
+                    if (entry.resource) {
+                      preventNavigation({
+                        fn: () => {
+                          if (entry.resource) {
+                            navigate(entry.resource.path);
+                            setIsModalOpen(false);
+                          }
+                        },
+                      });
+                    }
+                  }}
+                  onMouseMove={() => {
+                    if (!isContainerScrolling && selectedIndex !== index) {
+                      setTimeout(() => setSelectedIndex(index), 20);
+                    }
+                  }}
                 >
-                  <p className="text-sm">{t('no_match_found')}</p>
-                </span>
-              )}
-            </ComboboxOption>
-          )}
-        </Combobox.Options>
-      </div>
-    </Combobox>
+                  <span>
+                    <div>
+                      <p className="text-xs font-semibold">
+                        {entry.resource?.heading}
+                      </p>
+                      <p>{entry.label}</p>
+                    </div>
+                  </span>
+                </Div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className="flex items-center py-2 space-x-4 px-3"
+            style={{ backgroundColor: colors.$5 }}
+          >
+            <div className="flex items-center space-x-2 text-sm">
+              <div>
+                <Icon element={LuArrowUpDown} color={colors.$3} />
+              </div>
+
+              <span className="mb-0.5" style={{ color: colors.$3 }}>
+                {t('navigate')}
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2 text-sm px-3">
+              <div>
+                <Icon element={LuCornerDownLeft} color={colors.$3} />
+              </div>
+
+              <span className="mb-0.5" style={{ color: colors.$3 }}>
+                {t('select')}
+              </span>
+            </div>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 }
 

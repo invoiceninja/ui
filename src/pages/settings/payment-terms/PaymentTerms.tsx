@@ -52,6 +52,7 @@ export function PaymentTerms() {
         linkToCreate="/settings/payment_terms/create"
         linkToEdit="/settings/payment_terms/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

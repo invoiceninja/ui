@@ -40,6 +40,7 @@ export function Schedules() {
         linkToCreate="/settings/schedules/create"
         linkToEdit="/settings/schedules/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

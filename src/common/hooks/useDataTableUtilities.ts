@@ -16,7 +16,7 @@ import collect from 'collect.js';
 interface Params {
   apiEndpoint: URL;
   isInitialConfiguration: boolean;
-  tableKey: string;
+  tableKey: string | undefined;
   customFilters?: SelectOption[];
   customFilter?: string[] | undefined;
 }
