@@ -45,8 +45,8 @@ import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
+import { Link } from '$app/components/forms';
 import { MdAttachMoney } from 'react-icons/md';
-import { Tooltip } from '$app/components/Tooltip';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -100,39 +100,38 @@ export default function Edit() {
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {invoice && (
-            <div className="flex space-x-20">
+            <div className="flex items-center space-x-20">
               <span className="text-sm">{t('status')}</span>
 
               <div className="flex items-center space-x-4">
                 <InvoiceStatusBadge entity={invoice} />
 
                 {invoice.status_id === InvoiceStatus.Paid && (
-                  <Tooltip
-                    message={t('reverse') as string}
-                    placement="bottom"
-                    width="auto"
-                    withoutArrow
-                  >
-                    <div
-                      className="cursor-pointer"
-                      onClick={() =>
-                        navigate(
-                          route('/payments/:id/edit', {
-                            id:
-                              invoice?.payments?.find((payment) =>
-                                payment.paymentables?.some(
-                                  (item) =>
-                                    item.invoice_id === invoice?.id &&
-                                    item.archived_at === 0
-                                )
-                              )?.id || '',
-                          })
-                        )
-                      }
-                    >
-                      <Icon element={MdAttachMoney} size={23} />
-                    </div>
-                  </Tooltip>
+                  <div className="flex flex-col justify-start items-start space-y-2">
+                    {invoice?.payments?.map((payment) => (
+                      <div
+                        key={payment.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            navigate(
+                              route('/payments/:id/edit', {
+                                id: payment.id,
+                              })
+                            )
+                          }
+                        >
+                          <Icon element={MdAttachMoney} size={23} />
+                        </div>
+
+                        <Link to={`/payments/${payment.id}/edit`}>
+                          {payment.number}
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
