@@ -28,6 +28,7 @@ export interface SelectProps extends CommonProps {
   customSelector?: boolean;
   dismissable?: boolean;
   clearAfterSelection?: boolean;
+  menuPosition?: 'fixed';
 }
 
 export function SelectField(props: SelectProps) {
@@ -156,6 +157,7 @@ export function SelectField(props: SelectProps) {
 
             return onValueChange?.(v.value as string);
           }}
+          menuPosition={props.menuPosition}
           isDisabled={disabled}
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
