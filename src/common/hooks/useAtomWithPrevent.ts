@@ -85,8 +85,8 @@ export function useAtomWithPrevent<T extends Entity>(
       const currentPathsForExcluding = currentEntityPaths.filter((path) =>
         EXCLUDING_PROPERTIES_KEYS.some(
           (excludingPropertyKey) =>
-            path.includes(excludingPropertyKey) ||
-            (path.includes('line_items') && path.split('.')?.[2] === '_id')
+            path?.includes(excludingPropertyKey) ||
+            (path?.includes('line_items') && path?.split('.')?.[2] === '_id')
         )
       );
 
@@ -94,8 +94,8 @@ export function useAtomWithPrevent<T extends Entity>(
 
       currentPathsForExcluding.forEach((path) => {
         if (
-          !path.includes('.') ||
-          (path.includes('line_items') && path.split('.')?.[2] === '_id')
+          !path?.includes('.') ||
+          (path?.includes('line_items') && path?.split('.')?.[2] === '_id')
         ) {
           unset(updatedEntity, path as unknown as keyof Entity);
           unset(currentInitialValue, path as unknown as keyof Entity);
