@@ -19,7 +19,6 @@ interface Props {
   onChange: (value: string) => unknown;
   label?: string;
   disabled?: boolean;
-  handleOnBlur?: () => void;
 }
 
 export function MarkdownEditor(props: Props) {
@@ -97,9 +96,6 @@ export function MarkdownEditor(props: Props) {
           convert_urls: false,
         }}
         onEditorChange={handleChange}
-        onBlur={() => {
-          props.handleOnBlur?.();
-        }}
         disabled={props.disabled}
       />
     </div>

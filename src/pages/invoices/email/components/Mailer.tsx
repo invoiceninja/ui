@@ -15,6 +15,7 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { useHandleSend } from '$app/common/hooks/emails/useHandleSend';
+import { useResolveTemplate } from '$app/common/hooks/emails/useResolveTemplate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -24,22 +25,12 @@ import { Contact } from '$app/components/emails/Contact';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
 import { MailerComponent } from '$app/pages/purchase-orders/email/Email';
-import {
-  forwardRef,
-  RefObject,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
+import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { request } from '$app/common/helpers/request';
-import { cloneDeep } from 'lodash';
-import { toast } from '$app/common/helpers/toast/toast';
 
 export type MailerResourceType =
   | 'invoice'
@@ -60,102 +51,43 @@ interface Props {
   redirectUrl: string;
 }
 
-export interface EmailTemplate {
-  subject: string;
-  body: string;
-  wrapper: string;
-  raw_body: string;
-  raw_subject: string;
-  cc_email: string;
-}
-
 export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const [t] = useTranslation();
 
-  const company = useCurrentCompany();
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const [templateId, setTemplateId] = useState(props.defaultEmail);
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+  const [ccEmail, setCcEmail] = useState('');
   const reactSettings = useReactSettings();
+
+  const isCcEmailAvailable =
+    isSelfHosted() || (isHosted() && (proPlan() || enterprisePlan()));
+
+  const company = useCurrentCompany();
+
+  const handleTemplateChange = (id: string) => {
+    setSubject('');
+    setBody('');
+    setCcEmail('');
+    setTemplateId(id);
+  };
+
+  const template = useResolveTemplate(
+    body,
+    props.resourceType,
+    props.resource?.id || '',
+    subject,
+    templateId,
+    ccEmail
+  );
 
   const pdfUrl = useGeneratePdfUrl({
     resourceType: props.resourceType,
   });
 
-  const controllerRef = useRef<AbortController | null>(null);
-
-  const [errors, setErrors] = useState<ValidationBag>();
-  const [currentTemplate, setCurrentTemplate] = useState<EmailTemplate>();
-  const [triggerTemplateGeneration, setTriggerTemplateGeneration] =
-    useState<boolean>(true);
-
   const handleSend = useHandleSend({ setErrors });
-
-  const [payloadData, setPayloadData] = useState({
-    body: '',
-    ccEmail: '',
-    subject: '',
-    templateId: props.defaultEmail,
-  });
-
-  const isCcEmailAvailable =
-    isSelfHosted() || (isHosted() && (proPlan() || enterprisePlan()));
-
-  const handleTemplateChange = (id: string) => {
-    setPayloadData(
-      cloneDeep({
-        body: '',
-        ccEmail: '',
-        subject: '',
-        templateId: id,
-      })
-    );
-
-    setTriggerTemplateGeneration(true);
-  };
-
-  useEffect(() => {
-    if (triggerTemplateGeneration) {
-      setTriggerTemplateGeneration(false);
-
-      toast.processing();
-
-      if (controllerRef.current) {
-        controllerRef.current.abort();
-      }
-
-      controllerRef.current = new AbortController();
-
-      request(
-        'POST',
-        endpoint('/api/v1/templates'),
-        {
-          body: payloadData.body,
-          entity: props.resourceType,
-          entity_id: props.resource?.id || '',
-          subject: payloadData.subject,
-          template: payloadData.templateId,
-          cc_email: payloadData.ccEmail,
-        },
-        {
-          signal: controllerRef.current
-            ? controllerRef.current.signal
-            : undefined,
-        }
-      ).then((response) => {
-        toast.dismiss();
-        setCurrentTemplate(response.data);
-      });
-    }
-  }, [triggerTemplateGeneration, props.resourceType, props.resource?.id]);
-
-  useEffect(() => {
-    if (currentTemplate) {
-      setPayloadData((current) => ({
-        ...current,
-        subject: currentTemplate.raw_subject,
-        body: currentTemplate.raw_body,
-        ccEmail: currentTemplate.cc_email,
-      }));
-    }
-  }, [currentTemplate]);
 
   useImperativeHandle(
     ref,
@@ -163,18 +95,18 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
       return {
         sendEmail() {
           handleSend(
-            payloadData.body,
+            body,
             props.resourceType,
             props.resource?.id || '',
-            payloadData.subject,
-            payloadData.templateId,
+            subject,
+            templateId,
             props.redirectUrl,
-            payloadData.ccEmail
+            ccEmail
           );
         },
       };
     },
-    [payloadData]
+    [body, subject, templateId, ccEmail]
   );
 
   return (
@@ -190,7 +122,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
 
           <Element leftSide={t('template')}>
             <SelectField
-              defaultValue={payloadData.templateId}
+              defaultValue={templateId}
               onValueChange={(value) => handleTemplateChange(value)}
               errorMessage={errors?.errors.template}
             >
@@ -227,46 +159,32 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
           {isCcEmailAvailable && (
             <InputField
               label={t('cc_email')}
-              value={payloadData.ccEmail}
-              onValueChange={(value) => {
-                setPayloadData((current) => ({ ...current, ccEmail: value }));
-
-                setTriggerTemplateGeneration(true);
-              }}
+              value={ccEmail || template?.cc_email}
+              onValueChange={(value) => setCcEmail(value)}
               errorMessage={errors?.errors.cc_email}
             />
           )}
 
           <InputField
             label={t('subject')}
-            value={payloadData.subject}
-            onValueChange={(value) => {
-              setPayloadData((current) => ({ ...current, subject: value }));
-
-              setTriggerTemplateGeneration(true);
-            }}
+            value={subject || template?.raw_subject}
+            onValueChange={(value) => setSubject(value)}
             disabled={freePlan() && isHosted()}
             errorMessage={errors?.errors.subject}
           />
 
           {(proPlan() || enterprisePlan()) && (
             <MarkdownEditor
-              value={payloadData.body}
-              onChange={(value) =>
-                setPayloadData((current) => ({ ...current, body: value }))
-              }
-              handleOnBlur={() => setTriggerTemplateGeneration(true)}
+              value={body || template?.raw_body}
+              onChange={(value) => setBody(String(value))}
             />
           )}
         </Card>
 
-        {currentTemplate && (
-          <Card className="scale-y-100" title={currentTemplate.subject}>
+        {template && (
+          <Card className="scale-y-100" title={template.subject}>
             <iframe
-              srcDoc={generateEmailPreview(
-                currentTemplate.body,
-                currentTemplate.wrapper
-              )}
+              srcDoc={generateEmailPreview(template.body, template.wrapper)}
               width="100%"
               height={800}
             />
