@@ -16,7 +16,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +42,7 @@ import {
 } from '$app/common/queries/sockets';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -62,8 +63,8 @@ export default function Credit() {
 
   const { data } = useCreditQuery({ id: id! });
 
-  const [credit, setQuote] = useAtom(creditAtom);
   const invoiceSum = useAtomValue(invoiceSumAtom);
+  const [credit, setCredit] = useAtomWithPrevent(creditAtom);
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -89,7 +90,7 @@ export default function Credit() {
 
       _credit.line_items.map((item) => (item._id = v4()));
 
-      setQuote(_credit);
+      setCredit(_credit);
 
       if (_credit && _credit.client) {
         setClient(_credit.client);

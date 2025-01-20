@@ -32,6 +32,7 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { AddUninvoicedItemsButton } from '../common/components/AddUninvoicedItemsButton';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -54,7 +55,7 @@ export default function Create() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
 
   const { data, isLoading } = useBlankInvoiceQuery({
     enabled: typeof invoice === 'undefined',

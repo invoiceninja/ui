@@ -33,7 +33,6 @@ import { Client } from '$app/common/interfaces/client';
 import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
-import { useAtom } from 'jotai';
 import { EInvoiceComponent } from '../settings';
 import {
   socketId,
@@ -47,6 +46,7 @@ import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 dayjs.extend(utc);
 
@@ -65,7 +65,7 @@ export default function Invoice() {
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
 
   const [triggerValidationQuery, setTriggerValidationQuery] =
     useState<boolean>(true);
