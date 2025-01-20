@@ -40,6 +40,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { request } from '$app/common/helpers/request';
 import { cloneDeep } from 'lodash';
 import { toast } from '$app/common/helpers/toast/toast';
+import { flushSync } from 'react-dom';
 
 export type MailerResourceType =
   | 'invoice'
@@ -252,9 +253,9 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
           {(proPlan() || enterprisePlan()) && (
             <MarkdownEditor
               value={payloadData.body}
-              onChange={(value) =>
-                setPayloadData((current) => ({ ...current, body: value }))
-              }
+              onChange={(value) => {
+                setPayloadData((current) => ({ ...current, body: value }));
+              }}
               handleOnBlur={() => setTriggerTemplateGeneration(true)}
             />
           )}
