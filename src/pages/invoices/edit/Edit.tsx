@@ -32,7 +32,6 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
@@ -45,8 +44,6 @@ import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
-import { Link } from '$app/components/forms';
-import { MdAttachMoney } from 'react-icons/md';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -103,37 +100,7 @@ export default function Edit() {
             <div className="flex items-center space-x-20">
               <span className="text-sm">{t('status')}</span>
 
-              <div className="flex items-center space-x-4">
-                <InvoiceStatusBadge entity={invoice} />
-
-                {invoice.status_id === InvoiceStatus.Paid && (
-                  <div className="flex flex-col justify-start items-start space-y-2">
-                    {invoice?.payments?.map((payment) => (
-                      <div
-                        key={payment.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <div
-                          className="cursor-pointer"
-                          onClick={() =>
-                            navigate(
-                              route('/payments/:id/edit', {
-                                id: payment.id,
-                              })
-                            )
-                          }
-                        >
-                          <Icon element={MdAttachMoney} size={23} />
-                        </div>
-
-                        <Link to={`/payments/${payment.id}/edit`}>
-                          {payment.number}
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <InvoiceStatusBadge entity={invoice} />
             </div>
           )}
 
