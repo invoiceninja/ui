@@ -255,6 +255,8 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               value={payloadData.body}
               onChange={(value) => {
                 setPayloadData((current) => ({ ...current, body: value }));
+
+                setTriggerTemplateGeneration(true);
               }}
               handleOnBlur={() => setTriggerTemplateGeneration(true)}
             />
