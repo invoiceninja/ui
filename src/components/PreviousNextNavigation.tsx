@@ -32,6 +32,7 @@ import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { Tooltip } from './Tooltip';
 import { useTranslation } from 'react-i18next';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 type Entity =
   | 'recurring_invoice'
@@ -85,6 +86,7 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
 
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const preventNavigation = usePreventNavigation();
 
   const queryClient = useQueryClient();
 
@@ -116,6 +118,30 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
     }
 
     return currentIndex + 1;
+  };
+
+  const navigateToPrevious = () => {
+    const previousIndex = getPreviousIndex();
+
+    if (previousIndex !== null) {
+      navigate(
+        route(`/${entity}s/:id/${isEditPage ? 'edit' : ''}`, {
+          id: currentData[previousIndex].id,
+        })
+      );
+    }
+  };
+
+  const navigateToNext = () => {
+    const nextIndex = getNextIndex();
+
+    if (nextIndex !== null) {
+      navigate(
+        route(`/${entity}s/:id/${isEditPage ? 'edit' : ''}`, {
+          id: currentData[nextIndex].id,
+        })
+      );
+    }
   };
 
   useEffect(() => {
@@ -164,15 +190,9 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
             'cursor-pointer': getPreviousIndex() !== null,
           })}
           onClick={() => {
-            const previousIndex = getPreviousIndex();
-
-            if (previousIndex !== null) {
-              navigate(
-                route(`/${entity}s/:id/${isEditPage ? 'edit' : ''}`, {
-                  id: currentData[previousIndex].id,
-                })
-              );
-            }
+            preventNavigation({
+              fn: () => navigateToPrevious(),
+            });
           }}
         >
           <Icon element={MdKeyboardArrowLeft} size={29} />
@@ -192,15 +212,9 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
             'cursor-pointer': getNextIndex() !== null,
           })}
           onClick={() => {
-            const nextIndex = getNextIndex();
-
-            if (nextIndex !== null) {
-              navigate(
-                route(`/${entity}s/:id/${isEditPage ? 'edit' : ''}`, {
-                  id: currentData[nextIndex].id,
-                })
-              );
-            }
+            preventNavigation({
+              fn: () => navigateToNext(),
+            });
           }}
         >
           <Icon element={MdKeyboardArrowRight} size={29} />
