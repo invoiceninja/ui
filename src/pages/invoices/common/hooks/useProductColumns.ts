@@ -175,18 +175,36 @@ export function useProductColumns() {
       }
     });
 
-    // In some cases, the user may add the line_total variable in a different position than the last.
-    // We want to ensure that it is completely excluded from the variables so that it can be added in the last position.
-    updatedVariables = updatedVariables.filter(
-      (variable) => variable !== '$product.line_total'
-    );
-
-    updatedVariables.push('$product.line_total');
-
     if (!company?.enable_product_quantity) {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$product.quantity'
       );
+    }
+
+    // In some cases, the user may add the labels variable in a different position than the last.
+    // We want to ensure that if it is added, it is present in the last position.
+    if (updatedVariables.includes('$product.tax_amount')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$product.tax_amount'
+      );
+
+      updatedVariables.push('$product.tax_amount');
+    }
+
+    if (updatedVariables.includes('$product.gross_line_total')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$product.gross_line_total'
+      );
+
+      updatedVariables.push('$product.gross_line_total');
+    }
+
+    if (updatedVariables.includes('$product.line_total')) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$product.line_total'
+      );
+
+      updatedVariables.push('$product.line_total');
     }
 
     setColumns(updatedVariables);
