@@ -19,6 +19,7 @@ import { $refetch } from '../hooks/useRefetch';
 
 interface CompanyGatewaysParams {
   status?: string;
+  perPage?: string;
 }
 export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
   const { isAdmin } = useAdmin();
@@ -30,9 +31,13 @@ export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/company_gateways?sort=id|desc&status=:status', {
-          status: status || 'active',
-        })
+        endpoint(
+          '/api/v1/company_gateways?sort=id|desc&status=:status&per_page=:perPage',
+          {
+            status: status || 'active',
+            perPage: params?.perPage ?? '100',
+          }
+        )
       ),
     { staleTime: Infinity, enabled: isAdmin }
   );
