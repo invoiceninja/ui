@@ -121,6 +121,7 @@ export function DateRangePicker(props: Props) {
                   handleChangeValue(dateString)
                 }
                 onOpenChange={(value) => setIsCalendarVisible(value)}
+                style={{ minWidth: '19rem' }}
               />
             </ConfigProvider>
           </div>
