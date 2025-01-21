@@ -19,10 +19,11 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 export default function ProductColumns() {
   const [t] = useTranslation();
   const company = useCompanyChanges();
-  const handleValueChange = useHandleSettingsValueChange();
-  const customField = useCustomField();
 
-  const defaultVariables = [
+  const customField = useCustomField();
+  const handleValueChange = useHandleSettingsValueChange();
+
+  let defaultVariables = [
     { value: '$product.item', label: t('item') },
     { value: '$product.description', label: t('description') },
     { value: '$product.quantity', label: t('quantity') },
@@ -57,6 +58,14 @@ export default function ProductColumns() {
     { value: '$product.gross_line_total', label: t('gross_line_total') },
     { value: '$product.tax_amount', label: t('tax_amount') },
   ];
+
+  if (!company?.enabled_item_tax_rates) {
+    defaultVariables = defaultVariables.filter(
+      (variable) =>
+        variable.value !== '$product.tax_amount' &&
+        variable.value !== '$product.tax'
+    );
+  }
 
   return (
     <Card
