@@ -162,6 +162,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               value={ccEmail || template?.cc_email}
               onValueChange={(value) => setCcEmail(value)}
               errorMessage={errors?.errors.cc_email}
+              changeOverride
             />
           )}
 
@@ -171,6 +172,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             onValueChange={(value) => setSubject(value)}
             disabled={freePlan() && isHosted()}
             errorMessage={errors?.errors.subject}
+            changeOverride
           />
 
           {(proPlan() || enterprisePlan()) && (
