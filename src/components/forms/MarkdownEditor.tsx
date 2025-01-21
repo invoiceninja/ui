@@ -23,7 +23,10 @@ interface Props {
 
 export function MarkdownEditor(props: Props) {
   const [value, setValue] = useState<string | undefined>();
+
   const editorRef = useRef<Editor | null>(null);
+
+  const initialRef = useRef(true);
 
   useEffect(() => {
     setValue(props.value);
@@ -39,7 +42,12 @@ export function MarkdownEditor(props: Props) {
 
   const handleChange = (input: string | undefined) => {
     setValue(input || '');
-    delayedQuery(input || '');
+
+    if (initialRef.current) {
+      initialRef.current = false;
+    } else {
+      delayedQuery(input || '');
+    }
   };
 
   const colors = useColorScheme();
