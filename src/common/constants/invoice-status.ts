@@ -18,6 +18,5 @@ export default {
   [InvoiceStatus.Sent]: 'sent',
   [InvoiceStatus.Partial]: 'partial',
   [InvoiceStatus.Paid]: 'paid',
-  [InvoiceStatus.Cancelled]: 'cancelled',
   [InvoiceStatus.Reversed]: 'reversed',
 };
