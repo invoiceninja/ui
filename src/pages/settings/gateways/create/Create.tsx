@@ -131,8 +131,6 @@ export function Create() {
           companyGateway.gateway_key === gateway?.key
       );
 
-    console.log(gateway, isDuplicating);
-
     if (isDuplicating) {
       setIsDuplicatingGatewayModalOpen(true);
     }
@@ -173,7 +171,7 @@ export function Create() {
       return handleGoCardless();
     }
 
-    if (gateway) {
+    if (gateway && !createBySetup) {
       setTabIndex(1);
     }
 
@@ -183,6 +181,8 @@ export function Create() {
   const handleOnDuplicatingGatewayCancel = () => {
     setGateway(undefined);
     setIsDuplicatingGatewayModalOpen(false);
+    setTabIndex(0);
+    createBySetup && setCreateBySetup(false);
   };
 
   const handleSetup = () => {
@@ -310,11 +310,11 @@ export function Create() {
   }, [gateway]);
 
   useEffect(() => {
-    if (createBySetup) {
+    if (createBySetup && !isDuplicatingGatewayModalOpen) {
       onSave(1);
       setCreateBySetup(false);
     }
-  }, [companyGateway]);
+  }, [companyGateway, isDuplicatingGatewayModalOpen]);
 
   useEffect(() => {
     if (!filteredGateways.length) return;
@@ -346,7 +346,6 @@ export function Create() {
 
       <DuplicatingGatewayModal
         visible={isDuplicatingGatewayModalOpen}
-        setVisible={setIsDuplicatingGatewayModalOpen}
         onConfirm={handleOnDuplicatingGatewayConfirm}
         onCancel={handleOnDuplicatingGatewayCancel}
       />
@@ -359,7 +358,7 @@ export function Create() {
         <Card title={t('add_gateway')}>
           <Element leftSide={t('payment_provider')}>
             <SelectField
-              value={gateway?.id}
+              value={gateway?.id || ''}
               onValueChange={(value) => handleChange(value, true)}
               errorMessage={errors?.errors.gateway_key}
               customSelector
