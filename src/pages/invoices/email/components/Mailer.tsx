@@ -228,11 +228,9 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             <InputField
               label={t('cc_email')}
               value={payloadData.ccEmail}
-              onValueChange={(value) => {
-                setPayloadData((current) => ({ ...current, ccEmail: value }));
-
-                setTriggerTemplateGeneration(true);
-              }}
+              onValueChange={(value) =>
+                setPayloadData((current) => ({ ...current, ccEmail: value }))
+              }
               errorMessage={errors?.errors.cc_email}
             />
           )}
@@ -246,16 +244,19 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               setTriggerTemplateGeneration(true);
             }}
             disabled={freePlan() && isHosted()}
+            changeOverride
             errorMessage={errors?.errors.subject}
           />
 
           {(proPlan() || enterprisePlan()) && (
             <MarkdownEditor
               value={payloadData.body}
-              onChange={(value) =>
-                setPayloadData((current) => ({ ...current, body: value }))
-              }
-              handleOnBlur={() => setTriggerTemplateGeneration(true)}
+              onChange={(value) => {
+                setPayloadData((current) => ({ ...current, body: value }));
+
+                setTriggerTemplateGeneration(true);
+              }}
+              handleChangeOnlyOnUserInput
             />
           )}
         </Card>

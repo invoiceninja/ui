@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -96,6 +97,11 @@ export function useTabs(params: Params) {
     {
       name: t('email_history'),
       href: route('/invoices/:id/email_history', { id }),
+    },
+    {
+      name: t('payments'),
+      href: route('/invoices/:id/payments', { id }),
+      enabled: invoice?.status_id === InvoiceStatus.Paid,
     },
   ];
 
