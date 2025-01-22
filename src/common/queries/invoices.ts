@@ -43,7 +43,7 @@ export function useInvoiceQuery(params: InvoiceQueryParams) {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/:id?include=client.group_settings${isLockedParam}`,
+          `/api/v1/invoices/:id?include=payments,client.group_settings${isLockedParam}`,
           {
             id: params.id,
           }
