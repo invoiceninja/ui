@@ -127,21 +127,21 @@ export function DateRangePicker(props: Props) {
           </div>
         )}
       >
-        <div
-          className="cursor-pointer"
-          onClick={(event) => {
-            event.stopPropagation();
-
-            onClick();
-
-            setIsVisible((current) => !current);
-          }}
-        >
-          <Icon
-            element={Calendar}
-            color={isCurrentDateRangeActive() ? 'lightgreen' : 'white'}
-            style={{ width: '1.4rem', height: '1.4rem' }}
-          />
+        <div className="relative" style={{ width: '1.4rem', height: '1.4rem' }}>
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer p-1"
+            onClick={(event) => {
+              event.stopPropagation();
+              onClick();
+              setIsVisible((current) => !current);
+            }}
+          >
+            <Icon
+              element={Calendar}
+              color={isCurrentDateRangeActive() ? 'lightgreen' : 'white'}
+              style={{ width: '1.4rem', height: '1.4rem' }}
+            />
+          </div>
         </div>
       </Tippy>
     </div>
