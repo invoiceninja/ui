@@ -18,6 +18,7 @@ import { PurchaseOrder } from '../interfaces/purchase-order';
 import { Expense } from '../interfaces/expense';
 import { RecurringExpense } from '../interfaces/recurring-expense';
 import { Transaction } from '../interfaces/transactions';
+import { useReactSettings } from './useReactSettings';
 
 type Resource =
   | Invoice
@@ -35,6 +36,8 @@ interface Params {
 }
 export function useSumTableColumn(params?: Params) {
   const formatMoney = useFormatMoney();
+
+  const reactSettings = useReactSettings();
 
   const { currencyPath, countryPath } = params || {};
 
@@ -62,7 +65,8 @@ export function useSumTableColumn(params?: Params) {
       return formatMoney(
         result,
         typeof countryIds[0] === 'string' ? countryIds[0] : undefined,
-        typeof currencyIds[0] === 'string' ? currencyIds[0] : undefined
+        typeof currencyIds[0] === 'string' ? currencyIds[0] : undefined,
+        reactSettings?.number_precision || 2
       );
     }
 
