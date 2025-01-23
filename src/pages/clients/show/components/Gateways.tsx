@@ -206,23 +206,37 @@ export function Gateways(props: Props) {
 
                   {token.is_default && (
                     <div
-                      className="inline-flex items-center rounded-full py-1 px-3 text-xs space-x-1"
-                      style={{
-                        backgroundColor: colors.$5,
-                      }}
+                      className="inline-flex items-center text-xs"
+                      style={{ height: '1.5rem' }}
                     >
-                      <span>{t('default')}</span>
+                      <div
+                        className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
+                        style={{
+                          borderColor: colors.$5,
+                          backgroundColor: colors.$5,
+                        }}
+                      >
+                        {t('save_as_default')}
+                      </div>
 
                       {isAdmin && (
                         <Dropdown
                           className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
                           customLabel={
-                            <div className="cursor-pointer">
+                            <Div
+                              className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
+                              style={{
+                                borderColor: colors.$5,
+                                paddingTop: '0.16rem',
+                                paddingBottom: '0.16rem',
+                              }}
+                              theme={{ hoverBgColor: colors.$4 }}
+                            >
                               <Icon
                                 element={ChevronDown}
                                 style={{ width: '1.1rem', height: '1.1rem' }}
                               />
-                            </div>
+                            </Div>
                           }
                           minWidth="9rem"
                           maxWidth="11rem"
@@ -242,27 +256,45 @@ export function Gateways(props: Props) {
 
               {!token.is_default && (
                 <div className="flex items-center justify-start">
-                  <Div
-                    className="inline-flex items-center text-xs cursor-pointer border rounded-full py-1 px-3 self-start space-x-1"
-                    style={{ borderColor: colors.$5 }}
-                    onClick={() => handleSetDefault(token.id)}
-                    theme={{ hoverBgColor: colors.$5 }}
+                  <div
+                    className="inline-flex items-center text-xs cursor-pointer self-start"
+                    style={{ height: '1.5rem' }}
                   >
-                    <span>{t('save_as_default')}</span>
+                    <Div
+                      className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
+                      onClick={() => handleSetDefault(token.id)}
+                      style={{
+                        borderColor: colors.$5,
+                      }}
+                      theme={{ hoverBgColor: colors.$5 }}
+                    >
+                      {t('save_as_default')}
+                    </Div>
 
                     {isAdmin && (
                       <Dropdown
-                        className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                        className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
                         customLabel={
-                          <div className="cursor-pointer">
+                          <Div
+                            className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
+                            style={{
+                              borderColor: colors.$5,
+                              paddingTop: '0.16rem',
+                              paddingBottom: '0.16rem',
+                            }}
+                            theme={{ hoverBgColor: colors.$5 }}
+                          >
                             <Icon
                               element={ChevronDown}
                               style={{ width: '1.1rem', height: '1.1rem' }}
                             />
-                          </div>
+                          </Div>
                         }
-                        minWidth="9rem"
-                        maxWidth="11rem"
+                        minWidth="10rem"
+                        maxWidth="12rem"
+                        style={{
+                          borderColor: colors.$5,
+                        }}
                       >
                         <DropdownElement
                           icon={<Icon element={MdDelete} />}
@@ -272,7 +304,7 @@ export function Gateways(props: Props) {
                         </DropdownElement>
                       </Dropdown>
                     )}
-                  </Div>
+                  </div>
                 </div>
               )}
             </div>

@@ -258,6 +258,7 @@ export function Combobox<T = any>({
 
   useClickAway(comboboxRef, () => {
     setIsOpen(false);
+    onInputValueChange?.(inputValue);
 
     if (
       selectedOption &&
@@ -340,7 +341,6 @@ export function Combobox<T = any>({
                 onFocus();
               }
             }}
-            onBlur={() => onInputValueChange?.(inputValue)}
             placeholder={inputOptions.placeholder}
             disabled={readonly}
             defaultValue={

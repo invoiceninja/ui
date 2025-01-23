@@ -30,6 +30,9 @@ const EInvoice = lazy(
 const Documents = lazy(
   () => import('$app/pages/invoices/edit/components/Documents')
 );
+const Payments = lazy(
+  () => import('$app/pages/invoices/edit/components/Payments')
+);
 const Settings = lazy(
   () => import('$app/pages/invoices/edit/components/Settings')
 );
@@ -117,6 +120,7 @@ export const invoiceRoutes = (
       <Route path="activity" element={<Activities />} />
       <Route path="history" element={<History />} />
       <Route path="email_history" element={<EmailHistory />} />
+      <Route path="payments" element={<Payments />} />
     </Route>
 
     <Route
