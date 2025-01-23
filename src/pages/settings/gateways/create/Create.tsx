@@ -13,7 +13,10 @@ import { Button, Link, SelectField } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
-import { useBlankCompanyGatewayQuery } from '$app/common/queries/company-gateways';
+import {
+  useBlankCompanyGatewayQuery,
+  useCompanyGatewaysQuery,
+} from '$app/common/queries/company-gateways';
 import { Settings } from '$app/components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +42,7 @@ import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import classNames from 'classnames';
 import { HelpWidget } from '$app/components/HelpWidget';
+import { DuplicatingGatewayModal } from './components/DuplicatingGatewayModal';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -84,29 +88,79 @@ export function Create() {
 
   const { documentTitle } = useTitle('add_gateway');
 
-  const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('online_payments'), href: '/settings/online_payments' },
+    { name: t('add_gateway'), href: '/settings/gateways/create' },
+  ];
 
-  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
+  const defaultTab = [t('payment_provider')];
 
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const [gateway, setGateway] = useState<Gateway>();
-
-  const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
-
-  const [createBySetup, setCreateBySetup] = useState<boolean>(false);
-
-  const [tabIndex, setTabIndex] = useState<number>(0);
+  const additionalTabs = [
+    t('credentials'),
+    t('settings'),
+    t('required_fields'),
+    t('limits_and_fees'),
+  ];
 
   const gateways = useGateways();
+
+  const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
+  const { data: companyGatewaysResponse } = useCompanyGatewaysQuery({
+    status: 'active',
+    perPage: '1000',
+  });
+
+  const [gateway, setGateway] = useState<Gateway>();
+  const [tabIndex, setTabIndex] = useState<number>(0);
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [tabs, setTabs] = useState<string[]>(defaultTab);
+  const [createBySetup, setCreateBySetup] = useState<boolean>(false);
+  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
+  const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
+  const [isDuplicatingGatewayModalOpen, setIsDuplicatingGatewayModalOpen] =
+    useState<boolean>(false);
 
   const onSave = useHandleCreate(companyGateway, setErrors);
 
   const handleChange = (value: string, isManualChange?: boolean) => {
     const gateway = gateways.find((gateway) => gateway.id === value);
 
+    const isDuplicating =
+      gateway &&
+      companyGatewaysResponse?.data.data.some(
+        (companyGateway: CompanyGateway) =>
+          companyGateway.gateway_key === gateway?.key
+      );
+
+    if (isDuplicating) {
+      setIsDuplicatingGatewayModalOpen(true);
+    }
+
     setGateway(gateway);
 
+    if (gateway?.key === '80af24a6a691230bbec33e930ab40666' && !isDuplicating) {
+      return handleSetup();
+    }
+
+    if (gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34' && !isDuplicating) {
+      return handleStripeSetup();
+    }
+
+    if (
+      gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' &&
+      isHosted() &&
+      !isDuplicating
+    ) {
+      return handleGoCardless();
+    }
+
+    if (isManualChange && value && !isDuplicating) {
+      setTabIndex(1);
+    }
+  };
+
+  const handleOnDuplicatingGatewayConfirm = () => {
     if (gateway?.key === '80af24a6a691230bbec33e930ab40666') {
       return handleSetup();
     }
@@ -119,9 +173,18 @@ export function Create() {
       return handleGoCardless();
     }
 
-    if (isManualChange && value) {
+    if (gateway && !createBySetup) {
       setTabIndex(1);
     }
+
+    setIsDuplicatingGatewayModalOpen(false);
+  };
+
+  const handleOnDuplicatingGatewayCancel = () => {
+    setGateway(undefined);
+    setIsDuplicatingGatewayModalOpen(false);
+    setTabIndex(0);
+    createBySetup && setCreateBySetup(false);
   };
 
   const handleSetup = () => {
@@ -155,23 +218,6 @@ export function Create() {
   };
 
   const handleGoCardless = useHandleGoCardless();
-
-  const defaultTab = [t('payment_provider')];
-
-  const additionalTabs = [
-    t('credentials'),
-    t('settings'),
-    t('required_fields'),
-    t('limits_and_fees'),
-  ];
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('online_payments'), href: '/settings/online_payments' },
-    { name: t('add_gateway'), href: '/settings/gateways/create' },
-  ];
-
-  const [tabs, setTabs] = useState<string[]>(defaultTab);
 
   const getGatewayNameByKey = (key: string) => {
     const gateway = gatewaysDetails.find((gateway) => gateway.key === key);
@@ -266,11 +312,11 @@ export function Create() {
   }, [gateway]);
 
   useEffect(() => {
-    if (createBySetup) {
+    if (createBySetup && !isDuplicatingGatewayModalOpen) {
       onSave(1);
       setCreateBySetup(false);
     }
-  }, [companyGateway]);
+  }, [companyGateway, isDuplicatingGatewayModalOpen]);
 
   useEffect(() => {
     if (!filteredGateways.length) return;
@@ -300,6 +346,12 @@ export function Create() {
         url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
       />
 
+      <DuplicatingGatewayModal
+        visible={isDuplicatingGatewayModalOpen}
+        onConfirm={handleOnDuplicatingGatewayConfirm}
+        onCancel={handleOnDuplicatingGatewayCancel}
+      />
+
       <TabGroup
         tabs={tabs}
         defaultTabIndex={tabIndex}
@@ -308,7 +360,7 @@ export function Create() {
         <Card title={t('add_gateway')}>
           <Element leftSide={t('payment_provider')}>
             <SelectField
-              value={gateway?.id}
+              value={gateway?.id || ''}
               onValueChange={(value) => handleChange(value, true)}
               errorMessage={errors?.errors.gateway_key}
               customSelector
