@@ -399,9 +399,15 @@ export function DataTable<T extends object>(props: Props<T>) {
       (dateRangeColumn) => columnId === dateRangeColumn.column
     )?.queryParameterKey;
 
-    columnOfCurrentQueryParameter !== columnId &&
-      queryParameterOfCurrentColumn &&
-      setDateRangeQueryParameter(queryParameterOfCurrentColumn);
+
+    if (
+      columnOfCurrentQueryParameter !== columnId &&
+      typeof columnOfCurrentQueryParameter !== 'undefined'
+    ) {
+      if (queryParameterOfCurrentColumn) {
+        setDateRangeQueryParameter(queryParameterOfCurrentColumn);
+      }
+    }
   };
 
   const getFooterColumn = (columnId: string) => {
@@ -849,7 +855,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.columns.map(
                 (column, index) =>
                   Boolean(!excludeColumns.includes(column.id)) && (
-                    <Td key={index} customizeTextColor resizable={`${apiEndpoint.pathname}.${column.id}`}>
+                    <Td
+                      key={index}
+                      customizeTextColor
+                      resizable={`${apiEndpoint.pathname}.${column.id}`}
+                    >
                       {getFooterColumn(column.id) ? (
                         <div className="flex items-center space-x-3">
                           {getFooterColumn(column.id)?.format(

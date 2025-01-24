@@ -102,6 +102,7 @@ export function DateRangePicker(props: Props) {
             style={{
               backgroundColor: colors.$2,
               border: `1px solid ${colors.$5}`,
+              width: 300
             }}
             onClick={(event) => event.stopPropagation()}
           >
