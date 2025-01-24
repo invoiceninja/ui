@@ -12,7 +12,7 @@ import { Client } from '$app/common/interfaces/client';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdDeleteForever, MdWarning } from 'react-icons/md';
+import { MdDeleteForever } from 'react-icons/md';
 import { usePurgeClient } from '../hooks/usePurgeClient';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Dispatch, SetStateAction, useState } from 'react';
@@ -45,13 +45,9 @@ export function PurgeClientAction(props: Props) {
         onClose={setIsWarningModalOpen}
       >
         <div className="flex flex-col space-y-6">
-          <div className="flex items-center space-x-2">
-            <Icon element={MdWarning} size={35} color="orange" />
-
-            <span className="text-center font-medium">
-              {t('purge_client_warning')}
-            </span>
-          </div>
+          <span className="text-left font-medium">
+            {t('purge_client_warning')}
+          </span>
 
           <Button
             onClick={() => {
