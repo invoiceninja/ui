@@ -168,7 +168,7 @@ export function ClientCreate({
                   label={t('name')}
                   value={client?.name || ''}
                   onValueChange={(value) => handleChange('name', value)}
-                  errorMessage={errors?.errors.name}
+                  errorMessage={errors?.errors.name || errors?.errors.id}
                 />
 
                 <InputField
