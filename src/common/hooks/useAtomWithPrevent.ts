@@ -82,6 +82,12 @@ export function useAtomWithPrevent<T extends Entity>(
     ) {
       const currentEntityPaths = generatePaths(entity as T);
 
+      /**
+       * Filters out:
+       * 1. Properties specified in EXCLUDING_PROPERTIES_KEYS (e.g. terms, footer etc.)
+       * 2. Line item _id properties (e.g. line_items.0._id which is path to the _id of the first line item) since new IDs are generated
+       *    when joining the page
+       */
       const currentPathsForExcluding = currentEntityPaths.filter((path) =>
         EXCLUDING_PROPERTIES_KEYS.some(
           (excludingPropertyKey) =>
