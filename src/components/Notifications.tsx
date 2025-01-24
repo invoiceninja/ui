@@ -28,6 +28,8 @@ import classNames from 'classnames';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useSockets } from '$app/common/hooks/useSockets';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Icon } from './icons/Icon';
+import { useColorScheme } from '$app/common/colors';
 
 export interface Notification {
   label: string;
@@ -49,6 +51,7 @@ export function Notifications() {
   const [isVisible, setIsVisible] = useState(false);
   const [notifications, setNotifications] = useAtom(notificationsAtom);
 
+  const colors = useColorScheme();
   const companyUser = useCurrentCompanyUser();
 
   useSocketEvent({
@@ -224,7 +227,7 @@ export function Notifications() {
             'animate-jiggle': notifications.length > 0,
           })}
         >
-          <Bell size={20} />
+          <Icon className="w-5 h-5" element={Bell} color={colors.$3} />
 
           {notifications.length > 0 ? (
             <span className="absolute top-0 right-0 h-2 w-2 rounded-full border-white border-2 bg-blue-500"></span>
