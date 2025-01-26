@@ -14,7 +14,7 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { authenticate } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
 import { Fragment, useEffect, useState } from 'react';
-import { Check, ChevronDown } from 'react-feather';
+import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,6 +31,8 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useColorScheme } from '$app/common/colors';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
+import { CloseNavbarArrow } from './icons/CloseNavbarArrow';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -109,22 +111,34 @@ export function CompanySwitcher() {
         className="relative inline-block text-left w-full"
         data-cy="companyDropdown"
       >
-        <Menu.Button className="flex items-center justify-between w-full rounded font-medium pl-2">
-          <div className="flex items-center justify-center space-x-3">
-            <img className="w-8" src={logo} alt="Company logo" />
-            <div className="flex flex-col items-between">
-              <span className="text-sm text-start w-28 truncate">
+        <div className="flex items-center">
+          <Menu.Button className="flex items-center justify-start space-x-3 w-full">
+            <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-[#FFFFFF] hover:bg-opacity-10">
+              <img
+                className="rounded-full border overflow-hidden aspect-square"
+                src={logo}
+                alt="Company logo"
+                style={{
+                  borderColor: colors.$14,
+                  width: '1.65rem',
+                }}
+              />
+
+              <span
+                className="text-sm text-start w-28 truncate"
+                style={{ color: colors.$15 }}
+              >
                 {companyName}
               </span>
-              {(user?.first_name || user?.last_name) && (
-                <span className="text-xs text-start w-28 truncate">
-                  {user.first_name} {user.last_name}
-                </span>
-              )}
+
+              <ExpandCollapseChevron />
             </div>
+          </Menu.Button>
+
+          <div>
+            <CloseNavbarArrow />
           </div>
-          <ChevronDown size={18} className="text-gray-300" />
-        </Menu.Button>
+        </div>
 
         <Transition
           as={Fragment}

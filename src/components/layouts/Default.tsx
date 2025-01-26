@@ -62,6 +62,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
+import classNames from 'classnames';
 
 export interface SaveOption {
   label: string;
@@ -422,12 +423,13 @@ export function Default(props: Props) {
       <DesktopSidebar navigation={navigation} docsLink={props.docsLink} />
 
       <div
-        className={`${
-          isMiniSidebar ? 'md:pl-16' : 'md:pl-64'
-        } flex flex-col flex-1`}
+        className={classNames('flex flex-col flex-1', {
+          'md:pl-16': isMiniSidebar,
+          'md:pl-64': !isMiniSidebar,
+        })}
       >
         <div
-          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          style={{ backgroundColor: colors.$1 }}
           className="sticky top-0 z-10 flex-shrink-0 flex h-16 border-b shadow"
         >
           <button
@@ -438,6 +440,7 @@ export function Default(props: Props) {
             <span className="sr-only">Open sidebar</span>
             <MenuIcon className="dark:text-gray-100" />
           </button>
+
           <div
             className="flex-1 px-4 xl:px-8 flex items-center"
             data-cy="topNavbar"
