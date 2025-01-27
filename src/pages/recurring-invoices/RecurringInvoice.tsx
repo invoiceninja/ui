@@ -56,8 +56,6 @@ export default function RecurringInvoice() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const [saveOptions, setSaveOptions] = useState<SaveOption[]>();
-
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
@@ -91,45 +89,8 @@ export default function RecurringInvoice() {
     }
   }, [data]);
 
-  const initializeSaveOptions = (recurringInvoice: RecurringInvoiceType) => {
-    let currentSaveOptions: SaveOption[] | undefined;
-
-    if (recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT) {
-      const sendNowOption = {
-        onClick: () => setSendConfirmationVisible(true),
-        label: t('send_now'),
-        icon: <Icon element={MdSend} />,
-      };
-
-      currentSaveOptions = [sendNowOption];
-    }
-
-    if (
-      recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
-      recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED
-    ) {
-      const startOption = {
-        onClick: () => save(recurringInvoice as RecurringInvoiceType, 'start'),
-        label: t('start'),
-        icon: <Icon element={MdNotStarted} />,
-      };
-
-      if (currentSaveOptions) {
-        currentSaveOptions = [...currentSaveOptions, startOption];
-      } else {
-        currentSaveOptions = [startOption];
-      }
-    }
-
-    setSaveOptions(currentSaveOptions);
-  };
-
   useEffect(() => {
     recurringInvoice && calculateInvoiceSum(recurringInvoice);
-
-    if (recurringInvoice) {
-      initializeSaveOptions(recurringInvoice);
-    }
   }, [recurringInvoice]);
 
   return (
