@@ -30,6 +30,8 @@ import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { get } from 'lodash';
+import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import { useDispatch } from 'react-redux';
 
 type Entity = 'company' | 'invoice' | 'client';
 
@@ -319,6 +321,8 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     const company = useCurrentCompany();
 
     const [t] = useTranslation();
+    const dispatch = useDispatch();
+
     const [errors, setErrors] = useState<ValidationBag | null>(null);
 
     const form = useFormik({
@@ -345,6 +349,10 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
         request('POST', endpoint('/api/v1/einvoice/configurations'), values)
           .then(() => {
             toast.success('saved_einvoice_details');
+
+            request('POST', endpoint('/api/v1/refresh')).then((data) => {
+              dispatch(updateCompanyUsers(data.data.data));
+            });
           })
           .catch((error: AxiosError<ValidationBag>) => {
             if (error.response?.status === 422) {
