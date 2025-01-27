@@ -32,6 +32,7 @@ import collect from 'collect.js';
 import { useQueryClient } from 'react-query';
 import { useAtom } from 'jotai';
 import {
+  Cell,
   Preview,
   PreviewResponse,
   previewAtom,
@@ -52,6 +53,8 @@ import { useShowReportField } from '../common/hooks/useShowReportField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+
 interface Range {
   identifier: string;
   label: string;
@@ -121,7 +124,9 @@ export default function Reports() {
 
   const reports = useReports();
   const queryClient = useQueryClient();
+
   const scheduleReport = useScheduleReport();
+  const numericFormatter = useNumericFormatter();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -255,22 +260,18 @@ export default function Reports() {
 
   const [preview, setPreview] = useAtom(previewAtom);
 
-  const adjustCellValue = (
-    currentCellDisplayValue: string | number | JSX.Element
-  ) => {
-    if (typeof currentCellDisplayValue !== 'string') {
-      return currentCellDisplayValue;
+  const adjustCellValue = (currentCell: Cell) => {
+    if (typeof currentCell.display_value !== 'string') {
+      return currentCell.display_value;
     }
 
-    const parsedDisplayValue = parseFloat(currentCellDisplayValue.toString());
+    const parsedDisplayValue = parseFloat(currentCell.display_value.toString());
 
     if (!isNaN(parsedDisplayValue) && typeof parsedDisplayValue === 'number') {
-      return parseFloat(
-        currentCellDisplayValue.toString().replace(/\./g, '').replace(',', '.')
-      );
+      return numericFormatter(currentCell.display_value.toString());
     }
 
-    return currentCellDisplayValue;
+    return currentCell.display_value;
   };
 
   const handlePreview = async () => {
@@ -318,7 +319,7 @@ export default function Reports() {
               rows: Object.values(rows).map((row) =>
                 row.map((cell) => ({
                   ...cell,
-                  display_value: adjustCellValue(cell.display_value),
+                  display_value: adjustCellValue(cell),
                 }))
               ),
             });
