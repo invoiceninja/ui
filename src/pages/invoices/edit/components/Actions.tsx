@@ -264,6 +264,7 @@ export function useActions(params?: Params) {
             isCommonActionSection={!dropdown}
             tooltipText={t('add_comment')}
             icon={MdComment}
+            disablePreventNavigation
           >
             {t('add_comment')}
           </EntityActionElement>
