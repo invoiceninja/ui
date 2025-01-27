@@ -23,8 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 
-import { Icon } from '$app/components/icons/Icon';
-import { MdNotStarted, MdSend } from 'react-icons/md';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import {
   ConfirmActionModal,
