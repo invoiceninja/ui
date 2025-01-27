@@ -54,6 +54,7 @@ import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { numberFormattableColumns } from '../common/constants/columns';
 
 interface Range {
   identifier: string;
@@ -265,10 +266,21 @@ export default function Reports() {
       return currentCell.display_value;
     }
 
-    const parsedDisplayValue = parseFloat(currentCell.display_value.toString());
+    if (
+      numberFormattableColumns.some((currentColumn) =>
+        currentCell.identifier.endsWith(currentColumn)
+      )
+    ) {
+      const parsedDisplayValue = parseFloat(
+        currentCell.display_value.toString()
+      );
 
-    if (!isNaN(parsedDisplayValue) && typeof parsedDisplayValue === 'number') {
-      return numericFormatter(currentCell.display_value.toString());
+      if (
+        !isNaN(parsedDisplayValue) &&
+        typeof parsedDisplayValue === 'number'
+      ) {
+        return numericFormatter(currentCell.display_value.toString());
+      }
     }
 
     return currentCell.display_value;
