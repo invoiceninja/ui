@@ -139,17 +139,16 @@ export default function RecurringInvoice() {
       {...((hasPermission('edit_recurring_invoice') ||
         entityAssigned(recurringInvoice)) &&
         recurringInvoice && {
-          onSaveClick: () => save(recurringInvoice),
-          navigationTopRight: (
-            <ResourceActions
-              resource={recurringInvoice}
-              label={t('more_actions')}
-              actions={actions}
-              cypressRef="recurringInvoiceActionDropdown"
-            />
-          ),
-          additionalSaveOptions: saveOptions,
-        })}
+        navigationTopRight: (
+          <ResourceActions
+            resource={recurringInvoice}
+            onSaveClick={() => save(recurringInvoice)}
+            // label={t('more_actions')}
+            actions={actions}
+            cypressRef="recurringInvoiceActionDropdown"
+          />
+        ),
+      })}
       afterBreadcrumbs={<PreviousNextNavigation entity="recurring_invoice" />}
     >
       {recurringInvoice?.id === id ? (

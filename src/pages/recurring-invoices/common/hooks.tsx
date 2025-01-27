@@ -53,6 +53,7 @@ import {
   MdNotStarted,
   MdPictureAsPdf,
   MdRestore,
+  MdSend,
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -85,6 +86,7 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { confirmActionModalAtom } from './components/ConfirmActionModal';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -300,6 +302,7 @@ export function useActions(params?: Params) {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const toggleStartStop = useToggleStartStop();
+  const setSendConfirmationVisible = useSetAtom(confirmActionModalAtom);
 
   const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
@@ -338,21 +341,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
-    (recurringInvoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'view_pdf',
-        })}
-        entity="recurring_invoice"
-        actionKey="view_pdf"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('view_pdf')}
-        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
-        icon={MdPictureAsPdf}
-      >
-        {t('view_pdf')}
-      </EntityActionElement>
-    ),
+    
     (recurringInvoice) =>
       (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
         recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
@@ -370,6 +359,41 @@ export function useActions(params?: Params) {
           {t('start')}
         </EntityActionElement>
       ),
+
+    (recurringInvoice) =>
+      (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT) && (
+
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'send_now',
+          })}
+          entity="recurring_invoice"
+          actionKey="send_now"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('start')}
+          onClick={() => setSendConfirmationVisible(true)}
+          icon={MdSend}
+        >
+          {t('send_now')}
+        </EntityActionElement>
+
+      ),
+
+    (recurringInvoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="recurring_invoice"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
+        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
+        icon={MdPictureAsPdf}
+      >
+        {t('view_pdf')}
+      </EntityActionElement>
+    ),
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
         <EntityActionElement
