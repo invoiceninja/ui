@@ -378,22 +378,6 @@ export function useActions(params?: Params) {
         </EntityActionElement>
 
       ),
-
-    (recurringInvoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'view_pdf',
-        })}
-        entity="recurring_invoice"
-        actionKey="view_pdf"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('view_pdf')}
-        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
-        icon={MdPictureAsPdf}
-      >
-        {t('view_pdf')}
-      </EntityActionElement>
-    ),
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
         <EntityActionElement
@@ -410,6 +394,22 @@ export function useActions(params?: Params) {
           {t('stop')}
         </EntityActionElement>
       ),
+    (recurringInvoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="recurring_invoice"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
+        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
+        icon={MdPictureAsPdf}
+      >
+        {t('view_pdf')}
+      </EntityActionElement>
+    ),
+    
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
         <UpdatePricesAction
