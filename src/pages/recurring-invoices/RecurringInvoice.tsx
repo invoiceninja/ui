@@ -13,7 +13,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
-import { Default, SaveOption } from '$app/components/layouts/Default';
+import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { useAtom, useSetAtom } from 'jotai';
@@ -62,7 +62,6 @@ export default function RecurringInvoice() {
     },
   ];
 
-  const setSendConfirmationVisible = useSetAtom(confirmActionModalAtom);
   const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
 
   const [client, setClient] = useState<Client>();
