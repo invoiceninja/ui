@@ -16,7 +16,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,10 +24,7 @@ import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
-import {
-  ConfirmActionModal,
-  confirmActionModalAtom,
-} from './common/components/ConfirmActionModal';
+import { ConfirmActionModal } from './common/components/ConfirmActionModal';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useRecurringInvoiceQuery } from './common/queries';
