@@ -216,7 +216,7 @@ export function Gateways(props: Props) {
                           backgroundColor: colors.$5,
                         }}
                       >
-                        {t('save_as_default')}
+                        {t('default')}
                       </div>
 
                       {isAdmin && (
