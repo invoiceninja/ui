@@ -10,7 +10,6 @@
 
 import { Menu, Transition } from '@headlessui/react';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { authenticate } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
 import { Fragment, useEffect, useState } from 'react';
@@ -35,6 +34,10 @@ import Avatar from 'react-avatar';
 import { Plus } from './icons/Plus';
 import { Person } from './icons/Person';
 import { Exit } from './icons/Exit';
+import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -54,12 +57,20 @@ export function CompanySwitcher() {
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
   const logo = useLogo();
-  const user = useCurrentUser();
   const location = useLocation();
   const colors = useColorScheme();
+  const user = useInjectUserChanges();
+  const currentUser = useCurrentUser();
   const companyName = useCompanyName();
   const queryClient = useQueryClient();
   const { isAdmin, isOwner } = useAdmin();
+
+  const updateCompanyUser = useUpdateCompanyUser();
+  const handleUserChange = useHandleCurrentUserChangeProperty();
+
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
+  );
 
   const currentCompany = useCurrentCompany();
   const preventNavigation = usePreventNavigation();
@@ -109,6 +120,20 @@ export function CompanySwitcher() {
     }
   }, [currentCompany]);
 
+  useEffect(() => {
+    const showMiniSidebar =
+      user?.company_user?.react_settings?.show_mini_sidebar;
+
+    if (
+      user &&
+      typeof showMiniSidebar !== 'undefined' &&
+      currentUser?.company_user?.react_settings?.show_mini_sidebar !==
+        showMiniSidebar
+    ) {
+      updateCompanyUser(user);
+    }
+  }, [user?.company_user?.react_settings.show_mini_sidebar]);
+
   return (
     <>
       <CompanyCreate
@@ -148,7 +173,15 @@ export function CompanySwitcher() {
             </SwitcherDiv>
           </Menu.Button>
 
-          <div className="cursor-pointer">
+          <div
+            className="cursor-pointer"
+            onClick={() =>
+              handleUserChange(
+                'company_user.react_settings.show_mini_sidebar',
+                !isMiniSidebar
+              )
+            }
+          >
             <CloseNavbarArrow />
           </div>
         </div>
@@ -189,67 +222,64 @@ export function CompanySwitcher() {
               style={{ borderColor: '#09090B1A' }}
             >
               {state?.api?.length >= 1 &&
-                state?.api?.map((record: any, index: number) => {
-                  console.log(record);
-                  return (
-                    <Menu.Item key={index}>
-                      <div className="px-1 space-y-0.5">
-                        {index === 0 && (
-                          <p
-                            className="pl-2"
-                            style={{ color: '#A1A1AA', fontSize: '0.6875rem' }}
-                          >
-                            {t('company')}
-                          </p>
-                        )}
-
-                        <SwitcherDiv
-                          className="flex items-center px-2 justify-between py-1.5 rounded-md cursor-pointer"
-                          theme={{ hoverColor: `#09090B13` }}
-                          onClick={() =>
-                            preventNavigation({
-                              fn: () => switchCompany(index),
-                              actionKey: 'switchCompany',
-                            })
-                          }
+                state?.api?.map((record: any, index: number) => (
+                  <Menu.Item key={index}>
+                    <div className="px-1 space-y-0.5">
+                      {index === 0 && (
+                        <p
+                          className="pl-2"
+                          style={{ color: '#A1A1AA', fontSize: '0.6875rem' }}
                         >
-                          <div className="flex items-center space-x-2 flex-1">
-                            {record.company.settings.company_logo ? (
-                              <img
-                                className="rounded-full border overflow-hidden aspect-square"
-                                src={record.company.settings.company_logo}
-                                alt="Company logo"
-                                style={{
-                                  borderColor: colors.$14,
-                                  width: '1.5rem',
-                                }}
-                              />
-                            ) : (
-                              <Avatar
-                                name={
-                                  (record.company.settings.name ||
-                                    t('untitled_company'))?.[0]
-                                }
-                                round={true}
-                                size="1.5rem"
-                              />
-                            )}
+                          {t('company')}
+                        </p>
+                      )}
 
-                            <div
-                              className="flex-1 truncate"
-                              style={{ fontSize: '0.8125rem' }}
-                            >
-                              {record.company.settings.name ||
-                                t('untitled_company')}
-                            </div>
+                      <SwitcherDiv
+                        className="flex items-center px-2 justify-between py-1.5 rounded-md cursor-pointer"
+                        theme={{ hoverColor: `#09090B13` }}
+                        onClick={() =>
+                          preventNavigation({
+                            fn: () => switchCompany(index),
+                            actionKey: 'switchCompany',
+                          })
+                        }
+                      >
+                        <div className="flex items-center space-x-2 flex-1">
+                          {record.company.settings.company_logo ? (
+                            <img
+                              className="rounded-full border overflow-hidden aspect-square"
+                              src={record.company.settings.company_logo}
+                              alt="Company logo"
+                              style={{
+                                borderColor: colors.$14,
+                                width: '1.5rem',
+                              }}
+                            />
+                          ) : (
+                            <Avatar
+                              name={
+                                (record.company.settings.name ||
+                                  t('untitled_company'))?.[0]
+                              }
+                              round={true}
+                              size="1.5rem"
+                            />
+                          )}
+
+                          <div
+                            className="flex-1 truncate"
+                            style={{ fontSize: '0.8125rem' }}
+                          >
+                            {record.company.settings.name ||
+                              t('untitled_company')}
                           </div>
+                        </div>
 
-                          {state.currentIndex === index && <Check />}
-                        </SwitcherDiv>
-                      </div>
-                    </Menu.Item>
-                  );
-                })}
+                        {state.currentIndex === index && <Check />}
+                      </SwitcherDiv>
+                    </div>
+                  </Menu.Item>
+                ))}
             </div>
 
             <div className="py-1">
