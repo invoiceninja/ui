@@ -15,18 +15,45 @@ export function CloseNavbarArrow() {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="20px"
-      height="20px"
-      viewBox="0 0 20 20"
+      width="18px"
+      height="18px"
+      viewBox="0 0 18 18"
     >
-      <polyline
-        points="12 3 7 10 12 17"
+      <line
+        x1="6.25"
+        y1="2.75"
+        x2="6.25"
+        y2="15.25"
         fill="none"
         stroke="#74747C"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth="1.5"
+        data-color="color-2"
+      ></line>
+      <polyline
+        points="12.25 6.5 9.75 9 12.25 11.5"
+        fill="none"
+        stroke="#74747C"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        data-color="color-2"
       ></polyline>
+      <rect
+        x="1.75"
+        y="2.75"
+        width="14.5"
+        height="12.5"
+        rx="2"
+        ry="2"
+        transform="translate(18 18) rotate(180)"
+        fill="none"
+        stroke="#74747C"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      ></rect>
     </svg>
   );
 }
