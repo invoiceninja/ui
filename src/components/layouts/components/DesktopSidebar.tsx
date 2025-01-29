@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useLogo } from '$app/common/hooks/useLogo';
 import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 import { Icon } from 'react-feather';
@@ -44,7 +43,6 @@ export function DesktopSidebar(props: Props) {
     user?.company_user?.react_settings.show_mini_sidebar
   );
 
-  const logo = useLogo();
   const colors = useColorScheme();
 
   return (
@@ -74,11 +72,7 @@ export function DesktopSidebar(props: Props) {
             color: colors.$3,
           }}
         >
-          {isMiniSidebar ? (
-            <img className="w-8" src={logo} alt="Company logo" />
-          ) : (
-            <CompanySwitcher />
-          )}
+          <CompanySwitcher />
         </div>
 
         <div className="flex-grow flex flex-col mt-3">

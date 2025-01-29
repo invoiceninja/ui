@@ -12,7 +12,7 @@ interface Props {
   color?: string;
 }
 
-export function CloseNavbarArrow({ color = '#A1A1AA' }: Props) {
+export function OpenNavbarArrow({ color = '#74747C' }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -24,9 +24,9 @@ export function CloseNavbarArrow({ color = '#A1A1AA' }: Props) {
       viewBox="0 0 18 18"
     >
       <line
-        x1="6.25"
+        x1="11.75"
         y1="2.75"
-        x2="6.25"
+        x2="11.75"
         y2="15.25"
         fill="none"
         stroke={color}
@@ -36,7 +36,7 @@ export function CloseNavbarArrow({ color = '#A1A1AA' }: Props) {
         data-color="color-2"
       ></line>
       <polyline
-        points="12.25 6.5 9.75 9 12.25 11.5"
+        points="5.75 6.5 8.25 9 5.75 11.5"
         fill="none"
         stroke={color}
         strokeLinecap="round"
@@ -51,7 +51,6 @@ export function CloseNavbarArrow({ color = '#A1A1AA' }: Props) {
         height="12.5"
         rx="2"
         ry="2"
-        transform="translate(18 18) rotate(180)"
         fill="none"
         stroke={color}
         strokeLinecap="round"

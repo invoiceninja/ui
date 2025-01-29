@@ -14,15 +14,13 @@ import { request } from '$app/common/helpers/request';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   HelpCircle,
   Info,
   Mail,
   MessageSquare,
   AlertCircle,
-  ChevronLeft,
-  ChevronRight,
 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -32,9 +30,6 @@ import { Modal } from './Modal';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
-import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import classNames from 'classnames';
 import { AboutModal } from './AboutModal';
 import { Icon } from './icons/Icon';
@@ -55,13 +50,10 @@ export function HelpSidebarIcons(props: Props) {
   const colors = useColorScheme();
   const user = useInjectUserChanges();
   const account = useCurrentAccount();
-  const currentUser = useCurrentUser();
 
   const { mobileNavbar } = props;
 
   const dispatch = useDispatch();
-  const updateCompanyUser = useUpdateCompanyUser();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
 
   const { data: latestVersion } = useQuery({
     queryKey: ['/pdf.invoicing.co/api/version'],
@@ -128,20 +120,6 @@ export function HelpSidebarIcons(props: Props) {
       setCronsNotEnabledModal(false);
     });
   };
-
-  useEffect(() => {
-    const showMiniSidebar =
-      user?.company_user?.react_settings?.show_mini_sidebar;
-
-    if (
-      user &&
-      typeof showMiniSidebar !== 'undefined' &&
-      currentUser?.company_user?.react_settings?.show_mini_sidebar !==
-        showMiniSidebar
-    ) {
-      updateCompanyUser(user);
-    }
-  }, [user?.company_user?.react_settings.show_mini_sidebar]);
 
   return (
     <>
@@ -335,28 +313,6 @@ export function HelpSidebarIcons(props: Props) {
             </button>
           </>
         )}
-
-        <button
-          className="rounded-full"
-          onClick={() =>
-            handleUserChange(
-              'company_user.react_settings.show_mini_sidebar',
-              !isMiniSidebar
-            )
-          }
-        >
-          <Tippy
-            duration={0}
-            content={
-              <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
-                {isMiniSidebar ? t('show_menu') : t('hide_menu')}
-              </span>
-            }
-            className="text-white rounded mb-1.5"
-          >
-            {isMiniSidebar ? <ChevronRight /> : <ChevronLeft />}
-          </Tippy>
-        </button>
       </nav>
     </>
   );

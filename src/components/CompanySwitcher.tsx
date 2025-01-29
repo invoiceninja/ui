@@ -22,7 +22,6 @@ import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate'
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
 import { freePlan } from '$app/common/guards/guards/free-plan';
-import { useColorScheme } from '$app/common/colors';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
@@ -35,9 +34,9 @@ import { Plus } from './icons/Plus';
 import { Person } from './icons/Person';
 import { Exit } from './icons/Exit';
 import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -58,21 +57,21 @@ export function CompanySwitcher() {
 
   const logo = useLogo();
   const location = useLocation();
-  const colors = useColorScheme();
-  const user = useInjectUserChanges();
-  const currentUser = useCurrentUser();
   const companyName = useCompanyName();
   const queryClient = useQueryClient();
   const { isAdmin, isOwner } = useAdmin();
+  const currentCompany = useCurrentCompany();
+
+  const currentUser = useCurrentUser();
+  const userChanges = useInjectUserChanges();
+
+  const isMiniSidebar = Boolean(
+    userChanges?.company_user?.react_settings?.show_mini_sidebar
+  );
 
   const updateCompanyUser = useUpdateCompanyUser();
   const handleUserChange = useHandleCurrentUserChangeProperty();
 
-  const isMiniSidebar = Boolean(
-    user?.company_user?.react_settings.show_mini_sidebar
-  );
-
-  const currentCompany = useCurrentCompany();
   const preventNavigation = usePreventNavigation();
 
   const [shouldShowAddCompany, setShouldShowAddCompany] =
@@ -122,17 +121,33 @@ export function CompanySwitcher() {
 
   useEffect(() => {
     const showMiniSidebar =
-      user?.company_user?.react_settings?.show_mini_sidebar;
+      userChanges?.company_user?.react_settings?.show_mini_sidebar;
 
     if (
-      user &&
+      userChanges &&
       typeof showMiniSidebar !== 'undefined' &&
       currentUser?.company_user?.react_settings?.show_mini_sidebar !==
         showMiniSidebar
     ) {
-      updateCompanyUser(user);
+      updateCompanyUser(userChanges);
     }
-  }, [user?.company_user?.react_settings.show_mini_sidebar]);
+  }, [userChanges?.company_user?.react_settings.show_mini_sidebar]);
+
+  if (isMiniSidebar) {
+    return (
+      <>
+        <img
+          className="rounded-full border overflow-hidden aspect-square"
+          src={logo}
+          alt="Company logo"
+          style={{
+            borderColor: '#FFFFFF19',
+            width: '1.5rem',
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -150,21 +165,21 @@ export function CompanySwitcher() {
           <Menu.Button className="flex items-center justify-start space-x-3 w-full">
             <SwitcherDiv
               className="flex items-center space-x-3 p-1.5 rounded-md"
-              theme={{ hoverColor: `${colors.$1}1A` }}
+              theme={{ hoverColor: '#FFFFFF0D' }}
             >
               <img
                 className="rounded-full border overflow-hidden aspect-square"
                 src={logo}
                 alt="Company logo"
                 style={{
-                  borderColor: colors.$14,
+                  borderColor: '#FFFFFF19',
                   width: '1.65rem',
                 }}
               />
 
               <span
                 className="text-sm text-start w-28 truncate"
-                style={{ color: colors.$15 }}
+                style={{ color: '#FAFAFA' }}
               >
                 {companyName}
               </span>
@@ -174,11 +189,11 @@ export function CompanySwitcher() {
           </Menu.Button>
 
           <div
-            className="cursor-pointer"
+            className="cursor-pointer pr-2.5"
             onClick={() =>
               handleUserChange(
                 'company_user.react_settings.show_mini_sidebar',
-                !isMiniSidebar
+                true
               )
             }
           >
@@ -198,20 +213,22 @@ export function CompanySwitcher() {
           <Menu.Items
             className="origin-top-right absolute left-0 mt-2 rounded shadow-lg"
             style={{
-              backgroundColor: colors.$1,
+              backgroundColor: 'white',
               width: '14.5rem',
             }}
           >
-            <div className="py-1 border-b" style={{ borderColor: '#09090B1A' }}>
+            <div className="border-b" style={{ borderColor: '#09090B1A' }}>
               <Menu.Item>
-                <div className="px-3 py-1">
-                  <p style={{ fontSize: '0.6875rem' }}>{t('signed_in_as')}</p>
+                <div className="px-3 pb-1.5 pt-2">
+                  <p style={{ fontSize: '0.6875rem', color: '#A1A1AA' }}>
+                    {t('signed_in_as')}
+                  </p>
 
                   <p
-                    className="font-medium truncate"
+                    className="font-medium truncate text-black"
                     style={{ fontSize: '0.8125rem' }}
                   >
-                    {user?.email}
+                    {currentUser?.email}
                   </p>
                 </div>
               </Menu.Item>
@@ -251,7 +268,7 @@ export function CompanySwitcher() {
                               src={record.company.settings.company_logo}
                               alt="Company logo"
                               style={{
-                                borderColor: colors.$14,
+                                borderColor: '#FFFFFF19',
                                 width: '1.5rem',
                               }}
                             />
@@ -267,7 +284,7 @@ export function CompanySwitcher() {
                           )}
 
                           <div
-                            className="flex-1 truncate"
+                            className="flex-1 truncate text-black"
                             style={{ fontSize: '0.8125rem' }}
                           >
                             {record.company.settings.name ||
@@ -295,7 +312,10 @@ export function CompanySwitcher() {
                       >
                         <Plus />
 
-                        <span style={{ fontSize: '0.8125rem' }}>
+                        <span
+                          className="text-black"
+                          style={{ fontSize: '0.8125rem' }}
+                        >
                           {t('add_company')}
                         </span>
                       </SwitcherDiv>
@@ -317,7 +337,10 @@ export function CompanySwitcher() {
                     >
                       <Person />
 
-                      <span style={{ fontSize: '0.8125rem' }}>
+                      <span
+                        className="text-black"
+                        style={{ fontSize: '0.8125rem' }}
+                      >
                         {t('account_management')}
                       </span>
                     </SwitcherDiv>
@@ -338,7 +361,12 @@ export function CompanySwitcher() {
                   >
                     <Exit />
 
-                    <span style={{ fontSize: '0.8125rem' }}>{t('logout')}</span>
+                    <span
+                      className="text-black"
+                      style={{ fontSize: '0.8125rem' }}
+                    >
+                      {t('logout')}
+                    </span>
                   </SwitcherDiv>
                 </div>
               </Menu.Item>
