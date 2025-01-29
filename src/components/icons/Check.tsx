@@ -8,21 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export function Check() {
+type Props = {
+  color?: string;
+};
+
+export function Check({ color = '#18181B' }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="1rem"
-      height="1rem"
+      width="1.1rem"
+      height="1.1rem"
       viewBox="0 0 20 20"
     >
       <polyline
         points="4 11 8 15 16 5"
         fill="none"
-        stroke="#18181B"
+        stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"

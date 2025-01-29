@@ -441,7 +441,7 @@ export function Default(props: Props) {
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <MenuIcon className="dark:text-gray-100" />
+            <MenuIcon color={colors.$3} />
           </button>
 
           <div
@@ -460,7 +460,7 @@ export function Default(props: Props) {
                       )
                     }
                   >
-                    <OpenNavbarArrow />
+                    <OpenNavbarArrow color={colors.$3} />
                   </div>
                 )}
 

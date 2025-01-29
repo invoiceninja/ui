@@ -8,7 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export function ExpandCollapseChevron() {
+interface Props {
+  color?: string;
+}
+
+export function ExpandCollapseChevron({ color = '#FFFFFF' }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +26,7 @@ export function ExpandCollapseChevron() {
       <polyline
         points="13 7 10 4 7 7"
         fill="none"
-        stroke="#74747C"
+        stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
@@ -30,7 +34,7 @@ export function ExpandCollapseChevron() {
       <polyline
         points="13 13 10 16 7 13"
         fill="none"
-        stroke="#74747C"
+        stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"

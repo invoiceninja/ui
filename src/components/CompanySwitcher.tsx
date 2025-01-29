@@ -37,6 +37,7 @@ import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleC
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useColorScheme } from '$app/common/colors';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -57,6 +58,7 @@ export function CompanySwitcher() {
 
   const logo = useLogo();
   const location = useLocation();
+  const colors = useColorScheme();
   const companyName = useCompanyName();
   const queryClient = useQueryClient();
   const { isAdmin, isOwner } = useAdmin();
@@ -141,8 +143,8 @@ export function CompanySwitcher() {
           src={logo}
           alt="Company logo"
           style={{
-            borderColor: '#FFFFFF19',
-            width: '1.5rem',
+            borderColor: '#e5e7eb',
+            width: '1.66rem',
           }}
         />
       </>
@@ -163,29 +165,23 @@ export function CompanySwitcher() {
       >
         <div className="flex items-center">
           <Menu.Button className="flex items-center justify-start space-x-3 w-full">
-            <SwitcherDiv
-              className="flex items-center space-x-3 p-1.5 rounded-md"
-              theme={{ hoverColor: '#FFFFFF0D' }}
-            >
+            <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700">
               <img
                 className="rounded-full border overflow-hidden aspect-square"
                 src={logo}
                 alt="Company logo"
                 style={{
-                  borderColor: '#FFFFFF19',
+                  borderColor: '#e5e7eb',
                   width: '1.65rem',
                 }}
               />
 
-              <span
-                className="text-sm text-start w-28 truncate"
-                style={{ color: '#FAFAFA' }}
-              >
+              <span className="text-sm text-start w-28 truncate text-gray-200">
                 {companyName}
               </span>
 
-              <ExpandCollapseChevron />
-            </SwitcherDiv>
+              <ExpandCollapseChevron color="#e5e7eb" />
+            </div>
           </Menu.Button>
 
           <div
@@ -197,7 +193,7 @@ export function CompanySwitcher() {
               )
             }
           >
-            <CloseNavbarArrow />
+            <CloseNavbarArrow color="#e5e7eb" />
           </div>
         </div>
 
@@ -211,23 +207,19 @@ export function CompanySwitcher() {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items
-            className="origin-top-right absolute left-0 mt-2 rounded shadow-lg"
+            className="origin-top-right absolute left-0 mt-2 rounded shadow-lg border"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: colors.$1,
               width: '14.5rem',
+              borderColor: colors.$4,
             }}
           >
-            <div className="border-b" style={{ borderColor: '#09090B1A' }}>
+            <div className="border-b" style={{ borderColor: colors.$4 }}>
               <Menu.Item>
                 <div className="px-3 pb-1.5 pt-2">
-                  <p style={{ fontSize: '0.6875rem', color: '#A1A1AA' }}>
-                    {t('signed_in_as')}
-                  </p>
+                  <p className="text-xs text-gray-500">{t('signed_in_as')}</p>
 
-                  <p
-                    className="font-medium truncate text-black"
-                    style={{ fontSize: '0.8125rem' }}
-                  >
+                  <p className="font-medium truncate text-sm">
                     {currentUser?.email}
                   </p>
                 </div>
@@ -236,24 +228,21 @@ export function CompanySwitcher() {
 
             <div
               className="flex flex-col pb-1 pt-2 border-b"
-              style={{ borderColor: '#09090B1A' }}
+              style={{ borderColor: colors.$4 }}
             >
               {state?.api?.length >= 1 &&
                 state?.api?.map((record: any, index: number) => (
                   <Menu.Item key={index}>
                     <div className="px-1 space-y-0.5">
                       {index === 0 && (
-                        <p
-                          className="pl-2"
-                          style={{ color: '#A1A1AA', fontSize: '0.6875rem' }}
-                        >
+                        <p className="pl-2 text-xs text-gray-500">
                           {t('company')}
                         </p>
                       )}
 
                       <SwitcherDiv
                         className="flex items-center px-2 justify-between py-1.5 rounded-md cursor-pointer"
-                        theme={{ hoverColor: `#09090B13` }}
+                        theme={{ hoverColor: colors.$5 }}
                         onClick={() =>
                           preventNavigation({
                             fn: () => switchCompany(index),
@@ -268,7 +257,7 @@ export function CompanySwitcher() {
                               src={record.company.settings.company_logo}
                               alt="Company logo"
                               style={{
-                                borderColor: '#FFFFFF19',
+                                borderColor: colors.$4,
                                 width: '1.5rem',
                               }}
                             />
@@ -283,16 +272,15 @@ export function CompanySwitcher() {
                             />
                           )}
 
-                          <div
-                            className="flex-1 truncate text-black"
-                            style={{ fontSize: '0.8125rem' }}
-                          >
+                          <div className="w-36 truncate text-sm">
                             {record.company.settings.name ||
                               t('untitled_company')}
                           </div>
                         </div>
 
-                        {state.currentIndex === index && <Check />}
+                        {state.currentIndex === index && (
+                          <Check color={colors.$3} />
+                        )}
                       </SwitcherDiv>
                     </div>
                   </Menu.Item>
@@ -307,17 +295,12 @@ export function CompanySwitcher() {
                     <div className="px-1">
                       <SwitcherDiv
                         className="flex items-center pl-3 space-x-3 py-2 rounded-md cursor-pointer"
-                        theme={{ hoverColor: `#09090B13` }}
+                        theme={{ hoverColor: colors.$5 }}
                         onClick={() => setIsCompanyCreateModalOpened(true)}
                       >
                         <Plus />
 
-                        <span
-                          className="text-black"
-                          style={{ fontSize: '0.8125rem' }}
-                        >
-                          {t('add_company')}
-                        </span>
+                        <span className="text-sm">{t('add_company')}</span>
                       </SwitcherDiv>
                     </div>
                   </Menu.Item>
@@ -328,7 +311,7 @@ export function CompanySwitcher() {
                   <div className="px-1">
                     <SwitcherDiv
                       className="flex items-center space-x-3 pl-3 py-2 rounded-md cursor-pointer"
-                      theme={{ hoverColor: `#09090B13` }}
+                      theme={{ hoverColor: colors.$5 }}
                       onClick={() =>
                         preventNavigation({
                           url: '/settings/account_management',
@@ -337,12 +320,7 @@ export function CompanySwitcher() {
                     >
                       <Person />
 
-                      <span
-                        className="text-black"
-                        style={{ fontSize: '0.8125rem' }}
-                      >
-                        {t('account_management')}
-                      </span>
+                      <span className="text-sm">{t('account_management')}</span>
                     </SwitcherDiv>
                   </div>
                 </Menu.Item>
@@ -352,7 +330,7 @@ export function CompanySwitcher() {
                 <div className="pl-1.5 pr-1">
                   <SwitcherDiv
                     className="flex items-center space-x-3 pl-3 py-2 rounded-md cursor-pointer"
-                    theme={{ hoverColor: `#09090B13` }}
+                    theme={{ hoverColor: colors.$5 }}
                     onClick={() =>
                       preventNavigation({
                         url: '/logout',
@@ -361,12 +339,7 @@ export function CompanySwitcher() {
                   >
                     <Exit />
 
-                    <span
-                      className="text-black"
-                      style={{ fontSize: '0.8125rem' }}
-                    >
-                      {t('logout')}
-                    </span>
+                    <span className="text-sm">{t('logout')}</span>
                   </SwitcherDiv>
                 </div>
               </Menu.Item>
