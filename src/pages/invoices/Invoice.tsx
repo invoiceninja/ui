@@ -65,10 +65,15 @@ export default function Invoice() {
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
-  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
 
   const [triggerValidationQuery, setTriggerValidationQuery] =
     useState<boolean>(true);
+
+  const { data } = useInvoiceQuery({ id, includeIsLocked: true });
+
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom, {
+    disableFunctionality: id === data?.id && data?.is_locked,
+  });
 
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: invoice,
@@ -82,8 +87,6 @@ export default function Invoice() {
       setTriggerValidationQuery(false);
     },
   });
-
-  const { data } = useInvoiceQuery({ id, includeIsLocked: true });
 
   const [client, setClient] = useState<Client | undefined>();
 
