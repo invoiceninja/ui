@@ -8,6 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+interface Requirements {
+  requirements: (
+    | { currently_due: Record<string, string>[] }
+    | { past_due: Record<string, string>[] }
+    | { verification: Record<string, string>[] }
+  )[];
+}
+
+interface Settings {
+  general: Record<string, string>;
+  requirements: Requirements[];
+  capabilities: Record<string, string>;
+}
+
 export interface CompanyGateway {
   id: string;
   gateway_key: string;
@@ -38,6 +52,7 @@ export interface CompanyGateway {
   token_billing: string;
   test_mode: boolean;
   always_show_required_fields: boolean;
+  settings?: Settings;
 }
 
 export interface FeesAndLimitsEntry {
