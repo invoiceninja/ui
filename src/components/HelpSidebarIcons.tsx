@@ -38,6 +38,8 @@ import { useQuery } from 'react-query';
 import axios from 'axios';
 import { MdWarning } from 'react-icons/md';
 import { UpdateAppModal } from './UpdateAppModal';
+import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
+import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
 
 interface Props {
   docsLink?: string;
@@ -54,6 +56,7 @@ export function HelpSidebarIcons(props: Props) {
   const { mobileNavbar } = props;
 
   const dispatch = useDispatch();
+  const handleCollapseExpandSidebar = useHandleCollapseExpandSidebar();
 
   const { data: latestVersion } = useQuery({
     queryKey: ['/pdf.invoicing.co/api/version'],
@@ -312,6 +315,15 @@ export function HelpSidebarIcons(props: Props) {
               </Tippy>
             </button>
           </>
+        )}
+
+        {isMiniSidebar && (
+          <div
+            className="cursor-pointer"
+            onClick={() => handleCollapseExpandSidebar(false)}
+          >
+            <OpenNavbarArrow color="#e5e7eb" />
+          </div>
         )}
       </nav>
     </>

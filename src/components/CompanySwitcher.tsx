@@ -33,11 +33,10 @@ import Avatar from 'react-avatar';
 import { Plus } from './icons/Plus';
 import { Person } from './icons/Person';
 import { Exit } from './icons/Exit';
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useColorScheme } from '$app/common/colors';
+import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -71,10 +70,8 @@ export function CompanySwitcher() {
     userChanges?.company_user?.react_settings?.show_mini_sidebar
   );
 
-  const updateCompanyUser = useUpdateCompanyUser();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
-
   const preventNavigation = usePreventNavigation();
+  const handleCollapseExpandSidebar = useHandleCollapseExpandSidebar();
 
   const [shouldShowAddCompany, setShouldShowAddCompany] =
     useState<boolean>(false);
@@ -120,20 +117,6 @@ export function CompanySwitcher() {
       setShouldShowAddCompany(false);
     }
   }, [currentCompany]);
-
-  useEffect(() => {
-    const showMiniSidebar =
-      userChanges?.company_user?.react_settings?.show_mini_sidebar;
-
-    if (
-      userChanges &&
-      typeof showMiniSidebar !== 'undefined' &&
-      currentUser?.company_user?.react_settings?.show_mini_sidebar !==
-        showMiniSidebar
-    ) {
-      updateCompanyUser(userChanges);
-    }
-  }, [userChanges?.company_user?.react_settings.show_mini_sidebar]);
 
   if (isMiniSidebar) {
     return (
@@ -186,12 +169,7 @@ export function CompanySwitcher() {
 
           <div
             className="cursor-pointer pr-2.5"
-            onClick={() =>
-              handleUserChange(
-                'company_user.react_settings.show_mini_sidebar',
-                true
-              )
-            }
+            onClick={() => handleCollapseExpandSidebar(true)}
           >
             <CloseNavbarArrow color="#e5e7eb" />
           </div>

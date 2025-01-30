@@ -63,8 +63,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
 import classNames from 'classnames';
-import { OpenNavbarArrow } from '../icons/OpenNavbarArrow';
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
 
 export interface SaveOption {
   label: string;
@@ -96,7 +94,6 @@ export function Default(props: Props) {
   const enabled = useEnabled();
   const hasPermission = useHasPermission();
   const preventNavigation = usePreventNavigation();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
 
   const user = useInjectUserChanges();
   const company = useCurrentCompany();
@@ -449,28 +446,12 @@ export function Default(props: Props) {
             data-cy="topNavbar"
           >
             <div className="flex flex-1 items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                {user?.company_user?.react_settings.show_mini_sidebar && (
-                  <div
-                    className="cursor-pointer pr-2.5"
-                    onClick={() =>
-                      handleUserChange(
-                        'company_user.react_settings.show_mini_sidebar',
-                        false
-                      )
-                    }
-                  >
-                    <OpenNavbarArrow color={colors.$3} />
-                  </div>
-                )}
-
-                <h2
-                  style={{ color: colors.$3 }}
-                  className="text-sm md:text-lg whitespace-nowrap"
-                >
-                  {props.title}
-                </h2>
-              </div>
+              <h2
+                style={{ color: colors.$3 }}
+                className="text-sm md:text-lg whitespace-nowrap"
+              >
+                {props.title}
+              </h2>
 
               <QuickCreatePopover />
               <Search />
