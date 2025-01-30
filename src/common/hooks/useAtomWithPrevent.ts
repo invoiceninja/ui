@@ -37,10 +37,17 @@ const EXCLUDING_PROPERTIES_KEYS = [
   'footer',
 ];
 
+interface Options {
+  disableFunctionality?: boolean;
+}
+
 export function useAtomWithPrevent<T extends Entity>(
-  atom: PrimitiveAtom<T | undefined>
+  atom: PrimitiveAtom<T | undefined>,
+  options?: Options
 ): [T | undefined, SetAtom<[SetStateAction<T | undefined>], void>] {
   const { id } = useParams();
+
+  const { disableFunctionality = false } = options || {};
 
   const setChanges = useSetAtom(changesAtom);
 
@@ -78,7 +85,8 @@ export function useAtomWithPrevent<T extends Entity>(
       entity &&
       currentInitialValue &&
       entity.id === currentInitialValue.id &&
-      !isFunctionalityDisabled
+      !isFunctionalityDisabled &&
+      !disableFunctionality
     ) {
       const currentEntityPaths = generatePaths(entity as T);
 
