@@ -8,17 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface Requirements {
-  requirements: (
-    | { currently_due: Record<string, string>[] }
-    | { past_due: Record<string, string>[] }
-    | { verification: Record<string, string>[] }
-  )[];
-}
-
 interface Settings {
   general: Record<string, string>;
-  requirements: Requirements[];
+  requirements: Record<string, string>;
   capabilities: Record<string, string>;
 }
 

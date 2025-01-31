@@ -79,61 +79,8 @@ export function Edit() {
   }, [companyGateway, gateways]);
 
   useEffect(() => {
-    const settings = {
-      general: {
-        'Payouts Enabled': 'No',
-        'Dashboard Display Name': '',
-        'Dashboard Timezone': '',
-        'Statement Descriptor': 'WWW.050SS.NET',
-        'Statement Descriptor Prefix': '050SS',
-        'Support Address City': '',
-        'Support Address Country': '',
-        'Support Address Line 1': '',
-        'Support Address Postal Code': '',
-        'Support Address State': '',
-        'Default Currency': 'usd',
-        Country: 'CA',
-      },
-      requirements: [
-        {
-          currently_due: [],
-        },
-        {
-          past_due: [],
-        },
-        {
-          verification: [
-            {
-              'legal_entity.documents.proof_of_registration.files':
-                "Directors on the document don't match the account. The users that are missing from your account are: MARK TOKENSTEIN.",
-            },
-            {
-              'legal_entity.verification.additional_document':
-                'The same type of document was used twice. Two unique documents are required.',
-            },
-          ],
-        },
-      ],
-      capabilities: {
-        acss_debit_payments: 'active',
-        affirm_payments: 'active',
-        afterpay_clearpay_payments: 'active',
-        bancontact_payments: 'active',
-        card_payments: 'active',
-        eps_payments: 'active',
-        giropay_payments: 'active',
-        ideal_payments: 'active',
-        klarna_payments: 'active',
-        link_payments: 'active',
-        p24_payments: 'active',
-        sepa_debit_payments: 'active',
-        sofort_payments: 'active',
-        platform_payments: 'active',
-      },
-    };
-
     if (data?.data.data) {
-      setCompanyGateway({ ...data.data.data, settings });
+      setCompanyGateway(data.data.data);
     }
   }, [data]);
 
