@@ -234,7 +234,7 @@ export function CompanySwitcher() {
                                   t('untitled_company'))?.[0]
                               }
                               round={true}
-                              textSizeRatio={1.9}
+                              textSizeRatio={2}
                               size="1.5rem"
                             />
                           )}
