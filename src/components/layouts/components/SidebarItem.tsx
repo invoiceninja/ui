@@ -68,7 +68,7 @@ export function SidebarItem(props: Props) {
       }}
       key={item.name}
       className={classNames(
-        'flex items-center justify-between group px-4 text-sm font-medium',
+        'flex items-center justify-between group px-1.5 text-sm font-medium rounded-md',
         {
           'text-white border-l-4 border-transparent': item.current,
           'text-gray-300 border-l-4 border-transparent': !item.current,

@@ -31,7 +31,7 @@ export function useInjectUserChanges(options?: Options) {
   const changes = useUserChanges();
 
   useEffect(() => {
-    if (changes && options?.overwrite === false) {
+    if (Object.keys(changes || {}).length && !options?.overwrite) {
       // We don't want to overwrite existing changes,
       // so let's just not inject anything if we already have a value,
       // and relative argument.
