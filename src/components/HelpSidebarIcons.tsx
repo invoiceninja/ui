@@ -40,6 +40,7 @@ import { MdWarning } from 'react-icons/md';
 import { UpdateAppModal } from './UpdateAppModal';
 import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
 import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
+import { CloseNavbarArrow } from './icons/CloseNavbarArrow';
 
 interface Props {
   docsLink?: string;
@@ -317,14 +318,28 @@ export function HelpSidebarIcons(props: Props) {
           </>
         )}
 
-        {isMiniSidebar && (
-          <div
-            className="cursor-pointer"
-            onClick={() => handleCollapseExpandSidebar(false)}
+        <div
+          className="cursor-pointer"
+          onClick={() => handleCollapseExpandSidebar(!isMiniSidebar)}
+        >
+          <Tippy
+            duration={0}
+            content={
+              <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
+                {isMiniSidebar ? t('show_menu') : t('hide_menu')}
+              </span>
+            }
+            className="text-white rounded text-xs mb-2"
           >
-            <OpenNavbarArrow color="#e5e7eb" />
-          </div>
-        )}
+            <div>
+              {isMiniSidebar ? (
+                <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
+              ) : (
+                <CloseNavbarArrow color="#e5e7eb" size="1.62rem" />
+              )}
+            </div>
+          </Tippy>
+        </div>
       </nav>
     </>
   );

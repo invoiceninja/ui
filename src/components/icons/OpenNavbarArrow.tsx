@@ -10,17 +10,18 @@
 
 interface Props {
   color?: string;
+  size?: string;
 }
 
-export function OpenNavbarArrow({ color = '#74747C' }: Props) {
+export function OpenNavbarArrow({ color = '#74747C', size = '1.3rem' }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="1.3rem"
-      height="1.3rem"
+      width={size}
+      height={size}
       viewBox="0 0 18 18"
     >
       <line

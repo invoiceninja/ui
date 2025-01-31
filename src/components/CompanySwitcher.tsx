@@ -25,7 +25,6 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
-import { CloseNavbarArrow } from './icons/CloseNavbarArrow';
 import { styled } from 'styled-components';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Check } from './icons/Check';
@@ -36,7 +35,6 @@ import { Exit } from './icons/Exit';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useColorScheme } from '$app/common/colors';
-import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -71,7 +69,6 @@ export function CompanySwitcher() {
   );
 
   const preventNavigation = usePreventNavigation();
-  const handleCollapseExpandSidebar = useHandleCollapseExpandSidebar();
 
   const [shouldShowAddCompany, setShouldShowAddCompany] =
     useState<boolean>(false);
@@ -146,34 +143,25 @@ export function CompanySwitcher() {
         className="relative inline-block text-left w-full"
         data-cy="companyDropdown"
       >
-        <div className="flex items-center">
-          <Menu.Button className="flex items-center justify-start space-x-3 w-full">
-            <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700">
-              <img
-                className="rounded-full border overflow-hidden aspect-square"
-                src={logo}
-                alt="Company logo"
-                style={{
-                  borderColor: '#e5e7eb',
-                  width: '1.65rem',
-                }}
-              />
+        <Menu.Button className="flex items-center justify-start space-x-3 w-full">
+          <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700">
+            <img
+              className="rounded-full border overflow-hidden aspect-square"
+              src={logo}
+              alt="Company logo"
+              style={{
+                borderColor: '#e5e7eb',
+                width: '1.65rem',
+              }}
+            />
 
-              <span className="text-sm text-start w-28 truncate text-gray-200">
-                {companyName}
-              </span>
+            <span className="text-sm text-start w-36 truncate text-gray-200">
+              {companyName}
+            </span>
 
-              <ExpandCollapseChevron color="#e5e7eb" />
-            </div>
-          </Menu.Button>
-
-          <div
-            className="cursor-pointer pr-2.5"
-            onClick={() => handleCollapseExpandSidebar(true)}
-          >
-            <CloseNavbarArrow color="#e5e7eb" />
+            <ExpandCollapseChevron color="#e5e7eb" />
           </div>
-        </div>
+        </Menu.Button>
 
         <Transition
           as={Fragment}
