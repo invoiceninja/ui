@@ -31,6 +31,7 @@ import { LuArrowUpDown, LuCornerDownLeft } from 'react-icons/lu';
 import { useAtomValue } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
+import { Search as SearchIcon } from '$app/components/icons/Search';
 
 const Div = styled.div`
   color: ${(props) => props.theme.color};
@@ -214,12 +215,28 @@ export function Search$() {
 
   return (
     <>
-      <InputField
-        className="border-transparent focus:border-transparent focus:ring-0 border-0"
+      <div
+        className="flex items-center border rounded-md px-1 py-1 space-x-5"
         onClick={() => setIsModalOpen(true)}
-        placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
-        style={{ backgroundColor: colors.$1, color: colors.$3, width: '21rem' }}
-      />
+        style={{ borderColor: colors.$5 }}
+      >
+        <div className="flex items-center space-x-1.5 pl-1">
+          <SearchIcon color={colors.$5} />
+
+          <p className="text-sm" style={{ color: colors.$5 }}>
+            {t('search_placeholder')}
+          </p>
+        </div>
+
+        <div
+          className="flex items-center border px-1.5 py-0.5"
+          style={{ borderColor: colors.$5, borderRadius: '0.25rem' }}
+        >
+          <p className="text-sm" style={{ color: colors.$5 }}>
+            Ctrl+K
+          </p>
+        </div>
+      </div>
 
       <Modal
         visible={isModalOpen}
@@ -229,23 +246,24 @@ export function Search$() {
         withoutPadding
         size="regular"
       >
-        <div
-          className="flex flex-col pt-3"
-          style={{ backgroundColor: colors.$1 }}
-        >
-          <div className="flex flex-col space-y-5 px-3 pb-3">
+        <div className="flex flex-col" style={{ backgroundColor: colors.$1 }}>
+          <div className="flex flex-col space-y-5 pb-3">
             <div className="flex items-center space-x-3">
-              <div className="flex-1">
-                <InputField
-                  className="focus:ring-0"
-                  innerRef={inputRef}
-                  value={query}
-                  onValueChange={(value) => handleChange(value)}
-                  onClick={() => setSelectedIndex(-1)}
-                  placeholder={`${t('search')}...`}
-                  changeOverride
-                  style={{ backgroundColor: colors.$1, color: colors.$3 }}
-                />
+              <div className="flex items-center space-x-1.5 py-2 px-4 flex-1 border-b">
+                <SearchIcon color={colors.$5} size="1.6rem" />
+
+                <div className="flex-1">
+                  <InputField
+                    className="border-transparent focus:border-transparent focus:ring-0 border-0 w-full px-0"
+                    innerRef={inputRef}
+                    value={query}
+                    onValueChange={(value) => handleChange(value)}
+                    onClick={() => setSelectedIndex(-1)}
+                    placeholder={t('search_placeholder')}
+                    changeOverride
+                    style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                  />
+                </div>
               </div>
 
               {isFetching && <Spinner />}
