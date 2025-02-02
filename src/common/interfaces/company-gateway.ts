@@ -10,7 +10,11 @@
 
 interface Settings {
   general: Record<string, string>;
-  requirements: Record<string, string>;
+  requirements: {
+    currently_due: string[][];
+    past_due: string[][];
+    verification: string[][];
+  };
   capabilities: Record<string, string>;
 }
 

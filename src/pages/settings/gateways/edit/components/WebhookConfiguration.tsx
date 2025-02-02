@@ -49,13 +49,29 @@ export function WebhookConfiguration(props: Props) {
         {Object.entries(companyGateway?.settings?.requirements || {}).length >
           0 && (
           <Element leftSide={t('requirements')}>
-            <ul className="list-disc">
+            <ul className="list-disc space-y-2">
               {Object.entries(companyGateway?.settings?.requirements || {}).map(
-                ([key, value], index) => (
-                  <li key={index}>{`${t(key)}${
-                    value ? `: ${t(value)}` : ''
-                  }`}</li>
-                )
+                ([key, arrays]) => {
+                  if (!arrays.length) {
+                    return null;
+                  }
+
+                  const flattenedValues = arrays.flatMap((arr) => arr);
+
+                  return flattenedValues.length > 0 ? (
+                    <li key={key}>
+                      <div className="flex items-center space-x-6">
+                        <span className="font-medium w-32">{t(key)}:</span>
+
+                        <ul className="list-disc">
+                          {flattenedValues.map((value, index) => (
+                            <li key={index}>{t(value)}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </li>
+                  ) : null;
+                }
               )}
             </ul>
           </Element>
