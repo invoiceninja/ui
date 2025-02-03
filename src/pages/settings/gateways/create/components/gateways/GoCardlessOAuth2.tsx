@@ -10,17 +10,9 @@
 
 import { Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Check } from 'react-feather';
 
-interface Props {
-  companyGateway: CompanyGateway;
-  setCompanyGateway: React.Dispatch<
-    React.SetStateAction<CompanyGateway | undefined>
-  >
-}
-
-export function GoCardlessOAuth2({ companyGateway, setCompanyGateway }: Props) {
+export function GoCardlessOAuth2() {
   const { t } = useTranslation();
 
   return (
