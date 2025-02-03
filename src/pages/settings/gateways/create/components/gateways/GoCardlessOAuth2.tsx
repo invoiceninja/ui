@@ -10,10 +10,8 @@
 
 import { Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { useResolveConfigValue } from '../../hooks/useResolveConfigValue';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Check } from 'react-feather';
-import { useHandleCredentialsChange } from '$app/pages/settings/gateways/create/hooks/useHandleCredentialsChange';
 
 interface Props {
   companyGateway: CompanyGateway;
