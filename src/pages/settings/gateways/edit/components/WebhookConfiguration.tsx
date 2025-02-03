@@ -34,12 +34,18 @@ export function WebhookConfiguration(props: Props) {
       <Card title={t('settings')}>
         {Object.entries(companyGateway?.settings?.general || {}).length > 0 && (
           <Element leftSide={t('general')}>
-            <ul className="list-disc">
+            <ul className="list-disc space-y-2">
               {Object.entries(companyGateway?.settings?.general || {}).map(
                 ([key, value], index) => (
-                  <li key={index}>{`${t(key)}${
-                    value ? `: ${t(value)}` : ''
-                  }`}</li>
+                  <li key={index}>
+                    <div className="flex space-x-4">
+                      <span className="flex-shrink-0 min-w-[16.5rem] font-medium">
+                        {t(key)}:
+                      </span>
+
+                      <span>{t(value)}</span>
+                    </div>
+                  </li>
                 )
               )}
             </ul>
@@ -49,7 +55,7 @@ export function WebhookConfiguration(props: Props) {
         {Object.entries(companyGateway?.settings?.requirements || {}).length >
           0 && (
           <Element leftSide={t('requirements')}>
-            <ul className="list-disc space-y-2">
+            <ul className="list-disc space-y-4">
               {Object.entries(companyGateway?.settings?.requirements || {}).map(
                 ([key, arrays]) => {
                   if (!arrays.length) {
@@ -60,12 +66,18 @@ export function WebhookConfiguration(props: Props) {
 
                   return flattenedValues.length > 0 ? (
                     <li key={key}>
-                      <div className="flex items-center space-x-6">
-                        <span className="font-medium w-32">{t(key)}:</span>
+                      <div className="flex items-center space-x-4">
+                        <span className="font-medium min-w-[16.5rem] flex-shrink-0">
+                          {t(key)}:
+                        </span>
 
-                        <ul className="list-disc">
+                        <ul className="list-disc ml-0">
                           {flattenedValues.map((value, index) => (
-                            <li key={index}>{t(value)}</li>
+                            <li key={index} className="ml-4">
+                              <span className="block break-all">
+                                {t(value)}
+                              </span>
+                            </li>
                           ))}
                         </ul>
                       </div>
@@ -80,12 +92,18 @@ export function WebhookConfiguration(props: Props) {
         {Object.entries(companyGateway?.settings?.capabilities || {}).length >
           0 && (
           <Element leftSide={t('capabilities')}>
-            <ul className="list-disc">
+            <ul className="list-disc space-y-2">
               {Object.entries(companyGateway?.settings?.capabilities || {}).map(
                 ([key, value], index) => (
-                  <li key={index}>{`${t(key)}${
-                    value ? `: ${t(value)}` : ''
-                  }`}</li>
+                  <li key={index}>
+                    <div className="flex space-x-4">
+                      <span className="flex-shrink-0 min-w-[16.5rem] font-medium">
+                        {t(key)}:
+                      </span>
+
+                      <span>{t(value)}</span>
+                    </div>
+                  </li>
                 )
               )}
             </ul>
