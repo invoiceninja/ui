@@ -287,7 +287,7 @@ export function BulkUpdatesAction(props: Props) {
 
             {getFieldType() === 'remainingCyclesSelector' && (
                 <SelectField
-                  value={newColumnValue == '' ? setNewColumnValue("-1") : newColumnValue}
+                  value={newColumnValue}
                   onValueChange={(value) => setNewColumnValue(value)}
                 >
                   <option value="-1">{t('endless')}</option>
