@@ -31,7 +31,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCached } from 'react-icons/md';
 import Toggle from '$app/components/forms/Toggle';
-import { Element } from '$app/components/cards';
 
 interface Props {
   entity: 'client' | 'expense' | 'recurring_invoice';
