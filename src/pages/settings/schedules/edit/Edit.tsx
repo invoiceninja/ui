@@ -13,12 +13,10 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useScheduleQuery } from '$app/common/queries/schedules';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useEffect, useState } from 'react';
@@ -38,7 +36,6 @@ export function Edit() {
   const { id } = useParams();
 
   const actions = useActions();
-  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -99,13 +96,11 @@ export function Edit() {
             resource={schedule}
             onSaveClick={handleSave}
             actions={actions}
-            disableSaveButton={isFormBusy || !schedule || showPlanAlert}
+            disableSaveButton={isFormBusy || !schedule}
           />
         )
       }
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
-
       {schedule ? (
         <ScheduleForm
           schedule={schedule}

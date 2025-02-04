@@ -19,6 +19,9 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
 import { useBulk } from '$app/common/queries/users';
+import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { isHosted } from '$app/common/helpers';
 
 export function Users() {
   useTitle('user_management');
@@ -59,6 +62,8 @@ export function Users() {
         breadcrumbs={pages}
         docsLink="/docs/advanced-settings/#user_management"
       >
+        {!enterprisePlan() && isHosted() && <UsersPlanAlert />}
+
         <DataTable
           resource="user"
           columns={columns}

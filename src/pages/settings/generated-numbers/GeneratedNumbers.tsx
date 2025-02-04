@@ -48,11 +48,10 @@ export function GeneratedNumbers() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
-      
     >
       <Tabs tabs={tabs} className="mt-6" />
 
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      <AdvancedSettingsPlanAlert />
 
       <div className="my-4">
         <Outlet />
