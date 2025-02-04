@@ -40,6 +40,8 @@ export function BankAccounts() {
   ];
 
   const handleRefresh = () => {
+    toast.processing();
+
     request(
       'POST',
       endpoint('/api/v1/bank_integrations/refresh_accounts'),
@@ -74,7 +76,11 @@ export function BankAccounts() {
             <ConnectAccounts />
 
             {isHosted() && enterprisePlan() && (
-              <Button type="secondary" onClick={handleRefresh}>
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={handleRefresh}
+              >
                 <span className="mr-2">
                   {<Icon element={MdRefresh} size={20} />}
                 </span>
