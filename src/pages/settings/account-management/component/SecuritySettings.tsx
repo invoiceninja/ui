@@ -66,8 +66,6 @@ export function SecuritySettings() {
     },
   ];
 
-  console.log(companyChanges?.session_timeout);
-
   const handleLogoutAllSessions = () => {
     if (!isSessionsLogoutBusy) {
       setIsSessionsLogoutBusy(true);
