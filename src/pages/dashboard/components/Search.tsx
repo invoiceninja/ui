@@ -234,7 +234,6 @@ export function Search$() {
   const groupResults = (data: Entry<SearchRecord>[]) => {
     const groups = {
       clients: [] as Entry<SearchRecord>[],
-      products: [] as Entry<SearchRecord>[],
       invoices: [] as Entry<SearchRecord>[],
       recurring_invoices: [] as Entry<SearchRecord>[],
       payments: [] as Entry<SearchRecord>[],
@@ -250,11 +249,11 @@ export function Search$() {
       const type = entry.resource?.type;
 
       switch (type) {
-        case '/invoice':
-          groups.invoices.push(entry);
-          break;
         case '/client':
           groups.clients.push(entry);
+          break;
+        case '/invoice':
+          groups.invoices.push(entry);
           break;
         case '/recurring_invoice':
           groups.recurring_invoices.push(entry);
@@ -268,14 +267,14 @@ export function Search$() {
         case '/credit':
           groups.credits.push(entry);
           break;
-        case '/purchase_order':
-          groups.purchase_orders.push(entry);
-          break;
         case '/project':
           groups.projects.push(entry);
           break;
         case '/task':
           groups.tasks.push(entry);
+          break;
+        case '/purchase_order':
+          groups.purchase_orders.push(entry);
           break;
         default:
           groups.other.push(entry);
@@ -424,12 +423,6 @@ export function Search$() {
                       return renderSearchItem(entry, index);
                     })}
 
-                    {renderGroupTitle('products', groups.products.length > 0)}
-                    {groups.products.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
                     {renderGroupTitle('invoices', groups.invoices.length > 0)}
                     {groups.invoices.map((entry) => {
                       const index = currentIndex++;
@@ -494,7 +487,7 @@ export function Search$() {
                           .findIndex(
                             (item) =>
                               (item as Entry<SearchRecord>).id ===
-                              groups.other[0].id
+                              groups.other[0]?.id
                           )
                       );
                     })}
