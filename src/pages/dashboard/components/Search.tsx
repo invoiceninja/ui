@@ -289,8 +289,8 @@ export function Search$() {
     if (!hasResults) return null;
 
     return (
-      <div className="px-4 py-2 mt-4 first:mt-0">
-        <p className="text-xs font-medium text-gray-500">{t(title)}</p>
+      <div className="px-4 mt-4 mb-2 first:mt-0">
+        <span className="text-xs font-medium text-gray-400">{t(title)}</span>
       </div>
     );
   };
@@ -300,10 +300,6 @@ export function Search$() {
     index: number,
     firstIndexInOtherGroup?: number
   ) => {
-    if (firstIndexInOtherGroup === index) {
-      console.log(entry);
-    }
-
     return (
       <Div
         key={entry.id}
@@ -311,7 +307,7 @@ export function Search$() {
           backgroundColor: index === selectedIndex ? colors.$5 : 'transparent',
           color: colors.$3,
         }}
-        className="cursor-pointer py-2.5 active:font-semibold search-option text-sm"
+        className="cursor-pointer py-2.5 font-medium active:font-semibold search-option text-sm px-4"
         onClick={() => {
           if (entry.resource) {
             preventNavigation({
@@ -331,8 +327,6 @@ export function Search$() {
         }}
         style={{
           borderRadius: '0.25rem',
-          paddingLeft: '1.125rem',
-          paddingRight: '1.125rem',
           ...(firstIndexInOtherGroup === index && {
             marginTop: '1rem',
           }),
