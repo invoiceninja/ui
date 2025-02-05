@@ -87,7 +87,7 @@ export function Actions(props: Props) {
 
       <Button
         className="flex items-center space-x-1"
-        onClick={() => downloadPdf(invoice)}
+        onClick={() => downloadPdf(invoice, deliveryNote)}
       >
         <Icon element={MdDownload} color="white" />
         <span>{t('download')}</span>
