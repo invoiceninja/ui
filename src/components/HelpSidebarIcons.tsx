@@ -203,7 +203,7 @@ export function HelpSidebarIcons(props: Props) {
 
       <nav
         style={{ borderColor: colors.$5 }}
-        className={classNames('flex py-4 text-white border-t', {
+        className={classNames('flex space-x-2.5 py-4 text-white border-t', {
           'justify-end': mobileNavbar,
           'justify-around': !mobileNavbar,
           'px-2': !isUpdateAvailable,
@@ -222,7 +222,7 @@ export function HelpSidebarIcons(props: Props) {
                   className="text-white rounded text-xs mb-2"
                 >
                   <div>
-                    <Icon element={MdWarning} color="white" size={23.5} />
+                    <Icon element={MdWarning} color="white" size={21.5} />
                   </div>
                 </Tippy>
               </div>
@@ -238,7 +238,7 @@ export function HelpSidebarIcons(props: Props) {
                   content={t('error')}
                   className="text-white rounded text-xs mb-2"
                 >
-                  <AlertCircle />
+                  <AlertCircle size={21.5} />
                 </Tippy>
               </button>
             )}
@@ -254,7 +254,7 @@ export function HelpSidebarIcons(props: Props) {
                     className="cursor-pointer"
                     onClick={() => setIsContactVisible(true)}
                   >
-                    <Mail />
+                    <Mail size={21.5} />
                   </div>
                 ) : (
                   <div
@@ -263,7 +263,7 @@ export function HelpSidebarIcons(props: Props) {
                       window.open('https://slack.invoiceninja.com', '_blank')
                     }
                   >
-                    <Icon element={FaSlack} color="white" size={23} />
+                    <Icon element={FaSlack} color="white" size={21.5} />
                   </div>
                 )}
               </Tippy>
@@ -280,7 +280,7 @@ export function HelpSidebarIcons(props: Props) {
                 content={t('support_forum')}
                 className="text-white rounded text-xs mb-2"
               >
-                <MessageSquare />
+                <MessageSquare size={21.5} />
               </Tippy>
             </a>
 
@@ -299,7 +299,7 @@ export function HelpSidebarIcons(props: Props) {
                 content={t('user_guide')}
                 className="text-white rounded text-xs mb-2"
               >
-                <HelpCircle />
+                <HelpCircle size={21.5} />
               </Tippy>
             </a>
 
@@ -312,7 +312,7 @@ export function HelpSidebarIcons(props: Props) {
                 content={t('about')}
                 className="text-white rounded text-xs mb-2"
               >
-                <Info />
+                <Info size={21.5} />
               </Tippy>
             </button>
           </>
@@ -335,7 +335,7 @@ export function HelpSidebarIcons(props: Props) {
               {isMiniSidebar ? (
                 <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
               ) : (
-                <CloseNavbarArrow color="#e5e7eb" size="1.62rem" />
+                <CloseNavbarArrow color="#e5e7eb" size="1.35rem" />
               )}
             </div>
           </Tippy>
