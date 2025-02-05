@@ -180,15 +180,32 @@ export function Search$() {
 
       if (selectedIndex !== -1 && optionsContainerRef.current) {
         const container = optionsContainerRef.current;
-        const selectedElement = container.children[
-          selectedIndex
-        ] as HTMLElement;
+        const allItems = Array.from(
+          container.getElementsByClassName('search-option')
+        );
+        const selectedElement = allItems[selectedIndex] as HTMLElement;
 
         if (selectedElement) {
-          selectedElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          });
+          if (selectedIndex === 0) {
+            container.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          } else {
+            const containerRect = container.getBoundingClientRect();
+            const elementRect = selectedElement.getBoundingClientRect();
+
+            const isVisible =
+              elementRect.top >= containerRect.top &&
+              elementRect.bottom <= containerRect.bottom;
+
+            if (!isVisible) {
+              selectedElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+              });
+            }
+          }
         }
       }
 
@@ -213,6 +230,121 @@ export function Search$() {
 
     setSelectedIndex(-1);
   }, [query]);
+
+  const groupResults = (data: Entry<SearchRecord>[]) => {
+    const groups = {
+      clients: [] as Entry<SearchRecord>[],
+      products: [] as Entry<SearchRecord>[],
+      invoices: [] as Entry<SearchRecord>[],
+      recurring_invoices: [] as Entry<SearchRecord>[],
+      payments: [] as Entry<SearchRecord>[],
+      quotes: [] as Entry<SearchRecord>[],
+      credits: [] as Entry<SearchRecord>[],
+      projects: [] as Entry<SearchRecord>[],
+      tasks: [] as Entry<SearchRecord>[],
+      purchase_orders: [] as Entry<SearchRecord>[],
+      other: [] as Entry<SearchRecord>[],
+    };
+
+    data.forEach((entry) => {
+      const type = entry.resource?.type;
+
+      switch (type) {
+        case '/invoice':
+          groups.invoices.push(entry);
+          break;
+        case '/client':
+          groups.clients.push(entry);
+          break;
+        case '/recurring_invoice':
+          groups.recurring_invoices.push(entry);
+          break;
+        case '/payment':
+          groups.payments.push(entry);
+          break;
+        case '/quote':
+          groups.quotes.push(entry);
+          break;
+        case '/credit':
+          groups.credits.push(entry);
+          break;
+        case '/purchase_order':
+          groups.purchase_orders.push(entry);
+          break;
+        case '/project':
+          groups.projects.push(entry);
+          break;
+        case '/task':
+          groups.tasks.push(entry);
+          break;
+        default:
+          groups.other.push(entry);
+      }
+    });
+
+    return groups;
+  };
+
+  const renderGroupTitle = (title: string, hasResults: boolean) => {
+    if (!hasResults) return null;
+
+    return (
+      <div className="px-4 py-2 mt-4 first:mt-0">
+        <p className="text-xs font-medium text-gray-500">{t(title)}</p>
+      </div>
+    );
+  };
+
+  const renderSearchItem = (
+    entry: Entry<SearchRecord>,
+    index: number,
+    firstIndexInOtherGroup?: number
+  ) => {
+    if (firstIndexInOtherGroup === index) {
+      console.log(entry);
+    }
+
+    return (
+      <Div
+        key={entry.id}
+        theme={{
+          backgroundColor: index === selectedIndex ? colors.$5 : 'transparent',
+          color: colors.$3,
+        }}
+        className="cursor-pointer py-2.5 active:font-semibold search-option text-sm"
+        onClick={() => {
+          if (entry.resource) {
+            preventNavigation({
+              fn: () => {
+                if (entry.resource) {
+                  navigate(entry.resource.path);
+                  setIsModalOpen(false);
+                }
+              },
+            });
+          }
+        }}
+        onMouseMove={() => {
+          if (!isContainerScrolling && selectedIndex !== index) {
+            setTimeout(() => setSelectedIndex(index), 20);
+          }
+        }}
+        style={{
+          borderRadius: '0.25rem',
+          paddingLeft: '1.125rem',
+          paddingRight: '1.125rem',
+          ...(firstIndexInOtherGroup === index && {
+            marginTop: '1rem',
+          }),
+        }}
+      >
+        <div>
+          <p className="text-xs font-semibold">{entry.resource?.heading}</p>
+          <p>{entry.label}</p>
+        </div>
+      </Div>
+    );
+  };
 
   return (
     <>
@@ -286,47 +418,95 @@ export function Search$() {
                 }, 50);
               }}
             >
-              {options?.map((entry, index) => (
-                <Div
-                  key={entry.id}
-                  theme={{
-                    backgroundColor:
-                      index === selectedIndex ? colors.$5 : 'transparent',
-                    color: colors.$3,
-                  }}
-                  className="cursor-pointer py-2.5 active:font-semibold search-option"
-                  onClick={() => {
-                    if (entry.resource) {
-                      preventNavigation({
-                        fn: () => {
-                          if (entry.resource) {
-                            navigate(entry.resource.path);
-                            setIsModalOpen(false);
-                          }
-                        },
-                      });
-                    }
-                  }}
-                  onMouseMove={() => {
-                    if (!isContainerScrolling && selectedIndex !== index) {
-                      setTimeout(() => setSelectedIndex(index), 20);
-                    }
-                  }}
-                  style={{
-                    borderRadius: '0.25rem',
-                    paddingLeft: '1.125rem',
-                    paddingRight: '1.125rem',
-                  }}
-                >
-                  <div>
-                    <p className="text-xs font-semibold">
-                      {entry.resource?.heading}
-                    </p>
+              {(() => {
+                const groups = groupResults(options.toArray() || []);
+                let currentIndex = 0;
 
-                    <p>{entry.label}</p>
-                  </div>
-                </Div>
-              ))}
+                return (
+                  <>
+                    {renderGroupTitle('clients', groups.clients.length > 0)}
+                    {groups.clients.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle('products', groups.products.length > 0)}
+                    {groups.products.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle('invoices', groups.invoices.length > 0)}
+                    {groups.invoices.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle(
+                      'recurring_invoices',
+                      groups.recurring_invoices.length > 0
+                    )}
+                    {groups.recurring_invoices.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle('payments', groups.payments.length > 0)}
+                    {groups.payments.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle('quotes', groups.quotes.length > 0)}
+                    {groups.quotes.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle('credits', groups.credits.length > 0)}
+                    {groups.credits.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle('projects', groups.projects.length > 0)}
+                    {groups.projects.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle('tasks', groups.tasks.length > 0)}
+                    {groups.tasks.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {renderGroupTitle(
+                      'purchase_orders',
+                      groups.purchase_orders.length > 0
+                    )}
+                    {groups.purchase_orders.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
+                    {groups.other.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(
+                        entry,
+                        index,
+                        options
+                          .toArray()
+                          .findIndex(
+                            (item) =>
+                              (item as Entry<SearchRecord>).id ===
+                              groups.other[0].id
+                          )
+                      );
+                    })}
+                  </>
+                );
+              })()}
             </div>
           </div>
 
