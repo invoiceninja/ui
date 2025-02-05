@@ -147,10 +147,7 @@ export function Credentials(props: Props) {
           props.gateway.key === GOCARDLESS &&
           isHosted() &&
           config('oauth2') === true && (
-            <GoCardlessOAuth2
-              companyGateway={props.companyGateway}
-              setCompanyGateway={props.setCompanyGateway}
-            />
+            <GoCardlessOAuth2/>
           )}
 
         {props.gateway &&

@@ -27,7 +27,7 @@ import {
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Icon } from '$app/components/icons/Icon';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCached } from 'react-icons/md';
 import Toggle from '$app/components/forms/Toggle';
@@ -48,6 +48,7 @@ interface BulkUpdateField {
     | 'customField'
     | 'taxSelector'
     | 'toggle'
+    | 'remainingCyclesSelector'
     | 'textarea';
 }
 
@@ -68,6 +69,7 @@ const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'tax3', type: 'taxSelector' },
   { key: 'should_be_invoiced', type: 'toggle' },
   { key: 'uses_inclusive_taxes', type: 'toggle' },
+  { key: 'remaining_cycles', type: 'remainingCyclesSelector' },
 ];
 
 export function BulkUpdatesAction(props: Props) {
@@ -93,7 +95,6 @@ export function BulkUpdatesAction(props: Props) {
   const handleOnClose = () => {
     setIsModalOpen(false);
     setColumn('');
-    setNewColumnValue('');
   };
 
   const getFieldType = () => {
@@ -103,6 +104,18 @@ export function BulkUpdatesAction(props: Props) {
 
     return bulkUpdateFieldsTypes.find(({ key }) => key === column)?.type || '';
   };
+
+  useEffect(() => {
+    if (column === 'remaining_cycles') {
+      setNewColumnValue("-1");
+    }
+    else if (column === 'uses_inclusive_taxes') {
+      setNewColumnValue(false);
+    }
+    else{
+      setNewColumnValue('');
+    }
+  }, [column]);
 
   const showColumn = (columnKey: string) => {
     if (columnKey.includes('rate')) {
@@ -198,7 +211,7 @@ export function BulkUpdatesAction(props: Props) {
             value={column}
             onValueChange={(value) => {
               setColumn(value);
-              setNewColumnValue('');
+              
             }}
             withBlank
             customSelector
@@ -272,6 +285,20 @@ export function BulkUpdatesAction(props: Props) {
               </SelectField>
             )}
 
+            {getFieldType() === 'remainingCyclesSelector' && (
+                <SelectField
+                  value={newColumnValue}
+                  onValueChange={(value) => setNewColumnValue(value)}
+                >
+                  <option value="-1">{t('endless')}</option>
+                  {[...Array(37).keys()].map((number, index) => (
+                    <option value={number} key={index}>
+                      {number}
+                    </option>
+                  ))}
+                </SelectField>
+            )}
+            
             {getFieldType() === 'countrySelector' && (
               <CountrySelector
                 value={newColumnValue as string}
