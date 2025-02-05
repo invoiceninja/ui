@@ -26,12 +26,13 @@ import {
 import { debounce } from 'lodash';
 import { InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { Icon } from '$app/components/icons/Icon';
-import { LuArrowUpDown, LuCornerDownLeft } from 'react-icons/lu';
 import { useAtomValue } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
 import { Search as SearchIcon } from '$app/components/icons/Search';
+import { OppositeArrows } from '$app/components/icons/OppositeArrows';
+import { ReturnKey } from './ReturnKey';
+import { ExternalLink } from '$app/components/icons/ExternalLink';
 
 const Div = styled.div`
   color: ${(props) => props.theme.color};
@@ -247,7 +248,7 @@ export function Search$() {
         size="regular"
       >
         <div className="flex flex-col" style={{ backgroundColor: colors.$1 }}>
-          <div className="flex flex-col space-y-5 pb-3">
+          <div className="flex flex-col pb-3">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-1.5 py-2 px-4 flex-1 border-b">
                 <SearchIcon color={colors.$5} size="1.6rem" />
@@ -271,7 +272,7 @@ export function Search$() {
 
             <div
               ref={optionsContainerRef}
-              className="overflow-y-auto h-96"
+              className="flex flex-col overflow-y-auto h-96 px-1 pt-3"
               onMouseLeave={() => selectedIndex !== -1 && setSelectedIndex(-1)}
               onScroll={() => {
                 setIsContainerScrolling(true);
@@ -293,7 +294,7 @@ export function Search$() {
                       index === selectedIndex ? colors.$5 : 'transparent',
                     color: colors.$3,
                   }}
-                  className="cursor-pointer pl-2 py-2.5 active:font-semibold search-option"
+                  className="cursor-pointer py-2.5 active:font-semibold search-option"
                   onClick={() => {
                     if (entry.resource) {
                       preventNavigation({
@@ -311,42 +312,75 @@ export function Search$() {
                       setTimeout(() => setSelectedIndex(index), 20);
                     }
                   }}
+                  style={{
+                    borderRadius: '0.25rem',
+                    paddingLeft: '1.125rem',
+                    paddingRight: '1.125rem',
+                  }}
                 >
-                  <span>
-                    <div>
-                      <p className="text-xs font-semibold">
-                        {entry.resource?.heading}
-                      </p>
-                      <p>{entry.label}</p>
-                    </div>
-                  </span>
+                  <div>
+                    <p className="text-xs font-semibold">
+                      {entry.resource?.heading}
+                    </p>
+
+                    <p>{entry.label}</p>
+                  </div>
                 </Div>
               ))}
             </div>
           </div>
 
           <div
-            className="flex items-center py-2 space-x-4 px-3"
-            style={{ backgroundColor: colors.$5 }}
+            className="flex items-center justify-between"
+            style={{
+              backgroundColor: colors.$5,
+              paddingLeft: '1.125rem',
+              paddingRight: '1.125rem',
+            }}
           >
-            <div className="flex items-center space-x-2 text-sm">
-              <div>
-                <Icon element={LuArrowUpDown} color={colors.$3} />
+            <div className="flex items-center py-2 space-x-3">
+              <div className="flex items-center space-x-2 text-sm">
+                <div>
+                  <OppositeArrows color={colors.$8} size="1.3rem" />
+                </div>
+
+                <span className="mb-0.5" style={{ color: colors.$3 }}>
+                  {t('navigate')}
+                </span>
               </div>
 
-              <span className="mb-0.5" style={{ color: colors.$3 }}>
-                {t('navigate')}
-              </span>
+              <div className="flex items-center space-x-2 text-sm px-3">
+                <div>
+                  <ReturnKey color={colors.$8} size="1.1rem" />
+                </div>
+
+                <span className="mb-0.5" style={{ color: colors.$3 }}>
+                  {t('select')}
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-2 text-sm px-3">
+                <span className="font-semibold" style={{ color: colors.$8 }}>
+                  ESC
+                </span>
+
+                <span style={{ color: colors.$3 }}>{t('close')}</span>
+              </div>
             </div>
 
-            <div className="flex items-center space-x-2 text-sm px-3">
-              <div>
-                <Icon element={LuCornerDownLeft} color={colors.$3} />
-              </div>
-
+            <div
+              className="flex cursor-pointer items-center space-x-2 text-sm px-3"
+              onClick={() => {
+                window.open('https://invoiceninja.com/docs', '_blank');
+              }}
+            >
               <span className="mb-0.5" style={{ color: colors.$3 }}>
-                {t('select')}
+                {t('docs')}
               </span>
+
+              <div>
+                <ExternalLink color={colors.$8} size="1.15rem" />
+              </div>
             </div>
           </div>
         </div>
