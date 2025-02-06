@@ -538,7 +538,7 @@ export function Search$() {
             <div
               className="flex cursor-pointer items-center space-x-2 text-sm px-3"
               onClick={() => {
-                window.open('https://invoiceninja.com/docs', '_blank');
+                window.open('https://invoiceninja.github.io', '_blank');
               }}
             >
               <span className="mb-0.5" style={{ color: colors.$3 }}>
