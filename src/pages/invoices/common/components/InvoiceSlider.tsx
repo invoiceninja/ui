@@ -534,6 +534,10 @@ export function InvoiceSlider() {
         </div>
 
         <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="text-sm px-4">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords.map((emailRecord, index) => (
             <EmailRecord
               key={index}
