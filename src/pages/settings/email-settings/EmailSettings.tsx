@@ -71,7 +71,7 @@ export function EmailSettings() {
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      <AdvancedSettingsPlanAlert />
 
       <Card title={t('settings')}>
         <Element

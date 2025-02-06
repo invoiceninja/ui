@@ -13,8 +13,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
-import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
@@ -107,8 +105,6 @@ export function EInvoice() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
-
-  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
 
@@ -209,8 +205,6 @@ export function EInvoice() {
         onSave();
       }}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
-
       <PEPPOLPlanBanner />
 
       {Boolean(!company?.legal_entity_id) && (

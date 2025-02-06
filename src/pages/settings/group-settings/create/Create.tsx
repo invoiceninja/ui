@@ -65,7 +65,7 @@ export function Create() {
       onSaveClick={handleSave}
       disableSaveButton={isFormBusy || !groupSettings || showPlanAlert}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      <AdvancedSettingsPlanAlert />
 
       {groupSettings && (
         <Card title={t('new_group')}>

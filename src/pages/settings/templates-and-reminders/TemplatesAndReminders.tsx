@@ -340,7 +340,7 @@ export function TemplatesAndReminders() {
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      <AdvancedSettingsPlanAlert />
 
       <Card title={t('edit')}>
         <Element
