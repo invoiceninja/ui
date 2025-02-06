@@ -57,6 +57,7 @@ export function useActions() {
             notes: transaction.description,
             cost: transaction.amount,
             product_key: transaction.date,
+            quantity: 1,
           },
         ],
       })
