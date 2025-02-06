@@ -471,6 +471,10 @@ export function QuoteSlider() {
         </div>
 
         <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="px-4 text-sm">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords?.map((emailRecord, index) => (
             <EmailRecord
               key={index}

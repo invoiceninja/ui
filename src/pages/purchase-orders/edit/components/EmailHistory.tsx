@@ -18,7 +18,6 @@ import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 
 export default function EmailHistory() {
   const [t] = useTranslation();
@@ -63,7 +62,7 @@ export default function EmailHistory() {
       )}
 
       {!isLoading && !emailRecords.length && (
-        <NonClickableElement>{t('api_404')}</NonClickableElement>
+        <span className="px-6">{t('email_history_empty')}</span>
       )}
 
       {emailRecords.map((emailRecord, index) => (
