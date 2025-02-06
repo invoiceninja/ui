@@ -34,10 +34,14 @@ export function PEPPOLPlanBanner() {
 
   return (
     <Alert className="mb-4" type="warning" disableClosing>
-      <div className="flex items-center">
-        <Icon element={MdInfoOutline} className="mr-2" size={20} />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div>
+            <Icon element={MdInfoOutline} size={20} />
+          </div>
 
-        <span>{t('peppol_plan_warning')}</span>
+          <span>{t('peppol_plan_warning')}</span>
+        </div>
 
         {currentUser?.company_user && (
           <Link

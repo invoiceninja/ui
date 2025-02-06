@@ -13,9 +13,9 @@ import { Settings } from '../../../components/layouts/Settings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Tabs } from '$app/components/Tabs';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
 export function CustomFields() {
   useTitle('custom_fields');
@@ -60,7 +60,7 @@ export function CustomFields() {
 
       <Tabs tabs={modules} />
 
-      <CustomFieldsPlanAlert />
+      <AdvancedSettingsPlanAlert />
 
       <Outlet />
     </Settings>

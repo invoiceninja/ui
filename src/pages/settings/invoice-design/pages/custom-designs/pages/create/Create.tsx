@@ -28,8 +28,8 @@ import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { CustomDesignsPlanAlert } from '../../components/CustomDesignsPlanAlert';
 import { Editor } from '@monaco-editor/react';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
 export const templateEntites = [
   'invoice',
@@ -166,7 +166,7 @@ export default function Create() {
 
   return (
     <Container breadcrumbs={[]}>
-      <CustomDesignsPlanAlert />
+      <AdvancedSettingsPlanAlert />
 
       <Card title={t('new_design')}>
         <Element leftSide={t('name')}>

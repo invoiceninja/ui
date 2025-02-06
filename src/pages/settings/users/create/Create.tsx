@@ -18,7 +18,6 @@ import { User } from '$app/common/interfaces/user';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useBlankUserQuery } from '$app/common/queries/users';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Settings } from '$app/components/layouts/Settings';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { TabGroup } from '$app/components/TabGroup';
@@ -30,6 +29,7 @@ import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
 
 export function Create() {
   useTitle('new_user');
@@ -125,11 +125,7 @@ export function Create() {
       onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
       disableSaveButton={!enterprisePlan() && isHosted()}
     >
-      {!enterprisePlan() && isHosted() && (
-        <AdvancedSettingsPlanAlert
-          message={t('add_users_not_supported') as string}
-        />
-      )}
+      {!enterprisePlan() && isHosted() && <UsersPlanAlert />}
 
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
