@@ -17,6 +17,7 @@ import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useActions } from '../common/hooks/useActions';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
 export function GroupSettings() {
   const { documentTitle } = useTitle('online_payments');
@@ -53,6 +54,8 @@ export function GroupSettings() {
       breadcrumbs={pages}
       docsLink="en/advanced-settings/#group_settings"
     >
+      <AdvancedSettingsPlanAlert />
+
       <DataTable
         columns={columns}
         resource="group"
