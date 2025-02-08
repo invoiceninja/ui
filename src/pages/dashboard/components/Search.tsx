@@ -242,11 +242,14 @@ export function Search$() {
       projects: [] as Entry<SearchRecord>[],
       tasks: [] as Entry<SearchRecord>[],
       purchase_orders: [] as Entry<SearchRecord>[],
+      settings: [] as Entry<SearchRecord>[],
       other: [] as Entry<SearchRecord>[],
     };
 
     data.forEach((entry) => {
-      const type = entry.resource?.type;
+      const type = entry.resource?.path.startsWith('/settings')
+        ? '/settings'
+        : entry.resource?.type;
 
       switch (type) {
         case '/client':
@@ -275,6 +278,9 @@ export function Search$() {
           break;
         case '/purchase_order':
           groups.purchase_orders.push(entry);
+          break;
+        case '/settings':
+          groups.settings.push(entry);
           break;
         default:
           groups.other.push(entry);
@@ -477,6 +483,12 @@ export function Search$() {
                       return renderSearchItem(entry, index);
                     })}
 
+                    {renderGroupTitle('settings', groups.settings.length > 0)}
+                    {groups.settings.map((entry) => {
+                      const index = currentIndex++;
+                      return renderSearchItem(entry, index);
+                    })}
+
                     {groups.other.map((entry) => {
                       const index = currentIndex++;
                       return renderSearchItem(
@@ -508,7 +520,7 @@ export function Search$() {
             <div className="flex items-center py-2 space-x-3">
               <div className="flex items-center space-x-2 text-sm">
                 <div>
-                  <OppositeArrows color={colors.$8} size="1.3rem" />
+                  <OppositeArrows color={colors.$3} size="1.3rem" />
                 </div>
 
                 <span className="mb-0.5" style={{ color: colors.$3 }}>
@@ -518,7 +530,7 @@ export function Search$() {
 
               <div className="flex items-center space-x-2 text-sm px-3">
                 <div>
-                  <ReturnKey color={colors.$8} size="1.1rem" />
+                  <ReturnKey color={colors.$3} size="1.1rem" />
                 </div>
 
                 <span className="mb-0.5" style={{ color: colors.$3 }}>
@@ -527,7 +539,7 @@ export function Search$() {
               </div>
 
               <div className="flex items-center space-x-2 text-sm px-3">
-                <span className="font-semibold" style={{ color: colors.$8 }}>
+                <span className="font-semibold" style={{ color: colors.$3 }}>
                   ESC
                 </span>
 
@@ -546,7 +558,7 @@ export function Search$() {
               </span>
 
               <div>
-                <ExternalLink color={colors.$8} size="1.15rem" />
+                <ExternalLink color={colors.$3} size="1.15rem" />
               </div>
             </div>
           </div>
