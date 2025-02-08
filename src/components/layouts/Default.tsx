@@ -459,7 +459,13 @@ export function Default(props: Props) {
 
               {shouldShowUnlockButton && (
                 <button
-                  className="hidden sm:inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
+                  className="hidden sm:inline-flex items-center justify-center py-1.5 px-4 rounded-lg text-sm font-medium text-white relative overflow-hidden"
+                  style={{
+                    background: '#2176FF',
+                    border: '1px solid #0062ff',
+                    boxShadow:
+                      '0 4px 6px rgba(20,83,184,0.18), inset 0 2px 0 rgba(255,255,255,0.25)',
+                  }}
                   onClick={() =>
                     preventNavigation({
                       url: (isSelfHosted()
@@ -470,7 +476,9 @@ export function Default(props: Props) {
                     })
                   }
                 >
-                  <span>
+                  <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+
+                  <span className="relative z-10">
                     {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
                   </span>
                 </button>
