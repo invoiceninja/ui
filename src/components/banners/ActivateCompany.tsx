@@ -9,11 +9,13 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Banner } from '../Banner';
 import { Link } from 'react-router-dom';
-import { buttonStyles } from './VerifyEmail';
+import { Popover } from '@headlessui/react';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+
+export const buttonStyles =
+  'font-medium text-xs md:text-sm underline cursor-pointer';
 
 export function ActivateCompany() {
   const [t] = useTranslation();
@@ -29,17 +31,19 @@ export function ActivateCompany() {
   }
 
   return (
-    <Banner variant="orange">
-      <div className="flex space-x-1">
-        <span>{t('company_disabled_warning')}.</span>
+    <Popover className="relative">
+      <div className="max-w-max rounded-lg bg-[#FCD34DB3] px-6 py-4 shadow-lg">
+        <div className="flex items-center justify-center space-x-1">
+          <span className="text-sm">{t('company_disabled_warning')}.</span>
 
-        <Link
-          className={buttonStyles}
-          to="/settings/account_management/overview"
-        >
-          {t('activate_company')}
-        </Link>
+          <Link
+            className="cursor-pointer text-sm font-semibold underline hover:no-underline"
+            to="/settings/account_management/overview"
+          >
+            {t('activate_company')}
+          </Link>
+        </div>
       </div>
-    </Banner>
+    </Popover>
   );
 }

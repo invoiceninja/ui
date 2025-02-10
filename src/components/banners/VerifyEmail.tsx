@@ -43,20 +43,18 @@ export function VerifyEmail() {
 
   return (
     <Popover className="relative">
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="w-96 rounded-lg bg-[#FCD34DB3] px-4 py-3.5 shadow-lg">
-          <div className="flex items-center justify-center space-x-1">
-            <span className="text-sm">{t('confirm_your_email_address')}.</span>
+      <div className="max-w-max rounded-lg bg-[#FCD34DB3] px-6 py-4 shadow-lg">
+        <div className="flex items-center justify-center space-x-1">
+          <span className="text-sm">{t('confirm_your_email_address')}.</span>
 
-            <div
-              className="cursor-pointer text-sm font-semibold underline hover:no-underline"
-              onClick={(event) => {
-                event.stopPropagation();
-                resend();
-              }}
-            >
-              {t('resend_email')}
-            </div>
+          <div
+            className="cursor-pointer text-sm font-semibold underline hover:no-underline"
+            onClick={(event) => {
+              event.stopPropagation();
+              resend();
+            }}
+          >
+            {t('resend_email')}
           </div>
         </div>
       </div>
