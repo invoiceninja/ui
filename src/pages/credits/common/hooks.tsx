@@ -155,6 +155,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
   ) => {
     const lineItems = credit?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;

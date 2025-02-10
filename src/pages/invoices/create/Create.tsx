@@ -110,7 +110,8 @@ export default function Create() {
         searchParams.get('action') !== 'invoice_project' &&
         searchParams.get('action') !== 'invoice_task' &&
         searchParams.get('action') !== 'invoice_expense' &&
-        searchParams.get('action') !== 'invoice_product'
+        searchParams.get('action') !== 'invoice_product' &&
+        searchParams.get('action') !== 'invoice_transaction'
       ) {
         value = undefined;
       }
@@ -145,7 +146,8 @@ export default function Create() {
         searchParams.get('action') !== 'invoice_project' &&
         searchParams.get('action') !== 'invoice_task' &&
         searchParams.get('action') !== 'invoice_expense' &&
-        searchParams.get('action') !== 'invoice_product'
+        searchParams.get('action') !== 'invoice_product' &&
+        searchParams.get('action') !== 'invoice_transaction'
       ) {
         setInvoice(undefined);
       }
