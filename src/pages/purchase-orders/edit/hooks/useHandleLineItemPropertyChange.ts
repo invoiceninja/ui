@@ -23,6 +23,10 @@ export function useHandleLineItemPropertyChange(
   ) => {
     const updatedPurchaseOrder = cloneDeep(purchaseOrder) as PurchaseOrder;
 
+    if (updatedPurchaseOrder.line_items[index][property] === value) {
+      return;
+    }
+
     set(updatedPurchaseOrder, `line_items.${index}.${property}`, value);
 
     setPurchaseOrder(updatedPurchaseOrder);
