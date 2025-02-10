@@ -107,7 +107,7 @@ export function useQuickCreateActions() {
     },
     {
       key: 'subscription',
-      url: '/settings/subscription/create',
+      url: '/settings/subscriptions/create',
       section: 'income',
       visible: (proPlan() || enterprisePlan()) && (isAdmin || isOwner),
     },
