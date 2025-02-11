@@ -101,7 +101,7 @@ export function Default(props: Props) {
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
-  const shouldShowUnlockButton =
+  const shouldShowUnlockButton = true;
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
@@ -459,12 +459,12 @@ export function Default(props: Props) {
 
               {shouldShowUnlockButton && (
                 <button
-                  className="hidden sm:inline-flex items-center justify-center py-1.5 px-4 rounded-lg text-sm font-medium text-white relative overflow-hidden"
+                  className="hidden sm:inline-flex items-center justify-center py-[9px] px-4 rounded-[6px] text-sm font-medium text-white relative overflow-hidden"
                   style={{
                     background: '#2176FF',
                     border: '1px solid #0062ff',
                     boxShadow:
-                      '0 4px 6px rgba(20,83,184,0.18), inset 0 2px 0 rgba(255,255,255,0.25)',
+                      '0px 1px 1px 0px #1453B82E, 0px 2px 2px 0px #1453B829, 0px 5px 3px 0px #1453B817, 0px 9px 4px 0px #1453B808, 0px 15px 4px 0px #1453B800, 0px 1px 0px 0px #FFFFFF40 inset, 0px 0px 0px 1px #0062FF',
                   }}
                   onClick={() =>
                     preventNavigation({
