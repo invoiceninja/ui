@@ -400,12 +400,11 @@ export function DataTable<T extends object>(props: Props<T>) {
       (dateRangeColumn) => columnId === dateRangeColumn.column
     )?.queryParameterKey;
 
-    console.log(columnOfCurrentQueryParameter);
-
-    if (columnOfCurrentQueryParameter !== columnId) {
-      if (queryParameterOfCurrentColumn) {
-        setDateRangeQueryParameter(queryParameterOfCurrentColumn);
-      }
+    if (
+      columnOfCurrentQueryParameter !== columnId &&
+      queryParameterOfCurrentColumn
+    ) {
+      setDateRangeQueryParameter(queryParameterOfCurrentColumn);
     }
   };
 
