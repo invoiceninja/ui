@@ -5,17 +5,29 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { useQuickCreateSections } from '$app/common/hooks/entities/useQuickCreateSections';
 import { useQuickCreateActions } from '$app/common/hooks/entities/useQuickCreateActions';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { isHosted, isSelfHosted } from '$app/common/helpers';
-import { MdArrowDropDown } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { Icon } from './icons/Icon';
 
 const Div = styled.div`
   &:hover {
     background-color: ${(props) => props.theme.hoverColor};
+    font-weight: 500;
+  }
+`;
+
+const StyledPopoverButton = styled(Popover.Button)`
+  background-color: ${(props) => props.theme.backgroundColor};
+
+  &:hover {
+    background-color: ${(props) => props.theme.hoverBackgroundColor};
+  }
+
+  &:focus {
+    background-color: ${(props) => props.theme.hoverBackgroundColor};
   }
 `;
 
@@ -25,7 +37,6 @@ export function QuickCreatePopover() {
   const preventNavigation = usePreventNavigation();
 
   const colors = useColorScheme();
-  const accentColor = useAccentColor();
   const actions = useQuickCreateActions();
   const sections = useQuickCreateSections();
 
@@ -36,20 +47,20 @@ export function QuickCreatePopover() {
   );
 
   return (
-    <Popover className="relative mt-2">
+    <Popover className="relative">
       {() => (
         <>
-          <Popover.Button
+          <StyledPopoverButton
             data-cy="quickPopoverButton"
-            style={{ backgroundColor: colors.$1, color: colors.$3 }}
-            className={classNames(
-              'group inline-flex items-center rounded text-base font-medium  focus:outline-none focus:ring-1 focus:ring-gray-200 focus:ring-offset-2'
-            )}
+            className="flex items-center justify-center h-10 w-10 rounded-lg border shadow-sm focus:outline-none"
+            style={{ borderColor: colors.$5 }}
+            theme={{
+              hoverBackgroundColor: colors.$4,
+              backgroundColor: colors.$1,
+            }}
           >
-            <BiPlus className="cursor-pointer text-xl" />
-
-            <MdArrowDropDown className="cursor-pointer text-xl" />
-          </Popover.Button>
+            <Icon element={BiPlus} size={23} style={{ color: colors.$3 }} />
+          </StyledPopoverButton>
 
           <Transition
             as={Fragment}
@@ -62,27 +73,24 @@ export function QuickCreatePopover() {
           >
             <Popover.Panel
               className={classNames(
-                'absolute z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2',
+                'absolute z-10 mt-1.5 w-screen max-w-md -translate-x-1/2 transform px-2',
                 {
-                  'left-14 md:-left-12 md:max-w-2xl lg:max-w-3xl lg:left-full':
+                  'left-14 md:left-0 md:max-w-2xl lg:max-w-3xl lg:left-full':
                     isHosted() && !isMiniSidebar,
-                  'left-14 md:left-52 md:max-w-2xl lg:max-w-3xl':
+                  'left-14 md:left-56 md:max-w-2xl lg:max-w-3xl':
                     isHosted() && isMiniSidebar,
-                  'left-14 md:left-8 lg:max-w-lg lg:left-full':
+                  'left-14 md:left-8 lg:max-w-xl lg:left-full':
                     isSelfHosted() && !isMiniSidebar,
-                  'left-14 md:left-8 lg:max-w-lg lg:left-20':
+                  'left-14 md:left-8 lg:max-w-xl lg:left-28':
                     isSelfHosted() && isMiniSidebar,
                 }
               )}
             >
-              <div
-                style={{ borderColor: colors.$4 }}
-                className="border overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
-              >
+              <div className="overflow-hidden rounded-lg shadow-2xl ring-1 ring-black ring-opacity-5">
                 <div
                   style={{ backgroundColor: colors.$1 }}
                   className={classNames(
-                    'relative grid gap-y-4 md:gap-y-0 px-2 py-4 grid-cols-2',
+                    'relative grid gap-y-4 gap-x-2 md:gap-y-0 px-3 py-5 grid-cols-2',
                     {
                       'md:grid-cols-3': isHosted(),
                     }
@@ -95,15 +103,15 @@ export function QuickCreatePopover() {
                           key={section.name}
                           className="flex flex-col items-start rounded-lg transition duration-150 ease-in-out"
                         >
-                          <div className="flex items-center pl-3">
+                          <div className="flex items-center px-2">
                             <section.icon
-                              className="text-base"
-                              color={accentColor}
+                              color={section.iconColor}
+                              size="1.3rem"
                             />
 
                             <p
                               style={{ color: colors.$3 }}
-                              className="uppercase text-sm tracking-wide font-medium ml-1 md:ml-2"
+                              className="text-sm tracking-wide font-medium ml-1 md:ml-2"
                             >
                               {t(section.name)}
                             </p>
@@ -115,9 +123,13 @@ export function QuickCreatePopover() {
                                 action.section === section.name &&
                                 action.visible && (
                                   <Div
-                                    theme={{ hoverColor: colors.$2 }}
+                                    theme={{
+                                      hoverColor: colors.$4,
+                                      textColor: colors.$3,
+                                      hoverTextColor: colors.$3,
+                                    }}
                                     key={action.key}
-                                    className="flex items-center pl-3 space-x-1 py-1 cursor-pointer rounded"
+                                    className="flex items-center space-x-2 py-2 pl-2 cursor-pointer rounded"
                                     onClick={() =>
                                       preventNavigation({
                                         url: action.url,
@@ -126,13 +138,14 @@ export function QuickCreatePopover() {
                                     }
                                   >
                                     <BiPlus
-                                      className="text-base"
+                                      className="hover:font-medium"
+                                      size={21}
                                       style={{ color: colors.$3 }}
                                     />
 
                                     <span
+                                      className="text-sm"
                                       style={{ color: colors.$3 }}
-                                      className="text-sm text-gray-800"
                                     >
                                       {t(action.key)}
                                     </span>

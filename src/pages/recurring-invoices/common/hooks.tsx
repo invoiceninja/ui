@@ -152,6 +152,9 @@ export function useRecurringInvoiceUtilities(
   ) => {
     const lineItems = recurringInvoice?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;

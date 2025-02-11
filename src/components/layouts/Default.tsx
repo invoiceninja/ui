@@ -451,6 +451,7 @@ export function Default(props: Props) {
               </h2>
 
               <QuickCreatePopover />
+
               <Search />
             </div>
 

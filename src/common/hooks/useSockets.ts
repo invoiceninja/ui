@@ -40,13 +40,14 @@ export function useSockets() {
       cluster: 'eu',
       authEndpoint: apiEndpoint() + '/broadcasting/auth',
       forceTLS: false,
-      enableStats: true,
       wsHost: 'socket.invoicing.co',
       wsPort: 6002,
       enabledTransports: ['ws', 'wss'],
       auth: {
         headers: defaultHeaders(),
       },
+      enableStats: false,
+      disableStats: true,
     });
 
     setPusher(client);
