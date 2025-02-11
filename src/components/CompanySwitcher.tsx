@@ -35,6 +35,7 @@ import { Exit } from './icons/Exit';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -119,7 +120,12 @@ export function CompanySwitcher() {
     return (
       <>
         <img
-          className="rounded-full border overflow-hidden aspect-square"
+          className={classNames(
+            'rounded-full border overflow-hidden aspect-square',
+            {
+              'object-cover': logo?.includes('invoiceninja-logo@light'),
+            }
+          )}
           src={logo}
           alt="Company logo"
           style={{
@@ -146,7 +152,12 @@ export function CompanySwitcher() {
         <Menu.Button className="flex items-center justify-start space-x-3 w-full">
           <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700">
             <img
-              className="rounded-full border overflow-hidden aspect-square"
+              className={classNames(
+                'rounded-full border overflow-hidden aspect-square',
+                {
+                  'object-cover': logo?.includes('invoiceninja-logo@light'),
+                }
+              )}
               src={logo}
               alt="Company logo"
               style={{
