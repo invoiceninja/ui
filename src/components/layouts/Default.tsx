@@ -101,8 +101,7 @@ export function Default(props: Props) {
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
-  const shouldShowUnlockButton = true;
-    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
+  const shouldShowUnlockButton = !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
