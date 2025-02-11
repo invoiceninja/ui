@@ -33,6 +33,10 @@ import { Button, Link } from './forms';
 import { useReplaceVariables } from '$app/common/hooks/useReplaceTranslationVariables';
 import { CardCheck } from './icons/CardCheck';
 import { GoDotFill } from 'react-icons/go';
+import { CardChange } from './icons/CardChange';
+import { FileSearch } from './icons/FileSearch';
+import { FileAdd } from './icons/FileAdd';
+import { FileEdit } from './icons/FileEdit';
 export interface Notification {
   label: string;
   displayLabel: ReactNode;
@@ -59,6 +63,29 @@ export function Notifications() {
 
   const colors = useColorScheme();
   const companyUser = useCurrentCompanyUser();
+
+  const randomNotifications: Notification[] = [
+    {
+      label: 'Payment updated: #PAY-002',
+      displayLabel: (
+        <div className="flex items-center space-x-1">
+          <span>{t('payment_updated')}:</span>
+          <Link to={route('/payments/:id/edit', { id: '2' })}>#1002</Link>
+        </div>
+      ),
+      date: new Date(Date.now() - 259200000).toString(),
+      link: route('/payments/:id/edit', { id: '2' }),
+      readAt: new Date(Date.now() - 172800000).toString(),
+      icon: (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$5 }}
+        >
+          <CardChange size="1.3rem" color={colors.$3} />
+        </div>
+      ),
+    },
+  ];
 
   useSocketEvent({
     on: [
@@ -93,6 +120,14 @@ export function Notifications() {
           date: new Date().toString(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <CardCheck size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -139,6 +174,14 @@ export function Notifications() {
           date: new Date().toString(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <FileSearch size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -160,7 +203,7 @@ export function Notifications() {
             client: $credit.client?.display_name,
           }),
           displayLabel: replaceVariables(
-            t('notification_invoice_viewed_subject') as string,
+            t('notification_credit_created_subject') as string,
             {
               invoice: (
                 <Link to={route('/credits/:id/edit', { id: $credit.id })}>
@@ -178,6 +221,14 @@ export function Notifications() {
           date: new Date().toString(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <FileAdd size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -207,6 +258,14 @@ export function Notifications() {
           date: new Date().toString(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <FileEdit size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -236,6 +295,14 @@ export function Notifications() {
           date: new Date().toString(),
           link: route('/payments/:id/edit', { id: payment.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <CardChange size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -253,116 +320,6 @@ export function Notifications() {
   const sockets = useSockets();
   const dateFormat = useCurrentCompanyDateFormats();
   const reactSettings = useReactSettings();
-
-  const randomNotifications: Notification[] = [
-    {
-      label: 'Invoice #1001 paid by Acme Corp',
-      displayLabel: replaceVariables(
-        t('notification_invoice_paid_subject') as string,
-        {
-          invoice: (
-            <Link to={route('/invoices/:id/edit', { id: '1' })}>#INV-1001</Link>
-          ),
-          client: (
-            <Link to={route('/clients/:id', { id: '1' })}>Acme Corp</Link>
-          ),
-        }
-      ),
-      date: new Date(Date.now() - 1800000).toString(),
-      link: route('/invoices/:id/edit', { id: '1' }),
-      readAt: null,
-      icon: (
-        <div
-          className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
-        >
-          <CardCheck size="1.3rem" color={colors.$8} />
-        </div>
-      ),
-    },
-    {
-      label: 'Invoice #1002 viewed by TechStart Ltd',
-      displayLabel: replaceVariables(
-        t('notification_invoice_viewed_subject') as string,
-        {
-          invoice: (
-            <Link to={route('/invoices/:id/edit', { id: '2' })}>#INV-1002</Link>
-          ),
-          client: (
-            <Link to={route('/clients/:id', { id: '2' })}>TechStart Ltd</Link>
-          ),
-        }
-      ),
-      date: new Date(Date.now() - 3600000).toString(),
-      link: route('/invoices/:id/edit', { id: '2' }),
-      readAt: new Date(Date.now() - 1800000).toString(),
-      icon: (
-        <div
-          className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
-        >
-          <CardCheck size="1.3rem" color={colors.$8} />
-        </div>
-      ),
-    },
-    {
-      label: 'Credit note #CRD-001 created for Global Services Inc',
-      displayLabel: replaceVariables(
-        t('notification_credit_created_subject') as string,
-        {
-          invoice: (
-            <Link to={route('/credits/:id/edit', { id: '1' })}>#CRD-001</Link>
-          ),
-          client: (
-            <Link to={route('/clients/:id', { id: '3' })}>
-              Global Services Inc
-            </Link>
-          ),
-        }
-      ),
-      date: new Date(Date.now() - 7200000).toString(),
-      link: route('/credits/:id/edit', { id: '1' }),
-      readAt: new Date(Date.now() - 3600000).toString(),
-    },
-    {
-      label: 'Credit updated: #CRD-002',
-      displayLabel: (
-        <div className="flex items-center space-x-1">
-          <span>{t('credit_updated')}:</span>
-          <Link to={route('/credits/:id/edit', { id: '2' })}>#CRD-002</Link>
-        </div>
-      ),
-      date: new Date(Date.now() - 86400000).toString(),
-      link: route('/credits/:id/edit', { id: '2' }),
-      readAt: new Date(Date.now() - 43200000).toString(),
-    },
-    {
-      label: 'Payment updated: #PAY-001',
-      displayLabel: (
-        <div className="flex items-center space-x-1">
-          <span>{t('payment_updated')}:</span>
-          <Link to={route('/payments/:id/edit', { id: '1' })}>#PAY-001</Link>
-        </div>
-      ),
-      date: new Date(Date.now() - 172800000).toString(),
-      link: route('/payments/:id/edit', { id: '1' }),
-      readAt: null,
-    },
-    {
-      label: 'Payment updated: #PAY-002',
-      displayLabel: (
-        <div className="flex items-center space-x-1">
-          <span>{t('payment_updated')}:</span>
-          <Link to={route('/payments/:id/edit', { id: '2' })}>#PAY-002</Link>
-        </div>
-      ),
-      date: new Date(Date.now() - 259200000).toString(),
-      link: route('/payments/:id/edit', { id: '2' }),
-      readAt: new Date(Date.now() - 172800000).toString(),
-    },
-  ];
-
-  console.log(randomNotifications);
 
   useEffect(() => {
     if (
@@ -445,11 +402,18 @@ export function Notifications() {
                 key={i}
                 className="flex items-center justify-between px-6 py-2 space-x-2"
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2.5">
                   {notification.icon}
 
-                  <div className="flex flex-col space-y-1">
-                    <div className="text-sm">{notification.displayLabel}</div>
+                  <div className="flex flex-col space-y-0.5">
+                    <div
+                      className="text-sm"
+                      style={{
+                        color: colors.$3,
+                      }}
+                    >
+                      {notification.displayLabel}
+                    </div>
 
                     <p className="text-xs text-gray-500">
                       {date(
