@@ -392,21 +392,19 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const handleDateRangeColumnClick = (columnId: string) => {
     const columnOfCurrentQueryParameter = dateRangeColumns.find(
-      (dateRangeColumn) => dateRangeQueryParameter === dateRangeColumn.column
+      (dateRangeColumn) =>
+        dateRangeQueryParameter === dateRangeColumn.queryParameterKey
     )?.column;
 
     const queryParameterOfCurrentColumn = dateRangeColumns.find(
       (dateRangeColumn) => columnId === dateRangeColumn.column
     )?.queryParameterKey;
 
-
     if (
       columnOfCurrentQueryParameter !== columnId &&
-      typeof columnOfCurrentQueryParameter !== 'undefined'
+      queryParameterOfCurrentColumn
     ) {
-      if (queryParameterOfCurrentColumn) {
-        setDateRangeQueryParameter(queryParameterOfCurrentColumn);
-      }
+      setDateRangeQueryParameter(queryParameterOfCurrentColumn);
     }
   };
 
