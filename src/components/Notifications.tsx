@@ -17,7 +17,7 @@ import { useAtom } from 'jotai';
 import { GenericMessage, useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
-import { isHosted, isSelfHosted, trans } from '$app/common/helpers';
+import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { NonClickableElement } from './cards/NonClickableElement';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { Credit } from '$app/common/interfaces/credit';
@@ -36,7 +36,8 @@ import { FileSearch } from './icons/FileSearch';
 import { FileAdd } from './icons/FileAdd';
 import { FileEdit } from './icons/FileEdit';
 import dayjs from 'dayjs';
-import { useGetRelativeTime } from '$app/common/hooks/useGetRelativeTime';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export interface Notification {
   label: string;
@@ -55,16 +56,33 @@ export const notificationsAtom = atomWithStorage<Notification[]>(
 export function Notifications() {
   const [t] = useTranslation();
 
-  const getRelativeTime = useGetRelativeTime();
   const replaceVariables = useReplaceVariables();
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [notifications, setNotifications] = useAtom(notificationsAtom);
 
   const sockets = useSockets();
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
   const companyUser = useCurrentCompanyUser();
+  const { timeFormat } = useCompanyTimeFormat();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const getDateTimeLabel = (dateTimestamp: number) => {
+    const now = dayjs();
+    const timestamp = dayjs.unix(dateTimestamp);
+
+    const diffDays = now.diff(timestamp, 'day');
+    const diffMinutes = now.diff(timestamp, 'minute');
+
+    if (diffMinutes <= 1) {
+      return t('just_now');
+    } else if (diffDays === 1) {
+      return t('yesterday');
+    } else {
+      return date(dateTimestamp, `${dateFormat} ${timeFormat}`);
+    }
+  };
 
   useSocketEvent({
     on: [
@@ -391,7 +409,7 @@ export function Notifications() {
                     </div>
 
                     <p className="text-xs text-gray-500">
-                      {getRelativeTime(notification.date)}
+                      {getDateTimeLabel(notification.date)}
                     </p>
                   </div>
                 </div>
