@@ -17,14 +17,12 @@ import { useAtom } from 'jotai';
 import { GenericMessage, useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
-import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { NonClickableElement } from './cards/NonClickableElement';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { Credit } from '$app/common/interfaces/credit';
 import { Payment } from '$app/common/interfaces/payment';
 import classNames from 'classnames';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useSockets } from '$app/common/hooks/useSockets';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Icon } from './icons/Icon';
@@ -37,10 +35,13 @@ import { CardChange } from './icons/CardChange';
 import { FileSearch } from './icons/FileSearch';
 import { FileAdd } from './icons/FileAdd';
 import { FileEdit } from './icons/FileEdit';
+import dayjs from 'dayjs';
+import { useGetRelativeTime } from '$app/common/hooks/useGetRelativeTime';
+
 export interface Notification {
   label: string;
   displayLabel: ReactNode;
-  date: string;
+  date: number;
   link: string | null;
   readAt: string | null;
   icon?: ReactNode;
@@ -52,40 +53,18 @@ export const notificationsAtom = atomWithStorage<Notification[]>(
 );
 
 export function Notifications() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
-  const { timeFormat } = useCompanyTimeFormat();
-
+  const getRelativeTime = useGetRelativeTime();
   const replaceVariables = useReplaceVariables();
 
   const [isVisible, setIsVisible] = useState(false);
   const [notifications, setNotifications] = useAtom(notificationsAtom);
 
+  const sockets = useSockets();
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
   const companyUser = useCurrentCompanyUser();
-
-  const randomNotifications: Notification[] = [
-    {
-      label: 'Payment updated: #PAY-002',
-      displayLabel: (
-        <div className="flex items-center space-x-1">
-          <span>{t('payment_updated')}:</span>
-          <Link to={route('/payments/:id/edit', { id: '2' })}>#1002</Link>
-        </div>
-      ),
-      date: new Date(Date.now() - 259200000).toString(),
-      link: route('/payments/:id/edit', { id: '2' }),
-      readAt: new Date(Date.now() - 172800000).toString(),
-      icon: (
-        <div
-          className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
-        >
-          <CardChange size="1.3rem" color={colors.$3} />
-        </div>
-      ),
-    },
-  ];
 
   useSocketEvent({
     on: [
@@ -117,7 +96,7 @@ export function Notifications() {
               ),
             }
           ),
-          date: new Date().toString(),
+          date: dayjs().unix(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
           icon: (
@@ -171,7 +150,7 @@ export function Notifications() {
               ),
             }
           ),
-          date: new Date().toString(),
+          date: dayjs().unix(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
           icon: (
@@ -218,7 +197,7 @@ export function Notifications() {
               ),
             }
           ),
-          date: new Date().toString(),
+          date: dayjs().unix(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
           icon: (
@@ -255,7 +234,7 @@ export function Notifications() {
               </Link>
             </div>
           ),
-          date: new Date().toString(),
+          date: dayjs().unix(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
           icon: (
@@ -292,7 +271,7 @@ export function Notifications() {
               </Link>
             </div>
           ),
-          date: new Date().toString(),
+          date: dayjs().unix(),
           link: route('/payments/:id/edit', { id: payment.id }),
           readAt: null,
           icon: (
@@ -317,10 +296,6 @@ export function Notifications() {
     },
   });
 
-  const sockets = useSockets();
-  const dateFormat = useCurrentCompanyDateFormats();
-  const reactSettings = useReactSettings();
-
   useEffect(() => {
     if (
       isSelfHosted() &&
@@ -339,7 +314,7 @@ export function Notifications() {
           const notification = {
             label: message.message,
             displayLabel: message.message,
-            date: new Date().toString(),
+            date: dayjs().unix(),
             link: message.link,
             readAt: null,
           };
@@ -395,9 +370,9 @@ export function Notifications() {
         }
         withoutDivider
       >
-        {randomNotifications.length > 0 ? (
+        {notifications.length > 0 ? (
           <div className="flex flex-col space-y-2 pt-2">
-            {randomNotifications.map((notification, i) => (
+            {notifications.map((notification, i) => (
               <div
                 key={i}
                 className="flex items-center justify-between px-6 py-2 space-x-2"
@@ -416,10 +391,7 @@ export function Notifications() {
                     </div>
 
                     <p className="text-xs text-gray-500">
-                      {date(
-                        notification.date,
-                        `${dateFormat.dateFormat} ${timeFormat}`
-                      )}
+                      {getRelativeTime(notification.date)}
                     </p>
                   </div>
                 </div>
