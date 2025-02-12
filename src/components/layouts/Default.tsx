@@ -102,8 +102,7 @@ export function Default(props: Props) {
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
-  const shouldShowUnlockButton =
-    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
+  const shouldShowUnlockButton = !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
@@ -463,7 +462,13 @@ export function Default(props: Props) {
 
               {shouldShowUnlockButton && (
                 <button
-                  className="hidden sm:inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
+                  className="hidden sm:inline-flex items-center justify-center py-[9px] px-4 rounded-[6px] text-sm font-medium text-white relative overflow-hidden"
+                  style={{
+                    background: '#2176FF',
+                    border: '1px solid #0062ff',
+                    boxShadow:
+                      '0px 1px 1px 0px #1453B82E, 0px 2px 2px 0px #1453B829, 0px 5px 3px 0px #1453B817, 0px 9px 4px 0px #1453B808, 0px 15px 4px 0px #1453B800, 0px 1px 0px 0px #FFFFFF40 inset, 0px 0px 0px 1px #0062FF',
+                  }}
                   onClick={() =>
                     preventNavigation({
                       url: (isSelfHosted()
@@ -474,7 +479,9 @@ export function Default(props: Props) {
                     })
                   }
                 >
-                  <span>
+                  <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+
+                  <span className="relative z-10">
                     {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
                   </span>
                 </button>

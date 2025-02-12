@@ -140,7 +140,7 @@ export function Settings() {
           <div className="flex flex-col space-y-1">
             {isSelfHosted() && (
               <CopyToClipboard
-                text={`${company?.portal_domain}/client/login?company_key=${company?.company_key}`}
+                text={`${company?.portal_domain}/client/login/${company?.company_key}`}
               />
             )}
 
