@@ -299,6 +299,18 @@ export function Settings() {
         />
       </Element>
 
+      <Element
+        leftSide={t('enable_client_profile_update')}
+        leftSideHelp={t('enable_client_profile_update_help')}
+      >
+        <Toggle
+          checked={Boolean(company?.settings?.enable_client_profile_update)}
+          onValueChange={(value) =>
+            handleChange('settings.enable_client_profile_update', value)
+          }
+        />
+      </Element>
+
       {/* <Element leftSide={t('storefront')} leftSideHelp={t('storefront_help')}>
         <Toggle />
       </Element> */}
