@@ -70,7 +70,7 @@ export function Card(props: Props) {
   return (
     <div
       className={classNames(
-        `border shadow rounded overflow-visible ${props.className}`,
+        `border shadow rounded-md overflow-visible ${props.className}`,
         {
           'overflow-y-auto': props.withScrollableBody,
           'h-full': height === 'full',

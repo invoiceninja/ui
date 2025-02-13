@@ -9,7 +9,7 @@
  */
 
 import { Button, SelectField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { Chart } from '$app/pages/dashboard/components/Chart';
 import { useEffect, useState } from 'react';
 import { Spinner } from '$app/components/Spinner';
@@ -239,210 +239,211 @@ export function Totals() {
       )}
 
       {/* Quick date, currency & date picker. */}
-      <div className="flex justify-end">
-        <div className="flex space-x-2">
-          {currencies && (
-            <SelectField
-              value={currency.toString()}
-              onValueChange={(value) =>
-                update('preferences.dashboard_charts.currency', parseInt(value))
-              }
-            >
-              <option value="999">{t('all')}</option>
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-gray-500">
+          {trans('account_login_text', {
+            value: `${user?.first_name} ${user?.last_name}`,
+          })}
+        </span>
 
-              {currencies.map((currency, index) => (
-                <option key={index} value={currency.value}>
-                  {currency.label}
-                </option>
-              ))}
-            </SelectField>
-          )}
-
+        <div className="flex">
           <div className="flex space-x-2">
-            <Button
-              key="day-btn"
-              type={chartScale === 'day' ? 'primary' : 'secondary'}
-              onClick={() =>
-                update('preferences.dashboard_charts.default_view', 'day')
-              }
-            >
-              {t('day')}
-            </Button>
+            {currencies && (
+              <SelectField
+                value={currency.toString()}
+                onValueChange={(value) =>
+                  update(
+                    'preferences.dashboard_charts.currency',
+                    parseInt(value)
+                  )
+                }
+              >
+                <option value="999">{t('all')}</option>
 
-            <Button
-              key="week-btn"
-              type={chartScale === 'week' ? 'primary' : 'secondary'}
-              onClick={() =>
-                update('preferences.dashboard_charts.default_view', 'week')
-              }
-            >
-              {t('week')}
-            </Button>
+                {currencies.map((currency, index) => (
+                  <option key={index} value={currency.value}>
+                    {currency.label}
+                  </option>
+                ))}
+              </SelectField>
+            )}
 
-            <Button
-              key="month-btn"
-              type={chartScale === 'month' ? 'primary' : 'secondary'}
-              onClick={() =>
-                update('preferences.dashboard_charts.default_view', 'month')
-              }
-            >
-              {t('month')}
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                key="day-btn"
+                type={chartScale === 'day' ? 'primary' : 'secondary'}
+                onClick={() =>
+                  update('preferences.dashboard_charts.default_view', 'day')
+                }
+              >
+                {t('day')}
+              </Button>
+
+              <Button
+                key="week-btn"
+                type={chartScale === 'week' ? 'primary' : 'secondary'}
+                onClick={() =>
+                  update('preferences.dashboard_charts.default_view', 'week')
+                }
+              >
+                {t('week')}
+              </Button>
+
+              <Button
+                key="month-btn"
+                type={chartScale === 'month' ? 'primary' : 'secondary'}
+                onClick={() =>
+                  update('preferences.dashboard_charts.default_view', 'month')
+                }
+              >
+                {t('month')}
+              </Button>
+            </div>
+
+            <div className="flex flex-auto justify-center sm:col-start-3 ">
+              <DropdownDateRangePicker
+                handleDateChange={handleDateChange}
+                startDate={dates.start_date}
+                endDate={dates.end_date}
+                handleDateRangeChange={(value) =>
+                  update('preferences.dashboard_charts.range', value)
+                }
+                value={body.date_range}
+              />
+            </div>
+
+            <Preferences>
+              <CurrencySelector
+                label={t('currency')}
+                value={currency.toString()}
+                onChange={(v) =>
+                  update('preferences.dashboard_charts.currency', parseInt(v))
+                }
+              />
+
+              <SelectField
+                label={t('range')}
+                value={chartScale}
+                onValueChange={(value) =>
+                  update(
+                    'preferences.dashboard_charts.default_view',
+                    value as ChartsDefaultView
+                  )
+                }
+              >
+                <option value="day">{t('day')}</option>
+                <option value="week">{t('week')}</option>
+                <option value="month">{t('month')}</option>
+              </SelectField>
+
+              <SelectField
+                label={t('date_range')}
+                value={dateRange}
+                onValueChange={(value) =>
+                  update('preferences.dashboard_charts.range', value)
+                }
+              >
+                <option value="last7_days">{t('last_7_days')}</option>
+                <option value="last30_days">{t('last_30_days')}</option>
+                <option value="this_month">{t('this_month')}</option>
+                <option value="last_month">{t('last_month')}</option>
+                <option value="this_quarter">{t('current_quarter')}</option>
+                <option value="last_quarter">{t('last_quarter')}</option>
+                <option value="this_year">{t('this_year')}</option>
+                <option value="last_year">{t('last_year')}</option>
+                <option value={'last365_days'}>{`${t('last365_days')}`}</option>
+              </SelectField>
+            </Preferences>
           </div>
-
-          <div className="flex flex-auto justify-center sm:col-start-3 ">
-            <DropdownDateRangePicker
-              handleDateChange={handleDateChange}
-              startDate={dates.start_date}
-              endDate={dates.end_date}
-              handleDateRangeChange={(value) =>
-                update('preferences.dashboard_charts.range', value)
-              }
-              value={body.date_range}
-            />
-          </div>
-
-          <Preferences>
-            <CurrencySelector
-              label={t('currency')}
-              value={currency.toString()}
-              onChange={(v) =>
-                update('preferences.dashboard_charts.currency', parseInt(v))
-              }
-            />
-
-            <SelectField
-              label={t('range')}
-              value={chartScale}
-              onValueChange={(value) =>
-                update(
-                  'preferences.dashboard_charts.default_view',
-                  value as ChartsDefaultView
-                )
-              }
-            >
-              <option value="day">{t('day')}</option>
-              <option value="week">{t('week')}</option>
-              <option value="month">{t('month')}</option>
-            </SelectField>
-
-            <SelectField
-              label={t('date_range')}
-              value={dateRange}
-              onValueChange={(value) =>
-                update('preferences.dashboard_charts.range', value)
-              }
-            >
-              <option value="last7_days">{t('last_7_days')}</option>
-              <option value="last30_days">{t('last_30_days')}</option>
-              <option value="this_month">{t('this_month')}</option>
-              <option value="last_month">{t('last_month')}</option>
-              <option value="this_quarter">{t('current_quarter')}</option>
-              <option value="last_quarter">{t('last_quarter')}</option>
-              <option value="this_year">{t('this_year')}</option>
-              <option value="last_year">{t('last_year')}</option>
-              <option value={'last365_days'}>{`${t('last365_days')}`}</option>
-            </SelectField>
-          </Preferences>
         </div>
       </div>
 
       <div className="grid grid-cols-12 mt-4 gap-4">
         {company && (
           <Card
-            title={t('account_login_text')}
+            title={t('recent_transactions')}
             className="col-span-12 xl:col-span-4"
+            withoutBodyPadding
           >
-            <div className="pb-8">
-              <div className="flex flex-col space-y-2 px-6">
-                <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
+            <div className="flex flex-col px-4">
+              <div
+                className="flex justify-between items-center border-b border-dashed py-3"
+                style={{ borderColor: colors.$4 }}
+              >
+                <span className="text-gray-500">{t('invoices')}</span>
 
-                <span className="text-sm">{t('recent_transactions')}</span>
+                <Badge style={{ backgroundColor: '#2176FF26' }}>
+                  <span className="text-base" style={{ color: '#2176FF' }}>
+                    {formatMoney(
+                      totalsData[currency]?.invoices?.invoiced_amount || 0,
+                      company.settings.country_id,
+                      currency.toString(),
+                      2
+                    )}
+                  </span>
+                </Badge>
               </div>
 
-              <div className="flex flex-col mt-8">
-                <div
-                  style={{ borderColor: colors.$4 }}
-                  className="flex justify-between items-center border-b py-3 px-6"
-                >
-                  <span>{t('invoices')}</span>
+              <div
+                style={{ borderColor: colors.$4 }}
+                className="flex justify-between items-center border-b border-dashed py-3"
+              >
+                <span className="text-gray-500">{t('payments')}</span>
 
-                  <Badge style={{ backgroundColor: TotalColors.Blue }}>
-                    <span className="mx-2 text-base">
-                      {formatMoney(
-                        totalsData[currency]?.invoices?.invoiced_amount || 0,
-                        company.settings.country_id,
-                        currency.toString(),
-                        2
-                      )}
-                    </span>
-                  </Badge>
-                </div>
+                <span className="text-base" style={{ color: '#22C55E' }}>
+                  {formatMoney(
+                    totalsData[currency]?.revenue?.paid_to_date || 0,
+                    company.settings.country_id,
+                    currency.toString(),
+                    2
+                  )}
+                </span>
+              </div>
 
-                <div
-                  style={{ borderColor: colors.$4 }}
-                  className="flex justify-between items-center border-b py-3 px-6"
-                >
-                  <span>{t('payments')}</span>
-                  <Badge style={{ backgroundColor: TotalColors.Green }}>
-                    <span className="mx-2 text-base">
-                      {formatMoney(
-                        totalsData[currency]?.revenue?.paid_to_date || 0,
-                        company.settings.country_id,
-                        currency.toString(),
-                        2
-                      )}
-                    </span>
-                  </Badge>
-                </div>
+              <div
+                style={{ borderColor: colors.$4 }}
+                className="flex justify-between items-center border-b border-dashed py-3"
+              >
+                <span className="text-gray-500">{t('expenses')}</span>
 
-                <div
-                  style={{ borderColor: colors.$4 }}
-                  className="flex justify-between items-center border-b py-3 px-6"
-                >
-                  <span>{t('expenses')}</span>
-                  <Badge style={{ backgroundColor: TotalColors.Gray }}>
-                    <span className="mx-2 text-base">
-                      {formatMoney(
-                        totalsData[currency]?.expenses?.amount || 0,
-                        company.settings.country_id,
-                        currency.toString(),
-                        2
-                      )}
-                    </span>
-                  </Badge>
-                </div>
+                <Badge style={{ backgroundColor: '#A1A1AA26' }}>
+                  <span className="text-base" style={{ color: '#A1A1AA' }}>
+                    {formatMoney(
+                      totalsData[currency]?.expenses?.amount || 0,
+                      company.settings.country_id,
+                      currency.toString(),
+                      2
+                    )}
+                  </span>
+                </Badge>
+              </div>
 
-                <div
-                  style={{ borderColor: colors.$4 }}
-                  className="flex justify-between items-center border-b py-3 px-6"
-                >
-                  <span>{t('outstanding')}</span>
-                  <Badge style={{ backgroundColor: TotalColors.Red }}>
-                    <span className="mx-2 text-base">
-                      {formatMoney(
-                        totalsData[currency]?.outstanding?.amount || 0,
-                        company.settings.country_id,
-                        currency.toString(),
-                        2
-                      )}
-                    </span>
-                  </Badge>
-                </div>
+              <div
+                style={{ borderColor: colors.$4 }}
+                className="flex justify-between items-center border-b border-dashed py-3"
+              >
+                <span className="text-gray-500">{t('outstanding')}</span>
 
-                <div
-                  style={{ borderColor: colors.$4 }}
-                  className="flex justify-between items-center border-b py-3 px-6"
-                >
-                  <span>{t('total_invoices_outstanding')}</span>
+                <Badge style={{ backgroundColor: '#EF444426' }}>
+                  <span className="text-base" style={{ color: '#EF4444' }}>
+                    {formatMoney(
+                      totalsData[currency]?.outstanding?.amount || 0,
+                      company.settings.country_id,
+                      currency.toString(),
+                      2
+                    )}
+                  </span>
+                </Badge>
+              </div>
 
-                  <Badge variant="white">
-                    <span className="mx-2 text-base">
-                      {totalsData[currency]?.outstanding?.outstanding_count ||
-                        0}
-                    </span>
-                  </Badge>
-                </div>
+              <div className="flex justify-between items-center py-3 px-6">
+                <span>{t('total_invoices_outstanding')}</span>
+
+                <Badge variant="white">
+                  <span className="mx-2 text-base">
+                    {totalsData[currency]?.outstanding?.outstanding_count || 0}
+                  </span>
+                </Badge>
               </div>
             </div>
           </Card>
