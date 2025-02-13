@@ -10,8 +10,6 @@
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
-import { Banner } from '../Banner';
-import { buttonStyles } from './VerifyEmail';
 import { Link, useLocation } from 'react-router-dom';
 import {
   useEInvoiceHealthCheck,
@@ -25,17 +23,19 @@ import { useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { atom, useAtom } from 'jotai';
+import { Popover } from '@headlessui/react';
 
 export const EINVOICE_CREDITS_MIN_THRESHOLD = 15;
 
 export function EInvoiceCredits() {
-  const company = useCurrentCompany();
-  const quota = useQuota();
+  const [t] = useTranslation();
 
-  const [isVisible, setVisible] = useState(false);
+  const quota = useQuota();
+  const company = useCurrentCompany();
 
   const { data: healthcheck } = useEInvoiceHealthCheck();
-  const { t } = useTranslation();
+
+  const [isVisible, setVisible] = useState<boolean>(false);
 
   if (
     !company.legal_entity_id ||
@@ -58,15 +58,20 @@ export function EInvoiceCredits() {
           text={t('notification_no_credits')}
         />
 
-        <Banner variant="red">
-          <div className="flex space-x-1">
-            <span>{t('notification_no_credits')}</span>
+        <Popover className="relative">
+          <div className="max-w-max rounded-lg bg-red-300 px-6 py-4 shadow-lg">
+            <div className="flex items-center justify-center space-x-1">
+              <span className="text-sm">{t('notification_no_credits')}</span>
 
-            <span className={buttonStyles} onClick={() => setVisible(true)}>
-              {t('learn_more')}
-            </span>
+              <span
+                className="cursor-pointer text-sm font-semibold underline hover:no-underline"
+                onClick={() => setVisible(true)}
+              >
+                {t('learn_more')}
+              </span>
+            </div>
           </div>
-        </Banner>
+        </Popover>
       </>
     );
   }
@@ -80,15 +85,20 @@ export function EInvoiceCredits() {
           text={t('notification_credits_low')}
         />
 
-        <Banner variant="orange">
-          <div className="flex space-x-1">
-            <span>{t('notification_credits_low')}</span>
+        <Popover className="relative">
+          <div className="max-w-max rounded-lg bg-[#FCD34D] px-6 py-4 shadow-lg">
+            <div className="flex items-center justify-center space-x-1">
+              <span className="text-sm">{t('notification_credits_low')}</span>
 
-            <span className={buttonStyles} onClick={() => setVisible(true)}>
-              {t('learn_more')}
-            </span>
+              <span
+                className="cursor-pointer text-sm font-semibold underline hover:no-underline"
+                onClick={() => setVisible(true)}
+              >
+                {t('learn_more')}
+              </span>
+            </div>
           </div>
-        </Banner>
+        </Popover>
       </>
     );
   }
@@ -105,9 +115,9 @@ interface DialogProps {
 function Dialog({ isVisible, setVisible, text }: DialogProps) {
   const { t } = useTranslation();
 
-  const accentColor = useAccentColor();
   const quota = useQuota();
   const location = useLocation();
+  const accentColor = useAccentColor();
 
   useEffect(() => {
     setVisible(false);
@@ -136,10 +146,11 @@ const retriesAtom = atom(0);
 const statusAtom = atom<'pending' | 'error' | 'success'>('pending');
 
 function RegenerateToken() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
+  const queryClient = useQueryClient();
 
   const refresh = useRefreshCompanyUsers();
-  const queryClient = useQueryClient();
 
   const [status, setStatus] = useAtom(statusAtom);
   const [retries, setRetries] = useAtom(retriesAtom);
@@ -185,10 +196,12 @@ function RegenerateToken() {
   }
 
   return (
-    <Banner variant="red">
-      <div className="flex space-x-1">
-        <span>{t('einvoice_token_not_found')}</span>
+    <Popover className="relative">
+      <div className="max-w-max rounded-lg bg-[#FCD34D] px-6 py-4 shadow-lg">
+        <div className="flex items-center justify-center space-x-1">
+          <span className="text-sm">{t('einvoice_token_not_found')}</span>
+        </div>
       </div>
-    </Banner>
+    </Popover>
   );
 }
