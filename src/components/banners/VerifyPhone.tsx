@@ -219,7 +219,7 @@ export function VerifyPhone() {
   return (
     <>
       <Popover className="relative">
-        <div className="max-w-max rounded-lg bg-[#FCD34DB3] px-6 py-4 shadow-lg">
+        <div className="max-w-max rounded-lg bg-[#FCD34D] px-6 py-4 shadow-lg">
           <div className="flex items-center justify-center space-x-1">
             <span className="text-sm">{t('verify_phone_number_help')}.</span>
 
