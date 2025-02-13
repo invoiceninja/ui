@@ -407,10 +407,12 @@ export function Default(props: Props) {
 
   return (
     <div>
-      <ActivateCompany />
-      <VerifyEmail />
-      <VerifyPhone />
-      <EInvoiceCredits />
+      <div className="fixed bottom-4 right-4 z-50 flex items-end flex-col-reverse space-y-4 space-y-reverse">
+        <ActivateCompany />
+        <VerifyEmail />
+        <VerifyPhone />
+        <EInvoiceCredits />
+      </div>
 
       <MobileSidebar
         navigation={navigation}
