@@ -9,7 +9,7 @@
  */
 
 import reactStringReplace from 'react-string-replace';
-import { ReactNode } from 'react';
+import { Fragment, ReactNode } from 'react';
 
 interface Replacements {
   [key: string]: ReactNode;
@@ -22,9 +22,11 @@ export function useReplaceVariables() {
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      result = reactStringReplace(result, `:${variable}`, () => value);
+      result = reactStringReplace(result, `:${variable}`, (match, i) => (
+        <Fragment key={`${variable}-${i}`}>{value}</Fragment>
+      ));
     }
 
-    return result;
+    return Array.isArray(result) ? <Fragment>{result}</Fragment> : result;
   };
 }
