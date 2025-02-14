@@ -28,13 +28,13 @@ import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
 import { styled } from 'styled-components';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Check } from './icons/Check';
-import Avatar from 'react-avatar';
 import { Plus } from './icons/Plus';
 import { Person } from './icons/Person';
 import { Exit } from './icons/Exit';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useColorScheme } from '$app/common/colors';
+import companySettings from '$app/common/constants/company-settings';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -53,7 +53,7 @@ export function CompanySwitcher() {
   const { id } = useParams();
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
-  const logo = useLogo();
+  const logo = useLogo({ fallbackSmallLogo: true });
   const location = useLocation();
   const colors = useColorScheme();
   const companyName = useCompanyName();
@@ -217,27 +217,18 @@ export function CompanySwitcher() {
                         }
                       >
                         <div className="flex items-center space-x-2 flex-1">
-                          {record.company.settings.company_logo ? (
-                            <img
-                              className="rounded-full border overflow-hidden aspect-square object-cover"
-                              src={record.company.settings.company_logo}
-                              alt="Company logo"
-                              style={{
-                                borderColor: colors.$4,
-                                width: '1.5rem',
-                              }}
-                            />
-                          ) : (
-                            <Avatar
-                              name={
-                                (record.company.settings.name ||
-                                  t('untitled_company'))?.[0]
-                              }
-                              round={true}
-                              textSizeRatio={2}
-                              size="1.5rem"
-                            />
-                          )}
+                          <img
+                            className="rounded-full border overflow-hidden aspect-square object-cover"
+                            src={
+                              record.company.settings.company_logo ||
+                              companySettings.smallLogo
+                            }
+                            alt="Company logo"
+                            style={{
+                              borderColor: colors.$5,
+                              width: '1.5rem',
+                            }}
+                          />
 
                           <div className="w-36 truncate text-sm">
                             {record.company.settings.name ||
