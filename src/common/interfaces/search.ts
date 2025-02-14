@@ -17,7 +17,7 @@ export interface SearchResponse {
 
 export interface SearchRecord {
   name: string;
-  type: number;
+  type: string;
   id: string;
   path: string;
   heading: string;
