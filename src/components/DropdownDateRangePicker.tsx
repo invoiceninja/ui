@@ -10,14 +10,14 @@
 
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { ConfigProvider, DatePicker } from 'antd';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
 import { atom, useAtomValue } from 'jotai';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Icon } from './icons/Icon';
+import { MdOutlineCalendarMonth } from 'react-icons/md';
 
 type Props = {
   value?: string;
@@ -68,16 +68,11 @@ export function DropdownDateRangePicker(props: Props) {
     );
   };
 
-  const accentColor = useAccentColor();
-
   return (
     <div className="flex justify-end items-center">
-      <Calendar style={{ color: accentColor }} className="mx-2" />
       <SelectField
+        className="rounded-md"
         value={props.value}
-        className={
-          'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
-        }
         onValueChange={(value) => {
           value === 'custom'
             ? setIsModalVisible(true)
@@ -85,15 +80,34 @@ export function DropdownDateRangePicker(props: Props) {
 
           props.handleDateRangeChange(value);
         }}
-        style={{ width: '9.7rem' }}
+        style={{ width: '9.7rem', borderRadius: '0.375rem' }}
+        customSelector
+        dismissable={false}
+        withoutSeparator
       >
         {/* last365_days,,,,,this_year,last_year,all_time,custom */}
-        <option value="last7_days">{t('last_7_days')}</option>
-        <option value="last30_days">{t('last_30_days')}</option>
-        <option value="this_month">{t('this_month')}</option>
-        <option value="last_month">{t('last_month')}</option>
-        <option value="this_quarter">{t('current_quarter')}</option>
-        <option value="last_quarter">{t('last_quarter')}</option>
+
+        <option value="last7_days">
+          <div className="flex space-x-1 items-center">
+            <Icon element={MdOutlineCalendarMonth} />
+
+            <div>{t('last_7_days')}</div>
+          </div>
+        </option>
+        <option value="last30_days">
+          <div className="flex space-x-1 items-center">
+            <Icon element={MdOutlineCalendarMonth} />
+
+            <div>{t('last_30_days')}</div>
+          </div>
+        </option>
+        <option value="this_month">
+          <div className="flex space-x-1 items-center">
+            <Icon element={MdOutlineCalendarMonth} />
+
+            <div>{t('this_month')}</div>
+          </div>
+        </option>
         <option value="this_year">{t('this_year')}</option>
         <option value="last_year">{t('last_year')}</option>
         <option value={'last365_days'}>{`${t('last365_days')}`}</option>

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, SelectField } from '$app/components/forms';
-import { endpoint, trans } from '$app/common/helpers';
+import { SelectField } from '$app/components/forms';
+import { endpoint } from '$app/common/helpers';
 import { Chart } from '$app/pages/dashboard/components/Chart';
 import { useEffect, useState } from 'react';
 import { Spinner } from '$app/components/Spinner';
@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Badge } from '$app/components/Badge';
 import {
   ChartsDefaultView,
@@ -31,6 +30,7 @@ import { useColorScheme } from '$app/common/colors';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
+import styled from 'styled-components';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -73,6 +73,13 @@ export enum TotalColors {
   Red = '#BE4D25',
   Gray = '#242930',
 }
+
+const ChartScaleBox = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverBgColor};
+  }
+`;
 
 const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
   last7_days: {
@@ -125,7 +132,6 @@ export function Totals() {
 
   const formatMoney = useFormatMoney();
 
-  const user = useCurrentUser();
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
@@ -240,16 +246,13 @@ export function Totals() {
 
       {/* Quick date, currency & date picker. */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">
-          {trans('account_login_text', {
-            value: `${user?.first_name} ${user?.last_name}`,
-          })}
-        </span>
+        <span className="text-sm text-gray-500">{t('account_login_text')}</span>
 
         <div className="flex">
           <div className="flex space-x-2">
             {currencies && (
               <SelectField
+                className="rounded-md"
                 value={currency.toString()}
                 onValueChange={(value) =>
                   update(
@@ -268,36 +271,61 @@ export function Totals() {
               </SelectField>
             )}
 
-            <div className="flex space-x-2">
-              <Button
-                key="day-btn"
-                type={chartScale === 'day' ? 'primary' : 'secondary'}
+            <div
+              className="flex rounded-lg overflow-hidden border"
+              style={{ borderColor: colors.$5 }}
+            >
+              <ChartScaleBox
+                className="flex items-center px-4 cursor-pointer text-sm"
                 onClick={() =>
                   update('preferences.dashboard_charts.default_view', 'day')
                 }
+                theme={{
+                  backgroundColor: chartScale === 'day' ? colors.$3 : colors.$1,
+                  hoverBgColor: chartScale === 'day' ? colors.$3 : colors.$4,
+                }}
+                style={{
+                  color: chartScale === 'day' ? colors.$1 : colors.$3,
+                }}
               >
                 {t('day')}
-              </Button>
+              </ChartScaleBox>
 
-              <Button
-                key="week-btn"
-                type={chartScale === 'week' ? 'primary' : 'secondary'}
+              <ChartScaleBox
+                className="flex items-center px-4 cursor-pointer border-l text-sm"
                 onClick={() =>
                   update('preferences.dashboard_charts.default_view', 'week')
                 }
+                theme={{
+                  backgroundColor:
+                    chartScale === 'week' ? colors.$3 : colors.$1,
+                  hoverBgColor: chartScale === 'week' ? colors.$3 : colors.$4,
+                }}
+                style={{
+                  borderColor: colors.$4,
+                  color: chartScale === 'week' ? colors.$1 : colors.$3,
+                }}
               >
                 {t('week')}
-              </Button>
+              </ChartScaleBox>
 
-              <Button
-                key="month-btn"
-                type={chartScale === 'month' ? 'primary' : 'secondary'}
+              <ChartScaleBox
+                className="flex items-center px-4 cursor-pointer border-l text-sm"
                 onClick={() =>
                   update('preferences.dashboard_charts.default_view', 'month')
                 }
+                theme={{
+                  backgroundColor:
+                    chartScale === 'month' ? colors.$3 : colors.$1,
+                  hoverBgColor: chartScale === 'month' ? colors.$3 : colors.$4,
+                }}
+                style={{
+                  borderColor: colors.$4,
+                  color: chartScale === 'month' ? colors.$1 : colors.$3,
+                }}
               >
                 {t('month')}
-              </Button>
+              </ChartScaleBox>
             </div>
 
             <div className="flex flex-auto justify-center sm:col-start-3 ">
