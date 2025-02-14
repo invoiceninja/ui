@@ -29,6 +29,8 @@ export interface SelectProps extends CommonProps {
   dismissable?: boolean;
   clearAfterSelection?: boolean;
   menuPosition?: 'fixed';
+  withoutSeparator?: boolean;
+  searchable?: boolean;
 }
 
 export function SelectField(props: SelectProps) {
@@ -47,6 +49,7 @@ export function SelectField(props: SelectProps) {
     cypressRef,
     dismissable = true,
     clearAfterSelection,
+    searchable = true,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -86,7 +89,7 @@ export function SelectField(props: SelectProps) {
     }),
     control: (base, { isDisabled }) => ({
       ...base,
-      borderRadius: '3px',
+      borderRadius: '0.375rem',
       backgroundColor: colors.$1,
       color: colors.$3,
       borderColor: colors.$5,
@@ -103,6 +106,11 @@ export function SelectField(props: SelectProps) {
         backgroundColor: colors.$7,
       },
       minHeight: '1.875rem',
+    }),
+    ...(props.withoutSeparator && {
+      indicatorSeparator: () => ({
+        display: 'none',
+      }),
     }),
   };
 
@@ -162,7 +170,7 @@ export function SelectField(props: SelectProps) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           styles={customStyles}
-          isSearchable
+          isSearchable={searchable}
           isClearable={Boolean(
             dismissable &&
               selectedEntry?.value &&
