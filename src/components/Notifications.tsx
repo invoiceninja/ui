@@ -8,34 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Bell, Trash } from 'react-feather';
+import { Bell } from 'react-feather';
 import { Slider } from './cards/Slider';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import { GenericMessage, useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
-import { ClickableElement } from './cards';
 import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { NonClickableElement } from './cards/NonClickableElement';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { Credit } from '$app/common/interfaces/credit';
 import { Payment } from '$app/common/interfaces/payment';
 import classNames from 'classnames';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useSockets } from '$app/common/hooks/useSockets';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Icon } from './icons/Icon';
 import { useColorScheme } from '$app/common/colors';
+import { Button, Link } from './forms';
+import { useReplaceVariables } from '$app/common/hooks/useReplaceTranslationVariables';
+import { CardCheck } from './icons/CardCheck';
+import { GoDotFill } from 'react-icons/go';
+import { CardChange } from './icons/CardChange';
+import { FileSearch } from './icons/FileSearch';
+import { FileAdd } from './icons/FileAdd';
+import { FileEdit } from './icons/FileEdit';
+import dayjs from 'dayjs';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export interface Notification {
   label: string;
-  date: string;
+  displayLabel: ReactNode;
+  date: number;
   link: string | null;
   readAt: string | null;
+  icon?: ReactNode;
 }
 
 export const notificationsAtom = atomWithStorage<Notification[]>(
@@ -44,15 +54,35 @@ export const notificationsAtom = atomWithStorage<Notification[]>(
 );
 
 export function Notifications() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
-  const { timeFormat } = useCompanyTimeFormat();
+  const replaceVariables = useReplaceVariables();
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [notifications, setNotifications] = useAtom(notificationsAtom);
 
+  const sockets = useSockets();
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
   const companyUser = useCurrentCompanyUser();
+  const { timeFormat } = useCompanyTimeFormat();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const getDateTimeLabel = (dateTimestamp: number) => {
+    const now = dayjs();
+    const timestamp = dayjs.unix(dateTimestamp);
+
+    const diffDays = now.diff(timestamp, 'day');
+    const diffMinutes = now.diff(timestamp, 'minute');
+
+    if (diffMinutes <= 1) {
+      return t('just_now');
+    } else if (diffDays === 1) {
+      return t('yesterday');
+    } else {
+      return date(dateTimestamp, `${dateFormat} ${timeFormat}`);
+    }
+  };
 
   useSocketEvent({
     on: [
@@ -68,9 +98,33 @@ export function Notifications() {
 
         const notification = {
           label: `${$invoice.number}: ${t('invoice_paid')}`,
-          date: new Date().toString(),
+          displayLabel: replaceVariables(
+            t('notification_invoice_paid_subject') as string,
+            {
+              invoice: (
+                <Link to={route('/invoices/:id/edit', { id: $invoice.id })}>
+                  {`#${$invoice.number}`}
+                </Link>
+              ),
+
+              client: (
+                <Link to={route('/clients/:id', { id: $invoice.client_id })}>
+                  {$invoice.client?.display_name}
+                </Link>
+              ),
+            }
+          ),
+          date: dayjs().unix(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <CardCheck size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -98,9 +152,33 @@ export function Notifications() {
             invoice: $invoice.number,
             client: $invoice.client?.display_name,
           }),
-          date: new Date().toString(),
+          displayLabel: replaceVariables(
+            t('notification_invoice_viewed_subject') as string,
+            {
+              invoice: (
+                <Link to={route('/invoices/:id/edit', { id: $invoice.id })}>
+                  {`#${$invoice.number}`}
+                </Link>
+              ),
+
+              client: (
+                <Link to={route('/clients/:id', { id: $invoice.client_id })}>
+                  {$invoice.client?.display_name}
+                </Link>
+              ),
+            }
+          ),
+          date: dayjs().unix(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <FileSearch size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -117,10 +195,37 @@ export function Notifications() {
         const $credit = data as Credit;
 
         const notification = {
-          label: `${t('credit_created')}: ${$credit.number}`,
-          date: new Date().toString(),
+          label: trans('notification_credit_created_subject', {
+            invoice: $credit.number,
+            client: $credit.client?.display_name,
+          }),
+          displayLabel: replaceVariables(
+            t('notification_credit_created_subject') as string,
+            {
+              invoice: (
+                <Link to={route('/credits/:id/edit', { id: $credit.id })}>
+                  {`#${$credit.number}`}
+                </Link>
+              ),
+
+              client: (
+                <Link to={route('/clients/:id', { id: $credit.client_id })}>
+                  {$credit.client?.display_name}
+                </Link>
+              ),
+            }
+          ),
+          date: dayjs().unix(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <FileAdd size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -138,9 +243,26 @@ export function Notifications() {
 
         const notification = {
           label: `${t('credit_updated')}: ${$credit.number}`,
-          date: new Date().toString(),
+          displayLabel: (
+            <div className="flex items-center space-x-1">
+              <span>{t('credit_updated')}:</span>
+
+              <Link to={route('/credits/:id/edit', { id: $credit.id })}>
+                {`#${$credit.number}`}
+              </Link>
+            </div>
+          ),
+          date: dayjs().unix(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <FileEdit size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -158,9 +280,26 @@ export function Notifications() {
 
         const notification = {
           label: `${t('payment_updated')}: ${payment.number}`,
-          date: new Date().toString(),
+          displayLabel: (
+            <div className="flex items-center space-x-1">
+              <span>{t('payment_updated')}:</span>
+
+              <Link to={route('/payments/:id/edit', { id: payment.id })}>
+                {`#${payment.number}`}
+              </Link>
+            </div>
+          ),
+          date: dayjs().unix(),
           link: route('/payments/:id/edit', { id: payment.id }),
           readAt: null,
+          icon: (
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$5 }}
+            >
+              <CardChange size="1.3rem" color={colors.$3} />
+            </div>
+          ),
         };
 
         if (
@@ -174,10 +313,6 @@ export function Notifications() {
       }
     },
   });
-
-  const sockets = useSockets();
-  const dateFormat = useCurrentCompanyDateFormats();
-  const reactSettings = useReactSettings();
 
   useEffect(() => {
     if (
@@ -196,7 +331,8 @@ export function Notifications() {
         (message: GenericMessage) => {
           const notification = {
             label: message.message,
-            date: new Date().toString(),
+            displayLabel: message.message,
+            date: dayjs().unix(),
             link: message.link,
             readAt: null,
           };
@@ -241,42 +377,56 @@ export function Notifications() {
         size="regular"
         title={t('notifications')!}
         topRight={
-          <button type="button" onClick={() => setNotifications([])}>
-            <Trash size={18} />
-          </button>
+          <Button
+            type="minimal"
+            behavior="button"
+            className="rounded-md"
+            onClick={() => setNotifications([])}
+          >
+            {t('clear')}
+          </Button>
         }
+        withoutDivider
       >
-        {notifications.map((notification, i) =>
-          notification.link ? (
-            <ClickableElement key={i} to={notification.link}>
-              <div>
-                <p>{notification.label}</p>
-                <p className="text-xs">
-                  {date(
-                    notification.date,
-                    `${dateFormat.dateFormat} ${timeFormat}`
-                  )}
-                </p>
-              </div>
-            </ClickableElement>
-          ) : (
-            <NonClickableElement key={i}>
-              <p>{notification.label}</p>
-              <p className="text-xs">
-                {date(
-                  notification.date,
-                  `${dateFormat.dateFormat} ${timeFormat}`
-                )}
-              </p>
-            </NonClickableElement>
-          )
-        )}
+        {notifications.length > 0 ? (
+          <div className="flex flex-col space-y-2 pt-2">
+            {notifications.map((notification, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between px-6 py-2 space-x-2"
+              >
+                <div className="flex items-center space-x-2.5">
+                  {notification.icon}
 
-        {notifications.length === 0 ? (
+                  <div className="flex flex-col space-y-0.5">
+                    <div
+                      className="text-sm"
+                      style={{
+                        color: colors.$3,
+                      }}
+                    >
+                      {notification.displayLabel}
+                    </div>
+
+                    <p className="text-xs text-gray-500">
+                      {getDateTimeLabel(notification.date)}
+                    </p>
+                  </div>
+                </div>
+
+                {!notification.readAt && (
+                  <div>
+                    <Icon element={GoDotFill} size={14} color="#2176FF" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
           <NonClickableElement>
             {t('no_unread_notifications')}
           </NonClickableElement>
-        ) : null}
+        )}
       </Slider>
     </>
   );
