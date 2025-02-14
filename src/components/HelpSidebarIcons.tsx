@@ -14,15 +14,13 @@ import { request } from '$app/common/helpers/request';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   HelpCircle,
   Info,
   Mail,
   MessageSquare,
   AlertCircle,
-  ChevronLeft,
-  ChevronRight,
 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -32,9 +30,6 @@ import { Modal } from './Modal';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
-import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import classNames from 'classnames';
 import { AboutModal } from './AboutModal';
 import { Icon } from './icons/Icon';
@@ -43,6 +38,9 @@ import { useQuery } from 'react-query';
 import axios from 'axios';
 import { MdWarning } from 'react-icons/md';
 import { UpdateAppModal } from './UpdateAppModal';
+import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
+import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
+import { CloseNavbarArrow } from './icons/CloseNavbarArrow';
 
 interface Props {
   docsLink?: string;
@@ -55,13 +53,11 @@ export function HelpSidebarIcons(props: Props) {
   const colors = useColorScheme();
   const user = useInjectUserChanges();
   const account = useCurrentAccount();
-  const currentUser = useCurrentUser();
 
   const { mobileNavbar } = props;
 
   const dispatch = useDispatch();
-  const updateCompanyUser = useUpdateCompanyUser();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
+  const handleCollapseExpandSidebar = useHandleCollapseExpandSidebar();
 
   const { data: latestVersion } = useQuery({
     queryKey: ['/pdf.invoicing.co/api/version'],
@@ -128,20 +124,6 @@ export function HelpSidebarIcons(props: Props) {
       setCronsNotEnabledModal(false);
     });
   };
-
-  useEffect(() => {
-    const showMiniSidebar =
-      user?.company_user?.react_settings?.show_mini_sidebar;
-
-    if (
-      user &&
-      typeof showMiniSidebar !== 'undefined' &&
-      currentUser?.company_user?.react_settings?.show_mini_sidebar !==
-        showMiniSidebar
-    ) {
-      updateCompanyUser(user);
-    }
-  }, [user?.company_user?.react_settings.show_mini_sidebar]);
 
   return (
     <>
@@ -221,7 +203,7 @@ export function HelpSidebarIcons(props: Props) {
 
       <nav
         style={{ borderColor: colors.$5 }}
-        className={classNames('flex py-4 text-white border-t', {
+        className={classNames('flex space-x-2.5 py-4 text-white border-t', {
           'justify-end': mobileNavbar,
           'justify-around': !mobileNavbar,
           'px-2': !isUpdateAvailable,
@@ -240,7 +222,7 @@ export function HelpSidebarIcons(props: Props) {
                   className="text-white rounded text-xs mb-2"
                 >
                   <div>
-                    <Icon element={MdWarning} color="white" size={23.5} />
+                    <Icon element={MdWarning} color="white" size={21.5} />
                   </div>
                 </Tippy>
               </div>
@@ -256,7 +238,7 @@ export function HelpSidebarIcons(props: Props) {
                   content={t('error')}
                   className="text-white rounded text-xs mb-2"
                 >
-                  <AlertCircle />
+                  <AlertCircle size={21.5} />
                 </Tippy>
               </button>
             )}
@@ -272,7 +254,7 @@ export function HelpSidebarIcons(props: Props) {
                     className="cursor-pointer"
                     onClick={() => setIsContactVisible(true)}
                   >
-                    <Mail />
+                    <Mail size={21.5} />
                   </div>
                 ) : (
                   <div
@@ -281,7 +263,7 @@ export function HelpSidebarIcons(props: Props) {
                       window.open('https://slack.invoiceninja.com', '_blank')
                     }
                   >
-                    <Icon element={FaSlack} color="white" size={23} />
+                    <Icon element={FaSlack} color="white" size={21.5} />
                   </div>
                 )}
               </Tippy>
@@ -298,7 +280,7 @@ export function HelpSidebarIcons(props: Props) {
                 content={t('support_forum')}
                 className="text-white rounded text-xs mb-2"
               >
-                <MessageSquare />
+                <MessageSquare size={21.5} />
               </Tippy>
             </a>
 
@@ -317,7 +299,7 @@ export function HelpSidebarIcons(props: Props) {
                 content={t('user_guide')}
                 className="text-white rounded text-xs mb-2"
               >
-                <HelpCircle />
+                <HelpCircle size={21.5} />
               </Tippy>
             </a>
 
@@ -330,20 +312,15 @@ export function HelpSidebarIcons(props: Props) {
                 content={t('about')}
                 className="text-white rounded text-xs mb-2"
               >
-                <Info />
+                <Info size={21.5} />
               </Tippy>
             </button>
           </>
         )}
 
-        <button
-          className="rounded-full"
-          onClick={() =>
-            handleUserChange(
-              'company_user.react_settings.show_mini_sidebar',
-              !isMiniSidebar
-            )
-          }
+        <div
+          className="cursor-pointer"
+          onClick={() => handleCollapseExpandSidebar(!isMiniSidebar)}
         >
           <Tippy
             duration={0}
@@ -352,11 +329,17 @@ export function HelpSidebarIcons(props: Props) {
                 {isMiniSidebar ? t('show_menu') : t('hide_menu')}
               </span>
             }
-            className="text-white rounded mb-1.5"
+            className="text-white rounded text-xs mb-2"
           >
-            {isMiniSidebar ? <ChevronRight /> : <ChevronLeft />}
+            <div>
+              {isMiniSidebar ? (
+                <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
+              ) : (
+                <CloseNavbarArrow color="#e5e7eb" size="1.35rem" />
+              )}
+            </div>
           </Tippy>
-        </button>
+        </div>
       </nav>
     </>
   );

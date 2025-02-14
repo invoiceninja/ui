@@ -13,15 +13,21 @@ import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 
-export function useLogo() {
+interface Params {
+  fallbackSmallLogo?: boolean;
+}
+
+export function useLogo(props?: Params) {
+  const { fallbackSmallLogo } = props || {};
+
   const companyChanges = useCompanyChanges();
   const currentCompany = useCurrentCompany();
 
-  return (
-    companyChanges?.settings?.company_logo ||
+  return companyChanges?.settings?.company_logo ||
     currentCompany?.settings?.company_logo ||
-    companySettings.logo
-  );
+    fallbackSmallLogo
+    ? companySettings.smallLogo
+    : companySettings.logo;
 }
 
 export function useCompanyName() {
