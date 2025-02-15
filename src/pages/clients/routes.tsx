@@ -13,7 +13,8 @@ import { assigned } from '$app/common/guards/guards/assigned';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
+import { TabLoader } from '$app/components/TabLoader';
 
 const Clients = lazy(() => import('$app/pages/clients/index/Clients'));
 const Import = lazy(() => import('$app/pages/clients/import/Import'));
@@ -97,17 +98,94 @@ export const clientRoutes = (
         />
       }
     >
-      <Route path="" element={<Invoices />} />
-      <Route path="quotes" element={<Quotes />} />
-      <Route path="payments" element={<Payments />} />
-      <Route path="recurring_invoices" element={<RecurringInvoices />} />
-      <Route path="credits" element={<Credits />} />
-      <Route path="projects" element={<Projects />} />
-      <Route path="tasks" element={<Tasks />} />
-      <Route path="expenses" element={<Expenses />} />
-      <Route path="recurring_expenses" element={<RecurringExpenses />} />
-      <Route path="activities" element={<Activities />} />
-      <Route path="documents" element={<Documents />} />
+      <Route
+        path=""
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Invoices />
+          </Suspense>
+        }
+      />
+      <Route
+        path="quotes"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Quotes />
+          </Suspense>
+        }
+      />
+      <Route
+        path="payments"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Payments />
+          </Suspense>
+        }
+      />
+      <Route
+        path="recurring_invoices"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <RecurringInvoices />
+          </Suspense>
+        }
+      />
+      <Route
+        path="credits"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Credits />
+          </Suspense>
+        }
+      />
+      <Route
+        path="projects"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Projects />
+          </Suspense>
+        }
+      />
+      <Route
+        path="tasks"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Tasks />
+          </Suspense>
+        }
+      />
+      <Route
+        path="expenses"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Expenses />
+          </Suspense>
+        }
+      />
+      <Route
+        path="recurring_expenses"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <RecurringExpenses />
+          </Suspense>
+        }
+      />
+      <Route
+        path="activities"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Activities />
+          </Suspense>
+        }
+      />
+      <Route
+        path="documents"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Documents />
+          </Suspense>
+        }
+      />
     </Route>
     <Route
       path=":id/statement"
