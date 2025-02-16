@@ -16,8 +16,8 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
 import { atom, useAtomValue } from 'jotai';
-import { Icon } from './icons/Icon';
-import { MdOutlineCalendarMonth } from 'react-icons/md';
+import { Calendar } from './icons/Calendar';
+import { useColorScheme } from '$app/common/colors';
 
 type Props = {
   value?: string;
@@ -30,20 +30,18 @@ type Props = {
 export const antdLocaleAtom = atom<any | null>(null);
 
 export function DropdownDateRangePicker(props: Props) {
-  const [t] = useTranslation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const { RangePicker } = DatePicker;
+  const [t] = useTranslation();
 
-  const [customStartDate, setCustomStartDate] = useState<string>();
-  const [customEndDate, setCustomEndDate] = useState<string>();
-
+  const colors = useColorScheme();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
   const antdLocale = useAtomValue(antdLocaleAtom);
 
-  useEffect(() => {
-    setCustomStartDate(props.startDate);
-    setCustomEndDate(props.endDate);
-  }, [props.startDate, props.endDate]);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+  const [customEndDate, setCustomEndDate] = useState<string>();
+  const [customStartDate, setCustomStartDate] = useState<string>();
 
   const handleCustomDateChange = (value: [string, string]) => {
     dayjs.extend(customParseFormat);
@@ -68,6 +66,11 @@ export function DropdownDateRangePicker(props: Props) {
     );
   };
 
+  useEffect(() => {
+    setCustomStartDate(props.startDate);
+    setCustomEndDate(props.endDate);
+  }, [props.startDate, props.endDate]);
+
   return (
     <div className="flex justify-end items-center">
       <SelectField
@@ -84,35 +87,18 @@ export function DropdownDateRangePicker(props: Props) {
         customSelector
         dismissable={false}
         withoutSeparator
+        searchable={false}
+        controlIcon={<Calendar color={colors.$3} />}
       >
-        {/* last365_days,,,,,this_year,last_year,all_time,custom */}
-
-        <option value="last7_days">
-          <div className="flex space-x-1 items-center">
-            <Icon element={MdOutlineCalendarMonth} />
-
-            <div>{t('last_7_days')}</div>
-          </div>
-        </option>
-        <option value="last30_days">
-          <div className="flex space-x-1 items-center">
-            <Icon element={MdOutlineCalendarMonth} />
-
-            <div>{t('last_30_days')}</div>
-          </div>
-        </option>
-        <option value="this_month">
-          <div className="flex space-x-1 items-center">
-            <Icon element={MdOutlineCalendarMonth} />
-
-            <div>{t('this_month')}</div>
-          </div>
-        </option>
+        <option value="last7_days">{t('last_7_days')}</option>
+        <option value="last30_days">{t('last_30_days')}</option>
+        <option value="this_month">{t('this_month')}</option>
         <option value="this_year">{t('this_year')}</option>
         <option value="last_year">{t('last_year')}</option>
         <option value={'last365_days'}>{`${t('last365_days')}`}</option>
         <option value={'custom'}>{`${t('custom')}`}</option>
       </SelectField>
+
       {isModalVisible && (
         <div className="flex flex-row space-x-2">
           <ConfigProvider locale={antdLocale?.default}>

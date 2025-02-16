@@ -16,6 +16,7 @@ import { useColorScheme } from '$app/common/colors';
 import React, { ReactNode, isValidElement } from 'react';
 import { SelectOption } from '../datatables/Actions';
 import Select, { StylesConfig } from 'react-select';
+import { ChevronDown } from '../icons/ChevronDown';
 
 export interface SelectProps extends CommonProps {
   defaultValue?: any;
@@ -31,6 +32,7 @@ export interface SelectProps extends CommonProps {
   menuPosition?: 'fixed';
   withoutSeparator?: boolean;
   searchable?: boolean;
+  controlIcon?: ReactNode;
 }
 
 export function SelectField(props: SelectProps) {
@@ -50,6 +52,7 @@ export function SelectField(props: SelectProps) {
     dismissable = true,
     clearAfterSelection,
     searchable = true,
+    controlIcon,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -176,7 +179,36 @@ export function SelectField(props: SelectProps) {
               selectedEntry?.value &&
               selectedEntry?.value !== blankOptionValue
           )}
+          blurInputOnSelect
           data-cy={cypressRef}
+          components={{
+            Control: ({ children: currentChildren, innerProps, isFocused }) => (
+              <div
+                className={classNames(
+                  'flex items-center rounded-md border cursor-pointer',
+                  { 'pl-2': controlIcon }
+                )}
+                style={{
+                  height: '2.5rem',
+                  backgroundColor: colors.$1,
+                  borderColor: isFocused ? '#2463eb' : colors.$5,
+                  boxShadow: isFocused ? '0 0 0 1px #2463eb' : 'none',
+                }}
+                {...innerProps}
+              >
+                {controlIcon}
+                {currentChildren}
+              </div>
+            ),
+            DropdownIndicator: () => (
+              <div
+                className="flex items-center justify-center px-3 hover:opacity-75 h-full w-full"
+                style={{ color: colors.$3 }}
+              >
+                <ChevronDown color={colors.$3} size="1rem" />
+              </div>
+            ),
+          }}
         />
       )}
 

@@ -464,8 +464,13 @@ export function Totals() {
                 </Badge>
               </div>
 
-              <div className="flex justify-between items-center py-3 px-6">
-                <span>{t('total_invoices_outstanding')}</span>
+              <div
+                style={{ borderColor: colors.$4 }}
+                className="flex justify-between items-center py-3"
+              >
+                <span className="text-gray-500">
+                  {t('total_invoices_outstanding')}
+                </span>
 
                 <Badge variant="white">
                   <span className="mx-2 text-base">
