@@ -10,27 +10,37 @@
 
 import { Menu, Transition } from '@headlessui/react';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { authenticate } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
 import { Fragment, useEffect, useState } from 'react';
-import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { DropdownElement } from './dropdown/DropdownElement';
 import { useLogo } from '$app/common/hooks/useLogo';
 import { useCompanyName } from '$app/common/hooks/useLogo';
 import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
 import { freePlan } from '$app/common/guards/guards/free-plan';
-import { Icon } from './icons/Icon';
-import { MdLogout, MdManageAccounts } from 'react-icons/md';
-import { BiPlusCircle } from 'react-icons/bi';
-import { useColorScheme } from '$app/common/colors';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
+import { styled } from 'styled-components';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { Check } from './icons/Check';
+import { Plus } from './icons/Plus';
+import { Person } from './icons/Person';
+import { Exit } from './icons/Exit';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useColorScheme } from '$app/common/colors';
+import companySettings from '$app/common/constants/company-settings';
+
+const SwitcherDiv = styled.div`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -43,14 +53,22 @@ export function CompanySwitcher() {
   const { id } = useParams();
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
-  const logo = useLogo();
-  const user = useCurrentUser();
+  const logo = useLogo({ fallbackSmallLogo: true });
   const location = useLocation();
   const colors = useColorScheme();
   const companyName = useCompanyName();
   const queryClient = useQueryClient();
   const { isAdmin, isOwner } = useAdmin();
   const currentCompany = useCurrentCompany();
+
+  const currentUser = useCurrentUser();
+  const userChanges = useInjectUserChanges();
+
+  const isMiniSidebar = Boolean(
+    userChanges?.company_user?.react_settings?.show_mini_sidebar
+  );
+
+  const preventNavigation = usePreventNavigation();
 
   const [shouldShowAddCompany, setShouldShowAddCompany] =
     useState<boolean>(false);
@@ -97,6 +115,22 @@ export function CompanySwitcher() {
     }
   }, [currentCompany]);
 
+  if (isMiniSidebar) {
+    return (
+      <>
+        <img
+          className="rounded-full border overflow-hidden aspect-square object-cover"
+          src={logo}
+          alt="Company logo"
+          style={{
+            borderColor: '#e5e7eb',
+            width: '1.66rem',
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <CompanyCreate
@@ -109,21 +143,24 @@ export function CompanySwitcher() {
         className="relative inline-block text-left w-full"
         data-cy="companyDropdown"
       >
-        <Menu.Button className="flex items-center justify-between w-full rounded font-medium pl-2">
-          <div className="flex items-center justify-center space-x-3">
-            <img className="w-8" src={logo} alt="Company logo" />
-            <div className="flex flex-col items-between">
-              <span className="text-sm text-start w-28 truncate">
-                {companyName}
-              </span>
-              {(user?.first_name || user?.last_name) && (
-                <span className="text-xs text-start w-28 truncate">
-                  {user.first_name} {user.last_name}
-                </span>
-              )}
-            </div>
+        <Menu.Button className="flex items-center justify-start space-x-3 w-full">
+          <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700">
+            <img
+              className="rounded-full border overflow-hidden aspect-square object-cover"
+              src={logo}
+              alt="Company logo"
+              style={{
+                borderColor: '#e5e7eb',
+                width: '1.65rem',
+              }}
+            />
+
+            <span className="text-sm text-start w-36 truncate text-gray-200">
+              {companyName}
+            </span>
+
+            <ExpandCollapseChevron color="#e5e7eb" />
           </div>
-          <ChevronDown size={18} className="text-gray-300" />
         </Menu.Button>
 
         <Transition
@@ -136,71 +173,133 @@ export function CompanySwitcher() {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items
-            style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
-            className="border origin-top-right absolute left-0 mt-2 w-56 rounded shadow-lg"
+            className="origin-top-right absolute left-0 mt-2 rounded shadow-lg border"
+            style={{
+              backgroundColor: colors.$1,
+              width: '14.5rem',
+              borderColor: colors.$4,
+            }}
           >
-            <div className="py-1">
+            <div className="border-b" style={{ borderColor: colors.$4 }}>
               <Menu.Item>
-                <DropdownElement>
-                  <p className="text-sm">{t('signed_in_as')}</p>
-                  <p className="text-sm font-medium truncate">{user?.email}</p>
-                </DropdownElement>
+                <div className="px-3 pb-1.5 pt-2">
+                  <p className="text-xs text-gray-500">{t('signed_in_as')}</p>
+
+                  <p className="font-medium truncate text-sm">
+                    {currentUser?.email}
+                  </p>
+                </div>
               </Menu.Item>
             </div>
 
-            <div className="py-1">
+            <div
+              className="flex flex-col pb-1 pt-2 border-b"
+              style={{ borderColor: colors.$4 }}
+            >
               {state?.api?.length >= 1 &&
                 state?.api?.map((record: any, index: number) => (
                   <Menu.Item key={index}>
-                    <DropdownElement
-                      actionKey="switchCompany"
-                      onClick={() => switchCompany(index)}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <span>
-                          {record.company.settings.name ||
-                            t('untitled_company')}
-                        </span>
+                    <div className="px-1 space-y-0.5">
+                      {index === 0 && (
+                        <p className="pl-2 text-xs text-gray-500">
+                          {t('company')}
+                        </p>
+                      )}
 
-                        {state.currentIndex === index && <Check size={18} />}
-                      </div>
-                    </DropdownElement>
+                      <SwitcherDiv
+                        className="flex items-center px-2 justify-between py-1.5 rounded-md cursor-pointer"
+                        theme={{ hoverColor: colors.$5 }}
+                        onClick={() =>
+                          preventNavigation({
+                            fn: () => switchCompany(index),
+                            actionKey: 'switchCompany',
+                          })
+                        }
+                      >
+                        <div className="flex items-center space-x-2 flex-1">
+                          <img
+                            className="rounded-full border overflow-hidden aspect-square object-cover"
+                            src={
+                              record.company.settings.company_logo ||
+                              companySettings.smallLogo
+                            }
+                            alt="Company logo"
+                            style={{
+                              borderColor: colors.$5,
+                              width: '1.5rem',
+                            }}
+                          />
+
+                          <div className="w-36 truncate text-sm">
+                            {record.company.settings.name ||
+                              t('untitled_company')}
+                          </div>
+                        </div>
+
+                        {state.currentIndex === index && (
+                          <Check color={colors.$3} />
+                        )}
+                      </SwitcherDiv>
+                    </div>
                   </Menu.Item>
                 ))}
             </div>
+
             <div className="py-1">
               {shouldShowAddCompany &&
                 canUserAddCompany &&
                 (isAdmin || isOwner) && (
                   <Menu.Item>
-                    <DropdownElement
-                      className="flex items-center"
-                      onClick={() => setIsCompanyCreateModalOpened(true)}
-                      icon={<Icon element={BiPlusCircle} size={22} />}
-                    >
-                      <span>{t('add_company')}</span>
-                    </DropdownElement>
+                    <div className="px-1">
+                      <SwitcherDiv
+                        className="flex items-center pl-3 space-x-3 py-2 rounded-md cursor-pointer"
+                        theme={{ hoverColor: colors.$5 }}
+                        onClick={() => setIsCompanyCreateModalOpened(true)}
+                      >
+                        <Plus />
+
+                        <span className="text-sm">{t('add_company')}</span>
+                      </SwitcherDiv>
+                    </div>
                   </Menu.Item>
                 )}
 
               {(isAdmin || isOwner) && (
                 <Menu.Item>
-                  <DropdownElement
-                    to="/settings/account_management"
-                    icon={<Icon element={MdManageAccounts} size={22} />}
-                  >
-                    {t('account_management')}
-                  </DropdownElement>
+                  <div className="px-1">
+                    <SwitcherDiv
+                      className="flex items-center space-x-3 pl-3 py-2 rounded-md cursor-pointer"
+                      theme={{ hoverColor: colors.$5 }}
+                      onClick={() =>
+                        preventNavigation({
+                          url: '/settings/account_management',
+                        })
+                      }
+                    >
+                      <Person />
+
+                      <span className="text-sm">{t('account_management')}</span>
+                    </SwitcherDiv>
+                  </div>
                 </Menu.Item>
               )}
 
               <Menu.Item>
-                <DropdownElement
-                  to="/logout"
-                  icon={<Icon element={MdLogout} size={22} />}
-                >
-                  {t('logout')}
-                </DropdownElement>
+                <div className="pl-1.5 pr-1">
+                  <SwitcherDiv
+                    className="flex items-center space-x-3 pl-3 py-2 rounded-md cursor-pointer"
+                    theme={{ hoverColor: colors.$5 }}
+                    onClick={() =>
+                      preventNavigation({
+                        url: '/logout',
+                      })
+                    }
+                  >
+                    <Exit />
+
+                    <span className="text-sm">{t('logout')}</span>
+                  </SwitcherDiv>
+                </div>
               </Menu.Item>
             </div>
           </Menu.Items>
