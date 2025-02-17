@@ -17,7 +17,6 @@ import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
 import { Fragment, useEffect, useState, useRef, memo } from 'react';
-import { styled } from 'styled-components';
 import collect from 'collect.js';
 import {
   isNavigationModalVisibleAtom,
@@ -33,11 +32,7 @@ import { Search as SearchIcon } from '$app/components/icons/Search';
 import { OppositeArrows } from '$app/components/icons/OppositeArrows';
 import { ReturnKey } from './ReturnKey';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
-
-const Div = styled.div`
-  color: ${(props) => props.theme.color};
-  background-color: ${(props) => props.theme.backgroundColor};
-`;
+import { SearchGroups } from './SearchGroups';
 
 export function Search$() {
   const [t] = useTranslation();
@@ -290,61 +285,6 @@ export function Search$() {
     return groups;
   };
 
-  const renderGroupTitle = (title: string, hasResults: boolean) => {
-    if (!hasResults) return null;
-
-    return (
-      <div className="px-4 mt-4 mb-2 first:mt-0">
-        <span className="text-xs font-medium text-gray-400">{t(title)}</span>
-      </div>
-    );
-  };
-
-  const renderSearchItem = (
-    entry: Entry<SearchRecord>,
-    index: number,
-    firstIndexInOtherGroup?: number
-  ) => {
-    return (
-      <Div
-        key={entry.id}
-        theme={{
-          backgroundColor: index === selectedIndex ? colors.$5 : 'transparent',
-          color: colors.$3,
-        }}
-        className="cursor-pointer py-2.5 font-medium active:font-semibold search-option text-sm px-4"
-        onClick={() => {
-          if (entry.resource) {
-            preventNavigation({
-              fn: () => {
-                if (entry.resource) {
-                  navigate(entry.resource.path);
-                  setIsModalOpen(false);
-                }
-              },
-            });
-          }
-        }}
-        onMouseMove={() => {
-          if (!isContainerScrolling && selectedIndex !== index) {
-            setTimeout(() => setSelectedIndex(index), 20);
-          }
-        }}
-        style={{
-          borderRadius: '0.25rem',
-          ...(firstIndexInOtherGroup === index && {
-            marginTop: '1rem',
-          }),
-        }}
-      >
-        <div>
-          <p className="text-xs font-semibold">{entry.resource?.heading}</p>
-          <p>{entry.label}</p>
-        </div>
-      </Div>
-    );
-  };
-
   return (
     <>
       <div
@@ -417,95 +357,13 @@ export function Search$() {
                 }, 50);
               }}
             >
-              {(() => {
-                const groups = groupResults(options.toArray() || []);
-                let currentIndex = 0;
-
-                return (
-                  <>
-                    {renderGroupTitle('clients', groups.clients.length > 0)}
-                    {groups.clients.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle('invoices', groups.invoices.length > 0)}
-                    {groups.invoices.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle(
-                      'recurring_invoices',
-                      groups.recurring_invoices.length > 0
-                    )}
-                    {groups.recurring_invoices.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle('payments', groups.payments.length > 0)}
-                    {groups.payments.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle('quotes', groups.quotes.length > 0)}
-                    {groups.quotes.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle('credits', groups.credits.length > 0)}
-                    {groups.credits.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle('projects', groups.projects.length > 0)}
-                    {groups.projects.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle('tasks', groups.tasks.length > 0)}
-                    {groups.tasks.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle(
-                      'purchase_orders',
-                      groups.purchase_orders.length > 0
-                    )}
-                    {groups.purchase_orders.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {renderGroupTitle('settings', groups.settings.length > 0)}
-                    {groups.settings.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(entry, index);
-                    })}
-
-                    {groups.other.map((entry) => {
-                      const index = currentIndex++;
-                      return renderSearchItem(
-                        entry,
-                        index,
-                        options
-                          .toArray()
-                          .findIndex(
-                            (item) =>
-                              (item as Entry<SearchRecord>).id ===
-                              groups.other[0]?.id
-                          )
-                      );
-                    })}
-                  </>
-                );
-              })()}
+              <SearchGroups
+                groups={groupResults(options.toArray() || [])}
+                selectedIndex={selectedIndex}
+                setSelectedIndex={setSelectedIndex}
+                isContainerScrolling={isContainerScrolling}
+                setIsModalOpen={setIsModalOpen}
+              />
             </div>
           </div>
 
