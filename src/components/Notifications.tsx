@@ -10,7 +10,7 @@
 
 import { Bell } from 'react-feather';
 import { Slider } from './cards/Slider';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
@@ -39,13 +39,33 @@ import dayjs from 'dayjs';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
+type NotificationType =
+  | 'invoiceWasPaid'
+  | 'invoiceWasViewed'
+  | 'creditWasCreated'
+  | 'creditWasUpdated'
+  | 'paymentWasUpdated'
+  | 'genericMessage';
+
+interface DisplayLabel {
+  notificationType: NotificationType;
+  invoiceNumber?: string;
+  clientName?: string;
+  invoiceId?: string;
+  clientId?: string;
+  message?: string;
+  creditId?: string;
+  creditNumber?: string;
+  paymentId?: string;
+  paymentNumber?: string;
+}
+
 export interface Notification {
   label: string;
-  displayLabel: ReactNode;
+  displayLabel: DisplayLabel;
   date: number;
   link: string | null;
   readAt: string | null;
-  icon?: ReactNode;
 }
 
 export const notificationsAtom = atomWithStorage<Notification[]>(
@@ -67,6 +87,176 @@ export function Notifications() {
   const companyUser = useCurrentCompanyUser();
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const generateDisplayLabel = (currentDisplayLabel: DisplayLabel) => {
+    if (currentDisplayLabel.notificationType === 'invoiceWasPaid') {
+      return replaceVariables(
+        t('notification_invoice_paid_subject') as string,
+        {
+          invoice: (
+            <Link
+              to={route('/invoices/:id/edit', {
+                id: currentDisplayLabel.invoiceId,
+              })}
+            >
+              {`#${currentDisplayLabel.invoiceNumber}`}
+            </Link>
+          ),
+
+          client: (
+            <Link
+              to={route('/clients/:id', { id: currentDisplayLabel.clientId })}
+            >
+              {currentDisplayLabel.clientName}
+            </Link>
+          ),
+        }
+      );
+    }
+
+    if (currentDisplayLabel.notificationType === 'invoiceWasViewed') {
+      return replaceVariables(
+        t('notification_invoice_viewed_subject') as string,
+        {
+          invoice: (
+            <Link
+              to={route('/invoices/:id/edit', {
+                id: currentDisplayLabel.invoiceId,
+              })}
+            >
+              {`#${currentDisplayLabel.invoiceNumber}`}
+            </Link>
+          ),
+
+          client: (
+            <Link
+              to={route('/clients/:id', { id: currentDisplayLabel.clientId })}
+            >
+              {currentDisplayLabel.clientName}
+            </Link>
+          ),
+        }
+      );
+    }
+
+    if (currentDisplayLabel.notificationType === 'creditWasCreated') {
+      return replaceVariables(
+        t('notification_credit_created_subject') as string,
+        {
+          invoice: (
+            <Link
+              to={route('/credits/:id/edit', {
+                id: currentDisplayLabel.creditId,
+              })}
+            >
+              {`#${currentDisplayLabel.creditNumber}`}
+            </Link>
+          ),
+
+          client: (
+            <Link
+              to={route('/clients/:id', { id: currentDisplayLabel.clientId })}
+            >
+              {currentDisplayLabel.clientName}
+            </Link>
+          ),
+        }
+      );
+    }
+
+    if (currentDisplayLabel.notificationType === 'creditWasUpdated') {
+      return (
+        <div className="flex items-center space-x-1">
+          <span>{t('credit_updated')}:</span>
+
+          <Link
+            to={route('/credits/:id/edit', {
+              id: currentDisplayLabel.creditId,
+            })}
+          >
+            {`#${currentDisplayLabel.creditNumber}`}
+          </Link>
+        </div>
+      );
+    }
+
+    if (currentDisplayLabel.notificationType === 'paymentWasUpdated') {
+      return (
+        <div className="flex items-center space-x-1">
+          <span>{t('payment_updated')}:</span>
+
+          <Link
+            to={route('/payments/:id/edit', {
+              id: currentDisplayLabel.paymentId,
+            })}
+          >
+            {`#${currentDisplayLabel.paymentNumber}`}
+          </Link>
+        </div>
+      );
+    }
+
+    return currentDisplayLabel.message;
+  };
+
+  const generateIcon = (notificationType: NotificationType) => {
+    if (notificationType === 'invoiceWasPaid') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$5 }}
+        >
+          <CardCheck size="1.3rem" color={colors.$3} />
+        </div>
+      );
+    }
+
+    if (notificationType === 'invoiceWasViewed') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$5 }}
+        >
+          <FileSearch size="1.3rem" color={colors.$3} />
+        </div>
+      );
+    }
+
+    if (notificationType === 'creditWasCreated') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$5 }}
+        >
+          <FileAdd size="1.3rem" color={colors.$3} />
+        </div>
+      );
+    }
+
+    if (notificationType === 'creditWasUpdated') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$5 }}
+        >
+          <FileEdit size="1.3rem" color={colors.$3} />
+        </div>
+      );
+    }
+
+    if (notificationType === 'paymentWasUpdated') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$5 }}
+        >
+          <CardChange size="1.3rem" color={colors.$3} />
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   const getDateTimeLabel = (dateTimestamp: number) => {
     const now = dayjs();
@@ -98,33 +288,16 @@ export function Notifications() {
 
         const notification = {
           label: `${$invoice.number}: ${t('invoice_paid')}`,
-          displayLabel: replaceVariables(
-            t('notification_invoice_paid_subject') as string,
-            {
-              invoice: (
-                <Link to={route('/invoices/:id/edit', { id: $invoice.id })}>
-                  {`#${$invoice.number}`}
-                </Link>
-              ),
-
-              client: (
-                <Link to={route('/clients/:id', { id: $invoice.client_id })}>
-                  {$invoice.client?.display_name}
-                </Link>
-              ),
-            }
-          ),
+          displayLabel: {
+            notificationType: 'invoiceWasPaid' as const,
+            invoiceNumber: $invoice.number,
+            clientName: $invoice.client?.display_name,
+            invoiceId: $invoice.id,
+            clientId: $invoice.client_id,
+          },
           date: dayjs().unix(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
-          icon: (
-            <div
-              className="p-2 rounded-full"
-              style={{ backgroundColor: colors.$5 }}
-            >
-              <CardCheck size="1.3rem" color={colors.$3} />
-            </div>
-          ),
         };
 
         if (
@@ -152,33 +325,16 @@ export function Notifications() {
             invoice: $invoice.number,
             client: $invoice.client?.display_name,
           }),
-          displayLabel: replaceVariables(
-            t('notification_invoice_viewed_subject') as string,
-            {
-              invoice: (
-                <Link to={route('/invoices/:id/edit', { id: $invoice.id })}>
-                  {`#${$invoice.number}`}
-                </Link>
-              ),
-
-              client: (
-                <Link to={route('/clients/:id', { id: $invoice.client_id })}>
-                  {$invoice.client?.display_name}
-                </Link>
-              ),
-            }
-          ),
+          displayLabel: {
+            notificationType: 'invoiceWasViewed' as const,
+            invoiceNumber: $invoice.number,
+            clientName: $invoice.client?.display_name,
+            invoiceId: $invoice.id,
+            clientId: $invoice.client_id,
+          },
           date: dayjs().unix(),
           link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
-          icon: (
-            <div
-              className="p-2 rounded-full"
-              style={{ backgroundColor: colors.$5 }}
-            >
-              <FileSearch size="1.3rem" color={colors.$3} />
-            </div>
-          ),
         };
 
         if (
@@ -199,33 +355,16 @@ export function Notifications() {
             invoice: $credit.number,
             client: $credit.client?.display_name,
           }),
-          displayLabel: replaceVariables(
-            t('notification_credit_created_subject') as string,
-            {
-              invoice: (
-                <Link to={route('/credits/:id/edit', { id: $credit.id })}>
-                  {`#${$credit.number}`}
-                </Link>
-              ),
-
-              client: (
-                <Link to={route('/clients/:id', { id: $credit.client_id })}>
-                  {$credit.client?.display_name}
-                </Link>
-              ),
-            }
-          ),
+          displayLabel: {
+            notificationType: 'creditWasCreated' as const,
+            creditNumber: $credit.number,
+            clientName: $credit.client?.display_name,
+            creditId: $credit.id,
+            clientId: $credit.client_id,
+          },
           date: dayjs().unix(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
-          icon: (
-            <div
-              className="p-2 rounded-full"
-              style={{ backgroundColor: colors.$5 }}
-            >
-              <FileAdd size="1.3rem" color={colors.$3} />
-            </div>
-          ),
         };
 
         if (
@@ -243,26 +382,14 @@ export function Notifications() {
 
         const notification = {
           label: `${t('credit_updated')}: ${$credit.number}`,
-          displayLabel: (
-            <div className="flex items-center space-x-1">
-              <span>{t('credit_updated')}:</span>
-
-              <Link to={route('/credits/:id/edit', { id: $credit.id })}>
-                {`#${$credit.number}`}
-              </Link>
-            </div>
-          ),
+          displayLabel: {
+            notificationType: 'creditWasUpdated' as const,
+            creditNumber: $credit.number,
+            creditId: $credit.id,
+          },
           date: dayjs().unix(),
           link: route('/credits/:id/edit', { id: $credit.id }),
           readAt: null,
-          icon: (
-            <div
-              className="p-2 rounded-full"
-              style={{ backgroundColor: colors.$5 }}
-            >
-              <FileEdit size="1.3rem" color={colors.$3} />
-            </div>
-          ),
         };
 
         if (
@@ -280,26 +407,14 @@ export function Notifications() {
 
         const notification = {
           label: `${t('payment_updated')}: ${payment.number}`,
-          displayLabel: (
-            <div className="flex items-center space-x-1">
-              <span>{t('payment_updated')}:</span>
-
-              <Link to={route('/payments/:id/edit', { id: payment.id })}>
-                {`#${payment.number}`}
-              </Link>
-            </div>
-          ),
+          displayLabel: {
+            notificationType: 'paymentWasUpdated' as const,
+            paymentNumber: payment.number,
+            paymentId: payment.id,
+          },
           date: dayjs().unix(),
           link: route('/payments/:id/edit', { id: payment.id }),
           readAt: null,
-          icon: (
-            <div
-              className="p-2 rounded-full"
-              style={{ backgroundColor: colors.$5 }}
-            >
-              <CardChange size="1.3rem" color={colors.$3} />
-            </div>
-          ),
         };
 
         if (
@@ -331,7 +446,10 @@ export function Notifications() {
         (message: GenericMessage) => {
           const notification = {
             label: message.message,
-            displayLabel: message.message,
+            displayLabel: {
+              notificationType: 'genericMessage' as const,
+              message: message.message,
+            },
             date: dayjs().unix(),
             link: message.link,
             readAt: null,
@@ -396,7 +514,7 @@ export function Notifications() {
                 className="flex items-center justify-between px-6 py-2 space-x-2"
               >
                 <div className="flex items-center space-x-2.5">
-                  {notification.icon}
+                  {generateIcon(notification.displayLabel.notificationType)}
 
                   <div className="flex flex-col space-y-0.5">
                     <div
@@ -405,7 +523,7 @@ export function Notifications() {
                         color: colors.$3,
                       }}
                     >
-                      {notification.displayLabel}
+                      {generateDisplayLabel(notification.displayLabel)}
                     </div>
 
                     <p className="text-xs text-gray-500">
