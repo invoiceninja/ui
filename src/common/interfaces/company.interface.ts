@@ -337,6 +337,8 @@ export interface Settings {
   task_round_to_nearest: number;
   merge_e_invoice_to_pdf: boolean;
   payment_flow: string;
+  enable_client_profile_update: boolean;
+  preference_product_notes_for_html_view: boolean;
 }
 
 export interface TaxData {
