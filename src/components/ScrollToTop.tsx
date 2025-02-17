@@ -18,13 +18,13 @@ export function ScrollToTop(props: any) {
   const id = pathSegments?.[2] || '';
 
   const isClientShowPage =
-    location.pathname.startsWith('/clients') &&
     id &&
+    location.pathname.startsWith(`/clients/${id}`) &&
     !location.pathname.endsWith('/edit');
 
   const isVendorShowPage =
-    location.pathname.startsWith('/vendors') &&
     id &&
+    location.pathname.startsWith(`/vendors/${id}`) &&
     !location.pathname.endsWith('/edit');
 
   useEffect(() => {
