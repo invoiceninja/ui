@@ -140,7 +140,7 @@ export function Settings() {
           <div className="flex flex-col space-y-1">
             {isSelfHosted() && (
               <CopyToClipboard
-                text={`${company?.portal_domain}/client/login?company_key=${company?.company_key}`}
+                text={`${company?.portal_domain}/client/login/${company?.company_key}`}
               />
             )}
 
@@ -265,18 +265,8 @@ export function Settings() {
       </Element>
 
       <Element
-        leftSide={
-          <PropertyCheckbox
-            propertyKey="show_pdfhtml_on_mobile"
-            labelElement={
-              <SettingsLabel
-                label={t('show_pdfhtml_on_mobile')}
-                helpLabel={t('show_pdfhtml_on_mobile_help')}
-              />
-            }
-            defaultValue={false}
-          />
-        }
+        leftSide={t('show_pdfhtml_on_mobile')}
+        leftSideHelp={t('show_pdfhtml_on_mobile_help')}
       >
         <Toggle
           checked={Boolean(company?.settings?.show_pdfhtml_on_mobile)}
@@ -287,6 +277,20 @@ export function Settings() {
         />
       </Element>
 
+      { company?.settings?.show_pdfhtml_on_mobile && (
+        <Element
+          leftSide={t('preference_product_notes_for_html_view')}
+          leftSideHelp={t('preference_product_notes_for_html_view_help')}
+        >
+          <Toggle
+            checked={Boolean(company?.settings?.preference_product_notes_for_html_view)}
+            onValueChange={(value) =>
+              handleChange('settings.preference_product_notes_for_html_view', value)
+            }
+          />
+        </Element>
+      )}
+
       <Element
         leftSide={t('enable_client_portal_dashboard')}
         leftSideHelp={t('enable_client_portal_dashboard_help')}
@@ -295,6 +299,18 @@ export function Settings() {
           checked={Boolean(company?.settings?.enable_client_portal_dashboard)}
           onValueChange={(value) =>
             handleChange('settings.enable_client_portal_dashboard', value)
+          }
+        />
+      </Element>
+
+      <Element
+        leftSide={t('enable_client_profile_update')}
+        leftSideHelp={t('enable_client_profile_update_help')}
+      >
+        <Toggle
+          checked={Boolean(company?.settings?.enable_client_profile_update)}
+          onValueChange={(value) =>
+            handleChange('settings.enable_client_profile_update', value)
           }
         />
       </Element>

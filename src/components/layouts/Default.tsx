@@ -62,6 +62,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
+import classNames from 'classnames';
 
 export interface SaveOption {
   label: string;
@@ -101,8 +102,7 @@ export function Default(props: Props) {
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
-  const shouldShowUnlockButton =
-    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
+  const shouldShowUnlockButton = !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
@@ -408,10 +408,12 @@ export function Default(props: Props) {
 
   return (
     <div>
-      <ActivateCompany />
-      <VerifyEmail />
-      <VerifyPhone />
-      <EInvoiceCredits />
+      <div className="fixed bottom-4 right-4 z-50 flex items-end flex-col-reverse space-y-4 space-y-reverse">
+        <ActivateCompany />
+        <VerifyEmail />
+        <VerifyPhone />
+        <EInvoiceCredits />
+      </div>
 
       <MobileSidebar
         navigation={navigation}
@@ -422,12 +424,13 @@ export function Default(props: Props) {
       <DesktopSidebar navigation={navigation} docsLink={props.docsLink} />
 
       <div
-        className={`${
-          isMiniSidebar ? 'md:pl-16' : 'md:pl-64'
-        } flex flex-col flex-1`}
+        className={classNames('flex flex-col flex-1', {
+          'md:pl-16': isMiniSidebar,
+          'md:pl-64': !isMiniSidebar,
+        })}
       >
         <div
-          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          style={{ backgroundColor: colors.$1 }}
           className="sticky top-0 z-10 flex-shrink-0 flex h-16 border-b shadow"
         >
           <button
@@ -436,8 +439,9 @@ export function Default(props: Props) {
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <MenuIcon className="dark:text-gray-100" />
+            <MenuIcon color={colors.$3} />
           </button>
+
           <div
             className="flex-1 px-4 xl:px-8 flex items-center"
             data-cy="topNavbar"
@@ -460,7 +464,13 @@ export function Default(props: Props) {
 
               {shouldShowUnlockButton && (
                 <button
-                  className="hidden sm:inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
+                  className="hidden sm:inline-flex items-center justify-center py-[9px] px-4 rounded-[6px] text-sm font-medium text-white relative overflow-hidden"
+                  style={{
+                    background: '#2176FF',
+                    border: '1px solid #0062ff',
+                    boxShadow:
+                      '0px 1px 1px 0px #1453B82E, 0px 2px 2px 0px #1453B829, 0px 5px 3px 0px #1453B817, 0px 9px 4px 0px #1453B808, 0px 15px 4px 0px #1453B800, 0px 1px 0px 0px #FFFFFF40 inset, 0px 0px 0px 1px #0062FF',
+                  }}
                   onClick={() =>
                     preventNavigation({
                       url: (isSelfHosted()
@@ -471,7 +481,9 @@ export function Default(props: Props) {
                     })
                   }
                 >
-                  <span>
+                  <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+
+                  <span className="relative z-10">
                     {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
                   </span>
                 </button>
