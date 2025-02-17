@@ -265,18 +265,8 @@ export function Settings() {
       </Element>
 
       <Element
-        leftSide={
-          <PropertyCheckbox
-            propertyKey="show_pdfhtml_on_mobile"
-            labelElement={
-              <SettingsLabel
-                label={t('show_pdfhtml_on_mobile')}
-                helpLabel={t('show_pdfhtml_on_mobile_help')}
-              />
-            }
-            defaultValue={false}
-          />
-        }
+        leftSide={t('show_pdfhtml_on_mobile')}
+        leftSideHelp={t('show_pdfhtml_on_mobile_help')}
       >
         <Toggle
           checked={Boolean(company?.settings?.show_pdfhtml_on_mobile)}
@@ -286,6 +276,20 @@ export function Settings() {
           disabled={disableSettingsField('show_pdfhtml_on_mobile')}
         />
       </Element>
+
+      { company?.settings?.show_pdfhtml_on_mobile && (
+        <Element
+          leftSide={t('preference_product_notes_for_html_view')}
+          leftSideHelp={t('preference_product_notes_for_html_view_help')}
+        >
+          <Toggle
+            checked={Boolean(company?.settings?.preference_product_notes_for_html_view)}
+            onValueChange={(value) =>
+              handleChange('settings.preference_product_notes_for_html_view', value)
+            }
+          />
+        </Element>
+      )}
 
       <Element
         leftSide={t('enable_client_portal_dashboard')}
