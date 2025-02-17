@@ -31,6 +31,7 @@ import { LuArrowUpDown, LuCornerDownLeft } from 'react-icons/lu';
 import { useAtomValue } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
+import { BiSearch } from 'react-icons/bi';
 
 const Div = styled.div`
   color: ${(props) => props.theme.color};
@@ -214,8 +215,16 @@ export function Search$() {
 
   return (
     <>
+      <button
+        type="button"
+        onClick={() => setIsModalOpen(true)}
+        className="lg:hidden flex justify-end items-end"
+      >
+        <Icon element={BiSearch} size={22} style={{ color: colors.$3 }} />
+      </button>
+
       <InputField
-        className="border-transparent focus:border-transparent focus:ring-0 border-0"
+        className="hidden lg:block border-transparent focus:border-transparent focus:ring-0 border-0"
         onClick={() => setIsModalOpen(true)}
         placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
         style={{ backgroundColor: colors.$1, color: colors.$3, width: '21rem' }}
