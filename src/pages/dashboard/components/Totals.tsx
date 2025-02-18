@@ -260,6 +260,9 @@ export function Totals() {
                     parseInt(value)
                   )
                 }
+                customSelector
+                withoutSeparator
+                dismissable={false}
               >
                 <option value="999">{t('all')}</option>
 
@@ -386,17 +389,20 @@ export function Totals() {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 mt-4 gap-4">
+      <div className="grid grid-cols-12 mt-4 gap-8">
         {company && (
           <Card
             title={t('recent_transactions')}
-            className="col-span-12 xl:col-span-4"
+            className="col-span-12 xl:col-span-3"
+            headerClassName="px-3 sm:px-4"
             withoutBodyPadding
+            style={{ borderColor: colors.$5 }}
+            headerStyle={{ borderColor: colors.$5 }}
           >
             <div className="flex flex-col px-4">
               <div
-                className="flex justify-between items-center border-b border-dashed py-3"
-                style={{ borderColor: colors.$4 }}
+                className="flex justify-between items-center border-b border-dashed py-5"
+                style={{ borderColor: colors.$5 }}
               >
                 <span className="text-gray-500">{t('invoices')}</span>
 
@@ -413,8 +419,8 @@ export function Totals() {
               </div>
 
               <div
-                style={{ borderColor: colors.$4 }}
-                className="flex justify-between items-center border-b border-dashed py-3"
+                className="flex justify-between items-center border-b border-dashed py-5"
+                style={{ borderColor: colors.$5 }}
               >
                 <span className="text-gray-500">{t('payments')}</span>
 
@@ -429,8 +435,8 @@ export function Totals() {
               </div>
 
               <div
-                style={{ borderColor: colors.$4 }}
-                className="flex justify-between items-center border-b border-dashed py-3"
+                className="flex justify-between items-center border-b border-dashed py-5"
+                style={{ borderColor: colors.$5 }}
               >
                 <span className="text-gray-500">{t('expenses')}</span>
 
@@ -447,8 +453,8 @@ export function Totals() {
               </div>
 
               <div
-                style={{ borderColor: colors.$4 }}
-                className="flex justify-between items-center border-b border-dashed py-3"
+                className="flex justify-between items-center border-b border-dashed py-5"
+                style={{ borderColor: colors.$5 }}
               >
                 <span className="text-gray-500">{t('outstanding')}</span>
 
@@ -464,15 +470,16 @@ export function Totals() {
                 </Badge>
               </div>
 
-              <div
-                style={{ borderColor: colors.$4 }}
-                className="flex justify-between items-center py-3"
-              >
+              <div className="flex justify-between items-center py-5">
                 <span className="text-gray-500">
                   {t('total_invoices_outstanding')}
                 </span>
 
-                <Badge variant="white">
+                <Badge
+                  variant="transparent"
+                  className="border"
+                  style={{ borderColor: colors.$5 }}
+                >
                   <span className="mx-2 text-base">
                     {totalsData[currency]?.outstanding?.outstanding_count || 0}
                   </span>
@@ -485,7 +492,11 @@ export function Totals() {
         {chartData && (
           <Card
             title={t('overview')}
-            className="col-span-12 xl:col-span-8 pr-4"
+            className="col-span-12 xl:col-span-9"
+            headerClassName="px-3 sm:px-4"
+            childrenClassName="pl-3 pr-8"
+            style={{ borderColor: colors.$5 }}
+            headerStyle={{ borderColor: colors.$5 }}
           >
             <Chart
               chartSensitivity={chartScale}

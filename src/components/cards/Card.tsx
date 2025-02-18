@@ -56,6 +56,8 @@ interface Props {
   withoutHeaderBorder?: boolean;
   topRight?: ReactNode;
   height?: 'full';
+  headerStyle?: CSSProperties;
+  headerClassName?: string;
 }
 
 export function Card(props: Props) {
@@ -70,17 +72,17 @@ export function Card(props: Props) {
   return (
     <div
       className={classNames(
-        `border shadow rounded-md overflow-visible ${props.className}`,
+        `border rounded-md overflow-visible ${props.className}`,
         {
           'overflow-y-auto': props.withScrollableBody,
           'h-full': height === 'full',
         }
       )}
       style={{
-        ...props.style,
         backgroundColor: colors.$1,
         color: colors.$3,
         borderColor: colors.$4,
+        ...props.style,
       }}
     >
       <form
@@ -89,17 +91,20 @@ export function Card(props: Props) {
       >
         {props.title && (
           <div
-            className={classNames({
-              'bg-white sticky top-0': props.withScrollableBody,
-              'px-4 sm:px-6 py-3': padding == 'small',
-              'px-4 sm:px-6 py-5': padding == 'regular',
-              'border-b': !props.withoutHeaderBorder,
-            })}
+            className={classNames(
+              {
+                'bg-white sticky top-0': props.withScrollableBody,
+                'px-4 sm:px-6 py-3': padding == 'small',
+                'px-4 sm:px-6 py-5': padding == 'regular',
+                'border-b': !props.withoutHeaderBorder,
+              },
+              props.headerClassName
+            )}
             onClick={() =>
               typeof props.collapsed !== 'undefined' &&
               setIsCollpased(!isCollapsed)
             }
-            style={{ borderColor: colors.$4 }}
+            style={{ borderColor: colors.$4, ...props.headerStyle }}
           >
             <div
               className={classNames('flex items-center justify-between', {
