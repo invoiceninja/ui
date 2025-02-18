@@ -8,17 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export interface SearchResponse {
-  client_contacts: SearchRecord[];
-  clients: SearchRecord[];
-  invoices: SearchRecord[];
-  settings: SearchRecord[];
-}
+import { Spinner } from '$app/components/Spinner';
 
-export interface SearchRecord {
-  name: string;
-  type: string;
-  id: string;
-  path: string;
-  heading: string;
+export function TabLoader() {
+  return (
+    <div className="py-4">
+      <Spinner />
+    </div>
+  );
 }

@@ -455,7 +455,6 @@ export function Default(props: Props) {
               </h2>
 
               <QuickCreatePopover />
-
               <Search />
             </div>
 
@@ -483,8 +482,12 @@ export function Default(props: Props) {
                 >
                   <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
 
-                  <span className="relative z-10">
+                  <span className="relative z-10 hidden xl:block">
                     {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
+                  </span>
+
+                  <span className="relative z-10 xl:hidden">
+                    {t('upgrade')}
                   </span>
                 </button>
               )}

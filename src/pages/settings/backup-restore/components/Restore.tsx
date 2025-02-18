@@ -9,7 +9,7 @@
  */
 
 import { Card } from '$app/components/cards';
-import { UploadImport } from '$app/components/import/UploadImport';
+import { UploadCompanyImport } from '$app/components/import/UploadCompanyImport';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +22,7 @@ export function Restore() {
     <div className="grid grid-cols-12">
       <div className="col-span-12">
         {!isDataImported ? (
-          <UploadImport
+          <UploadCompanyImport
             entity="company"
             onSuccess={false}
             type="zip"
