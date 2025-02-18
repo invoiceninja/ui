@@ -332,7 +332,11 @@ export function Search$() {
           <div className="flex flex-col pb-3">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-1.5 py-2 px-4 flex-1 border-b">
-                <SearchIcon color={colors.$5} size="1.6rem" />
+                {isFetching ? (
+                  <Spinner />
+                ) : (
+                  <SearchIcon color={colors.$5} size="1.6rem" />
+                )}
 
                 <div className="flex-1">
                   <InputField
@@ -347,8 +351,6 @@ export function Search$() {
                   />
                 </div>
               </div>
-
-              {isFetching && <Spinner />}
             </div>
 
             <div
