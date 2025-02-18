@@ -494,7 +494,7 @@ export function Totals() {
             title={t('overview')}
             className="col-span-12 xl:col-span-9"
             headerClassName="px-3 sm:px-4"
-            childrenClassName="pl-3 pr-8"
+            childrenClassName="pl-2 pr-8"
             style={{ borderColor: colors.$5 }}
             headerStyle={{ borderColor: colors.$5 }}
           >
