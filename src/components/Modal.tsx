@@ -111,7 +111,7 @@ export function Modal(props: Props) {
                 colorScheme: colors.$0,
               }}
               className={classNames(
-                'inline-block align-bottom rounded text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
+                'inline-block align-bottom rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
                 {
                   'max-w-sm':
                     props.size === 'extraSmall' ||

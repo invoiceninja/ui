@@ -17,7 +17,6 @@ import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
 import { Fragment, useEffect, useState, useRef, memo } from 'react';
-import { styled } from 'styled-components';
 import collect from 'collect.js';
 import {
   isNavigationModalVisibleAtom,
@@ -26,17 +25,14 @@ import {
 import { debounce } from 'lodash';
 import { InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { Icon } from '$app/components/icons/Icon';
-import { LuArrowUpDown, LuCornerDownLeft } from 'react-icons/lu';
 import { useAtomValue } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
-import { BiSearch } from 'react-icons/bi';
-
-const Div = styled.div`
-  color: ${(props) => props.theme.color};
-  background-color: ${(props) => props.theme.backgroundColor};
-`;
+import { Search as SearchIcon } from '$app/components/icons/Search';
+import { OppositeArrows } from '$app/components/icons/OppositeArrows';
+import { ReturnKey } from './ReturnKey';
+import { ExternalLink } from '$app/components/icons/ExternalLink';
+import { SearchGroups } from './SearchGroups';
 
 export function Search$() {
   const [t] = useTranslation();
@@ -179,15 +175,32 @@ export function Search$() {
 
       if (selectedIndex !== -1 && optionsContainerRef.current) {
         const container = optionsContainerRef.current;
-        const selectedElement = container.children[
-          selectedIndex
-        ] as HTMLElement;
+        const allItems = Array.from(
+          container.getElementsByClassName('search-option')
+        );
+        const selectedElement = allItems[selectedIndex] as HTMLElement;
 
         if (selectedElement) {
-          selectedElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          });
+          if (selectedIndex === 0) {
+            container.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          } else {
+            const containerRect = container.getBoundingClientRect();
+            const elementRect = selectedElement.getBoundingClientRect();
+
+            const isVisible =
+              elementRect.top >= containerRect.top &&
+              elementRect.bottom <= containerRect.bottom;
+
+            if (!isVisible) {
+              selectedElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+              });
+            }
+          }
         }
       }
 
@@ -213,22 +226,89 @@ export function Search$() {
     setSelectedIndex(-1);
   }, [query]);
 
+  const groupResults = (data: Entry<SearchRecord>[]) => {
+    const groups = {
+      clients: [] as Entry<SearchRecord>[],
+      invoices: [] as Entry<SearchRecord>[],
+      recurring_invoices: [] as Entry<SearchRecord>[],
+      payments: [] as Entry<SearchRecord>[],
+      quotes: [] as Entry<SearchRecord>[],
+      credits: [] as Entry<SearchRecord>[],
+      projects: [] as Entry<SearchRecord>[],
+      tasks: [] as Entry<SearchRecord>[],
+      purchase_orders: [] as Entry<SearchRecord>[],
+      settings: [] as Entry<SearchRecord>[],
+      other: [] as Entry<SearchRecord>[],
+    };
+
+    data.forEach((entry) => {
+      const type = entry.resource?.path.startsWith('/settings')
+        ? '/settings'
+        : entry.resource?.type;
+
+      switch (type) {
+        case '/client':
+          groups.clients.push(entry);
+          break;
+        case '/invoice':
+          groups.invoices.push(entry);
+          break;
+        case '/recurring_invoice':
+          groups.recurring_invoices.push(entry);
+          break;
+        case '/payment':
+          groups.payments.push(entry);
+          break;
+        case '/quote':
+          groups.quotes.push(entry);
+          break;
+        case '/credit':
+          groups.credits.push(entry);
+          break;
+        case '/project':
+          groups.projects.push(entry);
+          break;
+        case '/task':
+          groups.tasks.push(entry);
+          break;
+        case '/purchase_order':
+          groups.purchase_orders.push(entry);
+          break;
+        case '/settings':
+          groups.settings.push(entry);
+          break;
+        default:
+          groups.other.push(entry);
+      }
+    });
+
+    return groups;
+  };
+
   return (
     <>
-      <button
-        type="button"
+      <div
+        className="flex items-center border rounded-md px-1 py-1 space-x-5"
         onClick={() => setIsModalOpen(true)}
-        className="lg:hidden flex justify-end items-end"
+        style={{ borderColor: colors.$5 }}
       >
-        <Icon element={BiSearch} size={22} style={{ color: colors.$3 }} />
-      </button>
+        <div className="flex items-center space-x-1.5 pl-1">
+          <SearchIcon color={colors.$5} />
 
-      <InputField
-        className="hidden lg:block border-transparent focus:border-transparent focus:ring-0 border-0"
-        onClick={() => setIsModalOpen(true)}
-        placeholder={`${t('search_placeholder')}. (Ctrl+K)`}
-        style={{ backgroundColor: colors.$1, color: colors.$3, width: '21rem' }}
-      />
+          <p className="text-sm" style={{ color: colors.$5 }}>
+            {t('search_placeholder')}
+          </p>
+        </div>
+
+        <div
+          className="flex items-center border px-1.5 py-0.5"
+          style={{ borderColor: colors.$5, borderRadius: '0.25rem' }}
+        >
+          <p className="text-sm" style={{ color: colors.$5 }}>
+            Ctrl+K
+          </p>
+        </div>
+      </div>
 
       <Modal
         visible={isModalOpen}
@@ -238,23 +318,24 @@ export function Search$() {
         withoutPadding
         size="regular"
       >
-        <div
-          className="flex flex-col pt-3"
-          style={{ backgroundColor: colors.$1 }}
-        >
-          <div className="flex flex-col space-y-5 px-3 pb-3">
+        <div className="flex flex-col" style={{ backgroundColor: colors.$1 }}>
+          <div className="flex flex-col pb-3">
             <div className="flex items-center space-x-3">
-              <div className="flex-1">
-                <InputField
-                  className="focus:ring-0"
-                  innerRef={inputRef}
-                  value={query}
-                  onValueChange={(value) => handleChange(value)}
-                  onClick={() => setSelectedIndex(-1)}
-                  placeholder={`${t('search')}...`}
-                  changeOverride
-                  style={{ backgroundColor: colors.$1, color: colors.$3 }}
-                />
+              <div className="flex items-center space-x-1.5 py-2 px-4 flex-1 border-b">
+                <SearchIcon color={colors.$5} size="1.6rem" />
+
+                <div className="flex-1">
+                  <InputField
+                    className="border-transparent focus:border-transparent focus:ring-0 border-0 w-full px-0"
+                    innerRef={inputRef}
+                    value={query}
+                    onValueChange={(value) => handleChange(value)}
+                    onClick={() => setSelectedIndex(-1)}
+                    placeholder={t('search_placeholder')}
+                    changeOverride
+                    style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                  />
+                </div>
               </div>
 
               {isFetching && <Spinner />}
@@ -262,7 +343,7 @@ export function Search$() {
 
             <div
               ref={optionsContainerRef}
-              className="overflow-y-auto h-96"
+              className="flex flex-col overflow-y-auto h-96 px-1 pt-3"
               onMouseLeave={() => selectedIndex !== -1 && setSelectedIndex(-1)}
               onScroll={() => {
                 setIsContainerScrolling(true);
@@ -276,68 +357,67 @@ export function Search$() {
                 }, 50);
               }}
             >
-              {options?.map((entry, index) => (
-                <Div
-                  key={entry.id}
-                  theme={{
-                    backgroundColor:
-                      index === selectedIndex ? colors.$5 : 'transparent',
-                    color: colors.$3,
-                  }}
-                  className="cursor-pointer pl-2 py-2.5 active:font-semibold search-option"
-                  onClick={() => {
-                    if (entry.resource) {
-                      preventNavigation({
-                        fn: () => {
-                          if (entry.resource) {
-                            navigate(entry.resource.path);
-                            setIsModalOpen(false);
-                          }
-                        },
-                      });
-                    }
-                  }}
-                  onMouseMove={() => {
-                    if (!isContainerScrolling && selectedIndex !== index) {
-                      setTimeout(() => setSelectedIndex(index), 20);
-                    }
-                  }}
-                >
-                  <span>
-                    <div>
-                      <p className="text-xs font-semibold">
-                        {entry.resource?.heading}
-                      </p>
-                      <p>{entry.label}</p>
-                    </div>
-                  </span>
-                </Div>
-              ))}
+              <SearchGroups
+                groups={groupResults(options.toArray() || [])}
+                selectedIndex={selectedIndex}
+                setSelectedIndex={setSelectedIndex}
+                isContainerScrolling={isContainerScrolling}
+                setIsModalOpen={setIsModalOpen}
+              />
             </div>
           </div>
 
           <div
-            className="flex items-center py-2 space-x-4 px-3"
-            style={{ backgroundColor: colors.$5 }}
+            className="flex items-center justify-between"
+            style={{
+              backgroundColor: colors.$5,
+              paddingLeft: '1.125rem',
+              paddingRight: '1.125rem',
+            }}
           >
-            <div className="flex items-center space-x-2 text-sm">
-              <div>
-                <Icon element={LuArrowUpDown} color={colors.$3} />
+            <div className="flex items-center py-2 space-x-3">
+              <div className="flex items-center space-x-2 text-sm">
+                <div>
+                  <OppositeArrows color={colors.$3} size="1.3rem" />
+                </div>
+
+                <span className="mb-0.5" style={{ color: colors.$3 }}>
+                  {t('navigate')}
+                </span>
               </div>
 
-              <span className="mb-0.5" style={{ color: colors.$3 }}>
-                {t('navigate')}
-              </span>
+              <div className="flex items-center space-x-2 text-sm px-3">
+                <div>
+                  <ReturnKey color={colors.$3} size="1.1rem" />
+                </div>
+
+                <span className="mb-0.5" style={{ color: colors.$3 }}>
+                  {t('select')}
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-2 text-sm px-3">
+                <span className="font-semibold" style={{ color: colors.$3 }}>
+                  ESC
+                </span>
+
+                <span style={{ color: colors.$3 }}>{t('close')}</span>
+              </div>
             </div>
 
-            <div className="flex items-center space-x-2 text-sm px-3">
-              <div>
-                <Icon element={LuCornerDownLeft} color={colors.$3} />
-              </div>
-
+            <div
+              className="flex cursor-pointer items-center space-x-2 text-sm px-3"
+              onClick={() => {
+                window.open('https://invoiceninja.github.io', '_blank');
+              }}
+            >
               <span className="mb-0.5" style={{ color: colors.$3 }}>
-                {t('select')}
+                {t('docs')}
               </span>
+
+              <div>
+                <ExternalLink color={colors.$3} size="1.15rem" />
+              </div>
             </div>
           </div>
         </div>
