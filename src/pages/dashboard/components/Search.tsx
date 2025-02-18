@@ -33,6 +33,8 @@ import { OppositeArrows } from '$app/components/icons/OppositeArrows';
 import { ReturnKey } from './ReturnKey';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
 import { SearchGroups } from './SearchGroups';
+import { BiSearch } from 'react-icons/bi';
+import { Icon } from '$app/components/icons/Icon';
 
 export function Search$() {
   const [t] = useTranslation();
@@ -287,8 +289,16 @@ export function Search$() {
 
   return (
     <>
+      <button
+        type="button"
+        onClick={() => setIsModalOpen(true)}
+        className="lg:hidden flex justify-end items-end"
+      >
+        <Icon element={BiSearch} size={22} style={{ color: colors.$3 }} />
+      </button>
+
       <div
-        className="flex items-center border rounded-md px-1 py-1 space-x-5"
+        className="hidden lg:flex items-center border rounded-md p-1.5 space-x-5"
         onClick={() => setIsModalOpen(true)}
         style={{ borderColor: colors.$5 }}
       >
@@ -322,7 +332,11 @@ export function Search$() {
           <div className="flex flex-col pb-3">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-1.5 py-2 px-4 flex-1 border-b">
-                <SearchIcon color={colors.$5} size="1.6rem" />
+                {isFetching ? (
+                  <Spinner />
+                ) : (
+                  <SearchIcon color={colors.$5} size="1.6rem" />
+                )}
 
                 <div className="flex-1">
                   <InputField
@@ -337,8 +351,6 @@ export function Search$() {
                   />
                 </div>
               </div>
-
-              {isFetching && <Spinner />}
             </div>
 
             <div
