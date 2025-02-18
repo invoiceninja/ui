@@ -298,7 +298,7 @@ export function Search$() {
       </button>
 
       <div
-        className="hidden lg:flex items-center border rounded-md px-1 py-1 space-x-5"
+        className="hidden lg:flex items-center border rounded-md p-1.5 space-x-5"
         onClick={() => setIsModalOpen(true)}
         style={{ borderColor: colors.$5 }}
       >
