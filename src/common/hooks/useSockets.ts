@@ -75,18 +75,20 @@ export function useSockets() {
 }
 
 export function useCleanupConnections() {
-  const [connections, setConnections] = useAtom(connectionsAtom);
+  const [connections] = useAtom(connectionsAtom);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (connections.length > 1) {
-        const last = connections[connections.length - 1];
+        connections.map((connection) => {
+          if (connection === connections[connections.length - 1]) {
+            return;
+          }
 
-        last.disconnect();
+          connection.disconnect();
+        });
 
-        setConnections((connections) =>
-          connections.filter((connection) => connection !== last)
-        );
+        // setConnections([connections[connections.length - 1]]);
       }
 
       return () => clearTimeout(timeout);
