@@ -206,7 +206,7 @@ export function Notifications() {
       );
 
       return () => {
-        sockets.channel(channelName).unsubscribe();
+        channel.unbind('App\\Events\\General\\GenericMessage');
       };
     }
   }, [sockets, reactSettings.preferences.enable_public_notifications]);
