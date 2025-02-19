@@ -19,10 +19,16 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
+import { CalendarAlert } from '$app/components/icons/CalendarAlert';
 
 export function PastDueInvoices() {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
+
+  const colors = useColorScheme();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
@@ -79,12 +85,25 @@ export function PastDueInvoices() {
 
   return (
     <Card
-      title={t('past_due_invoices')}
+      title={
+        <div className="flex items-center gap-2">
+          <CalendarAlert
+            size="1.4rem"
+            color="#F5B041"
+            exclamationMarkColor="#E74C3C"
+          />
+
+          <span>{t('past_due_invoices')}</span>
+        </div>
+      }
       className="h-96 relative"
+      headerClassName="px-2 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
-      withoutHeaderBorder
+      style={{ borderColor: colors.$5 }}
+      headerStyle={{ borderColor: colors.$5 }}
+      withoutHeaderPadding
     >
-      <div className="pl-6 pr-4">
+      <div className="px-4 pt-4">
         <DataTable
           resource="invoice"
           columns={columns}
@@ -100,14 +119,24 @@ export function PastDueInvoices() {
             withoutTopBorder: true,
             withoutLeftBorder: true,
             withoutRightBorder: true,
+            disableThUppercase: true,
+            withoutThVerticalPadding: true,
+            useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
             thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
+            tdClassName: 'first:pl-2 py-3',
+            thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },
+            thTextSize: 'small',
+            thStyle: {
+              borderBottom: `1px solid ${colors.$5}`,
+            },
+            rowSeparatorColor: colors.$5,
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
           }}
           style={{
-            height: '19.9rem',
+            height: '18.9rem',
           }}
           withoutSortQueryParameter
         />

@@ -93,6 +93,8 @@ export function DropdownDateRangePicker(props: Props) {
         <option value="last7_days">{t('last_7_days')}</option>
         <option value="last30_days">{t('last_30_days')}</option>
         <option value="this_month">{t('this_month')}</option>
+        <option value="last_month">{t('last_month')}</option>
+        <option value="this_quarter">{t('current_quarter')}</option>
         <option value="this_year">{t('this_year')}</option>
         <option value="last_year">{t('last_year')}</option>
         <option value={'last365_days'}>{`${t('last365_days')}`}</option>
