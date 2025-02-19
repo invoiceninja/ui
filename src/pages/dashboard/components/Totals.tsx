@@ -245,8 +245,10 @@ export function Totals() {
       )}
 
       {/* Quick date, currency & date picker. */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">{t('account_login_text')}</span>
+      <div className="flex items-center justify-end lg:justify-between">
+        <span className="hidden lg:inline-block text-sm text-gray-500">
+          {t('account_login_text')}
+        </span>
 
         <div className="flex">
           <div className="flex space-x-2">
@@ -389,15 +391,16 @@ export function Totals() {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 mt-4 gap-8">
+      <div className="grid grid-cols-10 mt-4 gap-8">
         {company && (
           <Card
             title={t('recent_transactions')}
-            className="col-span-12 xl:col-span-3"
-            headerClassName="px-3 sm:px-4"
+            className="col-span-10 xl:col-span-3"
+            headerClassName="px-2 sm:px-4 py-3 sm:py-4"
             withoutBodyPadding
             style={{ borderColor: colors.$5 }}
             headerStyle={{ borderColor: colors.$5 }}
+            withoutHeaderPadding
           >
             <div className="flex flex-col px-4">
               <div
@@ -492,11 +495,12 @@ export function Totals() {
         {chartData && (
           <Card
             title={t('overview')}
-            className="col-span-12 xl:col-span-9"
-            headerClassName="px-3 sm:px-4"
-            childrenClassName="pl-2 pr-8"
+            className="col-span-10 xl:col-span-7"
+            headerClassName="px-2 sm:px-4 py-3 sm:py-4"
+            childrenClassName="pl-0 pr-4"
             style={{ borderColor: colors.$5 }}
             headerStyle={{ borderColor: colors.$5 }}
+            withoutHeaderPadding
           >
             <Chart
               chartSensitivity={chartScale}

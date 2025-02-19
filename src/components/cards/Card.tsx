@@ -34,7 +34,7 @@ export interface ButtonOption {
 
 interface Props {
   children: ReactNode;
-  title?: string | null;
+  title?: ReactNode | null;
   description?: string;
   withSaveButton?: boolean;
   additionalSaveOptions?: ButtonOption[];
@@ -58,6 +58,7 @@ interface Props {
   height?: 'full';
   headerStyle?: CSSProperties;
   headerClassName?: string;
+  withoutHeaderPadding?: boolean;
 }
 
 export function Card(props: Props) {
@@ -94,8 +95,10 @@ export function Card(props: Props) {
             className={classNames(
               {
                 'bg-white sticky top-0': props.withScrollableBody,
-                'px-4 sm:px-6 py-3': padding == 'small',
-                'px-4 sm:px-6 py-5': padding == 'regular',
+                'px-4 sm:px-6 py-3':
+                  padding == 'small' && !props.withoutHeaderPadding,
+                'px-4 sm:px-6 py-5':
+                  padding == 'regular' && !props.withoutHeaderPadding,
                 'border-b': !props.withoutHeaderBorder,
               },
               props.headerClassName

@@ -102,6 +102,13 @@ interface StyleOptions {
   thClassName?: string;
   tdClassName?: string;
   addRowSeparator?: boolean;
+  thStyle?: CSSProperties;
+  withoutThVerticalPadding?: boolean;
+  useOnlyCurrentSortDirectionIcon?: boolean;
+  thTextSize?: 'extraSmall' | 'small';
+  disableThUppercase?: boolean;
+  descIcon?: ReactNode;
+  ascIcon?: ReactNode;
 }
 
 interface Props<T> extends CommonProps {
@@ -594,11 +601,17 @@ export function DataTable<T extends object>(props: Props<T>) {
         style={props.style}
         resizable={apiEndpoint.pathname}
       >
-        <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
+        <Thead
+          backgroundColor={styleOptions?.headerBackgroundColor}
+          style={styleOptions?.thStyle}
+        >
           {!props.withoutActions && !hideEditableOptions && (
             <Th
               className={styleOptions?.thClassName}
               resizable={`${apiEndpoint.pathname}.leftCheckbox`}
+              withoutVerticalPadding={styleOptions?.withoutThVerticalPadding}
+              textSize={styleOptions?.thTextSize}
+              disableUppercase={styleOptions?.disableThUppercase}
             >
               <Checkbox
                 innerRef={mainCheckbox}
@@ -640,6 +653,13 @@ export function DataTable<T extends object>(props: Props<T>) {
                   }}
                   childrenClassName={styleOptions?.thChildrenClassName}
                   resizable={`${apiEndpoint.pathname}.${column.id}`}
+                  useOnlyCurrentSortDirectionIcon={
+                    styleOptions?.useOnlyCurrentSortDirectionIcon
+                  }
+                  textSize={styleOptions?.thTextSize}
+                  disableUppercase={styleOptions?.disableThUppercase}
+                  descIcon={styleOptions?.descIcon}
+                  ascIcon={styleOptions?.ascIcon}
                 >
                   <div className="flex items-center space-x-3">
                     {dateRangeColumns.some(

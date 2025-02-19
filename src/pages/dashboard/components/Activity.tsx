@@ -18,9 +18,12 @@ import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
 import React from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 export function Activity() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const { data, isLoading, isError } = useQuery(
     ['/api/v1/activities'],
@@ -35,6 +38,11 @@ export function Activity() {
       title={t('recent_activity')}
       className="h-96 relative"
       withoutBodyPadding
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
+      childrenClassName="px-0"
+      style={{ borderColor: colors.$5 }}
+      headerStyle={{ borderColor: colors.$5 }}
+      withoutHeaderPadding
     >
       {isLoading && (
         <NonClickableElement>
@@ -46,10 +54,10 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      <div className="pl-6 pr-4">
+      <div className="pt-4">
         <div
-          className="flex flex-col overflow-y-auto pr-4"
-          style={{ height: '19.9rem' }}
+          className="flex flex-col overflow-y-auto px-4"
+          style={{ height: '18.9rem' }}
         >
           {data?.data.data &&
             data.data.data.map((record: ActivityRecord, index: number) => (

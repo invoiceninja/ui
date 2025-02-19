@@ -21,7 +21,12 @@ export function Thead(props: Props) {
   const accentColor = useAccentColor();
 
   return (
-    <thead style={{ backgroundColor: backgroundColor || accentColor }}>
+    <thead
+      style={{
+        backgroundColor: backgroundColor || accentColor,
+        ...props.style,
+      }}
+    >
       <tr>{props.children}</tr>
     </thead>
   );
