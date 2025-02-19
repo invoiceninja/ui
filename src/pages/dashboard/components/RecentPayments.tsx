@@ -142,8 +142,9 @@ export function RecentPayments() {
             thStyle: {
               borderBottom: `1px solid ${colors.$5}`,
             },
-            ascIcon: <ArrowUp size="1.1rem" color="#A1A1AA" />,
-            descIcon: <ArrowDown size="1.1rem" color="#A1A1AA" />,
+            rowSeparatorColor: colors.$5,
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
           }}
           style={{
             height: '18.9rem',

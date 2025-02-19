@@ -109,6 +109,7 @@ interface StyleOptions {
   disableThUppercase?: boolean;
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
+  rowSeparatorColor?: string;
 }
 
 interface Props<T> extends CommonProps {
@@ -686,6 +687,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td colSpan={100}>
                 <Spinner />
@@ -699,6 +703,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
@@ -712,6 +719,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td className={styleOptions?.tdClassName} colSpan={100}>
                 {t('no_records_found')}
@@ -728,6 +738,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
                 backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
+                style={{
+                  borderColor: styleOptions?.rowSeparatorColor,
+                }}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td

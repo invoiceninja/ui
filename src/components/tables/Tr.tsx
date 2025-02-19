@@ -26,6 +26,7 @@ export function Tr(props: Props) {
     <tr
       style={{
         backgroundColor: backgroundColor || colors.$1,
+        ...props.style,
       }}
       onClick={(event) =>
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
