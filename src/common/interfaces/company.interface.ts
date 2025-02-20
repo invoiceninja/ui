@@ -338,7 +338,9 @@ export interface Settings {
   merge_e_invoice_to_pdf: boolean;
   payment_flow: string;
   enable_client_profile_update: boolean;
+  preference_product_notes_for_html_view: boolean;
   unlock_invoice_documents_after_payment: boolean;
+
 }
 
 export interface TaxData {

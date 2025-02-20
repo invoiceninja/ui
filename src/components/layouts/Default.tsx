@@ -62,6 +62,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
+import classNames from 'classnames';
 
 export interface SaveOption {
   label: string;
@@ -423,12 +424,13 @@ export function Default(props: Props) {
       <DesktopSidebar navigation={navigation} docsLink={props.docsLink} />
 
       <div
-        className={`${
-          isMiniSidebar ? 'md:pl-16' : 'md:pl-64'
-        } flex flex-col flex-1`}
+        className={classNames('flex flex-col flex-1', {
+          'md:pl-16': isMiniSidebar,
+          'md:pl-64': !isMiniSidebar,
+        })}
       >
         <div
-          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          style={{ backgroundColor: colors.$1 }}
           className="sticky top-0 z-10 flex-shrink-0 flex h-16 border-b shadow"
         >
           <button
@@ -437,8 +439,9 @@ export function Default(props: Props) {
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <MenuIcon className="dark:text-gray-100" />
+            <MenuIcon color={colors.$3} />
           </button>
+
           <div
             className="flex-1 px-4 xl:px-8 flex items-center"
             data-cy="topNavbar"
@@ -452,7 +455,6 @@ export function Default(props: Props) {
               </h2>
 
               <QuickCreatePopover />
-
               <Search />
             </div>
 
@@ -480,8 +482,12 @@ export function Default(props: Props) {
                 >
                   <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
 
-                  <span className="relative z-10">
+                  <span className="relative z-10 hidden xl:block">
                     {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
+                  </span>
+
+                  <span className="relative z-10 xl:hidden">
+                    {t('upgrade')}
                   </span>
                 </button>
               )}
