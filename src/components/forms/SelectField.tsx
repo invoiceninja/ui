@@ -13,7 +13,7 @@ import { Alert } from '$app/components/Alert';
 import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
-import React, { ReactNode, isValidElement } from 'react';
+import React, { CSSProperties, ReactNode, isValidElement } from 'react';
 import { SelectOption } from '../datatables/Actions';
 import Select, { StylesConfig } from 'react-select';
 import { ChevronDown } from '../icons/ChevronDown';
@@ -33,6 +33,7 @@ export interface SelectProps extends CommonProps {
   withoutSeparator?: boolean;
   searchable?: boolean;
   controlIcon?: ReactNode;
+  controlStyle?: CSSProperties;
 }
 
 export function SelectField(props: SelectProps) {
@@ -53,6 +54,7 @@ export function SelectField(props: SelectProps) {
     clearAfterSelection,
     searchable = true,
     controlIcon,
+    controlStyle,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -98,6 +100,7 @@ export function SelectField(props: SelectProps) {
       borderColor: colors.$5,
       cursor: isDisabled ? 'not-allowed' : 'pointer',
       pointerEvents: isDisabled ? 'auto' : 'unset',
+      ...controlStyle,
     }),
     option: (base, { isSelected, isFocused }) => ({
       ...base,
@@ -181,34 +184,35 @@ export function SelectField(props: SelectProps) {
           )}
           blurInputOnSelect
           data-cy={cypressRef}
-          components={{
-            Control: ({ children: currentChildren, innerProps, isFocused }) => (
-              <div
-                className={classNames(
-                  'flex items-center rounded-md border cursor-pointer',
-                  { 'pl-2': controlIcon }
-                )}
-                style={{
-                  height: '2.5rem',
-                  backgroundColor: colors.$1,
-                  borderColor: isFocused ? '#2463eb' : colors.$5,
-                  boxShadow: isFocused ? '0 0 0 1px #2463eb' : 'none',
-                }}
-                {...innerProps}
-              >
-                {controlIcon}
-                {currentChildren}
-              </div>
-            ),
-            DropdownIndicator: () => (
-              <div
-                className="flex items-center justify-center px-3 hover:opacity-75 h-full w-full"
-                style={{ color: colors.$3 }}
-              >
-                <ChevronDown color={colors.$3} size="1rem" />
-              </div>
-            ),
-          }}
+          components={
+            controlIcon
+              ? {
+                  Control: ({ children, innerProps, isFocused }) => (
+                    <div
+                      className="flex items-center rounded-md border cursor-pointer pl-2"
+                      style={{
+                        height: '2.5rem',
+                        backgroundColor: colors.$1,
+                        borderColor: isFocused ? '#2463eb' : colors.$5,
+                        ...controlStyle,
+                      }}
+                      {...innerProps}
+                    >
+                      {controlIcon}
+                      {children}
+                    </div>
+                  ),
+                  DropdownIndicator: () => (
+                    <div
+                      className="flex items-center justify-center px-3 hover:opacity-75 h-full w-full"
+                      style={{ color: colors.$3 }}
+                    >
+                      <ChevronDown color={colors.$3} size="1rem" />
+                    </div>
+                  ),
+                }
+              : undefined
+          }
         />
       )}
 

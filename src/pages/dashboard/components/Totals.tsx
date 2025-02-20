@@ -236,6 +236,13 @@ export function Totals() {
     }
   }, [chart.data]);
 
+  useEffect(() => {
+    return () => {
+      update('preferences.dashboard_charts.default_view', 'month');
+      update('preferences.dashboard_charts.range', 'this_month');
+    };
+  }, []);
+
   return (
     <>
       {totals.isLoading && (

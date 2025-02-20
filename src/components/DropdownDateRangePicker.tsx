@@ -18,6 +18,7 @@ import { SelectField } from './forms';
 import { atom, useAtomValue } from 'jotai';
 import { Calendar } from './icons/Calendar';
 import { useColorScheme } from '$app/common/colors';
+import styled from 'styled-components';
 
 type Props = {
   value?: string;
@@ -29,8 +30,55 @@ type Props = {
 
 export const antdLocaleAtom = atom<any | null>(null);
 
+const { RangePicker } = DatePicker;
+
+const StyledRangePicker = styled(RangePicker)`
+  &:focus {
+    border: none;
+    outline: none;
+  }
+
+  &.ant-picker {
+    border-color: #d1d5db;
+    width: 16rem;
+  }
+
+  &.ant-picker-focused {
+    border-color: #2463eb !important;
+  }
+
+  .ant-picker-suffix {
+    display: none;
+  }
+
+  .ant-picker-input {
+    text-align: center;
+  }
+
+  .ant-picker-input-active {
+    background-color: #e6f7ff;
+    border-radius: 4px;
+  }
+
+  .ant-picker-input-active input {
+    color: #1890ff;
+    font-weight: 500;
+  }
+
+  &.ant-picker-range-active .ant-picker-input-active input {
+    color: #1890ff;
+  }
+
+  .ant-picker-range-separator {
+    color: #8c8c8c;
+  }
+
+  .ant-picker-active-bar {
+    display: none !important;
+  }
+`;
+
 export function DropdownDateRangePicker(props: Props) {
-  const { RangePicker } = DatePicker;
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -71,6 +119,12 @@ export function DropdownDateRangePicker(props: Props) {
     setCustomEndDate(props.endDate);
   }, [props.startDate, props.endDate]);
 
+  useEffect(() => {
+    return () => {
+      setIsModalVisible(false);
+    };
+  }, []);
+
   return (
     <div className="flex justify-end items-center">
       <SelectField
@@ -89,6 +143,13 @@ export function DropdownDateRangePicker(props: Props) {
         withoutSeparator
         searchable={false}
         controlIcon={<Calendar color={colors.$3} />}
+        {...(props.value === 'custom' && {
+          controlStyle: {
+            borderTopRightRadius: '0',
+            borderBottomRightRadius: '0',
+            borderRight: 'none',
+          },
+        })}
       >
         <option value="last7_days">{t('last_7_days')}</option>
         <option value="last30_days">{t('last_30_days')}</option>
@@ -104,11 +165,18 @@ export function DropdownDateRangePicker(props: Props) {
       {isModalVisible && (
         <div className="flex flex-row space-x-2">
           <ConfigProvider locale={antdLocale?.default}>
-            <RangePicker
+            <StyledRangePicker
               size="large"
+              className="rounded-md"
               defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
               format={dateFormat}
               onChange={(_, dateString) => handleCustomDateChange(dateString)}
+              style={{
+                borderTopLeftRadius: '0',
+                borderBottomLeftRadius: '0',
+              }}
+              separator={<span style={{ color: '#888' }}>—</span>}
+              allowClear={false}
             />
           </ConfigProvider>
         </div>
