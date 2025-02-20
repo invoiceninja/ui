@@ -123,7 +123,7 @@ export function PastDueInvoices() {
             withoutThVerticalPadding: true,
             useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
+            thChildrenClassName: 'text-gray-500',
             tdClassName: 'first:pl-2 py-3',
             thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },

@@ -103,7 +103,7 @@ export function Th$(props: Props) {
               width: currentWidth !== -1 ? currentWidth : 'auto',
             }}
           >
-            <span className="overflow-hidden whitespace-nowrap text-ellipsis text-gray-500">
+            <span className="overflow-hidden whitespace-nowrap text-ellipsis">
               {props.children}
             </span>
 
