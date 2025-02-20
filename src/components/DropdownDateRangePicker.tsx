@@ -44,37 +44,101 @@ const StyledRangePicker = styled(RangePicker)`
   }
 
   &.ant-picker-focused {
-    border-color: #2463eb !important;
+    border-color: #09090b !important;
   }
 
   .ant-picker-suffix {
     display: none;
   }
 
+  /* Improved text centering */
   .ant-picker-input {
     text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .ant-picker-input input {
+    text-align: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.85) !important;
   }
 
   .ant-picker-input-active {
-    background-color: #e6f7ff;
+    background-color: #09090b1a;
     border-radius: 4px;
   }
 
   .ant-picker-input-active input {
-    color: #1890ff;
+    color: #09090b;
     font-weight: 500;
   }
 
   &.ant-picker-range-active .ant-picker-input-active input {
-    color: #1890ff;
+    color: #09090b;
   }
 
   .ant-picker-range-separator {
     color: #8c8c8c;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
   }
 
   .ant-picker-active-bar {
     display: none !important;
+  }
+
+  .ant-picker-panels {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .ant-picker-panel {
+    border: none;
+    background-color: white;
+  }
+
+  .ant-picker-date-panel,
+  .ant-picker-datetime-panel,
+  .ant-picker-time-panel {
+    width: auto;
+  }
+
+  .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: #09090b;
+  }
+
+  .ant-picker-cell-in-view.ant-picker-cell-in-range::before {
+    background-color: #09090b1a;
+  }
+
+  .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+  .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+    background-color: #09090b;
+    color: white;
+  }
+
+  .ant-picker-header-view button {
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  .ant-picker-header-view button:hover {
+    color: #09090b;
+  }
+
+  &:not(.ant-picker-focused) .ant-picker-input input {
+    background-color: transparent;
+    color: rgba(0, 0, 0, 0.85) !important;
+  }
+
+  &:not(.ant-picker-focused):not(.ant-picker-range-active)
+    .ant-picker-input-active {
+    background-color: transparent;
+  }
+
+  &:not(.ant-picker-focused) .ant-picker-active-bar {
+    display: none;
   }
 `;
 
