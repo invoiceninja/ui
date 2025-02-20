@@ -653,6 +653,28 @@ export function OnlinePayments() {
             disabled={disableSettingsField('payment_flow')}
           />
         </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="unlock_invoice_documents_after_payment"
+              labelElement={<SettingsLabel label={t('unlock_invoice_documents_after_payment')} />}
+              defaultValue={false}
+            />
+          }
+          leftSideHelp={t('unlock_invoice_documents_after_payment_help')}
+        >
+          <Toggle
+            id="unlock_invoice_documents_after_payment"
+            checked={Boolean(company?.settings.unlock_invoice_documents_after_payment)}
+            onChange={(value) =>
+              handleChangeProperty('settings.unlock_invoice_documents_after_payment', value)
+            }
+            disabled={disableSettingsField('unlock_invoice_documents_after_payment')}
+          />
+        </Element>
+
+        
       </Card>
     </Settings>
   );
