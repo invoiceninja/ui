@@ -131,6 +131,7 @@ const StyledRangePicker = styled(RangePicker)`
   &:not(.ant-picker-focused) .ant-picker-input input {
     background-color: transparent;
     color: rgba(0, 0, 0, 0.85) !important;
+    font-weight: normal;
   }
 
   &:not(.ant-picker-focused):not(.ant-picker-range-active)
