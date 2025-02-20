@@ -39,13 +39,14 @@ const StyledRangePicker = styled(RangePicker)`
   }
 
   &.ant-picker {
-    border-color: #d1d5db;
+    border-color: var(--picker-border-color);
     width: 16rem;
     height: 2.5rem;
+    background-color: var(--picker-bg);
   }
 
   &.ant-picker-focused {
-    border-color: #09090b !important;
+    border-color: var(--accent-color) !important;
     box-shadow: none !important;
   }
 
@@ -62,25 +63,24 @@ const StyledRangePicker = styled(RangePicker)`
   .ant-picker-input input {
     text-align: center;
     justify-content: center;
-    color: rgba(0, 0, 0, 0.85) !important;
+    color: var(--input-text-color) !important;
   }
 
   .ant-picker-input-active {
-    background-color: #09090b1a;
+    background-color: var(--active-state-bg);
     border-radius: 4px;
   }
 
   .ant-picker-input-active input {
-    color: #09090b;
+    color: var(--accent-color);
     font-weight: 500;
   }
 
   &.ant-picker-range-active .ant-picker-input-active input {
-    color: #09090b;
+    color: var(--accent-color);
   }
 
   .ant-picker-range-separator {
-    color: #8c8c8c;
     display: flex;
     align-items: center;
     margin-bottom: 0.25rem;
@@ -97,7 +97,7 @@ const StyledRangePicker = styled(RangePicker)`
 
   .ant-picker-panel {
     border: none;
-    background-color: white;
+    background-color: var(--calendar-bg);
   }
 
   .ant-picker-date-panel,
@@ -107,30 +107,30 @@ const StyledRangePicker = styled(RangePicker)`
   }
 
   .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
-    background-color: #09090b;
+    background-color: var(--accent-color);
   }
 
   .ant-picker-cell-in-view.ant-picker-cell-in-range::before {
-    background-color: #09090b1a;
+    background-color: var(--active-state-bg);
   }
 
   .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
   .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
-    background-color: #09090b;
-    color: white;
+    background-color: var(--accent-color);
+    color: var(--calendar-bg);
   }
 
   .ant-picker-header-view button {
-    color: rgba(0, 0, 0, 0.85);
+    color: var(--input-text-color);
   }
 
   .ant-picker-header-view button:hover {
-    color: #09090b;
+    color: var(--accent-color);
   }
 
   &:not(.ant-picker-focused) .ant-picker-input input {
     background-color: transparent;
-    color: rgba(0, 0, 0, 0.85) !important;
+    color: var(--input-text-color) !important;
     font-weight: normal;
   }
 
@@ -229,7 +229,19 @@ export function DropdownDateRangePicker(props: Props) {
       </SelectField>
 
       {isModalVisible && (
-        <div className="flex flex-row space-x-2">
+        <div
+          className="flex flex-row space-x-2"
+          style={
+            {
+              '--accent-color': colors.$3,
+              '--active-state-bg': colors.$4,
+              '--calendar-bg': colors.$2,
+              '--input-text-color': colors.$3,
+              '--picker-border-color': colors.$5,
+              '--picker-bg': colors.$1,
+            } as React.CSSProperties
+          }
+        >
           <ConfigProvider locale={antdLocale?.default}>
             <StyledRangePicker
               size="large"
@@ -241,7 +253,7 @@ export function DropdownDateRangePicker(props: Props) {
                 borderTopLeftRadius: '0',
                 borderBottomLeftRadius: '0',
               }}
-              separator={<span style={{ color: '#888' }}>—</span>}
+              separator={<span style={{ color: colors.$4 }}>—</span>}
               allowClear={false}
             />
           </ConfigProvider>
