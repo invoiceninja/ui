@@ -53,7 +53,7 @@ export function QuickCreatePopover() {
           <StyledPopoverButton
             data-cy="quickPopoverButton"
             className="flex items-center justify-center h-10 w-10 rounded-lg border shadow-sm focus:outline-none"
-            style={{ borderColor: colors.$5 }}
+            style={{ height: '2.3rem', borderColor: colors.$5 }}
             theme={{
               hoverBackgroundColor: colors.$4,
               backgroundColor: colors.$1,

@@ -300,7 +300,7 @@ export function Search$() {
       <div
         className="hidden lg:flex items-center border rounded-md p-1.5 space-x-5"
         onClick={() => setIsModalOpen(true)}
-        style={{ borderColor: colors.$5 }}
+        style={{ height: '2.3rem', borderColor: colors.$5 }}
       >
         <div className="flex items-center space-x-1.5 pl-1">
           <SearchIcon color={colors.$5} />
