@@ -41,17 +41,18 @@ const StyledRangePicker = styled(RangePicker)`
   &.ant-picker {
     border-color: #d1d5db;
     width: 16rem;
+    height: 2.5rem;
   }
 
   &.ant-picker-focused {
     border-color: #09090b !important;
+    box-shadow: none !important;
   }
 
   .ant-picker-suffix {
     display: none;
   }
 
-  /* Improved text centering */
   .ant-picker-input {
     text-align: center;
     display: flex;
