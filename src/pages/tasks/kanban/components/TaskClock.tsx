@@ -11,12 +11,26 @@
 import { Task } from '$app/common/interfaces/task';
 import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
 import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
+import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
 
 interface Props {
   task: Task;
   calculateLastTimeLog?: boolean;
 }
+
+export const formatTime = (seconds: number) => {
+  const ONE_DAY_IN_SECONDS = 86400;
+
+  if (seconds >= ONE_DAY_IN_SECONDS) {
+    return dayjs.duration(seconds, 'seconds').format('D[d] H[h] m[m] s[s]');
+  }
+
+  return dayjs.duration(seconds, 'seconds').format('HH:mm:ss');
+};
 
 export function TaskClock(props: Props) {
   const [seconds, setSeconds] = useState<number>(0);
@@ -77,9 +91,5 @@ export function TaskClock(props: Props) {
     };
   }, [props.task.updated_at]);
 
-  return (
-    <p>
-      {isTaskActive && new Date(seconds * 1000).toISOString().slice(11, 19)}
-    </p>
-  );
+  return <p>{isTaskActive && formatTime(seconds)}</p>;
 }
