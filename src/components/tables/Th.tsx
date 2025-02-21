@@ -86,7 +86,7 @@ export function Th$(props: Props) {
           whiteSpace: 'nowrap',
         }}
       >
-        {props.onColumnClick ? (
+        {props.onColumnClick && props.onColumnClick !== null ? (
           <div
             className="flex items-center space-x-1 overflow-hidden whitespace-nowrap text-ellipsis"
             onClick={handleClick}

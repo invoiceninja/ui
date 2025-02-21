@@ -628,7 +628,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
           {props.columns.map(
             (column, index) =>
-              Boolean(!excludeColumns.includes(column.id)) && (
+              Boolean(!excludeColumns.includes(column.id)) &&
+              (column.id === '__actions__' ? (
+                <Th resizable={`${apiEndpoint.pathname}.${column.id}`} />
+              ) : (
                 <Th
                   id={column.id}
                   key={index}
@@ -653,10 +656,10 @@ export function DataTable<T extends object>(props: Props<T>) {
                     <span>{column.label}</span>
                   </div>
                 </Th>
-              )
+              ))
           )}
 
-          {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
+          {/* {props.withResourcefulActions && !hideEditableOptions && <Th></Th>} */}
         </Thead>
 
         <Tbody style={styleOptions?.tBodyStyle}>
@@ -732,7 +735,92 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                 {props.columns.map(
                   (column, index) =>
-                    Boolean(!excludeColumns.includes(column.id)) && (
+                    Boolean(!excludeColumns.includes(column.id)) &&
+                    (column.id === '__actions__' &&
+                    props.withResourcefulActions &&
+                    !hideEditableOptions ? (
+                      <Td>
+                        <Dropdown label={t('actions')}>
+                          {props.linkToEdit &&
+                            (props.showEdit?.(resource) || !props.showEdit) && (
+                              <DropdownElement
+                                to={route(props.linkToEdit, {
+                                  id: resource?.id,
+                                })}
+                                icon={<Icon element={MdEdit} />}
+                              >
+                                {t('edit')}
+                              </DropdownElement>
+                            )}
+
+                          {props.linkToEdit &&
+                            props.customActions &&
+                            showCustomActionDivider(resource) &&
+                            (props.showEdit?.(resource) || !props.showEdit) && (
+                              <Divider withoutPadding />
+                            )}
+
+                          {props.customActions &&
+                            props.customActions.map(
+                              (
+                                action: ResourceAction<typeof resource>,
+                                index: number
+                              ) =>
+                                !bottomActionsKeys.includes(
+                                  action(resource)?.key || ''
+                                ) && <div key={index}>{action(resource)}</div>
+                            )}
+
+                          {props.customActions &&
+                            (props.showRestore?.(resource) ||
+                              !props.showRestore) && <Divider withoutPadding />}
+
+                          {resource?.archived_at === 0 &&
+                            (props.showArchive?.(resource) ||
+                              !props.showArchive) && (
+                              <DropdownElement
+                                onClick={() => bulk('archive', resource.id)}
+                                icon={<Icon element={MdArchive} />}
+                              >
+                                {t('archive')}
+                              </DropdownElement>
+                            )}
+
+                          {resource?.archived_at > 0 &&
+                            (props.showRestore?.(resource) ||
+                              !props.showRestore) && (
+                              <DropdownElement
+                                onClick={() => bulk('restore', resource.id)}
+                                icon={<Icon element={MdRestore} />}
+                              >
+                                {t('restore')}
+                              </DropdownElement>
+                            )}
+
+                          {!resource?.is_deleted &&
+                            (props.showDelete?.(resource) ||
+                              !props.showDelete) && (
+                              <DropdownElement
+                                onClick={() => bulk('delete', resource.id)}
+                                icon={<Icon element={MdDelete} />}
+                              >
+                                {t('delete')}
+                              </DropdownElement>
+                            )}
+
+                          {props.customActions &&
+                            props.customActions.map(
+                              (
+                                action: ResourceAction<typeof resource>,
+                                index: number
+                              ) =>
+                                bottomActionsKeys.includes(
+                                  action(resource)?.key || ''
+                                ) && <div key={index}>{action(resource)}</div>
+                            )}
+                        </Dropdown>
+                      </Td>
+                    ) : (
                       <Td
                         key={index}
                         className={classNames(
@@ -755,10 +843,10 @@ export function DataTable<T extends object>(props: Props<T>) {
                           ? column.format(resource[column.id], resource)
                           : resource[column.id]}
                       </Td>
-                    )
+                    ))
                 )}
 
-                {props.withResourcefulActions && !hideEditableOptions && (
+                {/* {props.withResourcefulActions && !hideEditableOptions && (
                   <Td>
                     <Dropdown label={t('actions')}>
                       {props.linkToEdit &&
@@ -839,7 +927,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         )}
                     </Dropdown>
                   </Td>
-                )}
+                )} */}
               </Tr>
             ))}
         </Tbody>

@@ -175,7 +175,9 @@ export function DataTableColumnsPicker(props: Props) {
                     className="flex items-center justify-between py-2 text-sm"
                   >
                     <div className="flex space-x-2 items-center">
-                      <Icon element={MdClose} size={20} />
+                      {column === '__actions__' ? null : (
+                        <Icon element={MdClose} size={20} />
+                      )}
 
                       <p>{t(column)}</p>
                     </div>
@@ -202,12 +204,14 @@ export function DataTableColumnsPicker(props: Props) {
                           className="flex items-center justify-between py-2"
                         >
                           <div className="flex space-x-2 items-center">
-                            <Icon
-                              className="cursor-pointer"
-                              element={MdClose}
-                              size={20}
-                              onClick={() => handleDelete(column)}
-                            />
+                            {column === '__actions__' ? null : (
+                              <Icon
+                                className="cursor-pointer"
+                                element={MdClose}
+                                size={20}
+                                onClick={() => handleDelete(column)}
+                              />
+                            )}
 
                             <p>{t(column)}</p>
                           </div>

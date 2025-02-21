@@ -63,6 +63,7 @@ export const defaultColumns: string[] = [
   'balance',
   'date',
   'due_date',
+  '__actions__',
 ];
 
 export function useAllInvoiceColumns() {
@@ -482,6 +483,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
     },
+    useActionColumn(),
   ];
 
   const list: string[] =
@@ -490,4 +492,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useActionColumn<T>() {
+  return {
+    column: '__actions__',
+    id: '__actions__' as keyof T,
+    label: '',
+    format: () => <p>This is actions panel</p>,
+  };
 }
