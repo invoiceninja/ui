@@ -11,9 +11,10 @@
 interface Props {
   size?: string;
   color?: string;
+  className?: string;
 }
 
-export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
+export function Cube({ size = '1rem', color = '#A1A1AA', className }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,31 +23,38 @@ export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
       y="0px"
       width={size}
       height={size}
-      viewBox="0 0 20 20"
+      viewBox="0 0 18 18"
+      className={className}
     >
-      <line
-        x1="10"
-        y1="16.5"
-        x2="10"
-        y2="3.5"
+      <polyline
+        points="14.983 5.53 9 9 3.017 5.53"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth="1.5"
+        data-color="color-2"
+      ></polyline>
+      <line
+        x1="9"
+        y1="15.938"
+        x2="9"
+        y2="9"
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
         data-color="color-2"
       ></line>
-      <line
-        x1="3.5"
-        y1="10"
-        x2="16.5"
-        y2="10"
+      <path
+        d="M7.997,2.332L3.747,4.797c-.617,.358-.997,1.017-.997,1.73v4.946c0,.713,.38,1.372,.997,1.73l4.25,2.465c.621,.36,1.386,.36,2.007,0l4.25-2.465c.617-.358,.997-1.017,.997-1.73V6.527c0-.713-.38-1.372-.997-1.73l-4.25-2.465c-.621-.36-1.386-.36-2.007,0Z"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
-      ></line>
+        strokeWidth="1.5"
+      ></path>
     </svg>
   );
 }
