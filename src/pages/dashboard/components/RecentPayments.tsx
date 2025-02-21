@@ -87,7 +87,7 @@ export function RecentPayments() {
       id: 'amount',
       label: t('amount'),
       format: (value, payment) => (
-        <Badge variant="green">
+        <Badge variant="green" className="font-mono">
           {formatMoney(
             value,
             payment.client?.country_id,
@@ -107,8 +107,8 @@ export function RecentPayments() {
           <span>{t('recent_payments')}</span>
         </div>
       }
-      className="h-96 relative"
-      headerClassName="px-2 sm:px-4 py-3 sm:py-4"
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
       style={{ borderColor: colors.$5 }}
       headerStyle={{ borderColor: colors.$5 }}

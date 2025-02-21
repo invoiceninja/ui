@@ -261,7 +261,7 @@ export function Totals() {
           <div className="flex space-x-2">
             {currencies && (
               <SelectField
-                className="rounded-md"
+                className="rounded-md shadow-sm"
                 value={currency.toString()}
                 onValueChange={(value) =>
                   update(
@@ -284,7 +284,7 @@ export function Totals() {
             )}
 
             <div
-              className="flex rounded-lg overflow-hidden border"
+              className="flex rounded-lg overflow-hidden border shadow-sm"
               style={{ borderColor: colors.$5 }}
             >
               <ChartScaleBox
@@ -402,8 +402,8 @@ export function Totals() {
         {company && (
           <Card
             title={t('recent_transactions')}
-            className="col-span-10 xl:col-span-3"
-            headerClassName="px-2 sm:px-4 py-3 sm:py-4"
+            className="col-span-10 xl:col-span-3 shadow-sm"
+            headerClassName="px-3 sm:px-4 py-3 sm:py-4"
             withoutBodyPadding
             style={{ borderColor: colors.$5 }}
             headerStyle={{ borderColor: colors.$5 }}
@@ -417,7 +417,10 @@ export function Totals() {
                 <span className="text-gray-500">{t('invoices')}</span>
 
                 <Badge style={{ backgroundColor: '#2176FF26' }}>
-                  <span className="text-base" style={{ color: '#2176FF' }}>
+                  <span
+                    className="text-base font-mono"
+                    style={{ color: '#2176FF' }}
+                  >
                     {formatMoney(
                       totalsData[currency]?.invoices?.invoiced_amount || 0,
                       company.settings.country_id,
@@ -434,14 +437,19 @@ export function Totals() {
               >
                 <span className="text-gray-500">{t('payments')}</span>
 
-                <span className="text-base" style={{ color: '#22C55E' }}>
-                  {formatMoney(
-                    totalsData[currency]?.revenue?.paid_to_date || 0,
-                    company.settings.country_id,
-                    currency.toString(),
-                    2
-                  )}
-                </span>
+                <Badge style={{ backgroundColor: '#22C55E26' }}>
+                  <span
+                    className="text-base font-mono"
+                    style={{ color: '#22C55E' }}
+                  >
+                    {formatMoney(
+                      totalsData[currency]?.revenue?.paid_to_date || 0,
+                      company.settings.country_id,
+                      currency.toString(),
+                      2
+                    )}
+                  </span>
+                </Badge>
               </div>
 
               <div
@@ -451,7 +459,10 @@ export function Totals() {
                 <span className="text-gray-500">{t('expenses')}</span>
 
                 <Badge style={{ backgroundColor: '#A1A1AA26' }}>
-                  <span className="text-base" style={{ color: '#A1A1AA' }}>
+                  <span
+                    className="text-base font-mono"
+                    style={{ color: '#A1A1AA' }}
+                  >
                     {formatMoney(
                       totalsData[currency]?.expenses?.amount || 0,
                       company.settings.country_id,
@@ -469,7 +480,10 @@ export function Totals() {
                 <span className="text-gray-500">{t('outstanding')}</span>
 
                 <Badge style={{ backgroundColor: '#EF444426' }}>
-                  <span className="text-base" style={{ color: '#EF4444' }}>
+                  <span
+                    className="text-base font-mono"
+                    style={{ color: '#EF4444' }}
+                  >
                     {formatMoney(
                       totalsData[currency]?.outstanding?.amount || 0,
                       company.settings.country_id,
@@ -490,7 +504,7 @@ export function Totals() {
                   className="border"
                   style={{ borderColor: colors.$5 }}
                 >
-                  <span className="mx-2 text-base">
+                  <span className="mx-2 text-base font-mono">
                     {totalsData[currency]?.outstanding?.outstanding_count || 0}
                   </span>
                 </Badge>
@@ -502,9 +516,9 @@ export function Totals() {
         {chartData && (
           <Card
             title={t('overview')}
-            className="col-span-10 xl:col-span-7"
-            headerClassName="px-2 sm:px-4 py-3 sm:py-4"
-            childrenClassName="pl-0 pr-4"
+            className="col-span-10 xl:col-span-7 shadow-sm"
+            headerClassName="px-3 sm:px-4 py-3 sm:py-4"
+            childrenClassName="px-4"
             style={{ borderColor: colors.$5 }}
             headerStyle={{ borderColor: colors.$5 }}
             withoutHeaderPadding

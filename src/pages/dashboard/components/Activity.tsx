@@ -36,7 +36,7 @@ export function Activity() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-96 relative"
+      className="h-96 relative shadow-sm"
       withoutBodyPadding
       headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       childrenClassName="px-0"

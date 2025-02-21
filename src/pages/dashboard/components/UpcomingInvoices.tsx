@@ -76,7 +76,7 @@ export function UpcomingInvoices() {
       id: 'balance',
       label: t('balance'),
       format: (value, invoice) => (
-        <Badge variant="blue">
+        <Badge variant="blue" className="font-mono">
           {formatMoney(
             value,
             invoice.client?.country_id,
@@ -96,8 +96,8 @@ export function UpcomingInvoices() {
           <span>{t('upcoming_invoices')}</span>
         </div>
       }
-      className="h-96 relative"
-      headerClassName="px-2 sm:px-4 py-3 sm:py-4"
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
       style={{ borderColor: colors.$5 }}
       headerStyle={{ borderColor: colors.$5 }}

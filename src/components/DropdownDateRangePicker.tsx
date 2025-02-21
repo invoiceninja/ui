@@ -194,7 +194,7 @@ export function DropdownDateRangePicker(props: Props) {
   return (
     <div className="flex justify-end items-center">
       <SelectField
-        className="rounded-md"
+        className="rounded-md shadow-sm"
         value={props.value}
         onValueChange={(value) => {
           value === 'custom'

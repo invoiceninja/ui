@@ -65,7 +65,7 @@ export function UpcomingQuotes() {
       id: 'amount',
       label: t('amount'),
       format: (value, quote) => (
-        <Badge variant="orange">
+        <Badge variant="orange" className="font-mono">
           {formatMoney(
             value,
             quote.client?.country_id,
@@ -82,11 +82,11 @@ export function UpcomingQuotes() {
         <div className="flex items-center gap-2">
           <CalendarCheckOut size="1.4rem" color="#66B2FF" />
 
-          <span>{t('upcoming_invoices')}</span>
+          <span>{t('upcoming_quotes')}</span>
         </div>
       }
-      className="h-96 relative"
-      headerClassName="px-2 sm:px-4 py-3 sm:py-4"
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
       style={{ borderColor: colors.$5 }}
       headerStyle={{ borderColor: colors.$5 }}

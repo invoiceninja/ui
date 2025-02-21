@@ -145,7 +145,7 @@ export function usePreferences() {
             </Modal>
 
             <div
-              className="flex items-center justify-center p-2 cursor-pointer border rounded-md"
+              className="flex items-center justify-center p-2 cursor-pointer border rounded-md shadow-sm"
               onClick={() => setIsVisible(true)}
               style={{
                 backgroundColor: colors.$1,

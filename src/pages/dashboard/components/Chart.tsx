@@ -261,7 +261,7 @@ export function Chart(props: Props) {
               <span style={{ color: colors.$3 }}>{item.name}</span>
             </div>
 
-            <span className="font-medium">
+            <span className="font-medium font-mono">
               {formatMoney(
                 item.value,
                 company.settings.country_id,
