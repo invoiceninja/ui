@@ -23,11 +23,11 @@ export function useLogo(props?: Params) {
   const companyChanges = useCompanyChanges();
   const currentCompany = useCurrentCompany();
 
-  return companyChanges?.settings?.company_logo ||
+  return (
+    companyChanges?.settings?.company_logo ||
     currentCompany?.settings?.company_logo ||
-    fallbackSmallLogo
-    ? companySettings.smallLogo
-    : companySettings.logo;
+    (fallbackSmallLogo ? companySettings.smallLogo : companySettings.logo)
+  );
 }
 
 export function useCompanyName() {
