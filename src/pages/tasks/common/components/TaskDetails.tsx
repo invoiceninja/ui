@@ -36,6 +36,10 @@ import { MdLaunch } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
 
 interface Props {
   task: Task;

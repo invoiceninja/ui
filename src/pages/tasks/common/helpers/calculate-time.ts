@@ -12,9 +12,6 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-dayjs.extend(duration);
-dayjs.extend(relativeTime);
-
 export type TimeLogType = [number, number, string, boolean];
 export type TimeLogsType = TimeLogType[];
 
@@ -55,11 +52,17 @@ export function calculateHours(log: string, includeRunning = false) {
     seconds += Math.max(durationInSeconds, 0);
   }
 
-  if (seconds < 86400) {
-    return dayjs.duration(seconds, 'seconds').format('HH:mm:ss');
+  const totalHours = Math.floor(seconds / 3600);
+  const totalMinutes = Math.floor((seconds % 3600) / 60);
+  const totalSecondsRemaining = seconds % 60;
+
+  if (totalHours < 24) {
+    return `${totalHours}:${totalMinutes
+      .toString()
+      .padStart(2, '0')}:${totalSecondsRemaining.toString().padStart(2, '0')}`;
   }
 
-  return dayjs.duration(seconds, 'seconds').format('D[d] H[h] m[m] s[s]');
+  return `${totalHours}h`;
 }
 
 interface CalculateTimeOptions {
@@ -69,6 +72,8 @@ interface CalculateTimeOptions {
 
 export function calculateTime(log: string, options?: CalculateTimeOptions) {
   const times = parseTimeLog(log);
+  dayjs.extend(duration);
+  dayjs.extend(relativeTime);
 
   let seconds = 0;
 
