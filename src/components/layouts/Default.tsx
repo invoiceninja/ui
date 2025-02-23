@@ -8,20 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { FormEvent, ReactElement, ReactNode, useState } from 'react';
-import {
-  Menu as MenuIcon,
-  FileText,
-  Settings,
-  Users,
-  Repeat,
-  CreditCard,
-  File,
-  Briefcase,
-  Clock,
-  PieChart,
-  Info,
-} from 'react-feather';
+import { FormEvent, ReactElement, ReactNode, useState } from 'react';
+import { Menu as MenuIcon, Info } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -30,8 +18,6 @@ import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
-import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
 import { isDemo, isSelfHosted, trans } from '$app/common/helpers';
@@ -65,6 +51,19 @@ import { House } from '../icons/House';
 import { Cube } from '../icons/Cube';
 import { Invoice as InvoiceIcon } from '../icons/Invoice';
 import { Refresh } from '../icons/Refresh';
+import { Users } from '../icons/Users';
+import { CreditCard } from '../icons/CreditCard';
+import { Files } from '../icons/Files';
+import { Wallet } from '../icons/Wallet';
+import { SuitCase } from '../icons/SuitCase';
+import { ClipboardCheck } from '../icons/ClipboardCheck';
+import { Office } from '../icons/Office';
+import { FileClock } from '../icons/FileClock';
+import SackCoins from '../icons/SackCoins';
+import { CurrencyExchange } from '../icons/CurrencyExchange';
+import { ChartLine } from '../icons/ChartLine';
+import { ArrowsTransaction } from '../icons/ArrowsTransaction';
+import { Gear } from '../icons/Gear';
 
 export interface SaveOption {
   label: string;
@@ -202,7 +201,7 @@ export function Default(props: Props) {
     {
       name: t('quotes'),
       href: '/quotes',
-      icon: File,
+      icon: Files,
       current: location.pathname.startsWith('/quotes'),
       visible:
         enabled(ModuleBitmask.Quotes) &&
@@ -219,7 +218,7 @@ export function Default(props: Props) {
     {
       name: t('credits'),
       href: '/credits',
-      icon: FileText,
+      icon: Wallet,
       current: location.pathname.startsWith('/credits'),
       visible:
         enabled(ModuleBitmask.Credits) &&
@@ -236,7 +235,7 @@ export function Default(props: Props) {
     {
       name: t('projects'),
       href: '/projects',
-      icon: Briefcase,
+      icon: SuitCase,
       current: location.pathname.startsWith('/projects'),
       visible:
         enabled(ModuleBitmask.Projects) &&
@@ -253,7 +252,7 @@ export function Default(props: Props) {
     {
       name: t('tasks'),
       href: '/tasks',
-      icon: Clock,
+      icon: ClipboardCheck,
       current: location.pathname.startsWith('/tasks'),
       visible:
         enabled(ModuleBitmask.Tasks) &&
@@ -270,7 +269,7 @@ export function Default(props: Props) {
     {
       name: t('vendors'),
       href: '/vendors',
-      icon: BiBuildings,
+      icon: Office,
       current: location.pathname.startsWith('/vendors'),
       visible:
         enabled(ModuleBitmask.Vendors) &&
@@ -287,7 +286,7 @@ export function Default(props: Props) {
     {
       name: t('purchase_orders'),
       href: '/purchase_orders',
-      icon: BiFile,
+      icon: FileClock,
       current: location.pathname.startsWith('/purchase_orders'),
       visible:
         enabled(ModuleBitmask.PurchaseOrders) &&
@@ -304,7 +303,7 @@ export function Default(props: Props) {
     {
       name: t('expenses'),
       href: '/expenses',
-      icon: BiWallet,
+      icon: SackCoins,
       current: location.pathname.startsWith('/expenses'),
       visible:
         enabled(ModuleBitmask.Expenses) &&
@@ -321,7 +320,7 @@ export function Default(props: Props) {
     {
       name: t('recurring_expenses'),
       href: '/recurring_expenses',
-      icon: Repeat,
+      icon: CurrencyExchange,
       current: location.pathname.startsWith('/recurring_expenses'),
       visible:
         enabled(ModuleBitmask.RecurringExpenses) &&
@@ -338,14 +337,14 @@ export function Default(props: Props) {
     {
       name: t('reports'),
       href: '/reports',
-      icon: PieChart,
+      icon: ChartLine,
       current: location.pathname.startsWith('/reports'),
       visible: hasPermission('view_reports'),
     },
     {
       name: t('transactions'),
       href: '/transactions',
-      icon: AiOutlineBank,
+      icon: ArrowsTransaction,
       current: location.pathname.startsWith('/transactions'),
       visible:
         enabled(ModuleBitmask.Transactions) &&
@@ -365,7 +364,7 @@ export function Default(props: Props) {
         companyUser?.is_admin || companyUser?.is_owner
           ? '/settings/company_details'
           : '/settings/user_details',
-      icon: Settings,
+      icon: Gear,
       current: location.pathname.startsWith('/settings'),
       visible: Boolean(company),
     },

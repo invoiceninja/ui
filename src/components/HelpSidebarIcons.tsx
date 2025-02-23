@@ -219,7 +219,7 @@ export function HelpSidebarIcons(props: Props) {
                 <Tippy
                   duration={0}
                   content={t('update_available')}
-                  className="text-white rounded text-xs mb-2"
+                  className="rounded-md text-xs p-2 bg-[#F2F2F2]"
                 >
                   <div>
                     <Icon element={MdWarning} color="white" size={21.5} />
@@ -229,92 +229,91 @@ export function HelpSidebarIcons(props: Props) {
             )}
 
             {isSelfHosted() && account && !account.is_scheduler_running && (
-              <button
-                className="hover:bg-ninja-gray-darker rounded-full"
-                onClick={() => setCronsNotEnabledModal(true)}
+              <Tippy
+                duration={0}
+                content={t('error')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <Tippy
-                  duration={0}
-                  content={t('error')}
-                  className="text-white rounded text-xs mb-2"
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setCronsNotEnabledModal(true)}
                 >
                   <AlertCircle size={21.5} />
-                </Tippy>
-              </button>
+                </div>
+              </Tippy>
             )}
 
-            <div className="flex">
-              <Tippy
-                duration={0}
-                content={t('contact_us')}
-                className="text-white rounded text-xs mb-2"
-              >
-                {isHosted() ? (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => setIsContactVisible(true)}
-                  >
-                    <Mail size={21.5} />
-                  </div>
-                ) : (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
-                      window.open('https://slack.invoiceninja.com', '_blank')
-                    }
-                  >
-                    <Icon element={FaSlack} color="white" size={21.5} />
-                  </div>
-                )}
-              </Tippy>
-            </div>
-
-            <a
-              href="https://forum.invoiceninja.com"
-              target="_blank"
-              className="hover:bg-ninja-gray-darker rounded-full"
-              rel="noreferrer"
+            <Tippy
+              duration={0}
+              content={t('contact_us')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
-              <Tippy
-                duration={0}
-                content={t('support_forum')}
-                className="text-white rounded text-xs mb-2"
+              {isHosted() ? (
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setIsContactVisible(true)}
+                >
+                  <Mail size={21.5} />
+                </div>
+              ) : (
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open('https://slack.invoiceninja.com', '_blank')
+                  }
+                >
+                  <Icon element={FaSlack} color="white" size={21.5} />
+                </div>
+              )}
+            </Tippy>
+
+            <Tippy
+              duration={0}
+              content={t('support_forum')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+            >
+              <div
+                className="cursor-pointer"
+                onClick={() =>
+                  window.open('https://forum.invoiceninja.com', '_blank')
+                }
               >
                 <MessageSquare size={21.5} />
-              </Tippy>
-            </a>
+              </div>
+            </Tippy>
 
-            <a
-              href={
-                (props.docsLink &&
-                  `https://invoiceninja.github.io/${props.docsLink}`) ||
-                'https://invoiceninja.github.io'
-              }
-              target="_blank"
-              className="hover:bg-ninja-gray-darker rounded-full"
-              rel="noreferrer"
+            <Tippy
+              duration={0}
+              content={t('user_guide')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
-              <Tippy
-                duration={0}
-                content={t('user_guide')}
-                className="text-white rounded text-xs mb-2"
+              <div
+                className="cursor-pointer"
+                onClick={() =>
+                  window.open(
+                    props.docsLink
+                      ? `https://invoiceninja.github.io/${props.docsLink}`
+                      : 'https://invoiceninja.github.io',
+                    '_blank'
+                  )
+                }
               >
                 <HelpCircle size={21.5} />
-              </Tippy>
-            </a>
+              </div>
+            </Tippy>
 
-            <button
-              className="hover:bg-ninja-gray-darker rounded-full overflow-visible"
-              onClick={() => setIsAboutVisible(true)}
+            <Tippy
+              duration={0}
+              content={t('about')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
-              <Tippy
-                duration={0}
-                content={t('about')}
-                className="text-white rounded text-xs mb-2"
+              <div
+                className="cursor-pointer"
+                onClick={() => setIsAboutVisible(true)}
               >
                 <Info size={21.5} />
-              </Tippy>
-            </button>
+              </div>
+            </Tippy>
           </>
         )}
 
@@ -329,7 +328,7 @@ export function HelpSidebarIcons(props: Props) {
                 {isMiniSidebar ? t('show_menu') : t('hide_menu')}
               </span>
             }
-            className="text-white rounded text-xs mb-2"
+            className="rounded-md text-xs p-2 bg-[#F2F2F2]"
           >
             <div>
               {isMiniSidebar ? (
