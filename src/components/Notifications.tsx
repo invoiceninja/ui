@@ -204,9 +204,9 @@ export function Notifications() {
       return (
         <div
           className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
+          style={{ backgroundColor: colors.$15 }}
         >
-          <CardCheck size="1.3rem" color={colors.$3} />
+          <CardCheck size="1.3rem" color={colors.$16} />
         </div>
       );
     }
@@ -215,9 +215,9 @@ export function Notifications() {
       return (
         <div
           className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
+          style={{ backgroundColor: colors.$15 }}
         >
-          <FileSearch size="1.3rem" color={colors.$3} />
+          <FileSearch size="1.3rem" color={colors.$16} />
         </div>
       );
     }
@@ -226,9 +226,9 @@ export function Notifications() {
       return (
         <div
           className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
+          style={{ backgroundColor: colors.$15 }}
         >
-          <FileAdd size="1.3rem" color={colors.$3} />
+          <FileAdd size="1.3rem" color={colors.$16} />
         </div>
       );
     }
@@ -237,9 +237,9 @@ export function Notifications() {
       return (
         <div
           className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
+          style={{ backgroundColor: colors.$15 }}
         >
-          <FileEdit size="1.3rem" color={colors.$3} />
+          <FileEdit size="1.3rem" color={colors.$16} />
         </div>
       );
     }
@@ -248,9 +248,9 @@ export function Notifications() {
       return (
         <div
           className="p-2 rounded-full"
-          style={{ backgroundColor: colors.$5 }}
+          style={{ backgroundColor: colors.$15 }}
         >
-          <CardChange size="1.3rem" color={colors.$3} />
+          <CardChange size="1.3rem" color={colors.$16} />
         </div>
       );
     }
