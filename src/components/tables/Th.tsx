@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, ReactNode } from 'react';
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
@@ -27,6 +27,11 @@ interface Props extends CommonProps {
   textColor?: string;
   disableUppercase?: boolean;
   resizable?: string;
+  withoutVerticalPadding?: boolean;
+  useOnlyCurrentSortDirectionIcon?: boolean;
+  textSize?: 'extraSmall' | 'small';
+  descIcon?: ReactNode;
+  ascIcon?: ReactNode;
 }
 
 const defaultProps: Props = {
@@ -66,14 +71,18 @@ export function Th$(props: Props) {
         color: props.textColor || colors.$9,
         borderColor: colors.$4,
         width: currentWidth,
+        ...props.style,
       }}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       className={classNames(
-        `px-2 lg:px-2.5 xl:px-4 py-2.5 text-left text-xs font-medium tracking-wider whitespace-nowrap ${props.className}`,
+        `px-2 lg:px-2.5 xl:px-4 text-left font-medium tracking-wider whitespace-nowrap ${props.className}`,
         {
           'border-r relative': props.resizable,
           uppercase: !props.disableUppercase,
+          'py-2': !props.withoutVerticalPadding,
+          'text-xs': props.textSize === 'extraSmall' || !props.textSize,
+          'text-sm': props.textSize === 'small',
         }
       )}
       onMouseMove={handleMouseMove}
@@ -103,24 +112,34 @@ export function Th$(props: Props) {
                 hidden: currentWidth === -1 ? false : currentWidth < 50,
               })}
             >
-              {props.isCurrentlyUsed ? (
-                <div className="flex flex-col items-center justify-center -space-y-4">
-                  <FaSortUp
-                    className={classNames({
-                      'opacity-30': order !== 'asc',
-                    })}
-                    size={16}
-                  />
-
-                  <FaSortDown
-                    className={classNames({
-                      'opacity-30': order !== 'desc',
-                    })}
-                    size={16}
-                  />
-                </div>
+              {props.useOnlyCurrentSortDirectionIcon ? (
+                <>
+                  {props.isCurrentlyUsed && (
+                    <>{order === 'desc' ? props.descIcon : props.ascIcon}</>
+                  )}
+                </>
               ) : (
-                <FaSort size={16} className="opacity-30" />
+                <>
+                  {props.isCurrentlyUsed ? (
+                    <div className="flex flex-col items-center justify-center -space-y-4">
+                      <FaSortUp
+                        className={classNames({
+                          'opacity-30': order !== 'asc',
+                        })}
+                        size={16}
+                      />
+
+                      <FaSortDown
+                        className={classNames({
+                          'opacity-30': order !== 'desc',
+                        })}
+                        size={16}
+                      />
+                    </div>
+                  ) : (
+                    <FaSort size={16} className="opacity-30" />
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -129,14 +148,16 @@ export function Th$(props: Props) {
         )}
       </div>
 
-      {props.resizable ? <span
-        className={classNames(
-          'column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:bg-white hover:transition duration-50',
-          {
-            'bg-white': isResizing,
-          }
-        )}
-      ></span>: null}
+      {props.resizable ? (
+        <span
+          className={classNames(
+            'column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:bg-white hover:transition duration-50',
+            {
+              'bg-white': isResizing,
+            }
+          )}
+        ></span>
+      ) : null}
     </th>
   );
 }
