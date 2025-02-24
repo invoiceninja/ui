@@ -15,13 +15,7 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import {
-  HelpCircle,
-  Info,
-  Mail,
-  MessageSquare,
-  AlertCircle,
-} from 'react-feather';
+import { Mail } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from './forms';
@@ -36,7 +30,6 @@ import { Icon } from './icons/Icon';
 import { FaSlack } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import { MdWarning } from 'react-icons/md';
 import { UpdateAppModal } from './UpdateAppModal';
 import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
 import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
@@ -45,6 +38,11 @@ import { MoonStars } from './icons/MoonStars';
 import { useHandleDarkLightMode } from '$app/common/hooks/useHandleDarkLightMode';
 import { Sun } from './icons/Sun';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { TriangleWarning } from './icons/TriangleWarning';
+import { CircleWarning } from './icons/CircleWarning';
+import { Message } from './icons/Message';
+import { CircleQuestion } from './icons/CircleQuestion';
+import { CircleInfo } from './icons/CircleInfo';
 
 interface Props {
   docsLink?: string;
@@ -219,20 +217,18 @@ export function HelpSidebarIcons(props: Props) {
         {!isMiniSidebar && !mobileNavbar && (
           <>
             {isUpdateAvailable && (
-              <div
-                className="cursor-pointer"
-                onClick={() => setIsUpdateModalVisible(true)}
+              <Tippy
+                duration={0}
+                content={t('update_available')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <Tippy
-                  duration={0}
-                  content={t('update_available')}
-                  className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setIsUpdateModalVisible(true)}
                 >
-                  <div>
-                    <Icon element={MdWarning} color="white" size={21.5} />
-                  </div>
-                </Tippy>
-              </div>
+                  <TriangleWarning color="white" size="1.3rem" />
+                </div>
+              </Tippy>
             )}
 
             {isSelfHosted() && account && !account.is_scheduler_running && (
@@ -245,7 +241,7 @@ export function HelpSidebarIcons(props: Props) {
                   className="cursor-pointer"
                   onClick={() => setCronsNotEnabledModal(true)}
                 >
-                  <AlertCircle size={21.5} />
+                  <CircleWarning color="white" size="1.3rem" />
                 </div>
               </Tippy>
             )}
@@ -286,7 +282,7 @@ export function HelpSidebarIcons(props: Props) {
                     window.open('https://forum.invoiceninja.com', '_blank')
                   }
                 >
-                  <MessageSquare size={21.5} />
+                  <Message color="white" size="1.3rem" />
                 </div>
               </Tippy>
             )}
@@ -310,7 +306,7 @@ export function HelpSidebarIcons(props: Props) {
                     )
                   }
                 >
-                  <HelpCircle size={21.5} />
+                  <CircleQuestion color="white" size="1.3rem" />
                 </div>
               </Tippy>
             )}
@@ -324,7 +320,7 @@ export function HelpSidebarIcons(props: Props) {
                 className="cursor-pointer"
                 onClick={() => setIsAboutVisible(true)}
               >
-                <Info size={21.5} />
+                <CircleInfo color="white" size="1.3rem" />
               </div>
             </Tippy>
 
