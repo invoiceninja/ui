@@ -26,6 +26,7 @@ interface Location {
     custom_value3: string;
     custom_value4: string;
     is_deleted: boolean;
+    is_shipping_location: boolean;
     updated_at: number;
     archived_at: number;
     created_at: number;
