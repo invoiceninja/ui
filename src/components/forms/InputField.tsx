@@ -97,7 +97,7 @@ export function InputField(props: Props) {
           id={props.id}
           type={inputType}
           className={classNames(
-            `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
+            `w-full py-2 px-3 rounded-md text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
             {
               'border border-gray-300': props.border !== false,
             }
