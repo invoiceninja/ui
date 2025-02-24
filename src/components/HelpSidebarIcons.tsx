@@ -41,6 +41,10 @@ import { UpdateAppModal } from './UpdateAppModal';
 import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
 import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
 import { CloseNavbarArrow } from './icons/CloseNavbarArrow';
+import { MoonStars } from './icons/MoonStars';
+import { useHandleDarkLightMode } from '$app/common/hooks/useHandleDarkLightMode';
+import { Sun } from './icons/Sun';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   docsLink?: string;
@@ -54,9 +58,12 @@ export function HelpSidebarIcons(props: Props) {
   const user = useInjectUserChanges();
   const account = useCurrentAccount();
 
+  const reactSettings = useReactSettings();
+
   const { mobileNavbar } = props;
 
   const dispatch = useDispatch();
+  const handleDarkLightMode = useHandleDarkLightMode();
   const handleCollapseExpandSidebar = useHandleCollapseExpandSidebar();
 
   const { data: latestVersion } = useQuery({
@@ -267,40 +274,46 @@ export function HelpSidebarIcons(props: Props) {
               )}
             </Tippy>
 
-            <Tippy
-              duration={0}
-              content={t('support_forum')}
-              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
-            >
-              <div
-                className="cursor-pointer"
-                onClick={() =>
-                  window.open('https://forum.invoiceninja.com', '_blank')
-                }
+            {!isUpdateAvailable && (
+              <Tippy
+                duration={0}
+                content={t('support_forum')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <MessageSquare size={21.5} />
-              </div>
-            </Tippy>
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open('https://forum.invoiceninja.com', '_blank')
+                  }
+                >
+                  <MessageSquare size={21.5} />
+                </div>
+              </Tippy>
+            )}
 
-            <Tippy
-              duration={0}
-              content={t('user_guide')}
-              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
-            >
-              <div
-                className="cursor-pointer"
-                onClick={() =>
-                  window.open(
-                    props.docsLink
-                      ? `https://invoiceninja.github.io/${props.docsLink}`
-                      : 'https://invoiceninja.github.io',
-                    '_blank'
-                  )
-                }
+            {Boolean(
+              !(isSelfHosted() && account && !account.is_scheduler_running)
+            ) && (
+              <Tippy
+                duration={0}
+                content={t('user_guide')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <HelpCircle size={21.5} />
-              </div>
-            </Tippy>
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      props.docsLink
+                        ? `https://invoiceninja.github.io/${props.docsLink}`
+                        : 'https://invoiceninja.github.io',
+                      '_blank'
+                    )
+                  }
+                >
+                  <HelpCircle size={21.5} />
+                </div>
+              </Tippy>
+            )}
 
             <Tippy
               duration={0}
@@ -314,31 +327,48 @@ export function HelpSidebarIcons(props: Props) {
                 <Info size={21.5} />
               </div>
             </Tippy>
+
+            <Tippy
+              duration={0}
+              content={
+                reactSettings?.dark_mode ? t('light_mode') : t('dark_mode')
+              }
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+            >
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDarkLightMode(!reactSettings?.dark_mode)}
+              >
+                {reactSettings?.dark_mode ? (
+                  <Sun color="white" size="1.3rem" />
+                ) : (
+                  <MoonStars color="white" size="1.3rem" />
+                )}
+              </div>
+            </Tippy>
           </>
         )}
 
-        <div
-          className="cursor-pointer"
-          onClick={() => handleCollapseExpandSidebar(!isMiniSidebar)}
+        <Tippy
+          duration={0}
+          content={
+            <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
+              {isMiniSidebar ? t('show_menu') : t('hide_menu')}
+            </span>
+          }
+          className="rounded-md text-xs p-2 bg-[#F2F2F2]"
         >
-          <Tippy
-            duration={0}
-            content={
-              <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
-                {isMiniSidebar ? t('show_menu') : t('hide_menu')}
-              </span>
-            }
-            className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+          <div
+            className="cursor-pointer"
+            onClick={() => handleCollapseExpandSidebar(!isMiniSidebar)}
           >
-            <div>
-              {isMiniSidebar ? (
-                <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
-              ) : (
-                <CloseNavbarArrow color="#e5e7eb" size="1.35rem" />
-              )}
-            </div>
-          </Tippy>
-        </div>
+            {isMiniSidebar ? (
+              <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
+            ) : (
+              <CloseNavbarArrow color="#e5e7eb" size="1.35rem" />
+            )}
+          </div>
+        </Tippy>
       </nav>
     </>
   );

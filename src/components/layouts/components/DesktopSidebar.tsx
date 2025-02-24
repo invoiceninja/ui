@@ -56,7 +56,7 @@ export function DesktopSidebar(props: Props) {
     >
       <div
         className="flex flex-col flex-grow overflow-y-auto border-r px-3"
-        style={{ backgroundColor: '#27272A', borderColor: colors.$4 }}
+        style={{ backgroundColor: colors.$14, borderColor: colors.$4 }}
       >
         <div
           className={classNames(

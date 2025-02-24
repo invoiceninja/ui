@@ -43,6 +43,7 @@ export const $1 = {
   $11: 0.6, // Medium emphasis text
   $12: 0.38, // Disabled text
   $13: '#E5E7EB', // Navbar right icon hover
+  $14: '#121212', // Navigation bar background color
 };
 
 export const $2 = {
@@ -61,6 +62,7 @@ export const $2 = {
   $11: 0.8, // Secondary text opacity
   $12: 0.5, // Disabled text opacity
   $13: '#E5E7EB', // Navbar right icon hover
+  $14: '#27272A', // Navigation bar background color
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);
