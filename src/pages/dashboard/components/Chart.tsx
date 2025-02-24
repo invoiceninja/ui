@@ -12,7 +12,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate, useParseDayjs } from '$app/common/helpers';
-import { ChartData, TotalColors } from './Totals';
+import { ChartData } from './Totals';
 import {
   Line,
   CartesianGrid,
@@ -28,6 +28,27 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
 import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
+import { TooltipProps } from 'recharts';
+
+interface PayloadItem {
+  color: string;
+  name: string;
+  value: number;
+  dataKey: string;
+  payload: {
+    date: string;
+    invoices: number;
+    outstanding: number;
+    payments: number;
+    expenses: number;
+  };
+}
+
+type CustomTooltipProps = TooltipProps<any, any> & {
+  active?: boolean;
+  payload?: PayloadItem[];
+  label?: string;
+};
 
 type Props = {
   data: ChartData;
@@ -214,6 +235,46 @@ export function Chart(props: Props) {
     ).toString();
   };
 
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+    if (!active || !payload || !payload.length) {
+      return null;
+    }
+
+    return (
+      <div
+        className="p-4 shadow-lg rounded-md border"
+        style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+      >
+        <p className="font-semibold mb-2">{label}</p>
+
+        {payload.map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between space-x-10 py-1"
+          >
+            <div className="flex items-center space-x-2">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: item.color }}
+              />
+
+              <span style={{ color: colors.$3 }}>{item.name}</span>
+            </div>
+
+            <span className="font-medium font-mono">
+              {formatMoney(
+                item.value,
+                company.settings.country_id,
+                currency,
+                2
+              )}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <ResponsiveContainer width="100%" height={330}>
       <LineChart height={200} data={chartData} margin={{ top: 17, left: 5 }}>
@@ -222,7 +283,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('invoices') || ''}
           dataKey="invoices"
-          stroke={TotalColors.Blue}
+          stroke="#2276ff"
           dot={false}
           strokeWidth={2}
         />
@@ -232,7 +293,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('payments') || ''}
           dataKey="payments"
-          stroke={TotalColors.Green}
+          stroke="#22c55e"
           dot={false}
           strokeWidth={2}
         />
@@ -242,7 +303,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('outstanding') || ''}
           dataKey="outstanding"
-          stroke={TotalColors.Red}
+          stroke="#EF4444"
           dot={false}
           strokeWidth={2}
         />
@@ -252,13 +313,16 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('expenses') || ''}
           dataKey="expenses"
-          stroke={TotalColors.Gray}
+          stroke="#A1A1AA"
           dot={false}
           strokeWidth={2}
         />
 
         <CartesianGrid strokeDasharray="0" vertical={false} />
-        <Tooltip formatter={formatTooltipValues} />
+        <Tooltip
+          content={<CustomTooltip />}
+          wrapperStyle={{ outline: 'none' }}
+        />
 
         <XAxis
           dataKey="date"

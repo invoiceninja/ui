@@ -13,9 +13,10 @@ import { Alert } from '$app/components/Alert';
 import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
-import React, { ReactNode, isValidElement } from 'react';
+import React, { CSSProperties, ReactNode, isValidElement } from 'react';
 import { SelectOption } from '../datatables/Actions';
 import Select, { StylesConfig } from 'react-select';
+import { ChevronDown } from '../icons/ChevronDown';
 
 export interface SelectProps extends CommonProps {
   defaultValue?: any;
@@ -29,6 +30,10 @@ export interface SelectProps extends CommonProps {
   dismissable?: boolean;
   clearAfterSelection?: boolean;
   menuPosition?: 'fixed';
+  withoutSeparator?: boolean;
+  searchable?: boolean;
+  controlIcon?: ReactNode;
+  controlStyle?: CSSProperties;
 }
 
 export function SelectField(props: SelectProps) {
@@ -47,6 +52,9 @@ export function SelectField(props: SelectProps) {
     cypressRef,
     dismissable = true,
     clearAfterSelection,
+    searchable = true,
+    controlIcon,
+    controlStyle,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -86,12 +94,13 @@ export function SelectField(props: SelectProps) {
     }),
     control: (base, { isDisabled }) => ({
       ...base,
-      borderRadius: '3px',
+      borderRadius: '0.375rem',
       backgroundColor: colors.$1,
       color: colors.$3,
       borderColor: colors.$5,
       cursor: isDisabled ? 'not-allowed' : 'pointer',
       pointerEvents: isDisabled ? 'auto' : 'unset',
+      ...controlStyle,
     }),
     option: (base, { isSelected, isFocused }) => ({
       ...base,
@@ -103,6 +112,11 @@ export function SelectField(props: SelectProps) {
         backgroundColor: colors.$7,
       },
       minHeight: '1.875rem',
+    }),
+    ...(props.withoutSeparator && {
+      indicatorSeparator: () => ({
+        display: 'none',
+      }),
     }),
   };
 
@@ -162,13 +176,43 @@ export function SelectField(props: SelectProps) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           styles={customStyles}
-          isSearchable
+          isSearchable={searchable}
           isClearable={Boolean(
             dismissable &&
               selectedEntry?.value &&
               selectedEntry?.value !== blankOptionValue
           )}
+          blurInputOnSelect
           data-cy={cypressRef}
+          components={
+            controlIcon
+              ? {
+                  Control: ({ children, innerProps, isFocused }) => (
+                    <div
+                      className="flex items-center rounded-md border cursor-pointer pl-2"
+                      style={{
+                        height: '2.5rem',
+                        backgroundColor: colors.$1,
+                        borderColor: isFocused ? '#2463eb' : colors.$5,
+                        ...controlStyle,
+                      }}
+                      {...innerProps}
+                    >
+                      {controlIcon}
+                      {children}
+                    </div>
+                  ),
+                  DropdownIndicator: () => (
+                    <div
+                      className="flex items-center justify-center px-3 hover:opacity-75 h-full w-full"
+                      style={{ color: colors.$3 }}
+                    >
+                      <ChevronDown color={colors.$3} size="1rem" />
+                    </div>
+                  ),
+                }
+              : undefined
+          }
         />
       )}
 

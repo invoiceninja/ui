@@ -26,7 +26,7 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useStart } from '../hooks/useStart';
 import { useStop } from '../hooks/useStop';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
-import { TaskClock } from '../../kanban/components/TaskClock';
+import { formatTime, TaskClock } from '../../kanban/components/TaskClock';
 import { calculateTime } from '../helpers/calculate-time';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
@@ -36,6 +36,10 @@ import { MdLaunch } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
 
 interface Props {
   task: Task;
@@ -81,11 +85,7 @@ export function TaskDetails(props: Props) {
               {!isTaskRunning(task) && (
                 <div className="flex items-center">
                   {!isTaskRunning(task) && calculation && (
-                    <p>
-                      {new Date(Number(calculation) * 1000)
-                        .toISOString()
-                        .slice(11, 19)}
-                    </p>
+                    <p>{formatTime(Number(calculation))}</p>
                   )}
                 </div>
               )}
