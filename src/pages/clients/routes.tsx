@@ -21,6 +21,7 @@ const Import = lazy(() => import('$app/pages/clients/import/Import'));
 const Create = lazy(() => import('$app/pages/clients/create/Create'));
 const Edit = lazy(() => import('$app/pages/clients/edit/Edit'));
 const Client = lazy(() => import('$app/pages/clients/show/Client'));
+const ClientEdit = lazy(() => import('$app/pages/clients/Client'));
 const Quotes = lazy(() => import('$app/pages/clients/show/pages/Quotes'));
 const Payments = lazy(() => import('$app/pages/clients/show/pages/Payments'));
 const RecurringInvoices = lazy(
@@ -39,6 +40,13 @@ const Activities = lazy(
   () => import('$app/pages/clients/show/pages/Activities')
 );
 const Documents = lazy(() => import('$app/pages/clients/show/pages/Documents'));
+const Settings = lazy(
+  () => import('$app/pages/clients/common/components/Settings')
+);
+const Notes = lazy(() => import('$app/pages/clients/common/components/Notes'));
+const Classify = lazy(
+  () => import('$app/pages/clients/common/components/Classify')
+);
 
 export const clientRoutes = (
   <Route path="clients">
@@ -72,17 +80,24 @@ export const clientRoutes = (
         <Guard guards={[permission('create_client')]} component={<Create />} />
       }
     />
+
     <Route
-      path=":id/edit"
+      path=":id"
       element={
         <Guard
           guards={[
             or(permission('edit_client'), assigned('/api/v1/clients/:id')),
           ]}
-          component={<Edit />}
+          component={<ClientEdit />}
         />
       }
-    />
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="notes" element={<Notes />} />
+      <Route path="classify" element={<Classify />} />
+    </Route>
+
     <Route
       path=":id"
       element={
