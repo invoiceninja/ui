@@ -326,9 +326,7 @@ export function HelpSidebarIcons(props: Props) {
 
             <Tippy
               duration={0}
-              content={
-                reactSettings?.dark_mode ? t('light_mode') : t('dark_mode')
-              }
+              content={t('dark_mode')}
               className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
               <div
