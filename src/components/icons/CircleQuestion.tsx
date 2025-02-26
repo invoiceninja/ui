@@ -9,11 +9,13 @@
  */
 
 interface Props {
-  size?: string;
   color?: string;
+  size?: string;
 }
 
-export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
+export function CircleQuestion(props: Props) {
+  const { color = '#000', size = '1.2rem' } = props;
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,31 +24,33 @@ export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
       y="0px"
       width={size}
       height={size}
-      viewBox="0 0 20 20"
+      viewBox="0 0 18 18"
     >
-      <line
-        x1="10"
-        y1="16.5"
-        x2="10"
-        y2="3.5"
+      <circle
+        cx="9"
+        cy="9"
+        r="7.25"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth="1.5"
+      ></circle>
+      <path
+        d="M6.925,6.619c.388-1.057,1.294-1.492,2.18-1.492,.895,0,1.818,.638,1.818,1.808,0,1.784-1.816,1.468-2.096,3.065"
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
         data-color="color-2"
-      ></line>
-      <line
-        x1="3.5"
-        y1="10"
-        x2="16.5"
-        y2="10"
-        fill="none"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      ></line>
+      ></path>
+      <path
+        d="M8.791,13.567c-.552,0-1-.449-1-1s.448-1,1-1,1,.449,1,1-.448,1-1,1Z"
+        fill={color}
+        data-color="color-2"
+        data-stroke="none"
+      ></path>
     </svg>
   );
 }

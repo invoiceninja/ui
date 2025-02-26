@@ -43,6 +43,7 @@ export const $1 = {
   $11: 0.6, // Medium emphasis text
   $12: 0.38, // Disabled text
   $13: '#E5E7EB', // Navbar right icon hover
+  $14: '#121212', // Navigation bar background color
   $15: '#323236', // Light gray background
   $16: '#A1A1AA', // Dark gray icon
 };
@@ -63,6 +64,7 @@ export const $2 = {
   $11: 0.8, // Secondary text opacity
   $12: 0.5, // Disabled text opacity
   $13: '#E5E7EB', // Navbar right icon hover
+  $14: '#27272A', // Navigation bar background color
   $15: '#E4E4E7', // Light gray background
   $16: '#717179', // Dark gray icon
 };

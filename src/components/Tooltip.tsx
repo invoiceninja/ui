@@ -95,8 +95,8 @@ export function Tooltip(props: Props) {
               )}
               style={{
                 width: width || messageWidth,
-                backgroundColor: colors.$5,
-                color: colors.$3,
+                backgroundColor: colors.$3,
+                color: colors.$1,
               }}
             >
               {message}

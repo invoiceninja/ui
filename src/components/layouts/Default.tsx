@@ -9,22 +9,7 @@
  */
 
 import { FormEvent, ReactElement, ReactNode, useState } from 'react';
-import {
-  Home,
-  Menu as MenuIcon,
-  Box,
-  FileText,
-  Settings,
-  Users,
-  PlusCircle,
-  Repeat,
-  CreditCard,
-  File,
-  Briefcase,
-  Clock,
-  PieChart,
-  Info,
-} from 'react-feather';
+import { Menu as MenuIcon, Info } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -33,8 +18,6 @@ import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
-import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
 import { isDemo, isSelfHosted, trans } from '$app/common/helpers';
@@ -63,6 +46,24 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
 import classNames from 'classnames';
+import { Plus } from '../icons/Plus';
+import { House } from '../icons/House';
+import { Cube } from '../icons/Cube';
+import { Invoice as InvoiceIcon } from '../icons/Invoice';
+import { Refresh } from '../icons/Refresh';
+import { Users } from '../icons/Users';
+import { CreditCard } from '../icons/CreditCard';
+import { Files } from '../icons/Files';
+import { Wallet } from '../icons/Wallet';
+import { SuitCase } from '../icons/SuitCase';
+import { ClipboardCheck } from '../icons/ClipboardCheck';
+import { Office } from '../icons/Office';
+import { FileClock } from '../icons/FileClock';
+import SackCoins from '../icons/SackCoins';
+import { CurrencyExchange } from '../icons/CurrencyExchange';
+import { ChartLine } from '../icons/ChartLine';
+import { ArrowsTransaction } from '../icons/ArrowsTransaction';
+import { Gear } from '../icons/Gear';
 
 export interface SaveOption {
   label: string;
@@ -111,7 +112,7 @@ export function Default(props: Props) {
     {
       name: t('dashboard'),
       href: '/dashboard',
-      icon: Home,
+      icon: House,
       current: location.pathname.startsWith('/dashboard'),
       visible: hasPermission('view_dashboard'),
     },
@@ -125,7 +126,7 @@ export function Default(props: Props) {
         hasPermission('create_client') ||
         hasPermission('edit_client'),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/clients/create',
         label: t('new_client'),
         visible: hasPermission('create_client'),
@@ -134,14 +135,14 @@ export function Default(props: Props) {
     {
       name: t('products'),
       href: '/products',
-      icon: Box,
+      icon: Cube,
       current: location.pathname.startsWith('/products'),
       visible:
         hasPermission('view_product') ||
         hasPermission('create_product') ||
         hasPermission('edit_product'),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/products/create',
         label: t('new_product'),
         visible: hasPermission('create_product'),
@@ -150,7 +151,7 @@ export function Default(props: Props) {
     {
       name: t('invoices'),
       href: '/invoices',
-      icon: FileText,
+      icon: InvoiceIcon,
       current: location.pathname.startsWith('/invoices'),
       visible:
         enabled(ModuleBitmask.Invoices) &&
@@ -158,7 +159,7 @@ export function Default(props: Props) {
           hasPermission('create_invoice') ||
           hasPermission('edit_invoice')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/invoices/create',
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
@@ -167,7 +168,7 @@ export function Default(props: Props) {
     {
       name: t('recurring_invoices'),
       href: '/recurring_invoices',
-      icon: Repeat,
+      icon: Refresh,
       current: location.pathname.startsWith('/recurring_invoices'),
       visible:
         enabled(ModuleBitmask.RecurringInvoices) &&
@@ -175,7 +176,7 @@ export function Default(props: Props) {
           hasPermission('create_recurring_invoice') ||
           hasPermission('edit_recurring_invoice')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/recurring_invoices/create',
         label: t('new_recurring_invoice'),
         visible: hasPermission('create_recurring_invoice'),
@@ -191,7 +192,7 @@ export function Default(props: Props) {
         hasPermission('create_payment') ||
         hasPermission('edit_payment'),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/payments/create',
         label: t('new_payment'),
         visible: hasPermission('create_payment'),
@@ -200,7 +201,7 @@ export function Default(props: Props) {
     {
       name: t('quotes'),
       href: '/quotes',
-      icon: File,
+      icon: Files,
       current: location.pathname.startsWith('/quotes'),
       visible:
         enabled(ModuleBitmask.Quotes) &&
@@ -208,7 +209,7 @@ export function Default(props: Props) {
           hasPermission('create_quote') ||
           hasPermission('edit_quote')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/quotes/create',
         label: t('new_quote'),
         visible: hasPermission('create_quote'),
@@ -217,7 +218,7 @@ export function Default(props: Props) {
     {
       name: t('credits'),
       href: '/credits',
-      icon: FileText,
+      icon: Wallet,
       current: location.pathname.startsWith('/credits'),
       visible:
         enabled(ModuleBitmask.Credits) &&
@@ -225,7 +226,7 @@ export function Default(props: Props) {
           hasPermission('create_credit') ||
           hasPermission('edit_credit')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/credits/create',
         label: t('new_credit'),
         visible: hasPermission('create_credit'),
@@ -234,7 +235,7 @@ export function Default(props: Props) {
     {
       name: t('projects'),
       href: '/projects',
-      icon: Briefcase,
+      icon: SuitCase,
       current: location.pathname.startsWith('/projects'),
       visible:
         enabled(ModuleBitmask.Projects) &&
@@ -242,7 +243,7 @@ export function Default(props: Props) {
           hasPermission('create_project') ||
           hasPermission('edit_project')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/projects/create',
         label: t('new_project'),
         visible: hasPermission('create_project'),
@@ -251,7 +252,7 @@ export function Default(props: Props) {
     {
       name: t('tasks'),
       href: '/tasks',
-      icon: Clock,
+      icon: ClipboardCheck,
       current: location.pathname.startsWith('/tasks'),
       visible:
         enabled(ModuleBitmask.Tasks) &&
@@ -259,7 +260,7 @@ export function Default(props: Props) {
           hasPermission('edit_task') ||
           hasPermission('create_task')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/tasks/create',
         label: t('new_task'),
         visible: hasPermission('create_task'),
@@ -268,7 +269,7 @@ export function Default(props: Props) {
     {
       name: t('vendors'),
       href: '/vendors',
-      icon: BiBuildings,
+      icon: Office,
       current: location.pathname.startsWith('/vendors'),
       visible:
         enabled(ModuleBitmask.Vendors) &&
@@ -276,7 +277,7 @@ export function Default(props: Props) {
           hasPermission('create_vendor') ||
           hasPermission('edit_vendor')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/vendors/create',
         label: t('new_vendor'),
         visible: hasPermission('create_vendor'),
@@ -285,7 +286,7 @@ export function Default(props: Props) {
     {
       name: t('purchase_orders'),
       href: '/purchase_orders',
-      icon: BiFile,
+      icon: FileClock,
       current: location.pathname.startsWith('/purchase_orders'),
       visible:
         enabled(ModuleBitmask.PurchaseOrders) &&
@@ -293,7 +294,7 @@ export function Default(props: Props) {
           hasPermission('create_purchase_order') ||
           hasPermission('edit_purchase_order')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/purchase_orders/create',
         label: t('new_purchase_order'),
         visible: hasPermission('create_purchase_order'),
@@ -302,7 +303,7 @@ export function Default(props: Props) {
     {
       name: t('expenses'),
       href: '/expenses',
-      icon: BiWallet,
+      icon: SackCoins,
       current: location.pathname.startsWith('/expenses'),
       visible:
         enabled(ModuleBitmask.Expenses) &&
@@ -310,7 +311,7 @@ export function Default(props: Props) {
           hasPermission('create_expense') ||
           hasPermission('edit_expense')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/expenses/create',
         label: t('new_expense'),
         visible: hasPermission('create_expense'),
@@ -319,7 +320,7 @@ export function Default(props: Props) {
     {
       name: t('recurring_expenses'),
       href: '/recurring_expenses',
-      icon: Repeat,
+      icon: CurrencyExchange,
       current: location.pathname.startsWith('/recurring_expenses'),
       visible:
         enabled(ModuleBitmask.RecurringExpenses) &&
@@ -327,7 +328,7 @@ export function Default(props: Props) {
           hasPermission('create_recurring_expense') ||
           hasPermission('edit_recurring_expense')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/recurring_expenses/create',
         label: t('new_recurring_expense'),
         visible: hasPermission('create_recurring_expense'),
@@ -336,14 +337,14 @@ export function Default(props: Props) {
     {
       name: t('reports'),
       href: '/reports',
-      icon: PieChart,
+      icon: ChartLine,
       current: location.pathname.startsWith('/reports'),
       visible: hasPermission('view_reports'),
     },
     {
       name: t('transactions'),
       href: '/transactions',
-      icon: AiOutlineBank,
+      icon: ArrowsTransaction,
       current: location.pathname.startsWith('/transactions'),
       visible:
         enabled(ModuleBitmask.Transactions) &&
@@ -351,7 +352,7 @@ export function Default(props: Props) {
           hasPermission('create_bank_transaction') ||
           hasPermission('edit_bank_transaction')),
       rightButton: {
-        icon: PlusCircle,
+        icon: Plus,
         to: '/transactions/create',
         label: t('new_transaction'),
         visible: hasPermission('create_bank_transaction'),
@@ -363,7 +364,7 @@ export function Default(props: Props) {
         companyUser?.is_admin || companyUser?.is_owner
           ? '/settings/company_details'
           : '/settings/user_details',
-      icon: Settings,
+      icon: Gear,
       current: location.pathname.startsWith('/settings'),
       visible: Boolean(company),
     },

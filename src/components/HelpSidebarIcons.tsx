@@ -15,13 +15,7 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import {
-  HelpCircle,
-  Info,
-  Mail,
-  MessageSquare,
-  AlertCircle,
-} from 'react-feather';
+import { Mail } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from './forms';
@@ -36,11 +30,19 @@ import { Icon } from './icons/Icon';
 import { FaSlack } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import { MdWarning } from 'react-icons/md';
 import { UpdateAppModal } from './UpdateAppModal';
 import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
 import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
 import { CloseNavbarArrow } from './icons/CloseNavbarArrow';
+import { MoonStars } from './icons/MoonStars';
+import { useHandleDarkLightMode } from '$app/common/hooks/useHandleDarkLightMode';
+import { Sun } from './icons/Sun';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { TriangleWarning } from './icons/TriangleWarning';
+import { CircleWarning } from './icons/CircleWarning';
+import { Message } from './icons/Message';
+import { CircleQuestion } from './icons/CircleQuestion';
+import { CircleInfo } from './icons/CircleInfo';
 
 interface Props {
   docsLink?: string;
@@ -54,9 +56,12 @@ export function HelpSidebarIcons(props: Props) {
   const user = useInjectUserChanges();
   const account = useCurrentAccount();
 
+  const reactSettings = useReactSettings();
+
   const { mobileNavbar } = props;
 
   const dispatch = useDispatch();
+  const handleDarkLightMode = useHandleDarkLightMode();
   const handleCollapseExpandSidebar = useHandleCollapseExpandSidebar();
 
   const { data: latestVersion } = useQuery({
@@ -212,134 +217,152 @@ export function HelpSidebarIcons(props: Props) {
         {!isMiniSidebar && !mobileNavbar && (
           <>
             {isUpdateAvailable && (
-              <div
-                className="cursor-pointer"
-                onClick={() => setIsUpdateModalVisible(true)}
+              <Tippy
+                duration={0}
+                content={t('update_available')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <Tippy
-                  duration={0}
-                  content={t('update_available')}
-                  className="text-white rounded text-xs mb-2"
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setIsUpdateModalVisible(true)}
                 >
-                  <div>
-                    <Icon element={MdWarning} color="white" size={21.5} />
-                  </div>
-                </Tippy>
-              </div>
+                  <TriangleWarning color="white" size="1.3rem" />
+                </div>
+              </Tippy>
             )}
 
             {isSelfHosted() && account && !account.is_scheduler_running && (
-              <button
-                className="hover:bg-ninja-gray-darker rounded-full"
-                onClick={() => setCronsNotEnabledModal(true)}
-              >
-                <Tippy
-                  duration={0}
-                  content={t('error')}
-                  className="text-white rounded text-xs mb-2"
-                >
-                  <AlertCircle size={21.5} />
-                </Tippy>
-              </button>
-            )}
-
-            <div className="flex">
               <Tippy
                 duration={0}
-                content={t('contact_us')}
-                className="text-white rounded text-xs mb-2"
+                content={t('error')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                {isHosted() ? (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => setIsContactVisible(true)}
-                  >
-                    <Mail size={21.5} />
-                  </div>
-                ) : (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
-                      window.open('https://slack.invoiceninja.com', '_blank')
-                    }
-                  >
-                    <Icon element={FaSlack} color="white" size={21.5} />
-                  </div>
-                )}
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setCronsNotEnabledModal(true)}
+                >
+                  <CircleWarning color="white" size="1.3rem" />
+                </div>
               </Tippy>
-            </div>
+            )}
 
-            <a
-              href="https://forum.invoiceninja.com"
-              target="_blank"
-              className="hover:bg-ninja-gray-darker rounded-full"
-              rel="noreferrer"
+            <Tippy
+              duration={0}
+              content={t('contact_us')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
+              {isHosted() ? (
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setIsContactVisible(true)}
+                >
+                  <Mail size={21.5} />
+                </div>
+              ) : (
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open('https://slack.invoiceninja.com', '_blank')
+                  }
+                >
+                  <Icon element={FaSlack} color="white" size={21.5} />
+                </div>
+              )}
+            </Tippy>
+
+            {!isUpdateAvailable && (
               <Tippy
                 duration={0}
                 content={t('support_forum')}
-                className="text-white rounded text-xs mb-2"
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <MessageSquare size={21.5} />
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open('https://forum.invoiceninja.com', '_blank')
+                  }
+                >
+                  <Message color="white" size="1.3rem" />
+                </div>
               </Tippy>
-            </a>
+            )}
 
-            <a
-              href={
-                (props.docsLink &&
-                  `https://invoiceninja.github.io/${props.docsLink}`) ||
-                'https://invoiceninja.github.io'
-              }
-              target="_blank"
-              className="hover:bg-ninja-gray-darker rounded-full"
-              rel="noreferrer"
-            >
+            {Boolean(
+              !(isSelfHosted() && account && !account.is_scheduler_running)
+            ) && (
               <Tippy
                 duration={0}
                 content={t('user_guide')}
-                className="text-white rounded text-xs mb-2"
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <HelpCircle size={21.5} />
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      props.docsLink
+                        ? `https://invoiceninja.github.io/${props.docsLink}`
+                        : 'https://invoiceninja.github.io',
+                      '_blank'
+                    )
+                  }
+                >
+                  <CircleQuestion color="white" size="1.3rem" />
+                </div>
               </Tippy>
-            </a>
+            )}
 
-            <button
-              className="hover:bg-ninja-gray-darker rounded-full overflow-visible"
-              onClick={() => setIsAboutVisible(true)}
+            <Tippy
+              duration={0}
+              content={t('about')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
-              <Tippy
-                duration={0}
-                content={t('about')}
-                className="text-white rounded text-xs mb-2"
+              <div
+                className="cursor-pointer"
+                onClick={() => setIsAboutVisible(true)}
               >
-                <Info size={21.5} />
-              </Tippy>
-            </button>
+                <CircleInfo color="white" size="1.3rem" />
+              </div>
+            </Tippy>
+
+            <Tippy
+              duration={0}
+              content={t('dark_mode')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+            >
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDarkLightMode(!reactSettings?.dark_mode)}
+              >
+                {reactSettings?.dark_mode ? (
+                  <Sun color="white" size="1.3rem" />
+                ) : (
+                  <MoonStars color="white" size="1.3rem" />
+                )}
+              </div>
+            </Tippy>
           </>
         )}
 
-        <div
-          className="cursor-pointer"
-          onClick={() => handleCollapseExpandSidebar(!isMiniSidebar)}
+        <Tippy
+          duration={0}
+          content={
+            <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
+              {isMiniSidebar ? t('show_menu') : t('hide_menu')}
+            </span>
+          }
+          className="rounded-md text-xs p-2 bg-[#F2F2F2]"
         >
-          <Tippy
-            duration={0}
-            content={
-              <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
-                {isMiniSidebar ? t('show_menu') : t('hide_menu')}
-              </span>
-            }
-            className="text-white rounded text-xs mb-2"
+          <div
+            className="cursor-pointer"
+            onClick={() => handleCollapseExpandSidebar(!isMiniSidebar)}
           >
-            <div>
-              {isMiniSidebar ? (
-                <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
-              ) : (
-                <CloseNavbarArrow color="#e5e7eb" size="1.35rem" />
-              )}
-            </div>
-          </Tippy>
-        </div>
+            {isMiniSidebar ? (
+              <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
+            ) : (
+              <CloseNavbarArrow color="#e5e7eb" size="1.35rem" />
+            )}
+          </div>
+        </Tippy>
       </nav>
     </>
   );

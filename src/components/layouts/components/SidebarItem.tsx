@@ -15,7 +15,6 @@ import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import classNames from 'classnames';
 import { Link } from '$app/components/forms';
-import { hexToRGB } from '$app/common/hooks/useAdjustColorDarkness';
 
 const Div = styled.div`
   background-color: ${(props) => props.theme.color};
@@ -26,14 +25,7 @@ const Div = styled.div`
 
 const LinkStyled = styled(Link)`
   &:hover {
-    background-color: ${(props) => {
-      if (props.theme.hoverColor) {
-        const rgbColor = hexToRGB(props.theme.hoverColor);
-        return `rgba(${rgbColor.red}, ${rgbColor.green}, ${rgbColor.blue}, 0.1)`;
-      }
-
-      return props.theme.hoverColor;
-    }};
+    background-color: ${({ theme }) => theme.hoverColor};
   }
 `;
 
@@ -77,39 +69,40 @@ export function SidebarItem(props: Props) {
     >
       <LinkStyled to={item.href} className="w-full" withoutDefaultStyling>
         <div
-          className="flex justify-start items-center my-2"
+          className="flex justify-start items-center my-2 space-x-3"
           style={{
             color: item.current ? themeColors.$2 : themeColors.$4,
           }}
         >
           <item.icon
-            className={classNames('mr-3 flex-shrink-0 h-5 w-5', {
-              'text-white': item.current,
-              'text-gray-300 group-hover:text-white': !item.current,
-            })}
-            aria-hidden="true"
-            style={{
-              color: item.current ? themeColors.$2 : themeColors.$4,
-            }}
+            size="1.275rem"
+            color={
+              item.current
+                ? themeColors.$2 || 'white'
+                : themeColors.$4 || '#74747C'
+            }
           />
-          {!isMiniSidebar && item.name}
+
+          {!isMiniSidebar && <span>{item.name}</span>}
         </div>
       </LinkStyled>
 
       {item.rightButton && !isMiniSidebar && item.rightButton.visible && (
         <LinkStyled
           theme={{
-            hoverColor: colors.$13,
+            hoverColor: colors.$6,
           }}
           to={item.rightButton.to}
-          className="rounded-full p-1.5"
+          className="rounded-sm p-[0.1rem]"
           withoutDefaultStyling
         >
           <item.rightButton.icon
-            className="h-5 w-5"
-            style={{
-              color: item.current ? themeColors.$2 : themeColors.$4,
-            }}
+            size="1.1rem"
+            color={
+              item.current
+                ? themeColors.$2 || 'white'
+                : themeColors.$4 || '#d1d5db'
+            }
           />
         </LinkStyled>
       )}

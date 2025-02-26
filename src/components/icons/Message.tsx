@@ -9,11 +9,13 @@
  */
 
 interface Props {
-  size?: string;
   color?: string;
+  size?: string;
 }
 
-export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
+export function Message(props: Props) {
+  const { color = '#000', size = '1.2rem' } = props;
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,31 +24,16 @@ export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
       y="0px"
       width={size}
       height={size}
-      viewBox="0 0 20 20"
+      viewBox="0 0 18 18"
     >
-      <line
-        x1="10"
-        y1="16.5"
-        x2="10"
-        y2="3.5"
+      <path
+        d="M14.25,2.25H3.75c-1.105,0-2,.896-2,2v7c0,1.104,.895,2,2,2h2v3l3.75-3h4.75c1.105,0,2-.896,2-2V4.25c0-1.104-.895-2-2-2Z"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
-        data-color="color-2"
-      ></line>
-      <line
-        x1="3.5"
-        y1="10"
-        x2="16.5"
-        y2="10"
-        fill="none"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      ></line>
+        strokeWidth="1.5"
+      ></path>
     </svg>
   );
 }
