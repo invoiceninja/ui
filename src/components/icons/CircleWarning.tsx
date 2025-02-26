@@ -9,11 +9,13 @@
  */
 
 interface Props {
-  size?: string;
   color?: string;
+  size?: string;
 }
 
-export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
+export function CircleWarning(props: Props) {
+  const { color = '#000', size = '1.2rem' } = props;
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,31 +24,39 @@ export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
       y="0px"
       width={size}
       height={size}
-      viewBox="0 0 20 20"
+      viewBox="0 0 24 24"
     >
-      <line
-        x1="10"
-        y1="16.5"
-        x2="10"
-        y2="3.5"
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
         fill="none"
         stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeLinecap="square"
+        strokeMiterlimit="10"
+        strokeWidth="2"
+      ></circle>
+      <line
+        x1="12"
+        y1="7"
+        x2="12"
+        y2="13"
+        fill="none"
+        stroke={color}
+        strokeLinecap="square"
+        strokeMiterlimit="10"
         strokeWidth="2"
         data-color="color-2"
       ></line>
-      <line
-        x1="3.5"
-        y1="10"
-        x2="16.5"
-        y2="10"
-        fill="none"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      ></line>
+      <circle
+        cx="12"
+        cy="16.75"
+        r="1.25"
+        fill={color}
+        strokeWidth="0"
+        data-color="color-2"
+        data-cap="butt"
+      ></circle>
     </svg>
   );
 }

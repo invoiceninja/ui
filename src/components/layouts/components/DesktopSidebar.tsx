@@ -10,7 +10,6 @@
 
 import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
-import { Icon } from 'react-feather';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
 import { Tooltip } from '$app/components/Tooltip';
@@ -20,11 +19,11 @@ import classNames from 'classnames';
 export interface NavigationItem {
   name: string;
   href: string;
-  icon: Icon;
+  icon: React.ElementType;
   current: boolean;
   visible: boolean;
   rightButton?: {
-    icon: Icon;
+    icon: React.ElementType;
     to: string;
     label: string;
     visible: boolean;
@@ -57,7 +56,7 @@ export function DesktopSidebar(props: Props) {
     >
       <div
         className="flex flex-col flex-grow overflow-y-auto border-r px-3"
-        style={{ backgroundColor: colors.$6, borderColor: colors.$4 }}
+        style={{ backgroundColor: colors.$14, borderColor: colors.$4 }}
       >
         <div
           className={classNames(

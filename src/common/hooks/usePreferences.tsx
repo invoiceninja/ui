@@ -152,7 +152,7 @@ export function usePreferences() {
                 borderColor: colors.$5,
               }}
             >
-              <Gear size="1.2rem" color={colors.$3} />
+              <Gear color={colors.$3} />
             </div>
           </>
         );

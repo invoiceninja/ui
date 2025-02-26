@@ -97,7 +97,7 @@ export function Th$(props: Props) {
       >
         {props.onColumnClick ? (
           <div
-            className="flex items-center space-x-1 overflow-hidden whitespace-nowrap text-ellipsis"
+            className="flex items-center space-x-1 overflow-hidden whitespace-nowrap text-ellipsis cursor-pointer"
             onClick={handleClick}
             style={{
               width: currentWidth !== -1 ? currentWidth : 'auto',

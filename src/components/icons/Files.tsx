@@ -13,7 +13,9 @@ interface Props {
   color?: string;
 }
 
-export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
+export function Files(props: Props) {
+  const { size = '1rem', color = '#000' } = props;
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,31 +24,33 @@ export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
       y="0px"
       width={size}
       height={size}
-      viewBox="0 0 20 20"
+      viewBox="0 0 18 18"
     >
-      <line
-        x1="10"
-        y1="16.5"
-        x2="10"
-        y2="3.5"
+      <path
+        d="M5.25,13.25h-1c-1.105,0-2-.895-2-2V3.25c0-1.105,.895-2,2-2h5c1.105,0,2,.895,2,2v1.052"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth="1.5"
         data-color="color-2"
-      ></line>
-      <line
-        x1="3.5"
-        y1="10"
-        x2="16.5"
-        y2="10"
+      ></path>
+      <path
+        d="M5.25,14.25V6.25c0-1.105,.895-2,2-2h4.086c.265,0,.52,.105,.707,.293l2.914,2.914c.188,.188,.293,.442,.293,.707v6.086c0,1.105-.895,2-2,2H7.25c-1.105,0-2-.895-2-2Z"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
-      ></line>
+        strokeWidth="1.5"
+      ></path>
+      <path
+        d="M15.25,8.25h-3c-.552,0-1-.448-1-1v-3"
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      ></path>
     </svg>
   );
 }
