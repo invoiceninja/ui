@@ -85,6 +85,7 @@ export interface Invoice {
   e_invoice?: EInvoiceType;
   is_locked?: boolean;
   backup?: Backup;
+  location_id: string;
 }
 
 export interface Backup {

@@ -138,6 +138,7 @@ const invoice: Invoice = {
   reminder_last_sent: '',
   paid_to_date: 0,
   subscription_id: '',
+  location_id: '',
   auto_bill_enabled: false,
   invitations: [
     {
