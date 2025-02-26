@@ -13,7 +13,6 @@ import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
@@ -44,12 +43,6 @@ export default function Edit() {
               errors={errors}
               page="edit"
             />
-            <Address
-              client={client}
-              setClient={setClient}
-              setErrors={setErrors}
-              errors={errors}
-            />
           </div>
 
           <div className="flex flex-col w-full xl:w-1/2 space-y-4">
@@ -59,7 +52,8 @@ export default function Edit() {
               setErrors={setErrors}
               errors={errors}
             />
-            <AdditionalInfo
+
+            <Address
               client={client}
               setClient={setClient}
               setErrors={setErrors}

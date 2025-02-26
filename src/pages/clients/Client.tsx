@@ -41,9 +41,10 @@ import { useTabs } from './common/hooks/useTabs';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
-  const { id } = useParams();
 
   const [t] = useTranslation();
+
+  const { id } = useParams();
 
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
@@ -65,7 +66,7 @@ export default function Client() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
 
-  const tabs = useTabs();
+  const tabs = useTabs({ client });
 
   useEffect(() => {
     if (data) {

@@ -35,7 +35,7 @@ export default function Documents() {
   };
 
   return (
-    <Card title={t('documents')}>
+    <Card title={t('documents')} className="w-full xl:w-2/3">
       {id ? (
         <div className="px-6">
           <Upload
@@ -53,7 +53,7 @@ export default function Documents() {
           />
         </div>
       ) : (
-        <span>{t('save_to_upload_documents')}</span>
+        <div className="px-6 text-sm">{t('save_to_upload_documents')}.</div>
       )}
     </Card>
   );

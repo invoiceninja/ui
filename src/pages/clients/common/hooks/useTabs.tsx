@@ -9,11 +9,17 @@
  */
 
 import { route } from '$app/common/helpers/route';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { Client } from '$app/common/interfaces/client';
 
-export function useTabs() {
+interface Props {
+  client: Client | undefined;
+}
+
+export function useTabs({ client }: Props) {
   const [t] = useTranslation();
 
   const { id } = useParams();
@@ -24,20 +30,15 @@ export function useTabs() {
       href: route('/clients/:id/edit', { id }),
     },
     {
-      name: t('settings'),
-      href: route('/clients/:id/settings', { id }),
-    },
-    {
-      name: t('notes'),
-      href: route('/clients/:id/notes', { id }),
-    },
-    {
-      name: t('classify'),
-      href: route('/clients/:id/classify', { id }),
-    },
-    {
       name: t('documents'),
       href: route('/clients/:id/documents', { id }),
+      formatName: () => (
+        <DocumentsTabLabel numberOfDocuments={client?.documents.length} />
+      ),
+    },
+    {
+      name: t('settings'),
+      href: route('/clients/:id/settings', { id }),
     },
     {
       name: t('locations'),

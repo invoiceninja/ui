@@ -43,9 +43,14 @@ const Documents = lazy(() => import('$app/pages/clients/show/pages/Documents'));
 const Settings = lazy(
   () => import('$app/pages/clients/common/components/Settings')
 );
-const Notes = lazy(() => import('$app/pages/clients/common/components/Notes'));
-const Classify = lazy(
-  () => import('$app/pages/clients/common/components/Classify')
+const EditPageDocuments = lazy(
+  () => import('$app/pages/clients/common/components/Documents')
+);
+const Locations = lazy(
+  () => import('$app/pages/clients/common/components/Locations')
+);
+const CreatePage = lazy(
+  () => import('$app/pages/clients/create/ common/components/CreatePage')
 );
 
 export const clientRoutes = (
@@ -74,12 +79,18 @@ export const clientRoutes = (
         />
       }
     />
+
     <Route
       path="create"
       element={
         <Guard guards={[permission('create_client')]} component={<Create />} />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="documents" element={<EditPageDocuments />} />
+      <Route path="locations" element={<Locations />} />
+    </Route>
 
     <Route
       path=":id"
@@ -94,8 +105,8 @@ export const clientRoutes = (
     >
       <Route path="edit" element={<Edit />} />
       <Route path="settings" element={<Settings />} />
-      <Route path="notes" element={<Notes />} />
-      <Route path="classify" element={<Classify />} />
+      <Route path="documents" element={<EditPageDocuments />} />
+      <Route path="locations" element={<Locations />} />
     </Route>
 
     <Route
