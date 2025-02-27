@@ -15,7 +15,6 @@ import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 import { admin } from '$app/common/guards/guards/admin';
-import { ModuleBitmask } from '../settings/account-management/component';
 
 const Payment = lazy(() => import('$app/pages/payments/Payment'));
 const Import = lazy(() => import('$app/pages/payments/import/Import'));
