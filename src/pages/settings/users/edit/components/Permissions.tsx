@@ -167,7 +167,9 @@ export function Permissions(props: Props) {
         />
       </Element>
 
-      <Element leftSide={t('disable_emails')}>
+      <Element leftSide={t('disable_emails')}
+        leftSideHelp={t('disable_emails_help')}
+      >
         <Toggle
           checked={isPermissionChecked('disable_emails')}
           onValueChange={(value) =>
