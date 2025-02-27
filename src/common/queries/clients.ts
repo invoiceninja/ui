@@ -70,7 +70,7 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
       request(
         'GET',
         endpoint(
-          '/api/v1/clients/:id?include=group_settings,activities.history,locations',
+          '/api/v1/clients/:id?include=group_settings,activities.history',
           { id }
         )
       ).then(

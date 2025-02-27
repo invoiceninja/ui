@@ -18,7 +18,7 @@ import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 
 export interface ClientContext {
-  client: Client;
+  client: Client | undefined;
   setClient: Dispatch<SetStateAction<Client | undefined>>;
   contacts: Partial<ClientContact>[];
   setContacts: Dispatch<SetStateAction<Partial<ClientContact>[]>>;

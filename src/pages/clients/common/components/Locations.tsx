@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -14,7 +13,7 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms/InputField';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientContext } from '../../edit/Edit';
 import { useOutletContext } from 'react-router-dom';
@@ -23,6 +22,9 @@ import { v4 } from 'uuid';
 import Toggle from '$app/components/forms/Toggle';
 import { CustomField } from '$app/components/CustomField';
 import { Location } from '$app/common/interfaces/location';
+import { Button } from '$app/components/forms';
+import { useBlankLocationQuery } from '$app/common/queries/locations';
+import { LocationModal } from './LocationModal';
 
 export default function Locations() {
   const [t] = useTranslation();
@@ -32,8 +34,11 @@ export default function Locations() {
   const accentColor = useAccentColor();
 
   const context: ClientContext = useOutletContext();
-  const { client, setClient, errors, setErrors } = context;
+  const { client, errors, setErrors } = context;
 
+  const { data: blankLocation } = useBlankLocationQuery();
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentLocations, setCurrentLocations] = useState<Location[]>([]);
 
   const handleChange = (
@@ -88,131 +93,161 @@ export default function Locations() {
     setCurrentLocations(locations);
   };
 
+  useEffect(() => {
+    if (client?.locations?.length) {
+      setCurrentLocations(client.locations);
+    }
+  }, [client?.locations]);
+
   return (
-    <Card className="mt-4 xl:mt-0" title={t('locations')}>
-      {currentLocations.map((location, index, row) => (
-        <div
-          key={index}
-          className="pb-4 mb-4 border-b"
-          style={{ borderColor: colors.$5 }}
-        >
-          <Element leftSide={t('name')}>
-            <InputField
-              id={`name_${index}`}
-              value={location.name}
-              onValueChange={(value) =>
-                handleChange(value, 'name', location.id as string)
-              }
-              errorMessage={errors?.errors[`locations.${index}.name`]}
-            />
-          </Element>
-
-          <Element leftSide={t('address_1')}>
-            <InputField
-              id={`address_1_${index}`}
-              value={location.address1}
-              onValueChange={(value) =>
-                handleChange(value, 'address1', location.id as string)
-              }
-              errorMessage={errors?.errors[`locations.${index}.address1`]}
-            />
-          </Element>
-
-          <Element leftSide={t('email')}>
-            <InputField
-              id={`address2_${index}`}
-              value={location.address2}
-              onValueChange={(value) =>
-                handleChange(value, 'address2', location.id as string)
-              }
-              errorMessage={errors?.errors[`locations.${index}.address2`]}
-            />
-          </Element>
-
-          <Element leftSide={t('shipping_location')}>
-            <Toggle
-              checked={Boolean(location?.is_shipping_location)}
-              onChange={(value) =>
-                handleChange(
-                  value,
-                  'is_shipping_location',
-                  location.id as string
-                )
-              }
-            />
-          </Element>
-
-          {company?.custom_fields?.contact1 && (
-            <CustomField
-              field="location1"
-              defaultValue={location.custom_value1}
-              value={company.custom_fields.location1}
-              onValueChange={(value) =>
-                handleChange(value, 'custom_value1', location.id as string)
-              }
-            />
+    <>
+      <Card className="w-full xl:w-2/3" title={t('locations')}>
+        <div className="flex flex-col space-y-4 px-6">
+          {!currentLocations.length && (
+            <span className="text-sm">{t('no_records_found')}.</span>
           )}
 
-          {company?.custom_fields?.contact2 && (
-            <CustomField
-              field="location2"
-              defaultValue={location.custom_value2}
-              value={company.custom_fields.location2}
-              onValueChange={(value) =>
-                handleChange(value, 'custom_value2', location.id as string)
-              }
-            />
-          )}
+          {currentLocations.map((location, index, row) => (
+            <div
+              key={index}
+              className="pb-4 mb-4 border-b"
+              style={{ borderColor: colors.$5 }}
+            >
+              <Element leftSide={t('name')}>
+                <InputField
+                  id={`name_${index}`}
+                  value={location.name}
+                  onValueChange={(value) =>
+                    handleChange(value, 'name', location.id as string)
+                  }
+                  errorMessage={errors?.errors[`locations.${index}.name`]}
+                />
+              </Element>
 
-          {company?.custom_fields?.contact3 && (
-            <CustomField
-              field="location3"
-              defaultValue={location.custom_value3}
-              value={company.custom_fields.location3}
-              onValueChange={(value) =>
-                handleChange(value, 'custom_value3', location.id as string)
-              }
-            />
-          )}
+              <Element leftSide={t('address_1')}>
+                <InputField
+                  id={`address_1_${index}`}
+                  value={location.address1}
+                  onValueChange={(value) =>
+                    handleChange(value, 'address1', location.id as string)
+                  }
+                  errorMessage={errors?.errors[`locations.${index}.address1`]}
+                />
+              </Element>
 
-          {company?.custom_fields?.contact4 && (
-            <CustomField
-              field="location4"
-              defaultValue={location.custom_value4}
-              value={company.custom_fields.location4}
-              onValueChange={(value) =>
-                handleChange(value, 'custom_value4', location.id as string)
-              }
-            />
-          )}
+              <Element leftSide={t('email')}>
+                <InputField
+                  id={`address2_${index}`}
+                  value={location.address2}
+                  onValueChange={(value) =>
+                    handleChange(value, 'address2', location.id as string)
+                  }
+                  errorMessage={errors?.errors[`locations.${index}.address2`]}
+                />
+              </Element>
 
-          <div className="flex items-center">
-            <div className="flex items-center justify-between w-1/2">
-              {currentLocations.length >= 2 && (
-                <button
-                  type="button"
-                  onClick={() => destroy(index)}
-                  className="text-red-600"
-                >
-                  {t('remove_location')}
-                </button>
+              <Element leftSide={t('shipping_location')}>
+                <Toggle
+                  checked={Boolean(location?.is_shipping_location)}
+                  onChange={(value) =>
+                    handleChange(
+                      value,
+                      'is_shipping_location',
+                      location.id as string
+                    )
+                  }
+                />
+              </Element>
+
+              {company?.custom_fields?.contact1 && (
+                <CustomField
+                  field="location1"
+                  defaultValue={location.custom_value1}
+                  value={company.custom_fields.location1}
+                  onValueChange={(value) =>
+                    handleChange(value, 'custom_value1', location.id as string)
+                  }
+                />
               )}
-            </div>
 
-            <div className="w-1/2 flex justify-end">
-              {index + 1 === row.length && (
-                <button
-                  type="button"
-                  onClick={create}
-                  style={{ color: accentColor }}
-                >
-                  {t('add_location')}
-                </button>
+              {company?.custom_fields?.contact2 && (
+                <CustomField
+                  field="location2"
+                  defaultValue={location.custom_value2}
+                  value={company.custom_fields.location2}
+                  onValueChange={(value) =>
+                    handleChange(value, 'custom_value2', location.id as string)
+                  }
+                />
               )}
+
+              {company?.custom_fields?.contact3 && (
+                <CustomField
+                  field="location3"
+                  defaultValue={location.custom_value3}
+                  value={company.custom_fields.location3}
+                  onValueChange={(value) =>
+                    handleChange(value, 'custom_value3', location.id as string)
+                  }
+                />
+              )}
+
+              {company?.custom_fields?.contact4 && (
+                <CustomField
+                  field="location4"
+                  defaultValue={location.custom_value4}
+                  value={company.custom_fields.location4}
+                  onValueChange={(value) =>
+                    handleChange(value, 'custom_value4', location.id as string)
+                  }
+                />
+              )}
+
+              <div className="flex items-center">
+                <div className="flex items-center justify-between w-1/2">
+                  {currentLocations.length >= 2 && (
+                    <button
+                      type="button"
+                      onClick={() => destroy(index)}
+                      className="text-red-600"
+                    >
+                      {t('remove_location')}
+                    </button>
+                  )}
+                </div>
+
+                <div className="w-1/2 flex justify-end">
+                  {index + 1 === row.length && (
+                    <button
+                      type="button"
+                      onClick={create}
+                      style={{ color: accentColor }}
+                    >
+                      {t('add_location')}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
+
+          <Button
+            className="w-full"
+            type="primary"
+            behavior="button"
+            onClick={() => setIsModalOpen(true)}
+          >
+            {t('add_location')}
+          </Button>
         </div>
-      ))}
-    </Card>
+      </Card>
+
+      <LocationModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        blankLocation={blankLocation as Location}
+        clientId={client?.id}
+      />
+    </>
   );
 }
