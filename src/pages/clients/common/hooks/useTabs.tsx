@@ -30,15 +30,15 @@ export function useTabs({ client }: Props) {
       href: route('/clients/:id/edit', { id }),
     },
     {
+      name: t('settings'),
+      href: route('/clients/:id/settings', { id }),
+    },
+    {
       name: t('documents'),
       href: route('/clients/:id/documents', { id }),
       formatName: () => (
         <DocumentsTabLabel numberOfDocuments={client?.documents.length} />
       ),
-    },
-    {
-      name: t('settings'),
-      href: route('/clients/:id/settings', { id }),
     },
     {
       name: t('locations'),

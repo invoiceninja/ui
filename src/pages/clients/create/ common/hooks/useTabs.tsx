@@ -20,12 +20,12 @@ export function useTabs() {
       href: '/clients/create',
     },
     {
-      name: t('documents'),
-      href: '/clients/create/documents',
-    },
-    {
       name: t('settings'),
       href: '/clients/create/settings',
+    },
+    {
+      name: t('documents'),
+      href: '/clients/create/documents',
     },
     {
       name: t('locations'),

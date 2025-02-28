@@ -12,7 +12,6 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Location } from '$app/common/interfaces/location';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CountrySelector } from '$app/components/CountrySelector';
@@ -23,7 +22,7 @@ import { Modal } from '$app/components/Modal';
 import { AxiosError } from 'axios';
 import { set } from 'lodash';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -31,66 +30,76 @@ interface Props {
   setIsModalOpen: (isModalOpen: boolean) => void;
   blankLocation: Location;
   clientId: string | undefined;
+  currentEditingLocation: Location | null;
+  setCurrentEditingLocation: Dispatch<SetStateAction<Location | null>>;
 }
-
-const BLANK_LOCATION: Location = {
-  id: '',
-  user_id: '',
-  vendor_id: '',
-  client_id: '',
-  name: '',
-  address1: '',
-  address2: '',
-  phone: '',
-  city: '',
-  state: '',
-  postal_code: '',
-  country_id: '',
-  is_shipping_location: false,
-  custom_value1: '',
-  custom_value2: '',
-  custom_value3: '',
-  custom_value4: '',
-  is_deleted: false,
-  updated_at: 0,
-  archived_at: 0,
-  created_at: 0,
-};
 
 export function LocationModal({
   isModalOpen,
   setIsModalOpen,
   blankLocation,
   clientId,
+  currentEditingLocation,
+  setCurrentEditingLocation,
 }: Props) {
   const [t] = useTranslation();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | undefined>();
-  const [currentLocation, setCurrentLocation] = useState<Location>(
-    blankLocation || BLANK_LOCATION
-  );
+  const [currentLocation, setCurrentLocation] =
+    useState<Location>(blankLocation);
+
+  const handleOnClose = () => {
+    setIsModalOpen(false);
+    currentEditingLocation && setCurrentEditingLocation(null);
+  };
 
   const handleSave = () => {
     if (!isFormBusy) {
       toast.processing();
 
       setErrors(undefined);
-
       setIsFormBusy(true);
 
       request('POST', endpoint('/api/v1/locations'), {
         ...currentLocation,
         client_id: clientId,
       })
-        .then((response: GenericSingleResourceResponse<Location>) => {
+        .then(() => {
           toast.success('created_location');
-
-          console.log(response);
 
           $refetch(['clients']);
 
-          setIsModalOpen(false);
+          handleOnClose();
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  const handleEdit = () => {
+    if (!isFormBusy) {
+      toast.processing();
+
+      setErrors(undefined);
+      setIsFormBusy(true);
+
+      request(
+        'PUT',
+        endpoint('/api/v1/locations/:id', { id: currentEditingLocation?.id }),
+        currentLocation
+      )
+        .then(() => {
+          toast.success('updated_location');
+
+          $refetch(['clients']);
+
+          setCurrentEditingLocation(null);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
@@ -111,14 +120,14 @@ export function LocationModal({
   };
 
   useEffect(() => {
-    setCurrentLocation(blankLocation || BLANK_LOCATION);
+    setCurrentLocation(currentEditingLocation || blankLocation);
   }, [isModalOpen]);
 
   return (
     <Modal
-      title={t('add_location')}
+      title={currentEditingLocation ? t('edit_location') : t('add_location')}
       visible={isModalOpen}
-      onClose={() => setIsModalOpen(false)}
+      onClose={handleOnClose}
       overflowVisible
       size="regular"
     >
@@ -172,13 +181,6 @@ export function LocationModal({
           errorMessage={errors?.errors.postal_code}
         />
 
-        <InputField
-          label={t('country')}
-          value={currentLocation.country_id}
-          onValueChange={(value) => handleChange(value, 'country_id')}
-          errorMessage={errors?.errors.country_id}
-        />
-
         <CountrySelector
           label={t('country')}
           value={currentLocation.country_id}
@@ -200,7 +202,9 @@ export function LocationModal({
             className="w-full"
             type="primary"
             behavior="button"
-            onClick={handleSave}
+            onClick={currentEditingLocation ? handleEdit : handleSave}
+            disabled={isFormBusy}
+            disableWithoutIcon
           >
             {t('save')}
           </Button>
