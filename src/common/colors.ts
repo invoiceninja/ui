@@ -46,6 +46,7 @@ export const $1 = {
   $14: '#121212', // Navigation bar background color
   $15: '#323236', // Light gray background
   $16: '#A1A1AA', // Dark gray icon
+  $17: '#9D9DA8', // Placeholder text
 };
 
 export const $2 = {
@@ -67,6 +68,7 @@ export const $2 = {
   $14: '#27272A', // Navigation bar background color
   $15: '#E4E4E7', // Light gray background
   $16: '#717179', // Dark gray icon
+  $17: '#A1A1AA', // Placeholder text
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);
