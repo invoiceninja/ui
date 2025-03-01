@@ -46,8 +46,9 @@ export function LocationModal({
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | undefined>();
-  const [currentLocation, setCurrentLocation] =
-    useState<Location>(blankLocation);
+  const [currentLocation, setCurrentLocation] = useState<Location | undefined>(
+    blankLocation
+  );
 
   const handleOnClose = () => {
     setIsModalOpen(false);
@@ -112,6 +113,10 @@ export function LocationModal({
   };
 
   const handleChange = (value: string | boolean, property: string) => {
+    if (!currentLocation) {
+      return;
+    }
+
     const updatedLocation = cloneDeep(currentLocation);
 
     set(updatedLocation, property, value);
@@ -134,63 +139,64 @@ export function LocationModal({
       <div className="flex flex-col space-y-4">
         <InputField
           label={t('name')}
-          value={currentLocation.name}
+          value={currentLocation?.name || ''}
           onValueChange={(value) => handleChange(value, 'name')}
           errorMessage={errors?.errors.name}
         />
 
         <InputField
           label={t('address1')}
-          value={currentLocation.address1}
+          value={currentLocation?.address1 || ''}
           onValueChange={(value) => handleChange(value, 'address1')}
           errorMessage={errors?.errors.address1}
         />
 
         <InputField
           label={t('address2')}
-          value={currentLocation.address2}
+          value={currentLocation?.address2 || ''}
           onValueChange={(value) => handleChange(value, 'address2')}
           errorMessage={errors?.errors.address2}
         />
 
         <InputField
-          label={t('phone')}
-          value={currentLocation.phone}
-          onValueChange={(value) => handleChange(value, 'phone')}
-          errorMessage={errors?.errors.phone}
-        />
-
-        <InputField
           label={t('city')}
-          value={currentLocation.city}
+          value={currentLocation?.city || ''}
           onValueChange={(value) => handleChange(value, 'city')}
           errorMessage={errors?.errors.city}
         />
 
         <InputField
           label={t('state')}
-          value={currentLocation.state}
+          value={currentLocation?.state || ''}
           onValueChange={(value) => handleChange(value, 'state')}
           errorMessage={errors?.errors.state}
         />
 
         <InputField
           label={t('postal_code')}
-          value={currentLocation.postal_code}
+          value={currentLocation?.postal_code || ''}
           onValueChange={(value) => handleChange(value, 'postal_code')}
           errorMessage={errors?.errors.postal_code}
         />
 
         <CountrySelector
           label={t('country')}
-          value={currentLocation.country_id}
+          value={currentLocation?.country_id || ''}
           onChange={(value) => handleChange(value, 'country_id')}
+          errorMessage={errors?.errors.country_id}
+        />
+
+        <InputField
+          label={t('phone')}
+          value={currentLocation?.phone || ''}
+          onValueChange={(value) => handleChange(value, 'phone')}
+          errorMessage={errors?.errors.phone}
         />
 
         <div className="pt-1">
           <Toggle
             label={t('is_shipping_location')}
-            value={currentLocation.is_shipping_location}
+            value={Boolean(currentLocation?.is_shipping_location)}
             onValueChange={(value) =>
               handleChange(value, 'is_shipping_location')
             }

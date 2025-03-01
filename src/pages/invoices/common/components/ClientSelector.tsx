@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox, Link } from '$app/components/forms';
+import { Checkbox, InputLabel, Link, SelectField } from '$app/components/forms';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -21,6 +21,8 @@ import { useColorScheme } from '$app/common/colors';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
 import { ClientActionButtons } from './ClientActionButtons';
 import { Tooltip } from '$app/components/Tooltip';
+import { useLocationResolver } from '$app/common/hooks/location/useLocationResolver';
+import { Location } from '$app/common/interfaces/location';
 
 interface Props {
   readonly?: boolean;
@@ -31,15 +33,21 @@ interface Props {
   errorMessage?: string | string[];
   disableWithSpinner?: boolean;
   textOnly?: boolean;
+  onLocationChange?: (locationId: string) => void;
 }
 
 export function ClientSelector(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const [client, setClient] = useState<Client>();
+  const [location, setLocation] = useState<Location>();
 
   const { resource } = props;
 
   const clientResolver = useClientResolver();
+  const locationResolver = useLocationResolver();
 
   const handleCheckedState = (contactId: string) => {
     const potential = resource?.invitations.find(
@@ -56,12 +64,18 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
-  const colors = useColorScheme();
+  useEffect(() => {
+    if (resource?.location_id) {
+      locationResolver
+        .find(resource.location_id)
+        .then((resolvedLocation) => setLocation(resolvedLocation));
+    }
+  }, [resource?.location_id]);
 
   return (
     <>
       <div
-        className="flex  flex-col justify-between space-y-2"
+        className="flex flex-col justify-between space-y-2"
         style={{ color: colors.$3 }}
       >
         {props.textOnly ? (
@@ -81,64 +95,117 @@ export function ClientSelector(props: Props) {
         )}
 
         {client && <ClientActionButtons client={client} />}
+
+        {Boolean(resource?.client_id) && (
+          <>
+            {props.textOnly ? (
+              <>
+                {location ? (
+                  <div className="pt-4">
+                    <div className="flex flex-col space-y-1">
+                      <InputLabel>{t('location')}</InputLabel>
+
+                      <p className="text-sm font-semibold">{location.name}</p>
+                      <p className="text-xs">
+                        {location.address1}
+                        {location.address2 && `, ${location.address2}`}
+                      </p>
+                      <p className="text-xs">
+                        {location.city}, {location.state} {location.postal_code}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <>
+                {Array.isArray(resource?.client?.locations) &&
+                  props.onLocationChange && (
+                    <div className="pt-4">
+                      <SelectField
+                        label={t('location')}
+                        value={resource?.location_id}
+                        onValueChange={(value) =>
+                          props.onLocationChange?.(value)
+                        }
+                        customSelector
+                      >
+                        {resource.client.locations.map((location) => (
+                          <option key={location.id} value={location.id}>
+                            {location.name}
+                          </option>
+                        ))}
+                      </SelectField>
+                    </div>
+                  )}
+              </>
+            )}
+          </>
+        )}
       </div>
 
-      {resource?.client_id &&
-        client &&
-        client.contacts.map((contact, index) => (
-          <div key={index} className="flex justify-between items-center">
-            <div>
-              <Checkbox
-                id={contact.id}
-                value={contact.id}
-                label={
-                  contact.first_name.length >= 1
-                    ? `${contact.first_name} ${contact.last_name}`
-                    : contact.email || client.display_name
-                }
-                checked={handleCheckedState(contact.id)}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  props.onContactCheckboxChange(
-                    event.target.value,
-                    event.target.checked
-                  )
-                }
-              />
+      {resource?.client_id && client && client.contacts.length && (
+        <div>
+          {Boolean(props.onLocationChange || location) && (
+            <InputLabel className="mb-2">{t('contacts')}</InputLabel>
+          )}
 
-              <div className="relative">
-                {contact.first_name && (
-                  <p className="text-sm" style={{ color: colors.$3 }}>
-                    {contact.email}
-                  </p>
-                )}
+          {client.contacts.map((contact, index) => (
+            <div key={index} className="flex justify-between items-center">
+              <div>
+                <Checkbox
+                  id={contact.id}
+                  value={contact.id}
+                  label={
+                    contact.first_name.length >= 1
+                      ? `${contact.first_name} ${contact.last_name}`
+                      : contact.email || client.display_name
+                  }
+                  checked={handleCheckedState(contact.id)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    props.onContactCheckboxChange(
+                      event.target.value,
+                      event.target.checked
+                    )
+                  }
+                />
 
-                {resource.invitations.length >= 1 && (
-                  <div className="flex space-x-2 mt-1">
-                    <Link
-                      to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
-                      external
-                    >
-                      {t('view_in_portal')}
-                    </Link>
+                <div className="relative">
+                  {contact.first_name && (
+                    <p className="text-sm" style={{ color: colors.$3 }}>
+                      {contact.email}
+                    </p>
+                  )}
 
-                    <Tooltip
-                      width="auto"
-                      placement="bottom"
-                      message={t('copy_link') as string}
-                      withoutArrow
-                    >
-                      <CopyToClipboardIconOnly
-                        text={resource.invitations[0].link}
-                      />
-                    </Tooltip>
-                  </div>
-                )}
+                  {resource.invitations.length >= 1 && (
+                    <div className="flex space-x-2 mt-1">
+                      <Link
+                        to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
+                        external
+                      >
+                        {t('view_in_portal')}
+                      </Link>
+
+                      <Tooltip
+                        width="auto"
+                        placement="bottom"
+                        message={t('copy_link') as string}
+                        withoutArrow
+                      >
+                        <CopyToClipboardIconOnly
+                          text={resource.invitations[0].link}
+                        />
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
-          </div>
-        ))}
+              {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }
