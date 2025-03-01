@@ -15,8 +15,7 @@ export function Person() {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="1rem"
-      height="1rem"
+      style={{ width: '1rem', height: '1rem' }}
       viewBox="0 0 20 20"
     >
       <circle

@@ -20,8 +20,7 @@ export function Plus({ size = '1rem', color = '#A1A1AA' }: Props) {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width={size}
-      height={size}
+      style={{ width: size, height: size }}
       viewBox="0 0 20 20"
     >
       <line
