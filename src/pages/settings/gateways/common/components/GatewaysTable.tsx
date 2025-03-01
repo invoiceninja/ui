@@ -167,7 +167,7 @@ export function GatewaysTable(params: Params) {
 
   useEffect(() => {
     if (updateCompany) {
-      handleCompanySave(updateCompany);
+      handleCompanySave({ excludeToasters: true });
 
       setUpdateCompany(false);
     }
