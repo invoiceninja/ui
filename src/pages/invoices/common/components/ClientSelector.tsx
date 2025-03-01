@@ -146,9 +146,11 @@ export function ClientSelector(props: Props) {
 
       {resource?.client_id && client && client.contacts.length && (
         <div>
-          {Boolean(props.onLocationChange || location) && (
-            <InputLabel className="mb-2">{t('contacts')}</InputLabel>
-          )}
+          {Boolean(
+            (props.onLocationChange &&
+              Array.isArray(resource?.client?.locations)) ||
+              location
+          ) && <InputLabel className="mb-2">{t('contacts')}</InputLabel>}
 
           {client.contacts.map((contact, index) => (
             <div key={index} className="flex justify-between items-center">
