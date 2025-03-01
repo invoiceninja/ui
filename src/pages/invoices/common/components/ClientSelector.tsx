@@ -130,7 +130,7 @@ export function ClientSelector(props: Props) {
                         }
                         customSelector
                       >
-                        {resource.client.locations.map((location) => (
+                        {resource?.client?.locations.map((location) => (
                           <option key={location.id} value={location.id}>
                             {location.name}
                           </option>
