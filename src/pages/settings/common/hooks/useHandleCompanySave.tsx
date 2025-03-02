@@ -52,7 +52,7 @@ export function useHandleCompanySave() {
   );
 
   return async (options?: SaveOptions) => {
-    const { excludeToasters = false, syncSendTime = false } = options || {};
+    const { excludeToasters = false, syncSendTime } = options || {};
 
     if (!shouldUpdate() && isCompanySettingsActive) {
       return;
@@ -73,14 +73,15 @@ export function useHandleCompanySave() {
 
     setErrors(undefined);
 
+    let endpointUrl = '/api/v1/companies/:id';
+
+    if (typeof syncSendTime === 'boolean') {
+      endpointUrl += '?sync_send_time=' + syncSendTime;
+    }
+
     return request(
       'PUT',
-      endpoint(
-        `/api/v1/companies/:id${syncSendTime ? '?sync_send_time=true' : ''}`,
-        {
-          id: companyChanges?.id,
-        }
-      ),
+      endpoint(endpointUrl, { id: companyChanges?.id }),
       companyChanges
     )
       .then((response) => {

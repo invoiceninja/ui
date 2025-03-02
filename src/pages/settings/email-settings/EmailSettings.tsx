@@ -553,9 +553,9 @@ export function EmailSettings() {
       <SendTimeModal
         visible={isSendTimeModalOpen}
         setVisible={setIsSendTimeModalOpen}
-        onConfirm={() => {
+        onConfirm={(syncEnabled) => {
           onSave({
-            syncSendTime: true,
+            syncSendTime: syncEnabled,
           });
         }}
       />
