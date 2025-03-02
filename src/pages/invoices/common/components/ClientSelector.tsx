@@ -106,38 +106,51 @@ export function ClientSelector(props: Props) {
                       <InputLabel>{t('location')}</InputLabel>
 
                       <p className="text-sm font-semibold">{location.name}</p>
-                      <p className="text-xs">
-                        {location.address1}
-                        {location.address2 && `, ${location.address2}`}
-                      </p>
-                      <p className="text-xs">
-                        {location.city}, {location.state} {location.postal_code}
-                      </p>
+
+                      {(location.address1 || location.address2) && (
+                        <p className="text-xs">
+                          {location.address1}
+                          {location.address1 &&
+                            location.address2 &&
+                            `, ${location.address2}`}
+                        </p>
+                      )}
+
+                      {(location.city ||
+                        location.state ||
+                        location.postal_code) && (
+                        <p className="text-xs">
+                          {location.city}
+                          {location.city &&
+                            (location.state || location.postal_code) &&
+                            ', '}
+                          {location.state}
+                          {location.state && location.postal_code && ' '}
+                          {location.postal_code}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ) : null}
               </>
             ) : (
               <>
-                {Array.isArray(resource?.client?.locations) &&
-                  props.onLocationChange && (
-                    <div className="pt-4">
-                      <SelectField
-                        label={t('location')}
-                        value={resource?.location_id}
-                        onValueChange={(value) =>
-                          props.onLocationChange?.(value)
-                        }
-                        customSelector
-                      >
-                        {resource?.client?.locations.map((location) => (
-                          <option key={location.id} value={location.id}>
-                            {location.name}
-                          </option>
-                        ))}
-                      </SelectField>
-                    </div>
-                  )}
+                {Array.isArray(client?.locations) && props.onLocationChange && (
+                  <div className="pt-4">
+                    <SelectField
+                      label={t('location')}
+                      value={resource?.location_id}
+                      onValueChange={(value) => props.onLocationChange?.(value)}
+                      customSelector
+                    >
+                      {client?.locations.map((location) => (
+                        <option key={location.id} value={location.id}>
+                          {location.name}
+                        </option>
+                      ))}
+                    </SelectField>
+                  </div>
+                )}
               </>
             )}
           </>
@@ -147,8 +160,7 @@ export function ClientSelector(props: Props) {
       {resource?.client_id && client && client.contacts.length && (
         <div>
           {Boolean(
-            (props.onLocationChange &&
-              Array.isArray(resource?.client?.locations)) ||
+            (props.onLocationChange && Array.isArray(client?.locations)) ||
               location
           ) && <InputLabel className="mb-2">{t('contacts')}</InputLabel>}
 

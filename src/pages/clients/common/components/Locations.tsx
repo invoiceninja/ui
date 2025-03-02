@@ -147,12 +147,18 @@ export default function Locations() {
                   <span style={{ color: colors.$16 }}>Address: </span>
 
                   {location.address1}
-                  {location.address2 && `, ${location.address2}`}
+                  {location.address1 &&
+                    location.address2 &&
+                    `, ${location.address2}`}
                 </div>
 
                 <div className="text-sm mb-1">
                   <span style={{ color: colors.$16 }}>City: </span>
-                  {location.city}, {location.state} {location.postal_code}
+                  {location.city || ''}
+                  {location.state &&
+                    `${location.city ? ', ' : ''}${location.state}`}
+                  {location.postal_code &&
+                    `${location.state ? ' ' : ''}${location.postal_code}`}
                 </div>
 
                 <div className="text-sm mb-1">
