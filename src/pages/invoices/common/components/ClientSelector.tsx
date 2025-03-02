@@ -21,8 +21,6 @@ import { useColorScheme } from '$app/common/colors';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
 import { ClientActionButtons } from './ClientActionButtons';
 import { Tooltip } from '$app/components/Tooltip';
-import { useLocationResolver } from '$app/common/hooks/location/useLocationResolver';
-import { Location } from '$app/common/interfaces/location';
 
 interface Props {
   readonly?: boolean;
@@ -42,12 +40,10 @@ export function ClientSelector(props: Props) {
   const colors = useColorScheme();
 
   const [client, setClient] = useState<Client>();
-  const [location, setLocation] = useState<Location>();
 
   const { resource } = props;
 
   const clientResolver = useClientResolver();
-  const locationResolver = useLocationResolver();
 
   const handleCheckedState = (contactId: string) => {
     const potential = resource?.invitations.find(
@@ -63,14 +59,6 @@ export function ClientSelector(props: Props) {
         .find(resource.client_id)
         .then((client) => setClient(client));
   }, [resource?.client_id]);
-
-  useEffect(() => {
-    if (resource?.location_id) {
-      locationResolver
-        .find(resource.location_id)
-        .then((resolvedLocation) => setLocation(resolvedLocation));
-    }
-  }, [resource?.location_id]);
 
   return (
     <>
@@ -98,60 +86,21 @@ export function ClientSelector(props: Props) {
 
         {Boolean(resource?.client_id) && (
           <>
-            {props.textOnly ? (
-              <>
-                {location ? (
-                  <div className="pt-4">
-                    <div className="flex flex-col space-y-1">
-                      <InputLabel>{t('location')}</InputLabel>
-
-                      <p className="text-sm font-semibold">{location.name}</p>
-
-                      {(location.address1 || location.address2) && (
-                        <p className="text-xs">
-                          {location.address1}
-                          {location.address1 &&
-                            location.address2 &&
-                            `, ${location.address2}`}
-                        </p>
-                      )}
-
-                      {(location.city ||
-                        location.state ||
-                        location.postal_code) && (
-                        <p className="text-xs">
-                          {location.city}
-                          {location.city &&
-                            (location.state || location.postal_code) &&
-                            ', '}
-                          {location.state}
-                          {location.state && location.postal_code && ' '}
-                          {location.postal_code}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ) : null}
-              </>
-            ) : (
-              <>
-                {Array.isArray(client?.locations) && props.onLocationChange && (
-                  <div className="pt-4">
-                    <SelectField
-                      label={t('location')}
-                      value={resource?.location_id}
-                      onValueChange={(value) => props.onLocationChange?.(value)}
-                      customSelector
-                    >
-                      {client?.locations.map((location) => (
-                        <option key={location.id} value={location.id}>
-                          {location.name}
-                        </option>
-                      ))}
-                    </SelectField>
-                  </div>
-                )}
-              </>
+            {Boolean(client?.locations?.length) && props.onLocationChange && (
+              <div className="pt-4">
+                <SelectField
+                  label={t('location')}
+                  value={resource?.location_id}
+                  onValueChange={(value) => props.onLocationChange?.(value)}
+                  customSelector
+                >
+                  {client?.locations.map((location) => (
+                    <option key={location.id} value={location.id}>
+                      {location.name}
+                    </option>
+                  ))}
+                </SelectField>
+              </div>
             )}
           </>
         )}
@@ -160,7 +109,7 @@ export function ClientSelector(props: Props) {
       {resource?.client_id && client && client.contacts.length && (
         <div>
           {Boolean(
-            (props.onLocationChange && Array.isArray(client?.locations)) ||
+            (props.onLocationChange && Boolean(client?.locations?.length)) ||
               location
           ) && <InputLabel className="mb-2">{t('contacts')}</InputLabel>}
 

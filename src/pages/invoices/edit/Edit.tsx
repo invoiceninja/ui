@@ -137,6 +137,9 @@ export default function Edit() {
             resource={invoice}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
+            onLocationChange={(locationId) =>
+              handleChange('location_id', locationId)
+            }
             onContactCheckboxChange={handleInvitationChange}
             errorMessage={errors?.errors.client_id}
             textOnly
