@@ -22,8 +22,7 @@ export function Income({ size = '1rem', color = '#000' }: Props) {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width={size}
-      height={size}
+      style={{ width: size, height: size }}
       viewBox="0 0 20 20"
     >
       <rect

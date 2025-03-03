@@ -21,8 +21,7 @@ export function OpenWallet({ color = '#000', size = '1.2rem' }: Props) {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width={size}
-      height={size}
+      style={{ width: size, height: size }}
       viewBox="0 0 18 18"
     >
       <path
