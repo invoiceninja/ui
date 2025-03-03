@@ -99,6 +99,11 @@ export const ranges: Range[] = [
     label: 'this_year',
     scheduleIdentifier: 'this_year',
   },
+  {
+    identifier: 'last_year',
+    label: 'last_year',
+    scheduleIdentifier: 'last_year',
+  }, 
   { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
