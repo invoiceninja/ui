@@ -139,7 +139,7 @@ export default function Locations() {
                   <span className="text-lg font-semibold">{location.name}</span>
 
                   {location.is_shipping_location && (
-                    <Badge variant="blue">{t('shipping_location')}</Badge>
+                    <Badge variant="blue">{t('shipping')}</Badge>
                   )}
                 </div>
 
