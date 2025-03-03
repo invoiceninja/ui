@@ -28,10 +28,6 @@ import { useHandleProductChange } from './hooks/useHandleProductChange';
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { useColorScheme } from '$app/common/colors';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { PurchaseOrderContext } from '../create/Create';
 
 export default function Edit() {
@@ -68,12 +64,6 @@ export default function Edit() {
 
   const handleLineItemPropertyChange =
     useHandleLineItemPropertyChange(setPurchaseOrder);
-
-  const {
-    changeTemplateVisible,
-    setChangeTemplateVisible,
-    changeTemplateResources,
-  } = useChangeTemplate();
 
   return (
     <>
@@ -179,15 +169,6 @@ export default function Edit() {
           )}
         </div>
       )}
-
-      <ChangeTemplateModal<PurchaseOrder>
-        entity="purchase_order"
-        entities={changeTemplateResources as PurchaseOrder[]}
-        visible={changeTemplateVisible}
-        setVisible={setChangeTemplateVisible}
-        labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
-        bulkUrl="/api/v1/purchase_orders/bulk"
-      />
     </>
   );
 }
