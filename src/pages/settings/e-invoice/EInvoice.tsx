@@ -95,7 +95,7 @@ export function EInvoice() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('e_invoice'), href: '/settings/e_invoice' },
+    { name: t('e_invoicing'), href: '/settings/e_invoice' },
   ];
 
   const dispatch = useDispatch();
@@ -188,7 +188,7 @@ export function EInvoice() {
 
   return (
     <Settings
-      title={t('e_invoice')}
+      title={t('e_invoicing')}
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
       // onSaveClick={() => {
@@ -208,7 +208,7 @@ export function EInvoice() {
       <PEPPOLPlanBanner />
 
       {Boolean(!company?.legal_entity_id) && (
-        <Card title={t('e_invoice')}>
+        <Card title={t('e_invoicing')}>
           <Element
             leftSide={
               <PropertyCheckbox
