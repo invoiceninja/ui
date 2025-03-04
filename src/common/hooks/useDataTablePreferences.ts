@@ -21,7 +21,7 @@ import { endpoint } from '../helpers';
 import { request } from '../helpers/request';
 import { useUserChanges } from './useInjectUserChanges';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../stores/slices/user';
+import { injectInChangesWithData, updateUser } from '../stores/slices/user';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 
 interface Params {
@@ -78,6 +78,8 @@ export function useDataTablePreferences(params: Params) {
       $refetch(['company_users']);
 
       dispatch(updateUser(updatedUser));
+
+      dispatch(injectInChangesWithData(updatedUser));
     });
   };
 
