@@ -22,8 +22,7 @@ export function Sun(props: Props) {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width={size}
-      height={size}
+      style={{ width: size, height: size }}
       viewBox="0 0 12 12"
     >
       <circle cx="6" cy="6" r="3" strokeWidth="0" fill={color}></circle>
