@@ -37,6 +37,7 @@ interface Params {
   setSortedBy: Dispatch<SetStateAction<string | undefined>>;
   setStatus: Dispatch<SetStateAction<string[]>>;
   setPerPage: Dispatch<SetStateAction<PerPage>>;
+  setArePreferencesApplied: Dispatch<SetStateAction<boolean>>;
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
 }
@@ -58,6 +59,7 @@ export function useDataTablePreferences(params: Params) {
     setSortedBy,
     setStatus,
     setPerPage,
+    setArePreferencesApplied,
     withoutStoringPerPage,
     enableSavingFilterPreference,
   } = params;
@@ -168,6 +170,10 @@ export function useDataTablePreferences(params: Params) {
       } else {
         setStatus(['active']);
       }
+
+      setTimeout(() => {
+        setArePreferencesApplied(true);
+      }, 50);
     }
   }, [isInitialConfiguration]);
 
