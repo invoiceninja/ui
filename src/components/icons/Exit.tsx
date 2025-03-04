@@ -15,8 +15,7 @@ export function Exit() {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="0.85rem"
-      height="0.85rem"
+      style={{ width: '0.85rem', height: '0.85rem' }}
       viewBox="0 0 12 12"
     >
       <path

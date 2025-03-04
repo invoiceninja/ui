@@ -10,17 +10,17 @@
 
 type Props = {
   color?: string;
+  size?: string;
 };
 
-export function Check({ color = '#18181B' }: Props) {
+export function Check({ color = '#18181B', size = '1.1rem' }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="1.1rem"
-      height="1.1rem"
+      style={{ width: size, height: size }}
       viewBox="0 0 20 20"
     >
       <polyline
