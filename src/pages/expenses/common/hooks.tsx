@@ -59,7 +59,6 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
 import {
@@ -68,6 +67,7 @@ import {
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { Link } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -246,6 +246,8 @@ export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const colors = useColorScheme();
+
   const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
@@ -378,12 +380,11 @@ export function useExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -489,12 +490,11 @@ export function useExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }

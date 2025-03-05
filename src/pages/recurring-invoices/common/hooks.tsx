@@ -81,12 +81,12 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { confirmActionModalAtom } from './components/ConfirmActionModal';
+import { useColorScheme } from '$app/common/colors';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -344,7 +344,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
-    
+
     (recurringInvoice) =>
       (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
         recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
@@ -364,8 +364,7 @@ export function useActions(params?: Params) {
       ),
 
     (recurringInvoice) =>
-      (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT) && (
-
+      recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'send_now',
@@ -379,7 +378,6 @@ export function useActions(params?: Params) {
         >
           {t('send_now')}
         </EntityActionElement>
-
       ),
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
@@ -412,7 +410,7 @@ export function useActions(params?: Params) {
         {t('view_pdf')}
       </EntityActionElement>
     ),
-    
+
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
         <UpdatePricesAction
@@ -648,6 +646,8 @@ export function useRecurringInvoiceColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const colors = useColorScheme();
+
   const getSetting = useGetSetting();
   const getTimezone = useGetTimezone();
   const formatNumber = useFormatNumber();
@@ -850,12 +850,11 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -876,12 +875,11 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }
