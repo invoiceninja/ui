@@ -25,6 +25,7 @@ import { ChangePlan } from './ChangePlan';
 import { PopupProps } from './NewCreditCard';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useEnterpriseUtils } from '../../common/hooks/useEnterpriseUtils';
+import { useTranslation } from 'react-i18next';
 
 export type Plan =
   | '' // Free
@@ -140,6 +141,8 @@ export function Popup({ visible, onClose }: PopupProps) {
     setEnterprisePlan(getFirstAvailableEnterprise(pricing));
   }, [pricing]);
 
+  const { t } = useTranslation();
+
   return (
     <>
       <Modal
@@ -165,16 +168,16 @@ export function Popup({ visible, onClose }: PopupProps) {
       <Modal visible={visible} onClose={onClose} size="large">
         <div className="-mt-16 py-8">
           <div className="text-center">
-            <h1 className="text-4xl font-semibold">More than invoicing</h1>
-            <h2 className="text-2xl mt-2">
-              Simple Pricing. Advanced Features.
-            </h2>
+            <h1 className="text-4xl font-semibold">
+              {t('upgrade_popup_headline')}
+            </h1>
+            <h2 className="text-2xl mt-2">{t('upgrade_popup_description')}</h2>
           </div>
 
           {account.plan_term === '' || account.plan_term === 'month' ? (
             <div className="flex justify-center mt-6">
               <div className="flex items-center space-x-2">
-                <span>Monthly</span>
+                <span>{t('plan_term_monthly')}</span>
 
                 <Toggle
                   checked={pricing === 'year'}
@@ -182,7 +185,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                     setPricing((c) => (c === 'month' ? 'year' : 'month'))
                   }
                 />
-                <span>Annually</span>
+                <span>{t('plan_term_yearly')}</span>
               </div>
             </div>
           ) : null}
@@ -195,8 +198,10 @@ export function Popup({ visible, onClose }: PopupProps) {
               >
                 <div className="h-72 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-semibold text-2xl">Ninja Pro</h3>
-                    <p className="my-4">Pay year for 10 months + 2 free!</p>
+                    <h3 className="font-semibold text-2xl">
+                      {t('pro_plan_label')}
+                    </h3>
+                    <p className="my-4">{t('upgrade_popup_pro_headline')}</p>
 
                     <div>
                       <div className="flex items-end space-x-2">
@@ -208,7 +213,9 @@ export function Popup({ visible, onClose }: PopupProps) {
                         </h2>
 
                         <span>
-                          {pricing === 'month' ? '/month' : '/year'}
+                          {pricing === 'month'
+                            ? `/${t('month')}`
+                            : `/${t('year')}`}
                         </span>
                       </div>
                     </div>
@@ -225,7 +232,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                       setChangePlanVisible(true);
                     }}
                   >
-                    Upgrade plan
+                    {t('upgrade_plan')}
                   </button>
                 </div>
 
@@ -234,10 +241,12 @@ export function Popup({ visible, onClose }: PopupProps) {
                   style={{ backgroundColor: colors.$5 }}
                 ></div>
 
-                <p className="font-semibold uppercase">All free features +</p>
+                <p className="font-semibold uppercase">
+                  {t('all_free_features_plus')}
+                </p>
 
                 <div className="my-3 space-y-3">
-                  {plans?.features.pro_plan.map((feature, i) => (
+                  {features.pro.map((feature, i) => (
                     <div key={`pro-${i}`} className="flex items-center gap-3">
                       <FaCheck
                         color={accentColor}
@@ -258,8 +267,10 @@ export function Popup({ visible, onClose }: PopupProps) {
               >
                 <div className="h-72 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-semibold text-2xl">Ninja Pro</h3>
-                    <p className="my-4">Pay year for 10 months + 2 free!</p>
+                    <h3 className="font-semibold text-2xl">
+                      {t('pro_plan_label')}
+                    </h3>
+                    <p className="my-4">{t('upgrade_popup_pro_headline')}</p>
 
                     <div>
                       <div className="flex items-end space-x-2">
@@ -271,7 +282,9 @@ export function Popup({ visible, onClose }: PopupProps) {
                         </h2>
 
                         <span>
-                          {pricing === 'month' ? '/month' : '/year'}
+                          {pricing === 'month'
+                            ? `/${t('month')}`
+                            : `/${t('year')}`}
                         </span>
                       </div>
                     </div>
@@ -288,7 +301,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                       setChangePlanVisible(true);
                     }}
                   >
-                    Upgrade plan
+                    {t('upgrade_plan')}
                   </button>
                 </div>
 
@@ -297,10 +310,12 @@ export function Popup({ visible, onClose }: PopupProps) {
                   style={{ backgroundColor: colors.$5 }}
                 ></div>
 
-                <p className="font-semibold uppercase">All free features +</p>
+                <p className="font-semibold uppercase">
+                  {t('all_free_features_plus')}
+                </p>
 
                 <div className="my-3 space-y-3">
-                  {plans?.features.pro_plan.map((feature, i) => (
+                  {features.pro.map((feature, i) => (
                     <div key={`pro-${i}`} className="flex items-center gap-3">
                       <FaCheck
                         color={accentColor}
@@ -321,8 +336,12 @@ export function Popup({ visible, onClose }: PopupProps) {
               >
                 <div className="h-72 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-semibold text-2xl">Enterprise</h3>
-                    <p className="my-4">Pay year for 10 months + 2 free!</p>
+                    <h3 className="font-semibold text-2xl">
+                      {t('enterprise_plan_label')}
+                    </h3>
+                    <p className="my-4">
+                      {t('upgrade_popup_enterprise_headline')}
+                    </p>
 
                     <div>
                       <div className="flex items-end space-x-2">
@@ -342,7 +361,9 @@ export function Popup({ visible, onClose }: PopupProps) {
                         ) : null}
 
                         <span>
-                          {pricing === 'month' ? '/month' : '/year'}
+                          {pricing === 'month'
+                            ? `/${t('month')}`
+                            : `/${t('year')}`}
                         </span>
                       </div>
                     </div>
@@ -350,44 +371,56 @@ export function Popup({ visible, onClose }: PopupProps) {
 
                   <div className="flex flex-col space-y-3">
                     <SelectField
-                      label="Plan selected"
+                      label={t('plan_selected')}
                       value={enterprisePlan}
                       onValueChange={(v) => setEnterprisePlan(v as Plan)}
                     >
                       {isEnterprisePlanVisible('enterprise_plan', pricing) ? (
-                        <option value="enterprise_plan">1-2 users</option>
+                        <option value="enterprise_plan">
+                          1-2 {t('users').toLowerCase()}
+                        </option>
                       ) : null}
 
                       {isEnterprisePlanVisible('enterprise_plan_5', pricing) ? (
-                        <option value="enterprise_plan_5">3-5 users</option>
+                        <option value="enterprise_plan_5">
+                          3-5 {t('users').toLowerCase()}
+                        </option>
                       ) : null}
 
                       {isEnterprisePlanVisible(
                         'enterprise_plan_10',
                         pricing
                       ) ? (
-                        <option value="enterprise_plan_10">6-10 users</option>
+                        <option value="enterprise_plan_10">
+                          6-10 {t('users').toLowerCase()}
+                        </option>
                       ) : null}
 
                       {isEnterprisePlanVisible(
                         'enterprise_plan_20',
                         pricing
                       ) ? (
-                        <option value="enterprise_plan_20">11-20 users</option>
+                        <option value="enterprise_plan_20">
+                          11-20 {t('users').toLowerCase()}
+                        </option>
                       ) : null}
 
                       {isEnterprisePlanVisible(
                         'enterprise_plan_30',
                         pricing
                       ) ? (
-                        <option value="enterprise_plan_30">21-30 users</option>
+                        <option value="enterprise_plan_30">
+                          21-30 {t('users').toLowerCase()}
+                        </option>
                       ) : null}
 
                       {isEnterprisePlanVisible(
                         'enterprise_plan_50',
                         pricing
                       ) ? (
-                        <option value="enterprise_plan_50">31-50 users</option>
+                        <option value="enterprise_plan_50">
+                          31-50 {t('users').toLowerCase()}
+                        </option>
                       ) : null}
                     </SelectField>
 
@@ -400,7 +433,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                         setChangePlanVisible(true);
                       }}
                     >
-                      Upgrade plan
+                      {t('upgrade_plan')}
                     </button>
                   </div>
                 </div>
@@ -410,10 +443,12 @@ export function Popup({ visible, onClose }: PopupProps) {
                   style={{ backgroundColor: colors.$5 }}
                 ></div>
 
-                <p className="font-semibold uppercase">All pro features +</p>
+                <p className="font-semibold uppercase">
+                  {t('all_pro_features_plus')}
+                </p>
 
                 <div className="my-3 space-y-3">
-                  {plans?.features.enterprise_plan.map((feature, i) => (
+                  {features.enterprise.map((feature, i) => (
                     <div
                       key={`enterprise-${i}`}
                       className="flex items-center gap-3"
@@ -436,14 +471,16 @@ export function Popup({ visible, onClose }: PopupProps) {
             >
               <div className="h-72 flex flex-col justify-between">
                 <div>
-                  <h3 className="font-semibold text-2xl">Premium Business+</h3>
+                  <h3 className="font-semibold text-2xl">
+                    {t('premium_business_plus_label')}
+                  </h3>
                   <p className="my-4">
-                    Pro + Enterprise + Premium Business Concierge
+                    {t('upgrade_popup_premium_business_plus_headline')}
                   </p>
 
                   <div>
                     <h2 className="text-3xl font-semibold">
-                      Pricing? <br /> Let&apos;s talk!
+                      {t('upgrade_popup_premium_business_plus_pricing')}
                     </h2>
                   </div>
                 </div>
@@ -457,7 +494,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Contact us!
+                    {t('contact_us')}!
                   </a>
                 </div>
               </div>
@@ -467,10 +504,12 @@ export function Popup({ visible, onClose }: PopupProps) {
                 style={{ backgroundColor: colors.$5 }}
               ></div>
 
-              <p className="font-semibold uppercase">All features +</p>
+              <p className="font-semibold uppercase">
+                {t('all_features_plus')}
+              </p>
 
               <div className="my-3 space-y-3">
-                {plans?.features.premium_business_plan.map((feature, i) => (
+                {features.premium_business_plus.map((feature, i) => (
                   <div
                     key={`premium_business-${i}`}
                     className="flex items-center gap-3"
@@ -491,3 +530,40 @@ export function Popup({ visible, onClose }: PopupProps) {
     </>
   );
 }
+
+export const features = {
+  pro: [
+    'pro_plan_feature_1',
+    'pro_plan_feature_2',
+    'pro_plan_feature_3',
+    'pro_plan_feature_4',
+    'pro_plan_feature_5',
+    'pro_plan_feature_6',
+    'pro_plan_feature_7',
+    'pro_plan_feature_8',
+    'pro_plan_feature_9',
+    'pro_plan_feature_10',
+    'pro_plan_feature_11',
+    'pro_plan_feature_12',
+    'pro_plan_feature_13',
+    'pro_plan_feature_14',
+    'pro_plan_feature_15',
+    'pro_plan_feature_16',
+    'pro_plan_feature_17',
+    'pro_plan_feature_18',
+  ],
+  enterprise: [
+    'enterprise_plan_feature_1',
+    'enterprise_plan_feature_2',
+    'enterprise_plan_feature_3',
+    'enterprise_plan_feature_4',
+  ],
+  premium_business_plus: [
+    'premium_business_plan_feature_1',
+    'premium_business_plan_feature_2',
+    'premium_business_plan_feature_3',
+    'premium_business_plan_feature_4',
+    'premium_business_plan_feature_5',
+    'premium_business_plan_feature_6',
+  ],
+};
