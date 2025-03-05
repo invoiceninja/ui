@@ -48,7 +48,7 @@ export function useNumericFormatter() {
     decimalSeparator?: string,
     precision?: number
   ) => {
-    return numericFormatter(numStr, {
+    return numericFormatter(numStr.replaceAll(',', ''), {
       thousandSeparator: getThousandSeparator(thousandSeparator),
       decimalSeparator: getDecimalSeparator(decimalSeparator),
       decimalScale: precision || userNumberPrecision,

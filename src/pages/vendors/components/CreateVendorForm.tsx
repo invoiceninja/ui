@@ -68,7 +68,7 @@ export function CreateVendorForm(props: Props) {
     set(vendor as Vendor, 'contacts', contacts);
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request('POST', endpoint('/api/v1/vendors'), vendor)
       .then((response) => {

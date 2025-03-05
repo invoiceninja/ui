@@ -234,7 +234,7 @@ export function useCreate(props: CreateProps) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/credits?';
 
@@ -292,7 +292,7 @@ export function useSave(props: CreateProps) {
 
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/credits/:id?';
 

@@ -240,7 +240,7 @@ export function useCreate(props: CreateProps) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/quotes?';
 
@@ -294,7 +294,7 @@ export function useSave(props: CreateProps) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/quotes/:id?';
 

@@ -140,7 +140,7 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
-      name: t('e_invoice'),
+      name: t('e_invoicing'),
       href: '/settings/e_invoice',
       current: location.pathname.startsWith('/settings/e_invoice'),
       enabled: isAdmin || isOwner || false,
