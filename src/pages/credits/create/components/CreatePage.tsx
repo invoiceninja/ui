@@ -60,7 +60,11 @@ export default function CreatePage() {
           <ClientSelector
             resource={credit}
             onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
+            onLocationChange={(id) => handleChange('location_id', id)}
+            onClearButtonClick={() => {
+              handleChange('client_id', '');
+              handleChange('location_id', '');
+            }}
             onContactCheckboxChange={handleInvitationChange}
             errorMessage={errors?.errors.client_id}
             disableWithSpinner={searchParams.get('action') === 'create'}

@@ -64,6 +64,7 @@ export default function CreatePage() {
 
   const resetInvoiceForm = () => {
     handleChange('client_id', '');
+    handleChange('location_id', '');
     handleChange('tax_name1', '');
     handleChange('tax_rate1', 0);
     handleChange('tax_name2', '');
@@ -81,6 +82,7 @@ export default function CreatePage() {
           <ClientSelector
             resource={invoice}
             onChange={(id) => handleChange('client_id', id)}
+            onLocationChange={(id) => handleChange('location_id', id)}
             onClearButtonClick={resetInvoiceForm}
             onContactCheckboxChange={handleInvitationChange}
             readonly={searchParams.get('project') === 'true'}
