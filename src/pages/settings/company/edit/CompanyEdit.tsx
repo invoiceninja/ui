@@ -21,7 +21,10 @@ import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { Logo } from '../components';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { isEqual } from 'lodash';
@@ -86,6 +89,7 @@ export function CompanyEdit(props: Props) {
           : props.setIsModalOpen(false);
 
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
+        dispatch(resetChanges('company'));
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

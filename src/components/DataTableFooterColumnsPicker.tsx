@@ -22,7 +22,7 @@ import { endpoint } from '$app/common/helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { cloneDeep, set } from 'lodash';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
@@ -92,6 +92,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
           $refetch(['company_users']);
 
           dispatch(updateUser(userChanges));
+          dispatch(resetChanges());
 
           setIsModalOpen(false);
         })

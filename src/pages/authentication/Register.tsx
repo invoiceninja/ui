@@ -28,6 +28,7 @@ import { SignInProviders } from './components/SignInProviders';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   changeCurrentIndex,
+  resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -115,6 +116,7 @@ export function Register() {
           );
 
           dispatch(updateCompanyUsers(response.data.data));
+          dispatch(resetChanges('company'));
           dispatch(changeCurrentIndex(0));
         })
         .catch(

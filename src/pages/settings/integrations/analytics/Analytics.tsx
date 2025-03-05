@@ -20,6 +20,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   injectInChanges,
+  resetChanges,
   updateChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
@@ -80,6 +81,7 @@ export function Analytics() {
           dispatch(
             updateRecord({ object: 'company', data: response.data.data })
           );
+          dispatch(resetChanges('company'));
 
           toast.success('updated_settings');
         })

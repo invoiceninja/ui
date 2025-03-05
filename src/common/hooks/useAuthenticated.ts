@@ -12,6 +12,7 @@ import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
+  resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { useQueryClient } from 'react-query';
@@ -66,6 +67,7 @@ export function useAuthenticated(): boolean {
         );
 
         dispatch(updateCompanyUsers(response.data.data));
+        dispatch(resetChanges('company'));
         dispatch(changeCurrentIndex(currentIndex));
       })
       .catch(() => {

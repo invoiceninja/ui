@@ -15,6 +15,7 @@ import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
+  resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
@@ -76,6 +77,7 @@ export function SignInProviders() {
     );
 
     dispatch(updateCompanyUsers(response.data.data));
+    dispatch(resetChanges('company'));
     dispatch(changeCurrentIndex(currentIndex));
   };
 

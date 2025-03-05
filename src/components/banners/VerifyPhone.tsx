@@ -24,7 +24,10 @@ import VerificationInput from 'react-verification-input';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useDispatch } from 'react-redux';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -66,6 +69,7 @@ function Confirmation({
       request('POST', endpoint('/api/v1/refresh')).then(
         (response: GenericSingleResourceResponse<CompanyUser>) => {
           dispatch(updateCompanyUsers(response.data.data));
+          dispatch(resetChanges('company'));
           onComplete();
         }
       );

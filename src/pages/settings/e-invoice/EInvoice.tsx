@@ -29,7 +29,10 @@ import { request } from '$app/common/helpers/request';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
@@ -129,6 +132,7 @@ export function EInvoice() {
           dispatch(
             updateRecord({ object: 'company', data: response.data.data })
           );
+          dispatch(resetChanges('company'));
 
           toast.success('uploaded_document');
         })

@@ -14,7 +14,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { set } from 'lodash';
 import { useDispatch } from 'react-redux';
 
@@ -32,6 +32,7 @@ export function useUpdateCompanyUser() {
       $refetch(['company_users']);
 
       dispatch(updateUser(updatedUser));
+      dispatch(resetChanges());
     });
   };
 }

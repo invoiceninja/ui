@@ -13,7 +13,10 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Modal } from '$app/components/Modal';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
@@ -79,6 +82,7 @@ export function MergeClientModal(props: Props) {
               toast.success('merged_clients');
 
               dispatch(updateCompanyUsers(response.data.data));
+              dispatch(resetChanges('company'));
 
               setMergeIntoClientId('');
 

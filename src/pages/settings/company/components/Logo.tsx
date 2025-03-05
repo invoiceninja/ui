@@ -18,7 +18,10 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLogo } from '$app/common/hooks/useLogo';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -86,6 +89,7 @@ export function Logo({ isSettingsPage = true }: Props) {
             dispatch(
               updateRecord({ object: 'company', data: response.data.data })
             );
+            dispatch(resetChanges('company'));
           }
 
           if (isGroupSettingsActive) {

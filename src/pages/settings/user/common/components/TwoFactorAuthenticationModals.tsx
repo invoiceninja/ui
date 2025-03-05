@@ -13,7 +13,7 @@ import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { Modal } from '$app/components/Modal';
 import { merge } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
@@ -84,7 +84,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
         toast.success(response.data.message);
 
         dispatch(updateUser(merge({}, user, { google_2fa_secret: true })));
-
+        dispatch(resetChanges());
         setIsEnableModalOpen(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
@@ -104,6 +104,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
         toast.success('disabled_two_factor');
 
         dispatch(updateUser(merge({}, user, { google_2fa_secret: false })));
+        dispatch(resetChanges());
 
         setIsDisableModalOpen?.(false);
       }
@@ -130,6 +131,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
       toast.success('verified_phone_number');
 
       dispatch(updateUser(merge({}, user, { verified_phone_number: true })));
+      dispatch(resetChanges());
 
       setIsSmsModalOpen(false);
 

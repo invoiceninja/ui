@@ -14,7 +14,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
 import { cloneDeep, set } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
@@ -101,6 +101,7 @@ export function DataTableColumnsPicker(props: Props) {
       $refetch(['company_users']);
 
       dispatch(updateUser(user));
+      dispatch(resetChanges());
 
       toast.success('saved_settings');
     });
