@@ -8,11 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Project } from '$app/common/interfaces/project';
 import { InfoCard } from '$app/components/InfoCard';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -24,7 +23,7 @@ export function ProjectPublicNotes(props: Props) {
 
   const { project } = props;
 
-  const reactSettings = useReactSettings();
+  const colors = useColorScheme();
 
   return (
     <>
@@ -35,12 +34,11 @@ export function ProjectPublicNotes(props: Props) {
             value={
               <div className="whitespace-normal max-h-56 overflow-y-auto">
                 <article
-                  className={classNames('prose prose-sm', {
-                    'prose-invert': reactSettings.dark_mode,
-                  })}
+                  className="prose prose-sm"
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(project.public_notes),
                   }}
+                  style={{ color: colors.$1 }}
                 />
               </div>
             }

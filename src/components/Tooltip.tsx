@@ -106,10 +106,10 @@ export function Tooltip(props: Props) {
 
             {!withoutArrow && (
               <Icon
-                className="rotate-90 -mt-2.5"
+                className="rotate-90"
                 element={MdPlayArrow}
                 size={24}
-                style={{ color: colors.$5 }}
+                style={{ color: colors.$3, marginTop: '-0.51rem' }}
               />
             )}
           </div>
