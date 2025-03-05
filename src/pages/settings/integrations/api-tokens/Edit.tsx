@@ -30,9 +30,8 @@ import { useHandleChange } from './common/hooks/hooks';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -57,7 +56,7 @@ export function Edit() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState<boolean>(false);
@@ -68,7 +67,7 @@ export function Edit() {
 
   const handleChange = useHandleChange({ setApiToken, setErrors });
 
-  const handleSave = (password: string) => {
+  const handleSave = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       setErrors(undefined);
       toast.processing();
@@ -91,8 +90,8 @@ export function Edit() {
           }
 
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
+            setIsPasswordConfirmModalOpen(true);
           }
         })
         .finally(() => setIsFormBusy(false));

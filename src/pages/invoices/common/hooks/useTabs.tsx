@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -50,7 +51,8 @@ export function useTabs(params: Params) {
       href: route('/invoices/:id/e_invoice', { id }),
       enabled: Boolean(
         company?.settings.e_invoice_type === 'PEPPOL' &&
-          company?.settings.enable_e_invoice
+          company?.settings.enable_e_invoice &&
+          company?.tax_data?.acts_as_sender
       ),
       formatName: () => (
         <div className="flex space-x-1">
@@ -95,6 +97,11 @@ export function useTabs(params: Params) {
     {
       name: t('email_history'),
       href: route('/invoices/:id/email_history', { id }),
+    },
+    {
+      name: t('payments'),
+      href: route('/invoices/:id/payments', { id }),
+      enabled: invoice?.status_id === InvoiceStatus.Paid,
     },
   ];
 

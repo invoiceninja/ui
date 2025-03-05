@@ -52,7 +52,6 @@ import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { refetchByUrl } from '$app/common/hooks/useRefetch';
-import { useLocation } from 'react-router-dom';
 import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
@@ -103,6 +102,14 @@ interface StyleOptions {
   thClassName?: string;
   tdClassName?: string;
   addRowSeparator?: boolean;
+  thStyle?: CSSProperties;
+  withoutThVerticalPadding?: boolean;
+  useOnlyCurrentSortDirectionIcon?: boolean;
+  thTextSize?: 'extraSmall' | 'small';
+  disableThUppercase?: boolean;
+  descIcon?: ReactNode;
+  ascIcon?: ReactNode;
+  rowSeparatorColor?: string;
 }
 
 interface Props<T> extends CommonProps {
@@ -152,6 +159,7 @@ interface Props<T> extends CommonProps {
   withoutPerPageAsPreference?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
+  enableSavingFilterPreference?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -160,7 +168,6 @@ export type PerPage = '10' | '50' | '100';
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
-  const location = useLocation();
   const options = useDataTableOptions();
 
   const reactSettings = useReactSettings();
@@ -173,8 +180,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
-
-  const tableKey = `${location.pathname}${props.endpoint.replace('.', '')}`;
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
 
@@ -193,6 +198,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutPerPageAsPreference = false,
     withoutSortQueryParameter = false,
     showRestoreBulk,
+    enableSavingFilterPreference = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -232,9 +238,10 @@ export function DataTable<T extends object>(props: Props<T>) {
     setSort,
     setSortedBy,
     setStatus,
-    tableKey,
+    tableKey: `${props.resource}s`,
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
+    enableSavingFilterPreference,
   });
 
   const {
@@ -244,7 +251,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   } = useDataTableUtilities({
     apiEndpoint,
     isInitialConfiguration,
-    tableKey,
+    tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
   });
@@ -393,16 +400,20 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const handleDateRangeColumnClick = (columnId: string) => {
     const columnOfCurrentQueryParameter = dateRangeColumns.find(
-      (dateRangeColumn) => dateRangeQueryParameter === dateRangeColumn.column
+      (dateRangeColumn) =>
+        dateRangeQueryParameter === dateRangeColumn.queryParameterKey
     )?.column;
 
     const queryParameterOfCurrentColumn = dateRangeColumns.find(
       (dateRangeColumn) => columnId === dateRangeColumn.column
     )?.queryParameterKey;
 
-    columnOfCurrentQueryParameter !== columnId &&
-      queryParameterOfCurrentColumn &&
+    if (
+      columnOfCurrentQueryParameter !== columnId &&
+      queryParameterOfCurrentColumn
+    ) {
       setDateRangeQueryParameter(queryParameterOfCurrentColumn);
+    }
   };
 
   const getFooterColumn = (columnId: string) => {
@@ -433,7 +444,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
       if (shouldDeselectMainCheckbox && mainCheckbox.current) {
         mainCheckbox.current.checked = false;
-      } else if (mainCheckbox.current) {
+      } else if (mainCheckbox.current && data.data.data.length) {
         mainCheckbox.current.checked = true;
       }
     }
@@ -589,10 +600,20 @@ export function DataTable<T extends object>(props: Props<T>) {
         }
         isDataLoading={isLoading}
         style={props.style}
+        resizable={apiEndpoint.pathname}
       >
-        <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
+        <Thead
+          backgroundColor={styleOptions?.headerBackgroundColor}
+          style={styleOptions?.thStyle}
+        >
           {!props.withoutActions && !hideEditableOptions && (
-            <Th className={styleOptions?.thClassName}>
+            <Th
+              className={styleOptions?.thClassName}
+              resizable={`${apiEndpoint.pathname}.leftCheckbox`}
+              withoutVerticalPadding={styleOptions?.withoutThVerticalPadding}
+              textSize={styleOptions?.thTextSize}
+              disableUppercase={styleOptions?.disableThUppercase}
+            >
               <Checkbox
                 innerRef={mainCheckbox}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -632,6 +653,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                     setSort(data.sort);
                   }}
                   childrenClassName={styleOptions?.thChildrenClassName}
+                  resizable={`${apiEndpoint.pathname}.${column.id}`}
+                  useOnlyCurrentSortDirectionIcon={
+                    styleOptions?.useOnlyCurrentSortDirectionIcon
+                  }
+                  textSize={styleOptions?.thTextSize}
+                  disableUppercase={styleOptions?.disableThUppercase}
+                  descIcon={styleOptions?.descIcon}
+                  ascIcon={styleOptions?.ascIcon}
                 >
                   <div className="flex items-center space-x-3">
                     {dateRangeColumns.some(
@@ -658,6 +687,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td colSpan={100}>
                 <Spinner />
@@ -671,6 +703,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
@@ -684,6 +719,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td className={styleOptions?.tdClassName} colSpan={100}>
                 {t('no_records_found')}
@@ -700,6 +738,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
                 backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
+                style={{
+                  borderColor: styleOptions?.rowSeparatorColor,
+                }}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
@@ -741,6 +782,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                               : document.getElementById(resource.id)?.click();
                           }
                         }}
+                        resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
                         {column.format
                           ? column.format(resource[column.id], resource)
@@ -844,7 +886,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.columns.map(
                 (column, index) =>
                   Boolean(!excludeColumns.includes(column.id)) && (
-                    <Td key={index} customizeTextColor>
+                    <Td
+                      key={index}
+                      customizeTextColor
+                      resizable={`${apiEndpoint.pathname}.${column.id}`}
+                    >
                       {getFooterColumn(column.id) ? (
                         <div className="flex items-center space-x-3">
                           {getFooterColumn(column.id)?.format(

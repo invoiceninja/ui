@@ -9,11 +9,11 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Banner } from '../Banner';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint, isHosted } from '$app/common/helpers';
+import { Popover } from '@headlessui/react';
 
 export const buttonStyles =
   'font-medium text-xs md:text-sm underline cursor-pointer';
@@ -42,14 +42,22 @@ export function VerifyEmail() {
   }
 
   return (
-    <Banner variant="orange">
-      <div className="flex space-x-1">
-        <span>{t('confirm_your_email_address')}.</span>
+    <Popover className="relative">
+      <div className="max-w-max rounded-lg bg-[#FCD34D] px-6 py-4 shadow-lg">
+        <div className="flex items-center justify-center space-x-1">
+          <span className="text-sm">{t('confirm_your_email_address')}.</span>
 
-        <button className={buttonStyles} onClick={resend}>
-          {t('resend_email')}
-        </button>
+          <div
+            className="cursor-pointer text-sm font-semibold underline hover:no-underline"
+            onClick={(event) => {
+              event.stopPropagation();
+              resend();
+            }}
+          >
+            {t('resend_email')}
+          </div>
+        </div>
       </div>
-    </Banner>
+    </Popover>
   );
 }

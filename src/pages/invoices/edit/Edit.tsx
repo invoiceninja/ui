@@ -99,6 +99,7 @@ export default function Edit() {
           {invoice && (
             <div className="flex space-x-20">
               <span className="text-sm">{t('status')}</span>
+
               <InvoiceStatusBadge entity={invoice} />
             </div>
           )}

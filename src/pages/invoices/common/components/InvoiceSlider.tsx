@@ -60,6 +60,9 @@ import { useColorScheme } from '$app/common/colors';
 import { ViewLineItemExpense } from './ViewLineItemExpense';
 import { ViewLineItemTask } from './ViewLineItemTask';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -156,6 +159,10 @@ export function InvoiceSlider() {
 
   const colors = useColorScheme();
 
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
@@ -239,7 +246,7 @@ export function InvoiceSlider() {
         invoice &&
         (hasPermission('edit_invoice') || entityAssigned(invoice)) ? (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={invoice}
             actions={actions}
           />
@@ -344,7 +351,15 @@ export function InvoiceSlider() {
               </Tooltip>
 
               <Element leftSide={t('next_send_date')} twoGridColumns>
-                {invoice ? date(invoice.next_send_date, dateFormat) : null}
+                {invoice
+                  ? dateTime(
+                      invoice.next_send_date,
+                      '',
+                      '',
+                      getTimezone(getSetting(invoice.client, 'timezone_id'))
+                        .timeZone
+                    )
+                  : null}
               </Element>
 
               <Element leftSide={t('reminder_last_sent')} twoGridColumns>
@@ -431,7 +446,7 @@ export function InvoiceSlider() {
           )}
         </div>
 
-        <div>
+        <div className="divide-y">
           {resource?.activities && resource.activities.length === 0 && (
             <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
@@ -492,7 +507,7 @@ export function InvoiceSlider() {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col divide-y">
             {activities
               ?.filter(
                 (activity) =>
@@ -518,7 +533,11 @@ export function InvoiceSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="text-sm px-4">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords.map((emailRecord, index) => (
             <EmailRecord
               key={index}

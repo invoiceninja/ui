@@ -32,11 +32,8 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
-import { useQuery } from 'react-query';
 import { PasswordConfirmation } from './PasswordConfirmation';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
-import axios from 'axios';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface SystemInfo {
   system_health: boolean;
@@ -69,6 +66,8 @@ interface SystemInfo {
 interface Props {
   isAboutVisible: boolean;
   setIsAboutVisible: Dispatch<SetStateAction<boolean>>;
+  currentSystemInfo: SystemInfo | undefined;
+  latestVersion: string | undefined;
 }
 
 const Div = styled.div`
@@ -84,9 +83,14 @@ export function AboutModal(props: Props) {
 
   const colors = useColorScheme();
 
-  const { isAboutVisible, setIsAboutVisible } = props;
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const {
+    isAboutVisible,
+    setIsAboutVisible,
+    currentSystemInfo,
+    latestVersion,
+  } = props;
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isHealthCheckModalOpen, setIsHealthCheckModalOpen] =
@@ -98,28 +102,9 @@ export function AboutModal(props: Props) {
   const [isUpgradeLoadingModalOpen, setIsUpgradeLoadingModalOpen] =
     useState<boolean>(false);
 
-  const [systemInfo, setSystemInfo] = useState<SystemInfo>();
-
-  const { data: latestVersion } = useQuery({
-    queryKey: ['/pdf.invoicing.co/api/version'],
-    queryFn: () =>
-      axios
-        .get('https://pdf.invoicing.co/api/version')
-        .then((response) => response.data),
-    staleTime: Infinity,
-  });
-
-  const { data: currentSystemInfo } = useQuery({
-    queryKey: ['/api/v1/health_check'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/health_check')).then(
-        (response) => response.data
-      ),
-    staleTime: Infinity,
-    enabled:
-      isSelfHosted() &&
-      !(import.meta.env.VITE_API_URL as string).includes('staging'), // Note: The staging API helped me test this functionality, but the health_check endpoint is not available on the staging API.
-  });
+  const [systemInfo, setSystemInfo] = useState<SystemInfo | undefined>(
+    currentSystemInfo
+  );
 
   const handleHealthCheck = (allowAction?: boolean) => {
     if (!isFormBusy || allowAction) {
@@ -155,7 +140,7 @@ export function AboutModal(props: Props) {
     }
   };
 
-  const handleUpdateApp = (password: string) => {
+  const handleUpdateApp = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       setIsFormBusy(true);
       setIsUpgradeLoadingModalOpen(true);
@@ -169,8 +154,8 @@ export function AboutModal(props: Props) {
         .then(() => window.location.reload())
         .catch((error) => {
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
+            setIsPasswordConfirmModalOpen(true);
           }
         })
         .finally(() => {

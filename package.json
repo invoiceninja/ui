@@ -80,7 +80,7 @@
     "test": "jest",
     "clear-cache": "jest --clearCache",
     "prepare": "husky install",
-    "preview": "vite preview"
+    "preview": "vite build && vite preview"
   },
   "browserslist": {
     "production": [

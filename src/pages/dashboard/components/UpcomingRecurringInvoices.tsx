@@ -18,12 +18,23 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useTranslation } from 'react-i18next';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useColorScheme } from '$app/common/colors';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
+import { CalendarCheckOut } from '$app/components/icons/CalendarCheckOut';
 
 export function UpcomingRecurringInvoices() {
   const [t] = useTranslation();
-  const dateTime = useDateTime();
+
+  const colors = useColorScheme();
+
+  const getSetting = useGetSetting();
   const formatMoney = useFormatMoney();
+  const getTimezone = useGetTimezone();
   const disableNavigation = useDisableNavigation();
+  const dateTime = useDateTime({ withTimezone: true });
 
   const columns: DataTableColumns<RecurringInvoice> = [
     {
@@ -60,13 +71,20 @@ export function UpcomingRecurringInvoices() {
     {
       id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => dateTime(value),
+      format: (value, recurringInvoice) =>
+        dateTime(
+          value,
+          '',
+          '',
+          getTimezone(getSetting(recurringInvoice.client, 'timezone_id'))
+            .timeZone
+        ),
     },
     {
       id: 'balance',
       label: t('amount'),
       format: (value, recurringInvoice) => (
-        <Badge variant="blue">
+        <Badge variant="blue" className="font-mono">
           {formatMoney(
             value,
             recurringInvoice.client?.country_id,
@@ -79,12 +97,21 @@ export function UpcomingRecurringInvoices() {
 
   return (
     <Card
-      title={t('upcoming_recurring_invoices')}
-      className="h-96 relative"
+      title={
+        <div className="flex items-center gap-2">
+          <CalendarCheckOut size="1.4rem" color="#66B2FF" />
+
+          <span>{t('upcoming_recurring_invoices')}</span>
+        </div>
+      }
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
-      withoutHeaderBorder
+      style={{ borderColor: colors.$5 }}
+      headerStyle={{ borderColor: colors.$5 }}
+      withoutHeaderPadding
     >
-      <div className="pl-6 pr-4">
+      <div className="px-4 pt-4">
         <DataTable
           resource="recurring_invoice"
           columns={columns}
@@ -100,14 +127,24 @@ export function UpcomingRecurringInvoices() {
             withoutTopBorder: true,
             withoutLeftBorder: true,
             withoutRightBorder: true,
+            disableThUppercase: true,
+            withoutThVerticalPadding: true,
+            useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
+            thChildrenClassName: 'text-gray-500',
+            tdClassName: 'first:pl-2 py-3',
+            thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },
+            thTextSize: 'small',
+            thStyle: {
+              borderBottom: `1px solid ${colors.$5}`,
+            },
+            rowSeparatorColor: colors.$5,
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
           }}
           style={{
-            height: '19.9rem',
+            height: '18.9rem',
           }}
         />
       </div>

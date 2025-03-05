@@ -36,19 +36,23 @@ export function EUTaxDetails() {
 
   const displayCountryOption = (countryId: string) => {
     const iso31662 = resolveCountry(countryId)?.iso_3166_2;
+    const region = iso31662 === 'GB' ? 'UK' : 'EU';
 
     if (!iso31662) {
       return false;
     }
 
     return get(
-      company.tax_data.regions.EU.subregions,
+      company.tax_data.regions[region].subregions,
       `${iso31662}.vat_number`
     );
   };
 
   return (
-    <Card title={t('additional_tax_identifiers')}>
+    <Card
+      title={t('additional_tax_identifiers')}
+      description={t('additional_tax_identifiers_help').toString()}
+    >
       <Element leftSide={t('new_identifier')}>
         <Configure />
       </Element>
@@ -95,13 +99,23 @@ function Identifier({ country, vat }: IdentifierProps) {
         values
       )
         .then(() => {
-           toast.success();
+          toast.success();
 
-           refresh();
+          refresh();
 
-           setIsVisible(false);
+          setIsVisible(false);
         })
-        .catch(() => toast.error())
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            const message = get(error.response.data, 'errors.vat_number.0');
+
+            if (message) {
+              return toast.error(message);
+            }
+          }
+
+          return toast.error();
+        })
         .finally(() => setSubmitting(false));
     },
   });
@@ -205,6 +219,7 @@ function Configure() {
 
   const displayCountryOption = (countryId: string) => {
     const iso31662 = resolveCountry(countryId)?.iso_3166_2;
+    const region = iso31662 === 'GB' ? 'UK' : 'EU';
 
     if (!iso31662) {
       return false;
@@ -215,7 +230,7 @@ function Configure() {
     }
 
     return !get(
-      company.tax_data.regions.EU.subregions,
+      company.tax_data.regions[region].subregions,
       `${iso31662}.vat_number`
     );
   };

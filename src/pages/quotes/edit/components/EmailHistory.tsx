@@ -62,7 +62,7 @@ export default function EmailHistory() {
       )}
 
       {!isLoading && !emailRecords.length && (
-        <span className="px-6">{t('api_404')}</span>
+        <span className="px-6">{t('email_history_empty')}</span>
       )}
 
       {emailRecords.map((emailRecord, index) => (

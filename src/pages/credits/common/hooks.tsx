@@ -155,6 +155,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
   ) => {
     const lineItems = credit?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -231,7 +234,7 @@ export function useCreate(props: CreateProps) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/credits?';
 
@@ -289,7 +292,7 @@ export function useSave(props: CreateProps) {
 
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/credits/:id?';
 
@@ -485,6 +488,7 @@ export function useActions(params?: Params) {
             isCommonActionSection={!dropdown}
             tooltipText={t('add_comment')}
             icon={MdComment}
+            disablePreventNavigation
           >
             {t('add_comment')}
           </EntityActionElement>

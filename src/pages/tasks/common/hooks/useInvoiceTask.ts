@@ -28,7 +28,6 @@ import { route } from '$app/common/helpers/route';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
@@ -55,7 +54,6 @@ export function useInvoiceTask(params?: Params) {
 
   const setInvoice = useSetAtom(invoiceAtom);
 
-  const formatNumber = useFormatNumber();
   const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat();
 
   const calculateTaskHours = (timeLog: string, precision?: number) => {
@@ -147,13 +145,13 @@ export function useInvoiceTask(params?: Params) {
                 currencySeparators?.precision
               );
 
-              hoursDescription = `• ${formatNumber(hours)} ${t('hours')}`;
+              hoursDescription = `• ${hours} ${t('hours')}`;
             }
 
             const description = [];
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
-              description.push('<div class="task-time-details">\n');
+              description.push('<div class="task-time-details">');
             }
 
             if (company.invoice_task_datelog) {
@@ -190,13 +188,13 @@ export function useInvoiceTask(params?: Params) {
             }
 
             if (company.invoice_task_item_description && intervalDescription) {
-              description.push(`\n\n${intervalDescription}`);
+              description.push(`\n${intervalDescription}`);
             }
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
               description.push('\n');
 
-              description.push('</div>\n');
+              description.push('</div>');
             }
 
             parsed.push(description.join(' '));

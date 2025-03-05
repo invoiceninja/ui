@@ -45,11 +45,7 @@ export default function Products() {
   const customBulkActions = useCustomBulkActions();
 
   return (
-    <Default
-      title={t('products')}
-      breadcrumbs={pages}
-      docsLink="en/products"
-    >
+    <Default title={t('products')} breadcrumbs={pages} docsLink="en/products">
       <DataTable
         resource="product"
         columns={columns}
@@ -78,6 +74,7 @@ export default function Products() {
         }
         linkToCreateGuards={[permission('create_product')]}
         hideEditableOptions={!hasPermission('edit_product')}
+        enableSavingFilterPreference
       />
     </Default>
   );

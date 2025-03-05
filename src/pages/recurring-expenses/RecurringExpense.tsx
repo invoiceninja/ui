@@ -30,6 +30,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function RecurringExpense() {
   const [t] = useTranslation();
@@ -127,6 +128,7 @@ export default function RecurringExpense() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="recurring_expense" />}
     >
       {recurringExpense ? (
         <div className="space-y-4">

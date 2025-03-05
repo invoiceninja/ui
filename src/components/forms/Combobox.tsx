@@ -116,7 +116,6 @@ export function Combobox<T = any>({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   const comboboxRef = useRef<HTMLDivElement>(null);
-  const selectorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   let filteredOptions =
@@ -259,6 +258,7 @@ export function Combobox<T = any>({
 
   useClickAway(comboboxRef, () => {
     setIsOpen(false);
+    onInputValueChange?.(inputValue);
 
     if (
       selectedOption &&
@@ -283,10 +283,6 @@ export function Combobox<T = any>({
 
     handleOptionClick(option);
     onChange(option);
-  });
-
-  useClickAway(selectorRef, () => {
-    onInputValueChange?.(inputValue);
   });
 
   useDebounce(

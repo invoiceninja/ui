@@ -32,6 +32,7 @@ import collect from 'collect.js';
 import { useQueryClient } from 'react-query';
 import { useAtom } from 'jotai';
 import {
+  Cell,
   Preview,
   PreviewResponse,
   previewAtom,
@@ -52,6 +53,9 @@ import { useShowReportField } from '../common/hooks/useShowReportField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { numberFormattableColumns } from '../common/constants/columns';
+
 interface Range {
   identifier: string;
   label: string;
@@ -95,6 +99,11 @@ export const ranges: Range[] = [
     label: 'this_year',
     scheduleIdentifier: 'this_year',
   },
+  {
+    identifier: 'last_year',
+    label: 'last_year',
+    scheduleIdentifier: 'last_year',
+  }, 
   { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
@@ -121,7 +130,9 @@ export default function Reports() {
 
   const reports = useReports();
   const queryClient = useQueryClient();
+
   const scheduleReport = useScheduleReport();
+  const numericFormatter = useNumericFormatter();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -255,6 +266,31 @@ export default function Reports() {
 
   const [preview, setPreview] = useAtom(previewAtom);
 
+  const adjustCellValue = (currentCell: Cell) => {
+    if (typeof currentCell.display_value !== 'string') {
+      return currentCell.display_value;
+    }
+
+    if (
+      numberFormattableColumns.some((currentColumn) =>
+        currentCell.identifier.endsWith(currentColumn)
+      )
+    ) {
+      const parsedDisplayValue = parseFloat(
+        currentCell.display_value.toString()
+      );
+
+      if (
+        !isNaN(parsedDisplayValue) &&
+        typeof parsedDisplayValue === 'number'
+      ) {
+        return numericFormatter(currentCell.display_value.toString());
+      }
+    }
+
+    return currentCell.display_value;
+  };
+
   const handlePreview = async () => {
     setErrors(undefined);
     setPreview(null);
@@ -295,7 +331,15 @@ export default function Reports() {
           .then((response) => {
             const { columns, ...rows } = response;
 
-            setPreview({ columns, rows: Object.values(rows) });
+            setPreview({
+              columns,
+              rows: Object.values(rows).map((row) =>
+                row.map((cell) => ({
+                  ...cell,
+                  display_value: adjustCellValue(cell),
+                }))
+              ),
+            });
 
             toast.success();
           });

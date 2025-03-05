@@ -53,6 +53,7 @@ import {
   MdNotStarted,
   MdPictureAsPdf,
   MdRestore,
+  MdSend,
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -82,6 +83,10 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import { confirmActionModalAtom } from './components/ConfirmActionModal';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -147,6 +152,9 @@ export function useRecurringInvoiceUtilities(
   ) => {
     const lineItems = recurringInvoice?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -287,6 +295,7 @@ export function useToggleStartStop() {
 interface Params {
   showEditAction?: boolean;
   showCommonBulkActions?: boolean;
+  dropdown?: boolean;
 }
 
 export function useActions(params?: Params) {
@@ -296,10 +305,15 @@ export function useActions(params?: Params) {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const toggleStartStop = useToggleStartStop();
+  const setSendConfirmationVisible = useSetAtom(confirmActionModalAtom);
 
   const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
-  const { showEditAction, showCommonBulkActions } = params || {};
+  const {
+    showEditAction,
+    showCommonBulkActions,
+    dropdown = true,
+  } = params || {};
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'recurring_invoice',
@@ -330,67 +344,141 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
-    (recurringInvoice) => (
-      <DropdownElement
-        to={route('/recurring_invoices/:id/pdf', {
-          id: recurringInvoice.id,
-        })}
-        icon={<Icon element={MdPictureAsPdf} />}
-      >
-        {t('view_pdf')}
-      </DropdownElement>
-    ),
+    
     (recurringInvoice) =>
       (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
         recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'start',
+          })}
+          entity="recurring_invoice"
+          actionKey="start"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('start')}
           onClick={() => toggleStartStop(recurringInvoice, 'start')}
-          icon={<Icon element={MdNotStarted} />}
+          icon={MdNotStarted}
         >
           {t('start')}
-        </DropdownElement>
+        </EntityActionElement>
+      ),
+
+    (recurringInvoice) =>
+      (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT) && (
+
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'send_now',
+          })}
+          entity="recurring_invoice"
+          actionKey="send_now"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('start')}
+          onClick={() => setSendConfirmationVisible(true)}
+          icon={MdSend}
+        >
+          {t('send_now')}
+        </EntityActionElement>
+
       ),
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'stop',
+          })}
+          entity="recurring_invoice"
+          actionKey="stop"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('stop')}
           onClick={() => toggleStartStop(recurringInvoice, 'stop')}
-          icon={<Icon element={MdStopCircle} />}
+          icon={MdStopCircle}
         >
           {t('stop')}
-        </DropdownElement>
+        </EntityActionElement>
+      ),
+    (recurringInvoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="recurring_invoice"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
+        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
+        icon={MdPictureAsPdf}
+      >
+        {t('view_pdf')}
+      </EntityActionElement>
+    ),
+    
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <UpdatePricesAction
+          {...(!dropdown && {
+            key: 'update_prices',
+          })}
+          selectedIds={[recurringInvoice.id]}
+          dropdown={dropdown}
+        />
       ),
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
-        <UpdatePricesAction selectedIds={[recurringInvoice.id]} />
-      ),
-    (recurringInvoice) =>
-      !recurringInvoice.is_deleted && (
-        <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
+        <IncreasePricesAction
+          {...(!dropdown && {
+            key: 'increase_prices',
+          })}
+          selectedIds={[recurringInvoice.id]}
+          dropdown={dropdown}
+        />
       ),
     (recurringInvoice) => (
       <AddActivityComment
+        {...(!dropdown && {
+          key: 'add_comment',
+        })}
         entity="recurring_invoice"
         entityId={recurringInvoice.id}
         label={`#${recurringInvoice.number}`}
         labelElement={
-          <DropdownElement icon={<Icon element={MdComment} />}>
+          <EntityActionElement
+            entity="recurring_invoice"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+          >
             {t('add_comment')}
-          </DropdownElement>
+          </EntityActionElement>
         }
       />
     ),
     () => <Divider withoutPadding />,
     (recurringInvoice) =>
       hasPermission('create_recurring_invoice') && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'clone_to_recurring',
+          })}
+          entity="recurring_invoice"
+          actionKey="clone_to_recurring"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_recurring')}
           onClick={() => cloneToRecurringInvoice(recurringInvoice)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={MdControlPointDuplicate}
         >
           {t('clone_to_recurring')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (recurringInvoice) => (
-      <CloneOptionsModal recurringInvoice={recurringInvoice} />
+      <CloneOptionsModal
+        {...(!dropdown && {
+          key: 'clone_to_other',
+        })}
+        recurringInvoice={recurringInvoice}
+        dropdown={dropdown}
+      />
     ),
     () =>
       (isEditPage || Boolean(showCommonBulkActions)) && (
@@ -399,34 +487,61 @@ export function useActions(params?: Params) {
     (recurringInvoice) =>
       (isEditPage || Boolean(showCommonBulkActions)) &&
       getEntityState(recurringInvoice) === EntityState.Active && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'archive',
+          })}
+          entity="recurring_invoice"
+          actionKey="archive"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('archive')}
           onClick={() => bulk([recurringInvoice.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
+          icon={MdArchive}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (recurringInvoice) =>
       (isEditPage || Boolean(showCommonBulkActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Archived ||
         getEntityState(recurringInvoice) === EntityState.Deleted) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'restore',
+          })}
+          entity="recurring_invoice"
+          actionKey="restore"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('restore')}
           onClick={() => bulk([recurringInvoice.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
+          icon={MdRestore}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('restore')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (recurringInvoice) =>
       (isEditPage || Boolean(showCommonBulkActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Active ||
         getEntityState(recurringInvoice) === EntityState.Archived) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'delete',
+          })}
+          entity="recurring_invoice"
+          actionKey="delete"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('delete')}
           onClick={() => bulk([recurringInvoice.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
+          icon={MdDelete}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('delete')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
   ];
 
@@ -533,9 +648,11 @@ export function useRecurringInvoiceColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const dateTime = useDateTime();
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
   const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
+  const dateTime = useDateTime({ withTimezone: true });
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
@@ -610,7 +727,14 @@ export function useRecurringInvoiceColumns() {
       column: 'next_send_date',
       id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => dateTime(value),
+      format: (value, recurringInvoice) =>
+        dateTime(
+          value,
+          '',
+          '',
+          getTimezone(getSetting(recurringInvoice.client, 'timezone_id'))
+            .timeZone
+        ),
     },
     {
       column: 'frequency',

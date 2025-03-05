@@ -25,6 +25,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import collect from 'collect.js';
+import { Checkbox } from '$app/components/forms';
 
 export interface ResourceItem {
   id: string;
@@ -60,6 +61,7 @@ interface Props extends CommonProps {
   setSelectedIds: Dispatch<SetStateAction<string[]>>;
   selectedIds: string[];
   calculateTotal?: boolean;
+  addSelectAllButton?: boolean;
 }
 
 export function ListBox(props: Props) {
@@ -241,8 +243,31 @@ export function ListBox(props: Props) {
           backgroundColor: colors.$1,
           borderColor: colors.$4,
         }}
-        className={`flex justify-center px-5 py-3 relative border-b border-t ${props.className}`}
+        className={classNames(
+          `flex justify-center px-5 py-3 relative border-b border-t`,
+          props.className,
+          {
+            relative: props.addSelectAllButton,
+          }
+        )}
       >
+        {props.addSelectAllButton && (
+          <div className="absolute top-5 left-4">
+            <Checkbox
+              checked={
+                props.selectedIds?.length
+                  ? props.selectedIds?.length === resourceItems?.length
+                  : false
+              }
+              onValueChange={(_, value) =>
+                props.setSelectedIds(
+                  value ? resourceItems?.map((item) => item.id) || [] : []
+                )
+              }
+            />
+          </div>
+        )}
+
         <SearchArea
           dataKey={props.dataKey}
           searchParams={searchParams}

@@ -59,6 +59,9 @@ import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useColorScheme } from '$app/common/colors';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -129,6 +132,10 @@ export function QuoteSlider() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const reactSettings = useReactSettings();
+
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
 
   const formatMoney = useFormatMoney();
   const hasPermission = useHasPermission();
@@ -208,7 +215,7 @@ export function QuoteSlider() {
         quote &&
         (hasPermission('edit_quote') || entityAssigned(quote)) && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={quote}
             actions={actions}
           />
@@ -313,7 +320,15 @@ export function QuoteSlider() {
               </Tooltip>
 
               <Element leftSide={t('next_send_date')}>
-                {quote ? date(quote.next_send_date, dateFormat) : null}
+                {quote
+                  ? dateTime(
+                      quote.next_send_date,
+                      '',
+                      '',
+                      getTimezone(getSetting(quote.client, 'timezone_id'))
+                        .timeZone
+                    )
+                  : null}
               </Element>
 
               <Element leftSide={t('reminder_last_sent')}>
@@ -372,7 +387,7 @@ export function QuoteSlider() {
           )}
         </div>
 
-        <div>
+        <div className="divide-y">
           {resource?.activities &&
             resource.activities.map((activity) => (
               <ClickableElement
@@ -429,7 +444,7 @@ export function QuoteSlider() {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col divide-y">
             {activities
               ?.filter(
                 (activity) =>
@@ -455,7 +470,11 @@ export function QuoteSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="px-4 text-sm">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords?.map((emailRecord, index) => (
             <EmailRecord
               key={index}

@@ -13,9 +13,8 @@ import { defaultHeaders } from '$app/common/queries/common/headers';
 import { ValidationBag } from '../interfaces/validation-bag';
 import { toast } from './toast/toast';
 import { $refetch } from '../hooks/useRefetch';
-import { checkJsonObject, trans } from '../helpers';
+import { checkJsonObject } from '../helpers';
 import { clearLocalStorage } from './local-storage';
-import { toast as $toast } from 'react-hot-toast';
 
 const client = axios.create();
 
@@ -23,6 +22,10 @@ client.interceptors.response.use(
   (response) => {
     const payload = checkJsonObject(response.config.data);
     const requestMethod = response.config.method;
+
+    if (response.config?.headers?.['X-Api-Password'] !== undefined) {
+      window.dispatchEvent(new CustomEvent('reset.password.required'));
+    }
 
     if (
       requestMethod === 'put' ||
@@ -35,17 +38,26 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ValidationBag>) => {
+    const url = error.response?.config.url;
+
     if (
-      (error.response?.config.url?.includes('einvoice') &&
-        error.response?.status === 401) ||
-      error.response?.status === 403
+      url?.includes('einvoice') &&
+      (error.response?.status === 401 ||
+        error.response?.status === 403 ||
+        error.response?.status === 404)
     ) {
       console.error(error);
 
-      $toast.error(trans('einvoice_something_went_wrong', {}), {
-        duration: 10_000,
-      });
+      // if (!url.includes('quota')) {
+      //   $toast.error(trans('einvoice_something_went_wrong', {}), {
+      //     duration: 10_000,
+      //   });
+      // }
 
+      return;
+    }
+
+    if (url?.endsWith('/api/v1/einvoice/token/update') && error.response?.status === 500) {
       return Promise.reject(error);
     }
 

@@ -76,16 +76,24 @@ export function UploadImport(props: Props) {
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: { 'text/*': ['.csv'] },
+    accept: group === 'backup' 
+      ? { 'application/zip': ['.zip'] }
+      : { 'text/*': ['.csv'] },
     onDrop: async (acceptedFiles) => {
-      const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
-
-      if (shouldAddFiles) {
+      if (group === 'backup') {
         acceptedFiles.forEach((file) => {
           setFiles((prevState) => [...prevState, { group, file }]);
         });
       } else {
-        toast.error('csv_rows_length');
+        const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
+
+        if (shouldAddFiles) {
+          acceptedFiles.forEach((file) => {
+            setFiles((prevState) => [...prevState, { group, file }]);
+          });
+        } else {
+          toast.error('csv_rows_length');
+        }
       }
     },
   });

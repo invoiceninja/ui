@@ -19,6 +19,9 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
 import { useBulk } from '$app/common/queries/users';
+import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { isHosted } from '$app/common/helpers';
 
 export function Users() {
   useTitle('user_management');
@@ -32,7 +35,7 @@ export function Users() {
   const [action, setAction] = useState<'archive' | 'restore' | 'delete'>();
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
-  const bulk = useBulk();
+  const bulk = useBulk({ setIsPasswordConfirmModalOpen });
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -59,6 +62,8 @@ export function Users() {
         breadcrumbs={pages}
         docsLink="/docs/advanced-settings/#user_management"
       >
+        {!enterprisePlan() && isHosted() && <UsersPlanAlert />}
+
         <DataTable
           resource="user"
           columns={columns}
@@ -75,13 +80,16 @@ export function Users() {
             setAction(action);
             setIsPasswordConfirmModalOpen(true);
           }}
+          enableSavingFilterPreference
         />
       </Settings>
 
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
-        onSave={(password) => action && bulk(selectedUserIds, action, password)}
+        onSave={(password, isPasswordRequired) =>
+          action && bulk(selectedUserIds, action, password, isPasswordRequired)
+        }
         tableActions
       />
     </>

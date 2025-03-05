@@ -20,6 +20,7 @@ import { Entity } from '$app/common/hooks/useEntityCustomFields';
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
   noExternalPadding?: boolean;
+  selectMenuPosition?: 'fixed';
 }
 
 export function customField(value: string) {
@@ -35,7 +36,11 @@ export type CustomFields =
   | `${Entity}1`
   | `${Entity}2`
   | `${Entity}3`
-  | `${Entity}4`;
+  | `${Entity}4`
+  | 'surcharge1'
+  | 'surcharge2'
+  | 'surcharge3'
+  | 'surcharge4';
 
 export function useCustomField() {
   const company = useCurrentCompany();

@@ -29,6 +29,8 @@ interface Props {
   stopPropagationInHeader?: boolean;
   renderTransitionChildAsFragment?: boolean;
   initialFocusRef?: RefObject<HTMLElement>;
+  enableCloseOnClickAway?: boolean;
+  withoutPadding?: boolean;
 }
 
 interface TransitionChildProps {
@@ -58,6 +60,8 @@ function TransitionChild(props: TransitionChildProps) {
 export function Modal(props: Props) {
   const [open, setOpen] = useState(false);
 
+  const { enableCloseOnClickAway, disableClosing } = props;
+
   useEffect(() => {
     setOpen(props.visible);
   }, [props.visible]);
@@ -70,8 +74,8 @@ export function Modal(props: Props) {
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
         onClose={(value) => {
-          !props.disableClosing && setOpen(value);
-          !props.disableClosing && props.onClose(value);
+          (!disableClosing || enableCloseOnClickAway) && setOpen(value);
+          (!disableClosing || enableCloseOnClickAway) && props.onClose(value);
         }}
         initialFocus={props.initialFocusRef}
       >
@@ -107,7 +111,7 @@ export function Modal(props: Props) {
                 colorScheme: colors.$0,
               }}
               className={classNames(
-                'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
+                'inline-block align-bottom rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
                 {
                   'max-w-sm':
                     props.size === 'extraSmall' ||
@@ -118,58 +122,61 @@ export function Modal(props: Props) {
                   'bg-white': props.backgroundColor === 'white',
                   'bg-gray-50': props.backgroundColor === 'gray',
                   'overflow-hidden': !props.overflowVisible,
+                  'px-4 pt-5 pb-4 sm:p-6': !props.withoutPadding,
                 }
               )}
               onClick={(event) =>
                 props.stopPropagationInHeader && event.stopPropagation()
               }
             >
-              <div
-                className="flex flex-col justify-between items-start"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
-              >
-                <div className="flex w-full justify-between isolate">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg leading-6 font-medium"
-                    style={{
-                      backgroundColor: colors.$2,
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                    }}
-                  >
-                    {props.title}
-                  </Dialog.Title>
-
-                  {!props.disableClosing && (
-                    <X
-                      className="cursor-pointer"
-                      onClick={() => props.onClose(false)}
-                      fontSize={22}
-                      data-cy={props.closeButtonCypressRef}
-                    />
-                  )}
-                </div>
-
-                <div className="mt-2">
-                  {props.text && (
-                    <p
+              {props.title && (
+                <div
+                  className="flex flex-col justify-between items-start"
+                  style={{
+                    backgroundColor: colors.$2,
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                  }}
+                >
+                  <div className="flex w-full justify-between isolate">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg leading-6 font-medium"
                       style={{
                         backgroundColor: colors.$2,
                         color: colors.$3,
                         colorScheme: colors.$0,
                       }}
-                      className="text-sm"
                     >
-                      {props.text}
-                    </p>
-                  )}
+                      {props.title}
+                    </Dialog.Title>
+
+                    {!props.disableClosing && (
+                      <X
+                        className="cursor-pointer"
+                        onClick={() => props.onClose(false)}
+                        fontSize={22}
+                        data-cy={props.closeButtonCypressRef}
+                      />
+                    )}
+                  </div>
+
+                  <div className="mt-2">
+                    {props.text && (
+                      <p
+                        style={{
+                          backgroundColor: colors.$2,
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                        }}
+                        className="text-sm"
+                      >
+                        {props.text}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {props.children && (
                 <div

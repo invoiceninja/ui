@@ -37,7 +37,10 @@ import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 import { useSockets } from './common/hooks/useSockets';
-import { useGlobalSocketEvents } from './common/queries/sockets';
+import { usePrivateSocketEvents } from './common/queries/sockets';
+import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
+import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
+import { useSystemFonts } from './common/hooks/useSystemFonts';
 
 export function App() {
   const [t] = useTranslation();
@@ -52,6 +55,8 @@ export function App() {
   const user = useCurrentUser();
   const location = useLocation();
   const company = useCurrentCompany();
+
+  useWebSessionTimeout();
   useAddPreventNavigationEvents();
 
   const refetch = useRefetch();
@@ -62,6 +67,7 @@ export function App() {
   const switchToCompanySettings = useSwitchToCompanySettings();
 
   const colorScheme = useAtomValue(colorSchemeAtom);
+  const setIsPasswordRequired = useSetAtom(isPasswordRequiredAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
@@ -136,6 +142,10 @@ export function App() {
       navigate('/not_found')
     );
 
+    window.addEventListener('reset.password.required', () => {
+      setIsPasswordRequired(false);
+    });
+
     window.addEventListener('refetch', (event) => {
       const { property } = (event as CustomEvent).detail;
 
@@ -193,8 +203,8 @@ export function App() {
   }, [location, user]);
 
   const sockets = useSockets();
-  
-  useGlobalSocketEvents();
+
+  usePrivateSocketEvents();
 
   useEffect(() => {
     if (company && sockets) {
@@ -215,6 +225,8 @@ export function App() {
       }
     };
   }, [company?.company_key]);
+
+  useSystemFonts();
 
   return (
     <>

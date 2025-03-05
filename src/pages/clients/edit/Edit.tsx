@@ -37,6 +37,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -102,7 +103,7 @@ export default function Edit() {
   const onSave = async () => {
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request('PUT', endpoint('/api/v1/clients/:id', { id }), {
       ...client,
@@ -119,10 +120,6 @@ export default function Edit() {
         if (error.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        }
-
-        if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
         }
       });
   };
@@ -148,6 +145,7 @@ export default function Edit() {
           />
         )
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="client" />}
     >
       {isLoading && <Spinner />}
 

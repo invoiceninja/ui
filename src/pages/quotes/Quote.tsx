@@ -35,6 +35,8 @@ import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { useAtom } from 'jotai';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -108,10 +110,20 @@ export default function Edit() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="quote" />}
     >
       {quote?.id === id || !isLoading ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              quote && (
+                <div className="flex items-center">
+                  <CommonActions resource={quote} entity="quote" />
+                </div>
+              )
+            }
+          />
 
           <Outlet
             context={{

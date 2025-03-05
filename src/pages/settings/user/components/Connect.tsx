@@ -25,6 +25,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { atomWithStorage } from 'jotai/utils';
 import { useSetAtom } from 'jotai';
 import { SelectProviderModal } from '../common/components/SelectProviderModal';
+import { freePlan } from '$app/common/guards/guards/free-plan';
 
 export const connectMailerAtom = atomWithStorage('connectMailer', 'false');
 export function Connect() {
@@ -173,25 +174,27 @@ export function Connect() {
               </Button>
             </Element>
 
-            <Element leftSide="Gmail">
-              {user?.oauth_user_token ? (
-                <Button
-                  type="minimal"
-                  behavior="button"
-                  onClick={handleDisconnectMailer}
-                >
-                  {t('disconnect_gmail')}
-                </Button>
-              ) : (
-                <Button
-                  type="minimal"
-                  behavior="button"
-                  onClick={() => handleConnectMailer('google')}
-                >
-                  {t('connect_gmail')}
-                </Button>
-              )}
-            </Element>
+            {!freePlan() && (
+              <Element leftSide="Gmail">
+                {user?.oauth_user_token ? (
+                  <Button
+                    type="minimal"
+                    behavior="button"
+                    onClick={handleDisconnectMailer}
+                  >
+                    {t('disconnect_gmail')}
+                  </Button>
+                ) : (
+                  <Button
+                    type="minimal"
+                    behavior="button"
+                    onClick={() => handleConnectMailer('google')}
+                  >
+                    {t('connect_gmail')}
+                  </Button>
+                )}
+              </Element>
+            )}
           </>
         )}
 
@@ -207,25 +210,27 @@ export function Connect() {
               </Button>
             </Element>
 
-            <Element leftSide="Email">
-              {user?.oauth_user_token ? (
-                <Button
-                  type="minimal"
-                  behavior="button"
-                  onClick={handleDisconnectMailer}
-                >
-                  {t('disconnect_email')}
-                </Button>
-              ) : (
-                <Button
-                  type="minimal"
-                  behavior="button"
-                  onClick={() => handleConnectMailer('microsoft')}
-                >
-                  {t('connect_email')}
-                </Button>
-              )}
-            </Element>
+            {!freePlan() && (
+              <Element leftSide="Email">
+                {user?.oauth_user_token ? (
+                  <Button
+                    type="minimal"
+                    behavior="button"
+                    onClick={handleDisconnectMailer}
+                  >
+                    {t('disconnect_email')}
+                  </Button>
+                ) : (
+                  <Button
+                    type="minimal"
+                    behavior="button"
+                    onClick={() => handleConnectMailer('microsoft')}
+                  >
+                    {t('connect_email')}
+                  </Button>
+                )}
+              </Element>
+            )}
           </>
         )}
       </Card>

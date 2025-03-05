@@ -12,7 +12,6 @@ import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FiSettings } from 'react-icons/fi';
 import { useInjectUserChanges } from './useInjectUserChanges';
 import { ReactSettings, useReactSettings } from './useReactSettings';
 import { useDispatch, useStore } from 'react-redux';
@@ -30,6 +29,10 @@ import { RootState } from '../stores/store';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
 import { $refetch } from './useRefetch';
+import { useCurrentUser } from './useCurrentUser';
+import { isEqual } from 'lodash';
+import { Gear } from '$app/components/icons/Gear';
+import { useColorScheme } from '../colors';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix
@@ -62,10 +65,14 @@ interface SaveOptions {
 }
 
 export function usePreferences() {
+  const currentUser = useCurrentUser();
   const user = useInjectUserChanges({ overwrite: false });
 
   const [t] = useTranslation();
-  const [isVisible, setIsVisible] = useState(false);
+
+  const colors = useColorScheme();
+
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const dispatch = useDispatch();
@@ -82,6 +89,15 @@ export function usePreferences() {
   const { getState } = useStore<RootState>();
 
   const save = async ({ silent }: SaveOptions) => {
+    if (
+      isEqual(
+        currentUser?.company_user?.react_settings,
+        getState().user.changes.company_user.react_settings
+      )
+    ) {
+      return;
+    }
+
     !silent && toast.processing();
 
     request(
@@ -128,13 +144,16 @@ export function usePreferences() {
               <Button onClick={save}>{t('save')}</Button>
             </Modal>
 
-            <Button
-              type="minimal"
+            <div
+              className="flex items-center justify-center p-2 cursor-pointer border rounded-md shadow-sm"
               onClick={() => setIsVisible(true)}
-              noBackgroundColor
+              style={{
+                backgroundColor: colors.$1,
+                borderColor: colors.$5,
+              }}
             >
-              <FiSettings />
-            </Button>
+              <Gear color={colors.$3} />
+            </div>
           </>
         );
       },

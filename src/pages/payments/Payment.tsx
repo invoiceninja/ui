@@ -35,6 +35,7 @@ import {
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Payment() {
   const [t] = useTranslation();
@@ -109,6 +110,7 @@ export default function Payment() {
           {t('payment_status_changed')}
         </Banner>
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="payment" />}
     >
       <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} disableBackupNavigation />

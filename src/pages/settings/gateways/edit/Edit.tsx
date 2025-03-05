@@ -116,7 +116,7 @@ export function Edit() {
         id="gateways"
         url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
       />
-      
+
       <TabGroup
         tabs={tabs}
         defaultTabIndex={Number(searchParams.get('tab')) ?? 0}

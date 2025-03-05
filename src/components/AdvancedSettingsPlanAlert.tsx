@@ -14,6 +14,8 @@ import { Alert } from './Alert';
 import { Link } from './forms';
 import CommonProps from '../common/interfaces/common-props.interface';
 import { MdInfoOutline } from 'react-icons/md';
+import { Icon } from './icons/Icon';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 
 interface Props extends CommonProps {
   message?: string;
@@ -24,26 +26,31 @@ export function AdvancedSettingsPlanAlert(props: Props) {
 
   const user = useCurrentUser();
 
-  return (
-    <>
-      <div className={props.className}>
-        <Alert className="mb-4" type="warning" disableClosing>
-          <div className="flex items-center">
-            <MdInfoOutline className="mr-2" fontSize={20} />
-            {props.message ? props.message : t('start_free_trial_message')}
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
-            {user?.company_user && (
-              <Link
-                className="ml-10"
-                external
-                to={user.company_user.ninja_portal_url}
-              >
-                {t('plan_change')}
-              </Link>
-            )}
+  if (!showPlanAlert) {
+    return <></>;
+  }
+
+  return (
+    <div className={props.className}>
+      <Alert className="mb-4" type="warning" disableClosing>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Icon element={MdInfoOutline} size={20} />
+
+            <span>
+              {props.message ? props.message : t('start_free_trial_message')}
+            </span>
           </div>
-        </Alert>
-      </div>
-    </>
+
+          {user?.company_user && (
+            <Link external to={user.company_user.ninja_portal_url}>
+              {t('plan_change')}
+            </Link>
+          )}
+        </div>
+      </Alert>
+    </div>
   );
 }

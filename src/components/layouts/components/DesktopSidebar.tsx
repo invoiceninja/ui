@@ -8,10 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useLogo } from '$app/common/hooks/useLogo';
 import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
-import { Icon } from 'react-feather';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
 import { Tooltip } from '$app/components/Tooltip';
@@ -21,11 +19,11 @@ import classNames from 'classnames';
 export interface NavigationItem {
   name: string;
   href: string;
-  icon: Icon;
+  icon: React.ElementType;
   current: boolean;
   visible: boolean;
   rightButton?: {
-    icon: Icon;
+    icon: React.ElementType;
     to: string;
     label: string;
     visible: boolean;
@@ -44,7 +42,6 @@ export function DesktopSidebar(props: Props) {
     user?.company_user?.react_settings.show_mini_sidebar
   );
 
-  const logo = useLogo();
   const colors = useColorScheme();
 
   return (
@@ -58,31 +55,26 @@ export function DesktopSidebar(props: Props) {
       )}
     >
       <div
-        style={{ backgroundColor: colors.$6, borderColor: colors.$4 }}
-        className="flex flex-col flex-grow overflow-y-auto border-r"
+        className="flex flex-col flex-grow overflow-y-auto border-r px-3"
+        style={{ backgroundColor: colors.$14, borderColor: colors.$4 }}
       >
         <div
-          style={{
-            borderColor: colors.$5,
-            backgroundColor: colors.$1,
-            color: colors.$3,
-          }}
           className={classNames(
             'flex items-center flex-shrink-0 h-16 border-b',
             {
-              'pl-3 pr-6': !isMiniSidebar,
+              'py-3': !isMiniSidebar,
               'justify-center': isMiniSidebar,
             }
           )}
+          style={{
+            borderColor: 'white',
+            color: colors.$3,
+          }}
         >
-          {isMiniSidebar ? (
-            <img className="w-8" src={logo} alt="Company logo" />
-          ) : (
-            <CompanySwitcher />
-          )}
+          <CompanySwitcher />
         </div>
 
-        <div className="flex-grow flex flex-col mt-4">
+        <div className="flex-grow flex flex-col mt-3">
           <nav className="flex-1 pb-4 space-y-1" data-cy="navigationBar">
             {props.navigation.map((item, index) =>
               isMiniSidebar ? (

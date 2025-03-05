@@ -9,8 +9,11 @@
  */
 
 import { toast } from '$app/common/helpers/toast/toast';
-import { MouseEvent } from 'react';
+import { MouseEvent, useState } from 'react';
 import { MdOutlineContentCopy } from 'react-icons/md';
+import { AiFillEyeInvisible } from 'react-icons/ai';
+import { AiFillEye } from 'react-icons/ai';
+import { Icon } from './icons/Icon';
 
 interface Props {
   text: string;
@@ -21,6 +24,8 @@ interface Props {
 export function CopyToClipboard(props: Props) {
   const value = props.text || '';
 
+  const [isSecureVisible, setIsSecureVisible] = useState<boolean>(false);
+
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
 
@@ -29,13 +34,35 @@ export function CopyToClipboard(props: Props) {
   };
 
   return (
-    <div className={`inline-flex space-x-2 ${props.className}`}>
-      <span>{props.secure ? props.text.split('').map(() => '*') : value}</span>
+    <div className={`inline-flex items-center space-x-2 ${props.className}`}>
+      <span>
+        {props.secure && !isSecureVisible
+          ? props.text.split('').map(() => '*')
+          : value}
+      </span>
 
-      {value.length > 0 && navigator.clipboard && window.isSecureContext && (
+      {value.length > 0 && navigator.clipboard && window.isSecureContext ? (
         <button type="button" onClick={handleClick}>
           <MdOutlineContentCopy size={18} />
         </button>
+      ) : (
+        <>
+          {Boolean(props.secure) && (
+            <div
+              className="inline-flex items-center cursor-pointer"
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsSecureVisible((current) => !current);
+              }}
+            >
+              {isSecureVisible ? (
+                <Icon element={AiFillEye} />
+              ) : (
+                <Icon element={AiFillEyeInvisible} />
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

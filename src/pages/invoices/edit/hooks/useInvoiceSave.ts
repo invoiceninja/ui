@@ -39,7 +39,7 @@ export function useHandleSave(params: Params) {
     setErrors(undefined);
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/invoices/:id?';
 
