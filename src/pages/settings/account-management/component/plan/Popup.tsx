@@ -19,7 +19,6 @@ import { Modal } from '$app/components/Modal';
 import { AxiosResponse } from 'axios';
 import { get } from 'lodash';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { FaCheck, FaCheckDouble, FaCheckSquare } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import { ChangePlan } from './ChangePlan';
@@ -90,8 +89,6 @@ export function Popup({ visible, onClose }: PopupProps) {
     staleTime: Infinity,
     enabled: visible,
   });
-
-  const { t } = useTranslation();
 
   function isPlanVisible(
     plan: 'pro' | 'pro_annual' | 'enterprise' | 'enterprise_annual'
