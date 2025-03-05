@@ -71,7 +71,7 @@ export default function Product() {
 
       toast.processing();
 
-      await saveCompany(true);
+      await saveCompany({ excludeToasters: true });
 
       const url = searchParams.has('update_in_stock_quantity')
         ? endpoint('/api/v1/products/:id?update_in_stock_quantity=true', { id })

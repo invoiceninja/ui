@@ -94,7 +94,7 @@ export default function Create() {
       return onSave;
     }
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
