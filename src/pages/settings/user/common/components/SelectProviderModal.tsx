@@ -19,7 +19,10 @@ import { request } from '$app/common/helpers/request';
 import { endpoint, trans } from '$app/common/helpers';
 import { useDispatch } from 'react-redux';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 export function SelectProviderModal() {
@@ -52,6 +55,7 @@ export function SelectProviderModal() {
       },
     }).then((response) => {
       dispatch(updateRecord({ object: 'company', data: response.data.data }));
+      dispatch(resetChanges('company'));
 
       toast.success('updated_settings');
 
