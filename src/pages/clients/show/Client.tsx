@@ -61,7 +61,10 @@ export default function Client() {
     },
   ];
 
-  const tabs = useTabs({ client });
+  const tabs = useTabs({
+    client,
+    isPurgeOrMergeActionCalled,
+  });
   const actions = useActions({
     setIsPurgeOrMergeActionCalled,
   });
