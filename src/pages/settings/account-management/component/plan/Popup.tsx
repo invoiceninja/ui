@@ -141,7 +141,7 @@ export function Popup({ visible, onClose }: PopupProps) {
 
   useEffect(() => {
     setEnterprisePlan(getFirstAvailableEnterprise(pricing));
-  }, [pricing])
+  }, [pricing]);
 
   return (
     <>
@@ -177,7 +177,7 @@ export function Popup({ visible, onClose }: PopupProps) {
           {account.plan_term === '' || account.plan_term === 'month' ? (
             <div className="flex justify-center mt-6">
               <div className="flex items-center space-x-2">
-                <span>{t('monthly')}</span>
+                <span>Monthly</span>
 
                 <Toggle
                   checked={pricing === 'year'}
@@ -185,7 +185,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                     setPricing((c) => (c === 'month' ? 'year' : 'month'))
                   }
                 />
-                <span>{t('annual')}</span>
+                <span>Annually</span>
               </div>
             </div>
           ) : null}
@@ -211,7 +211,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                         </h2>
 
                         <span>
-                          {pricing === 'month' ? t('per_month') : t('per_year')}
+                          {pricing === 'month' ? '/month' : '/year'}
                         </span>
                       </div>
                     </div>
@@ -274,7 +274,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                         </h2>
 
                         <span>
-                          {pricing === 'month' ? t('per_month') : t('per_year')}
+                          {pricing === 'month' ? '/month' : '/year'}
                         </span>
                       </div>
                     </div>
@@ -345,7 +345,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                         ) : null}
 
                         <span>
-                          {pricing === 'month' ? t('per_month') : t('per_year')}
+                          {pricing === 'month' ? '/month' : '/year'}
                         </span>
                       </div>
                     </div>

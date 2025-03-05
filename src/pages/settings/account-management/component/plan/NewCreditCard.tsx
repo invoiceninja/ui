@@ -156,7 +156,7 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
     <Modal
       visible={visible}
       onClose={onClose}
-      title="Add new card"
+      title={t('add_payment_method')}
       disableClosing={isSubmitting}
     >
       {errors && <Alert type="danger">{errors}</Alert>}
@@ -174,7 +174,7 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
           onClick={handleSubmit}
           disabled={isSubmitting}
         >
-          Save card
+          {t('continue')}
         </Button>
       </div>
     </Modal>

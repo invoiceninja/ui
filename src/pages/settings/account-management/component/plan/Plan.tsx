@@ -9,7 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { date } from '$app/common/helpers';
+import { date, trans } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { ReactNode } from 'react';
@@ -49,7 +49,7 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
           <b>{price}</b>
         ) : (
           <p>
-            {trial ? 'Free trial, then' : null} <b> ${price} /</b>{' '}
+            {trial ? t('free_trial_then') : null} <b> ${price} /</b>{' '}
             <span className="lowercase">{t(term)}</span>
           </p>
         )}
@@ -57,13 +57,13 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
 
       {trial ? (
         <div className="flex justify-between items-center">
-          <p>{account.trial_days_left} days left</p>
-          <p>14 days trial</p>
+          <p>{trans('days_left', { days: account.trial_days_left })}</p>
+          <p>{trans('days_trial', { days: 14 })}</p>
         </div>
       ) : (
         <div className="flex justify-between items-center">
           <p>
-            Expires on <b>{date(account.plan_expires, dateFormat)}</b>
+            {t('expires_on')} <b>{date(account.plan_expires, dateFormat)}</b>
           </p>
         </div>
       )}

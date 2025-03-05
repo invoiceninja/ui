@@ -64,18 +64,22 @@ export function DeleteCreditCard({
   });
 
   return (
-    <Modal visible={visible} onClose={onClose} disableClosing={form.isSubmitting}>
+    <Modal
+      visible={visible}
+      onClose={onClose}
+      disableClosing={form.isSubmitting}
+    >
       <div className="px-5 text-center space-y-4 mb-4">
         <h4 className="font-semibold text-xl">
-          Are you sure you want to delete the credit card?
+          {t('confirm_remove_payment_method')}
         </h4>
 
-        <p>You can add a card again at any time.</p>
+        <p>{t('add_card_reminder')}</p>
       </div>
 
       <form className="flex justify-end gap-2" onSubmit={form.handleSubmit}>
         <Button type="primary" disabled={form.isSubmitting}>
-          Delete
+          {t('delete')}
         </Button>
       </form>
     </Modal>

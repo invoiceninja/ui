@@ -50,7 +50,7 @@ export function Plan2() {
         (response: AxiosResponse<GenericManyResponse<CompanyGateway>>) =>
           response.data.data
       ),
-      enabled: Boolean(account),
+    enabled: Boolean(account),
   });
 
   const [selectedGateway, setSelectedGateway] = useState<CompanyGateway | null>(
@@ -59,6 +59,7 @@ export function Plan2() {
 
   const { data: plans } = usePlansQuery();
   const { calculatePrice } = useEnterpriseUtils();
+  const { t } = useTranslation();
 
   if (!account || !plans) {
     return null;
@@ -156,7 +157,7 @@ export function Plan2() {
               className="text-sm hover:underline flex items-center space-x-1"
               onClick={() => setCreatePopupVisible(true)}
             >
-              <Plus size={18} /> <span>Add new card</span>
+              <Plus size={18} /> <span>{t('add_payment_method')}</span>
             </button>
 
             <NewCreditCard
@@ -175,7 +176,7 @@ export function Plan2() {
               >
                 <div className="flex flex-col items-center justify-center space-y-3">
                   <Plus size={48} />
-                  <p>Add new card</p>
+                  <p>{t('add_payment_method')}</p>
                 </div>
               </button>
             ) : null}
