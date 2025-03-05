@@ -109,7 +109,7 @@ export default function Client() {
   const onSave = async () => {
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request('PUT', endpoint('/api/v1/clients/:id', { id }), {
       ...client,

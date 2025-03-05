@@ -43,6 +43,14 @@ export function useTabs({ client }: Props) {
     {
       name: t('locations'),
       href: route('/clients/:id/locations', { id }),
+      formatName: () => (
+        <div className="flex space-x-1">
+          <span>{t('locations')}</span>
+          {Boolean(client?.locations.length) && (
+            <span className="font-bold">({client?.locations.length})</span>
+          )}
+        </div>
+      ),
     },
   ];
 

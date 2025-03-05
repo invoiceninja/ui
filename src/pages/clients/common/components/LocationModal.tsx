@@ -134,7 +134,6 @@ export function LocationModal({
       visible={isModalOpen}
       onClose={handleOnClose}
       overflowVisible
-      size="regular"
     >
       <div className="flex flex-col space-y-4">
         <InputField

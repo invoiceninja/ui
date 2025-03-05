@@ -15,15 +15,14 @@ import { useTranslation } from 'react-i18next';
 import { ClientContext } from '../../edit/Edit';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { Location } from '$app/common/interfaces/location';
-import { Button } from '$app/components/forms';
 import { useBlankLocationQuery } from '$app/common/queries/locations';
 import { LocationModal } from './LocationModal';
-import { Badge } from '$app/components/Badge';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import styled from 'styled-components';
 import classNames from 'classnames';
 import { Trash } from '$app/components/icons/Trash';
 import { Pencil } from '$app/components/icons/Pencil';
+import { Plus } from '$app/components/icons/Plus';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -42,8 +41,16 @@ const StyledIconBox = styled.div`
   &:hover {
     background-color: ${(props) => props.theme.hoverBackgroundColor};
   }
+`;
 
-  &:focus {
+const LocationCard = styled.div`
+  border-color: ${(props) => props.theme.borderColor};
+`;
+
+const NewLocationCard = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
+
+  &:hover {
     background-color: ${(props) => props.theme.hoverBackgroundColor};
   }
 `;
@@ -122,120 +129,131 @@ export default function Locations() {
 
   return (
     <>
-      <Card className="w-full xl:w-2/3" title={t('locations')}>
-        <div className="flex flex-col space-y-4 px-6">
-          {!currentLocations.length && (
-            <span className="text-sm">{t('no_records_found')}.</span>
-          )}
-
-          {currentLocations.map((location, index) => (
-            <div
-              key={index}
-              className="pb-4 mb-4 border-b flex flex-col md:flex-row gap-4"
-              style={{ borderColor: colors.$5 }}
+      <Card className="w-full" title={t('locations')}>
+        <div className="px-4 sm:px-6 py-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <NewLocationCard
+              className="flex flex-col space-y-2 items-center justify-center border-dashed border p-6 rounded-md cursor-pointer h-48"
+              theme={{
+                backgroundColor: colors.$1,
+                hoverBackgroundColor: colors.$4,
+                borderColor: colors.$5,
+              }}
+              onClick={() => setIsModalOpen(true)}
             >
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-lg font-semibold">{location.name}</span>
+              <Plus size="2rem" color={colors.$3} />
+              <span>{t('add_location')}</span>
+            </NewLocationCard>
 
-                  {location.is_shipping_location && (
-                    <Badge variant="blue">{t('shipping')}</Badge>
-                  )}
+            {currentLocations.map((location, index) => (
+              <LocationCard
+                key={index}
+                theme={{
+                  borderColor: colors.$5,
+                }}
+                className="px-3 py-4 flex justify-between space-x-4 border rounded-md h-48"
+              >
+                <div className="flex flex-col flex-1 truncate justify-between">
+                  <span className="text-lg font-semibold truncate mb-2 mt-1">
+                    {location.name}
+                  </span>
+
+                  <div className="flex flex-col space-y-1 text-sm">
+                    <div>
+                      <span style={{ color: colors.$16 }}>
+                        {t('address')}:{' '}
+                      </span>
+                      {location.address1}
+                      {location.address1 &&
+                        location.address2 &&
+                        `, ${location.address2}`}
+                    </div>
+
+                    <div>
+                      <span style={{ color: colors.$16 }}>{t('city')}: </span>
+                      {location.city || ''}
+                      {location.state &&
+                        `${location.city ? ', ' : ''}${location.state}`}
+                      {location.postal_code &&
+                        `${location.state ? ' ' : ''}${location.postal_code}`}
+                    </div>
+
+                    <div>
+                      <span style={{ color: colors.$16 }}>
+                        {t('country')}:{' '}
+                      </span>
+                      {resolveCountry(location.country_id)?.name}
+                    </div>
+
+                    <div>
+                      <span style={{ color: colors.$16 }}>{t('phone')}: </span>
+                      {location.phone}
+                    </div>
+
+                    <div>
+                      <span style={{ color: colors.$16 }}>
+                        {t('shipping')}:{' '}
+                      </span>
+                      {location.is_shipping_location ? t('yes') : t('no')}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="text-sm mb-1">
-                  <span style={{ color: colors.$16 }}>Address: </span>
-
-                  {location.address1}
-                  {location.address1 &&
-                    location.address2 &&
-                    `, ${location.address2}`}
-                </div>
-
-                <div className="text-sm mb-1">
-                  <span style={{ color: colors.$16 }}>City: </span>
-                  {location.city || ''}
-                  {location.state &&
-                    `${location.city ? ', ' : ''}${location.state}`}
-                  {location.postal_code &&
-                    `${location.state ? ' ' : ''}${location.postal_code}`}
-                </div>
-
-                <div className="text-sm mb-1">
-                  <span style={{ color: colors.$16 }}>Country: </span>
-
-                  {resolveCountry(location.country_id)?.name}
-                </div>
-
-                <div className="text-sm mb-1">
-                  <span style={{ color: colors.$16 }}>Phone: </span>
-
-                  {location.phone}
-                </div>
-              </div>
-
-              <div className="flex flex-row md:flex-col gap-2 mt-2 md:mt-0 justify-between">
-                <StyledIconBox
-                  className={classNames(
-                    'flex items-center justify-center w-10 rounded-lg border shadow-sm',
-                    {
-                      'cursor-not-allowed opacity-75': isFormBusy,
-                      'cursor-pointer': !isFormBusy,
+                <div className="flex flex-col justify-between">
+                  <StyledIconBox
+                    className={classNames(
+                      'flex items-center justify-center w-8 h-8 rounded-lg border',
+                      {
+                        'cursor-not-allowed opacity-75': isFormBusy,
+                        'cursor-pointer': !isFormBusy,
+                      }
+                    )}
+                    style={{ borderColor: colors.$5 }}
+                    theme={{
+                      hoverBackgroundColor: colors.$4,
+                      backgroundColor: colors.$1,
+                    }}
+                    onClick={() =>
+                      !isFormBusy && setCurrentEditingLocation(location)
                     }
-                  )}
-                  style={{ height: '2.3rem', borderColor: colors.$5 }}
-                  theme={{
-                    hoverBackgroundColor: colors.$4,
-                    backgroundColor: colors.$1,
-                  }}
-                  onClick={() =>
-                    !isFormBusy && setCurrentEditingLocation(location)
-                  }
-                >
-                  <Pencil size="1.25rem" color="#2176FF" />
-                </StyledIconBox>
+                  >
+                    <Pencil size="1rem" color="#2176FF" />
+                  </StyledIconBox>
 
-                <StyledIconBox
-                  className={classNames(
-                    'flex items-center justify-center w-10 rounded-lg border shadow-sm',
-                    {
-                      'cursor-not-allowed opacity-75': isFormBusy,
-                      'cursor-pointer': !isFormBusy,
-                    }
-                  )}
-                  style={{ height: '2.3rem', borderColor: colors.$5 }}
-                  theme={{
-                    hoverBackgroundColor: colors.$4,
-                    backgroundColor: colors.$1,
-                  }}
-                  onClick={() => {
-                    setDeleteLocationId(location.id);
-
-                    setTimeout(() => {
-                      setIsConfirmationVisible(true);
-                    }, 100);
-                  }}
-                >
-                  <Trash size="1.25rem" color="red" />
-                </StyledIconBox>
-              </div>
-            </div>
-          ))}
-
-          <Button
-            className="w-full"
-            type="primary"
-            behavior="button"
-            onClick={() => setIsModalOpen(true)}
-          >
-            {t('add_location')}
-          </Button>
+                  <StyledIconBox
+                    className={classNames(
+                      'flex items-center justify-center w-8 h-8 rounded-lg border',
+                      {
+                        'cursor-not-allowed opacity-75': isFormBusy,
+                        'cursor-pointer': !isFormBusy,
+                      }
+                    )}
+                    style={{ borderColor: colors.$5 }}
+                    theme={{
+                      hoverBackgroundColor: colors.$4,
+                      backgroundColor: colors.$1,
+                    }}
+                    onClick={() => {
+                      setDeleteLocationId(location.id);
+                      setTimeout(() => {
+                        setIsConfirmationVisible(true);
+                      }, 100);
+                    }}
+                  >
+                    <Trash size="1rem" color="red" />
+                  </StyledIconBox>
+                </div>
+              </LocationCard>
+            ))}
+          </div>
         </div>
       </Card>
 
       <ConfirmActionModal
         onClick={() => handleDeleteLocation(deleteLocationId)}
         disabledButton={isFormBusy}
+        title={t('delete_location')}
+        message={t('delete_location_confirmation')}
       />
 
       <LocationModal
