@@ -18,13 +18,9 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Client } from '$app/common/interfaces/client';
-import { useQuery } from 'react-query';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
 
 interface Params {
   client: Client | undefined;
-  isPurgeOrMergeActionCalled?: boolean;
 }
 export function useTabs(params: Params) {
   const [t] = useTranslation();
@@ -34,17 +30,7 @@ export function useTabs(params: Params) {
   const entityAssigned = useEntityAssigned();
 
   const { id } = useParams();
-  const { client, isPurgeOrMergeActionCalled } = params;
-
-  const { data: clientDocuments } = useQuery({
-    queryKey: ['/api/v1/documents', id, 'client'],
-    queryFn: () =>
-      request('POST', endpoint('/api/v1/clients/:id/documents', { id })).then(
-        (response) => response.data.data
-      ),
-    staleTime: Infinity,
-    enabled: Boolean(id) && !isPurgeOrMergeActionCalled,
-  });
+  const { client } = params;
 
   let tabs: Tab[] = [
     { name: t('invoices'), href: route('/clients/:id', { id }) },
@@ -89,7 +75,7 @@ export function useTabs(params: Params) {
         hasPermission('edit_client') ||
         entityAssigned(client),
       formatName: () => (
-        <DocumentsTabLabel numberOfDocuments={clientDocuments?.length} />
+        <DocumentsTabLabel numberOfDocuments={client?.documents?.length} />
       ),
     },
   ];
