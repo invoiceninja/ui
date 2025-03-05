@@ -13,7 +13,7 @@ import { admin } from '$app/common/guards/guards/admin';
 import { Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
-import { isDemo } from '$app/common/helpers';
+import { isDemo, isHosted } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 import { or } from '$app/common/guards/guards/or';
 
@@ -58,7 +58,18 @@ export const settingsRoutes = (
       <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />
       <Route path="import_export" element={<Settings.ImportExport />} />
       <Route path="account_management" element={<Settings.AccountManagement />}>
-        <Route path="" element={<Settings.Plan2 />} />
+        <Route
+          path=""
+          element={
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
+            isHosted() ? (
+              <Settings.Plan2 />
+            ) : (
+              <Settings.Plan />
+            )
+          }
+        />
+
         <Route
           path="overview"
           element={<Settings.AccountManagementOverview />}
