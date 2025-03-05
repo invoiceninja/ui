@@ -12,7 +12,10 @@ import Tippy from '@tippyjs/react';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  updateCompanyUsers,
+  resetChanges,
+} from '$app/common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { Mail } from 'react-feather';
@@ -125,6 +128,7 @@ export function HelpSidebarIcons(props: Props) {
 
     request('POST', endpoint('/api/v1/refresh')).then((data) => {
       dispatch(updateCompanyUsers(data.data.data));
+      dispatch(resetChanges('company'));
       setDisabledButton(false);
       setCronsNotEnabledModal(false);
     });

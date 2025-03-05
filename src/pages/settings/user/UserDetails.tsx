@@ -115,6 +115,7 @@ export function UserDetails() {
         }
 
         dispatch(updateUser(response[0].data.data));
+        dispatch(resetChanges());
 
         window.dispatchEvent(new CustomEvent('user.updated'));
 

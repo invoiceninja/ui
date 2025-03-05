@@ -19,7 +19,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
@@ -152,6 +152,7 @@ export function ImportTemplateModal(props: Props) {
             $refetch(['company_users']);
 
             dispatch(updateUser(updatedUser));
+            dispatch(resetChanges());
 
             handleOnClose();
 
