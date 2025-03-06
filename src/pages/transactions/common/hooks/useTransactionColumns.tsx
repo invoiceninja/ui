@@ -29,14 +29,13 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useColorScheme } from '$app/common/colors';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
-  const reactSettings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
@@ -108,12 +107,11 @@ export function useTransactionColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(cleanDescriptionText(value as string)),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }

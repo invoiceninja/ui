@@ -10,7 +10,10 @@
 
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -86,6 +89,7 @@ export function useHandleCompanySave() {
     )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
+        dispatch(resetChanges('company'));
 
         !adjustedExcludeToaster && toast.dismiss();
 

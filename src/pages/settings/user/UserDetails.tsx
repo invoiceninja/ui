@@ -38,6 +38,7 @@ import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuth
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { resetChanges as resetCompanyChanges } from '$app/common/stores/slices/company-users';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -115,13 +116,17 @@ export function UserDetails() {
         }
 
         dispatch(updateUser(response[0].data.data));
+        dispatch(resetChanges());
 
         window.dispatchEvent(new CustomEvent('user.updated'));
 
-        isAdmin &&
+        if (isAdmin) {
           dispatch(
             updateRecord({ object: 'company', data: response[1].data.data })
           );
+
+          dispatch(resetCompanyChanges('company'));
+        }
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {

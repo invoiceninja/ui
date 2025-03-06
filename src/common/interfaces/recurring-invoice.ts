@@ -79,4 +79,5 @@ export interface RecurringInvoice {
   documents: any[];
   client?: Client;
   activities?: Activity[];
+  location_id: string;
 }

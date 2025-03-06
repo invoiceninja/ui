@@ -82,6 +82,7 @@ export interface PurchaseOrder {
   e_invoice?: EInvoiceType;
   activities?: Activity[];
   reminder_schedule?: string;
+  location_id: string;
 }
 
 export interface Invitation {
