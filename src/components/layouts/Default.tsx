@@ -335,13 +335,6 @@ export function Default(props: Props) {
       },
     },
     {
-      name: t('reports'),
-      href: '/reports',
-      icon: ChartLine,
-      current: location.pathname.startsWith('/reports'),
-      visible: hasPermission('view_reports'),
-    },
-    {
       name: t('transactions'),
       href: '/transactions',
       icon: ArrowsTransaction,
@@ -357,6 +350,13 @@ export function Default(props: Props) {
         label: t('new_transaction'),
         visible: hasPermission('create_bank_transaction'),
       },
+    },
+    {
+      name: t('reports'),
+      href: '/reports',
+      icon: ChartLine,
+      current: location.pathname.startsWith('/reports'),
+      visible: hasPermission('view_reports'),
     },
     {
       name: t('settings'),
