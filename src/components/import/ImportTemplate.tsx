@@ -18,7 +18,7 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { cloneDeep, set } from 'lodash';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { User } from '$app/common/interfaces/user';
 import { useState } from 'react';
 import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
@@ -83,6 +83,7 @@ export function ImportTemplate(props: Props) {
             $refetch(['company_users']);
 
             dispatch(updateUser(updatedUser));
+            dispatch(resetChanges());
 
             onDeletedTemplate();
           })

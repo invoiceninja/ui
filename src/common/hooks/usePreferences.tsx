@@ -15,11 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useInjectUserChanges } from './useInjectUserChanges';
 import { ReactSettings, useReactSettings } from './useReactSettings';
 import { useDispatch, useStore } from 'react-redux';
-import {
-  injectInChanges,
-  updateChanges,
-  updateUser,
-} from '../stores/slices/user';
+import { resetChanges, updateChanges, updateUser } from '../stores/slices/user';
 import { toast } from '../helpers/toast/toast';
 import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
@@ -115,8 +111,7 @@ export function usePreferences() {
         $refetch(['company_users']);
 
         dispatch(updateUser(response.data.data));
-        dispatch(injectInChanges());
-
+        dispatch(resetChanges());
         setIsVisible(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
