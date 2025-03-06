@@ -71,6 +71,7 @@ export default function EInvoice() {
     eInvoiceValidationEntityResponse,
     setTriggerValidationQuery,
     setInvoice,
+    errors,
   } = context;
 
   const { data: activities } = useQuery({
@@ -144,8 +145,6 @@ export default function EInvoice() {
 
     setInvoice(updatedInvoice);
   };
-
-  console.log(invoice?.e_invoice);
 
   return (
     <>
@@ -300,12 +299,13 @@ export default function EInvoice() {
             type="date"
             value={
               invoice?.e_invoice?.InvoicePeriod?.[
-                'start_date' as keyof EInvoiceType['InvoicePeriod']
+                'StartDate' as keyof EInvoiceType['InvoicePeriod']
               ]
             }
             onValueChange={(value) =>
-              handleChange('e_invoice.InvoicePeriod.start_date', value)
+              handleChange('e_invoice.InvoicePeriod.StartDate', value)
             }
+            errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.StartDate']}
           />
         </Element>
 
@@ -314,12 +314,13 @@ export default function EInvoice() {
             type="date"
             value={
               invoice?.e_invoice?.InvoicePeriod?.[
-                'end_date' as keyof EInvoiceType['InvoicePeriod']
+                'EndDate' as keyof EInvoiceType['InvoicePeriod']
               ]
             }
             onValueChange={(value) =>
-              handleChange('e_invoice.InvoicePeriod.end_date', value)
+              handleChange('e_invoice.InvoicePeriod.EndDate', value)
             }
+            errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.EndDate']}
           />
         </Element>
       </Card>
