@@ -173,9 +173,7 @@ export function useDataTablePreferences(params: Params) {
         setStatus(['active']);
       }
 
-      setTimeout(() => {
-        setArePreferencesApplied(true);
-      }, 50);
+      setArePreferencesApplied(true);
     }
   }, [isInitialConfiguration]);
 
