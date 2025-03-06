@@ -10,8 +10,8 @@
 
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card } from '$app/components/cards';
-import { EInvoiceComponent } from '$app/pages/settings';
+import { Card, Element } from '$app/components/cards';
+import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import {
   Dispatch,
   ReactNode,
@@ -25,7 +25,7 @@ import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { Button, Link } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCheckCircle } from 'react-icons/md';
@@ -40,6 +40,7 @@ import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { useQuery } from 'react-query';
 import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
+import { cloneDeep, set } from 'lodash';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -69,6 +70,7 @@ export default function EInvoice() {
     invoice,
     eInvoiceValidationEntityResponse,
     setTriggerValidationQuery,
+    setInvoice,
   } = context;
 
   const { data: activities } = useQuery({
@@ -134,6 +136,16 @@ export default function EInvoice() {
 
     return text;
   };
+
+  const handleChange = (property: string, value: string | number | boolean) => {
+    const updatedInvoice = cloneDeep(invoice) as Invoice;
+
+    set(updatedInvoice, property, value);
+
+    setInvoice(updatedInvoice);
+  };
+
+  console.log(invoice?.e_invoice);
 
   return (
     <>
@@ -281,6 +293,36 @@ export default function EInvoice() {
           </div>
         </Card>
       )}
+
+      <Card title={t('date_range')}>
+        <Element leftSide={t('start_date')}>
+          <InputField
+            type="date"
+            value={
+              invoice?.e_invoice?.InvoicePeriod?.[
+                'start_date' as keyof EInvoiceType['InvoicePeriod']
+              ]
+            }
+            onValueChange={(value) =>
+              handleChange('e_invoice.InvoicePeriod.start_date', value)
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('end_date')}>
+          <InputField
+            type="date"
+            value={
+              invoice?.e_invoice?.InvoicePeriod?.[
+                'end_date' as keyof EInvoiceType['InvoicePeriod']
+              ]
+            }
+            onValueChange={(value) =>
+              handleChange('e_invoice.InvoicePeriod.end_date', value)
+            }
+          />
+        </Element>
+      </Card>
     </>
   );
 }

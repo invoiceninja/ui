@@ -27,6 +27,7 @@ interface Params {
 export function useTabs(params: Params) {
   const [t] = useTranslation();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const company = useCurrentCompany();
 
   const hasPermission = useHasPermission();
@@ -49,11 +50,12 @@ export function useTabs(params: Params) {
     {
       name: t('e_invoice'),
       href: route('/invoices/:id/e_invoice', { id }),
-      enabled: Boolean(
-        company?.settings.e_invoice_type === 'PEPPOL' &&
-          company?.settings.enable_e_invoice &&
-          company?.tax_data?.acts_as_sender
-      ),
+      // enabled: Boolean(
+      //   company?.settings.e_invoice_type === 'PEPPOL' &&
+      //     company?.settings.enable_e_invoice &&
+      //     company?.tax_data?.acts_as_sender
+      // ),
+      enabled: true,
       formatName: () => (
         <div className="flex space-x-1">
           <span>{t('e_invoice')}</span>
