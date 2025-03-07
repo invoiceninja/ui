@@ -106,9 +106,7 @@ export default function Locations() {
   };
 
   useEffect(() => {
-    if (client?.locations?.length) {
-      setCurrentLocations(client.locations);
-    }
+    setCurrentLocations(client?.locations || []);
   }, [client?.locations]);
 
   useEffect(() => {
