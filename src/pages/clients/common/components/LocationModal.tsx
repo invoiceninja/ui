@@ -194,7 +194,7 @@ export function LocationModal({
 
         <div className="pt-1">
           <Toggle
-            label={t('is_shipping_location')}
+            label={t('shipping_address')}
             value={Boolean(currentLocation?.is_shipping_location)}
             onValueChange={(value) =>
               handleChange(value, 'is_shipping_location')
