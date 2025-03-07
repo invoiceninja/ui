@@ -73,8 +73,6 @@ export function DeleteCreditCard({
         <h4 className="font-semibold text-xl">
           {t('confirm_remove_payment_method')}
         </h4>
-
-        <p>{t('add_card_reminder')}</p>
       </div>
 
       <form className="flex justify-end gap-2" onSubmit={form.handleSubmit}>
