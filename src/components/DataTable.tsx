@@ -224,6 +224,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
+  const [arePreferencesApplied, setArePreferencesApplied] =
+    useState<boolean>(false);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -238,6 +240,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     setSort,
     setSortedBy,
     setStatus,
+    setArePreferencesApplied,
     tableKey: `${props.resource}s`,
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
@@ -336,7 +339,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     () => request(methodType, apiEndpoint.href),
     {
       staleTime: props.staleTime ?? Infinity,
-      enabled: !disableQuery,
+      enabled: !disableQuery && arePreferencesApplied,
     }
   );
 
