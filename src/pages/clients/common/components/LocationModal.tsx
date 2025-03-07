@@ -11,6 +11,7 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Location } from '$app/common/interfaces/location';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -43,6 +44,8 @@ export function LocationModal({
   setCurrentEditingLocation,
 }: Props) {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | undefined>();
@@ -125,7 +128,13 @@ export function LocationModal({
   };
 
   useEffect(() => {
-    setCurrentLocation(currentEditingLocation || blankLocation);
+    setCurrentLocation(
+      currentEditingLocation ||
+        cloneDeep({
+          ...blankLocation,
+          country_id: company?.settings?.country_id || '',
+        })
+    );
   }, [isModalOpen]);
 
   return (
