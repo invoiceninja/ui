@@ -62,7 +62,7 @@ export const settingsRoutes = (
           path=""
           element={
             import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-            isHosted() ? (
+            (import.meta.env.PROD ? isHosted() : true) ? (
               <Settings.Plan2 />
             ) : (
               <Settings.Plan />
