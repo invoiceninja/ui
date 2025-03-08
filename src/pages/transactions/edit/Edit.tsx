@@ -46,8 +46,6 @@ export default function Edit() {
 
   const { data } = useTransactionQuery({ id });
 
-  console.log(data);
-
   const actions = useActions();
 
   const resolveCurrencySeparator = useResolveCurrencySeparator();
