@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
@@ -80,4 +81,5 @@ export interface RecurringInvoice {
   client?: Client;
   activities?: Activity[];
   location_id: string;
+  e_invoice?: EInvoiceType;
 }

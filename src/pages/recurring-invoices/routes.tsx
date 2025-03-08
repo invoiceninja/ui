@@ -49,6 +49,9 @@ const Schedule = lazy(
 );
 const Edit = lazy(() => import('$app/pages/recurring-invoices/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/recurring-invoices/pdf/Pdf'));
+const EInvoice = lazy(
+  () => import('$app/pages/recurring-invoices/edit/components/EInvoice')
+);
 
 export const recurringInvoiceRoutes = (
   <Route path="/recurring_invoices">
@@ -102,6 +105,7 @@ export const recurringInvoiceRoutes = (
       }
     >
       <Route path="edit" element={<Edit />} />
+      <Route path="e_invoice" element={<EInvoice />} />
       <Route path="documents" element={<Documents />} />
       <Route path="settings" element={<Settings />} />
       <Route path="activity" element={<Activities />} />
