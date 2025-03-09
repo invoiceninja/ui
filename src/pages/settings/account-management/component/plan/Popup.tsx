@@ -253,7 +253,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                         size={14}
                         className="flex-shrink-0"
                       />
-                      <p>{feature}</p>
+                      <p>{t(feature)}</p>
                     </div>
                   ))}
                 </div>
@@ -458,7 +458,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                         size={14}
                         className="flex-shrink-0"
                       />
-                      <p>{feature}</p>
+                      <p>{t(feature)}</p>
                     </div>
                   ))}
                 </div>
@@ -519,7 +519,7 @@ export function Popup({ visible, onClose }: PopupProps) {
                       size={14}
                       className="flex-shrink-0"
                     />
-                    <p>{feature}</p>
+                    <p>{t(feature)}</p>
                   </div>
                 ))}
               </div>
@@ -559,11 +559,11 @@ export const features = {
     'enterprise_plan_feature_4',
   ],
   premium_business_plus: [
-    'premium_business_plan_feature_1',
-    'premium_business_plan_feature_2',
-    'premium_business_plan_feature_3',
-    'premium_business_plan_feature_4',
-    'premium_business_plan_feature_5',
-    'premium_business_plan_feature_6',
+    'premium_business_plus_feature_1',
+    'premium_business_plus_feature_2',
+    'premium_business_plus_feature_3',
+    'premium_business_plus_feature_4',
+    'premium_business_plus_feature_5',
+    'premium_business_plus_feature_6',
   ],
 };
