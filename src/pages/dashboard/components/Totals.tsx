@@ -147,8 +147,6 @@ export function Totals() {
   const dateRange =
     settings?.preferences?.dashboard_charts?.range || 'this_month';
 
-  console.log(dateRange);
-
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
     start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
     end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
@@ -249,7 +247,7 @@ export function Totals() {
 
         update(
           'preferences.dashboard_charts.range',
-          currentRange ?? 'this_month'
+          currentRange || 'this_month'
         );
       }
     };
