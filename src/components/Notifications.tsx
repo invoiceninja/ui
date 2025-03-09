@@ -465,17 +465,6 @@ export function Notifications() {
     }
   }, [sockets, reactSettings.preferences.enable_public_notifications]);
 
-  // This is a temporary fix for new implementation of notifications. If you see this code in 2 years, feel free to remove it.
-  useEffect(() => {
-    const doNotificationsContainAllDetails = notifications.every(
-      ({ displayLabel }) => Boolean(displayLabel?.notificationType)
-    );
-
-    if (notifications.length > 0 && !doNotificationsContainAllDetails) {
-      setNotifications([]);
-    }
-  }, []);
-
   if (
     isSelfHosted() &&
     !reactSettings.preferences.enable_public_notifications
