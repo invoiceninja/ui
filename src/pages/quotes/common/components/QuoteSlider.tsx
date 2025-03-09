@@ -53,8 +53,6 @@ import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useColorScheme } from '$app/common/colors';
@@ -130,8 +128,6 @@ export function QuoteSlider() {
 
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const reactSettings = useReactSettings();
 
   const getSetting = useGetSetting();
   const getTimezone = useGetTimezone();
@@ -303,14 +299,13 @@ export function QuoteSlider() {
                 width="auto"
                 tooltipElement={
                   <article
-                    className={classNames('prose prose-sm', {
-                      'prose-invert': reactSettings.dark_mode,
-                    })}
+                    className="prose prose-sm"
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
                         (resource?.reminder_schedule as string) ?? ''
                       ),
                     }}
+                    style={{ color: colors.$1 }}
                   />
                 }
               >
@@ -471,6 +466,10 @@ export function QuoteSlider() {
         </div>
 
         <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="px-4 text-sm">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords?.map((emailRecord, index) => (
             <EmailRecord
               key={index}

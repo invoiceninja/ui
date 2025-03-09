@@ -37,27 +37,27 @@ export function SecuritySettings() {
 
   const options = [
     {
-      value: 1_800_000,
+      value: 1800000,
       label: route(t('count_minutes'), { count: '30' }),
     },
     {
-      value: 7_200_000,
+      value: 7200000,
       label: route(t('count_hours'), { count: '2' }),
     },
     {
-      value: 28_800_000,
+      value: 28800000,
       label: route(t('count_hours'), { count: '8' }),
     },
     {
-      value: 86_400_000,
+      value: 86400000,
       label: route(t('count_day'), { count: '1' }),
     },
     {
-      value: 604_800_000,
+      value: 604800000,
       label: route(t('count_days'), { count: '7' }),
     },
     {
-      value: 2_592_000_000,
+      value: 2592000000,
       label: route(t('count_days'), { count: '30' }),
     },
     {

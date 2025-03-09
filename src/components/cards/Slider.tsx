@@ -25,6 +25,7 @@ interface Props extends CommonProps {
   withContainer?: boolean;
   withoutActionContainer?: boolean;
   topRight?: ReactNode;
+  withoutDivider?: boolean;
 }
 
 export function Slider(props: Props) {
@@ -59,7 +60,7 @@ export function Slider(props: Props) {
               >
                 <div className="flex flex-col flex-1 h-0 overflow-y-auto">
                   <div
-                    className="py-6 px-4 sm:px-6 border-b"
+                    className="py-4 px-4 sm:px-6 border-b"
                     style={{ borderColor: colors.$4 }}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -84,12 +85,10 @@ export function Slider(props: Props) {
                   </div>
                   <div className="flex flex-1 flex-col justify-between items-center">
                     <div
-                      className={classNames(
-                        'flex flex-col flex-1 divide-y divide-gray-200 w-full',
-                        {
-                          'p-4': props.withContainer,
-                        }
-                      )}
+                      className={classNames('flex flex-col flex-1 w-full', {
+                        'p-4': props.withContainer,
+                        'divide-y divide-gray-200': !props.withoutDivider,
+                      })}
                     >
                       {props.children}
                     </div>

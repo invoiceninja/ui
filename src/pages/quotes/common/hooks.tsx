@@ -100,10 +100,10 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { AiOutlineFileText } from 'react-icons/ai';
+import { useColorScheme } from '$app/common/colors';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -240,7 +240,7 @@ export function useCreate(props: CreateProps) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/quotes?';
 
@@ -294,7 +294,7 @@ export function useSave(props: CreateProps) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/quotes/:id?';
 
@@ -511,6 +511,7 @@ export function useActions(params?: Params) {
             isCommonActionSection={!dropdown}
             tooltipText={t('add_comment')}
             icon={MdComment}
+            disablePreventNavigation
           >
             {t('add_comment')}
           </EntityActionElement>
@@ -791,9 +792,10 @@ export function useQuoteColumns() {
   const quoteColumns = useAllQuoteColumns();
   type QuoteColumns = (typeof quoteColumns)[number];
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
   const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
@@ -1072,12 +1074,11 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -1098,12 +1099,11 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }

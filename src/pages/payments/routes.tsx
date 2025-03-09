@@ -17,6 +17,7 @@ import { lazy } from 'react';
 import { admin } from '$app/common/guards/guards/admin';
 
 const Payment = lazy(() => import('$app/pages/payments/Payment'));
+const Import = lazy(() => import('$app/pages/payments/import/Import'));
 const Payments = lazy(() => import('$app/pages/payments/index/Payments'));
 const Create = lazy(() => import('$app/pages/payments/create/Create'));
 const Edit = lazy(() => import('$app/pages/payments/edit/Edit'));
@@ -88,5 +89,17 @@ export const paymentRoutes = (
     >
       <Route path="payment_fields" element={<PaymentFields />} />
     </Route>
+
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            or(permission('create_payment'), permission('edit_payment')),
+          ]}
+          component={<Import />}
+        />
+      }
+    />
   </Route>
 );

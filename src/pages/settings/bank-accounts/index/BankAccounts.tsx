@@ -18,12 +18,12 @@ import { MdRefresh, MdRuleFolder } from 'react-icons/md';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Icon } from '$app/components/icons/Icon';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { ConnectAccounts } from '../common/components/ConnectAccounts';
+import { BankAccountsPlanAlert } from '../common/components/BankAccountsPlanAlert';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -40,6 +40,8 @@ export function BankAccounts() {
   ];
 
   const handleRefresh = () => {
+    toast.processing();
+
     request(
       'POST',
       endpoint('/api/v1/bank_integrations/refresh_accounts'),
@@ -55,11 +57,7 @@ export function BankAccounts() {
       breadcrumbs={pages}
       docsLink="/docs/advanced-settings/#bank_accounts"
     >
-      {!enterprisePlan() && isHosted() && (
-        <AdvancedSettingsPlanAlert
-          message={t('upgrade_to_connect_bank_account') as string}
-        />
-      )}
+      {!enterprisePlan() && isHosted() && <BankAccountsPlanAlert />}
 
       <DataTable
         resource="bank_account"
@@ -74,7 +72,11 @@ export function BankAccounts() {
             <ConnectAccounts />
 
             {isHosted() && enterprisePlan() && (
-              <Button type="secondary" onClick={handleRefresh}>
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={handleRefresh}
+              >
                 <span className="mr-2">
                   {<Icon element={MdRefresh} size={20} />}
                 </span>

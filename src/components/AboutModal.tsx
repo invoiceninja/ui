@@ -30,7 +30,10 @@ import { Icon } from './icons/Icon';
 import { MdInfo, MdWarning } from 'react-icons/md';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  updateCompanyUsers,
+  resetChanges,
+} from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
@@ -131,6 +134,7 @@ export function AboutModal(props: Props) {
           request('POST', endpoint('/api/v1/refresh?current_company=true'))
             .then((response) => {
               dispatch(updateCompanyUsers(response.data.data));
+              dispatch(resetChanges('company'));
               toast.dismiss();
               handleHealthCheck(true);
             })

@@ -27,14 +27,14 @@ export function useSave(
 
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     const adjustedPaymentPayload = { ...payment };
 
     delete adjustedPaymentPayload.invoices;
     delete adjustedPaymentPayload.credits;
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request(
       'PUT',

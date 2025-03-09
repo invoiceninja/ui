@@ -53,6 +53,7 @@ import {
   MdNotStarted,
   MdPictureAsPdf,
   MdRestore,
+  MdSend,
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -80,11 +81,12 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { confirmActionModalAtom } from './components/ConfirmActionModal';
+import { useColorScheme } from '$app/common/colors';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -303,6 +305,7 @@ export function useActions(params?: Params) {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const toggleStartStop = useToggleStartStop();
+  const setSendConfirmationVisible = useSetAtom(confirmActionModalAtom);
 
   const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
@@ -341,21 +344,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
-    (recurringInvoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'view_pdf',
-        })}
-        entity="recurring_invoice"
-        actionKey="view_pdf"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('view_pdf')}
-        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
-        icon={MdPictureAsPdf}
-      >
-        {t('view_pdf')}
-      </EntityActionElement>
-    ),
+
     (recurringInvoice) =>
       (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
         recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
@@ -371,6 +360,23 @@ export function useActions(params?: Params) {
           icon={MdNotStarted}
         >
           {t('start')}
+        </EntityActionElement>
+      ),
+
+    (recurringInvoice) =>
+      recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'send_now',
+          })}
+          entity="recurring_invoice"
+          actionKey="send_now"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('start')}
+          onClick={() => setSendConfirmationVisible(true)}
+          icon={MdSend}
+        >
+          {t('send_now')}
         </EntityActionElement>
       ),
     (recurringInvoice) =>
@@ -389,6 +395,22 @@ export function useActions(params?: Params) {
           {t('stop')}
         </EntityActionElement>
       ),
+    (recurringInvoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="recurring_invoice"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
+        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
+        icon={MdPictureAsPdf}
+      >
+        {t('view_pdf')}
+      </EntityActionElement>
+    ),
+
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
         <UpdatePricesAction
@@ -624,6 +646,8 @@ export function useRecurringInvoiceColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const colors = useColorScheme();
+
   const getSetting = useGetSetting();
   const getTimezone = useGetTimezone();
   const formatNumber = useFormatNumber();
@@ -826,12 +850,11 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -852,12 +875,11 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }

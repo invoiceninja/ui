@@ -17,7 +17,6 @@ import {
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Button, InputField, Link } from '$app/components/forms';
-import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { useTranslation } from 'react-i18next';
@@ -26,16 +25,12 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-
-const Div = styled.div`
-  border-color: ${(props) => props.theme.borderColor};
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
-`;
+import dayjs from 'dayjs';
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -215,28 +210,42 @@ export function useGenerateActivityElement() {
     return text;
   };
 
-  const colors = useColorScheme();
+  const getDateTimeLabel = (dateTimestamp: number) => {
+    const now = dayjs();
+    const timestamp = dayjs.unix(dateTimestamp);
+
+    const diffDays = now.diff(timestamp, 'day');
+    const diffMinutes = now.diff(timestamp, 'minute');
+
+    if (diffMinutes <= 1) {
+      return t('just_now');
+    } else if (diffDays === 1) {
+      return t('yesterday');
+    } else {
+      return date(
+        dateTimestamp,
+        `${dateFormat} ${timeFormat.replace(':ss', '')}`
+      );
+    }
+  };
 
   return (activity: ActivityRecord) => (
-    <Div
-      theme={{ borderColor: colors.$4, hoverColor: colors.$2 }}
-      className="flex flex-col py-2 border border-t-0 border-x-0 last:border-b-0"
+    <div
+      className="flex flex-col py-2.5 border border-t-0 border-x-0 last:border-b-0 border-dashed"
+      style={{ borderColor: colors.$5 }}
     >
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-1">
         <span className="text-sm">{generate(activity)}</span>
 
         <div className="flex space-x-3">
           <span className="dark:text-white text-sm">
-            {date(
-              activity.created_at,
-              `${dateFormat} ${timeFormat.replace(':ss', '')}`
-            )}
+            {getDateTimeLabel(activity.created_at)}
           </span>
 
           <span className="text-gray-500 text-sm">{activity.ip}</span>
         </div>
       </div>
-    </Div>
+    </div>
   );
 }
 

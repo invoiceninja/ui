@@ -43,7 +43,7 @@ export function useHandleCreate(params: Params) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/invoices?';
 

@@ -20,10 +20,17 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { CreditCardChecked } from '$app/components/icons/CreditCardChecked';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
 
 export function RecentPayments() {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
+
+  const colors = useColorScheme();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
@@ -80,7 +87,7 @@ export function RecentPayments() {
       id: 'amount',
       label: t('amount'),
       format: (value, payment) => (
-        <Badge variant="green">
+        <Badge variant="green" className="font-mono">
           {formatMoney(
             value,
             payment.client?.country_id,
@@ -93,11 +100,21 @@ export function RecentPayments() {
 
   return (
     <Card
-      title={t('recent_payments')}
-      className="h-96 relative"
+      title={
+        <div className="flex items-center gap-2">
+          <CreditCardChecked size="1.4rem" color="#22C55E" />
+
+          <span>{t('recent_payments')}</span>
+        </div>
+      }
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
+      style={{ borderColor: colors.$5 }}
+      headerStyle={{ borderColor: colors.$5 }}
+      withoutHeaderPadding
     >
-      <div className="pl-6 pr-4">
+      <div className="px-4 pt-4">
         <DataTable
           resource="payment"
           columns={columns}
@@ -113,14 +130,24 @@ export function RecentPayments() {
             withoutTopBorder: true,
             withoutLeftBorder: true,
             withoutRightBorder: true,
+            disableThUppercase: true,
+            withoutThVerticalPadding: true,
+            useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
+            thChildrenClassName: 'text-gray-500',
+            tdClassName: 'first:pl-2 py-3',
+            thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },
+            thTextSize: 'small',
+            thStyle: {
+              borderBottom: `1px solid ${colors.$5}`,
+            },
+            rowSeparatorColor: colors.$5,
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
           }}
           style={{
-            height: '19.9rem',
+            height: '18.9rem',
           }}
         />
       </div>

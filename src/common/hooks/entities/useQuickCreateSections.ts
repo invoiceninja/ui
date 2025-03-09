@@ -9,35 +9,36 @@
  */
 
 import { isHosted } from '$app/common/helpers';
-import { IconType } from 'react-icons';
-import {
-  MdAreaChart,
-  MdOutlineBuild,
-  MdOutlineShoppingBag,
-} from 'react-icons/md';
+import { Income } from '$app/components/icons/Income';
+import { OpenWallet } from '$app/components/icons/OpenWallet';
+import { Settings } from '$app/components/icons/Settings';
 
 interface EntitySection {
   name: string;
-  icon: IconType;
+  icon: React.ElementType;
   visible: boolean;
+  iconColor?: string;
 }
 
 export function useQuickCreateSections() {
   const sections: EntitySection[] = [
     {
       name: 'income',
-      icon: MdAreaChart,
+      icon: Income,
       visible: true,
+      iconColor: '#22C55E',
     },
     {
       name: 'expense',
-      icon: MdOutlineShoppingBag,
+      icon: OpenWallet,
       visible: true,
+      iconColor: '#EF4444',
     },
     {
       name: 'settings',
-      icon: MdOutlineBuild,
+      icon: Settings,
       visible: isHosted(),
+      iconColor: '#A1A1AA',
     },
   ];
 

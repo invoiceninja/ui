@@ -25,6 +25,7 @@ const FILE_KEY = {
   invoices: 'invoice',
   accounting: 'invoice',
   contacts: 'client',
+  backup: 'backup',
 };
 
 const IMPORTS: Record<ImportType, string[]> = {
@@ -33,6 +34,7 @@ const IMPORTS: Record<ImportType, string[]> = {
   invoicely: ['clients', 'invoices'],
   waveaccounting: ['clients', 'accounting'],
   zoho: ['contacts', 'invoices'],
+  quickbooks: ['backup'],
 };
 
 type ImportType =
@@ -40,6 +42,7 @@ type ImportType =
   | 'invoice2go'
   | 'invoicely'
   | 'waveaccounting'
+  | 'quickbooks'
   | 'zoho';
 
 export interface ImportedFile {
@@ -120,6 +123,7 @@ export function Import() {
           <option value="freshbooks">{t('freshbooks')}</option>
           <option value="invoice2go">{t('invoice2go')}</option>
           <option value="invoicely">{t('invoicely')}</option>
+          <option value="quickbooks">{t('quickbooks')}</option>
           <option value="waveaccounting">{t('waveaccounting')}</option>
           <option value="zoho">{t('zoho')}</option>
         </SelectField>

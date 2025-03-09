@@ -25,8 +25,8 @@ export function useDownloadPdf(props: Props) {
   const queryClient = useQueryClient();
   const url = useGeneratePdfUrl({ resourceType: props.resource });
 
-  return (resource: MailerResource) => {
-    const downloadableUrl = url(resource);
+  return (resource: MailerResource, deliveryNote?: boolean) => {
+    const downloadableUrl = url(resource, deliveryNote);
 
     if (downloadableUrl) {
       toast.processing();

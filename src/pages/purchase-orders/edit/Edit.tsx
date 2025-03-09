@@ -28,8 +28,6 @@ import { useHandleProductChange } from './hooks/useHandleProductChange';
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { useColorScheme } from '$app/common/colors';
-
-
 import { PurchaseOrderContext } from '../create/Create';
 
 export default function Edit() {

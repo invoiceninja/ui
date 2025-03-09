@@ -52,8 +52,6 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
@@ -154,8 +152,6 @@ export function InvoiceSlider() {
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
-
-  const reactSettings = useReactSettings();
 
   const colors = useColorScheme();
 
@@ -334,14 +330,13 @@ export function InvoiceSlider() {
                 width="auto"
                 tooltipElement={
                   <article
-                    className={classNames('prose prose-sm', {
-                      'prose-invert': reactSettings.dark_mode,
-                    })}
+                    className="prose prose-sm"
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
                         (resource?.reminder_schedule as string) ?? ''
                       ),
                     }}
+                    style={{ color: colors.$1 }}
                   />
                 }
               >
@@ -534,6 +529,10 @@ export function InvoiceSlider() {
         </div>
 
         <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="text-sm px-4">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords.map((emailRecord, index) => (
             <EmailRecord
               key={index}

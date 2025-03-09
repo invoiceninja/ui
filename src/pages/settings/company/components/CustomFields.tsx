@@ -11,9 +11,9 @@
 import { Card } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
 export function CustomFields() {
   const [t] = useTranslation();
@@ -24,7 +24,7 @@ export function CustomFields() {
 
   return (
     <>
-      <CustomFieldsPlanAlert />
+      <AdvancedSettingsPlanAlert />
 
       <Card title={t('custom_fields')}>
         <div className="px-6">

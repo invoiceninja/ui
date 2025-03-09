@@ -19,9 +19,16 @@ interface Props {
 }
 
 export function useGeneratePdfUrl(props: Props) {
-  return (resource: MailerResource) => {
+  return (resource: MailerResource, deliveryNote?: boolean) => {
     if (resource.invitations.length === 0) {
       return;
+    }
+
+    if (deliveryNote) {
+      return endpoint('/api/v1/:resource/:id/delivery_note', {
+        resource: `${props.resourceType}s`,
+        id: resource.id,
+      });
     }
 
     if (
