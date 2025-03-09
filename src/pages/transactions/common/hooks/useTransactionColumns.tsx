@@ -112,6 +112,30 @@ export function useTransactionColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
+      column: 'created_at',
+      id: 'created_at',
+      label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'updated_at',
+      id: 'updated_at',
+      label: t('updated_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'archived_at',
+      id: 'archived_at',
+      label: t('archived_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'is_deleted',
+      id: 'is_deleted',
+      label: t('is_deleted'),
+      format: (_, transaction) => (transaction.is_deleted ? t('yes') : t('no')),
+    },
+    {
       column: 'participant_name',
       id: 'participant_name',
       label: t('participant_name'),
