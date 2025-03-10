@@ -23,8 +23,6 @@ export function ClientPrivateNotes(props: Props) {
 
   const { client } = props;
 
-  const colors = useColorScheme();
-
   return (
     <>
       {Boolean(client && client.private_notes) && (

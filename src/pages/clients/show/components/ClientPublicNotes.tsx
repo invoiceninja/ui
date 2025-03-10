@@ -23,8 +23,6 @@ export function ClientPublicNotes(props: Props) {
 
   const { client } = props;
 
-  const colors = useColorScheme();
-
   return (
     <>
       {Boolean(client && client.public_notes) && (
