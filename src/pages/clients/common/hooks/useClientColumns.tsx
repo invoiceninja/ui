@@ -35,7 +35,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'name',
@@ -103,7 +103,6 @@ export function useClientColumns() {
 
   const disableNavigation = useDisableNavigation();
 
-  const colors = useColorScheme();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -326,11 +325,12 @@ export function useClientColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
-                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -351,11 +351,12 @@ export function useClientColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
-                style={{ color: colors.$1 }}
               />
             </div>
           }
