@@ -508,37 +508,40 @@ export function Notifications() {
       >
         {notifications.length > 0 ? (
           <div className="flex flex-col space-y-2 pt-2">
-            {notifications.map((notification, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between px-6 py-2 space-x-2"
-              >
-                <div className="flex items-center space-x-2.5">
-                  {generateIcon(notification.displayLabel.notificationType)}
+            {notifications.map(
+              (notification, i) =>
+                Boolean(notification.displayLabel) && (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between px-6 py-2 space-x-2"
+                  >
+                    <div className="flex items-center space-x-2.5">
+                      {generateIcon(notification.displayLabel.notificationType)}
 
-                  <div className="flex flex-col space-y-0.5">
-                    <div
-                      className="text-sm"
-                      style={{
-                        color: colors.$3,
-                      }}
-                    >
-                      {generateDisplayLabel(notification.displayLabel)}
+                      <div className="flex flex-col space-y-0.5">
+                        <div
+                          className="text-sm"
+                          style={{
+                            color: colors.$3,
+                          }}
+                        >
+                          {generateDisplayLabel(notification.displayLabel)}
+                        </div>
+
+                        <p className="text-xs text-gray-500">
+                          {getDateTimeLabel(notification.date)}
+                        </p>
+                      </div>
                     </div>
 
-                    <p className="text-xs text-gray-500">
-                      {getDateTimeLabel(notification.date)}
-                    </p>
+                    {!notification.readAt && (
+                      <div>
+                        <Icon element={GoDotFill} size={14} color="#2176FF" />
+                      </div>
+                    )}
                   </div>
-                </div>
-
-                {!notification.readAt && (
-                  <div>
-                    <Icon element={GoDotFill} size={14} color="#2176FF" />
-                  </div>
-                )}
-              </div>
-            ))}
+                )
+            )}
           </div>
         ) : (
           <NonClickableElement>
