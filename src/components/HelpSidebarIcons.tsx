@@ -12,18 +12,13 @@ import Tippy from '@tippyjs/react';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
-import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
 import {
-  HelpCircle,
-  Info,
-  Mail,
-  MessageSquare,
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight,
-} from 'react-feather';
+  updateCompanyUsers,
+  resetChanges,
+} from '$app/common/stores/slices/company-users';
+import { useFormik } from 'formik';
+import { useState } from 'react';
+import { Mail } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from './forms';
@@ -32,17 +27,25 @@ import { Modal } from './Modal';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
-import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import classNames from 'classnames';
 import { AboutModal } from './AboutModal';
 import { Icon } from './icons/Icon';
 import { FaSlack } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import { MdWarning } from 'react-icons/md';
 import { UpdateAppModal } from './UpdateAppModal';
+import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
+import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
+import { CloseNavbarArrow } from './icons/CloseNavbarArrow';
+import { MoonStars } from './icons/MoonStars';
+import { useHandleDarkLightMode } from '$app/common/hooks/useHandleDarkLightMode';
+import { Sun } from './icons/Sun';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { TriangleWarning } from './icons/TriangleWarning';
+import { CircleWarning } from './icons/CircleWarning';
+import { Message } from './icons/Message';
+import { CircleQuestion } from './icons/CircleQuestion';
+import { CircleInfo } from './icons/CircleInfo';
 
 interface Props {
   docsLink?: string;
@@ -55,13 +58,14 @@ export function HelpSidebarIcons(props: Props) {
   const colors = useColorScheme();
   const user = useInjectUserChanges();
   const account = useCurrentAccount();
-  const currentUser = useCurrentUser();
+
+  const reactSettings = useReactSettings();
 
   const { mobileNavbar } = props;
 
   const dispatch = useDispatch();
-  const updateCompanyUser = useUpdateCompanyUser();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
+  const handleDarkLightMode = useHandleDarkLightMode();
+  const handleCollapseExpandSidebar = useHandleCollapseExpandSidebar();
 
   const { data: latestVersion } = useQuery({
     queryKey: ['/pdf.invoicing.co/api/version'],
@@ -124,24 +128,11 @@ export function HelpSidebarIcons(props: Props) {
 
     request('POST', endpoint('/api/v1/refresh')).then((data) => {
       dispatch(updateCompanyUsers(data.data.data));
+      dispatch(resetChanges('company'));
       setDisabledButton(false);
       setCronsNotEnabledModal(false);
     });
   };
-
-  useEffect(() => {
-    const showMiniSidebar =
-      user?.company_user?.react_settings?.show_mini_sidebar;
-
-    if (
-      user &&
-      typeof showMiniSidebar !== 'undefined' &&
-      currentUser?.company_user?.react_settings?.show_mini_sidebar !==
-        showMiniSidebar
-    ) {
-      updateCompanyUser(user);
-    }
-  }, [user?.company_user?.react_settings.show_mini_sidebar]);
 
   return (
     <>
@@ -221,7 +212,7 @@ export function HelpSidebarIcons(props: Props) {
 
       <nav
         style={{ borderColor: colors.$5 }}
-        className={classNames('flex py-4 text-white border-t', {
+        className={classNames('flex space-x-2.5 py-4 text-white border-t', {
           'justify-end': mobileNavbar,
           'justify-around': !mobileNavbar,
           'px-2': !isUpdateAvailable,
@@ -230,133 +221,152 @@ export function HelpSidebarIcons(props: Props) {
         {!isMiniSidebar && !mobileNavbar && (
           <>
             {isUpdateAvailable && (
-              <div
-                className="cursor-pointer"
-                onClick={() => setIsUpdateModalVisible(true)}
+              <Tippy
+                duration={0}
+                content={t('update_available')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <Tippy
-                  duration={0}
-                  content={t('update_available')}
-                  className="text-white rounded text-xs mb-2"
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setIsUpdateModalVisible(true)}
                 >
-                  <div>
-                    <Icon element={MdWarning} color="white" size={23.5} />
-                  </div>
-                </Tippy>
-              </div>
+                  <TriangleWarning color="white" size="1.3rem" />
+                </div>
+              </Tippy>
             )}
 
             {isSelfHosted() && account && !account.is_scheduler_running && (
-              <button
-                className="hover:bg-ninja-gray-darker rounded-full"
-                onClick={() => setCronsNotEnabledModal(true)}
-              >
-                <Tippy
-                  duration={0}
-                  content={t('error')}
-                  className="text-white rounded text-xs mb-2"
-                >
-                  <AlertCircle />
-                </Tippy>
-              </button>
-            )}
-
-            <div className="flex">
               <Tippy
                 duration={0}
-                content={t('contact_us')}
-                className="text-white rounded text-xs mb-2"
+                content={t('error')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                {isHosted() ? (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => setIsContactVisible(true)}
-                  >
-                    <Mail />
-                  </div>
-                ) : (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
-                      window.open('https://slack.invoiceninja.com', '_blank')
-                    }
-                  >
-                    <Icon element={FaSlack} color="white" size={23} />
-                  </div>
-                )}
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setCronsNotEnabledModal(true)}
+                >
+                  <CircleWarning color="white" size="1.3rem" />
+                </div>
               </Tippy>
-            </div>
+            )}
 
-            <a
-              href="https://forum.invoiceninja.com"
-              target="_blank"
-              className="hover:bg-ninja-gray-darker rounded-full"
-              rel="noreferrer"
+            <Tippy
+              duration={0}
+              content={t('contact_us')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
+              {isHosted() ? (
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setIsContactVisible(true)}
+                >
+                  <Mail size={21.5} />
+                </div>
+              ) : (
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open('https://slack.invoiceninja.com', '_blank')
+                  }
+                >
+                  <Icon element={FaSlack} color="white" size={21.5} />
+                </div>
+              )}
+            </Tippy>
+
+            {!isUpdateAvailable && (
               <Tippy
                 duration={0}
                 content={t('support_forum')}
-                className="text-white rounded text-xs mb-2"
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <MessageSquare />
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open('https://forum.invoiceninja.com', '_blank')
+                  }
+                >
+                  <Message color="white" size="1.3rem" />
+                </div>
               </Tippy>
-            </a>
+            )}
 
-            <a
-              href={
-                (props.docsLink &&
-                  `https://invoiceninja.github.io/${props.docsLink}`) ||
-                'https://invoiceninja.github.io'
-              }
-              target="_blank"
-              className="hover:bg-ninja-gray-darker rounded-full"
-              rel="noreferrer"
-            >
+            {Boolean(
+              !(isSelfHosted() && account && !account.is_scheduler_running)
+            ) && (
               <Tippy
                 duration={0}
                 content={t('user_guide')}
-                className="text-white rounded text-xs mb-2"
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
               >
-                <HelpCircle />
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      props.docsLink
+                        ? `https://invoiceninja.github.io/${props.docsLink}`
+                        : 'https://invoiceninja.github.io',
+                      '_blank'
+                    )
+                  }
+                >
+                  <CircleQuestion color="white" size="1.3rem" />
+                </div>
               </Tippy>
-            </a>
+            )}
 
-            <button
-              className="hover:bg-ninja-gray-darker rounded-full overflow-visible"
-              onClick={() => setIsAboutVisible(true)}
+            <Tippy
+              duration={0}
+              content={t('about')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
             >
-              <Tippy
-                duration={0}
-                content={t('about')}
-                className="text-white rounded text-xs mb-2"
+              <div
+                className="cursor-pointer"
+                onClick={() => setIsAboutVisible(true)}
               >
-                <Info />
-              </Tippy>
-            </button>
+                <CircleInfo color="white" size="1.3rem" />
+              </div>
+            </Tippy>
+
+            <Tippy
+              duration={0}
+              content={t('dark_mode')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+            >
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDarkLightMode(!reactSettings?.dark_mode)}
+              >
+                {reactSettings?.dark_mode ? (
+                  <Sun color="white" size="1.3rem" />
+                ) : (
+                  <MoonStars color="white" size="1.3rem" />
+                )}
+              </div>
+            </Tippy>
           </>
         )}
 
-        <button
-          className="rounded-full"
-          onClick={() =>
-            handleUserChange(
-              'company_user.react_settings.show_mini_sidebar',
-              !isMiniSidebar
-            )
+        <Tippy
+          duration={0}
+          content={
+            <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
+              {isMiniSidebar ? t('show_menu') : t('hide_menu')}
+            </span>
           }
+          className="rounded-md text-xs p-2 bg-[#F2F2F2]"
         >
-          <Tippy
-            duration={0}
-            content={
-              <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
-                {isMiniSidebar ? t('show_menu') : t('hide_menu')}
-              </span>
-            }
-            className="text-white rounded mb-1.5"
+          <div
+            className="cursor-pointer"
+            onClick={() => handleCollapseExpandSidebar(!isMiniSidebar)}
           >
-            {isMiniSidebar ? <ChevronRight /> : <ChevronLeft />}
-          </Tippy>
-        </button>
+            {isMiniSidebar ? (
+              <OpenNavbarArrow color="#e5e7eb" size="1.5rem" />
+            ) : (
+              <CloseNavbarArrow color="#e5e7eb" size="1.35rem" />
+            )}
+          </div>
+        </Tippy>
       </nav>
     </>
   );

@@ -84,4 +84,5 @@ export interface Quote {
   activities?: Activity[];
   payments?: Payment[];
   reminder_schedule?: string;
+  location_id: string;
 }

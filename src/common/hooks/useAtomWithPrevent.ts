@@ -17,14 +17,15 @@ import {
 } from 'jotai';
 import { Invoice } from '../interfaces/invoice';
 import { useEffect, useState } from 'react';
-import { cloneDeep, flatMapDeep, isEqual, isObject, keys } from 'lodash';
+import { cloneDeep, flatMapDeep, isEqual, isObject, keys, unset } from 'lodash';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 import { useParams } from 'react-router-dom';
 import { diff } from 'deep-object-diff';
 import { useDebounce } from 'react-use';
 import { Quote } from '../interfaces/quote';
+import { PurchaseOrder } from '../interfaces/purchase-order';
 
-type Entity = Invoice | Quote;
+type Entity = Invoice | Quote | PurchaseOrder;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 
 export const changesAtom = atom<any | null>(null);
@@ -36,10 +37,17 @@ const EXCLUDING_PROPERTIES_KEYS = [
   'footer',
 ];
 
+interface Options {
+  disableFunctionality?: boolean;
+}
+
 export function useAtomWithPrevent<T extends Entity>(
-  atom: PrimitiveAtom<T | undefined>
+  atom: PrimitiveAtom<T | undefined>,
+  options?: Options
 ): [T | undefined, SetAtom<[SetStateAction<T | undefined>], void>] {
   const { id } = useParams();
+
+  const { disableFunctionality = false } = options || {};
 
   const setChanges = useSetAtom(changesAtom);
 
@@ -77,22 +85,34 @@ export function useAtomWithPrevent<T extends Entity>(
       entity &&
       currentInitialValue &&
       entity.id === currentInitialValue.id &&
-      !isFunctionalityDisabled
+      !isFunctionalityDisabled &&
+      !disableFunctionality
     ) {
       const currentEntityPaths = generatePaths(entity as T);
 
+      /**
+       * Filters out:
+       * 1. Properties specified in EXCLUDING_PROPERTIES_KEYS (e.g. terms, footer etc.)
+       * 2. Line item _id properties (e.g. line_items.0._id which is path to the _id of the first line item) since new IDs are generated
+       *    when joining the page
+       */
       const currentPathsForExcluding = currentEntityPaths.filter((path) =>
-        EXCLUDING_PROPERTIES_KEYS.some((excludingPropertyKey) =>
-          path.includes(excludingPropertyKey)
+        EXCLUDING_PROPERTIES_KEYS.some(
+          (excludingPropertyKey) =>
+            path?.includes(excludingPropertyKey) ||
+            (path?.includes('line_items') && path?.split('.')?.[2] === '_id')
         )
       );
 
       const updatedEntity = cloneDeep(entity) as T;
 
       currentPathsForExcluding.forEach((path) => {
-        if (!path.includes('.')) {
-          delete updatedEntity[path as unknown as keyof Entity];
-          delete currentInitialValue[path as unknown as keyof Entity];
+        if (
+          !path?.includes('.') ||
+          (path?.includes('line_items') && path?.split('.')?.[2] === '_id')
+        ) {
+          unset(updatedEntity, path as unknown as keyof Entity);
+          unset(currentInitialValue, path as unknown as keyof Entity);
         }
       });
 

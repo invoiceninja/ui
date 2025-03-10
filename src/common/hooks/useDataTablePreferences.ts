@@ -21,7 +21,7 @@ import { endpoint } from '../helpers';
 import { request } from '../helpers/request';
 import { useUserChanges } from './useInjectUserChanges';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../stores/slices/user';
+import { injectInChangesWithData, updateUser } from '../stores/slices/user';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 
 interface Params {
@@ -37,6 +37,7 @@ interface Params {
   setSortedBy: Dispatch<SetStateAction<string | undefined>>;
   setStatus: Dispatch<SetStateAction<string[]>>;
   setPerPage: Dispatch<SetStateAction<PerPage>>;
+  setArePreferencesApplied: Dispatch<SetStateAction<boolean>>;
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
 }
@@ -58,6 +59,7 @@ export function useDataTablePreferences(params: Params) {
     setSortedBy,
     setStatus,
     setPerPage,
+    setArePreferencesApplied,
     withoutStoringPerPage,
     enableSavingFilterPreference,
   } = params;
@@ -76,6 +78,8 @@ export function useDataTablePreferences(params: Params) {
       $refetch(['company_users']);
 
       dispatch(updateUser(updatedUser));
+
+      dispatch(injectInChangesWithData(updatedUser));
     });
   };
 
@@ -168,6 +172,8 @@ export function useDataTablePreferences(params: Params) {
       } else {
         setStatus(['active']);
       }
+
+      setArePreferencesApplied(true);
     }
   }, [isInitialConfiguration]);
 

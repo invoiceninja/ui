@@ -13,13 +13,11 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankScheduleQuery } from '$app/common/queries/schedules';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
@@ -43,8 +41,6 @@ export function Create() {
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-
-  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -121,11 +117,9 @@ export function Create() {
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={isFormBusy || !schedule || showPlanAlert}
+      disableSaveButton={isFormBusy || !schedule}
       onSaveClick={handleSave}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
-
       {schedule ? (
         <ScheduleForm
           schedule={schedule}

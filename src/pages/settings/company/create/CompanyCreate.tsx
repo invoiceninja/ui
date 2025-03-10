@@ -14,7 +14,10 @@ import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
 import { Modal } from '$app/components/Modal';
 import { useState, SetStateAction, Dispatch } from 'react';
@@ -89,6 +92,8 @@ export function CompanyCreate(props: Props) {
               const companyUser = companyUsers[createdCompanyIndex];
 
               dispatch(updateCompanyUsers(companyUsers));
+
+              dispatch(resetChanges('company'));
 
               toast.success('created_new_company');
 

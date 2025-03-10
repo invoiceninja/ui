@@ -102,6 +102,14 @@ interface StyleOptions {
   thClassName?: string;
   tdClassName?: string;
   addRowSeparator?: boolean;
+  thStyle?: CSSProperties;
+  withoutThVerticalPadding?: boolean;
+  useOnlyCurrentSortDirectionIcon?: boolean;
+  thTextSize?: 'extraSmall' | 'small';
+  disableThUppercase?: boolean;
+  descIcon?: ReactNode;
+  ascIcon?: ReactNode;
+  rowSeparatorColor?: string;
 }
 
 interface Props<T> extends CommonProps {
@@ -216,6 +224,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
+  const [arePreferencesApplied, setArePreferencesApplied] =
+    useState<boolean>(false);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -230,6 +240,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     setSort,
     setSortedBy,
     setStatus,
+    setArePreferencesApplied,
     tableKey: `${props.resource}s`,
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
@@ -328,7 +339,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     () => request(methodType, apiEndpoint.href),
     {
       staleTime: props.staleTime ?? Infinity,
-      enabled: !disableQuery,
+      enabled: !disableQuery && arePreferencesApplied,
     }
   );
 
@@ -392,21 +403,19 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const handleDateRangeColumnClick = (columnId: string) => {
     const columnOfCurrentQueryParameter = dateRangeColumns.find(
-      (dateRangeColumn) => dateRangeQueryParameter === dateRangeColumn.column
+      (dateRangeColumn) =>
+        dateRangeQueryParameter === dateRangeColumn.queryParameterKey
     )?.column;
 
     const queryParameterOfCurrentColumn = dateRangeColumns.find(
       (dateRangeColumn) => columnId === dateRangeColumn.column
     )?.queryParameterKey;
 
-
     if (
       columnOfCurrentQueryParameter !== columnId &&
-      typeof columnOfCurrentQueryParameter !== 'undefined'
+      queryParameterOfCurrentColumn
     ) {
-      if (queryParameterOfCurrentColumn) {
-        setDateRangeQueryParameter(queryParameterOfCurrentColumn);
-      }
+      setDateRangeQueryParameter(queryParameterOfCurrentColumn);
     }
   };
 
@@ -596,11 +605,17 @@ export function DataTable<T extends object>(props: Props<T>) {
         style={props.style}
         resizable={apiEndpoint.pathname}
       >
-        <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
+        <Thead
+          backgroundColor={styleOptions?.headerBackgroundColor}
+          style={styleOptions?.thStyle}
+        >
           {!props.withoutActions && !hideEditableOptions && (
             <Th
               className={styleOptions?.thClassName}
               resizable={`${apiEndpoint.pathname}.leftCheckbox`}
+              withoutVerticalPadding={styleOptions?.withoutThVerticalPadding}
+              textSize={styleOptions?.thTextSize}
+              disableUppercase={styleOptions?.disableThUppercase}
             >
               <Checkbox
                 innerRef={mainCheckbox}
@@ -642,6 +657,13 @@ export function DataTable<T extends object>(props: Props<T>) {
                   }}
                   childrenClassName={styleOptions?.thChildrenClassName}
                   resizable={`${apiEndpoint.pathname}.${column.id}`}
+                  useOnlyCurrentSortDirectionIcon={
+                    styleOptions?.useOnlyCurrentSortDirectionIcon
+                  }
+                  textSize={styleOptions?.thTextSize}
+                  disableUppercase={styleOptions?.disableThUppercase}
+                  descIcon={styleOptions?.descIcon}
+                  ascIcon={styleOptions?.ascIcon}
                 >
                   <div className="flex items-center space-x-3">
                     {dateRangeColumns.some(
@@ -668,6 +690,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td colSpan={100}>
                 <Spinner />
@@ -681,6 +706,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
@@ -694,6 +722,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
+              style={{
+                borderColor: styleOptions?.rowSeparatorColor,
+              }}
             >
               <Td className={styleOptions?.tdClassName} colSpan={100}>
                 {t('no_records_found')}
@@ -710,6 +741,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
                 backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
+                style={{
+                  borderColor: styleOptions?.rowSeparatorColor,
+                }}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td

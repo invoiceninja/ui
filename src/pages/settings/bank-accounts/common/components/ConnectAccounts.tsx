@@ -12,7 +12,7 @@ import { endpoint, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,26 +104,60 @@ export function ConnectAccounts() {
         <div ref={divRef} className="flex flex-col space-y-6">
           {enterprisePlan() && (
             <div
-              className="flex cursor-pointer h-44 border-4"
+              className="flex flex-col cursor-pointer border-4"
               style={{
                 borderColor: account === 'yodlee' ? accentColor : colors.$5,
+                height: '10.25rem',
               }}
               onClick={() => setAccount('yodlee')}
             >
-              <img className="flex-1" src={yodleeLogo} />
+              <img className="h-32" src={yodleeLogo} />
+
+              <div
+                className="flex items-center justify-center space-x-2 text-xs pb-3"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <p className="text-gray-500">{t('yodlee_regions')}.</p>
+
+                <Link
+                  className="text-xs"
+                  to="https://www.yodlee.com/open-banking/data-connections"
+                  external
+                >
+                  {t('learn_more')}.
+                </Link>
+              </div>
             </div>
           )}
 
           {enterprisePlan() && (
             <div
               data-cy="nordigenBox"
-              className="flex cursor-pointer py-14 px-12 h-44 border-4"
+              className="flex flex-col items-center cursor-pointer border-4"
               style={{
                 borderColor: account === 'nordigen' ? accentColor : colors.$5,
+                height: '10.25rem',
               }}
               onClick={() => setAccount('nordigen')}
             >
-              <img className="flex-1" src={goCardlessLogo} />
+              <div className="flex flex-1 items-center justify-center">
+                <img src={goCardlessLogo} style={{ width: '15rem' }} />
+              </div>
+
+              <div
+                className="flex items-center justify-center space-x-2 text-xs pb-3"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <p className="text-gray-500">{t('nordigen_regions')}.</p>
+
+                <Link
+                  className="text-xs"
+                  to="https://gocardless.com/bank-account-data/coverage/"
+                  external
+                >
+                  {t('learn_more')}.
+                </Link>
+              </div>
             </div>
           )}
 

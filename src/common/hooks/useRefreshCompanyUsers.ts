@@ -10,7 +10,10 @@
 
 import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
-import { updateCompanyUsers } from '../stores/slices/company-users';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '../stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 
 export function useRefreshCompanyUsers() {
@@ -19,6 +22,7 @@ export function useRefreshCompanyUsers() {
   return async () => {
     return request('POST', endpoint('/api/v1/refresh')).then((response) => {
       dispatch(updateCompanyUsers(response.data.data));
+      dispatch(resetChanges('company'));
     });
   };
 }

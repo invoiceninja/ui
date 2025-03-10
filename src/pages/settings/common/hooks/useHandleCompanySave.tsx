@@ -10,12 +10,15 @@
 
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
@@ -25,12 +28,18 @@ import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpda
 import { useUpdateClientSettings } from '$app/pages/clients/common/hooks/useUpdateClientSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
+interface SaveOptions {
+  excludeToasters?: boolean;
+  syncSendTime?: boolean;
+}
+
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
+
   const companyChanges = useInjectCompanyChanges();
 
+  const shouldUpdate = useShouldUpdateCompany();
   const handleUpdateGroupSettings = useHandleUpdate({});
-
   const updateClientSettings = useUpdateClientSettings();
 
   const {
@@ -39,15 +48,15 @@ export function useHandleCompanySave() {
     isClientSettingsActive,
   } = useCurrentSettingsLevel();
 
-  const [, setErrors] = useAtom(companySettingsErrorsAtom);
+  const setErrors = useSetAtom(companySettingsErrorsAtom);
 
   const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
     hasLanguageChangedAtom
   );
 
-  const shouldUpdate = useShouldUpdateCompany();
+  return async (options?: SaveOptions) => {
+    const { excludeToasters = false, syncSendTime } = options || {};
 
-  return async (excludeToasters?: boolean) => {
     if (!shouldUpdate() && isCompanySettingsActive) {
       return;
     }
@@ -67,13 +76,20 @@ export function useHandleCompanySave() {
 
     setErrors(undefined);
 
+    let endpointUrl = '/api/v1/companies/:id';
+
+    if (typeof syncSendTime === 'boolean') {
+      endpointUrl += '?sync_send_time=' + syncSendTime;
+    }
+
     return request(
       'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
+      endpoint(endpointUrl, { id: companyChanges?.id }),
       companyChanges
     )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
+        dispatch(resetChanges('company'));
 
         !adjustedExcludeToaster && toast.dismiss();
 

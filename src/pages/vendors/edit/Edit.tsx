@@ -66,7 +66,7 @@ export default function Edit() {
     set(vendor as Vendor, 'contacts', contacts);
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request('PUT', endpoint('/api/v1/vendors/:id', { id }), vendor)
       .then(() => {

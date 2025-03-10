@@ -94,9 +94,9 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { useColorScheme } from '$app/common/colors';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -155,6 +155,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
   ) => {
     const lineItems = credit?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -231,7 +234,7 @@ export function useCreate(props: CreateProps) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/credits?';
 
@@ -289,7 +292,7 @@ export function useSave(props: CreateProps) {
 
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/credits/:id?';
 
@@ -485,6 +488,7 @@ export function useActions(params?: Params) {
             isCommonActionSection={!dropdown}
             tooltipText={t('add_comment')}
             icon={MdComment}
+            disablePreventNavigation
           >
             {t('add_comment')}
           </EntityActionElement>
@@ -753,6 +757,8 @@ export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const colors = useColorScheme();
+
   const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
@@ -999,12 +1005,11 @@ export function useCreditColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -1025,12 +1030,11 @@ export function useCreditColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
-                })}
+                className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{ color: colors.$1 }}
               />
             </div>
           }

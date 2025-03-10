@@ -11,7 +11,6 @@
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { isHosted } from '$app/common/helpers';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
@@ -21,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../../components/layouts/Settings';
 import { useBlankBankAccountQuery } from '../common/queries';
 import { useHandleCreate } from './hooks/useHandleCreate';
+import { BankAccountsPlanAlert } from '../common/components/BankAccountsPlanAlert';
 
 export function Create() {
   const [t] = useTranslation();
@@ -68,9 +68,11 @@ export function Create() {
       title={t('new_bank_account')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#create_bank_account"
-      disableSaveButton={!enterprisePlan() && !proPlan() && isHosted()}
+      disableSaveButton={!enterprisePlan() && isHosted()}
       onSaveClick={handleSave}
     >
+      {!enterprisePlan() && isHosted() && <BankAccountsPlanAlert />}
+
       <Card onFormSubmit={handleSave} title={t('new_bank_account')}>
         <Element leftSide={t('account_name')}>
           <InputField

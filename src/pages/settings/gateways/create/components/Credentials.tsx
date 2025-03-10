@@ -71,8 +71,8 @@ export function Credentials(props: Props) {
   }
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
-  const [isTestingSuccessful, setIsTestingSuccessful] = useState<boolean>();
   const [testingMessage, setTestingMessage] = useState<string>('');
+  const [isTestingModalOpen, setIsTestingModalOpen] = useState<boolean>(false);
 
   const handleTestCredentials = () => {
     if (!isTestingBusy) {
@@ -85,10 +85,9 @@ export function Credentials(props: Props) {
           id: props.companyGateway.id,
         })
       )
-        .then(() => setIsTestingSuccessful(true))
-        .catch((error) => {
-          setTestingMessage(error.response?.data?.message);
-          setIsTestingSuccessful(false);
+        .then((response) => {
+          setIsTestingModalOpen(true);
+          setTestingMessage(response.data.message);
         })
         .finally(() => {
           toast.dismiss();
@@ -146,12 +145,7 @@ export function Credentials(props: Props) {
         {props.gateway &&
           props.gateway.key === GOCARDLESS &&
           isHosted() &&
-          config('oauth2') === true && (
-            <GoCardlessOAuth2
-              companyGateway={props.companyGateway}
-              setCompanyGateway={props.setCompanyGateway}
-            />
-          )}
+          config('oauth2') === true && <GoCardlessOAuth2 />}
 
         {props.gateway &&
           !hostedGateways.includes(props.gateway.key) &&
@@ -201,18 +195,16 @@ export function Credentials(props: Props) {
 
       <Modal
         title={t('status')}
-        visible={typeof isTestingSuccessful !== 'undefined'}
-        onClose={() => setIsTestingSuccessful(undefined)}
+        visible={isTestingModalOpen}
+        onClose={() => setIsTestingModalOpen(false)}
       >
-        {typeof isTestingSuccessful !== 'undefined' && (
-          <span className="text-center font-medium text-base pb-3">
-            {t(
-              isTestingSuccessful
-                ? 'success'
-                : testingMessage || 'status_failed'
-            )}
-          </span>
-        )}
+        <span className="text-center font-medium text-base pb-3">
+          {t(
+            testingMessage && testingMessage !== 'false'
+              ? testingMessage
+              : 'status_failed'
+          )}
+        </span>
       </Modal>
     </>
   );

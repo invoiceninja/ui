@@ -18,7 +18,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,6 +32,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { useCalculateInvoiceSum } from '../edit/hooks/useCalculateInvoiceSum';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export interface PurchaseOrderContext {
   purchaseOrder: PurchaseOrder | undefined;
@@ -80,7 +80,8 @@ export default function Create() {
     },
   ];
 
-  const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+  const [purchaseOrder, setPurchaseOrder] =
+    useAtomWithPrevent(purchaseOrderAtom);
 
   const { data, isLoading } = useBlankPurchaseOrderQuery({
     enabled: typeof purchaseOrder === 'undefined',

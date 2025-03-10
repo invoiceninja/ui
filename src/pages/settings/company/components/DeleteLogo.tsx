@@ -11,7 +11,10 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { Button } from '$app/components/forms/Button';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -83,6 +86,7 @@ export function DeleteLogo({ isSettingsPage = true }: Props) {
           dispatch(
             updateRecord({ object: 'company', data: response.data.data })
           );
+          dispatch(resetChanges('company'));
         }
 
         if (isGroupSettingsActive) {

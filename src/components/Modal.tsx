@@ -111,7 +111,7 @@ export function Modal(props: Props) {
                 colorScheme: colors.$0,
               }}
               className={classNames(
-                'inline-block align-bottom rounded text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
+                'inline-block align-bottom rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
                 {
                   'max-w-sm':
                     props.size === 'extraSmall' ||
@@ -138,7 +138,7 @@ export function Modal(props: Props) {
                     colorScheme: colors.$0,
                   }}
                 >
-                  <div className="flex w-full justify-between">
+                  <div className="flex w-full justify-between isolate">
                     <Dialog.Title
                       as="h3"
                       className="text-lg leading-6 font-medium"
