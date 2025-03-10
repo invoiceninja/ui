@@ -604,6 +604,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         isDataLoading={isLoading}
         style={props.style}
         resizable={apiEndpoint.pathname}
+        isReadyForHeightCalculation={arePreferencesApplied}
       >
         <Thead
           backgroundColor={styleOptions?.headerBackgroundColor}

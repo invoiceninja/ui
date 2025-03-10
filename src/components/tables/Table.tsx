@@ -22,6 +22,7 @@ interface Props extends CommonProps {
   onVerticalOverflowChange?: (overflow: boolean) => void;
   isDataLoading?: boolean;
   resizable?: string;
+  isReadyForHeightCalculation?: boolean;
 }
 
 export function Table(props: Props) {
@@ -52,7 +53,8 @@ export function Table(props: Props) {
       typeof tableHeight === 'number' &&
       typeof tableParentHeight === 'number' &&
       !props.isDataLoading &&
-      onVerticalOverflowChange
+      onVerticalOverflowChange &&
+      props.isReadyForHeightCalculation
     ) {
       if (tableHeight > tableParentHeight) {
         onVerticalOverflowChange(true);
@@ -62,19 +64,28 @@ export function Table(props: Props) {
         setIsVerticallyOverflow(false);
       }
     }
-  }, [props.isDataLoading, tableHeight, tableParentHeight]);
+  }, [
+    props.isDataLoading,
+    tableHeight,
+    tableParentHeight,
+    props.isReadyForHeightCalculation,
+  ]);
 
   useEffect(() => {
-    if (props.style?.height) {
+    if (props.style?.height && props.isReadyForHeightCalculation) {
       setManualTableHeight(props.style.height);
     }
-  }, [props.style?.height]);
+  }, [props.style?.height, props.isReadyForHeightCalculation]);
 
   useEffect(() => {
-    if (!isVerticallyOverflow && onVerticalOverflowChange) {
+    if (
+      !isVerticallyOverflow &&
+      onVerticalOverflowChange &&
+      props.isReadyForHeightCalculation
+    ) {
       setManualTableHeight('auto');
     }
-  }, [isVerticallyOverflow]);
+  }, [isVerticallyOverflow, props.isReadyForHeightCalculation]);
 
   const colors = useColorScheme();
 
