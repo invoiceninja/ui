@@ -61,6 +61,8 @@ import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -154,6 +156,7 @@ export function InvoiceSlider() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const getSetting = useGetSetting();
   const getTimezone = useGetTimezone();
@@ -330,13 +333,14 @@ export function InvoiceSlider() {
                 width="auto"
                 tooltipElement={
                   <article
-                    className="prose prose-sm"
+                    className={classNames('prose prose-sm', {
+                      'prose-invert': !reactSettings?.dark_mode,
+                    })}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
                         (resource?.reminder_schedule as string) ?? ''
                       ),
                     }}
-                    style={{ color: colors.$1 }}
                   />
                 }
               >
