@@ -11,7 +11,7 @@
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
-import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
+import { EInvoiceComponent } from '$app/pages/settings';
 import {
   Dispatch,
   ReactNode,
@@ -297,30 +297,22 @@ export default function EInvoice() {
         <Element leftSide={t('start_date')}>
           <InputField
             type="date"
-            value={
-              invoice?.e_invoice?.InvoicePeriod?.[
-                'StartDate' as keyof EInvoiceType['InvoicePeriod']
-              ]
-            }
+            value={invoice?.InvoicePeriod?.StartDate || ''}
             onValueChange={(value) =>
-              handleChange('e_invoice.InvoicePeriod.StartDate', value)
+              handleChange('InvoicePeriod.StartDate', value)
             }
-            errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.StartDate']}
+            errorMessage={errors?.errors?.['InvoicePeriod.StartDate']}
           />
         </Element>
 
         <Element leftSide={t('end_date')}>
           <InputField
             type="date"
-            value={
-              invoice?.e_invoice?.InvoicePeriod?.[
-                'EndDate' as keyof EInvoiceType['InvoicePeriod']
-              ]
-            }
+            value={invoice?.InvoicePeriod?.EndDate || ''}
             onValueChange={(value) =>
-              handleChange('e_invoice.InvoicePeriod.EndDate', value)
+              handleChange('InvoicePeriod.EndDate', value)
             }
-            errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.EndDate']}
+            errorMessage={errors?.errors?.['InvoicePeriod.EndDate']}
           />
         </Element>
       </Card>

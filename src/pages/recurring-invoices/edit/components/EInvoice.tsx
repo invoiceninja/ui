@@ -15,7 +15,6 @@ import { RecurringInvoiceContext } from '../../create/Create';
 import { useOutletContext } from 'react-router-dom';
 import { cloneDeep, set } from 'lodash';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { EInvoiceType } from '$app/pages/settings';
 
 export default function EInvoice() {
   const [t] = useTranslation();
@@ -37,25 +36,18 @@ export default function EInvoice() {
         <InputField
           element="textarea"
           value={
-            (
-              recurringInvoice?.e_invoice?.InvoicePeriod?.[
-                'Description' as keyof EInvoiceType['InvoicePeriod']
-              ] as unknown as string
-            )?.split('|')?.[0] || ''
+            recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[0] || ''
           }
           onValueChange={(value) =>
             handleChange(
-              'e_invoice.InvoicePeriod.Description',
+              'InvoicePeriod.Description',
               `${value}|${
-                (
-                  recurringInvoice?.e_invoice?.InvoicePeriod?.[
-                    'Description' as keyof EInvoiceType['InvoicePeriod']
-                  ] as unknown as string
-                )?.split('|')?.[1] || ''
+                recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[1] ||
+                ''
               }`
             )
           }
-          errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.StartDate']}
+          errorMessage={errors?.errors?.['InvoicePeriod.StartDate']}
         />
       </Element>
 
@@ -63,25 +55,18 @@ export default function EInvoice() {
         <InputField
           element="textarea"
           value={
-            (
-              recurringInvoice?.e_invoice?.InvoicePeriod?.[
-                'Description' as keyof EInvoiceType['InvoicePeriod']
-              ] as unknown as string
-            )?.split('|')?.[1] || ''
+            recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[1] || ''
           }
           onValueChange={(value) =>
             handleChange(
-              'e_invoice.InvoicePeriod.Description',
+              'InvoicePeriod.Description',
               `${
-                (
-                  recurringInvoice?.e_invoice?.InvoicePeriod?.[
-                    'Description' as keyof EInvoiceType['InvoicePeriod']
-                  ] as unknown as string
-                )?.split('|')?.[0] || ''
+                recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[0] ||
+                ''
               }|${value}`
             )
           }
-          errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.EndDate']}
+          errorMessage={errors?.errors?.['InvoicePeriod.EndDate']}
         />
       </Element>
     </Card>
