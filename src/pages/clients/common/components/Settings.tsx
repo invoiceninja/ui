@@ -41,7 +41,7 @@ export default function Settings() {
   const handleChange = (property: string, value: string | number | boolean) => {
     const $client = cloneDeep(client)!;
 
-    if (property !== 'currency_id' && value === '') {
+    if (property !== 'currency_id' && $client.settings?.[property] !== undefined && value === '') {
       delete $client.settings?.[property];
     } else {
       set($client, property, value);

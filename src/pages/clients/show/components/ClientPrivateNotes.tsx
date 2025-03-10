@@ -38,7 +38,6 @@ export function ClientPrivateNotes(props: Props) {
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(client.private_notes),
                   }}
-                  style={{ color: colors.$1 }}
                 />
               </div>
             }
