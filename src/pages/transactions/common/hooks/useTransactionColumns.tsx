@@ -29,18 +29,21 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+
+
+import classNames from 'classnames';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
 
-  const colors = useColorScheme();
   const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
   const cleanDescriptionText = useCleanDescriptionText();
+  const reactSettings = useReactSettings();
 
   const { data: invoices } = useInvoicesQuery({ perPage: 1000 });
 
@@ -107,11 +110,12 @@ export function useTransactionColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(cleanDescriptionText(value as string)),
                 }}
-                style={{ color: colors.$1 }}
               />
             </div>
           }
