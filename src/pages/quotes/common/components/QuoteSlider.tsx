@@ -60,6 +60,8 @@ import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -120,6 +122,7 @@ export function QuoteSlider() {
   const queryClient = useQueryClient();
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const actions = useActions({
     showCommonBulkAction: true,
@@ -299,13 +302,14 @@ export function QuoteSlider() {
                 width="auto"
                 tooltipElement={
                   <article
-                    className="prose prose-sm"
+                    className={classNames('prose prose-sm', {
+                      'prose-invert': !reactSettings?.dark_mode,
+                    })}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
                         (resource?.reminder_schedule as string) ?? ''
                       ),
                     }}
-                    style={{ color: colors.$1 }}
                   />
                 }
               >
