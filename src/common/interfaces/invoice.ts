@@ -14,6 +14,11 @@ import { Payment } from './payment';
 import { Invitation } from './purchase-order';
 import { TaxInfo } from './tax-info';
 
+interface InvoicePeriod {
+  StartDate: string;
+  EndDate: string;
+}
+
 export interface Invoice {
   id: string;
   user_id: string;
@@ -86,6 +91,7 @@ export interface Invoice {
   is_locked?: boolean;
   backup?: Backup;
   location_id: string;
+  InvoicePeriod?: InvoicePeriod;
 }
 
 export interface Backup {
