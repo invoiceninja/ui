@@ -23,6 +23,8 @@ export function ClientPrivateNotes(props: Props) {
 
   const { client } = props;
 
+  const colors = useColorScheme();
+
   return (
     <>
       {Boolean(client && client.private_notes) && (
@@ -36,6 +38,8 @@ export function ClientPrivateNotes(props: Props) {
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(client.private_notes),
                   }}
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+
                 />
               </div>
             }

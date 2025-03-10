@@ -23,6 +23,8 @@ export function ClientPublicNotes(props: Props) {
 
   const { client } = props;
 
+  const colors = useColorScheme();
+
   return (
     <>
       {Boolean(client && client.public_notes) && (
@@ -36,6 +38,7 @@ export function ClientPublicNotes(props: Props) {
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(client.public_notes),
                   }}
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
                 />
               </div>
             }
