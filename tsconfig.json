@@ -26,7 +26,6 @@
       "$tests/*": ["tests/*"],
       "~/*": ["./*"]
     },
-    "verbatimModuleSyntax": true,
     "types": ["node", "vite/client"]
   },
   "exclude": ["node_modules", "public/tinymce_6.4.2"]
