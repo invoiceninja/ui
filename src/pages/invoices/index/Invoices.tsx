@@ -45,6 +45,8 @@ import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -88,6 +90,14 @@ export default function Invoices() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+
+  useSocketEvent({
+    on: [
+      'App\\Events\\Invoice\\InvoiceWasPaid',
+      'App\\Events\\Invoice\\InvoiceWasViewed',
+    ],
+    callback: () => $refetch(['invoices']),
+  });
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} docsLink="en/invoices">
@@ -141,6 +151,7 @@ export default function Invoices() {
           setInvoiceSliderVisibility(true);
         }}
         dateRangeColumns={dateRangeColumns}
+        enableSavingFilterPreference
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}

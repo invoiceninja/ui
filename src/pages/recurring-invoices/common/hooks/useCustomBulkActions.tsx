@@ -21,6 +21,7 @@ import { useBulkAction } from '../queries';
 import { UpdatePricesAction } from '../components/UpdatePricesAction';
 import { IncreasePricesAction } from '../components/IncreasePricesAction';
 import { Dispatch, SetStateAction } from 'react';
+import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -110,6 +111,7 @@ export const useCustomBulkActions = () => {
         <UpdatePricesAction
           selectedIds={selectedIds}
           setSelected={setSelected}
+          dropdown
         />
       ),
     ({ selectedIds, selectedResources, setSelected }) =>
@@ -118,6 +120,7 @@ export const useCustomBulkActions = () => {
         <IncreasePricesAction
           selectedIds={selectedIds}
           setSelected={setSelected}
+          dropdown
         />
       ),
     ({ selectedResources, setSelected }) =>
@@ -134,6 +137,13 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
+    ({ selectedIds, setSelected }) => (
+      <BulkUpdatesAction
+        entity="recurring_invoice"
+        resourceIds={selectedIds}
+        setSelected={setSelected}
+      />
+    ),
   ];
 
   return customBulkActions;

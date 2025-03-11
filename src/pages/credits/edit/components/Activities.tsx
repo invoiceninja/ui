@@ -23,6 +23,7 @@ import { Spinner } from '$app/components/Spinner';
 import { route } from '$app/common/helpers/route';
 import { Link } from '$app/components/forms';
 import reactStringReplace from 'react-string-replace';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
@@ -38,38 +39,35 @@ export function useGenerateActivityElement() {
       ),
 
       user: activity.user?.label ?? t('system'),
-      invoice:
-        (
-          <Link
-            to={route('/invoices/:id/edit', {
-              id: activity.invoice?.hashed_id,
-            })}
-          >
-            {activity?.invoice?.label}
-          </Link>
-        ) ?? '',
+      invoice: (
+        <Link
+          to={route('/invoices/:id/edit', {
+            id: activity.invoice?.hashed_id,
+          })}
+        >
+          {activity?.invoice?.label}
+        </Link>
+      ),
 
-      recurring_invoice:
-        (
-          <Link
-            to={route('/recurring_invoices/:id/edit', {
-              id: activity?.recurring_invoice?.hashed_id,
-            })}
-          >
-            {activity?.recurring_invoice?.label}
-          </Link>
-        ) ?? '',
+      recurring_invoice: (
+        <Link
+          to={route('/recurring_invoices/:id/edit', {
+            id: activity?.recurring_invoice?.hashed_id,
+          })}
+        >
+          {activity?.recurring_invoice?.label}
+        </Link>
+      ),
 
-      contact:
-        (
-          <Link
-            to={route('/clients/:id/edit', {
-              id: activity?.contact?.hashed_id,
-            })}
-          >
-            {activity?.contact?.label}
-          </Link>
-        ) ?? '',
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', {
+            id: activity?.contact?.hashed_id,
+          })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      ),
 
       notes: activity?.notes && (
         <>
@@ -115,6 +113,7 @@ export default function Activities() {
 
   const activityElement = useGenerateActivityElement();
 
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: activities, isLoading } = useQuery({
@@ -147,7 +146,7 @@ export default function Activities() {
         <NonClickableElement key={activity.id} className="flex flex-col">
           <p>{activityElement(activity)}</p>
           <p className="inline-flex items-center space-x-1">
-            <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+            <p>{date(activity.created_at, `${dateFormat} ${timeFormat}`)}</p>
             <p>&middot;</p>
             <p>{activity.ip}</p>
           </p>

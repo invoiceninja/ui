@@ -8,31 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from '$app/common/queries/statics';
 import { updateChanges } from '$app/common/stores/slices/company-users';
-import { RootState } from '$app/common/stores/store';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
-import { InputField, SelectField } from '../../../../components/forms';
+import { InputField } from '../../../../components/forms';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { CountrySelector } from '$app/components/CountrySelector';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function Address() {
   const [t] = useTranslation();
-  const { data: statics } = useStaticsQuery();
+
   const dispatch = useDispatch();
-
   const disableSettingsField = useDisableSettingsField();
+  const handleChangeCompanyProperty = useHandleCurrentCompanyChangeProperty();
 
-  const companyChanges = useSelector(
-    (state: RootState) => state.companyUsers.changes.company
-  );
-
+  const companyChanges = useCompanyChanges();
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
@@ -141,20 +139,15 @@ export function Address() {
               />
             }
           >
-            <SelectField
+            <CountrySelector
               value={companyChanges?.settings?.country_id || ''}
-              onChange={handleChange}
-              id="settings.country_id"
+              onChange={(value) =>
+                handleChangeCompanyProperty('settings.country_id', value)
+              }
               disabled={disableSettingsField('country_id')}
+              dismissable
               errorMessage={errors?.errors['settings.country_id']}
-              withBlank
-            >
-              {statics?.countries.map((size: { id: string; name: string }) => (
-                <option key={size.id} value={size.id}>
-                  {size.name}
-                </option>
-              ))}
-            </SelectField>
+            />
           </Element>
         </Card>
       )}

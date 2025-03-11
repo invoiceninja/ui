@@ -16,6 +16,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CustomField } from '$app/components/CustomField';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useTranslation } from 'react-i18next';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   invoice?: Invoice;
@@ -51,14 +52,12 @@ export function InvoiceDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('partial')}>
-          <InputField
-            id="partial"
-            type="number"
-            changeOverride={true}
+          <NumberInputField
+            value={invoice?.partial || ''}
             onValueChange={(value) =>
               handleChange('partial', parseFloat(value) || 0)
             }
-            value={invoice?.partial || ''}
+            changeOverride
             errorMessage={props.errors?.errors.partial}
           />
         </Element>
@@ -119,8 +118,7 @@ export function InvoiceDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <InputField
-                type="number"
+              <NumberInputField
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value) || 0)
                 }
@@ -136,6 +134,8 @@ export function InvoiceDetails(props: Props) {
                 }
                 value={invoice?.is_amount_discount.toString()}
                 errorMessage={props.errors?.errors.is_amount_discount}
+                customSelector
+                dismissable={false}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>

@@ -16,6 +16,8 @@ import { MdDeleteForever } from 'react-icons/md';
 import { usePurgeClient } from '../hooks/usePurgeClient';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { Modal } from '$app/components/Modal';
+import { Button } from '$app/components/forms';
 
 interface Props {
   client: Client;
@@ -26,15 +28,43 @@ export function PurgeClientAction(props: Props) {
 
   const { client, setIsPurgeOrMergeActionCalled } = props;
 
-  const handlePurgeClient = usePurgeClient({ setIsPurgeOrMergeActionCalled });
-
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState<boolean>(false);
+  const [isWarningModalOpen, setIsWarningModalOpen] = useState<boolean>(false);
+
+  const handlePurgeClient = usePurgeClient({
+    setIsPurgeOrMergeActionCalled,
+    setPasswordConfirmModalOpen,
+  });
 
   return (
     <>
+      <Modal
+        title={t('purge_client')}
+        visible={isWarningModalOpen}
+        onClose={setIsWarningModalOpen}
+      >
+        <div className="flex flex-col space-y-6">
+          <span className="text-left font-medium">
+            {t('purge_client_warning')}
+          </span>
+
+          <Button
+            onClick={() => {
+              setIsWarningModalOpen(false);
+
+              setTimeout(() => {
+                setPasswordConfirmModalOpen(true);
+              }, 310);
+            }}
+          >
+            {t('continue')}
+          </Button>
+        </div>
+      </Modal>
+
       <DropdownElement
-        onClick={() => setPasswordConfirmModalOpen(true)}
+        onClick={() => setIsWarningModalOpen(true)}
         icon={<Icon element={MdDeleteForever} />}
       >
         {t('purge')}
@@ -43,7 +73,9 @@ export function PurgeClientAction(props: Props) {
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}
-        onSave={(password) => handlePurgeClient(password, client.id)}
+        onSave={(password, isPasswordRequired) =>
+          handlePurgeClient(password, client.id, isPasswordRequired)
+        }
       />
     </>
   );

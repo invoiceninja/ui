@@ -27,6 +27,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Create() {
   const { documentTitle } = useTitle('create_tax_rate');
@@ -122,11 +123,10 @@ export function Create() {
               errorMessage={errors?.errors.name}
             />
 
-            <InputField
+            <NumberInputField
               required
-              type="number"
               label={t('tax_rate')}
-              value={taxRate?.rate}
+              value={taxRate?.rate || ''}
               onValueChange={(value) => handleChange('rate', Number(value))}
               errorMessage={errors?.errors.rate}
             />

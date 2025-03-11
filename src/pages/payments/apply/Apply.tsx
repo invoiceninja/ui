@@ -31,6 +31,7 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Apply() {
   const { id } = useParams();
@@ -42,9 +43,7 @@ export default function Apply() {
   const formatMoney = useFormatMoney();
 
   const calcApplyAmount = (balance: number) => {
-  
-    if(payment){
-      
+    if (payment) {
       const unapplied = payment?.amount - payment?.applied;
 
       let invoices_total = 0;
@@ -52,8 +51,7 @@ export default function Apply() {
         invoices_total = invoices_total + Number(invoice.amount);
       });
 
-      return Math.min(unapplied-invoices_total, balance);
-
+      return Math.min(unapplied - invoices_total, balance);
     }
 
     return balance;
@@ -61,7 +59,6 @@ export default function Apply() {
 
   const calcApplyBalance = () => {
     if (payment) {
-
       const unapplied = payment?.amount - payment?.applied;
 
       let total = 0;
@@ -73,7 +70,7 @@ export default function Apply() {
     }
 
     return 0;
-  }
+  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -141,7 +138,7 @@ export default function Apply() {
         <>
           <Element leftSide={t('amount')}>
             {formatMoney(
-              payment?.amount ,
+              payment?.amount,
               payment.client?.country_id,
               payment.client?.settings.currency_id
             )}
@@ -161,7 +158,12 @@ export default function Apply() {
               payment.client?.country_id,
               payment.client?.settings.currency_id
             )}
-            {formik.values.invoices.length >= 1 && `  - (${formatMoney(calcApplyBalance(), payment.client?.country_id, payment.client?.settings.currency_id)} ${t('remaining')})`}
+            {formik.values.invoices.length >= 1 &&
+              `  - (${formatMoney(
+                calcApplyBalance(),
+                payment.client?.country_id,
+                payment.client?.settings.currency_id
+              )} ${t('remaining')})`}
           </Element>
         </>
       )}
@@ -230,12 +232,15 @@ export default function Apply() {
                 label={t('invoice_number')}
                 value={record.number}
               />
-              <InputField
-                type="number"
+              <NumberInputField
                 label={t('amount_received')}
-                id={`invoices[${index}].amount`}
-                onChange={formik.handleChange}
-                value={record.amount}
+                value={record.amount || ''}
+                onValueChange={(value) =>
+                  formik.setFieldValue(
+                    `invoices.${index}.amount`,
+                    parseFloat(value)
+                  )
+                }
               />
 
               <Button

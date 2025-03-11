@@ -17,7 +17,6 @@ import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankClientQuery } from '$app/common/queries/clients';
 import { cloneDeep, set } from 'lodash';
-import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInfo';
 import { Address } from '$app/pages/clients/edit/components/Address';
 import { Contacts } from '$app/pages/clients/edit/components/Contacts';
 import { Details } from '$app/pages/clients/edit/components/Details';
@@ -29,6 +28,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Modal } from '$app/components/Modal';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import classNames from 'classnames';
+import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInfo';
 
 interface Props {
   isModalOpen: boolean;
@@ -168,7 +168,7 @@ export function ClientCreate({
                   label={t('name')}
                   value={client?.name || ''}
                   onValueChange={(value) => handleChange('name', value)}
-                  errorMessage={errors?.errors.name}
+                  errorMessage={errors?.errors.name || errors?.errors.id}
                 />
 
                 <InputField

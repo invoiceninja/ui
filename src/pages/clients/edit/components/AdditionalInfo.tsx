@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
@@ -32,6 +32,7 @@ import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   client: Client | undefined;
@@ -139,16 +140,17 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('payment_terms')}>
               <SelectField
                 id="settings.payment_terms"
-                defaultValue={client?.settings?.payment_terms || ''}
+                value={client?.settings?.payment_terms || ''}
                 errorMessage={errors?.errors['settings.payment_terms']}
                 onValueChange={(value) =>
                   handleSettingsChange('payment_terms', value)
                 }
                 withBlank
+                customSelector
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
+                    <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -161,16 +163,17 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
                 id="settings.valid_until"
-                defaultValue={client?.settings?.valid_until || ''}
+                value={client?.settings?.valid_until || ''}
                 onValueChange={(value) =>
                   handleSettingsChange('valid_until', value)
                 }
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
+                customSelector
               >
                 {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
+                    <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -180,12 +183,10 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           )}
 
           <Element leftSide={t('task_rate')}>
-            <InputField
-              id="settings.default_task_rate"
-              type="number"
-              value={client?.settings?.default_task_rate}
+            <NumberInputField
+              value={client?.settings?.default_task_rate || ''}
               onValueChange={(value) =>
-                handleSettingsChange('default_task_rate', value)
+                handleSettingsChange('default_task_rate', parseFloat(value))
               }
               errorMessage={errors?.errors['settings.default_task_rate']}
             />
@@ -194,15 +195,12 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           <Element leftSide={t('send_reminders')}>
             <SelectField
               id="settings.send_reminders"
-              defaultValue={
+              value={
                 client?.settings?.send_reminders === true
                   ? 'enabled'
                   : client?.settings?.send_reminders === false
                   ? 'disabled'
                   : ''
-              }
-              className={
-                'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
               }
               onValueChange={(value) =>
                 handleSettingsChange(
@@ -212,6 +210,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               }
               withBlank
               errorMessage={errors?.errors['settings.send_reminders']}
+              customSelector
             >
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>
@@ -240,10 +239,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('size_id')}>
               <SelectField
                 id="size_id"
-                defaultValue={client?.size_id || ''}
+                value={client?.size_id || ''}
                 onValueChange={(value) => handleChange('size_id', value)}
                 errorMessage={errors?.errors.size_id}
                 withBlank
+                customSelector
               >
                 {statics?.sizes.map(
                   (size: { id: string; name: string }, index: number) => (
@@ -260,10 +260,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('industry')}>
               <SelectField
                 id="industry_id"
-                defaultValue={client?.industry_id || ''}
+                value={client?.industry_id || ''}
                 errorMessage={errors?.errors.industry_id}
                 onValueChange={(value) => handleChange('industry_id', value)}
                 withBlank
+                customSelector
               >
                 {statics?.industries.map(
                   (size: { id: string; name: string }, index: number) => (

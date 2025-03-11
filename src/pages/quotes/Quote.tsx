@@ -16,7 +16,6 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,10 +29,14 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Quote as IQuote } from '$app/common/interfaces/quote';
 import { useQuoteQuery } from './common/queries';
-import { quoteAtom } from './common/atoms';
+import { invoiceSumAtom, quoteAtom } from './common/atoms';
 import { useActions, useQuoteUtilities, useSave } from './common/hooks';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useAtom } from 'jotai';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -55,7 +58,8 @@ export default function Edit() {
 
   const { data, isLoading } = useQuoteQuery({ id: id! });
 
-  const [quote, setQuote] = useAtom(quoteAtom);
+  const [quote, setQuote] = useAtomWithPrevent(quoteAtom);
+  const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -106,10 +110,20 @@ export default function Edit() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="quote" />}
     >
       {quote?.id === id || !isLoading ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              quote && (
+                <div className="flex items-center">
+                  <CommonActions resource={quote} entity="quote" />
+                </div>
+              )
+            }
+          />
 
           <Outlet
             context={{
@@ -121,6 +135,7 @@ export default function Edit() {
               isDefaultFooter,
               setIsDefaultFooter,
               client,
+              invoiceSum,
             }}
           />
         </div>

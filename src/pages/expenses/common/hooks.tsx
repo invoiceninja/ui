@@ -59,8 +59,15 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
 import dayjs from 'dayjs';
+import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
+import { Link } from '$app/components/forms';
+import classNames from 'classnames';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -110,7 +117,7 @@ export function useActions() {
       expense.invoice_id.length === 0 &&
       hasPermission('create_invoice') && (
         <DropdownElement
-          onClick={() => create(expense)}
+          onClick={() => create([expense])}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_expense')}
@@ -119,7 +126,7 @@ export function useActions() {
     (expense) =>
       expense.should_be_invoiced === true &&
       expense.invoice_id.length === 0 && (
-        <AddToInvoiceAction expense={expense} />
+        <AddToInvoiceAction expenses={[expense]} />
       ),
     (expense) =>
       hasPermission('create_expense') && (
@@ -218,7 +225,7 @@ export function useAllExpenseColumns() {
     'payment_date',
     'payment_type',
     'private_notes',
-    //   'project', @Todo: Need to resolve relationship
+    'project',
     //   'recurring_expense', @Todo: Need to resolve relationship
     'should_be_invoiced',
     //   'tax_amount', @Todo: Need to calc
@@ -372,7 +379,7 @@ export function useExpenseColumns() {
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
                 className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
+                  'prose-invert': !reactSettings?.dark_mode,
                 })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
@@ -483,7 +490,7 @@ export function useExpenseColumns() {
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
                 className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
+                  'prose-invert': !reactSettings?.dark_mode,
                 })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
@@ -549,6 +556,16 @@ export function useExpenseColumns() {
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'project',
+      id: 'project',
+      label: t('project'),
+      format: (_, expense) => (
+        <Link to={route('/projects/:id', { id: expense?.project?.id })}>
+          {expense?.project?.name}
+        </Link>
+      ),
+    },
   ];
 
   const list: string[] =
@@ -582,44 +599,73 @@ export function useExpenseFilters() {
 
   const statusThemeColors = useStatusThemeColorScheme();
 
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
+    status: ['active'],
+    perPage: 500,
+  });
+
   const filters: SelectOption[] = [
     {
       label: t('logged'),
       value: 'logged',
       color: 'white',
       backgroundColor: '#6B7280',
+      dropdownKey: '0',
     },
     {
       label: t('pending'),
       value: 'pending',
       color: 'white',
       backgroundColor: '#93C5FD',
+      dropdownKey: '0',
     },
     {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
       backgroundColor: statusThemeColors.$3 || '#1D4ED8',
+      dropdownKey: '0',
     },
     {
       label: t('paid'),
       value: 'paid',
       color: 'white',
       backgroundColor: statusThemeColors.$1 || '#22C55E',
+      dropdownKey: '0',
     },
     {
       label: t('unpaid'),
       value: 'unpaid',
       color: 'white',
       backgroundColor: statusThemeColors.$4 || '#e6b05c',
+      dropdownKey: '0',
     },
     {
       label: t('uncategorized'),
       value: 'uncategorized',
       color: 'white',
       backgroundColor: '#b5812c',
+      dropdownKey: '0',
     },
   ];
+
+  expenseCategoriesResponse?.forEach((expenseCategory) => {
+    const { red, green, blue, hex } = hexToRGB(expenseCategory.color || '');
+
+    const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+    filters.push({
+      value: expenseCategory.id,
+      label: expenseCategory.name,
+      color: adjustColorDarkness(hex, darknessAmount),
+      backgroundColor: expenseCategory.color || '',
+      queryKey: 'categories',
+      dropdownKey: '1',
+      placeHolder: 'expense_categories',
+    });
+  });
 
   return filters;
 }

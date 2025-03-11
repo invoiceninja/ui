@@ -31,6 +31,7 @@ import collect from 'collect.js';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Refund() {
   const { id } = useParams();
@@ -235,39 +236,51 @@ export default function Refund() {
 
             if (invoiceItem)
               return (
-                <Element
-                  key={index}
-                  leftSide={`${t('invoice')}: ${invoiceItem?.number}`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <InputField
-                      id={`invoices[${index}].amount`}
-                      type="number"
-                      value={(formik.values.invoices[index] as Invoice).amount}
-                      onChange={formik.handleChange}
-                      errorMessage={
-                        errors?.errors[`invoices.${[index]}.invoice_id`]
-                      }
-                    />
-
-                    <Button
-                      behavior="button"
-                      type="minimal"
-                      onClick={() => {
-                        formik.setFieldValue(
-                          'invoices',
-                          formik.values.invoices.filter(
-                            (invoice: any) =>
-                              invoice.invoice_id !=
-                              requestInvoiceItem.invoice_id
+                <div key={index} className="flex flex-col">
+                  <Element leftSide={`${t('invoice')}: ${invoiceItem?.number}`}>
+                    <div className="flex items-center space-x-2">
+                      <NumberInputField
+                        value={
+                          (formik.values.invoices[index] as Invoice).amount ||
+                          ''
+                        }
+                        onValueChange={(value) =>
+                          formik.setFieldValue(
+                            `invoices.${index}.amount`,
+                            parseFloat(value)
                           )
-                        );
-                      }}
-                    >
-                      <X />
-                    </Button>
-                  </div>
-                </Element>
+                        }
+                      />
+
+                      <Button
+                        behavior="button"
+                        type="minimal"
+                        onClick={() => {
+                          formik.setFieldValue(
+                            'invoices',
+                            formik.values.invoices.filter(
+                              (invoice: any) =>
+                                invoice.invoice_id !=
+                                requestInvoiceItem.invoice_id
+                            )
+                          );
+                        }}
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                  </Element>
+
+                  {(errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                    errors?.errors[`invoices.${[index]}.amount`]) && (
+                    <div className="px-6">
+                      <Alert className="mt-2 break-all" type="danger">
+                        {errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                          errors?.errors[`invoices.${[index]}.amount`]}
+                      </Alert>
+                    </div>
+                  )}
+                </div>
               );
           }
         )}

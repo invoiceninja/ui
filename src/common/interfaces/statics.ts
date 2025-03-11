@@ -25,6 +25,7 @@ export interface Statics {
   timezones: Timezone[];
   templates: Templates;
   bulk_updates: Record<string, string[]>;
+  license_key?: string;
 }
 
 export interface Bank {

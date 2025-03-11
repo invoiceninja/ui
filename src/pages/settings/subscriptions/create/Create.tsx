@@ -127,7 +127,7 @@ export function Create() {
       onSaveClick={handleSave}
       disableSaveButton={!subscription || showPlanAlert}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      <AdvancedSettingsPlanAlert />
 
       <TabGroup tabs={tabs}>
         <div>

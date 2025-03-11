@@ -33,9 +33,12 @@ import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import collect from 'collect.js';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props {
-  expense: Expense;
+  expenses: Expense[];
+  bulkAction?: boolean;
 }
 
 const Div = styled.div`
@@ -46,26 +49,35 @@ const Div = styled.div`
 
 export function AddToInvoiceAction(props: Props) {
   const [t] = useTranslation();
+
+  const { expenses, bulkAction } = props;
+
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
-
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-
-  const colors = useColorScheme();
-
-  const queryClient = useQueryClient();
-
   const { calculatedTaxRate } = useInvoiceExpense();
 
-  const { expense } = props;
+  const colors = useColorScheme();
+  const queryClient = useQueryClient();
 
   const setInvoice = useSetAtom(invoiceAtom);
 
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [visibleModal, setVisibleModal] = useState<boolean>(false);
+
+  const handleOpenModal = () => {
+    if (bulkAction) {
+      const clientIds = collect(expenses).pluck('client_id').unique().toArray();
+
+      if (clientIds.length > 1) {
+        return toast.error('multiple_client_error');
+      }
+    }
+
+    setVisibleModal(true);
+  };
 
   const handleAddToInvoice = (invoice: Invoice) => {
     setInvoice(
@@ -74,7 +86,7 @@ export function AddToInvoiceAction(props: Props) {
           ...invoice,
           line_items: [
             ...invoice.line_items,
-            {
+            ...expenses.map((expense) => ({
               ...blankLineItem(),
               type_id: InvoiceItemType.Product,
               cost: expense.amount,
@@ -101,7 +113,11 @@ export function AddToInvoiceAction(props: Props) {
                 expense.tax_amount3,
                 expense.tax_rate3
               ),
-            },
+              custom_value1: expense.custom_value1,
+              custom_value2: expense.custom_value2,
+              custom_value3: expense.custom_value3,
+              custom_value4: expense.custom_value4,
+            })),
           ],
         }
     );
@@ -121,14 +137,14 @@ export function AddToInvoiceAction(props: Props) {
         .fetchQuery(
           [
             '/api/v1/invoices',
-            `include=client&status_id=1,2,3&is_deleted=true&filter_deleted_clients=true&client_id=${expense.client_id}`,
+            `include=client&status_id=1,2,3&is_deleted=true&filter_deleted_clients=true&client_id=${expenses[0]?.client_id}`,
           ],
           () =>
             request(
               'GET',
               endpoint(
                 '/api/v1/invoices?include=client.group_settings&status_id=1,2,3&is_deleted=true&filter_deleted_clients=true&client_id=:clientId',
-                { clientId: expense.client_id || '' }
+                { clientId: expenses[0]?.client_id || '' }
               )
             ),
           { staleTime: Infinity }
@@ -192,7 +208,7 @@ export function AddToInvoiceAction(props: Props) {
       </Modal>
 
       <DropdownElement
-        onClick={() => setVisibleModal(true)}
+        onClick={handleOpenModal}
         icon={<Icon element={MdTextSnippet} />}
       >
         {t('action_add_to_invoice')}

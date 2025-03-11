@@ -25,6 +25,8 @@ import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCategory, MdDownload } from 'react-icons/md';
+import { AddToInvoiceAction } from '../components/AddToInvoiceAction';
+import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 
 interface Props {
   isVisible: boolean;
@@ -126,6 +128,12 @@ export const useCustomBulkActions = () => {
     return expenses.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
+  const handleDisplayAddToInvoice = (expenses: Expense[]) => {
+    return expenses.every(({ should_be_invoiced, invoice_id }) => {
+      return should_be_invoiced && !invoice_id.length;
+    });
+  };
+
   const handleDownloadDocuments = (
     selectedExpenses: Expense[],
     setSelected: Dispatch<SetStateAction<string[]>>
@@ -151,6 +159,10 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
+    ({ selectedResources }) =>
+      handleDisplayAddToInvoice(selectedResources) && (
+        <AddToInvoiceAction expenses={selectedResources} bulkAction />
+      ),
     ({ selectedResources, setSelected }) => (
       <>
         {selectedResources ? (
@@ -173,6 +185,13 @@ export const useCustomBulkActions = () => {
           {t('change')} {t('category')}
         </DropdownElement>
       </>
+    ),
+    ({ selectedIds, setSelected }) => (
+      <BulkUpdatesAction
+        entity="expense"
+        resourceIds={selectedIds}
+        setSelected={setSelected}
+      />
     ),
   ];
 

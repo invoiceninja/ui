@@ -29,6 +29,13 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Banner } from '$app/components/Banner';
+import {
+  socketId,
+  useSocketEvent,
+  WithSocketId,
+} from '$app/common/queries/sockets';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Payment() {
   const [t] = useTranslation();
@@ -38,7 +45,7 @@ export default function Payment() {
 
   const { id } = useParams();
 
-  const { data } = usePaymentQuery({ id });
+  const { data } = usePaymentQuery({ id, include: 'credits' });
 
   const [paymentValue, setPaymentValue] = useState<PaymentEntity>();
 
@@ -70,6 +77,17 @@ export default function Payment() {
     changeTemplateResources,
   } = useChangeTemplate();
 
+  useSocketEvent<WithSocketId<PaymentEntity>>({
+    on: ['App\\Events\\Payment\\PaymentWasUpdated'],
+    callback: ({ data }) => {
+      if (socketId()?.toString() !== data['x-socket-id']) {
+        document
+          .getElementById('paymentUpdateBanner')
+          ?.classList.remove('hidden');
+      }
+    },
+  });
+
   return (
     <Default
       title={t('payment')}
@@ -87,6 +105,12 @@ export default function Payment() {
           ),
           disableSaveButton: !paymentValue,
         })}
+      aboveMainContainer={
+        <Banner id="paymentUpdateBanner" className="hidden" variant="orange">
+          {t('payment_status_changed')}
+        </Banner>
+      }
+      afterBreadcrumbs={<PreviousNextNavigation entity="payment" />}
     >
       <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} disableBackupNavigation />

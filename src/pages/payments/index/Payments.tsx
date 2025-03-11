@@ -23,6 +23,7 @@ import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
+import { or } from '$app/common/guards/guards/or';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEffect, useState } from 'react';
@@ -40,6 +41,10 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { EntityState } from '$app/common/enums/entity-state';
 import { getEntityState } from '$app/common/helpers';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Guard } from '$app/common/guards/Guard';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export default function Payments() {
   useTitle('payments');
@@ -84,6 +89,11 @@ export default function Payments() {
     changeTemplateResources,
   } = useChangeTemplate();
 
+  useSocketEvent({
+    on: 'App\\Events\\Payment\\PaymentWasUpdated',
+    callback: () => $refetch(['payments']),
+  });
+
   return (
     <Default title={t('payments')} breadcrumbs={pages} docsLink="en/payments/">
       <DataTable
@@ -106,6 +116,15 @@ export default function Payments() {
             table="payment"
           />
         }
+        rightSide={
+          <Guard
+            type="component"
+            component={<ImportButton route="/payments/import" />}
+            guards={[
+              or(permission('create_payment'), permission('edit_payment')),
+            ]}
+          />
+        }
         onTableRowClick={(payment) => {
           setSliderPaymentId(payment.id);
           setPaymentSliderVisibility(true);
@@ -117,6 +136,7 @@ export default function Payments() {
             (payment) => getEntityState(payment) === EntityState.Archived
           )
         }
+        enableSavingFilterPreference
       />
 
       {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}

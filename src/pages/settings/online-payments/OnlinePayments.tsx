@@ -15,13 +15,10 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { InputField, Link, SelectField } from '../../../components/forms';
+import { Link, SelectField } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import {
-  useHandleCurrentCompanyChange,
-  useHandleCurrentCompanyChangeProperty,
-} from '../common/hooks/useHandleCurrentCompanyChange';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Gateways } from '../gateways/index/Gateways';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
@@ -35,6 +32,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useStaticsQuery } from '$app/common/queries/statics';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function OnlinePayments() {
   useTitle('online_payments');
@@ -60,7 +58,6 @@ export function OnlinePayments() {
 
   const company = useInjectCompanyChanges();
 
-  const handleChange = useHandleCurrentCompanyChange();
   const handleChangeProperty = useHandleCurrentCompanyChangeProperty();
 
   const onSave = useHandleCompanySave();
@@ -89,7 +86,6 @@ export function OnlinePayments() {
       docsLink="en/basic-settings/#online_payments"
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      
     >
       <Gateways />
 
@@ -135,10 +131,13 @@ export function OnlinePayments() {
         >
           <SelectField
             value={company?.settings.auto_bill || 'off'}
-            onChange={handleChange}
-            id="settings.auto_bill"
+            onValueChange={(value) =>
+              handleChangeProperty('settings.auto_bill', value)
+            }
             disabled={disableSettingsField('auto_bill')}
             errorMessage={errors?.errors['settings.auto_bill']}
+            customSelector
+            dismissable={false}
           >
             <option value="always">
               {t('enabled')} ({t('auto_bill_help_always')})
@@ -170,11 +169,14 @@ export function OnlinePayments() {
           }
         >
           <SelectField
-            id="settings.auto_bill_date"
             value={company?.settings.auto_bill_date || 'on_send_date'}
-            onChange={handleChange}
+            onValueChange={(value) =>
+              handleChangeProperty('settings.auto_bill_date', value)
+            }
             disabled={disableSettingsField('auto_bill_date')}
             errorMessage={errors?.errors['settings.auto_bill_date']}
+            customSelector
+            dismissable={false}
           >
             <option value="on_send_date">{t('send_date')}</option>
             <option value="on_due_date">{t('due_date')}</option>
@@ -197,10 +199,13 @@ export function OnlinePayments() {
         >
           <SelectField
             value={company?.settings.use_credits_payment || 'off'}
-            id="settings.use_credits_payment"
-            onChange={handleChange}
+            onValueChange={(value) =>
+              handleChangeProperty('settings.use_credits_payment', value)
+            }
             disabled={disableSettingsField('use_credits_payment')}
             errorMessage={errors?.errors['settings.use_credits_payment']}
+            customSelector
+            dismissable={false}
           >
             <option value="always">{t('enabled')}</option>
             <option value="option">{t('show_option')}</option>
@@ -224,10 +229,13 @@ export function OnlinePayments() {
         >
           <SelectField
             value={company?.settings.use_unapplied_payment || 'off'}
-            id="settings.use_unapplied_payment"
-            onChange={handleChange}
+            onValueChange={(value) =>
+              handleChangeProperty('settings.use_unapplied_payment', value)
+            }
             disabled={disableSettingsField('use_unapplied_payment')}
             errorMessage={errors?.errors['settings.use_unapplied_payment']}
+            customSelector
+            dismissable={false}
           >
             <option value="always">{t('enabled')}</option>
             <option value="option">{t('show_option')}</option>
@@ -252,14 +260,16 @@ export function OnlinePayments() {
             >
               <SelectField
                 value={company?.settings?.payment_terms || ''}
-                id="settings.payment_terms"
-                onChange={handleChange}
+                onValueChange={(value) =>
+                  handleChangeProperty('settings.payment_terms', value)
+                }
                 disabled={disableSettingsField('payment_terms')}
                 errorMessage={errors?.errors['settings.payment_terms']}
+                customSelector
+                withBlank
               >
-                <option value=""></option>
                 {paymentTerms.map((type: PaymentTerm) => (
-                  <option key={type.id} value={type.num_days}>
+                  <option key={type.id} value={type.num_days.toString()}>
                     {type.name}
                   </option>
                 ))}
@@ -289,12 +299,14 @@ export function OnlinePayments() {
         >
           <SelectField
             value={company?.settings?.payment_type_id || '0'}
-            onChange={handleChange}
-            id="settings.payment_type_id"
+            onValueChange={(value) =>
+              handleChangeProperty('settings.payment_type_id', value)
+            }
             blankOptionValue="0"
             disabled={disableSettingsField('payment_type_id')}
             withBlank
             errorMessage={errors?.errors['settings.payment_type_id']}
+            customSelector
           >
             {statics?.payment_types.map(
               (type: { id: string; name: string }) => (
@@ -321,14 +333,16 @@ export function OnlinePayments() {
         >
           <SelectField
             value={company?.settings?.valid_until || ''}
-            id="settings.valid_until"
-            onChange={handleChange}
+            onValueChange={(value) =>
+              handleChangeProperty('settings.valid_until', value)
+            }
             disabled={disableSettingsField('valid_until')}
             withBlank
             errorMessage={errors?.errors['settings.valid_until']}
+            customSelector
           >
             {paymentTerms?.map((type: PaymentTerm) => (
-              <option key={type.id} value={type.num_days}>
+              <option key={type.id} value={type.num_days.toString()}>
                 {type.name}
               </option>
             ))}
@@ -350,14 +364,19 @@ export function OnlinePayments() {
         >
           <SelectField
             value={company?.settings?.default_expense_payment_type_id || ''}
-            onChange={handleChange}
+            onValueChange={(value) =>
+              handleChangeProperty(
+                'settings.default_expense_payment_type_id',
+                value
+              )
+            }
             disabled={disableSettingsField('default_expense_payment_type_id')}
-            id="settings.default_expense_payment_type_id"
             blankOptionValue="0"
             withBlank
             errorMessage={
               errors?.errors['settings.default_expense_payment_type_id']
             }
+            customSelector
           >
             {statics?.payment_types.map(
               (type: { id: string; name: string }) => (
@@ -519,8 +538,7 @@ export function OnlinePayments() {
               />
             }
           >
-            <InputField
-              type="number"
+            <NumberInputField
               value={
                 company?.settings.client_portal_under_payment_minimum || ''
               }
@@ -573,8 +591,7 @@ export function OnlinePayments() {
               />
             }
           >
-            <InputField
-              type="number"
+            <NumberInputField
               value={company?.settings.client_initiated_payments_minimum || ''}
               onValueChange={(value) =>
                 handleChangeProperty(
@@ -613,6 +630,51 @@ export function OnlinePayments() {
             disabled={disableSettingsField('payment_email_all_contacts')}
           />
         </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="payment_flow"
+              labelElement={<SettingsLabel label={t('one_page_checkout')} />}
+              defaultValue={false}
+            />
+          }
+          leftSideHelp={t('one_page_checkout_help')}
+        >
+          <Toggle
+            id="payment_flow"
+            checked={Boolean(company?.settings.payment_flow === 'smooth')}
+            onChange={(value) =>
+              handleChangeProperty(
+                'settings.payment_flow',
+                value ? 'smooth' : 'default'
+              )
+            }
+            disabled={disableSettingsField('payment_flow')}
+          />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="unlock_invoice_documents_after_payment"
+              labelElement={<SettingsLabel label={t('unlock_invoice_documents_after_payment')} />}
+              defaultValue={false}
+            />
+          }
+          leftSideHelp={t('unlock_invoice_documents_after_payment_help')}
+        >
+          <Toggle
+            id="unlock_invoice_documents_after_payment"
+            checked={Boolean(company?.settings.unlock_invoice_documents_after_payment)}
+            onChange={(value) =>
+              handleChangeProperty('settings.unlock_invoice_documents_after_payment', value)
+            }
+            disabled={disableSettingsField('unlock_invoice_documents_after_payment')}
+          />
+        </Element>
+
+        
       </Card>
     </Settings>
   );

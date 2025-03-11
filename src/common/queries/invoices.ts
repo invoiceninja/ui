@@ -27,15 +27,27 @@ export interface GenericQueryOptions {
   enabled: boolean;
 }
 
-export function useInvoiceQuery(params: { id: string | undefined }) {
+interface InvoiceQueryParams {
+  id: string | undefined;
+  includeIsLocked?: boolean;
+}
+
+export function useInvoiceQuery(params: InvoiceQueryParams) {
+  const { includeIsLocked } = params;
+
+  const isLockedParam = includeIsLocked ? '&is_locked=true' : '';
+
   return useQuery<Invoice>(
     ['/api/v1/invoices', params.id],
     () =>
       request(
         'GET',
-        endpoint('/api/v1/invoices/:id?include=client.group_settings', {
-          id: params.id,
-        })
+        endpoint(
+          `/api/v1/invoices/:id?include=payments,client.group_settings${isLockedParam}`,
+          {
+            id: params.id,
+          }
+        )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),

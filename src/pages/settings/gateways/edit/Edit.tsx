@@ -32,6 +32,7 @@ import collect from 'collect.js';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { isEqual } from 'lodash';
+import { HelpWidget } from '$app/components/HelpWidget';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_gateway');
@@ -111,6 +112,11 @@ export function Edit() {
         )
       }
     >
+      <HelpWidget
+        id="gateways"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
+      />
+
       <TabGroup
         tabs={tabs}
         defaultTabIndex={Number(searchParams.get('tab')) ?? 0}

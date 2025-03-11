@@ -46,6 +46,8 @@ import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceP
 import { date as formatDate } from '$app/common/helpers';
 import { useFormatTimeLog } from '../../kanban/common/hooks';
 import { TaskClock } from '../../kanban/components/TaskClock';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -65,26 +67,24 @@ function useGenerateActivityElement() {
         </Link>
       ),
       user: activity.user?.label ?? t('system'),
-      task:
-        (
-          <Link
-            to={route('/tasks/:id/edit', {
-              id: activity.task?.hashed_id,
-            })}
-          >
-            {activity?.task?.label}
-          </Link>
-        ) ?? '',
-      contact:
-        (
-          <Link
-            to={route('/clients/:id/edit', {
-              id: activity?.contact?.hashed_id,
-            })}
-          >
-            {activity?.contact?.label}
-          </Link>
-        ) ?? '',
+      task: (
+        <Link
+          to={route('/tasks/:id/edit', {
+            id: activity.task?.hashed_id,
+          })}
+        >
+          {activity?.task?.label}
+        </Link>
+      ),
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', {
+            id: activity?.contact?.hashed_id,
+          })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      ),
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -103,6 +103,9 @@ export function TaskSlider() {
     showCommonBulkAction: true,
     showEditAction: true,
   });
+
+  const { timeFormat } = useCompanyTimeFormat();
+  const userNumberPrecision = useUserNumberPrecision();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
@@ -143,7 +146,7 @@ export function TaskSlider() {
         task &&
         (hasPermission('edit_task') || entityAssigned(task)) && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={task}
             actions={actions}
           />
@@ -157,7 +160,8 @@ export function TaskSlider() {
             <Element leftSide={t('amount')}>
               {task
                 ? formatMoney(
-                    task.rate * calculateTaskHours(task.time_log),
+                    task.rate *
+                      calculateTaskHours(task.time_log, userNumberPrecision),
                     task.client?.country_id,
                     task.client?.settings.currency_id
                   )
@@ -179,32 +183,34 @@ export function TaskSlider() {
 
           <Divider withoutPadding />
 
-          {task &&
-            currentTaskTimeLogs?.map(([date, start, end], i) => (
-              <ClickableElement key={i}>
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <p>{formatDate(date, dateFormat)}</p>
+          <div className="divide-y">
+            {task &&
+              currentTaskTimeLogs?.map(([date, start, end], i) => (
+                <ClickableElement key={i}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p>{formatDate(date, dateFormat)}</p>
 
-                    <small>
-                      {start} - {end}
-                    </small>
-                  </div>
+                      <small>
+                        {start} - {end}
+                      </small>
+                    </div>
 
-                  <div>
-                    {isTaskRunning(task) &&
-                    i === currentTaskTimeLogs.length - 1 ? (
-                      <TaskClock task={task} calculateLastTimeLog={true} />
-                    ) : (
-                      calculateDifferenceBetweenLogs(task.time_log, i)
-                    )}
+                    <div>
+                      {isTaskRunning(task) &&
+                      i === currentTaskTimeLogs.length - 1 ? (
+                        <TaskClock task={task} calculateLastTimeLog={true} />
+                      ) : (
+                        calculateDifferenceBetweenLogs(task.time_log, i)
+                      )}
+                    </div>
                   </div>
-                </div>
-              </ClickableElement>
-            ))}
+                </ClickableElement>
+              ))}
+          </div>
         </div>
 
-        <div>
+        <div className='divide-y'>
           {activities?.map((activity) => (
             <NonClickableElement
               key={activity.id}
@@ -212,7 +218,9 @@ export function TaskSlider() {
             >
               <p>{activityElement(activity)}</p>
               <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>
+                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                </p>
                 <p>&middot;</p>
                 <p>{activity.ip}</p>
               </div>

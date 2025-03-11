@@ -21,11 +21,17 @@ import { WePay } from './gateways/WePay';
 import { PayPalPPCP } from './gateways/PayPalPPCP';
 import { Divider } from '$app/components/cards/Divider';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
+import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
+import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
+import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 import { useLocation } from 'react-router-dom';
+import { $help } from '$app/components/HelpWidget';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { HelpCircle } from 'react-feather';
 
 interface Props {
   gateway: Gateway;
@@ -47,15 +53,26 @@ export function Credentials(props: Props) {
     props.setCompanyGateway
   );
 
+  const config = useResolveConfigValue(props.companyGateway);
+
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
   const PAYPAL_PPCP = '80af24a6a691230bbec33e930ab40666';
+  const GOCARDLESS = 'b9886f9257f0c6ee7c302f1c74475f6c';
 
   const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
+  if (
+    isHosted() &&
+    props.gateway.key === GOCARDLESS &&
+    config('oauth2') === true
+  ) {
+    hostedGateways.push(GOCARDLESS);
+  }
+
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
-  const [isTestingSuccessful, setIsTestingSuccessful] = useState<boolean>();
   const [testingMessage, setTestingMessage] = useState<string>('');
+  const [isTestingModalOpen, setIsTestingModalOpen] = useState<boolean>(false);
 
   const handleTestCredentials = () => {
     if (!isTestingBusy) {
@@ -68,10 +85,9 @@ export function Credentials(props: Props) {
           id: props.companyGateway.id,
         })
       )
-        .then(() => setIsTestingSuccessful(true))
-        .catch((error) => {
-          setTestingMessage(error.response?.data?.message);
-          setIsTestingSuccessful(false);
+        .then((response) => {
+          setIsTestingModalOpen(true);
+          setTestingMessage(response.data.message);
         })
         .finally(() => {
           toast.dismiss();
@@ -80,9 +96,29 @@ export function Credentials(props: Props) {
     }
   };
 
+  const handleGoCardless = useHandleGoCardless();
+  const accentColor = useAccentColor();
+
   return (
     <>
-      <Card title={t('credentials')}>
+      <Card
+        title={t('credentials')}
+        topRight={
+          <button
+            style={{ color: accentColor }}
+            type="button"
+            onClick={() =>
+              $help('gateways', {
+                moveToHeading: 'Credentials',
+              })
+            }
+            className="inline-flex items-center space-x-1 text-sm"
+          >
+            <HelpCircle size={18} />
+            <span>{t('documentation')}</span>
+          </button>
+        }
+      >
         {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
           <Element leftSide={t('help')}>
             <Link external to={props.gateway.site_url}>
@@ -107,6 +143,11 @@ export function Credentials(props: Props) {
         )}
 
         {props.gateway &&
+          props.gateway.key === GOCARDLESS &&
+          isHosted() &&
+          config('oauth2') === true && <GoCardlessOAuth2 />}
+
+        {props.gateway &&
           !hostedGateways.includes(props.gateway.key) &&
           Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
             <Element leftSide={formatLabel(field)} key={index}>
@@ -118,6 +159,22 @@ export function Credentials(props: Props) {
             </Element>
           ))}
 
+        {props.gateway &&
+          props.gateway.key === GOCARDLESS &&
+          isHosted() &&
+          config('oauth2') !== true && (
+            <Element leftSide={t('OAuth 2.0')}>
+              <Button
+                behavior="button"
+                type="minimal"
+                onClick={handleGoCardless}
+              >
+                {t('connect')}
+              </Button>
+            </Element>
+          )}
+
+        <Divider />
         {!location.pathname.includes('/create') && (
           <>
             <Divider />
@@ -138,18 +195,16 @@ export function Credentials(props: Props) {
 
       <Modal
         title={t('status')}
-        visible={typeof isTestingSuccessful !== 'undefined'}
-        onClose={() => setIsTestingSuccessful(undefined)}
+        visible={isTestingModalOpen}
+        onClose={() => setIsTestingModalOpen(false)}
       >
-        {typeof isTestingSuccessful !== 'undefined' && (
-          <span className="text-center font-medium text-base pb-3">
-            {t(
-              isTestingSuccessful
-                ? 'success'
-                : testingMessage || 'status_failed'
-            )}
-          </span>
-        )}
+        <span className="text-center font-medium text-base pb-3">
+          {t(
+            testingMessage && testingMessage !== 'false'
+              ? testingMessage
+              : 'status_failed'
+          )}
+        </span>
       </Modal>
     </>
   );

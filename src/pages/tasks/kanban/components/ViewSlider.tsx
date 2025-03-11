@@ -98,31 +98,33 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {currentTaskTimeLogs?.map(([date, start, end], i) => (
-              <ClickableElement key={i}>
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <p>{formatDate(date, dateFormat)}</p>
+            <div className="divide-y">
+              {currentTaskTimeLogs?.map(([date, start, end], i) => (
+                <ClickableElement key={i}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p>{formatDate(date, dateFormat)}</p>
 
-                    <small>
-                      {start} - {end}
-                    </small>
-                  </div>
+                      <small>
+                        {start} - {end}
+                      </small>
+                    </div>
 
-                  <div>
-                    {isTaskRunning(currentTask) &&
-                    i === currentTaskTimeLogs.length - 1 ? (
-                      <TaskClock
-                        task={currentTask}
-                        calculateLastTimeLog={true}
-                      />
-                    ) : (
-                      calculateDifferenceBetweenLogs(currentTask.time_log, i)
-                    )}
+                    <div>
+                      {isTaskRunning(currentTask) &&
+                      i === currentTaskTimeLogs.length - 1 ? (
+                        <TaskClock
+                          task={currentTask}
+                          calculateLastTimeLog={true}
+                        />
+                      ) : (
+                        calculateDifferenceBetweenLogs(currentTask.time_log, i)
+                      )}
+                    </div>
                   </div>
-                </div>
-              </ClickableElement>
-            ))}
+                </ClickableElement>
+              ))}
+            </div>
           </>
         )}
       </div>

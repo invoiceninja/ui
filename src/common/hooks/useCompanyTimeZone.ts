@@ -11,6 +11,7 @@
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
 import { useCurrentCompany } from './useCurrentCompany';
+import { Timezone } from '../interfaces/statics';
 
 export function useCompanyTimeZone() {
   const company = useCurrentCompany();
@@ -23,7 +24,8 @@ export function useCompanyTimeZone() {
   useEffect(() => {
     if (statics?.timezones) {
       const result = statics.timezones.find(
-        (format: any) => format.id === company?.settings?.timezone_id ?? '1'
+        (currentTimezone: Timezone) =>
+          currentTimezone.id === company?.settings?.timezone_id ?? '1'
       );
 
       if (result) {

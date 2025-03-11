@@ -52,13 +52,17 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
 import { ViewLineItemExpense } from './ViewLineItemExpense';
 import { ViewLineItemTask } from './ViewLineItemTask';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -79,38 +83,35 @@ export function useGenerateActivityElement() {
       ),
 
       user: activity.user?.label ?? t('system'),
-      invoice:
-        (
-          <Link
-            to={route('/invoices/:id/edit', {
-              id: activity.invoice?.hashed_id,
-            })}
-          >
-            {activity?.invoice?.label}
-          </Link>
-        ) ?? '',
+      invoice: (
+        <Link
+          to={route('/invoices/:id/edit', {
+            id: activity.invoice?.hashed_id,
+          })}
+        >
+          {activity?.invoice?.label}
+        </Link>
+      ),
 
-      recurring_invoice:
-        (
-          <Link
-            to={route('/recurring_invoices/:id/edit', {
-              id: activity?.recurring_invoice?.hashed_id,
-            })}
-          >
-            {activity?.recurring_invoice?.label}
-          </Link>
-        ) ?? '',
+      recurring_invoice: (
+        <Link
+          to={route('/recurring_invoices/:id/edit', {
+            id: activity?.recurring_invoice?.hashed_id,
+          })}
+        >
+          {activity?.recurring_invoice?.label}
+        </Link>
+      ),
 
-      contact:
-        (
-          <Link
-            to={route('/clients/:id/edit', {
-              id: activity?.contact?.hashed_id,
-            })}
-          >
-            {activity?.contact?.label}
-          </Link>
-        ) ?? '',
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', {
+            id: activity?.contact?.hashed_id,
+          })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      ),
 
       notes: activity?.notes && (
         <>
@@ -154,9 +155,12 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
-  const colors = useColorScheme();
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -174,6 +178,7 @@ export function InvoiceSlider() {
     showEditAction: true,
   });
 
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: resource } = useQuery({
@@ -240,7 +245,7 @@ export function InvoiceSlider() {
         invoice &&
         (hasPermission('edit_invoice') || entityAssigned(invoice)) ? (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={invoice}
             actions={actions}
           />
@@ -329,7 +334,7 @@ export function InvoiceSlider() {
                 tooltipElement={
                   <article
                     className={classNames('prose prose-sm', {
-                      'prose-invert': reactSettings.dark_mode,
+                      'prose-invert': !reactSettings?.dark_mode,
                     })}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
@@ -345,7 +350,15 @@ export function InvoiceSlider() {
               </Tooltip>
 
               <Element leftSide={t('next_send_date')} twoGridColumns>
-                {invoice ? date(invoice.next_send_date, dateFormat) : null}
+                {invoice
+                  ? dateTime(
+                      invoice.next_send_date,
+                      '',
+                      '',
+                      getTimezone(getSetting(invoice.client, 'timezone_id'))
+                        .timeZone
+                    )
+                  : null}
               </Element>
 
               <Element leftSide={t('reminder_last_sent')} twoGridColumns>
@@ -432,7 +445,7 @@ export function InvoiceSlider() {
           )}
         </div>
 
-        <div>
+        <div className="divide-y">
           {resource?.activities && resource.activities.length === 0 && (
             <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
@@ -466,7 +479,7 @@ export function InvoiceSlider() {
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>{dayjs.unix(activity.created_at).fromNow()}</p>
                   </div>
@@ -493,7 +506,7 @@ export function InvoiceSlider() {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col divide-y">
             {activities
               ?.filter(
                 (activity) =>
@@ -509,7 +522,7 @@ export function InvoiceSlider() {
 
                   <p className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>&middot;</p>
                     <p>{activity.ip}</p>
@@ -519,7 +532,11 @@ export function InvoiceSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="text-sm px-4">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords.map((emailRecord, index) => (
             <EmailRecord
               key={index}

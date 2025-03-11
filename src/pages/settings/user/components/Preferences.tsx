@@ -17,20 +17,20 @@ import {
   preferencesDefaults,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { InputField } from '$app/components/forms';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { StatusColorTheme } from './StatusColorTheme';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Preferences() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const reactSettings = useReactSettings();
 
-  const handleChange = (property: string, value: string | boolean) => {
+  const handleChange = (property: string, value: string | number | boolean) => {
     dispatch(
       updateChanges({
         property: property,
@@ -89,16 +89,17 @@ export function Preferences() {
           leftSide={t('number_precision')}
           leftSideHelp={t('number_precision_help')}
         >
-          <InputField
-            value={reactSettings?.number_precision}
+          <NumberInputField
+            precision={0}
+            value={reactSettings?.number_precision || ''}
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.number_precision',
-                value
+                Number(value)
               )
             }
-            type="number"
             placeholder={t('number_precision')}
+            disablePrecision
           />
         </Element>
 
@@ -131,10 +132,41 @@ export function Preferences() {
           leftSideHelp={t('auto_expand_product_table_notes_help')}
         >
           <Toggle
-            checked={Boolean(reactSettings.preferences.auto_expand_product_table_notes)}
+            checked={Boolean(
+              reactSettings.preferences.auto_expand_product_table_notes
+            )}
             onValueChange={(value) =>
               handleChange(
                 'company_user.react_settings.preferences.auto_expand_product_table_notes',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('enable_public_notifications')} leftSideHelp={t('enable_public_notifications_help')}>
+          <Toggle
+            checked={Boolean(
+              reactSettings.preferences.enable_public_notifications
+            )}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.enable_public_notifications',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('use_system_fonts')}
+          leftSideHelp={t('use_system_fonts_help')}
+        >
+          <Toggle
+            checked={Boolean(reactSettings.preferences.use_system_fonts)}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.use_system_fonts',
                 value
               )
             }

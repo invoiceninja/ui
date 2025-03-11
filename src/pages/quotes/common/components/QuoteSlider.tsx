@@ -53,11 +53,15 @@ import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -77,26 +81,24 @@ export function useGenerateActivityElement() {
         </Link>
       ),
       user: activity.user?.label ?? t('system'),
-      quote:
-        (
-          <Link
-            to={route('/quotes/:id/edit', {
-              id: activity.quote?.hashed_id,
-            })}
-          >
-            {activity?.quote?.label}
-          </Link>
-        ) ?? '',
-      contact:
-        (
-          <Link
-            to={route('/clients/:id/edit', {
-              id: activity?.contact?.hashed_id,
-            })}
-          >
-            {activity?.contact?.label}
-          </Link>
-        ) ?? '',
+      quote: (
+        <Link
+          to={route('/quotes/:id/edit', {
+            id: activity.quote?.hashed_id,
+          })}
+        >
+          {activity?.quote?.label}
+        </Link>
+      ),
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', {
+            id: activity?.contact?.hashed_id,
+          })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      ),
       notes: activity?.notes && (
         <>
           <br />
@@ -120,14 +122,19 @@ export function QuoteSlider() {
   const queryClient = useQueryClient();
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const actions = useActions({
     showCommonBulkAction: true,
     showEditAction: true,
   });
+
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const reactSettings = useReactSettings();
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
 
   const formatMoney = useFormatMoney();
   const hasPermission = useHasPermission();
@@ -207,7 +214,7 @@ export function QuoteSlider() {
         quote &&
         (hasPermission('edit_quote') || entityAssigned(quote)) && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={quote}
             actions={actions}
           />
@@ -296,7 +303,7 @@ export function QuoteSlider() {
                 tooltipElement={
                   <article
                     className={classNames('prose prose-sm', {
-                      'prose-invert': reactSettings.dark_mode,
+                      'prose-invert': !reactSettings?.dark_mode,
                     })}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
@@ -312,7 +319,15 @@ export function QuoteSlider() {
               </Tooltip>
 
               <Element leftSide={t('next_send_date')}>
-                {quote ? date(quote.next_send_date, dateFormat) : null}
+                {quote
+                  ? dateTime(
+                      quote.next_send_date,
+                      '',
+                      '',
+                      getTimezone(getSetting(quote.client, 'timezone_id'))
+                        .timeZone
+                    )
+                  : null}
               </Element>
 
               <Element leftSide={t('reminder_last_sent')}>
@@ -371,7 +386,7 @@ export function QuoteSlider() {
           )}
         </div>
 
-        <div>
+        <div className="divide-y">
           {resource?.activities &&
             resource.activities.map((activity) => (
               <ClickableElement
@@ -401,7 +416,7 @@ export function QuoteSlider() {
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>{dayjs.unix(activity.created_at).fromNow()}</p>
                   </div>
@@ -428,7 +443,7 @@ export function QuoteSlider() {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col divide-y">
             {activities
               ?.filter(
                 (activity) =>
@@ -444,7 +459,7 @@ export function QuoteSlider() {
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
                     </p>
                     <p>&middot;</p>
                     <p>{activity.ip}</p>
@@ -454,7 +469,11 @@ export function QuoteSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col divide-y">
+          {Boolean(!emailRecords.length) && (
+            <span className="px-4 text-sm">{t('email_history_empty')}</span>
+          )}
+
           {emailRecords?.map((emailRecord, index) => (
             <EmailRecord
               key={index}

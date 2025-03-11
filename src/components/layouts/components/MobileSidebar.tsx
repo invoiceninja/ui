@@ -16,7 +16,6 @@ import { NavigationItem } from './DesktopSidebar';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { useLogo } from '$app/common/hooks/useLogo';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 
 interface Props {
@@ -26,7 +25,6 @@ interface Props {
 }
 
 export function MobileSidebar(props: Props) {
-  const logo = useLogo();
   const colors = useColorScheme();
   const user = useInjectUserChanges();
 
@@ -62,7 +60,10 @@ export function MobileSidebar(props: Props) {
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-ninja-gray dark:bg-gray-900">
+          <div
+            className="relative flex-1 flex flex-col max-w-xs w-full px-3"
+            style={{ backgroundColor: colors.$14 }}
+          >
             <Transition.Child
               as={Fragment}
               enter="ease-in-out duration-300"
@@ -85,14 +86,10 @@ export function MobileSidebar(props: Props) {
             </Transition.Child>
 
             <div
-              className="flex-shrink-0 flex items-center px-4 py-3 border-b h-16 justify-center border-gray-600"
-              style={{ backgroundColor: colors.$1, color: colors.$3 }}
+              className="flex-shrink-0 flex items-center px-0 md:px-4 py-3 border-b h-16 justify-center border-gray-600"
+              style={{ backgroundColor: colors.$14, color: colors.$3 }}
             >
-              {isMiniSidebar ? (
-                <img className="w-8" src={logo} alt="Company logo" />
-              ) : (
-                <CompanySwitcher />
-              )}
+              <CompanySwitcher />
             </div>
 
             <div className="flex flex-col flex-1 h-0 overflow-y-auto mt-4">

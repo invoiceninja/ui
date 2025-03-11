@@ -233,23 +233,39 @@ export function TransactionMatchDetails(props: Props) {
             <div>
               {props.isCreditTransactionType ? (
                 <ListBox
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   transactionDetails={props.transactionDetails}
                   dataKey="invoices"
                   setSelectedIds={setInvoiceIds}
                   selectedIds={invoiceIds}
+                  calculateTotal
                 />
               ) : (
                 <>
                   <ListBox
-                    style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
                     transactionDetails={props.transactionDetails}
                     dataKey="vendors"
                     setSelectedIds={setVendorIds}
                     selectedIds={vendorIds}
                   />
                   <ListBox
-                    style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
                     transactionDetails={props.transactionDetails}
                     dataKey="categories"
                     setSelectedIds={setExpenseCategoryIds}
@@ -260,7 +276,12 @@ export function TransactionMatchDetails(props: Props) {
 
               <div className="px-3 py-3 w-full border-t border-gray-200">
                 <Button
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   className="w-full"
                   onClick={
                     props.isCreditTransactionType
@@ -293,25 +314,43 @@ export function TransactionMatchDetails(props: Props) {
             <div>
               {props.isCreditTransactionType ? (
                 <ListBox
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   transactionDetails={props.transactionDetails}
                   dataKey="payments"
                   setSelectedIds={setPaymentIds}
                   selectedIds={paymentIds}
+                  calculateTotal
                 />
               ) : (
                 <ListBox
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   transactionDetails={props.transactionDetails}
                   dataKey="expenses"
                   setSelectedIds={setExpenseIds}
                   selectedIds={expenseIds}
+                  calculateTotal
+                  addSelectAllButton
                 />
               )}
 
               <div className="px-3 py-3 w-full border-t border-gray-200">
                 <Button
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   className="w-full"
                   onClick={
                     props.isCreditTransactionType

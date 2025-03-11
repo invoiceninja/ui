@@ -42,14 +42,13 @@ import {
   MdPageview,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { toast } from '$app/common/helpers/toast/toast';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { AxiosResponse } from 'axios';
 import { DocumentUrl } from '$app/components/DocumentsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 export function Table() {
   const { t } = useTranslation();
@@ -58,13 +57,13 @@ export function Table() {
   const reactSettings = useReactSettings();
   const setDocumentVisibility = useSetDocumentVisibility();
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
   const [documentId, setDocumentId] = useState('');
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   const [documentsUrls, setDocumentsUrls] = useState<DocumentUrl[]>([]);
 
@@ -124,8 +123,7 @@ export function Table() {
     document.body.removeChild(link);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const destroy = (password: string, isRequired = true) => {
+  const destroy = (password: string, isPasswordRequired: boolean) => {
     toast.processing();
 
     request(
@@ -137,8 +135,8 @@ export function Table() {
       .then(() => toast.success('deleted_document'))
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
+          setPasswordConfirmModalOpen(true);
         }
       })
       .finally(() => invalidateDocumentsQuery());
@@ -235,7 +233,7 @@ export function Table() {
                 <Td>{document.type}</Td>
                 <Td>{prettyBytes(document.size)}</Td>
                 <Td>
-                  <Dropdown label={t('more_actions')}>
+                  <Dropdown label={t('actions')}>
                     <DropdownElement
                       onClick={() => {
                         downloadDocument(document, true);

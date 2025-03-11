@@ -27,6 +27,7 @@ export interface Payload {
   projects?: string;
   vendors?: string;
   include_deleted?: boolean;
+  pdf_email_attachment?: boolean;
 }
 
 export interface Report {

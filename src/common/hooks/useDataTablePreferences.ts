@@ -21,13 +21,13 @@ import { endpoint } from '../helpers';
 import { request } from '../helpers/request';
 import { useUserChanges } from './useInjectUserChanges';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../stores/slices/user';
+import { injectInChangesWithData, updateUser } from '../stores/slices/user';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 
 interface Params {
   apiEndpoint: URL;
   customFilters?: SelectOption[];
-  tableKey: string;
+  tableKey: string | undefined;
   isInitialConfiguration: boolean;
   customFilter: string[] | undefined;
   setFilter: Dispatch<SetStateAction<string>>;
@@ -37,7 +37,9 @@ interface Params {
   setSortedBy: Dispatch<SetStateAction<string | undefined>>;
   setStatus: Dispatch<SetStateAction<string[]>>;
   setPerPage: Dispatch<SetStateAction<PerPage>>;
+  setArePreferencesApplied: Dispatch<SetStateAction<boolean>>;
   withoutStoringPerPage: boolean;
+  enableSavingFilterPreference?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -57,7 +59,9 @@ export function useDataTablePreferences(params: Params) {
     setSortedBy,
     setStatus,
     setPerPage,
+    setArePreferencesApplied,
     withoutStoringPerPage,
+    enableSavingFilterPreference,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -74,6 +78,8 @@ export function useDataTablePreferences(params: Params) {
       $refetch(['company_users']);
 
       dispatch(updateUser(updatedUser));
+
+      dispatch(injectInChangesWithData(updatedUser));
     });
   };
 
@@ -85,7 +91,7 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (!customFilter) {
+    if (!customFilter || !tableKey || !enableSavingFilterPreference) {
       return;
     }
 
@@ -124,6 +130,16 @@ export function useDataTablePreferences(params: Params) {
     const updatedUser = cloneDeep(user) as User;
 
     if (updatedUser) {
+      // @Todo: This is a temporary solution for creating the table_filters object. It can be removed after some time.
+      const tableFilters =
+        updatedUser.company_user?.react_settings.table_filters || {};
+
+      Object.keys(tableFilters).forEach((key) => {
+        if (key.includes('/')) {
+          delete tableFilters[key];
+        }
+      });
+
       set(
         updatedUser,
         `company_user.react_settings.table_filters.${tableKey}`,
@@ -156,6 +172,8 @@ export function useDataTablePreferences(params: Params) {
       } else {
         setStatus(['active']);
       }
+
+      setArePreferencesApplied(true);
     }
   }, [isInitialConfiguration]);
 

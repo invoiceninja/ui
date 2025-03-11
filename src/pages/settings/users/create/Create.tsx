@@ -18,7 +18,6 @@ import { User } from '$app/common/interfaces/user';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useBlankUserQuery } from '$app/common/queries/users';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Settings } from '$app/components/layouts/Settings';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { TabGroup } from '$app/components/TabGroup';
@@ -28,9 +27,9 @@ import { useNavigate } from 'react-router-dom';
 import { Details } from '../edit/components/Details';
 import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
 
 export function Create() {
   useTitle('new_user');
@@ -45,7 +44,7 @@ export function Create() {
 
   const tabs: string[] = [t('details'), t('notifications'), t('permissions')];
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const { data: response } = useBlankUserQuery();
   const [user, setUser] = useState<User>();
@@ -82,7 +81,7 @@ export function Create() {
     });
   }, [response?.data.data]);
 
-  const onSave = (password: string) => {
+  const onSave = (password: string, isPasswordRequired: boolean) => {
     toast.processing();
 
     setIsPasswordConfirmModalOpen(false);
@@ -103,8 +102,8 @@ export function Create() {
       })
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
+          setIsPasswordConfirmModalOpen(true);
         } else if (error.response?.status === 422) {
           const errorMessages = error.response.data;
 
@@ -126,11 +125,7 @@ export function Create() {
       onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
       disableSaveButton={!enterprisePlan() && isHosted()}
     >
-      {!enterprisePlan() && isHosted() && (
-        <AdvancedSettingsPlanAlert
-          message={t('add_users_not_supported') as string}
-        />
-      )}
+      {!enterprisePlan() && isHosted() && <UsersPlanAlert />}
 
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}

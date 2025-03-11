@@ -11,7 +11,7 @@
 import { toast } from '$app/common/helpers/toast/toast';
 import { Card, Element } from '$app/components/cards';
 import { useFormik } from 'formik';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -31,12 +31,15 @@ import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplate
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
 import { Icon } from '../icons/Icon';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 interface Props {
   entity: string;
   onSuccess: boolean;
   onFileImported?: () => unknown;
   type: string;
+  postWidgetSlot?: ReactNode;
+  exampleUrl?: string;
 }
 
 export interface ImportMap extends Record<string, any> {
@@ -362,6 +365,14 @@ export function UploadImport(props: Props) {
     return () => setSelectedTemplate('');
   }, []);
 
+  const accentColor = useAccentColor();
+
+  const downloadExampleFile = () => {
+    if (props.exampleUrl) {
+      window.open(props.exampleUrl, '_blank');
+    }
+  };
+
   return (
     <>
       <Card title={t(props.entity)}>
@@ -369,6 +380,17 @@ export function UploadImport(props: Props) {
           leftSide={t(isImportFileTypeZip ? 'company_backup_file' : 'csv_file')}
           leftSideHelp={isImportFileTypeZip && t('company_backup_file_help')}
         >
+          {props.exampleUrl ? (
+            <button
+              type="button"
+              style={{ color: accentColor }}
+              className="inline-flex items-center space-x-1 mb-4"
+              onClick={downloadExampleFile}
+            >
+              <span>{t('download_example_file')}</span>
+            </button>
+          ) : null}
+
           {!files.length ? (
             <div
               {...getRootProps()}
@@ -416,6 +438,8 @@ export function UploadImport(props: Props) {
               ))}
             </ul>
           )}
+
+          {props.postWidgetSlot ?? null}
         </Element>
 
         {isImportFileTypeZip && (
@@ -467,11 +491,13 @@ export function UploadImport(props: Props) {
               }}
               withBlank
             >
-              {templates.map((template, index) => (
-                <option key={index} value={template}>
-                  {template}
-                </option>
-              ))}
+              {templates
+                .filter((currentTemplate) => currentTemplate)
+                .map((template, index) => (
+                  <option key={index} value={template}>
+                    {template}
+                  </option>
+                ))}
             </SelectField>
           </Element>
 

@@ -43,7 +43,7 @@ export function useHandleCreate(params: Params) {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     let apiEndpoint = '/api/v1/invoices?';
 
@@ -65,6 +65,10 @@ export function useHandleCreate(params: Params) {
         toast.success('created_invoice');
 
         $refetch(['products', 'tasks']);
+
+        if (searchParams.get('action') === 'invoice_expense') {
+          $refetch(['expenses']);
+        }
 
         navigate(
           route('/invoices/:id/edit?table=:table', {

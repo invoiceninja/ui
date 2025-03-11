@@ -43,6 +43,9 @@ import { endpoint } from '$app/common/helpers';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Banner } from '$app/components/Banner';
+import { useColorScheme } from '$app/common/colors';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -73,6 +76,7 @@ export default function Create() {
     { name: t('new_payment'), href: '/payments/create' },
   ];
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const creditResolver = useCreditResolver();
   const invoiceResolver = useInvoiceResolver();
@@ -171,17 +175,6 @@ export default function Create() {
     }
   }, [blankPayment]);
 
-  useEffect(() => {
-    setPayment(
-      (current) =>
-        current && {
-          ...current,
-          currency_id: current.client?.settings.currency_id,
-          // amount: collect(payment?.invoices).sum('amount') as number,
-        }
-    );
-  }, [payment?.invoices]);
-
   const {
     handleInvoiceChange,
     handleExistingInvoiceChange,
@@ -217,6 +210,13 @@ export default function Create() {
       breadcrumbs={pages}
       onSaveClick={() => onSubmit(payment as unknown as Payment, sendEmail)}
       disableSaveButton={!payment || isFormBusy}
+      aboveMainContainer={
+        Boolean(payment && payment.amount < 0) && (
+          <Banner variant="orange" style={{ borderColor: colors.$5 }}>
+            {t('negative_payment_warning')}
+          </Banner>
+        )
+      }
     >
       <Container breadcrumbs={[]}>
         <Card title={t('enter_payment')}>
@@ -224,7 +224,10 @@ export default function Create() {
             <ClientSelector
               onChange={(client) => {
                 handleChange('client_id', client?.id as string);
-                handleChange('currency_id', client?.settings.currency_id);
+                handleChange(
+                  'currency_id',
+                  client?.settings.currency_id || '1'
+                );
                 handleChange('invoices', []);
                 handleChange('credits', []);
               }}
@@ -250,10 +253,8 @@ export default function Create() {
             leftSide={t('amount_received')}
             leftSideHelp={t('amount_received_help')}
           >
-            <InputField
-              id="amount"
-              type="number"
-              value={payment?.amount}
+            <NumberInputField
+              value={payment?.amount || ''}
               onValueChange={(value) =>
                 handleChange(
                   'amount',
@@ -261,6 +262,7 @@ export default function Create() {
                 )
               }
               errorMessage={errors?.errors.amount}
+              changeOverride
             />
           </Element>
 
@@ -313,9 +315,9 @@ export default function Create() {
                         .toArray()}
                     />
 
-                    <InputField
-                      type="number"
+                    <NumberInputField
                       label={t('amount_received')}
+                      value={invoice.amount || ''}
                       onValueChange={(value) =>
                         handleInvoiceInputChange(
                           index,
@@ -323,7 +325,6 @@ export default function Create() {
                         )
                       }
                       className="w-full"
-                      value={invoice.amount}
                       withoutLabelWrapping
                     />
 
@@ -386,6 +387,14 @@ export default function Create() {
             </Element>
           )}
 
+          {errors?.errors.invoices && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.invoices}
+              </Alert>
+            </div>
+          )}
+
           {payment?.client_id && <Divider />}
 
           {payment &&
@@ -430,8 +439,7 @@ export default function Create() {
                         .toArray()}
                     />
 
-                    <InputField
-                      type="number"
+                    <NumberInputField
                       label={t('amount')}
                       onValueChange={(value) =>
                         handleCreditInputChange(
@@ -440,7 +448,7 @@ export default function Create() {
                         )
                       }
                       className="w-full"
-                      value={credit.amount}
+                      value={credit.amount || ''}
                       withoutLabelWrapping
                     />
 
@@ -501,6 +509,14 @@ export default function Create() {
             </Element>
           )}
 
+          {errors?.errors.credits && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.credits}
+              </Alert>
+            </div>
+          )}
+
           {payment?.client_id && <Divider />}
 
           <Element leftSide={t('payment_date')}>
@@ -515,11 +531,11 @@ export default function Create() {
 
           <Element leftSide={t('payment_type')}>
             <SelectField
-              id="type_id"
               value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
+              customSelector
             >
               {paymentTypes.map(([key, value], index) => (
                 <option value={key} key={index}>
@@ -617,7 +633,7 @@ export default function Create() {
               currencyId={payment.currency_id || '1'}
               amount={
                 (collect(payment?.invoices).sum('amount') as number) +
-                  payment?.amount ?? 0
+                (payment?.amount ?? 0)
               }
               onChange={(exchangeRate, exchangeCurrencyId) => {
                 handleChange('exchange_rate', exchangeRate);

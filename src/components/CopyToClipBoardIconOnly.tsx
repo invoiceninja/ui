@@ -17,7 +17,7 @@ interface Props {
   className?: string;
   secure?: boolean;
   limit?: number;
-  stopPropagation?: boolean;
+  iconColor?: string;
 }
 
 export function CopyToClipboardIconOnly({
@@ -25,12 +25,13 @@ export function CopyToClipboardIconOnly({
   className,
   secure,
   limit = 0,
-  stopPropagation,
+  iconColor,
 }: Props) {
   const value = text || '';
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    stopPropagation && event.stopPropagation();
+    event.stopPropagation();
+
     navigator.clipboard.writeText(value);
     toast.success('copied_to_clipboard', { value: '' });
   };
@@ -47,7 +48,7 @@ export function CopyToClipboardIconOnly({
 
       {value.length > 0 && (
         <button type="button" onClick={handleClick}>
-          <MdOutlineContentCopy size={18} />
+          <MdOutlineContentCopy size={18} color={iconColor} />
         </button>
       )}
     </div>

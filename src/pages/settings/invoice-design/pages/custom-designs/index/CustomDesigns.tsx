@@ -10,15 +10,15 @@
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { DataTable } from '$app/components/DataTable';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Inline } from '$app/components/Inline';
-import { CustomDesignsPlanAlert } from '../components/CustomDesignsPlanAlert';
 
 export default function CustomDesigns() {
   return (
     <>
-      <CustomDesignsPlanAlert />
+      <AdvancedSettingsPlanAlert />
 
       <DataTable
         endpoint="/api/v1/designs?custom=true"
@@ -40,6 +40,7 @@ export default function CustomDesigns() {
         linkToEdit="/settings/invoice_design/custom_designs/:id/edit"
         withResourcefulActions
         hideEditableOptions={!proPlan() && !enterprisePlan()}
+        enableSavingFilterPreference
       />
     </>
   );

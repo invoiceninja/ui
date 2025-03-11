@@ -38,6 +38,7 @@ import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStat
 import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
 import paymentType from '$app/common/constants/payment-type';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -64,36 +65,33 @@ function useGenerateActivityElement() {
         payment?.client?.country_id,
         payment?.client?.settings.currency_id
       ),
-      invoice:
-        (
-          <Link
-            to={route('/invoices/:id/edit', {
-              id: activity.invoice?.hashed_id,
-            })}
-          >
-            {activity?.invoice?.label}
-          </Link>
-        ) ?? '',
-      payment:
-        (
-          <Link
-            to={route('/payments/:id/edit', {
-              id: activity.payment?.hashed_id,
-            })}
-          >
-            {activity?.payment?.label}
-          </Link>
-        ) ?? '',
-      contact:
-        (
-          <Link
-            to={route('/clients/:id/edit', {
-              id: activity?.contact?.hashed_id,
-            })}
-          >
-            {activity?.contact?.label}
-          </Link>
-        ) ?? '',
+      invoice: (
+        <Link
+          to={route('/invoices/:id/edit', {
+            id: activity.invoice?.hashed_id,
+          })}
+        >
+          {activity?.invoice?.label}
+        </Link>
+      ),
+      payment: (
+        <Link
+          to={route('/payments/:id/edit', {
+            id: activity.payment?.hashed_id,
+          })}
+        >
+          {activity?.payment?.label}
+        </Link>
+      ),
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', {
+            id: activity?.contact?.hashed_id,
+          })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      ),
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -112,6 +110,8 @@ export function PaymentSlider() {
     showCommonBulkAction: true,
     showEditAction: true,
   });
+
+  const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
@@ -150,7 +150,7 @@ export function PaymentSlider() {
         payment &&
         (hasPermission('edit_payment') || entityAssigned(payment)) && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={payment}
             actions={actions}
           />
@@ -269,7 +269,7 @@ export function PaymentSlider() {
           </div>
         </div>
 
-        <div>
+        <div className='divide-y'>
           {activities?.map((activity) => (
             <NonClickableElement
               key={activity.id}
@@ -277,7 +277,9 @@ export function PaymentSlider() {
             >
               <p>{activityElement(activity, payment)}</p>
               <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>
+                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                </p>
                 <p>&middot;</p>
                 <p>{activity.ip}</p>
               </div>

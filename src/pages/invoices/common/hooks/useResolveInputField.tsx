@@ -19,7 +19,6 @@ import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -45,6 +44,11 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useLocation } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import {
+  getTaxRateComboValue,
+  TaxNamePropertyType,
+} from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 const numberInputs = [
   'discount',
@@ -255,11 +259,10 @@ export function useResolveInputField(props: Props) {
               onTaxCreated={(taxRate) =>
                 handleTaxRateChange(property, index, taxRate)
               }
-              defaultValue={
-                resource?.line_items[index][
-                  property.replace('rate', 'name') as keyof InvoiceItem
-                ]
-              }
+              defaultValue={getTaxRateComboValue(
+                resource?.line_items[index],
+                property.replace('rate', 'name') as TaxNamePropertyType
+              )}
               onClearButtonClick={() => handleTaxRateChange(property, index)}
             />
 
@@ -305,11 +308,10 @@ export function useResolveInputField(props: Props) {
         onTaxCreated={(taxRate) =>
           handleTaxRateChange(property, index, taxRate)
         }
-        defaultValue={
-          resource?.line_items[index][
-            property.replace('rate', 'name') as keyof InvoiceItem
-          ]
-        }
+        defaultValue={getTaxRateComboValue(
+          resource?.line_items[index],
+          property.replace('rate', 'name') as TaxNamePropertyType
+        )}
         onClearButtonClick={() => handleTaxRateChange(property, index)}
       />
     );
@@ -357,7 +359,7 @@ export function useResolveInputField(props: Props) {
     if (numberInputs.includes(property)) {
       return (
         inputCurrencySeparators && (
-          <DecimalNumberInput
+          <NumberInputField
             precision={
               property === 'quantity'
                 ? 6
@@ -368,10 +370,9 @@ export function useResolveInputField(props: Props) {
                 : inputCurrencySeparators?.precision || 2
             }
             id={property}
-            currency={inputCurrencySeparators}
-            initialValue={resource?.line_items[index][property] as string}
+            value={resource?.line_items[index][property] || ''}
             className="auto"
-            onBlurValue={(value: string) => {
+            onValueChange={(value: string) => {
               onChange(
                 property,
                 isNaN(parseFloat(value)) ? 0 : parseFloat(value),
@@ -416,6 +417,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          selectMenuPosition="fixed"
         />
       ) : (
         <InputField
@@ -441,6 +443,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          selectMenuPosition="fixed"
         />
       ) : (
         <InputField

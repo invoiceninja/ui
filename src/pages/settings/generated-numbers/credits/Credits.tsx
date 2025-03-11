@@ -22,6 +22,7 @@ import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHan
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Credits() {
   const [t] = useTranslation();
@@ -73,8 +74,8 @@ export function Credits() {
           />
         }
       >
-        <InputField
-          type="number"
+        <NumberInputField
+          precision={0}
           value={companyChanges?.settings?.credit_number_counter || ''}
           onValueChange={(value) =>
             handleChange(

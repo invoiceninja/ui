@@ -14,7 +14,6 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { request } from '$app/common/helpers/request';
-import { EmailTemplate } from '$app/common/hooks/emails/useResolveTemplate';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
@@ -41,6 +40,8 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { cloneDeep } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { Spinner } from '$app/components/Spinner';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -339,7 +340,7 @@ export function TemplatesAndReminders() {
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      <AdvancedSettingsPlanAlert />
 
       <Card title={t('edit')}>
         <Element
@@ -362,6 +363,8 @@ export function TemplatesAndReminders() {
               !isCompanySettingsActive && setTemplateBody(undefined);
             }}
             cypressRef="templateSelector"
+            customSelector
+            dismissable={false}
           >
             {statics &&
               Object.keys(statics.templates).map((template, index) => (
@@ -369,6 +372,11 @@ export function TemplatesAndReminders() {
                   {t(template)}
                 </option>
               ))}
+
+            <option value="credit">{t('credit')}</option>
+            <option value="purchase_order">{t('purchase_order')}</option>
+
+            <option value="partial_payment">{t('partial_payment')}</option>
 
             <option value="custom1">{t('first_custom')}</option>
             <option value="custom2">{t('second_custom')}</option>
@@ -438,7 +446,8 @@ export function TemplatesAndReminders() {
             templateId === 'quote_reminder1' ? (
               <>
                 <Element leftSide={t('days')}>
-                  <InputField
+                  <NumberInputField
+                    precision={0}
                     value={
                       company?.settings[getNumDaysReminderKey(reminderIndex)] ||
                       0
@@ -449,7 +458,7 @@ export function TemplatesAndReminders() {
                         parseFloat(value) || 0
                       )
                     }
-                    type="number"
+                    disablePrecision
                   />
                 </Element>
 
@@ -523,8 +532,7 @@ export function TemplatesAndReminders() {
                 </Element>
 
                 <Element leftSide={t('late_fee_amount')}>
-                  <InputField
-                    type="number"
+                  <NumberInputField
                     value={
                       company?.settings[getLateFeeAmountKey(reminderIndex)] || 0
                     }
@@ -538,8 +546,7 @@ export function TemplatesAndReminders() {
                 </Element>
 
                 <Element leftSide={t('late_fee_percent')}>
-                  <InputField
-                    type="number"
+                  <NumberInputField
                     value={
                       company?.settings[getLateFeePercentKey(reminderIndex)] ||
                       0

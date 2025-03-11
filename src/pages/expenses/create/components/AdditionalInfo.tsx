@@ -14,7 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { CurrencySelector } from '$app/components/CurrencySelector';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import Toggle from '$app/components/forms/Toggle';
 import { PaymentTypeSelector } from '$app/components/payment-types/PaymentTypeSelector';
 import dayjs from 'dayjs';
@@ -23,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ExpenseCardProps } from './Details';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();
@@ -87,20 +87,18 @@ export function AdditionalInfo(props: ExpenseCardProps) {
     if (expense) {
       handleChange('invoice_currency_id', expense.invoice_currency_id);
 
-      if (expense.invoice_currency_id) {
+      if (expense.invoice_currency_id && expense.currency_id) {
         const resolveConvertCurrency = resolveCurrency(
           expense.invoice_currency_id
         );
+        const expenseCurrency = resolveCurrency(expense.currency_id);
 
-        if (resolveConvertCurrency) {
-          handleChange('exchange_rate', resolveConvertCurrency.exchange_rate);
+        if (resolveConvertCurrency && expenseCurrency) {
+          const currentExchangeRate =
+            resolveConvertCurrency.exchange_rate /
+            expenseCurrency.exchange_rate;
 
-          if (expense.amount) {
-            handleChange(
-              'foreign_amount',
-              expense.amount * resolveConvertCurrency.exchange_rate
-            );
-          }
+          handleChange('exchange_rate', currentExchangeRate);
         }
       } else {
         handleChange('foreign_amount', 0);
@@ -110,9 +108,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
       handleChange('foreign_amount', 0);
       handleChange('exchange_rate', 1);
     }
-  }, [expense?.invoice_currency_id]);
 
-  useEffect(() => {
     if (expense?.invoice_currency_id) {
       const resolvedCurrencySeparators = resolveCurrencySeparator(
         expense.invoice_currency_id
@@ -122,12 +118,10 @@ export function AdditionalInfo(props: ExpenseCardProps) {
         setCurrencySeparators(resolvedCurrencySeparators);
       }
     }
-  }, [expense?.invoice_currency_id]);
+  }, [expense?.invoice_currency_id, expense?.currency_id]);
 
   useEffect(() => {
     if (expense && expense.exchange_rate) {
-      handleChange('exchange_rate', expense.exchange_rate);
-
       if (expense.amount && expense.invoice_currency_id) {
         handleChange('foreign_amount', expense.amount * expense.exchange_rate);
       }
@@ -229,17 +223,18 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           </Element>
 
           <Element leftSide={t('exchange_rate')}>
-            <InputField
-              value={expense.exchange_rate.toFixed(5)}
+            <NumberInputField
+              value={expense.exchange_rate || ''}
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
               errorMessage={errors?.errors.exchange_rate}
+              disablePrecision
             />
           </Element>
 
           <Element leftSide={t('converted_amount')}>
-            <DecimalNumberInput
+            <NumberInputField
               border
               precision={
                 reactSettings?.number_precision &&
@@ -248,13 +243,13 @@ export function AdditionalInfo(props: ExpenseCardProps) {
                   ? reactSettings.number_precision
                   : currencySeparators?.precision || 2
               }
-              currency={currencySeparators}
               className="auto"
-              initialValue={(expense.foreign_amount || 0).toString()}
-              onChange={(value: string) =>
+              value={(expense.foreign_amount || 0).toString()}
+              onValueChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }
               errorMessage={errors?.errors.foreign_amount}
+              disablePrecision
             />
           </Element>
         </>

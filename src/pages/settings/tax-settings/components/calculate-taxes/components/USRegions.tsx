@@ -98,11 +98,15 @@ export function USRegions() {
           >
             <div
               className="flex col-span-1 items-center justify-start pl-5"
-              onClick={() =>
+              onClick={(e) => {
+                if (e.target instanceof HTMLInputElement) {
+                  return;
+                }
+                
                 divClickIntercept(
                   `tax_data.regions.US.subregions.${value[0]}.apply_tax`
-                )
-              }
+                );
+              }}
             >
               <Checkbox
                 id={`tax_data.regions.US.subregions.${value[0]}`}

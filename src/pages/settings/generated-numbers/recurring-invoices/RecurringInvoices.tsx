@@ -22,6 +22,7 @@ import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHan
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function RecurringInvoices() {
   const [t] = useTranslation();
@@ -78,8 +79,8 @@ export function RecurringInvoices() {
           />
         }
       >
-        <InputField
-          type="number"
+        <NumberInputField
+          precision={0}
           value={
             companyChanges?.settings?.recurring_invoice_number_counter || ''
           }

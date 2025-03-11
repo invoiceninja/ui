@@ -28,6 +28,9 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Credit } from '$app/common/interfaces/credit';
+import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Credits() {
   useTitle('credits');
@@ -40,9 +43,8 @@ export default function Credits() {
   const actions = useActions();
   const columns = useCreditColumns();
   const filters = useCreditsFilters();
-
   const creditColumns = useAllCreditColumns();
-
+  const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
 
   const {
@@ -50,6 +52,14 @@ export default function Credits() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+
+  useSocketEvent({
+    on: [
+      'App\\Events\\Credit\\CreditWasCreated',
+      'App\\Events\\Credit\\CreditWasUpdated',
+    ],
+    callback: () => $refetch(['credits']),
+  });
 
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="en/credits/">
@@ -72,8 +82,10 @@ export default function Credits() {
             table="credit"
           />
         }
+        dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_credit')]}
         hideEditableOptions={!hasPermission('edit_credit')}
+        enableSavingFilterPreference
       />
 
       <ChangeTemplateModal<Credit>

@@ -97,6 +97,7 @@ export function SearchableSelect({
       minWidth: '100%',
       backgroundColor: colors.$4,
       borderColor: colors.$4,
+      zIndex: 50,
     }),
     control: (base, { isDisabled }) => ({
       ...base,

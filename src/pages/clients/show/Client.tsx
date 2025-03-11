@@ -36,6 +36,9 @@ import {
 import { Client as IClient } from '$app/common/interfaces/client';
 import { ClientPublicNotes } from './components/ClientPublicNotes';
 import { ClientPrivateNotes } from './components/ClientPrivateNotes';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -60,7 +63,6 @@ export default function Client() {
 
   const tabs = useTabs({
     client,
-    isPurgeOrMergeActionCalled,
   });
   const actions = useActions({
     setIsPurgeOrMergeActionCalled,
@@ -85,6 +87,24 @@ export default function Client() {
     changeTemplateEntityContext,
   } = useChangeTemplate();
 
+  useSocketEvent({
+    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
+    callback: () => $refetch(['invoices']),
+  });
+
+  useSocketEvent({
+    on: 'App\\Events\\Payment\\PaymentWasUpdated',
+    callback: () => $refetch(['payments']),
+  });
+
+  useSocketEvent({
+    on: [
+      'App\\Events\\Credit\\CreditWasCreated',
+      'App\\Events\\Credit\\CreditWasUpdated',
+    ],
+    callback: () => $refetch(['credits']),
+  });
+
   return (
     <Default
       title={documentTitle}
@@ -101,6 +121,7 @@ export default function Client() {
           />
         )
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="client" />}
     >
       {isLoading && <Spinner />}
 

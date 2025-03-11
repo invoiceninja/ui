@@ -58,6 +58,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 dayjs.extend(duration);
 
@@ -136,6 +137,7 @@ export default function Show() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="project" />}
     >
       <div className="grid grid-cols-12 lg:space-y-0 gap-4">
         <div className="col-span-12 md:col-span-6 lg:col-span-3">
@@ -217,7 +219,7 @@ export default function Show() {
         <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoCard title={t('summary')}>
             <p>
-              {t('tasks')}: {project.tasks?.length}
+              {t('active_tasks')}: {project.tasks?.length}
             </p>
 
             <p>

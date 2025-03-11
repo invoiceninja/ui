@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from '$app/common/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface NotificationOptionType {
@@ -26,7 +25,7 @@ export function useNotificationOptions() {
     },
     {
       key: 'invoice_sent',
-      label: trans('invoice_sent', { count: '' }),
+      label: t('invoice_sent_notification_label'),
     },
     {
       key: 'invoice_viewed',

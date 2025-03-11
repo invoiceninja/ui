@@ -19,7 +19,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
@@ -52,6 +52,7 @@ export function ImportTemplateModal(props: Props) {
   const handleOnClose = () => {
     setTemplateName('');
     setIsSaveTemplateModalOpen(false);
+    navigate(`/${entity}s`);
   };
 
   const shouldOpenTemplateModal = () => {
@@ -92,7 +93,7 @@ export function ImportTemplateModal(props: Props) {
 
     Object.keys(reactSettings?.import_templates?.[entity]).forEach(
       (currentTemplateName) => {
-        if (currentTemplateName.toLowerCase() === templateName.toLowerCase()) {
+        if (currentTemplateName === templateName) {
           isTemplateDuplicated = true;
         }
       }
@@ -102,19 +103,40 @@ export function ImportTemplateModal(props: Props) {
   };
 
   const handleSaveTemplate = () => {
-    if (!isFormBusy) {
+    if (!isFormBusy && templateName) {
       toast.processing();
       setIsFormBusy(true);
 
       const updatedUser = cloneDeep(user) as User;
 
       if (updatedUser) {
+        const currentEntityImportTemplates = (cloneDeep(
+          updatedUser.company_user?.react_settings.import_templates?.[
+            props.entity
+          ]
+        ) || {}) as Record<string, Record<number, string>>;
+
+        const updatedEntityImportTemplates: Record<string, (string | null)[]> =
+          {};
+
+        if (!Array.isArray(currentEntityImportTemplates)) {
+          Object.entries(currentEntityImportTemplates).forEach(
+            ([key, value]) => {
+              if (!key || !value || !Array.isArray(value)) return;
+
+              updatedEntityImportTemplates[key] = value;
+            }
+          );
+        }
+
+        updatedEntityImportTemplates[templateName] = Object.values(
+          importMap.column_map?.[props.entity]?.mapping
+        ).map((column) => column || '') as string[];
+
         set(
           updatedUser,
-          `company_user.react_settings.import_templates.${props.entity}.${templateName}`,
-          Object.values(importMap.column_map?.[props.entity]?.mapping).map(
-            (column) => column || ''
-          )
+          `company_user.react_settings.import_templates.${props.entity}`,
+          updatedEntityImportTemplates
         );
 
         request(
@@ -130,6 +152,7 @@ export function ImportTemplateModal(props: Props) {
             $refetch(['company_users']);
 
             dispatch(updateUser(updatedUser));
+            dispatch(resetChanges());
 
             handleOnClose();
 
@@ -206,7 +229,9 @@ export function ImportTemplateModal(props: Props) {
             behavior="button"
             onClick={() => {
               setIsTemplateModalOpen(false);
-              setIsSaveTemplateModalOpen(true);
+              setTimeout(() => {
+                setIsSaveTemplateModalOpen(true);
+              }, 310);
             }}
           >
             {t('yes')}

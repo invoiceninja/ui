@@ -30,6 +30,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTabs } from './common/hooks/useTabs';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Product() {
   const [t] = useTranslation();
@@ -70,7 +71,7 @@ export default function Product() {
 
       toast.processing();
 
-      await saveCompany(true);
+      await saveCompany({ excludeToasters: true });
 
       const url = searchParams.has('update_in_stock_quantity')
         ? endpoint('/api/v1/products/:id?update_in_stock_quantity=true', { id })
@@ -118,6 +119,7 @@ export default function Product() {
             />
           ),
         })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="product" />}
     >
       <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} />

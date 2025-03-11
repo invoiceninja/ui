@@ -63,7 +63,8 @@ export function Permissions(props: Props) {
       permissions &&
       permissions.includes(`${type}_all`) &&
       permission !== 'view_reports' &&
-      permission !== 'view_dashboard'
+      permission !== 'view_dashboard' &&
+      permission !== 'disable_emails'
     ) {
       return true;
     }
@@ -87,9 +88,18 @@ export function Permissions(props: Props) {
 
     if (entity === 'all') {
       currentPermissions = currentPermissions.filter(
-        (currentPermission) => !currentPermission.startsWith(permissionType)
+        (currentPermission) =>
+          !currentPermission.startsWith(permissionType) ||
+          currentPermission === 'view_reports' ||
+          currentPermission === 'view_dashboard' ||
+          currentPermission === 'disable_emails'
       );
-    } else if (currentPermissions.includes(`${permissionType}_all`)) {
+    } else if (
+      currentPermissions.includes(`${permissionType}_all`) &&
+      permission !== 'view_reports' &&
+      permission !== 'view_dashboard' &&
+      permission !== 'disable_emails'
+    ) {
       const permissionsByType = permissions
         .map((currentPermission) => `${permissionType}_${currentPermission}`)
         .filter((currentPermission) => currentPermission !== permission);
@@ -154,6 +164,17 @@ export function Permissions(props: Props) {
             handlePermissionChange('view_reports', value)
           }
           cypressRef="viewReports"
+        />
+      </Element>
+
+      <Element leftSide={t('disable_emails')}
+        leftSideHelp={t('disable_emails_help')}
+      >
+        <Toggle
+          checked={isPermissionChecked('disable_emails')}
+          onValueChange={(value) =>
+            handlePermissionChange('disable_emails', value)
+          }
         />
       </Element>
 

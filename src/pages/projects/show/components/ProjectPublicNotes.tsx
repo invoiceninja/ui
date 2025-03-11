@@ -36,7 +36,7 @@ export function ProjectPublicNotes(props: Props) {
               <div className="whitespace-normal max-h-56 overflow-y-auto">
                 <article
                   className={classNames('prose prose-sm', {
-                    'prose-invert': reactSettings.dark_mode,
+                    'prose-invert': reactSettings?.dark_mode,
                   })}
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(project.public_notes),

@@ -69,9 +69,9 @@ export class InvoiceItemSumInclusive {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total -= this.item.discount;
+      this.item.line_total = parseFloat((this.item.line_total - this.item.discount).toFixed(2));
     } else {
-      this.item.line_total -= this.item.line_total * (this.item.discount / 100);
+      this.item.line_total = parseFloat((this.item.line_total - this.item.line_total * (this.item.discount / 100)).toFixed(2));
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;

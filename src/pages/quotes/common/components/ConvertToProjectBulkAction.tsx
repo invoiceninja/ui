@@ -9,45 +9,58 @@
  */
 
 import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdSwitchRight } from 'react-icons/md';
+import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useBulkAction } from '../hooks/useBulkAction';
 import { useColorScheme } from '$app/common/colors';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 
 interface Props {
   selectedIds: string[];
   setSelected?: Dispatch<SetStateAction<string[]>>;
+  disablePreventNavigation?: boolean;
+  dropdown: boolean;
 }
 export const ConvertToProjectBulkAction = (props: Props) => {
   const [t] = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { selectedIds, setSelected } = props;
+  const { selectedIds, setSelected, dropdown } = props;
   const colors = useColorScheme();
   const bulk = useBulkAction();
 
   return (
     <>
-      <DropdownElement
+      <EntityActionElement
+        entity="quote"
+        actionKey="convert_to_project"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('convert_to_project')}
         onClick={() => setIsModalOpen(true)}
-        icon={<Icon element={MdSwitchRight} />}
+        icon={MdOutlineCreateNewFolder}
+        disablePreventNavigation={props.disablePreventNavigation}
       >
         {t('convert_to_project')}
-      </DropdownElement>
+      </EntityActionElement>
 
       <Modal
         title={t('convert_to_project')}
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg"
-          style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-        >{t('are_you_sure')}</span>
+        <span
+          className="text-lg"
+          style={{
+            backgroundColor: colors.$2,
+            color: colors.$3,
+            colorScheme: colors.$0,
+          }}
+        >
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button

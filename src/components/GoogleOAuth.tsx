@@ -9,17 +9,26 @@
  */
 
 import { isHosted } from '$app/common/helpers';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense, lazy } from 'react';
+
+const GoogleOAuthProvider = lazy(() =>
+  import('@react-oauth/google').then((module) => ({
+    default: module.GoogleOAuthProvider,
+  }))
+);
 
 export function GoogleOAuth({ children }: { children: ReactNode }) {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-  return isHosted() ? (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      {children}
-    </GoogleOAuthProvider>
-  ) : (
-    <>{children}</>
+  if (!isHosted()) {
+    return <>{children}</>;
+  }
+
+  return (
+    <Suspense>
+      <GoogleOAuthProvider clientId={googleClientId}>
+        {children}
+      </GoogleOAuthProvider>
+    </Suspense>
   );
 }

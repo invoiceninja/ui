@@ -30,7 +30,7 @@ export function useDesignsQuery() {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/designs?status=active&sort=name|asc')
+        endpoint('/api/v1/designs?status=active&sort=name|asc&per_page=100')
       ).then((response: AxiosResponse<GenericManyResponse<Design>>) =>
         response.data.data.filter(
           (design) =>
@@ -80,7 +80,7 @@ export function useBlankDesignQuery(options?: GenericQueryOptions) {
 
 export function useTemplateQuery(entity: string) {
   return useQuery<Design[]>(
-    ['/api/v1/designs?template=true&entities=' + entity],
+    ['/api/v1/designs', '?template=true&entities=', entity],
     () =>
       request(
         'GET',

@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { updateChanges } from '$app/common/stores/slices/company-users';
@@ -16,14 +15,18 @@ import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
-import { Radio } from '../../../components/forms';
+import { InputField, Radio } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { ExpenseCategories } from '../expense-categories';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { isSelfHosted } from '$app/common/helpers';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 
 export function ExpenseSettings() {
+  useTitle('expense_settings');
   const [t] = useTranslation();
 
   const pages = [
@@ -31,24 +34,14 @@ export function ExpenseSettings() {
     { name: t('expense_settings'), href: '/settings/expense_settings' },
   ];
 
+  const companyChanges = useInjectCompanyChanges();
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
   const dispatch = useDispatch();
-
-  useTitle('expense_settings');
-  useInjectCompanyChanges();
-
-  const companyChanges = useCompanyChanges();
-
-  const handleToggleChange = (id: string, value: boolean) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: id,
-        value,
-      })
-    );
-
-  const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
+  const onSave = useHandleCompanySave();
+  const handleCurrentCompanyChangeProperty =
+    useHandleCurrentCompanyChangeProperty();
 
   return (
     <Settings
@@ -66,7 +59,10 @@ export function ExpenseSettings() {
           <Toggle
             checked={companyChanges?.mark_expenses_invoiceable}
             onChange={(value: boolean) =>
-              handleToggleChange('mark_expenses_invoiceable', value)
+              handleCurrentCompanyChangeProperty(
+                'mark_expenses_invoiceable',
+                value
+              )
             }
             cypressRef="shouldBeInvoicedToggle"
           />
@@ -76,7 +72,7 @@ export function ExpenseSettings() {
           <Toggle
             checked={companyChanges?.mark_expenses_paid}
             onChange={(value: boolean) =>
-              handleToggleChange('mark_expenses_paid', value)
+              handleCurrentCompanyChangeProperty('mark_expenses_paid', value)
             }
             cypressRef="markPaidToggle"
           />
@@ -89,7 +85,10 @@ export function ExpenseSettings() {
           <Toggle
             checked={companyChanges?.convert_expense_currency}
             onChange={(value: boolean) =>
-              handleToggleChange('convert_expense_currency', value)
+              handleCurrentCompanyChangeProperty(
+                'convert_expense_currency',
+                value
+              )
             }
             cypressRef="convertCurrencyToggle"
           />
@@ -102,7 +101,10 @@ export function ExpenseSettings() {
           <Toggle
             checked={companyChanges?.invoice_expense_documents}
             onChange={(value: boolean) =>
-              handleToggleChange('invoice_expense_documents', value)
+              handleCurrentCompanyChangeProperty(
+                'invoice_expense_documents',
+                value
+              )
             }
             cypressRef="addDocumentsToInvoiceToggle"
           />
@@ -114,13 +116,136 @@ export function ExpenseSettings() {
         >
           <Toggle
             onChange={(value: boolean) =>
-              handleToggleChange('notify_vendor_when_paid', value)
+              handleCurrentCompanyChangeProperty(
+                'notify_vendor_when_paid',
+                value
+              )
             }
             checked={companyChanges?.notify_vendor_when_paid || false}
           />
         </Element>
 
-        <Divider />
+        {isCompanySettingsActive && isSelfHosted() && (
+          <>
+            <Divider withoutPadding />
+
+            <Element className="mt-3.5" leftSide={t('expense_mailbox_active')}>
+              <Toggle
+                checked={Boolean(companyChanges?.expense_mailbox_active)}
+                onChange={(value: boolean) =>
+                  handleCurrentCompanyChangeProperty(
+                    'expense_mailbox_active',
+                    value
+                  )
+                }
+              />
+            </Element>
+
+            {Boolean(companyChanges?.expense_mailbox_active) && (
+              <>
+                <Element leftSide={t('expense_mailbox')}>
+                  <InputField
+                    value={companyChanges?.expense_mailbox || ''}
+                    onValueChange={(value) =>
+                      handleCurrentCompanyChangeProperty(
+                        'expense_mailbox',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+
+                <Element leftSide={t('inbound_mailbox_allow_company_users')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_company_users
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_company_users',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+
+                <Element leftSide={t('inbound_mailbox_allow_vendors')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_vendors
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_vendors',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+
+                <Element leftSide={t('inbound_mailbox_allow_clients')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_clients
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_clients',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+
+                <Element
+                  leftSide={t('inbound_mailbox_whitelist')}
+                  leftSideHelp={t('inbound_mailbox_whitelist_help')}
+                >
+                  <InputField
+                    value={companyChanges?.inbound_mailbox_whitelist || ''}
+                    onValueChange={(value) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_whitelist',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+
+                <Element
+                  leftSide={t('inbound_mailbox_blacklist')}
+                  leftSideHelp={t('inbound_mailbox_blacklist_help')}
+                >
+                  <InputField
+                    value={companyChanges?.inbound_mailbox_blacklist || ''}
+                    onValueChange={(value) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_blacklist',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+
+                <Element leftSide={t('inbound_mailbox_allow_unknown')}>
+                  <Toggle
+                    checked={Boolean(
+                      companyChanges?.inbound_mailbox_allow_unknown
+                    )}
+                    onChange={(value: boolean) =>
+                      handleCurrentCompanyChangeProperty(
+                        'inbound_mailbox_allow_unknown',
+                        value
+                      )
+                    }
+                  />
+                </Element>
+              </>
+            )}
+          </>
+        )}
+
+        <Divider className="pb-3.5" withoutPadding />
 
         <Element leftSide={t('enter_taxes')}>
           <Radio
@@ -154,7 +279,10 @@ export function ExpenseSettings() {
         >
           <Toggle
             onChange={(value: boolean) =>
-              handleToggleChange('expense_inclusive_taxes', value)
+              handleCurrentCompanyChangeProperty(
+                'expense_inclusive_taxes',
+                value
+              )
             }
             checked={companyChanges?.expense_inclusive_taxes || false}
             cypressRef="inclusiveTaxesToggle"

@@ -16,7 +16,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,10 +30,19 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Credit as ICredit } from '$app/common/interfaces/credit';
 import { useCreditQuery } from './common/queries';
-import { creditAtom } from './common/atoms';
+import { creditAtom, invoiceSumAtom } from './common/atoms';
 import { useActions, useCreditUtilities, useSave } from './common/hooks';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './common/hooks/useTabs';
+import { Banner } from '$app/components/Banner';
+import {
+  socketId,
+  useSocketEvent,
+  WithSocketId,
+} from '$app/common/queries/sockets';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -54,7 +63,8 @@ export default function Credit() {
 
   const { data } = useCreditQuery({ id: id! });
 
-  const [credit, setQuote] = useAtom(creditAtom);
+  const invoiceSum = useAtomValue(invoiceSumAtom);
+  const [credit, setCredit] = useAtomWithPrevent(creditAtom);
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -80,7 +90,7 @@ export default function Credit() {
 
       _credit.line_items.map((item) => (item._id = v4()));
 
-      setQuote(_credit);
+      setCredit(_credit);
 
       if (_credit && _credit.client) {
         setClient(_credit.client);
@@ -91,6 +101,17 @@ export default function Credit() {
   useEffect(() => {
     credit && calculateInvoiceSum(credit);
   }, [credit]);
+
+  useSocketEvent<WithSocketId<ICredit>>({
+    on: ['App\\Events\\Credit\\CreditWasUpdated'],
+    callback: ({ data }) => {
+      if (socketId()?.toString() !== data['x-socket-id']) {
+        document
+          .getElementById('creditUpdateBanner')
+          ?.classList.remove('hidden');
+      }
+    },
+  });
 
   return (
     <Default
@@ -107,10 +128,25 @@ export default function Credit() {
             />
           ),
         })}
+      aboveMainContainer={
+        <Banner id="creditUpdateBanner" className="hidden" variant="orange">
+          {t('credit_status_changed')}
+        </Banner>
+      }
+      afterBreadcrumbs={<PreviousNextNavigation entity="credit" />}
     >
       {credit?.id === id ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              credit && (
+                <div className="flex items-center">
+                  <CommonActions resource={credit} entity="credit" />
+                </div>
+              )
+            }
+          />
 
           <Outlet
             context={{
@@ -121,6 +157,7 @@ export default function Credit() {
               isDefaultFooter,
               setIsDefaultFooter,
               client,
+              invoiceSum,
             }}
           />
         </div>

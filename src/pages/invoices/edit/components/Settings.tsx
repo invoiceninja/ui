@@ -9,7 +9,6 @@
  */
 
 import Toggle from '$app/components/forms/Toggle';
-import { InputField } from '$app/components/forms';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
@@ -20,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Card } from '$app/components/cards';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Settings() {
   const [t] = useTranslation();
@@ -54,14 +54,14 @@ export default function Settings() {
             />
           </div>
 
-          <InputField
+          <NumberInputField
             label={t('exchange_rate')}
-            type="number"
             value={invoice?.exchange_rate || 1.0}
             onValueChange={(value) =>
               handleChange('exchange_rate', parseFloat(value) || 1.0)
             }
             errorMessage={errors?.errors.exchange_rate}
+            disablePrecision
           />
 
           <Toggle

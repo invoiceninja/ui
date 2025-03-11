@@ -65,11 +65,11 @@ export class InvoiceItemSum {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = this.item.line_total - this.item.discount;
+      this.item.line_total = parseFloat((this.item.line_total - this.item.discount).toFixed(2));
     } else {
       const discount = this.item.line_total * (this.item.discount / 100);
 
-      this.item.line_total = this.item.line_total - discount;
+      this.item.line_total = parseFloat((this.item.line_total - discount).toFixed(2));
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -131,17 +131,17 @@ export class InvoiceItemSum {
       );
     }
 
-    this.item.gross_line_total = this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
+    this.item.gross_line_total =
+      this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
 
-    this.totalTaxes += (isNaN(itemTax) ? 0 : itemTax);
+    this.totalTaxes += isNaN(itemTax) ? 0 : itemTax;
 
     return this;
   }
 
   protected groupTax(name: string, rate: number, total: number) {
+    if (name.length === 0) return;
 
-    if(name.length === 0) return;
-    
     let group = {};
 
     const key = name + rate.toString().replace(' ', ''); // 'Tax Rate' + '5' => 'TaxRate5'
@@ -159,10 +159,12 @@ export class InvoiceItemSum {
     //why? because dealing with floating point maths hurts. Epsilon does not cover the edge cases, but this does.
     this.subTotal += parseFloat(
       (this.item.line_total + 0.000000000000004).toFixed(
-        this.currency.precision
+        this.currency?.precision || 2
       )
     );
-    this.subTotal = parseFloat(this.subTotal.toFixed(this.currency.precision));
+    this.subTotal = parseFloat(
+      this.subTotal.toFixed(this.currency?.precision || 2)
+    );
 
     this.grossSubTotal += this.item.gross_line_total;
 
@@ -183,7 +185,6 @@ export class InvoiceItemSum {
         this.item = item;
 
         if (item.line_total != 0) {
-          
           const amount =
             this.item.line_total -
             this.item.line_total * (this.invoice.discount / this.subTotal);
@@ -237,7 +238,8 @@ export class InvoiceItemSum {
             );
           }
 
-          this.item.gross_line_total = this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
+          this.item.gross_line_total =
+            this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
           this.item.tax_amount = isNaN(itemTax) ? 0 : itemTax;
         }
 

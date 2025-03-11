@@ -169,7 +169,7 @@ export function useTaskColumns() {
         <Assigned
           entityId={task.project_id}
           cacheEndpoint="/api/v1/projects"
-          apiEndpoint="/api/v1/projects/:id"
+          apiEndpoint="/api/v1/projects/:id?include=client"
           preCheck={
             hasPermission('view_project') || hasPermission('edit_project')
           }
@@ -247,7 +247,7 @@ export function useTaskColumns() {
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
                 className={classNames('prose prose-sm', {
-                  'prose-invert': reactSettings.dark_mode,
+                  'prose-invert': !reactSettings?.dark_mode,
                 })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),

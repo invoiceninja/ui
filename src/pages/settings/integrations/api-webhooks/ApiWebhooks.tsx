@@ -35,6 +35,7 @@ export function ApiWebhooks() {
         linkToCreate="/settings/integrations/api_webhooks/create"
         linkToEdit="/settings/integrations/api_webhooks/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

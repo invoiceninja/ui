@@ -33,7 +33,7 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
   const hasPermission = useHasPermission();
 
   const perPageParameter =
-    import.meta.env.VITE_IS_TEST === 'true' ? '&per_page=1' : '';
+    import.meta.env.VITE_IS_TEST === 'true' ? '&per_page=1' : '&per_page=500';
 
   return (
     <>

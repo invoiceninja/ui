@@ -9,7 +9,7 @@
  */
 
 import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InputField, SelectField } from '.';
 import Toggle from './Toggle';
 import { useColorScheme } from '$app/common/colors';
@@ -19,6 +19,7 @@ export interface Props {
   field: string;
   value: string;
   onValueChange: (value: string | number | boolean) => unknown;
+  selectMenuPosition?: 'fixed';
 }
 
 export function InputCustomField(props: Props) {
@@ -64,7 +65,9 @@ export function InputCustomField(props: Props) {
           }}
           checked={
             typeof props.defaultValue === 'string'
-              ? props.defaultValue === 'true' || props.defaultValue === '1' || props.defaultValue === 'yes'
+              ? props.defaultValue === 'true' ||
+                props.defaultValue === '1' ||
+                props.defaultValue === 'yes'
               : props.defaultValue
           }
         />
@@ -82,13 +85,12 @@ export function InputCustomField(props: Props) {
 
       {!Object.values(AvailableTypes).includes(type as AvailableTypes) && (
         <SelectField
-          style={{ color: colors.$3, colorScheme: colors.$0 }}
           value={props.defaultValue || ''}
-          onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-            props.onValueChange(event.target.value)
-          }
+          onValueChange={(currentValue) => props.onValueChange(currentValue)}
+          customSelector
+          withBlank
+          menuPosition={props.selectMenuPosition}
         >
-          <option value=""></option>
           {type.split(',').map((option, index) => (
             <option key={index} value={option}>
               {option}

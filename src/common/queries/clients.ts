@@ -124,6 +124,10 @@ export function useBulk() {
         queryClient.invalidateQueries([invalidateQueryValue]);
 
       $refetch(['clients']);
+
+      if (action === 'delete') {
+        $refetch(['projects']);
+      }
     });
   };
 }

@@ -29,6 +29,7 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Credit } from '$app/common/interfaces/credit';
 import { Tab, Tabs } from '$app/components/Tabs';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export interface CreditsContext {
   credit: Credit | undefined;
@@ -73,7 +74,7 @@ export default function Create() {
 
   const [searchParams] = useSearchParams();
 
-  const [credit, setCredit] = useAtom(creditAtom);
+  const [credit, setCredit] = useAtomWithPrevent(creditAtom);
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
@@ -92,6 +93,27 @@ export default function Create() {
   });
 
   const save = useCreate({ setErrors, isDefaultFooter, isDefaultTerms });
+
+  const settingResolver = (client: Client, taxNumber: '1' | '2' | '3') => {
+    if (client?.settings?.[`tax_name${taxNumber}`]) {
+      return {
+        name: client.settings[`tax_name${taxNumber}`],
+        rate: client.settings[`tax_rate${taxNumber}`],
+      };
+    }
+
+    if (client?.group_settings?.settings?.[`tax_name${taxNumber}`]) {
+      return {
+        name: client?.group_settings?.settings[`tax_name${taxNumber}`],
+        rate: client?.group_settings?.settings[`tax_rate${taxNumber}`],
+      };
+    }
+
+    return {
+      name: company?.settings[`tax_name${taxNumber}`],
+      rate: company?.settings[`tax_rate${taxNumber}`],
+    };
+  };
 
   useEffect(() => {
     setInvoiceSum(undefined);
@@ -113,21 +135,6 @@ export default function Create() {
         searchParams.get('action') !== 'reverse'
       ) {
         const _credit = cloneDeep(data);
-
-        if (company && company.enabled_tax_rates > 0) {
-          _credit.tax_name1 = company.settings.tax_name1;
-          _credit.tax_rate1 = company.settings.tax_rate1;
-        }
-
-        if (company && company.enabled_tax_rates > 1) {
-          _credit.tax_name2 = company.settings.tax_name2;
-          _credit.tax_rate2 = company.settings.tax_rate2;
-        }
-
-        if (company && company.enabled_tax_rates > 2) {
-          _credit.tax_name3 = company.settings.tax_name3;
-          _credit.tax_rate3 = company.settings.tax_rate3;
-        }
 
         if (typeof _credit.line_items === 'string') {
           _credit.line_items = [];
@@ -169,6 +176,41 @@ export default function Create() {
         });
 
         handleChange('invitations', invitations);
+
+        if (!client.is_tax_exempt) {
+          if (
+            company &&
+            company.enabled_tax_rates > 0 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '1');
+
+            handleChange('tax_name1', name);
+            handleChange('tax_rate1', rate);
+          }
+
+          if (
+            company &&
+            company.enabled_tax_rates > 1 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '2');
+
+            handleChange('tax_name2', name);
+            handleChange('tax_rate2', rate);
+          }
+
+          if (
+            company &&
+            company.enabled_tax_rates > 2 &&
+            searchParams.get('action') !== 'clone'
+          ) {
+            const { name, rate } = settingResolver(client, '3');
+
+            handleChange('tax_name3', name);
+            handleChange('tax_rate3', rate);
+          }
+        }
       });
   }, [credit?.client_id]);
 

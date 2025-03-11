@@ -27,6 +27,11 @@ import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useActions } from '../common/hooks/useActions';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import {
+  defaultColumns,
+  useAllTransactionColumns,
+} from '../common/hooks/useAllTransactionColumns';
 
 export default function Transactions() {
   useTitle('transactions');
@@ -40,6 +45,7 @@ export default function Transactions() {
   const filters = useTransactionFilters();
   const columns = useTransactionColumns();
   const customBulkActions = useCustomBulkActions();
+  const transactionColumns = useAllTransactionColumns();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [sliderTitle, setSliderTitle] = useState<string>();
@@ -77,7 +83,6 @@ export default function Transactions() {
         title={t('transactions')}
         breadcrumbs={pages}
         docsLink="en/transactions/"
-        
       >
         <DataTable
           resource="transaction"
@@ -103,9 +108,17 @@ export default function Transactions() {
               component={<ImportButton route="/transactions/import" />}
             />
           }
+          leftSideChevrons={
+            <DataTableColumnsPicker
+              table="transaction"
+              columns={transactionColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+            />
+          }
           withResourcefulActions
           linkToCreateGuards={[permission('create_bank_transaction')]}
           hideEditableOptions={!hasPermission('edit_bank_transaction')}
+          enableSavingFilterPreference
         />
       </Default>
     </>

@@ -27,6 +27,7 @@ interface Props {
   tooltipElement?: ReactNode;
   disabled?: boolean;
   withoutWrapping?: boolean;
+  centerVertically?: boolean;
 }
 
 export function Tooltip(props: Props) {
@@ -94,8 +95,8 @@ export function Tooltip(props: Props) {
               )}
               style={{
                 width: width || messageWidth,
-                backgroundColor: colors.$5,
-                color: colors.$3,
+                backgroundColor: colors.$3,
+                color: colors.$1,
               }}
             >
               {message}
@@ -105,10 +106,10 @@ export function Tooltip(props: Props) {
 
             {!withoutArrow && (
               <Icon
-                className="rotate-90 -mt-2.5"
+                className="rotate-90"
                 element={MdPlayArrow}
                 size={24}
-                style={{ color: colors.$5 }}
+                style={{ color: colors.$3, marginTop: '-0.51rem' }}
               />
             )}
           </div>
@@ -119,6 +120,7 @@ export function Tooltip(props: Props) {
           ref={parentChildrenElement}
           className={classNames('cursor-pointer', {
             'truncate w-full': props.truncate,
+            'flex items-center': props.centerVertically,
           })}
         >
           {props.children}

@@ -65,7 +65,7 @@ export function TabGroup(props: Props) {
                 color: currentIndex === index ? accentColor : colors.$3,
               }}
               className={classNames(
-                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                'whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm',
                 { 'w-full': props.width === 'full' }
               )}
             >

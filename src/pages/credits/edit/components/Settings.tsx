@@ -17,9 +17,9 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Card } from '$app/components/cards';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Settings() {
   const [t] = useTranslation();
@@ -73,14 +73,14 @@ export default function Settings() {
             errorMessage={errors?.errors.project_id}
           />
 
-          <InputField
+          <NumberInputField
             label={t('exchange_rate')}
-            type="number"
             value={credit?.exchange_rate || 1.0}
             onValueChange={(value) =>
               handleChange('exchange_rate', parseFloat(value))
             }
             errorMessage={errors?.errors.exchange_rate}
+            disablePrecision
           />
 
           <div className="lg:pt-7">

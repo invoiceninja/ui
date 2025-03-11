@@ -28,6 +28,10 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { Page } from '$app/components/Breadcrumbs';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -45,8 +49,13 @@ export default function InvoiceDesign() {
   const tabs = useTabs();
   const location = useLocation();
   const company = useCompanyChanges();
+  const activeSettings = useActiveSettingsDetails();
+  const { isClientSettingsActive, isGroupSettingsActive } =
+    useCurrentSettingsLevel();
   const displaySaveButtonAndPreview =
     !location.pathname.includes('custom_designs');
+
+  const activeSettingsValue = useAtomValue(activeSettingsAtom);
 
   const onSave = useHandleCompanySave();
 
@@ -94,11 +103,22 @@ export default function InvoiceDesign() {
         request('POST', endpoint('/api/v1/designs/set/default'), {
           design_id,
           entity,
+          settings_level: isGroupSettingsActive
+            ? 'group_settings'
+            : activeSettings.level,
+          ...(isClientSettingsActive && { client_id: company?.settings?.id }),
+          ...(isGroupSettingsActive && {
+            group_settings_id: activeSettingsValue?.id,
+          }),
         })
       );
     });
 
-    axios.all(requests);
+    axios.all(requests).then(() => {
+      updatingRecords.forEach(({ entity }) => {
+        $refetch([`${entity}s` as RefetchKey]);
+      });
+    });
   };
 
   useEffect(() => {

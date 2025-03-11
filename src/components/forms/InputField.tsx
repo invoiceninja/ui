@@ -44,9 +44,12 @@ interface Props extends CommonProps {
 }
 
 export function InputField(props: Props) {
+  const colors = useColorScheme();
+  const reactSettings = useReactSettings({ overwrite: false });
+
   const isInitialTypePassword = props.type === 'password';
 
-  const [isInputMasked, setIsInputMasked] = useState(true);
+  const [isInputMasked, setIsInputMasked] = useState<boolean>(true);
 
   const inputType = useMemo(() => {
     if (props.type === 'password' && isInputMasked) {
@@ -59,9 +62,6 @@ export function InputField(props: Props) {
 
     return props.type;
   }, [props.type, isInputMasked]);
-
-  const colors = useColorScheme();
-  const reactSettings = useReactSettings({ overwrite: false });
 
   return (
     <section style={{ width: props.width }}>
@@ -97,22 +97,29 @@ export function InputField(props: Props) {
           id={props.id}
           type={inputType}
           className={classNames(
-            `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
+            `w-full py-2 px-3 rounded-md text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
             {
               'border border-gray-300': props.border !== false,
             }
           )}
           placeholder={props.placeholder || ''}
           onBlur={(event) => {
+            if (!props.changeOverride) {
+              event.target.value =
+                event.target.value === '' && props.type === 'number'
+                  ? '0'
+                  : event.target.value;
+
+              props.onValueChange && props.onValueChange(event.target.value);
+              props.onChange && props.onChange(event);
+            }
+          }}
+          onChange={(event) => {
             event.target.value =
               event.target.value === '' && props.type === 'number'
                 ? '0'
                 : event.target.value;
 
-            props.onValueChange && props.onValueChange(event.target.value);
-            props.onChange && props.onChange(event);
-          }}
-          onChange={(event) => {
             if (
               props.element === 'textarea' &&
               reactSettings.preferences.auto_expand_product_table_notes
@@ -130,6 +137,8 @@ export function InputField(props: Props) {
             }
           }}
           onClick={(event: any) => {
+            props.onClick && props.onClick();
+
             if (
               props.element === 'textarea' &&
               reactSettings.preferences.auto_expand_product_table_notes
