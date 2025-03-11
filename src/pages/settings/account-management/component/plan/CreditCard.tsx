@@ -23,8 +23,8 @@ import { useState } from "react";
 import { Check, Trash2 } from "react-feather";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "react-query";
-import visa from '~/public/gateway-card-images/visa.png';
-import mc from '~/public/gateway-card-images/mastercard.png';
+import visa from '/gateway-card-images/visa.png?url';
+import mc from '/gateway-card-images/mastercard.png?url';
 
 interface CreditCardProps {
   gateway: CompanyGateway;
