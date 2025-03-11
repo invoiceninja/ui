@@ -16,7 +16,7 @@
     "@stripe/stripe-js": "^4.8.0",
     "@tinymce/tinymce-react": "^5.0.1",
     "@tippyjs/react": "^4.2.6",
-    "antd": "^5.6.1",
+    "antd": "^5.24.3",
     "array-move": "^4.0.0",
     "axios": "^1.8.2",
     "classnames": "^2.3.2",
@@ -50,7 +50,7 @@
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",
     "react-json-tree": "^0.18.0",
-    "react-markdown": "^9.0.1",
+    "react-markdown": "^10.1.0",
     "react-number-format": "^5.4.2",
     "react-phone-number-input": "^3.2.23",
     "react-qr-code": "^2.0.8",
@@ -64,7 +64,7 @@
     "react-turnstile": "^1.1.2",
     "react-use": "^17.4.0",
     "react-verification-input": "^3.3.0",
-    "recharts": "^2.1.16",
+    "recharts": "^2.15.1",
     "rehype-raw": "^7.0.0",
     "remove": "^0.1.5",
     "socket.io-client": "^4.7.5",
@@ -112,7 +112,7 @@
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.45.1",
     "@typescript-eslint/parser": "^5.45.1",
-    "@vitejs/plugin-react": "^3.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.13",
     "eslint": "^8.29.0",
     "eslint-plugin-react": "^7.31.11",
@@ -122,14 +122,14 @@
     "postcss": "^8.4.19",
     "prettier": "2.8.8",
     "tailwindcss": "^3.2.4",
-    "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.3",
-    "vite": "^4.2.0",
-    "vite-tsconfig-paths": "^4.0.0"
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.5.2",
+    "vite": "^5.4.14",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "engines": {
     "node": ">=22"
   },
-  "engineStrict": true
+  "engineStrict": true,
+  "type": "module"
 }
