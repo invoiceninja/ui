@@ -70,7 +70,7 @@
     "socket.io-client": "^4.7.5",
     "styled-components": "^6.0.7",
     "tailwind-scrollbar": "^3.0.0",
-    "uuid": "^9.0.0"
+    "uuid": "^11.1.0"
   },
   "scripts": {
     "dev": "vite",
