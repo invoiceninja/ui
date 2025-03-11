@@ -34,7 +34,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -123,7 +123,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
   const reactSettings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -400,11 +399,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
-                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -425,11 +425,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
-                style={{ color: colors.$1 }}
               />
             </div>
           }

@@ -86,7 +86,7 @@ import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { confirmActionModalAtom } from './components/ConfirmActionModal';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -646,8 +646,6 @@ export function useRecurringInvoiceColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const colors = useColorScheme();
-
   const getSetting = useGetSetting();
   const getTimezone = useGetTimezone();
   const formatNumber = useFormatNumber();
@@ -850,11 +848,12 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
-                style={{ color: colors.$1 }}
               />
             </div>
           }
@@ -875,11 +874,12 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
-                style={{ color: colors.$1 }}
               />
             </div>
           }
