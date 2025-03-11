@@ -13,7 +13,7 @@ import { InputField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { RecurringInvoiceContext } from '../../create/Create';
 import { useOutletContext } from 'react-router-dom';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, get, set } from 'lodash';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
 export default function EInvoice() {
@@ -30,24 +30,38 @@ export default function EInvoice() {
     setRecurringInvoice(updatedInvoice);
   };
 
+  console.log(recurringInvoice);
+
   return (
     <Card title={t('date_range')}>
       <Element leftSide={t('start_date')}>
         <InputField
           element="textarea"
           value={
-            recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[0] || ''
+            (
+              get(
+                recurringInvoice,
+                'e_invoice.Invoice.InvoicePeriod.Description'
+              ) as unknown as string
+            )?.split('|')?.[0] || ''
           }
           onValueChange={(value) =>
             handleChange(
-              'InvoicePeriod.Description',
+              'e_invoice.Invoice.InvoicePeriod.Description',
               `${value}|${
-                recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[1] ||
-                ''
+                (
+                  get(
+                    recurringInvoice,
+                    'e_invoice.Invoice.InvoicePeriod.Description'
+                  ) as unknown as string
+                )?.split('|')?.[1] || ''
               }`
             )
           }
-          errorMessage={errors?.errors?.['InvoicePeriod.StartDate']}
+          errorMessage={get(
+            errors?.errors,
+            'e_invoice.Invoice.InvoicePeriod.StartDate'
+          )}
         />
       </Element>
 
@@ -55,18 +69,30 @@ export default function EInvoice() {
         <InputField
           element="textarea"
           value={
-            recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[1] || ''
+            (
+              get(
+                recurringInvoice,
+                'e_invoice.Invoice.InvoicePeriod.Description'
+              ) as unknown as string
+            )?.split('|')?.[1] || ''
           }
           onValueChange={(value) =>
             handleChange(
-              'InvoicePeriod.Description',
+              'e_invoice.Invoice.InvoicePeriod.Description',
               `${
-                recurringInvoice?.InvoicePeriod?.Description?.split('|')?.[0] ||
-                ''
+                (
+                  get(
+                    recurringInvoice,
+                    'e_invoice.Invoice.InvoicePeriod.Description'
+                  ) as unknown as string
+                )?.split('|')?.[0] || ''
               }|${value}`
             )
           }
-          errorMessage={errors?.errors?.['InvoicePeriod.EndDate']}
+          errorMessage={get(
+            errors?.errors,
+            'e_invoice.Invoice.InvoicePeriod.EndDate'
+          )}
         />
       </Element>
     </Card>

@@ -13,10 +13,6 @@ import { Client } from './client';
 import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 
-interface InvoicePeriod {
-  Description: string;
-}
-
 export interface RecurringInvoice {
   id: string;
   user_id: string;
@@ -86,5 +82,4 @@ export interface RecurringInvoice {
   activities?: Activity[];
   location_id: string;
   e_invoice?: EInvoiceType;
-  InvoicePeriod?: InvoicePeriod;
 }

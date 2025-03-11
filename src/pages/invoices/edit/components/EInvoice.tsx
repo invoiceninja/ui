@@ -40,7 +40,7 @@ import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { useQuery } from 'react-query';
 import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, get, set } from 'lodash';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -297,22 +297,32 @@ export default function EInvoice() {
         <Element leftSide={t('start_date')}>
           <InputField
             type="date"
-            value={invoice?.InvoicePeriod?.StartDate || ''}
-            onValueChange={(value) =>
-              handleChange('InvoicePeriod.StartDate', value)
+            value={
+              get(invoice, 'e_invoice.Invoice.InvoicePeriod.StartDate') || ''
             }
-            errorMessage={errors?.errors?.['InvoicePeriod.StartDate']}
+            onValueChange={(value) =>
+              handleChange('e_invoice.Invoice.InvoicePeriod.StartDate', value)
+            }
+            errorMessage={get(
+              errors?.errors,
+              'e_invoice.Invoice.InvoicePeriod.StartDate'
+            )}
           />
         </Element>
 
         <Element leftSide={t('end_date')}>
           <InputField
             type="date"
-            value={invoice?.InvoicePeriod?.EndDate || ''}
-            onValueChange={(value) =>
-              handleChange('InvoicePeriod.EndDate', value)
+            value={
+              get(invoice, 'e_invoice.Invoice.InvoicePeriod.EndDate') || ''
             }
-            errorMessage={errors?.errors?.['InvoicePeriod.EndDate']}
+            onValueChange={(value) =>
+              handleChange('e_invoice.Invoice.InvoicePeriod.EndDate', value)
+            }
+            errorMessage={get(
+              errors?.errors,
+              'e_invoice.Invoice.InvoicePeriod.EndDate'
+            )}
           />
         </Element>
       </Card>
