@@ -123,7 +123,7 @@
     "prettier": "2.8.8",
     "tailwindcss": "^3.2.4",
     "ts-jest": "^29.1.0",
-    "typescript": "^5.5.2",
+    "typescript": "^5.8.2",
     "vite": "^5.4.14",
     "vite-tsconfig-paths": "^5.1.4"
   },
