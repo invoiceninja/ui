@@ -17,6 +17,7 @@ import React, { CSSProperties, ReactNode, isValidElement } from 'react';
 import { SelectOption } from '../datatables/Actions';
 import Select, { StylesConfig } from 'react-select';
 import { ChevronDown } from '../icons/ChevronDown';
+import { merge } from 'lodash';
 
 export interface SelectProps extends CommonProps {
   defaultValue?: any;
@@ -76,47 +77,54 @@ export function SelectField(props: SelectProps) {
   const defaultEntry = $entries?.find((entry) => entry.value === defaultValue);
 
   const customStyles: StylesConfig<SelectOption, false> = {
-    input: (styles) => ({
-      ...styles,
-      color: colors.$3,
-    }),
-    singleValue: (styles) => ({
-      ...styles,
-      color: colors.$3,
-    }),
-    menu: (base) => ({
-      ...base,
-      width: 'max-content',
-      minWidth: '100%',
-      backgroundColor: colors.$4,
-      borderColor: colors.$4,
-      zIndex: 50,
-    }),
-    control: (base, { isDisabled }) => ({
-      ...base,
-      borderRadius: '0.375rem',
-      backgroundColor: colors.$1,
-      color: colors.$3,
-      borderColor: colors.$5,
-      cursor: isDisabled ? 'not-allowed' : 'pointer',
-      pointerEvents: isDisabled ? 'auto' : 'unset',
-      ...controlStyle,
-    }),
-    option: (base, { isSelected, isFocused }) => ({
-      ...base,
-      display: 'flex',
-      alignItems: 'center',
-      color: colors.$3,
-      backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
-      ':hover': {
-        backgroundColor: colors.$7,
-      },
-      minHeight: '1.875rem',
-    }),
+    input: (styles) => {
+      return merge(styles, {
+        color: colors.$3,
+      });
+    },
+    singleValue: (styles) => {
+      return merge(styles, {
+        color: colors.$3,
+      });
+    },
+    menu: (base) => {
+      return merge(base, {
+        width: 'max-content',
+        minWidth: '100%',
+        backgroundColor: colors.$4,
+        borderColor: colors.$4,
+        zIndex: 50,
+      });
+    },
+    control: (base, { isDisabled }) => {
+      return merge(base, {
+        borderRadius: '0.375rem',
+        backgroundColor: colors.$1,
+        color: colors.$3,
+        borderColor: colors.$5,
+        cursor: isDisabled ? 'not-allowed' : 'pointer',
+        pointerEvents: isDisabled ? 'auto' : 'unset',
+        ...controlStyle,
+      });
+    },
+    option: (base, { isSelected, isFocused }) => {
+      return merge(base, {
+        display: 'flex',
+        alignItems: 'center',
+        color: colors.$3,
+        backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
+        ':hover': {
+          backgroundColor: colors.$7,
+        },
+        minHeight: '1.875rem',
+      });
+    },
     ...(props.withoutSeparator && {
-      indicatorSeparator: () => ({
-        display: 'none',
-      }),
+      indicatorSeparator: () => {
+        return {
+          display: 'none',
+        };
+      },
     }),
   };
 
