@@ -129,7 +129,7 @@
     "vite-tsconfig-paths": "^4.0.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=22"
   },
   "engineStrict": true
 }
