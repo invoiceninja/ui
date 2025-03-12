@@ -23,9 +23,9 @@ export function useCurrentCompanyDateFormats() {
   useEffect(() => {
     if (statics?.date_formats) {
       const result = statics.date_formats.find(
-        (format: any) => format.id === company?.settings?.date_format_id ?? '0'
+        (format) => format.id === (company?.settings?.date_format_id ?? '0')
       );
-
+      
       if (result) {
         setDateFormat(result.format_moment);
         setDateFormatId(result.id);
