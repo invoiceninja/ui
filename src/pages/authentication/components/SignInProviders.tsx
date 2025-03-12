@@ -24,8 +24,8 @@ import { ReactNode } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
-import AppleLogin from 'react-apple-login';
 import { v4 } from 'uuid';
+import AppleSignin from 'react-apple-signin-auth';
 
 export const msal = new PublicClientApplication({
   auth: {
@@ -99,7 +99,7 @@ export function SignInProviders() {
     request('POST', endpoint('/api/v1/oauth_login?provider=apple'), {
       id_token: response.authorization.id_token,
     }).then((response) => login(response));
-  }
+  };
 
   const handleMicrosoft = (token: string) => {
     request('POST', endpoint('/api/v1/oauth_login?provider=microsoft'), {
@@ -144,62 +144,19 @@ export function SignInProviders() {
           <p>Log in with Microsoft</p>
         </SignInProviderButton>
 
-        <AppleLogin 
-          clientId="com.invoiceninja.client" 
-          redirectURI="https://invoicing.co/auth/apple" 
-          scope='name email'
-          responseType='code id_token'
-          responseMode='form_post' //may not be accurate
-          usePopup={true}
-          nonce={v4()}
-          callback={(response) => {handleApple(response)}}
+        <AppleSignin
+          authOptions={{
+            clientId: 'com.invoiceninja.client',
+            scope: 'email name',
+            redirectURI: 'https://invoicing.co/auth/apple',
+            state: '',
+            nonce: v4(),
+            usePopup: true,
+          }}
+          uiType="dark"
+          onSuccess={handleApple}
+          onError={() => toast.error()}
         />
-
-{/* 
-payload should look like this.
-{
-     "authorization": {
-       "state": "[STATE]",
-       "code": "[CODE]",
-       "id_token": "[ID_TOKEN]"
-     },
-     "user": {
-       "email": "[EMAIL]",
-       "name": {
-         "firstName": "[FIRST_NAME]",
-         "lastName": "[LAST_NAME]"
-       }
-     }
-} */}
-
-
-        {/* 
-          eslint-disable-next-line 
-          @typescript-eslint/ban-ts-comment 
-        */}
-        {/* @ts-ignore */}
-        {/* <MicrosoftLogin
-          clientId={microsoftClientId}
-          authCallback={authHandler}
-          redirectUri={'https://app.invoicing.co/'}
-        >
-          <SignInProviderButton>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 23 23"
-            >
-              <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
-              <path fill="#f35325" d="M1 1h10v10H1z"></path>
-              <path fill="#81bc06" d="M12 1h10v10H12z"></path>
-              <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
-              <path fill="#ffba08" d="M12 12h10v10H12z"></path>
-            </svg>
-
-            <p>Log in with Microsoft</p>
-          </SignInProviderButton>
-        </MicrosoftLogin> */}
       </div>
     </div>
   );
