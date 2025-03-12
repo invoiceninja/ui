@@ -11,20 +11,24 @@
 import { Expense } from '$app/common/interfaces/expense';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
-import {
-  InvoiceItem,
-  InvoiceItemType,
-} from '$app/common/interfaces/invoice-item';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 
-export function useInvoiceExpense() {
+interface Params {
+  onlyAddToInvoice?: boolean;
+}
+export function useInvoiceExpense(params?: Params) {
   const navigate = useNavigate();
+
   const { data } = useBlankInvoiceQuery();
-  const [, setInvoice] = useAtom(invoiceAtom);
+
+  const setInvoice = useSetAtom(invoiceAtom);
+
+  const { onlyAddToInvoice } = params || {};
 
   const calculatedTaxRate = (
     expense: Expense,
@@ -42,24 +46,33 @@ export function useInvoiceExpense() {
     return default_rate;
   };
 
-  const create = (expense: Expense) => {
+  const create = (expenses: Expense[]) => {
     if (data) {
       const invoice: Invoice = { ...data };
 
-      invoice.date = expense.date;
-      invoice.client_id = expense.client_id;
-      invoice.uses_inclusive_taxes = expense.uses_inclusive_taxes;
-      invoice.project_id = expense.project_id;
-      invoice.vendor_id = expense.vendor_id;
+      if (!onlyAddToInvoice) {
+        invoice.date = expenses[0]?.date;
+        invoice.client_id = expenses[0]?.client_id;
+      }
 
-      const item: InvoiceItem = {
+      invoice.uses_inclusive_taxes = expenses[0]?.uses_inclusive_taxes;
+      invoice.project_id = expenses[0]?.project_id;
+      invoice.vendor_id = expenses[0]?.vendor_id;
+
+      const lineItems = expenses.map((expense) => ({
         ...blankLineItem(),
         type_id: InvoiceItemType.Product,
-        cost: expense.amount,
+        cost:
+          expense?.foreign_amount > 0 ? expense.foreign_amount : expense.amount,
         quantity: 1,
         product_key: expense?.category?.name ?? '',
         notes: expense.public_notes,
-        line_total: Number((expense.amount * 1).toPrecision(2)),
+        line_total: Number(
+          (expense?.foreign_amount > 0
+            ? expense.foreign_amount
+            : expense.amount * 1
+          ).toPrecision(2)
+        ),
         expense_id: expense.id,
         tax_name1: expense.tax_name1,
         tax_rate1: calculatedTaxRate(
@@ -79,15 +92,27 @@ export function useInvoiceExpense() {
           expense.tax_amount3,
           expense.tax_rate3
         ),
-      };
+        custom_value1: expense.custom_value1,
+        custom_value2: expense.custom_value2,
+        custom_value3: expense.custom_value3,
+        custom_value4: expense.custom_value4,
+      }));
 
-      invoice.line_items = [item];
+      if (!onlyAddToInvoice) {
+        setInvoice({ ...invoice, line_items: lineItems });
 
-      setInvoice(invoice);
-
-      navigate(
-        route('/invoices/create?table=products&action=invoice_expense', {})
-      );
+        navigate(
+          route('/invoices/create?table=products&action=invoice_expense', {})
+        );
+      } else {
+        setInvoice(
+          (current) =>
+            current && {
+              ...current,
+              line_items: [...current.line_items, ...lineItems],
+            }
+        );
+      }
     }
   };
 

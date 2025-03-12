@@ -8,11 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Number } from '$app/common/helpers/number';
+import { Number as NumberHelper } from '$app/common/helpers/number';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
-import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { Client } from '$app/common/interfaces/client';
 import { Country } from '$app/common/interfaces/country';
@@ -23,6 +21,8 @@ import {
   ProductTableResource,
   RelationType,
 } from '../components/ProductsTable';
+import { useCurrencyResolver } from '$app/common/helpers/currencies/currency-resolver';
+import { useCountryResolver } from '$app/common/helpers/country/country-resolver';
 
 interface Props {
   resource: ProductTableResource | undefined;
@@ -32,8 +32,8 @@ interface Props {
 export function useFormatMoney(props: Props) {
   const company = useCurrentCompany();
 
-  const currencyResolver = useResolveCurrency();
-  const countryResolver = useResolveCountry();
+  const currencyResolver = useCurrencyResolver();
+  const countryResolver = useCountryResolver();
   const vendorResolver = useVendorResolver();
   const clientResolver = useClientResolver();
 
@@ -64,36 +64,38 @@ export function useFormatMoney(props: Props) {
   }, [resource?.client_id, resource?.vendor_id]);
 
   useEffect(() => {
-    if (relation && relationType === 'client_id') {
-      const client = relation as Client;
+    if (relationType === 'client_id') {
+      const client = relation as Client | undefined;
 
-      setCurrency(
-        currencyResolver(
-          client.settings.currency_id || company?.settings.currency_id
-        )
-      );
+      currencyResolver
+        .find(client?.settings.currency_id || company?.settings.currency_id)
+        .then((currencyResponse) => setCurrency(currencyResponse));
 
-      setCountry(
-        countryResolver(client.country_id || company?.settings.country_id)
-      );
+      countryResolver
+        .find(client?.country_id || company?.settings.country_id)
+        .then((countryResponse) => setCountry(countryResponse));
     }
 
-    if (relation && relationType === 'vendor_id') {
-      const vendor = relation as Vendor;
+    if (relationType === 'vendor_id') {
+      const vendor = relation as Vendor | undefined;
 
-      setCurrency(
-        currencyResolver(vendor.currency_id || company?.settings.currency_id)
-      );
+      currencyResolver
+        .find(vendor?.currency_id || company?.settings.currency_id)
+        .then((currencyResponse) => setCurrency(currencyResponse));
 
-      setCountry(
-        countryResolver(vendor.country_id || company?.settings.country_id)
-      );
+      countryResolver
+        .find(vendor?.country_id || company?.settings.country_id)
+        .then((countryResponse) => setCountry(countryResponse));
     }
   }, [relation]);
 
   return (value: number | string) => {
     if (currency && country) {
-      return Number.formatMoney(value, currency, country);
+      return NumberHelper.formatMoney(
+        isNaN(Number(value)) ? 0 : value,
+        currency,
+        country
+      );
     }
 
     return value;

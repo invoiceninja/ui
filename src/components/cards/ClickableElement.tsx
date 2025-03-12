@@ -37,6 +37,7 @@ const LinkStyled = styled(Link)`
 interface Props extends CommonProps {
   to?: string;
   href?: string;
+  disableNavigation?: boolean;
 }
 
 export function ClickableElement(props: Props) {
@@ -49,6 +50,7 @@ export function ClickableElement(props: Props) {
       <LinkStyled
         theme={{ hoverColor: colors.$4, color: colors.$3 }}
         to={props.to}
+        style={{ pointerEvents: !props.disableNavigation ? 'all' : 'none' }}
         className={classes}
       >
         {props.children}

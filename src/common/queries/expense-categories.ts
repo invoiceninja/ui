@@ -10,13 +10,13 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
+import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface ExpenseCategoriesParams extends Params {
   enabled?: boolean;
@@ -29,12 +29,13 @@ export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter',
+          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter&status=:status',
           {
             perPage: params.perPage ?? '100',
             currentPage: params.currentPage ?? '1',
-            sort: params.sort ?? 'id|asc',
+            sort: params.sort ?? 'name|asc',
             filter: params.filter ?? '',
+            status: params.status?.join(',') ?? '',
           }
         )
       ).then(
@@ -52,7 +53,7 @@ interface Props {
 
 export function useExpenseCategoryQuery(props: Props) {
   return useQuery(
-    route('/api/v1/expense_categories/:id', { id: props.id }),
+    ['/api/v1/expense_categories', props.id],
     () =>
       request(
         'GET',
@@ -63,8 +64,6 @@ export function useExpenseCategoryQuery(props: Props) {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -74,17 +73,13 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_expense_category`);
 
-      queryClient.invalidateQueries('/api/v1/expense_categories');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/expense_categories/:id', { id })
-      );
+      $refetch(['expense_categories']);
     });
   };
 }
 
 export function useBlankExpenseCategoryQuery() {
-  const hasPermission = useHasPermission();
+  const { isAdmin } = useAdmin();
 
   return useQuery<ExpenseCategory>(
     '/api/v1/expense_categories/create',
@@ -93,6 +88,6 @@ export function useBlankExpenseCategoryQuery() {
         (response: GenericSingleResourceResponse<ExpenseCategory>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: hasPermission('create_expense') }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }

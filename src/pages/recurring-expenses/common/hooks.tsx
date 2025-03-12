@@ -16,7 +16,6 @@ import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -51,6 +50,19 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/recurring-expense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import dayjs from 'dayjs';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'status',
@@ -120,11 +132,15 @@ export function useAllRecurringExpenseColumns() {
 export function useRecurringExpenseColumns() {
   const [t] = useTranslation();
 
+  const disableNavigation = useDisableNavigation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
+  const calculateExpenseAmount = useCalculateExpenseAmount();
 
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
   type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
@@ -143,13 +159,14 @@ export function useRecurringExpenseColumns() {
       id: 'status_id',
       label: t('status'),
       format: (value, recurringExpense) => (
-        <Link
+        <DynamicLink
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
+          renderSpan={disableNavigation('recurring_expense', recurringExpense)}
         >
           <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -157,13 +174,14 @@ export function useRecurringExpenseColumns() {
       id: 'number',
       label: t('number'),
       format: (field, recurringExpense) => (
-        <Link
+        <DynamicLink
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
+          renderSpan={disableNavigation('recurring_expense', recurringExpense)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -172,9 +190,12 @@ export function useRecurringExpenseColumns() {
       label: t('vendor'),
       format: (value, recurringExpense) =>
         recurringExpense.vendor && (
-          <Link to={route('/vendors/:id', { id: value.toString() })}>
+          <DynamicLink
+            to={route('/vendors/:id', { id: value.toString() })}
+            renderSpan={disableNavigation('vendor', recurringExpense.vendor)}
+          >
             {recurringExpense.vendor.name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -183,9 +204,12 @@ export function useRecurringExpenseColumns() {
       label: t('client'),
       format: (value, recurringExpense) =>
         recurringExpense.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
+          <DynamicLink
+            to={route('/clients/:id', { id: value.toString() })}
+            renderSpan={disableNavigation('client', recurringExpense.client)}
+          >
             {recurringExpense.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -198,9 +222,9 @@ export function useRecurringExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value, recurringExpense) =>
+      format: (_, recurringExpense) =>
         formatMoney(
-          value,
+          calculateExpenseAmount(recurringExpense),
           recurringExpense.client?.country_id,
           recurringExpense.currency_id ||
             recurringExpense.client?.settings.currency_id
@@ -212,12 +236,23 @@ export function useRecurringExpenseColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -243,21 +278,25 @@ export function useRecurringExpenseColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('expense1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('expense2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('expense3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('expense4', value?.toString()),
     },
     {
       column: 'documents',
@@ -269,6 +308,7 @@ export function useRecurringExpenseColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -309,12 +349,23 @@ export function useRecurringExpenseColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -343,16 +394,19 @@ export function useRecurringExpenseColumns() {
       column: 'tax_rate1',
       id: 'tax_rate1',
       label: t('tax_rate1'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'tax_rate2',
       id: 'tax_rate2',
       label: t('tax_rate2'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'tax_rate3',
       id: 'tax_rate3',
       label: t('tax_rate3'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'transaction_reference',
@@ -417,13 +471,7 @@ export function useToggleStartStop() {
       endpoint(url, { id: recurringExpense.id }),
       recurringExpense
     ).then(() => {
-      queryClient.invalidateQueries('/api/v1/recurring_expenses');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/recurring_expenses/:id', {
-          id: recurringExpense.id,
-        })
-      );
+      $refetch(['recurring_expenses']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
@@ -437,6 +485,8 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const setExpense = useSetAtom(expenseAtom);
 
@@ -457,6 +507,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/recurring_expenses/create?action=clone');
@@ -468,6 +519,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/expenses/create?action=clone');
@@ -494,22 +546,24 @@ export function useActions() {
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,
-    (recurringExpense) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringExpense(recurringExpense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (recurringExpense) => (
-      <DropdownElement
-        onClick={() => cloneToExpense(recurringExpense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_expense')}
-      </DropdownElement>
-    ),
+    (recurringExpense) =>
+      hasPermission('create_recurring_expense') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringExpense(recurringExpense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (recurringExpense) =>
+      hasPermission('create_expense') && (
+        <DropdownElement
+          onClick={() => cloneToExpense(recurringExpense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_expense')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (recurringExpense) =>
       isEditPage &&

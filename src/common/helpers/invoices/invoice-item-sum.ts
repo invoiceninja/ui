@@ -28,7 +28,7 @@ export class InvoiceItemSum {
   constructor(
     protected invoice: Invoice | RecurringInvoice | PurchaseOrder,
     protected currency: Currency
-  ) { }
+  ) {}
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
@@ -57,18 +57,19 @@ export class InvoiceItemSum {
   }
 
   protected sumLineItem() {
-    this.item.line_total = this.item.cost * this.item.quantity + .000000000000004;
+    this.item.line_total =
+      this.item.cost * this.item.quantity + 0.000000000000004;
 
     return this;
   }
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = this.item.line_total - this.item.discount;
+      this.item.line_total = parseFloat((this.item.line_total - this.item.discount).toFixed(2));
     } else {
       const discount = this.item.line_total * (this.item.discount / 100);
 
-      this.item.line_total = this.item.line_total - discount;
+      this.item.line_total = parseFloat((this.item.line_total - discount).toFixed(2));
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -91,7 +92,11 @@ export class InvoiceItemSum {
     itemTax += itemTaxRateOneLocal;
 
     if (this.item.tax_name1.length >= 1) {
-      this.groupTax(this.item.tax_name1, this.item.tax_rate1, amount);
+      this.groupTax(
+        this.item.tax_name1,
+        this.item.tax_rate1,
+        itemTaxRateOneLocal
+      );
     }
 
     //
@@ -104,7 +109,11 @@ export class InvoiceItemSum {
     itemTax += itemTaxRateTwoLocal;
 
     if (this.item.tax_name2.length >= 1) {
-      this.groupTax(this.item.tax_name2, this.item.tax_rate2, amount);
+      this.groupTax(
+        this.item.tax_name2,
+        this.item.tax_rate2,
+        itemTaxRateTwoLocal
+      );
     }
 
     const itemTaxRateThreeLocal = this.calculateAmountLineTax(
@@ -115,17 +124,24 @@ export class InvoiceItemSum {
     itemTax += itemTaxRateThreeLocal;
 
     if (this.item.tax_name3.length >= 1) {
-      this.groupTax(this.item.tax_name3, this.item.tax_rate3, amount);
+      this.groupTax(
+        this.item.tax_name3,
+        this.item.tax_rate3,
+        itemTaxRateThreeLocal
+      );
     }
 
-    this.item.gross_line_total = this.item.line_total + itemTax;
+    this.item.gross_line_total =
+      this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
 
-    this.totalTaxes += itemTax;
+    this.totalTaxes += isNaN(itemTax) ? 0 : itemTax;
 
     return this;
   }
 
   protected groupTax(name: string, rate: number, total: number) {
+    if (name.length === 0) return;
+
     let group = {};
 
     const key = name + rate.toString().replace(' ', ''); // 'Tax Rate' + '5' => 'TaxRate5'
@@ -141,8 +157,14 @@ export class InvoiceItemSum {
 
   protected push() {
     //why? because dealing with floating point maths hurts. Epsilon does not cover the edge cases, but this does.
-    this.subTotal += parseFloat((this.item.line_total + .000000000000004).toFixed(this.currency.precision));
-    this.subTotal = parseFloat((this.subTotal).toFixed(this.currency.precision));
+    this.subTotal += parseFloat(
+      (this.item.line_total + 0.000000000000004).toFixed(
+        this.currency?.precision || 2
+      )
+    );
+    this.subTotal = parseFloat(
+      this.subTotal.toFixed(this.currency?.precision || 2)
+    );
 
     this.grossSubTotal += this.item.gross_line_total;
 
@@ -159,17 +181,13 @@ export class InvoiceItemSum {
     this.lineItems
       // .filter((item) => item.line_total > 0)
       .map((item, index: number) => {
-
         let itemTax = 0;
         this.item = item;
 
-        if (item.line_total > 0) {
-
+        if (item.line_total != 0) {
           const amount =
-            this.subTotal > 0
-              ? this.item.line_total -
-              this.invoice.discount * (this.item.line_total / this.subTotal)
-              : 0;
+            this.item.line_total -
+            this.item.line_total * (this.invoice.discount / this.subTotal);
 
           const itemTaxRateOneTotal = this.calculateAmountLineTax(
             this.item.tax_rate1,
@@ -220,12 +238,13 @@ export class InvoiceItemSum {
             );
           }
 
-          this.item.gross_line_total = this.item.line_total + itemTax;
-          this.item.tax_amount = itemTax;
+          this.item.gross_line_total =
+            this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
+          this.item.tax_amount = isNaN(itemTax) ? 0 : itemTax;
         }
 
         this.lineItems[index] = this.item;
-        this.totalTaxes += itemTax;
+        this.totalTaxes += isNaN(itemTax) ? 0 : itemTax;
       });
   }
 }

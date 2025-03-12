@@ -14,12 +14,12 @@ import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdSwitchRight } from 'react-icons/md';
 import { useBulkAction } from '../hooks/useBulkAction';
+import { AiOutlineFileText } from 'react-icons/ai';
 
 interface Props {
   selectedIds: string[];
-  setSelected?: Dispatch<SetStateAction<string[]>>;
+  setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const ConvertToInvoiceBulkAction = (props: Props) => {
   const [t] = useTranslation();
@@ -34,7 +34,7 @@ export const ConvertToInvoiceBulkAction = (props: Props) => {
     <>
       <DropdownElement
         onClick={() => setIsModalOpen(true)}
-        icon={<Icon element={MdSwitchRight} />}
+        icon={<Icon element={AiOutlineFileText} />}
       >
         {t('convert_to_invoice')}
       </DropdownElement>
@@ -51,9 +51,7 @@ export const ConvertToInvoiceBulkAction = (props: Props) => {
             behavior="button"
             onClick={() => {
               bulk(selectedIds, 'convert_to_invoice');
-
-              setSelected?.([]);
-
+              setSelected([]);
               setIsModalOpen(false);
             }}
           >

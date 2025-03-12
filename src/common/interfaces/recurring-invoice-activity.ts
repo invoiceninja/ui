@@ -14,6 +14,7 @@ export interface RecurringInvoiceActivity {
   client: Client;
   activity_type_id: number;
   id: string;
+  invoice: Client;
   hashed_id: string;
   notes: string;
   created_at: number;

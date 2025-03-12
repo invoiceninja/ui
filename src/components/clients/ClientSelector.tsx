@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
 import { Alert } from '../Alert';
 import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -25,11 +26,16 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   staleTime?: number;
   disableWithSpinner?: boolean;
   clearInputAfterSelection?: boolean;
+  dropdownLabelFn?: (client: Client) => string | JSX.Element;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const hasPermission = useHasPermission();
+
+  const { dropdownLabelFn } = props;
 
   return (
     <>
@@ -44,19 +50,29 @@ export function ClientSelector(props: ClientSelectorProps) {
           label: props.inputLabel?.toString(),
           value: props.value || null,
         }}
-        endpoint={new URL(endpoint('/api/v1/clients'))}
+        endpoint={endpoint('/api/v1/clients')}
         readonly={props.readonly}
         onDismiss={props.onClearButtonClick}
         querySpecificEntry="/api/v1/clients/:id"
         initiallyVisible={props.initiallyVisible}
-        entryOptions={{ id: 'id', label: 'display_name', value: 'id' }}
+        entryOptions={{
+          id: 'id',
+          label: 'display_name',
+          value: 'id',
+          customSearchableValue: (client) =>
+            client.contacts.map(({ email }) => email).join(','),
+          dropdownLabelFn,
+        }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
-        staleTime={props.staleTime || 500}
+        staleTime={props.staleTime || Infinity}
         sortBy={null}
         exclude={props.exclude}
         action={{
           label: t('new_client'),
-          visible: props.withoutAction ? false : true,
+          visible:
+            props.withoutAction || !hasPermission('create_client')
+              ? false
+              : true,
           onClick: () => setIsModalOpen(true),
         }}
         key="client_selector"

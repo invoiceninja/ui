@@ -11,14 +11,15 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface CompanyGatewaysParams {
   status?: string;
+  perPage?: string;
 }
 export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
   const { isAdmin } = useAdmin();
@@ -30,9 +31,13 @@ export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/company_gateways?sort=id|desc&status=:status', {
-          status: status || 'active',
-        })
+        endpoint(
+          '/api/v1/company_gateways?sort=id|desc&status=:status&per_page=:perPage',
+          {
+            status: status || 'active',
+            perPage: params?.perPage ?? '100',
+          }
+        )
       ),
     { staleTime: Infinity, enabled: isAdmin }
   );
@@ -48,12 +53,7 @@ export function useCompanyGatewayQuery(params: Params) {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    [
-      route('/api/v1/company_gateways/:id', {
-        id: params.id,
-      }),
-      params.queryParams,
-    ],
+    ['/api/v1/company_gateways', params.id, params.queryParams],
     () =>
       request(
         'GET',
@@ -69,7 +69,7 @@ export function useBlankCompanyGatewayQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route('/api/v1/company_gateways/create'),
+    ['/api/v1/company_gateways/create'],
     () => request('GET', endpoint('/api/v1/company_gateways/create')),
     { staleTime: Infinity, enabled: isAdmin }
   );
@@ -88,16 +88,10 @@ export function useBulk() {
     }).then(() => {
       toast.success(`${action}d_company_gateway`);
 
-      queryClient.invalidateQueries('/api/v1/company_gateways');
+      $refetch(['company_gateways']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(
-          route('/api/v1/company_gateways/:id', { id })
-        )
-      );
     });
   };
 }

@@ -14,10 +14,10 @@ import { endpoint } from '$app/common/helpers';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
@@ -26,21 +26,25 @@ import { useResolveCurrencySeparator } from '../common/hooks/useResolveCurrencyS
 import { TransactionForm } from '../components/TransactionForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { route } from '$app/common/helpers/route';
-import { useQueryClient } from 'react-query';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { useTransactionQuery } from '$app/common/queries/transactions';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useCleanDescriptionText } from '../common/hooks/useCleanDescription';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Edit() {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+  const cleanDescriptionText = useCleanDescriptionText();
 
   const { id } = useParams<string>();
 
   const { data } = useTransactionQuery({ id });
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 
@@ -71,9 +75,7 @@ export default function Edit() {
     },
   ];
 
-  const onSave = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const onSave = async () => {
     setErrors(undefined);
 
     setIsFormBusy(true);
@@ -88,13 +90,7 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_transaction');
 
-        queryClient.invalidateQueries('/api/v1/bank_transactions');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/bank_transactions/:id', { id })
-        );
-
-        navigate('/transactions');
+        $refetch(['bank_transactions']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -107,7 +103,10 @@ export default function Edit() {
 
   useEffect(() => {
     if (data) {
-      setTransaction(data);
+      setTransaction({
+        ...data,
+        description: cleanDescriptionText(data.description),
+      });
     }
   }, [data]);
 
@@ -127,19 +126,27 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!transaction || isFormBusy}
-      onSaveClick={onSave}
-      navigationTopRight={
-        transaction && (
-          <ResourceActions
-            resource={transaction}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
+      {...((hasPermission('edit_bank_transaction') ||
+        entityAssigned(transaction)) &&
+        transaction && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={transaction}
+              actions={actions}
+              onSaveClick={onSave}
+              disableSaveButton={!transaction || isFormBusy}
+              cypressRef="transactionActionDropdown"
+            />
+          ),
+        })}
+      afterBreadcrumbs={
+        <PreviousNextNavigation
+          entity="transaction"
+          entityEndpointName="bank_transaction"
+        />
       }
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
           {transaction && currencySeparators && (
             <TransactionForm

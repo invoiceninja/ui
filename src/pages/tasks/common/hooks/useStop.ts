@@ -13,12 +13,12 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Task } from '$app/common/interfaces/task';
 import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { parseTimeLog } from '../helpers/calculate-time';
 import dayjs from 'dayjs';
 import { isOverlapping } from '../helpers/is-overlapping';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useStop() {
   const queryClient = useQueryClient();
@@ -49,19 +49,7 @@ export function useStop() {
     ).then(() => {
       toast.success('stopped_task');
 
-      queryClient.invalidateQueries('/api/v1/tasks');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/tasks/:id', { id: task.id })
-      );
-
-      queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-          projectId: task.project_id,
-        })
-      );
+      $refetch(['tasks']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

@@ -13,16 +13,13 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
-  const queryClient = useQueryClient();
-
   const saveCompany = useHandleCompanySave();
 
   return async (payment: Payment) => {
@@ -30,14 +27,14 @@ export function useSave(
 
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     const adjustedPaymentPayload = { ...payment };
 
     delete adjustedPaymentPayload.invoices;
     delete adjustedPaymentPayload.credits;
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request(
       'PUT',
@@ -53,10 +50,6 @@ export function useSave(
           setErrors(error.response.data);
         }
       })
-      .finally(() =>
-        queryClient.invalidateQueries(
-          route('/api/v1/payments/:id', { id: payment.id })
-        )
-      );
+      .finally(() => $refetch(['payments']));
   };
 }

@@ -23,7 +23,7 @@ interface Props {
   >;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function RequiredFields(props: Props) {
   const [t] = useTranslation();
 
@@ -98,6 +98,16 @@ export function RequiredFields(props: Props) {
           label={t('update_address_help')}
           checked={props.companyGateway.update_details}
           onChange={(value) => handleChange('update_details', value)}
+        />
+      </Element>
+
+      <Element leftSide={t('always_show_required_fields')}>
+        <Toggle
+          label={t('always_show_required_fields_help')}
+          checked={props.companyGateway.always_show_required_fields ?? true}
+          onChange={(value) =>
+            handleChange('always_show_required_fields', value)
+          }
         />
       </Element>
     </Card>

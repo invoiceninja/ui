@@ -32,6 +32,7 @@ export const blankLineItem = (): InvoiceItem => {
     tax_rate3: 0,
     sort_id: 0,
     line_total: 0,
+    tax_amount: 0,
     gross_line_total: 0,
     date: '',
     custom_value1: '',

@@ -15,6 +15,7 @@ import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
+  resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
@@ -46,7 +47,7 @@ export function SignInProviderButton(props: SignInProviderButtonProps) {
     <button
       disabled={props.disabled}
       onClick={props.onClick}
-      className="rounded px-4 py-2 bg-white shadow-md flex justify-center items-center space-x-2 text-center hover:bg-gray-50 cursor-pointer text-sm disabled:cursor-not-allowed"
+      className="rounded px-4 py-2 bg-white border border-gray-200 flex justify-center items-center space-x-2 text-center hover:bg-gray-50 cursor-pointer text-sm disabled:cursor-not-allowed"
     >
       {props.children}
     </button>
@@ -78,6 +79,7 @@ export function SignInProviders() {
     );
 
     dispatch(updateCompanyUsers(response.data.data));
+    dispatch(resetChanges('company'));
     dispatch(changeCurrentIndex(currentIndex));
   };
 
@@ -117,7 +119,7 @@ export function SignInProviders() {
 
         <SignInProviderButton
           onClick={async () => {
-            await msal.handleRedirectPromise(); 
+            await msal.handleRedirectPromise();
 
             msal
               .loginPopup({

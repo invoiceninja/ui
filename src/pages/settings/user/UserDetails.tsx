@@ -32,39 +32,46 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { useAtom } from 'jotai';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
+import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { resetChanges as resetCompanyChanges } from '$app/common/stores/slices/company-users';
 
 export function UserDetails() {
   useTitle('user_details');
 
   const [t] = useTranslation();
+  const dispatch = useDispatch();
 
+  const user = useCurrentUser();
+  const { isAdmin } = useAdmin();
   const tabs = useUserDetailsTabs();
+  const company = useInjectCompanyChanges();
+
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [checkVerification, setCheckVerification] = useState<boolean>(false);
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('user_details'), href: '/settings/user_details' },
   ];
 
-  const user = useCurrentUser();
-
-  const dispatch = useDispatch();
-
-  const company = useInjectCompanyChanges();
-
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
+    hasLanguageChangedAtom
+  );
 
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   const userState = useSelector((state: RootState) => state.user);
 
-  const { isAdmin } = useAdmin();
+  const { save } = usePreferences();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
     toast.processing();
     setErrors(undefined);
@@ -93,19 +100,38 @@ export function UserDetails() {
       .then((response) => {
         toast.success('updated_settings');
 
+        $refetch(['users']);
+
+        if (hasLanguageChanged) {
+          $refetch(['statics']);
+          setHasLanguageIdChanged(false);
+        }
+
+        if (
+          response[0].data.data.phone !== user?.phone &&
+          user?.google_2fa_secret &&
+          !response[0].data.data.verified_phone_number
+        ) {
+          setCheckVerification(true);
+        }
+
         dispatch(updateUser(response[0].data.data));
+        dispatch(resetChanges());
 
         window.dispatchEvent(new CustomEvent('user.updated'));
 
-        isAdmin &&
+        if (isAdmin) {
           dispatch(
             updateRecord({ object: 'company', data: response[1].data.data })
           );
+
+          dispatch(resetCompanyChanges('company'));
+        }
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(passwordIsRequired);
+          setPasswordConfirmModalOpen(true);
         }
 
         if (error.response?.status == 422) {
@@ -113,6 +139,8 @@ export function UserDetails() {
           setErrors(error.response.data);
         }
       });
+
+    save({ silent: true });
   };
 
   useEffect(() => {
@@ -120,25 +148,32 @@ export function UserDetails() {
   }, [user]);
 
   return (
-    <Settings
-      onSaveClick={() => setPasswordConfirmModalOpen(true)}
-      onCancelClick={() => dispatch(resetChanges())}
-      title={t('user_details')}
-      breadcrumbs={pages}
-      docsLink="en/basic-settings/#user_details"
-      withoutBackButton
-    >
-      <PasswordConfirmation
-        show={isPasswordConfirmModalOpen}
-        onClose={setPasswordConfirmModalOpen}
-        onSave={onSave}
+    <>
+      <Settings
+        onSaveClick={() => setPasswordConfirmModalOpen(true)}
+        onCancelClick={() => dispatch(resetChanges())}
+        title={t('user_details')}
+        breadcrumbs={pages}
+        docsLink="en/basic-settings/#user_details"
+      >
+        <PasswordConfirmation
+          show={isPasswordConfirmModalOpen}
+          onClose={setPasswordConfirmModalOpen}
+          onSave={onSave}
+        />
+
+        <Tabs tabs={tabs} className="mt-6" />
+
+        <div className="my-4">
+          <Outlet context={errors} />
+        </div>
+      </Settings>
+
+      <TwoFactorAuthenticationModals
+        checkVerification={checkVerification}
+        setCheckVerification={setCheckVerification}
+        checkOnlyPhoneNumberVerification
       />
-
-      <Tabs tabs={tabs} className="mt-6" />
-
-      <div className="my-4">
-        <Outlet context={errors} />
-      </div>
-    </Settings>
+    </>
   );
 }

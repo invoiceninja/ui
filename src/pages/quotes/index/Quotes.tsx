@@ -27,29 +27,75 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtom } from 'jotai';
+import {
+  QuoteSlider,
+  quoteSliderAtom,
+  quoteSliderVisibilityAtom,
+} from '../common/components/QuoteSlider';
+import { useEffect, useState } from 'react';
+import { useQuoteQuery } from '../common/queries';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Quote } from '$app/common/interfaces/quote';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
+import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderQuoteId, setSliderQuoteId] = useState<string>('');
+  const [quoteSlider, setQuoteSlider] = useAtom(quoteSliderAtom);
+  const [quoteSliderVisibility, setQuoteSliderVisibility] = useAtom(
+    quoteSliderVisibilityAtom
+  );
+
+  const actions = useActions();
+  const filters = useQuoteFilters();
+  const columns = useQuoteColumns();
+  const reactSettings = useReactSettings();
+  const quoteColumns = useAllQuoteColumns();
+  const dateRangeColumns = useDateRangeColumns();
+  const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
+
+  const { data: quoteResponse } = useQuoteQuery({ id: sliderQuoteId });
 
   const pages: Page[] = [{ name: t('quotes'), href: route('/quotes') }];
 
-  const columns = useQuoteColumns();
+  useEffect(() => {
+    if (quoteResponse && quoteSliderVisibility) {
+      setQuoteSlider(quoteResponse);
+    }
+  }, [quoteResponse, quoteSliderVisibility]);
 
-  const actions = useActions();
+  useEffect(() => {
+    return () => setQuoteSliderVisibility(false);
+  }, []);
 
-  const quoteColumns = useAllQuoteColumns();
-
-  const filters = useQuoteFilters();
-
-  const customBulkActions = useCustomBulkActions();
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="quote"
         columns={columns}
+        footerColumns={footerColumns}
         endpoint="/api/v1/quotes?include=client&without_deleted_clients=true&sort=id|desc"
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
@@ -67,13 +113,48 @@ export default function Quotes() {
           />
         }
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={quoteColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="quote"
-          />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="quote"
+                  columns={allFooterColumns}
+                />
+
+                <span>|</span>
+              </>
+            )}
+
+            <DataTableColumnsPicker
+              columns={quoteColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="quote"
+            />
+          </div>
         }
+        onTableRowClick={(quote) => {
+          setSliderQuoteId(quote.id);
+          setQuoteSliderVisibility(true);
+        }}
+        dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_quote')]}
+        hideEditableOptions={!hasPermission('edit_quote')}
+        enableSavingFilterPreference
+      />
+
+      {!disableNavigation('quote', quoteSlider) && <QuoteSlider />}
+
+      <ChangeTemplateModal<Quote>
+        entity="quote"
+        entities={changeTemplateResources as Quote[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        bulkUrl="/api/v1/quotes/bulk"
       />
     </Default>
   );

@@ -8,11 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo, isSelfHosted } from '$app/common/helpers';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { SwitchToFlutter } from '$app/components/SwitchToFlutter';
 import { Activity } from '$app/pages/dashboard/components/Activity';
 import { PastDueInvoices } from '$app/pages/dashboard/components/PastDueInvoices';
 import { RecentPayments } from '$app/pages/dashboard/components/RecentPayments';
@@ -24,32 +20,26 @@ import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '../settings';
+import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Dashboard() {
-  useTitle('dashboard');
   const [t] = useTranslation();
-
-  const user = useCurrentUser();
+  useTitle('dashboard');
 
   const enabled = useEnabled();
 
-  const hasPermission = useHasPermission();
+  useSocketEvent({
+    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
+    callback: () => $refetch(['invoices']),
+  });
 
   return (
-    <Default
-      title={t('dashboard')}
-      navigationTopRight={
-        isSelfHosted() &&
-        !isDemo() &&
-        (user?.company_user?.is_admin || user?.company_user?.is_owner) && (
-          <SwitchToFlutter />
-        )
-      }
-      withoutBackButton
-    >
-      {hasPermission('view_dashboard') && <Totals />}
+    <Default title={t('dashboard')} breadcrumbs={[]}>
+      <Totals />
 
-      <div className="grid grid-cols-12 gap-4 my-6">
+      <div className="grid grid-cols-12 gap-8 my-8">
         <div className="col-span-12 xl:col-span-6">
           <Activity />
         </div>
@@ -79,6 +69,12 @@ export default function Dashboard() {
         {enabled(ModuleBitmask.Quotes) && (
           <div className="col-span-12 xl:col-span-6">
             <UpcomingQuotes />
+          </div>
+        )}
+
+        {enabled(ModuleBitmask.RecurringInvoices) && (
+          <div className="col-span-12 xl:col-span-6">
+            <UpcomingRecurringInvoices />
           </div>
         )}
       </div>

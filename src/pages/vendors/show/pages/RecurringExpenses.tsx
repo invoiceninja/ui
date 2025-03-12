@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { DataTable } from '$app/components/DataTable';
 import {
   useActions,
@@ -16,10 +18,10 @@ import {
 } from '$app/pages/recurring-expenses/common/hooks';
 import { useParams } from 'react-router-dom';
 
-const dataTableStaleTime = 50;
-
 export default function RecurringExpenses() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const columns = useRecurringExpenseColumns();
 
@@ -38,7 +40,9 @@ export default function RecurringExpenses() {
       bulkRoute="/api/v1/recurring_expenses/bulk"
       linkToCreate={route('/recurring_expenses/create?vendor=:id', { id })}
       linkToEdit="/recurring_expenses/:id/edit"
-      staleTime={dataTableStaleTime}
+      excludeColumns={['vendor_id']}
+      linkToCreateGuards={[permission('create_recurring_expense')]}
+      hideEditableOptions={!hasPermission('edit_recurring_expense')}
     />
   );
 }

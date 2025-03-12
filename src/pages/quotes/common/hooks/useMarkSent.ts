@@ -12,10 +12,10 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Quote } from '$app/common/interfaces/quote';
 import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useMarkSent() {
   const queryClient = useQueryClient();
@@ -31,11 +31,7 @@ export function useMarkSent() {
     ).then(() => {
       toast.success('quote_sent');
 
-      queryClient.invalidateQueries('/api/v1/quotes');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/quotes/:id', { id: quote.id })
-      );
+      $refetch(['quotes']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

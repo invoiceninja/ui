@@ -16,10 +16,11 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { useBulk } from '$app/common/queries/credits';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   selectedIds: string[];
-  setSelected?: Dispatch<SetStateAction<string[]>>;
+  setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const SendEmailBulkAction = (props: Props) => {
   const [t] = useTranslation();
@@ -29,6 +30,7 @@ export const SendEmailBulkAction = (props: Props) => {
   const { selectedIds, setSelected } = props;
 
   const bulk = useBulk();
+  const colors = useColorScheme();
 
   return (
     <>
@@ -44,7 +46,16 @@ export const SendEmailBulkAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <span
+          className="text-lg"
+          style={{
+            backgroundColor: colors.$2,
+            color: colors.$3,
+            colorScheme: colors.$0,
+          }}
+        >
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button
@@ -52,12 +63,12 @@ export const SendEmailBulkAction = (props: Props) => {
             onClick={() => {
               bulk(selectedIds, 'email');
 
-              setSelected?.([]);
+              setSelected([]);
 
               setIsModalOpen(false);
             }}
           >
-            <span className="text-base mx-3">{t('yes')}</span>
+            {t('yes')}
           </Button>
         </div>
       </Modal>

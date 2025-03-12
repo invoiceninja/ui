@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { RegisterForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted } from '../../common/helpers';
+import { apiEndpoint, isHosted } from '../../common/helpers';
 import { register } from '../../common/stores/slices/user';
 import { RegisterValidation } from './common/ValidationInterface';
 import { Header } from './components/Header';
@@ -28,23 +28,34 @@ import { SignInProviders } from './components/SignInProviders';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   changeCurrentIndex,
+  resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useColorScheme } from '$app/common/colors';
+import { useSearchParams } from 'react-router-dom';
+import { TurnstileWidget } from './components/TurnstileWidget';
+import { useTurnstile } from 'react-turnstile';
 
 export function Register() {
   useTitle('register');
 
   const [t] = useTranslation();
 
+  const turnstile = useTurnstile();
+
   const [errors, setErrors] = useState<RegisterValidation | undefined>(
     undefined
   );
 
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [isTurnstileVisible, setIsTrunstileVisible] = useState<boolean>(false);
+
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
+
+  const [searchParams] = useSearchParams();
 
   const form = useFormik({
     initialValues: {
@@ -69,13 +80,33 @@ export function Register() {
         return;
       }
 
-      request(
-        'POST',
-        endpoint(
-          '/api/v1/signup?include=token,user.company_user,company,account'
-        ),
-        values
-      )
+      const endpoint = new URL(
+        '/api/v1/signup?include=token,user.company_user,company,account',
+        apiEndpoint()
+      );
+
+      [
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_content',
+        'utm_term',
+      ].forEach((key) => {
+        if (searchParams.has(key)) {
+          endpoint.searchParams.append(key, searchParams.get(key) as string);
+        }
+      });
+
+      const rc = searchParams.get('rc');
+
+      if (rc) {
+        endpoint.searchParams.append('rc', rc as string);
+      }
+
+      request('POST', endpoint.href, {
+        ...values,
+        ['cf-turnstile']: turnstileToken,
+      })
         .then((response: AxiosResponse) => {
           dispatch(
             register({
@@ -85,6 +116,7 @@ export function Register() {
           );
 
           dispatch(updateCompanyUsers(response.data.data));
+          dispatch(resetChanges('company'));
           dispatch(changeCurrentIndex(0));
         })
         .catch(
@@ -96,99 +128,105 @@ export function Register() {
             setMessage(error.response?.data.message as string);
             setIsFormBusy(false);
           }
-        );
+        )
+        .finally(() => {
+          turnstile.reset();
+          setIsTrunstileVisible(false);
+          setTurnstileToken('');
+        });
     },
   });
 
   const colors = useColorScheme();
 
-  return (
-    <div className="h-screen">
-      <Header />
-      <div className="flex flex-col items-center">
-        <div
-          className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
-        >
-          <h2 className="text-2xl" style={{ color: colors.$3 }}>
-            {t('register_label')}
-          </h2>
+  useEffect(() => {
+    if (turnstileToken) {
+      form.handleSubmit();
+    }
+  }, [turnstileToken]);
 
-          <form onSubmit={form.handleSubmit} className="my-6">
-            <section>
+  return (
+    <>
+      <div className="h-screen">
+        <Header />
+
+        <div className="flex flex-col items-center">
+          <div
+            className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          >
+            <h2 className="text-2xl" style={{ color: colors.$3 }}>
+              {t('register_label')}
+            </h2>
+
+            <div className="space-y-5 my-6">
               <InputField
                 type="email"
                 autoComplete="on"
                 label={t('email_address')}
                 id="email"
                 onChange={form.handleChange}
+                errorMessage={errors?.email}
               />
 
-              {errors?.email && (
-                <Alert className="mt-2" type="danger">
-                  {errors.email}
-                </Alert>
-              )}
-            </section>
-
-            <section className="mt-4">
               <InputField
                 type="password"
                 autoComplete="on"
                 label={t('password')}
                 id="password"
                 onChange={form.handleChange}
+                errorMessage={errors?.password}
               />
 
-              {errors?.password && (
-                <Alert className="mt-2" type="danger">
-                  {errors.password}
-                </Alert>
-              )}
-            </section>
-
-            <section className="mt-4">
               <InputField
                 type="password"
                 autoComplete="on"
                 label={t('password_confirmation')}
                 id="password_confirmation"
                 onChange={form.handleChange}
+                errorMessage={errors?.password_confirmation}
               />
 
-              {errors?.password_confirmation && (
-                <Alert className="mt-2" type="danger">
-                  {errors.password_confirmation}
+              {message && (
+                <Alert className="mt-4" type="danger">
+                  {message}
                 </Alert>
               )}
-            </section>
 
-            {message && (
-              <Alert className="mt-4" type="danger">
-                {message}
-              </Alert>
-            )}
+              {isTurnstileVisible && (
+                <div className="flex justify-center">
+                  <TurnstileWidget
+                    onVerified={(token) => setTurnstileToken(token)}
+                  />
+                </div>
+              )}
 
-            <Button disabled={isFormBusy} className="mt-4" variant="block">
-              {t('register')}
-            </Button>
-          </form>
-
-          <div className="flex justify-center">
-            {isHosted() && <Link to="/login">{t('login')}</Link>}
-          </div>
-        </div>
-
-        {
-          <>
-            <SignInProviders />
-
-            <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-              <HostedLinks />
+              <Button
+                disabled={isFormBusy}
+                className="mt-4"
+                variant="block"
+                onClick={() => setIsTrunstileVisible(true)}
+              >
+                {t('register')}
+              </Button>
             </div>
-          </>
-        }
+
+            <div className="flex justify-center">
+              {isHosted() && <Link to="/login">{t('login')}</Link>}
+            </div>
+          </div>
+
+          {
+            <>
+              <SignInProviders />
+
+              <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+                <HostedLinks />
+              </div>
+            </>
+          }
+        </div>
       </div>
-    </div>
+    </>
   );
 }

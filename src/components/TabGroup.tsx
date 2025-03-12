@@ -10,7 +10,7 @@
 
 import classNames from 'classnames';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
 
 interface Props {
@@ -23,10 +23,15 @@ interface Props {
   childrenClassName?: string;
   withScrollableContent?: boolean;
   onTabChange?: (index: number) => void;
+  formatTabLabel?: (index: number) => ReactNode | undefined;
+  withoutVerticalMargin?: boolean;
 }
 
 export function TabGroup(props: Props) {
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
+
+  const { withoutVerticalMargin } = props;
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
@@ -40,11 +45,12 @@ export function TabGroup(props: Props) {
     setCurrentIndex(props.defaultTabIndex || 0);
   }, [props.defaultTabIndex]);
 
-  const colors = useColorScheme()
-
   return (
-    <div className={props.className}>
-      <div className="-mb-px flex space-x-8 overflow-x-auto border-b" style={{ borderColor: colors.$5 }}>
+    <div className={props.className} data-cy="tabs">
+      <div
+        className="-mb-px flex space-x-8 overflow-x-auto border-b"
+        style={{ borderColor: colors.$5 }}
+      >
         {props.tabs.map((tab, index) => (
           <div
             key={index}
@@ -59,11 +65,11 @@ export function TabGroup(props: Props) {
                 color: currentIndex === index ? accentColor : colors.$3,
               }}
               className={classNames(
-                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                'whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm',
                 { 'w-full': props.width === 'full' }
               )}
             >
-              {tab}
+              {props.formatTabLabel?.(index) || tab}
             </button>
           </div>
         ))}
@@ -72,7 +78,7 @@ export function TabGroup(props: Props) {
       <div
         className={classNames(props.childrenClassName, {
           'flex flex-1': props.height === 'full',
-          'my-4': props.height !== 'full',
+          'my-4': props.height !== 'full' && !withoutVerticalMargin,
           'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
@@ -85,7 +91,7 @@ export function TabGroup(props: Props) {
               // @ts-ignore
               className: classNames(element.props?.className, {
                 'flex flex-col flex-1': props.height === 'full',
-                'block my-4': props.height !== 'full',
+                'block my-4': props.height !== 'full' && !withoutVerticalMargin,
                 hidden: currentIndex !== index,
               }),
             })

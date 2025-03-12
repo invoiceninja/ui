@@ -63,7 +63,10 @@ export function SystemLog() {
       request(
         'GET',
         endpoint('/api/v1/system_logs?per_page=200&sort=created_at|DESC')
-      )
+      ),
+    {
+      staleTime: 3600000,
+    }
   );
 
   const categories: Category[] = [
@@ -110,6 +113,7 @@ export function SystemLog() {
     { id: 320, name: `Square` },
     { id: 321, name: t('gocardless') },
     { id: 322, name: `Razorpay` },
+    { id: 323, name: t('paypal') },
     { id: 400, name: `Quota exceeded` },
     { id: 401, name: `Upstream failure` },
     { id: 500, name: `Webhook response` },
@@ -142,7 +146,7 @@ export function SystemLog() {
   };
 
   const getLog = (src: string) => {
-    return <JSONTree data={JSON.parse(src)} theme={jsonTreeTheme} /> || src;
+    return <JSONTree data={JSON.parse(src)} theme={jsonTreeTheme} />;
   };
 
   return (

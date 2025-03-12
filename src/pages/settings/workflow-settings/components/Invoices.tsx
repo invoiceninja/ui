@@ -20,11 +20,16 @@ import Toggle from '../../../../components/forms/Toggle';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 
 export function Invoices() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -42,14 +47,25 @@ export function Invoices() {
   return (
     <Card title={t('invoices')}>
       <Element
-        leftSide={t('auto_email_invoice')}
-        leftSideHelp={t('auto_email_invoice_help')}
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="auto_email_invoice"
+            labelElement={
+              <SettingsLabel
+                label={t('auto_email_invoice')}
+                helpLabel={t('auto_email_invoice_help')}
+              />
+            }
+            defaultValue={false}
+          />
+        }
       >
         <Toggle
           checked={Boolean(companyChanges?.settings?.auto_email_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_email_invoice', value)
           }
+          disabled={disableSettingsField('auto_email_invoice')}
         />
       </Element>
 
@@ -70,20 +86,41 @@ export function Invoices() {
       <Divider />
 
       <Element
-        leftSide={t('auto_archive_invoice')}
-        leftSideHelp={t('auto_archive_invoice_help')}
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="auto_archive_invoice"
+            labelElement={
+              <SettingsLabel
+                label={t('auto_archive_invoice')}
+                helpLabel={t('auto_archive_invoice_help')}
+              />
+            }
+            defaultValue={false}
+          />
+        }
       >
         <Toggle
           checked={Boolean(companyChanges?.settings?.auto_archive_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice', value)
           }
+          disabled={disableSettingsField('auto_archive_invoice')}
         />
       </Element>
 
       <Element
-        leftSide={t('auto_archive_invoice_cancelled')}
-        leftSideHelp={t('auto_archive_invoice_cancelled_help')}
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="auto_archive_invoice_cancelled"
+            labelElement={
+              <SettingsLabel
+                label={t('auto_archive_invoice_cancelled')}
+                helpLabel={t('auto_archive_invoice_cancelled_help')}
+              />
+            }
+            defaultValue={false}
+          />
+        }
       >
         <Toggle
           checked={Boolean(
@@ -92,22 +129,33 @@ export function Invoices() {
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice_cancelled', value)
           }
+          disabled={disableSettingsField('auto_archive_invoice_cancelled')}
         />
       </Element>
 
       <Divider />
 
-      <Element leftSide={t('lock_invoices')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="lock_invoices"
+            labelElement={<SettingsLabel label={t('lock_invoices')} />}
+            defaultValue="off"
+          />
+        }
+      >
         <SelectField
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             handleToggleChange('settings.lock_invoices', event.target.value)
           }
           value={companyChanges?.settings?.lock_invoices || 'off'}
+          disabled={disableSettingsField('lock_invoices')}
           errorMessage={errors?.errors['settings.lock_invoices']}
         >
           <option value="off">{t('off')}</option>
           <option value="when_sent">{t('when_sent')}</option>
           <option value="when_paid">{t('when_paid')}</option>
+          <option value="end_of_month">{t('end_of_month')}</option>
         </SelectField>
       </Element>
     </Card>

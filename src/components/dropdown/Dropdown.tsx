@@ -29,6 +29,10 @@ import { useColorScheme } from '$app/common/colors';
 interface Props extends CommonProps {
   label?: string | null;
   cardActions?: boolean;
+  cypressRef?: string;
+  customLabel?: ReactNode;
+  minWidth?: string;
+  maxWidth?: string;
 }
 
 const LabelButton = styled.button`
@@ -84,13 +88,14 @@ export function Dropdown(props: Props) {
         render={() => (
           <DropdownElements
             theme={{ hoverColor: colors.$2 }}
-            className={`border box rounded-md shadow-lg focus:outline-none ${props.className}`}
+            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal ${props.className}`}
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$4,
-              minWidth: '12rem',
-              maxWidth: '14.7rem',
+              minWidth: props.minWidth ?? '12rem',
+              maxWidth: props.maxWidth ?? '14.7rem',
             }}
+            data-cy={props.cypressRef}
           >
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
@@ -107,30 +112,43 @@ export function Dropdown(props: Props) {
         )}
         visible={visible}
       >
-        <LabelButton
-          theme={{
-            backgroundColor: accentColor,
-            color: colors.$9,
-            borderColor: colors.$5,
-          }}
-          type="button"
-          disabled={props.disabled}
-          onClick={() => setVisible(!visible)}
-          className={classNames(
-            `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
-            {
-              'hover:bg-white hover:border-gray-300': !props.cardActions,
-              'hover:opacity-90': props.cardActions,
-            }
-          )}
-          style={{
-            backgroundColor: props.cardActions && accentColor,
-            color: props.cardActions ? 'white' : '',
-          }}
-        >
-          {!props.cardActions && <span>{props.label}</span>}
-          <ChevronDown size={props.cardActions ? 18 : 14} />
-        </LabelButton>
+        {props.customLabel ? (
+          <div
+            onClick={(event) => {
+              event.stopPropagation();
+              event.preventDefault();
+              setVisible(!visible);
+            }}
+          >
+            {props.customLabel}
+          </div>
+        ) : (
+          <LabelButton
+            theme={{
+              backgroundColor: accentColor,
+              color: colors.$9,
+              borderColor: colors.$5,
+            }}
+            type="button"
+            disabled={props.disabled}
+            onClick={() => setVisible(!visible)}
+            className={classNames(
+              `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
+              {
+                'hover:bg-white hover:border-gray-300': !props.cardActions,
+                'hover:opacity-90': props.cardActions,
+              }
+            )}
+            style={{
+              backgroundColor: props.cardActions && accentColor,
+              color: props.cardActions ? 'white' : '',
+            }}
+            data-cy="chevronDownButton"
+          >
+            {!props.cardActions && <span>{props.label}</span>}
+            <ChevronDown size={props.cardActions ? 18 : 14} />
+          </LabelButton>
+        )}
       </Tippy>
     </div>
   );

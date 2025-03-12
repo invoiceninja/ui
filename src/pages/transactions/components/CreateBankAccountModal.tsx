@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleCreate } from '$app/pages/settings/bank-accounts/create/hooks/useHandleCreate';
 import { useBlankBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   isModalOpen: boolean;
@@ -65,6 +66,8 @@ export function CreateBankAccountModal(props: Props) {
     }
   }, [data]);
 
+  const colors = useColorScheme();
+
   return (
     <Modal
       title={t('new_bank_account')}
@@ -72,6 +75,7 @@ export function CreateBankAccountModal(props: Props) {
       onClose={handleCancel}
     >
       <InputField
+        style={{ color: colors.$3, colorScheme: colors.$0 }}
         label={t('name')}
         value={bankAccount?.bank_account_name}
         onValueChange={(value) => handleChange('bank_account_name', value)}
@@ -79,7 +83,7 @@ export function CreateBankAccountModal(props: Props) {
       />
 
       <div className="flex justify-end">
-        <Button onClick={handleSave}>{t('save')}</Button>
+        <Button onClick={handleSave} style={{ color: colors.$3, colorScheme: colors.$0 }}>{t('save')}</Button>
       </div>
     </Modal>
   );

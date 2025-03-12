@@ -10,16 +10,29 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '../helpers/route';
+import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { GroupSettings } from '../interfaces/group-settings';
 import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
+import { Params as GlobalParams } from './common/params.interface';
 
-export function useGroupSettingsQuery() {
-  return useQuery('/api/v1/group_settings', () => {
-    return request('GET', endpoint('/api/v1/group_settings'));
-  });
+export function useGroupSettingsQuery(params?: GlobalParams) {
+  return useQuery<GroupSettings[]>(
+    ['/api/v1/group_settings', params],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/group_settings?status=:status&per_page=:perPage', {
+          status: params?.status ?? 'active',
+          perPage: params?.perPage ?? 20,
+        })
+      ).then(
+        (response: GenericSingleResourceResponse<GroupSettings[]>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
 }
 
 interface Params {
@@ -30,7 +43,7 @@ export function useGroupQuery(params: Params) {
   const { id } = params;
 
   return useQuery<GroupSettings>(
-    route('/api/v1/group_settings/:id', { id }),
+    ['/api/v1/group_settings', id],
     () =>
       request('GET', endpoint('/api/v1/group_settings/:id', { id })).then(
         (response: GenericSingleResourceResponse<GroupSettings>) =>
@@ -41,8 +54,6 @@ export function useGroupQuery(params: Params) {
 }
 
 export function useBulk() {
-  const queryClient = useQueryClient();
-
   return (ids: string[], action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -52,13 +63,7 @@ export function useBulk() {
     }).then(() => {
       toast.success(`${action}d_group`);
 
-      queryClient.invalidateQueries('/api/v1/group_settings');
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(
-          route('/api/v1/group_settings/:id', { id })
-        )
-      );
+      $refetch(['group_settings']);
     });
   };
 }

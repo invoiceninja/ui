@@ -13,8 +13,9 @@ import { useBulk } from '$app/common/queries/payments';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useTranslation } from 'react-i18next';
-import { MdSend } from 'react-icons/md';
+import { MdDesignServices, MdSend } from 'react-icons/md';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -27,21 +28,40 @@ export const useCustomBulkActions = () => {
     );
   };
 
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Payment>[] = [
-    (selectedIds, selectedPayments, setSelected) =>
-      selectedPayments &&
-      showEmailPaymentAction(selectedPayments) && (
+    ({ selectedResources, selectedIds, setSelected }) =>
+      showEmailPaymentAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'email');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdSend} />}
         >
           {t('email_payment')}
         </DropdownElement>
       ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/payments/bulk',
+            entity: 'payment',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
   ];
 
   return customBulkActions;

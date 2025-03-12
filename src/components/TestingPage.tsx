@@ -34,7 +34,7 @@ export function TestingPage() {
           inputOptions={{
             value: value ?? null,
           }}
-          endpoint={new URL(endpoint('/api/v1/clients?status=active'))}
+          endpoint={endpoint('/api/v1/clients?status=active')}
           entryOptions={{ id: 'id', label: 'name', value: 'id' }}
           onChange={(entry) => entry.resource && setValue(entry.resource.id)}
           onDismiss={() => setValue('')}

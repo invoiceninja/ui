@@ -29,8 +29,8 @@ import { TransactionForm } from '../components/TransactionForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { route } from '$app/common/helpers/route';
-import { useQueryClient } from 'react-query';
 import { useBlankTransactionQuery } from '$app/common/queries/transactions';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -40,8 +40,6 @@ export default function Create() {
   const company = useCurrentCompany();
 
   const { data } = useBlankTransactionQuery();
-
-  const queryClient = useQueryClient();
 
   const resolveCurrencySeparator = useResolveCurrencySeparator();
 
@@ -80,7 +78,7 @@ export default function Create() {
       .then((response: GenericSingleResourceResponse<Transaction>) => {
         toast.success('created_transaction');
 
-        queryClient.invalidateQueries('/api/v1/bank_transactions');
+        $refetch(['bank_transactions']);
 
         navigate(
           route('/transactions/:id/edit', { id: response.data.data.id })
@@ -122,7 +120,7 @@ export default function Create() {
       disableSaveButton={!transaction || isFormBusy}
       onSaveClick={onSave}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
           {currencySeparators && transaction && (
             <TransactionForm

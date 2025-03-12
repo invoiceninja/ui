@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -23,6 +22,14 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'number',
@@ -76,9 +83,13 @@ export function useVendorColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
+  const reactSettings = useReactSettings();
+
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
-  const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const vendorColumns = useAllVendorColumns();
   type VendorColumns = (typeof vendorColumns)[number];
@@ -104,7 +115,12 @@ export function useVendorColumns() {
       id: 'number',
       label: t('number'),
       format: (value, vendor) => (
-        <Link to={route('/vendors/:id', { id: vendor.id })}>{value}</Link>
+        <DynamicLink
+          to={route('/vendors/:id', { id: vendor.id })}
+          renderSpan={disableNavigation('vendor', vendor)}
+        >
+          {value}
+        </DynamicLink>
       ),
     },
     {
@@ -112,7 +128,12 @@ export function useVendorColumns() {
       id: 'name',
       label: t('name'),
       format: (value, vendor) => (
-        <Link to={route('/vendors/:id', { id: vendor.id })}>{value}</Link>
+        <DynamicLink
+          to={route('/vendors/:id', { id: vendor.id })}
+          renderSpan={disableNavigation('vendor', vendor)}
+        >
+          {value}
+        </DynamicLink>
       ),
     },
     {
@@ -185,21 +206,25 @@ export function useVendorColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('vendor1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('vendor2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('vendor3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('vendor4', value?.toString()),
     },
     {
       column: 'documents',
@@ -229,14 +254,23 @@ export function useVendorColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

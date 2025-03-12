@@ -19,23 +19,21 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankTaxRateQuery } from '$app/common/queries/tax-rates';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
-import { Container } from '$app/components/Container';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Create() {
   const { documentTitle } = useTitle('create_tax_rate');
 
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const { data: blankTaxRate } = useBlankTaxRateQuery();
 
@@ -65,7 +63,7 @@ export function Create() {
         .then((response) => {
           toast.success('created_tax_rate');
 
-          queryClient.invalidateQueries('/api/v1/tax_rates');
+          $refetch(['tax_rates']);
 
           if (actionType === 'save') {
             navigate(
@@ -105,10 +103,8 @@ export function Create() {
   }, [blankTaxRate]);
 
   return (
-    <Settings title={t('tax_rates')}>
-      <Container className="space-y-6">
-        <Breadcrumbs pages={pages} />
-
+    <Settings title={t('tax_rates')} breadcrumbs={pages}>
+      <div className="max-w-3xl">
         <Card
           title={documentTitle}
           withSaveButton
@@ -127,17 +123,16 @@ export function Create() {
               errorMessage={errors?.errors.name}
             />
 
-            <InputField
+            <NumberInputField
               required
-              type="number"
               label={t('tax_rate')}
-              value={taxRate?.rate}
+              value={taxRate?.rate || ''}
               onValueChange={(value) => handleChange('rate', Number(value))}
               errorMessage={errors?.errors.rate}
             />
           </CardContainer>
         </Card>
-      </Container>
+      </div>
     </Settings>
   );
 }

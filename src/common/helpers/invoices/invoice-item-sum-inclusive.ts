@@ -33,7 +33,7 @@ export class InvoiceItemSumInclusive {
       | Quote
       | PurchaseOrder
       | RecurringInvoice
-  ) { }
+  ) {}
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
@@ -69,9 +69,9 @@ export class InvoiceItemSumInclusive {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total -= this.item.discount;
+      this.item.line_total = parseFloat((this.item.line_total - this.item.discount).toFixed(2));
     } else {
-      this.item.line_total -= this.item.line_total * (this.item.discount / 100);
+      this.item.line_total = parseFloat((this.item.line_total - this.item.line_total * (this.item.discount / 100)).toFixed(2));
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -96,7 +96,11 @@ export class InvoiceItemSumInclusive {
     itemTax += itemTaxRateOneLocal;
 
     if (this.item.tax_name1.length >= 1) {
-      this.groupTax(this.item.tax_name1, this.item.tax_rate1, amount);
+      this.groupTax(
+        this.item.tax_name1,
+        this.item.tax_rate1,
+        itemTaxRateOneLocal
+      );
     }
 
     //
@@ -109,7 +113,11 @@ export class InvoiceItemSumInclusive {
     itemTax += itemTaxRateTwoLocal;
 
     if (this.item.tax_name2.length >= 1) {
-      this.groupTax(this.item.tax_name2, this.item.tax_rate2, amount);
+      this.groupTax(
+        this.item.tax_name2,
+        this.item.tax_rate2,
+        itemTaxRateTwoLocal
+      );
     }
 
     //
@@ -122,11 +130,15 @@ export class InvoiceItemSumInclusive {
     itemTax += itemTaxRateThreeLocal;
 
     if (this.item.tax_name3.length >= 1) {
-      this.groupTax(this.item.tax_name3, this.item.tax_rate3, amount);
+      this.groupTax(
+        this.item.tax_name3,
+        this.item.tax_rate3,
+        itemTaxRateThreeLocal
+      );
     }
 
     // this.item.gross_line_total = this.item.line_total + itemTax;
-    this.item.gross_line_total = this.item.line_total
+    this.item.gross_line_total = this.item.line_total;
     this.totalTaxes += itemTax;
 
     return this;
@@ -159,20 +171,17 @@ export class InvoiceItemSumInclusive {
   public calculateTaxesWithAmountDiscount() {
     this.taxCollection = collect();
 
-
     this.lineItems
       // .filter((item) => item.line_total > 0)
       .map((item, index: number) => {
-
         let itemTax = 0;
         this.item = item;
 
         if (item.line_total > 0) {
-
           const amount =
             this.subTotal > 0
               ? this.item.line_total -
-              this.invoice.discount * (this.item.line_total / this.subTotal)
+                this.invoice.discount * (this.item.line_total / this.subTotal)
               : 0;
 
           const itemTaxRateOneTotal = this.calcInclusiveLineTax(
@@ -225,14 +234,11 @@ export class InvoiceItemSumInclusive {
           }
 
           this.item.gross_line_total = this.item.line_total;
-          this.item.tax_amount = itemTax;
+          this.item.tax_amount = isNaN(itemTax) ? 0 : itemTax;
         }
 
         this.lineItems[index] = this.item;
         this.totalTaxes += itemTax;
-
       });
-
-
   }
 }

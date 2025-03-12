@@ -22,7 +22,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
@@ -33,6 +32,8 @@ import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisa
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useBlankSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Steps } from '../common/components/Steps';
 
 export function Create() {
   const { documentTitle } = useTitle('new_payment_link');
@@ -43,9 +44,10 @@ export function Create() {
 
   const { data } = useBlankSubscriptionQuery();
 
-  const { data: productsData } = useProductsQuery({ include: 'company' });
-
-  const queryClient = useQueryClient();
+  const { data: productsData } = useProductsQuery({
+    include: 'company',
+    status: ['active'],
+  });
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -55,7 +57,7 @@ export function Create() {
     { name: t('new_payment_link'), href: '/settings/subscriptions/create' },
   ];
 
-  const tabs = [t('overview'), t('settings'), t('webhook')];
+  const tabs = [t('overview'), t('settings'), t('webhook'), t('steps')];
 
   const [subscription, setSubscription] = useState<Subscription>();
 
@@ -102,7 +104,7 @@ export function Create() {
       .then((response: GenericSingleResourceResponse<Subscription>) => {
         toast.success('created_subscription');
 
-        queryClient.invalidateQueries('/api/v1/subscriptions');
+        $refetch(['subscriptions']);
 
         navigate(
           route('/settings/subscriptions/:id/edit', {
@@ -125,7 +127,7 @@ export function Create() {
       onSaveClick={handleSave}
       disableSaveButton={!subscription || showPlanAlert}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      <AdvancedSettingsPlanAlert />
 
       <TabGroup tabs={tabs}>
         <div>
@@ -135,6 +137,7 @@ export function Create() {
               handleChange={handleChange}
               errors={errors}
               products={products}
+              page="create"
             />
           )}
         </div>
@@ -152,6 +155,16 @@ export function Create() {
         <div>
           {subscription && (
             <Webhook
+              subscription={subscription}
+              handleChange={handleChange}
+              errors={errors}
+            />
+          )}
+        </div>
+
+        <div>
+          {subscription && (
+            <Steps
               subscription={subscription}
               handleChange={handleChange}
               errors={errors}

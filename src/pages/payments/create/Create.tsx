@@ -11,7 +11,6 @@
 import { Card, Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
-import paymentType from '$app/common/constants/payment-type';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -29,7 +28,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -43,6 +42,10 @@ import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
+import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Banner } from '$app/components/Banner';
+import { useColorScheme } from '$app/common/colors';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -73,13 +76,17 @@ export default function Create() {
     { name: t('new_payment'), href: '/payments/create' },
   ];
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
-  const invoiceResolver = useInvoiceResolver();
   const creditResolver = useCreditResolver();
+  const invoiceResolver = useInvoiceResolver();
+
   const formatMoney = useFormatMoney();
+  const paymentTypes = usePaymentTypes();
 
   const [payment, setPayment] = useAtom(paymentAtom);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [sendEmail, setSendEmail] = useState(
     company?.settings?.client_manual_payment_notification
   );
@@ -104,6 +111,7 @@ export default function Create() {
           invoices: [],
           credits: [],
           client_id: '',
+          type_id: company?.settings?.payment_type_id ?? '',
         };
       }
 
@@ -167,16 +175,6 @@ export default function Create() {
     }
   }, [blankPayment]);
 
-  useEffect(() => {
-    setPayment(
-      (current) =>
-        current && {
-          ...current,
-          // amount: collect(payment?.invoices).sum('amount') as number,
-        }
-    );
-  }, [payment?.invoices]);
-
   const {
     handleInvoiceChange,
     handleExistingInvoiceChange,
@@ -204,25 +202,32 @@ export default function Create() {
     setPayment((current) => current && { ...current, [field]: value });
   };
 
-  const onSubmit = useSave(setErrors);
+  const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={(event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        onSubmit(payment as unknown as Payment, sendEmail);
-      }}
-      disableSaveButton={!payment}
+      onSaveClick={() => onSubmit(payment as unknown as Payment, sendEmail)}
+      disableSaveButton={!payment || isFormBusy}
+      aboveMainContainer={
+        Boolean(payment && payment.amount < 0) && (
+          <Banner variant="orange" style={{ borderColor: colors.$5 }}>
+            {t('negative_payment_warning')}
+          </Banner>
+        )
+      }
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector
               onChange={(client) => {
                 handleChange('client_id', client?.id as string);
-                handleChange('currency_id', client?.settings.currency_id);
+                handleChange(
+                  'currency_id',
+                  client?.settings.currency_id || '1'
+                );
                 handleChange('invoices', []);
                 handleChange('credits', []);
               }}
@@ -248,10 +253,8 @@ export default function Create() {
             leftSide={t('amount_received')}
             leftSideHelp={t('amount_received_help')}
           >
-            <InputField
-              id="amount"
-              type="number"
-              value={payment?.amount}
+            <NumberInputField
+              value={payment?.amount || ''}
               onValueChange={(value) =>
                 handleChange(
                   'amount',
@@ -259,6 +262,7 @@ export default function Create() {
                 )
               }
               errorMessage={errors?.errors.amount}
+              changeOverride
             />
           </Element>
 
@@ -275,17 +279,27 @@ export default function Create() {
                         value: invoice.invoice_id,
                         label: t('invoice') ?? '',
                       }}
-                      endpoint={
-                        new URL(
-                          endpoint(
-                            `/api/v1/invoices?payable=${payment.client_id}`
-                          )
-                        )
-                      }
+                      endpoint={endpoint(
+                        `/api/v1/invoices?payable=${payment.client_id}&per_page=100`
+                      )}
                       entryOptions={{
                         label: 'number',
                         id: 'id',
                         value: 'id',
+                        searchable: 'number',
+                        dropdownLabelFn: (invoice) =>
+                          `${t('invoice_number_short')}${invoice.number} - ${t(
+                            'balance'
+                          )} ${formatMoney(
+                            invoice.balance,
+                            payment.client?.country_id,
+                            payment.client?.settings.currency_id
+                          )}`,
+                        inputLabelFn: (invoice) => {
+                          return invoice
+                            ? `${t('invoice_number_short')}${invoice?.number}`
+                            : '';
+                        },
                       }}
                       onChange={(entry) =>
                         entry.resource
@@ -301,9 +315,9 @@ export default function Create() {
                         .toArray()}
                     />
 
-                    <InputField
-                      type="number"
+                    <NumberInputField
                       label={t('amount_received')}
+                      value={invoice.amount || ''}
                       onValueChange={(value) =>
                         handleInvoiceInputChange(
                           index,
@@ -311,7 +325,6 @@ export default function Create() {
                         )
                       }
                       className="w-full"
-                      value={invoice.amount}
                       withoutLabelWrapping
                     />
 
@@ -343,18 +356,17 @@ export default function Create() {
           {payment?.client_id && (
             <Element leftSide={t('invoices')}>
               <ComboboxAsync<Invoice>
-                endpoint={
-                  new URL(
-                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
-                  )
-                }
+                endpoint={endpoint(
+                  `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
+                )}
                 inputOptions={{
                   value: 'id',
                 }}
                 entryOptions={{
                   id: 'id',
                   value: 'id',
-                  label: 'name',
+                  label: 'number',
+                  searchable: 'number',
                   dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
                       'balance'
@@ -375,6 +387,14 @@ export default function Create() {
             </Element>
           )}
 
+          {errors?.errors.invoices && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.invoices}
+              </Alert>
+            </div>
+          )}
+
           {payment?.client_id && <Divider />}
 
           {payment &&
@@ -388,17 +408,14 @@ export default function Create() {
                         value: credit.credit_id,
                         label: t('credit') ?? '',
                       }}
-                      endpoint={
-                        new URL(
-                          endpoint(
-                            `/api/v1/credits?client_id=${payment.client_id}`
-                          )
-                        )
-                      }
+                      endpoint={endpoint(
+                        `/api/v1/credits?client_id=${payment.client_id}&per_page=100&applicable=true`
+                      )}
                       entryOptions={{
                         id: 'id',
                         value: 'id',
                         label: 'number',
+                        searchable: 'number',
                         dropdownLabelFn: (credit) =>
                           `${t('credit')} #${credit.number} - ${t(
                             'balance'
@@ -422,8 +439,7 @@ export default function Create() {
                         .toArray()}
                     />
 
-                    <InputField
-                      type="number"
+                    <NumberInputField
                       label={t('amount')}
                       onValueChange={(value) =>
                         handleCreditInputChange(
@@ -432,7 +448,7 @@ export default function Create() {
                         )
                       }
                       className="w-full"
-                      value={credit.amount}
+                      value={credit.amount || ''}
                       withoutLabelWrapping
                     />
 
@@ -464,11 +480,9 @@ export default function Create() {
           {payment?.client_id && (
             <Element leftSide={t('credits')}>
               <ComboboxAsync<Credit>
-                endpoint={
-                  new URL(
-                    endpoint(`/api/v1/credits?client_id=${payment.client_id}`)
-                  )
-                }
+                endpoint={endpoint(
+                  `/api/v1/credits?client_id=${payment.client_id}&applicable=true`
+                )}
                 inputOptions={{
                   value: null,
                 }}
@@ -476,6 +490,7 @@ export default function Create() {
                   id: 'id',
                   label: 'number',
                   value: 'id',
+                  searchable: 'number',
                   dropdownLabelFn: (credit) =>
                     `${t('credit')} #${credit.number} - ${t(
                       'balance'
@@ -494,6 +509,14 @@ export default function Create() {
             </Element>
           )}
 
+          {errors?.errors.credits && (
+            <div className="px-6">
+              <Alert className="mt-2" type="danger">
+                {errors?.errors.credits}
+              </Alert>
+            </div>
+          )}
+
           {payment?.client_id && <Divider />}
 
           <Element leftSide={t('payment_date')}>
@@ -508,15 +531,15 @@ export default function Create() {
 
           <Element leftSide={t('payment_type')}>
             <SelectField
-              id="type_id"
               value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
+              customSelector
             >
-              {Object.entries(paymentType).map(([id, type], index) => (
-                <option value={id} key={index}>
-                  {t(type)}
+              {paymentTypes.map(([key, value], index) => (
+                <option value={key} key={index}>
+                  {value}
                 </option>
               ))}
             </SelectField>
@@ -595,7 +618,9 @@ export default function Create() {
               onChange={(value) => {
                 setConvertCurrency(value);
 
-                handleChange('exchange_currency_id', '');
+                if (!value) handleChange('exchange_currency_id', '');
+                else handleChange('exchange_currency_id', '1');
+
                 handleChange('exchange_rate', 1);
               }}
             />
@@ -604,9 +629,12 @@ export default function Create() {
           {convertCurrency && payment && (
             <ConvertCurrency
               exchangeRate={payment.exchange_rate.toString() || '1'}
-              exchangeCurrencyId={payment.exchange_currency_id || '1'}
+              exchangeCurrencyId={payment.exchange_currency_id}
               currencyId={payment.currency_id || '1'}
-              amount={payment?.amount}
+              amount={
+                (collect(payment?.invoices).sum('amount') as number) +
+                (payment?.amount ?? 0)
+              }
               onChange={(exchangeRate, exchangeCurrencyId) => {
                 handleChange('exchange_rate', exchangeRate);
                 handleChange('exchange_currency_id', exchangeCurrencyId);

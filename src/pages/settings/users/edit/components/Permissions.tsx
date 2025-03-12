@@ -14,6 +14,7 @@ import { User } from '$app/common/interfaces/user';
 import Toggle from '$app/components/forms/Toggle';
 import { clone } from 'lodash';
 import { useTranslation } from 'react-i18next';
+import { Permissions as PermissionsType } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   user: User;
@@ -54,11 +55,17 @@ export function Permissions(props: Props) {
     );
   };
 
-  const isPermissionChecked = (permission: string) => {
+  const isPermissionChecked = (permission: PermissionsType) => {
     const permissions = user?.company_user?.permissions;
     const [type] = permission.split('_');
 
-    if (permissions && permissions.includes(`${type}_all`)) {
+    if (
+      permissions &&
+      permissions.includes(`${type}_all`) &&
+      permission !== 'view_reports' &&
+      permission !== 'view_dashboard' &&
+      permission !== 'disable_emails'
+    ) {
       return true;
     }
 
@@ -69,17 +76,47 @@ export function Permissions(props: Props) {
     return false;
   };
 
-  const handlePermissionChange = (permission: string, value: boolean) => {
-    const permissions = clone(user?.company_user?.permissions ?? '')
+  const handlePermissionChange = (
+    permission: PermissionsType,
+    value: boolean
+  ) => {
+    let currentPermissions = clone(user?.company_user?.permissions ?? '')
       .split(',')
       .filter((value) => value !== permission);
 
-    if (value) {
-      permissions.push(permission);
+    const [permissionType, entity] = permission.split('_');
+
+    if (entity === 'all') {
+      currentPermissions = currentPermissions.filter(
+        (currentPermission) =>
+          !currentPermission.startsWith(permissionType) ||
+          currentPermission === 'view_reports' ||
+          currentPermission === 'view_dashboard' ||
+          currentPermission === 'disable_emails'
+      );
+    } else if (
+      currentPermissions.includes(`${permissionType}_all`) &&
+      permission !== 'view_reports' &&
+      permission !== 'view_dashboard' &&
+      permission !== 'disable_emails'
+    ) {
+      const permissionsByType = permissions
+        .map((currentPermission) => `${permissionType}_${currentPermission}`)
+        .filter((currentPermission) => currentPermission !== permission);
+
+      currentPermissions = currentPermissions.filter(
+        (currentPermission) => currentPermission !== `${permissionType}_all`
+      );
+
+      currentPermissions = [...currentPermissions, ...permissionsByType];
     }
 
-    if (permissions[0] === '') {
-      permissions.shift();
+    if (value) {
+      currentPermissions.push(permission);
+    }
+
+    if (currentPermissions[0] === '') {
+      currentPermissions.shift();
     }
 
     setUser(
@@ -88,7 +125,7 @@ export function Permissions(props: Props) {
           ...user,
           company_user: user.company_user && {
             ...user.company_user,
-            permissions: permissions.join(','),
+            permissions: currentPermissions.join(','),
           },
         }
     );
@@ -103,6 +140,7 @@ export function Permissions(props: Props) {
         <Toggle
           checked={user?.company_user?.is_admin}
           onChange={(value) => handleAdministratorToggle(value)}
+          cypressRef="admin"
         />
       </Element>
 
@@ -112,6 +150,7 @@ export function Permissions(props: Props) {
           onValueChange={(value) =>
             handlePermissionChange('view_dashboard', value)
           }
+          cypressRef="viewDashboard"
         />
       </Element>
 
@@ -123,6 +162,18 @@ export function Permissions(props: Props) {
           checked={isPermissionChecked('view_reports')}
           onValueChange={(value) =>
             handlePermissionChange('view_reports', value)
+          }
+          cypressRef="viewReports"
+        />
+      </Element>
+
+      <Element leftSide={t('disable_emails')}
+        leftSideHelp={t('disable_emails_help')}
+      >
+        <Toggle
+          checked={isPermissionChecked('disable_emails')}
+          onValueChange={(value) =>
+            handlePermissionChange('disable_emails', value)
           }
         />
       </Element>
@@ -172,10 +223,12 @@ export function Permissions(props: Props) {
           <div className="grid grid-cols-3  md:grid-cols-6">
             <div className="col-1">
               <Checkbox
-                checked={isPermissionChecked(`create_${permission}`)}
+                checked={isPermissionChecked(
+                  `create_${permission}` as PermissionsType
+                )}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange(
-                    `create_${permission}`,
+                    `create_${permission}` as PermissionsType,
                     event.target.checked
                   )
                 }
@@ -184,10 +237,12 @@ export function Permissions(props: Props) {
             </div>
             <div className="col-1">
               <Checkbox
-                checked={isPermissionChecked(`view_${permission}`)}
+                checked={isPermissionChecked(
+                  `view_${permission}` as PermissionsType
+                )}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange(
-                    `view_${permission}`,
+                    `view_${permission}` as PermissionsType,
                     event.target.checked
                   )
                 }
@@ -196,10 +251,12 @@ export function Permissions(props: Props) {
             </div>
             <div className="col-1">
               <Checkbox
-                checked={isPermissionChecked(`edit_${permission}`)}
+                checked={isPermissionChecked(
+                  `edit_${permission}` as PermissionsType
+                )}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange(
-                    `edit_${permission}`,
+                    `edit_${permission}` as PermissionsType,
                     event.target.checked
                   )
                 }

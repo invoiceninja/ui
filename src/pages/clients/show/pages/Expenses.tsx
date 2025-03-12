@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { DataTable } from '$app/components/DataTable';
 import {
   useActions,
@@ -17,10 +19,10 @@ import {
 } from '$app/pages/expenses/common/hooks';
 import { useParams } from 'react-router-dom';
 
-export const dataTableStaleTime = 50;
-
 export default function Expenses() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const columns = useExpenseColumns();
 
@@ -32,7 +34,7 @@ export default function Expenses() {
     <DataTable
       resource="expense"
       endpoint={route(
-        '/api/v1/expenses?include=client,vendor&client_id=:id&sort=id|desc',
+        '/api/v1/expenses?include=client,vendor,category,project&client_id=:id&sort=id|desc',
         {
           id,
         }
@@ -45,7 +47,9 @@ export default function Expenses() {
       bulkRoute="/api/v1/expenses/bulk"
       linkToCreate={route('/expenses/create?client=:id', { id })}
       linkToEdit="/expenses/:id/edit"
-      staleTime={dataTableStaleTime}
+      excludeColumns={['client_id']}
+      linkToCreateGuards={[permission('create_expense')]}
+      hideEditableOptions={!hasPermission('edit_expense')}
     />
   );
 }

@@ -28,6 +28,7 @@ export interface SubscriptionProps {
     value: Subscription[keyof Subscription]
   ) => void;
   errors: ValidationBag | undefined;
+  page?: 'create' | 'edit';
 }
 
 interface OverviewSubscriptionProps extends SubscriptionProps {
@@ -37,7 +38,7 @@ interface OverviewSubscriptionProps extends SubscriptionProps {
 export function Overview(props: OverviewSubscriptionProps) {
   const [t] = useTranslation();
 
-  const { subscription, handleChange, errors, products } = props;
+  const { subscription, handleChange, errors, products, page } = props;
 
   return (
     <Card title={t('overview')}>
@@ -51,7 +52,7 @@ export function Overview(props: OverviewSubscriptionProps) {
 
       <Element leftSide={t('group')}>
         <ComboboxAsync<GroupSettings>
-          endpoint={new URL(endpoint('/api/v1/group_settings?status=active'))}
+          endpoint={endpoint('/api/v1/group_settings?status=active')}
           onChange={(value: Entry<GroupSettings>) =>
             value.resource && handleChange('group_id', value.resource.id)
           }
@@ -114,12 +115,14 @@ export function Overview(props: OverviewSubscriptionProps) {
         />
       </Element>
 
-      <Element leftSide={t('purchase_page')}>
-        <CopyToClipboard
-          className="break-all"
-          text={subscription.purchase_page}
-        />
-      </Element>
+      {page !== 'create' && (
+        <Element leftSide={t('purchase_page')}>
+          <CopyToClipboard
+            className="break-all"
+            text={subscription.purchase_page}
+          />
+        </Element>
+      )}
     </Card>
   );
 }

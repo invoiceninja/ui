@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -18,7 +19,13 @@ export function generateClientPortalUrl(
   resource: Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder
 ) {
   if (resource.invitations.length > 0) {
-    return `${resource.invitations[0].link}?silent=true`;
+    const client = resource['client' as keyof typeof resource]
+      ? (resource['client' as keyof typeof resource] as unknown as Client)
+      : '';
+
+    return `${resource.invitations[0].link}?silent=true${
+      client ? `&client_hash=${client.client_hash}` : ''
+    }`;
   }
 
   return null;

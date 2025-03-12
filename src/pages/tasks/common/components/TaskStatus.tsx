@@ -18,6 +18,11 @@ import {
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
+import { useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
+import { TaskStatusesDropdown } from './TaskStatusesDropdown';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { Tooltip } from '$app/components/Tooltip';
 
 interface Props {
   entity: Task;
@@ -26,10 +31,20 @@ interface Props {
 export function TaskStatus(props: Props) {
   const [t] = useTranslation();
 
+  const ref = useRef(null);
+
   const adjustColorDarkness = useAdjustColorDarkness();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const { invoice_id, archived_at, is_deleted, time_log, status } =
     props.entity;
+
+  const [visibleDropdown, setVisibleDropdown] = useState<boolean>(false);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  useClickAway(ref, () => {
+    visibleDropdown && setVisibleDropdown(false);
+  });
 
   const isRunning = () => {
     const timeLogs = parseTimeLog(time_log);
@@ -46,9 +61,24 @@ export function TaskStatus(props: Props) {
 
   if (archived_at) return <Badge variant="orange">{t('archived')}</Badge>;
 
-  if (invoice_id) return <Badge variant="green">{t('invoiced')}</Badge>;
+  if (invoice_id) {
+    return (
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+        {t('invoiced')}
+      </Badge>
+    );
+  }
 
-  if (isRunning()) return <Badge variant="light-blue">{t('running')}</Badge>;
+  if (isRunning()) {
+    return (
+      <Badge
+        variant="light-blue"
+        style={{ backgroundColor: statusThemeColors.$2 }}
+      >
+        {t('running')}
+      </Badge>
+    );
+  }
 
   if (status) {
     const { red, green, blue, hex } = hexToRGB(status.color);
@@ -56,16 +86,61 @@ export function TaskStatus(props: Props) {
     const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
     return (
-      <StatusBadge
-        for={{}}
-        code={status.name}
-        style={{
-          color: adjustColorDarkness(hex, darknessAmount),
-          backgroundColor: status.color,
-        }}
-      />
+      <div ref={ref} onClick={(event) => event.stopPropagation()}>
+        <Tooltip
+          width="auto"
+          message={t('change_status') as string}
+          withoutArrow
+          placement="bottom"
+        >
+          <StatusBadge
+            for={{}}
+            code={status.name}
+            style={{
+              color: adjustColorDarkness(hex, darknessAmount),
+              backgroundColor: status.color,
+            }}
+            onClick={() =>
+              !isFormBusy && setVisibleDropdown((current) => !current)
+            }
+          />
+        </Tooltip>
+
+        <TaskStatusesDropdown
+          visible={visibleDropdown}
+          isFormBusy={isFormBusy}
+          setIsFormBusy={setIsFormBusy}
+          task={props.entity}
+          setVisible={setVisibleDropdown}
+        />
+      </div>
     );
   }
 
-  return <StatusBadge for={{}} code="logged" />;
+  return (
+    <div ref={ref} onClick={(event) => event.stopPropagation()}>
+      <Tooltip
+        width="auto"
+        message={t('change_status') as string}
+        withoutArrow
+        placement="bottom"
+      >
+        <StatusBadge
+          for={{}}
+          code="logged"
+          onClick={() =>
+            !isFormBusy && setVisibleDropdown((current) => !current)
+          }
+        />
+      </Tooltip>
+
+      <TaskStatusesDropdown
+        visible={visibleDropdown}
+        isFormBusy={isFormBusy}
+        setIsFormBusy={setIsFormBusy}
+        task={props.entity}
+        setVisible={setVisibleDropdown}
+      />
+    </div>
+  );
 }

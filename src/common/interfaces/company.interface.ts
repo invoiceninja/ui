@@ -8,6 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
+import { BankAccount } from './bank-accounts';
+import { Document } from './document.interface';
+
 export interface Company {
   id: string;
   size_id: string;
@@ -61,16 +65,35 @@ export interface Company {
   first_month_of_year: string;
   company_key: string;
   fill_products: boolean;
-}
-
-export interface CompanyInput {
-  name: string;
-  subdomain: string;
-  language_id: string;
-  currency_id: string;
+  convert_products: boolean;
+  bank_integrations: BankAccount[];
+  documents: Document[];
+  calculate_expense_tax_by_amount: boolean;
+  expense_inclusive_taxes: boolean;
+  smtp_host: string;
+  smtp_port: string;
+  smtp_encryption: string;
+  smtp_username: string;
+  smtp_password: string;
+  smtp_local_domain: string;
+  smtp_verify_peer: boolean;
+  e_invoice?: EInvoiceType;
+  use_comma_as_decimal_place?: boolean;
+  notify_vendor_when_paid?: boolean;
+  expense_mailbox_active?: boolean;
+  inbound_mailbox_allow_company_users?: boolean;
+  inbound_mailbox_allow_vendors?: boolean;
+  inbound_mailbox_allow_clients?: boolean;
+  inbound_mailbox_whitelist?: string;
+  inbound_mailbox_blacklist?: string;
+  inbound_mailbox_allow_unknown?: boolean;
+  expense_mailbox?: string;
+  legal_entity_id: string | null;
+  session_timeout?: number;
 }
 
 export interface Settings {
+  id?: string;
   accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
   auto_bill_standard_invoices: boolean;
@@ -222,7 +245,7 @@ export interface Settings {
   enable_reminder1: boolean;
   enable_reminder2: boolean;
   enable_reminder3: boolean;
-  enable_reminder_endless: boolean;
+  enable_reminder_endless?: boolean;
   num_days_reminder1: number;
   num_days_reminder2: number;
   num_days_reminder3: number;
@@ -236,7 +259,7 @@ export interface Settings {
   late_fee_percent1: number;
   late_fee_percent2: number;
   late_fee_percent3: number;
-  endless_reminder_frequency_id: string;
+  endless_reminder_frequency_id?: string;
   late_fee_endless_amount: number;
   late_fee_endless_percent: number;
   client_online_payment_notification: boolean;
@@ -280,6 +303,7 @@ export interface Settings {
   client_portal_under_payment_minimum: number;
   client_portal_allow_over_payment: boolean;
   use_credits_payment: string;
+  use_unapplied_payment: string;
   hide_empty_columns_on_pdf: boolean;
   email_from_name: string;
   auto_archive_invoice_cancelled: boolean;
@@ -297,20 +321,41 @@ export interface Settings {
   e_invoice_type: string;
   default_expense_payment_type_id: string;
   enable_e_invoice: boolean;
-  mark_paid_payment_email: boolean;
+  send_email_on_mark_paid: boolean;
   classification: string;
+  payment_email_all_contacts: boolean;
+  show_pdfhtml_on_mobile: boolean;
+  custom_sending_email: string;
+  statement_design_id: string;
+  delivery_note_design_id: string;
+  payment_receipt_design_id: string;
+  payment_refund_design_id: string;
+  enable_rappen_rounding: boolean;
+  e_quote_type: string;
+  brevo_secret: string;
+  task_round_up: boolean;
+  task_round_to_nearest: number;
+  merge_e_invoice_to_pdf: boolean;
+  payment_flow: string;
+  enable_client_profile_update: boolean;
+  preference_product_notes_for_html_view: boolean;
+  unlock_invoice_documents_after_payment: boolean;
+
 }
 
 export interface TaxData {
   version: string;
   seller_subregion: string;
   regions: Regions;
+  acts_as_sender: boolean;
+  acts_as_receiver: boolean;
 }
 
 export interface Regions {
   US: USRegion;
   EU: EURegion;
   AU: AURegion;
+  UK: UKRegion;
 }
 
 export interface USRegion {
@@ -378,13 +423,26 @@ export interface TaxSetting {
   tax_rate: number;
   tax_name: string;
   reduced_tax_rate: number;
+  vat_number: string;
 }
 
+export interface UKRegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: UKSubregions;
+}
 export interface EURegion {
   has_sales_above_threshold: boolean;
   tax_all_subregions: boolean;
   tax_threshold: number;
   subregions: EUSubregions;
+}
+
+export interface UKSubregions {
+  GB: TaxSetting;
+  'GB-NIR': TaxSetting;
+  IM: TaxSetting;
 }
 
 export interface EUSubregions {
@@ -403,12 +461,15 @@ export interface EUSubregions {
   HR: TaxSetting;
   HU: TaxSetting;
   IE: TaxSetting;
+  IS: TaxSetting;
   IT: TaxSetting;
+  LI: TaxSetting;
   LT: TaxSetting;
   LU: TaxSetting;
   LV: TaxSetting;
   MT: TaxSetting;
   NL: TaxSetting;
+  NO: TaxSetting;
   PT: TaxSetting;
   RO: TaxSetting;
   SE: TaxSetting;

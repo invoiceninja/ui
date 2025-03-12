@@ -30,6 +30,7 @@ import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
 import { useStart } from '../common/hooks/useStart';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -43,7 +44,10 @@ export default function Create() {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const { data: taskStatuses } = useTaskStatusesQuery();
+  const [isInitialConfiguration, setIsInitialConfiguration] =
+    useState<boolean>(true);
+
+  const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
   const { data } = useBlankTaskQuery({ enabled: typeof task === 'undefined' });
 
   const pages = [
@@ -62,13 +66,9 @@ export default function Create() {
       if (
         typeof data !== 'undefined' &&
         typeof value === 'undefined' &&
-        searchParams.get('action') !== 'clone' &&
-        taskStatuses
+        searchParams.get('action') !== 'clone'
       ) {
         const _task = cloneDeep(data);
-
-        _task.status_id =
-          taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '';
 
         if (searchParams.get('client')) {
           _task.client_id = searchParams.get('client')!;
@@ -89,7 +89,22 @@ export default function Create() {
 
       return value;
     });
-  }, [data, taskStatuses]);
+  }, [data]);
+
+  useEffect(() => {
+    if (task && taskStatuses && isInitialConfiguration) {
+      setTask(
+        (current) =>
+          current && {
+            ...current,
+            status_id:
+              taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '',
+          }
+      );
+
+      setIsInitialConfiguration(false);
+    }
+  }, [task, taskStatuses]);
 
   const handleChange = (property: keyof Task, value: unknown) => {
     setTask((current) => current && { ...current, [property]: value });
@@ -105,6 +120,8 @@ export default function Create() {
     request('POST', endpoint('/api/v1/tasks'), task)
       .then((response) => {
         company?.auto_start_tasks && start(response.data.data);
+
+        $refetch(['tasks']);
 
         toast.success('created_task');
 

@@ -18,6 +18,8 @@ interface Props {
   value?: string | undefined;
   onChange: (value: string) => unknown;
   label?: string;
+  disabled?: boolean;
+  handleChangeOnlyOnUserInput?: boolean;
 }
 
 export function MarkdownEditor(props: Props) {
@@ -44,7 +46,7 @@ export function MarkdownEditor(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" style={{ zIndex: 0 }}>
       {props.label && <InputLabel>{props.label}</InputLabel>}
 
       <Editor
@@ -53,6 +55,7 @@ export function MarkdownEditor(props: Props) {
         value={value}
         init={{
           height: 300,
+          entity_encoding: 'raw',
           menubar: false,
           plugins: [
             'advlist',
@@ -88,8 +91,21 @@ export function MarkdownEditor(props: Props) {
               : '/tinymce_6.4.2/tinymce/content.css',
           body_class: 'h-screen',
           skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
+          paste_data_images: false,
+          newline_behavior: 'invert',
+          browser_spellcheck: true,
+          convert_urls: false,
         }}
-        onEditorChange={handleChange}
+        onEditorChange={(currentValue) => {
+          if (props.handleChangeOnlyOnUserInput) {
+            if (currentValue !== props.value) {
+              handleChange(currentValue);
+            }
+          } else {
+            handleChange(currentValue);
+          }
+        }}
+        disabled={props.disabled}
       />
     </div>
   );

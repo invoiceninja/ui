@@ -23,32 +23,79 @@ import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
+import { or } from '$app/common/guards/guards/or';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  PaymentSlider,
+  paymentSliderAtom,
+  paymentSliderVisibilityAtom,
+} from '../common/components/PaymentSlider';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { EntityState } from '$app/common/enums/entity-state';
+import { getEntityState } from '$app/common/helpers';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Guard } from '$app/common/guards/Guard';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export default function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();
 
-  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
-
-  const columns = usePaymentColumns();
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const actions = useActions();
-
-  const paymentColumns = useAllPaymentColumns();
-
   const filters = usePaymentFilters();
-
+  const columns = usePaymentColumns();
+  const paymentColumns = useAllPaymentColumns();
   const customBulkActions = useCustomBulkActions();
 
+  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
+
+  const [sliderPaymentId, setSliderPaymentId] = useState<string>('');
+  const [paymentSlider, setPaymentSlider] = useAtom(paymentSliderAtom);
+  const [paymentSliderVisibility, setPaymentSliderVisibility] = useAtom(
+    paymentSliderVisibilityAtom
+  );
+
+  const { data: paymentResponse } = usePaymentQuery({
+    id: sliderPaymentId,
+    include: 'credits',
+  });
+
+  useEffect(() => {
+    if (paymentResponse && paymentSliderVisibility) {
+      setPaymentSlider(paymentResponse);
+    }
+  }, [paymentResponse, paymentSliderVisibility]);
+
+  useEffect(() => {
+    return () => setPaymentSliderVisibility(false);
+  }, []);
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
+  useSocketEvent({
+    on: 'App\\Events\\Payment\\PaymentWasUpdated',
+    callback: () => $refetch(['payments']),
+  });
+
   return (
-    <Default
-      title={t('payments')}
-      breadcrumbs={pages}
-      docsLink="en/payments/"
-      withoutBackButton
-    >
+    <Default title={t('payments')} breadcrumbs={pages} docsLink="en/payments/">
       <DataTable
         resource="payment"
         columns={columns}
@@ -69,7 +116,38 @@ export default function Payments() {
             table="payment"
           />
         }
+        rightSide={
+          <Guard
+            type="component"
+            component={<ImportButton route="/payments/import" />}
+            guards={[
+              or(permission('create_payment'), permission('edit_payment')),
+            ]}
+          />
+        }
+        onTableRowClick={(payment) => {
+          setSliderPaymentId(payment.id);
+          setPaymentSliderVisibility(true);
+        }}
         linkToCreateGuards={[permission('create_payment')]}
+        hideEditableOptions={!hasPermission('edit_payment')}
+        showRestoreBulk={(selectedPayments) =>
+          selectedPayments.every(
+            (payment) => getEntityState(payment) === EntityState.Archived
+          )
+        }
+        enableSavingFilterPreference
+      />
+
+      {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}
+
+      <ChangeTemplateModal<Payment>
+        entity="payment"
+        entities={changeTemplateResources as Payment[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(payment) => `${t('number')}: ${payment.number}`}
+        bulkUrl="/api/v1/payments/bulk"
       />
     </Default>
   );

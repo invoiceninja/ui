@@ -8,63 +8,48 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { v4 } from 'uuid';
-import { invoiceSumAtom, quoteAtom } from '../common/atoms';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
-import { useActions, useQuoteUtilities, useSave } from '../common/hooks';
-import { useQuoteQuery } from '../common/queries';
+import { useQuoteUtilities } from '../common/hooks';
 import { Card } from '$app/components/cards';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { useColorScheme } from '$app/common/colors';
+import { QuoteContext } from '../create/Create';
 
 export default function Edit() {
-  const { documentTitle } = useTitle('edit_quote');
-  const { t } = useTranslation();
-  const { id } = useParams();
+  const [t] = useTranslation();
+
+  const [searchParams] = useSearchParams();
 
   const reactSettings = useReactSettings();
 
-  const pages: Page[] = [
-    { name: t('quotes'), href: '/quotes' },
-    {
-      name: t('edit_quote'),
-      href: route('/quotes/:id/edit', { id }),
-    },
-  ];
+  const context: QuoteContext = useOutletContext();
+  const {
+    quote,
+    errors,
+    isDefaultTerms,
+    isDefaultFooter,
+    client,
+    setIsDefaultFooter,
+    setIsDefaultTerms,
+    invoiceSum,
+  } = context;
 
-  const { data } = useQuoteQuery({ id: id! });
-
-  const [quote, setQuote] = useAtom(quoteAtom);
-  const [invoiceSum] = useAtom(invoiceSumAtom);
-
-  const [client, setClient] = useState<Client>();
-  const [errors, setErrors] = useState<ValidationBag>();
-
+  const colors = useColorScheme();
+  const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
-  const clientResolver = useClientResolver();
 
   const {
     handleChange,
@@ -73,55 +58,24 @@ export default function Edit() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
-    calculateInvoiceSum,
   } = useQuoteUtilities({ client });
 
-  useEffect(() => {
-    if (data) {
-      const _quote = cloneDeep(data);
-
-      _quote.line_items.map((item) => (item._id = v4()));
-
-      setQuote(_quote);
-
-      if (_quote && _quote.client) {
-        setClient(_quote.client);
-
-        clientResolver.cache(_quote.client);
-      }
-    }
-  }, [data]);
-
-  useEffect(() => {
-    quote && calculateInvoiceSum(quote);
-  }, [quote]);
-
-  const actions = useActions();
-  const save = useSave({ setErrors });
-
-  const [searchParams] = useSearchParams()
-  const taskColumns = useTaskColumns()
-
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onSaveClick={() => quote && save(quote)}
-      navigationTopRight={
-        quote && (
-          <ResourceActions
-            resource={quote}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
-    >
+    <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {quote && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span
+                className="text-sm"
+                style={{
+                  backgroundColor: colors.$2,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
+              >
+                {t('status')}
+              </span>
               <QuoteStatusBadge entity={quote} />
             </div>
           )}
@@ -130,6 +84,9 @@ export default function Edit() {
             resource={quote}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
+            onLocationChange={(locationId) =>
+              handleChange('location_id', locationId)
+            }
             onContactCheckboxChange={handleInvitationChange}
             errorMessage={errors?.errors.client_id}
             textOnly
@@ -192,7 +149,14 @@ export default function Edit() {
           </TabGroup>
         </div>
 
-        <QuoteFooter handleChange={handleChange} errors={errors} />
+        <QuoteFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {quote && (
           <InvoiceTotals
@@ -215,10 +179,11 @@ export default function Edit() {
               entity="quote"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
         </div>
       )}
-    </Default>
+    </>
   );
 }

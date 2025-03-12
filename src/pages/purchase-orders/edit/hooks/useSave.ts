@@ -14,37 +14,67 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Dispatch, SetStateAction } from 'react';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
-export function useSave(setErrors: (errors: ValidationBag) => unknown) {
-  const queryClient = useQueryClient();
+interface Props {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+export function useSave(props: Props) {
+  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
 
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (purchaseOrder: PurchaseOrder) => {
+    setErrors(undefined);
     toast.processing();
+
+    let apiEndpoint = '/api/v1/purchase_orders/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
 
     request(
       'PUT',
-      endpoint('/api/v1/purchase_orders/:id', { id: purchaseOrder.id }),
+      endpoint(apiEndpoint, { id: purchaseOrder.id }),
       purchaseOrder
     )
-      .then(() => toast.success('updated_purchase_order'))
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
+        toast.success('updated_purchase_order');
+      })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => {
         setIsDeleteActionTriggered(undefined);
 
-        queryClient.invalidateQueries(
-          route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
-        );
+        $refetch(['purchase_orders']);
       });
   };
 }

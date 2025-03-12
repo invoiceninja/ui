@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -22,11 +23,17 @@ interface Props {
   onChange?: (value: Entry<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
+  resourceTaxName?: string;
+  resourceTaxRate?: number;
 }
 
 export function TaxRateSelector(props: Props) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { isAdmin, isOwner } = useAdmin();
+
+  const { resourceTaxName, resourceTaxRate } = props;
 
   return (
     <>
@@ -34,22 +41,32 @@ export function TaxRateSelector(props: Props) {
         inputOptions={{
           value: props.defaultValue ?? null,
         }}
-        endpoint={new URL(endpoint('/api/v1/tax_rates?status=active'))}
+        endpoint={endpoint('/api/v1/tax_rates?status=active')}
         onChange={(taxRate) => props.onChange && props.onChange(taxRate)}
         action={{
           label: t('create_tax_rate'),
           onClick: () => setIsModalOpen(true),
-          visible: true,
+          visible: isAdmin || isOwner,
         }}
         entryOptions={{
           id: 'id',
           value: 'name',
           label: 'name',
+          customValue: (taxRate) => `${taxRate.name}||${taxRate.rate}`,
           inputLabelFn: (taxRate) =>
-            taxRate ? `${taxRate.name} ${taxRate.rate}%` : '',
-          dropdownLabelFn: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
+            taxRate
+              ? resourceTaxName === taxRate.name
+                ? `${taxRate.name} ${resourceTaxRate}%`
+                : `${taxRate.name} ${taxRate.rate}%`
+              : '',
+          dropdownLabelFn: (taxRate) =>
+            resourceTaxName === taxRate.name
+              ? `${taxRate.name} ${resourceTaxRate}%`
+              : `${taxRate.name} ${taxRate.rate}%`,
         }}
+        sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
+        compareOnlyByValue
       />
 
       <TaxCreate

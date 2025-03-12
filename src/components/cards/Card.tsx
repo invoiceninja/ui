@@ -34,7 +34,7 @@ export interface ButtonOption {
 
 interface Props {
   children: ReactNode;
-  title?: string | null;
+  title?: ReactNode | null;
   description?: string;
   withSaveButton?: boolean;
   additionalSaveOptions?: ButtonOption[];
@@ -55,12 +55,16 @@ interface Props {
   childrenClassName?: string;
   withoutHeaderBorder?: boolean;
   topRight?: ReactNode;
+  height?: 'full';
+  headerStyle?: CSSProperties;
+  headerClassName?: string;
+  withoutHeaderPadding?: boolean;
 }
 
 export function Card(props: Props) {
   const [t] = useTranslation();
 
-  const { padding = 'regular' } = props;
+  const { padding = 'regular', height } = props;
 
   const [isCollapsed, setIsCollpased] = useState(props.collapsed);
 
@@ -69,30 +73,41 @@ export function Card(props: Props) {
   return (
     <div
       className={classNames(
-        `border shadow rounded overflow-visible ${props.className}`,
-        { 'overflow-y-auto': props.withScrollableBody }
+        `border rounded-md overflow-visible ${props.className}`,
+        {
+          'overflow-y-auto': props.withScrollableBody,
+          'h-full': height === 'full',
+        }
       )}
       style={{
-        ...props.style,
         backgroundColor: colors.$1,
         color: colors.$3,
         borderColor: colors.$4,
+        ...props.style,
       }}
     >
-      <form onSubmit={props.onFormSubmit}>
+      <form
+        onSubmit={props.onFormSubmit}
+        className={classNames({ 'h-full': height === 'full' })}
+      >
         {props.title && (
           <div
-            className={classNames({
-              'bg-white sticky top-0': props.withScrollableBody,
-              'px-4 sm:px-6 py-3': padding == 'small',
-              'px-4 sm:px-6 py-5': padding == 'regular',
-              'border-b': !props.withoutHeaderBorder,
-            })}
+            className={classNames(
+              {
+                'bg-white sticky top-0': props.withScrollableBody,
+                'px-4 sm:px-6 py-3':
+                  padding == 'small' && !props.withoutHeaderPadding,
+                'px-4 sm:px-6 py-5':
+                  padding == 'regular' && !props.withoutHeaderPadding,
+                'border-b': !props.withoutHeaderBorder,
+              },
+              props.headerClassName
+            )}
             onClick={() =>
               typeof props.collapsed !== 'undefined' &&
               setIsCollpased(!isCollapsed)
             }
-            style={{ borderColor: colors.$4 }}
+            style={{ borderColor: colors.$4, ...props.headerStyle }}
           >
             <div
               className={classNames('flex items-center justify-between', {
@@ -134,6 +149,7 @@ export function Card(props: Props) {
             'py-0': props.withoutBodyPadding,
             'py-4': padding === 'regular' && !props.withoutBodyPadding,
             'py-2': padding === 'small' && !props.withoutBodyPadding,
+            'h-full': height === 'full',
           })}
         >
           {props.isLoading && <Element leftSide={<Spinner />} />}
@@ -146,7 +162,10 @@ export function Card(props: Props) {
         </div>
 
         {(props.withSaveButton || props.additionalAction) && (
-          <div className="border-t px-4 py-5 sm:p-0" style={{ borderColor: colors.$4 }}>
+          <div
+            className="border-t px-4 py-5 sm:p-0"
+            style={{ borderColor: colors.$4 }}
+          >
             <dl className="sm:divide-y sm:divide-gray-200">
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
@@ -169,7 +188,7 @@ export function Card(props: Props) {
                       disabled={props.disableSubmitButton}
                       disableWithoutIcon={props.disableWithoutIcon}
                     >
-                      {props.saveButtonLabel ?? t('save')} 
+                      {props.saveButtonLabel ?? t('save')}
                     </Button>
 
                     <Dropdown

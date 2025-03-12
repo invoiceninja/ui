@@ -8,8 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
+import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
+import { Payment } from './payment';
 
 export interface Quote {
   id: string;
@@ -77,4 +80,9 @@ export interface Quote {
   invitations: any[];
   documents: any[];
   client?: Client;
+  e_invoice?: EInvoiceType;
+  activities?: Activity[];
+  payments?: Payment[];
+  reminder_schedule?: string;
+  location_id: string;
 }

@@ -14,26 +14,35 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '../hooks/useRefetch';
+import { useHasPermission } from '../hooks/permissions/useHasPermission';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery<PurchaseOrder>(
-    '/api/v1/purchase_orders/create',
+    ['/api/v1/purchase_orders', 'create'],
     () =>
       request('GET', endpoint('/api/v1/purchase_orders/create')).then(
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
           response.data.data
       ),
-    { ...options, staleTime: Infinity }
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_purchase_order')
+        ? options?.enabled ?? true
+        : false,
+    }
   );
 }
 
 export function usePurchaseOrderQuery(params: { id: string | undefined }) {
   return useQuery<PurchaseOrder>(
-    route('/api/v1/purchase_orders/:id', { id: params.id }),
+    ['/api/v1/purchase_orders', params.id],
     () =>
       request(
         'GET',
@@ -80,13 +89,11 @@ export function useBulk() {
 
       toast.success(message);
 
-      queryClient.invalidateQueries('/api/v1/purchase_orders');
+      $refetch(['purchase_orders']);
 
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(
-          route('/api/v1/purchase_orders/:id', { id })
-        )
-      );
+      if (action === 'expense') {
+        $refetch(['expenses']);
+      }
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
@@ -110,9 +117,7 @@ export function useMarkSent() {
     ).then(() => {
       toast.success('marked_purchase_order_as_sent');
 
-      queryClient.invalidateQueries(
-        route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
-      );
+      $refetch(['purchase_orders']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

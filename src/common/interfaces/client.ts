@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { ClientContact } from './client-contact';
+import { GroupSettings } from './group-settings';
+import { Location } from './location';
 import { TaxInfo } from './tax-info';
 import { Timestamps } from './timestamps';
 
@@ -77,9 +80,12 @@ export interface Client extends Timestamps {
   contacts: ClientContact[];
   documents: any[];
   gateway_tokens: GatewayToken[];
+  group_settings?: GroupSettings;
   has_valid_vat_number: boolean;
   is_tax_exempt: boolean;
   routing_id: string;
   tax_info?: TaxInfo;
   classification: string;
+  e_invoice: EInvoiceType;
+  locations: Location[];
 }

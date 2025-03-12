@@ -28,16 +28,17 @@ import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
+import { CustomField } from '$app/components/CustomField';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_project');
 
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('projects'), href: '/projects' },
@@ -107,7 +108,7 @@ export default function Create() {
       .then((response) => {
         toast.success('created_project');
 
-        queryClient.invalidateQueries('/api/v1/projects');
+        $refetch(['projects']);
 
         navigate(route('/projects/:id/edit', { id: response.data.data.id }));
       })
@@ -126,7 +127,7 @@ export default function Create() {
       disableSaveButton={!project}
       onSaveClick={onSave}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
           <Element leftSide={t('project_name')} required>
             <InputField
@@ -144,7 +145,6 @@ export default function Create() {
               clearButton={Boolean(project?.client_id)}
               onClearButtonClick={() => handleChange('client_id', '')}
               errorMessage={errors?.errors.client_id}
-              staleTime={Infinity}
             />
           </Element>
 
@@ -167,9 +167,8 @@ export default function Create() {
           </Element>
 
           <Element leftSide={t('budgeted_hours')}>
-            <InputField
-              type="number"
-              value={project?.budgeted_hours}
+            <NumberInputField
+              value={project?.budgeted_hours || ''}
               onValueChange={(value) =>
                 handleChange('budgeted_hours', parseFloat(value))
               }
@@ -178,9 +177,8 @@ export default function Create() {
           </Element>
 
           <Element leftSide={t('task_rate')}>
-            <InputField
-              type="number"
-              value={project?.task_rate}
+            <NumberInputField
+              value={project?.task_rate || ''}
               onValueChange={(value) =>
                 handleChange('task_rate', parseFloat(value))
               }
@@ -205,6 +203,50 @@ export default function Create() {
               errorMessage={errors?.errors.private_notes}
             />
           </Element>
+
+          {project && company?.custom_fields?.project1 && (
+            <CustomField
+              field="project1"
+              defaultValue={project.custom_value1 || ''}
+              value={company.custom_fields.project1}
+              onValueChange={(value) =>
+                handleChange('custom_value1', value.toString())
+              }
+            />
+          )}
+
+          {project && company?.custom_fields?.project2 && (
+            <CustomField
+              field="project2"
+              defaultValue={project.custom_value2 || ''}
+              value={company.custom_fields.project2}
+              onValueChange={(value) =>
+                handleChange('custom_value2', value.toString())
+              }
+            />
+          )}
+
+          {project && company?.custom_fields?.project3 && (
+            <CustomField
+              field="project3"
+              defaultValue={project.custom_value3 || ''}
+              value={company.custom_fields.project3}
+              onValueChange={(value) =>
+                handleChange('custom_value3', value.toString())
+              }
+            />
+          )}
+
+          {project && company?.custom_fields?.project4 && (
+            <CustomField
+              field="project4"
+              defaultValue={project.custom_value4 || ''}
+              value={company.custom_fields.project4}
+              onValueChange={(value) =>
+                handleChange('custom_value4', value.toString())
+              }
+            />
+          )}
         </Card>
       </Container>
     </Default>

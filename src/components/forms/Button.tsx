@@ -27,6 +27,7 @@ interface Props extends CommonProps {
   behavior?: 'button' | 'submit';
   disableWithoutIcon?: boolean;
   noBackgroundColor?: boolean;
+  form?: string;
 }
 
 const defaultProps: Props = {
@@ -106,6 +107,7 @@ export function Button(props: Props) {
       )}
       style={css}
       onClick={props.onClick}
+      form={props.form}
     >
       {props.disabled && !props.disableWithoutIcon ? (
         <Spinner variant="light" />

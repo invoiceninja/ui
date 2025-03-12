@@ -22,7 +22,6 @@ import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
@@ -31,15 +30,47 @@ import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Apply() {
-  const queryClient = useQueryClient();
   const { id } = useParams();
   const [t] = useTranslation();
   const { data: payment, isLoading } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
+
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
+
+  const calcApplyAmount = (balance: number) => {
+    if (payment) {
+      const unapplied = payment?.amount - payment?.applied;
+
+      let invoices_total = 0;
+      formik.values.invoices.map((invoice: any) => {
+        invoices_total = invoices_total + Number(invoice.amount);
+      });
+
+      return Math.min(unapplied - invoices_total, balance);
+    }
+
+    return balance;
+  };
+
+  const calcApplyBalance = () => {
+    if (payment) {
+      const unapplied = payment?.amount - payment?.applied;
+
+      let total = 0;
+      formik.values.invoices.map((invoice: any) => {
+        total = total + Number(invoice.amount);
+      });
+
+      return unapplied - total;
+    }
+
+    return 0;
+  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -63,21 +94,8 @@ export default function Apply() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-          queryClient.invalidateQueries(route('/api/v1/invoices'));
-          queryClient.invalidateQueries(route('/api/v1/clients'));
-          queryClient.invalidateQueries('/api/v1/clients');
-          queryClient.invalidateQueries(route('/api/v1/clients/:id', { id: payment?.client_id }));
-          queryClient.invalidateQueries(route('/api/v1/clients/:id/edit', { id: payment?.client_id }));
 
-          payment?.invoices?.forEach((paymentable: any) => {
-            queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id: paymentable.invoice_id }));
-          });
-
-          payment?.credits?.forEach((paymentable: any) => {
-            queryClient.invalidateQueries(route('/api/v1/credits/:id', { id: paymentable.credit_id }));
-          });
-
+          $refetch(['payments', 'invoices', 'clients', 'credits']);
         });
     },
   });
@@ -120,7 +138,7 @@ export default function Apply() {
         <>
           <Element leftSide={t('amount')}>
             {formatMoney(
-              payment?.amount - payment?.refunded,
+              payment?.amount,
               payment.client?.country_id,
               payment.client?.settings.currency_id
             )}
@@ -136,10 +154,16 @@ export default function Apply() {
 
           <Element leftSide={t('unapplied')}>
             {formatMoney(
-              payment?.amount - payment?.refunded - payment?.applied,
+              payment?.amount - payment?.applied,
               payment.client?.country_id,
               payment.client?.settings.currency_id
             )}
+            {formik.values.invoices.length >= 1 &&
+              `  - (${formatMoney(
+                calcApplyBalance(),
+                payment.client?.country_id,
+                payment.client?.settings.currency_id
+              )} ${t('remaining')})`}
           </Element>
         </>
       )}
@@ -147,11 +171,9 @@ export default function Apply() {
       <Element leftSide={t('invoices')}>
         {payment?.client_id ? (
           <ComboboxAsync<Invoice>
-            endpoint={
-              new URL(
-                endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
-              )
-            }
+            endpoint={endpoint(
+              `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
+            )}
             inputOptions={{
               value: 'id',
             }}
@@ -159,6 +181,7 @@ export default function Apply() {
               id: 'id',
               value: 'id',
               label: 'name',
+              searchable: 'number',
               dropdownLabelFn: (invoice) =>
                 `${t('invoice_number_short')}${invoice.number} - ${t(
                   'balance'
@@ -172,7 +195,7 @@ export default function Apply() {
               resource
                 ? handleInvoiceChange(
                     resource.id,
-                    resource.balance,
+                    calcApplyAmount(resource.balance),
                     resource.number
                   )
                 : null
@@ -181,6 +204,7 @@ export default function Apply() {
             exclude={collect(formik.values.invoices)
               .pluck('invoice_id')
               .toArray()}
+            clearInputAfterSelection
           />
         ) : null}
 
@@ -208,15 +232,19 @@ export default function Apply() {
                 label={t('invoice_number')}
                 value={record.number}
               />
-              <InputField
-                type="number"
+              <NumberInputField
                 label={t('amount_received')}
-                id={`invoices[${index}].amount`}
-                onChange={formik.handleChange}
-                value={record.amount}
+                value={record.amount || ''}
+                onValueChange={(value) =>
+                  formik.setFieldValue(
+                    `invoices.${index}.amount`,
+                    parseFloat(value)
+                  )
+                }
               />
 
               <Button
+                className="mt-7"
                 behavior="button"
                 type="minimal"
                 onClick={() => handleRemovingInvoice(record._id)}

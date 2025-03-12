@@ -8,202 +8,255 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
-import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint, isHosted } from '$app/common/helpers';
+import { Button, InputField } from '$app/components/forms';
+import { AxiosError } from 'axios';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useLanguages } from '$app/common/hooks/useLanguages';
-import { CompanyInput } from '$app/common/interfaces/company.interface';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { Modal } from '$app/components/Modal';
-import {
-  FormEvent,
-  useState,
-  SetStateAction,
-  Dispatch,
-  useEffect,
-} from 'react';
+import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { Logo } from '../components';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
+import { useDispatch } from 'react-redux';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { isEqual } from 'lodash';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { route } from '$app/common/helpers/route';
+import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
+const Div = styled.div`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }: 
+`;
+
 export function CompanyEdit(props: Props) {
   const [t] = useTranslation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const languages = useLanguages();
-
-  const currentCompany = useCurrentCompany();
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const companyChanges = useInjectCompanyChanges();
 
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [companyId, setCompanyId] = useState<string | undefined>();
+  const [stepIndex, setStepIndex] = useState<number>(0);
 
-  const [company, setCompany] = useState<CompanyInput>({
-    name: '',
-    language_id: '',
-    currency_id: '',
-    subdomain: '',
-  });
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const fetchCompanyDetails = async (company_id: string) => {
-    const response = await request(
-      'GET',
-      endpoint('/api/v1/companies/:id', { id: company_id })
-    );
+  const handleChangeName = (value: string) => {
+    handleChange('settings.name', value);
 
-    const companySettings = response?.data?.data?.settings;
+    const subDomainValue = value
+      .split('')
+      .filter((c) => /[a-zA-Z]/.test(c))
+      .join('')
+      .toLowerCase();
 
-    const { name, subdomain, language_id, currency_id } = companySettings;
+    handleChange('subdomain', subDomainValue);
+  };
 
-    setCompany({
-      name,
-      subdomain,
-      language_id,
-      currency_id,
+  const handleUpdateCompany = (isWizard: boolean) => {
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
+      companyChanges
+    )
+      .then((response) => {
+        toast.success('updated_company');
+
+        isWizard
+          ? setStepIndex((current) => current + 1)
+          : props.setIsModalOpen(false);
+
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+        dispatch(resetChanges('company'));
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
+      })
+      .finally(() => setIsFormBusy(false));
+  };
+
+  const handleConnectPaymentGateway = (
+    gateway: 'stripe_connect' | 'paypal_ppcp'
+  ) => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: gateway,
+    }).then((response) => {
+      let url = 'stripe/signup/:token';
+
+      if (gateway === 'paypal_ppcp') {
+        url = 'paypal?hash=:token';
+      }
+
+      window
+        .open(
+          route(`https://invoicing.co/${url}`, {
+            token: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus();
+
+      toast.dismiss();
     });
   };
 
-  const handleChange = (
-    property: keyof CompanyInput,
-    value: CompanyInput[keyof CompanyInput]
-  ) => {
-    setCompany((prevState) => ({
-      ...prevState,
-      [property]: value,
-    }));
-  };
-
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (isWizard: boolean) => {
     if (!isFormBusy) {
-      event?.preventDefault();
+      if (isEqual(company, companyChanges)) {
+        isWizard
+          ? setStepIndex((current) => current + 1)
+          : props.setIsModalOpen(false);
+        return;
+      }
 
       toast.processing();
-
       setErrors(undefined);
-
       setIsFormBusy(true);
 
-      const { name, language_id, subdomain, currency_id } = company;
-
-      request('GET', endpoint('/api/v1/companies/:id', { id: companyId }))
-        .then((response: AxiosResponse) => {
-          const respondedCompany = response.data.data;
-
-          const companySettings = respondedCompany.settings;
-
-          respondedCompany.settings = {
-            ...respondedCompany.settings,
-            name: name ? name : companySettings?.name,
-            subdomain: subdomain ? subdomain : companySettings?.subdomain,
-            language_id: language_id
-              ? language_id
-              : companySettings?.language_id,
-            currency_id: currency_id
-              ? currency_id
-              : companySettings?.currency_id,
-          };
-
-          if (subdomain && isHosted()) {
-            request('POST', endpoint('/api/v1/check_subdomain'), {
-              subdomain: subdomain,
-            }).catch((error: AxiosError) => {
-              if (error?.response?.status === 401) {
-                toast.error('subdomain_is_not_available');
-              }
-              return;
-            });
-          }
-
-          request(
-            'PUT',
-            endpoint('/api/v1/companies/:id', { id: companyId }),
-            respondedCompany
-          )
-            .then(() => {
-              toast.success('updated_company');
-
-              props.setIsModalOpen(false);
-
-              window.location.href = route('/');
-            })
-            .catch((error: AxiosError<ValidationBag>) => {
-              if (error.response?.status === 422) {
-                setErrors(error.response.data);
-                toast.dismiss();
-              }
-            });
+      if (companyChanges?.subdomain && isHosted()) {
+        request('POST', endpoint('/api/v1/check_subdomain'), {
+          subdomain: companyChanges.subdomain,
         })
-        .finally(() => setIsFormBusy(false));
+          .then(() => handleUpdateCompany(isWizard))
+          .finally(() => setIsFormBusy(false));
+      } else {
+        handleUpdateCompany(isWizard);
+      }
     }
   };
-
-  useEffect(() => {
-    if (currentCompany?.id) {
-      setCompanyId(currentCompany.id);
-    }
-  }, [currentCompany]);
-
-  useEffect(() => {
-    if (companyId) {
-      fetchCompanyDetails(companyId);
-    }
-  }, [companyId]);
 
   return (
     <Modal
-      title={t('welcome_to_invoice_ninja')}
+      title={
+        stepIndex !== 1
+          ? stepIndex === 0
+            ? t('welcome_to_invoice_ninja')
+            : t('accept_payments_online')
+          : ''
+      }
       visible={props.isModalOpen}
       onClose={() => {
         props.setIsModalOpen(false);
         setErrors(undefined);
       }}
       backgroundColor="white"
+      overflowVisible
     >
-      <InputField
-        label={t('company_name')}
-        value={company?.name}
-        onValueChange={(value) => handleChange('name', value)}
-        errorMessage={errors?.errors?.name}
-      />
+      <div className="flex flex-col space-y-6">
+        {stepIndex === 0 && (
+          <div className="flex flex-col space-y-4">
+            <InputField
+              label={t('company_name')}
+              value={companyChanges?.settings?.name}
+              onValueChange={(value) => handleChangeName(value)}
+              errorMessage={errors?.errors?.name}
+              changeOverride
+            />
 
-      {isHosted() && (
-        <InputField
-          label={t('subdomain')}
-          value={company?.subdomain}
-          onValueChange={(value) => handleChange('subdomain', value)}
-        />
-      )}
+            {isHosted() && (
+              <InputField
+                label={t('subdomain')}
+                value={companyChanges?.subdomain}
+                onValueChange={(value) => handleChange('subdomain', value)}
+                changeOverride
+              />
+            )}
 
-      <SelectField
-        label={t('language')}
-        value={company?.language_id}
-        onValueChange={(value) => handleChange('language_id', value)}
-        errorMessage={errors?.errors?.language_id}
-      >
-        {languages?.map((language, index) => (
-          <option key={index} value={language?.id}>
-            {language?.name}
-          </option>
-        ))}
-      </SelectField>
+            <LanguageSelector
+              label={t('language')}
+              value={companyChanges?.settings?.language_id || ''}
+              onChange={(value) => handleChange('settings.language_id', value)}
+              errorMessage={errors?.errors?.language_id}
+            />
 
-      <CurrencySelector
-        label={t('currency')}
-        value={company?.currency_id || ''}
-        onChange={(value) => handleChange('currency_id', value)}
-      />
+            <CurrencySelector
+              label={t('currency')}
+              value={companyChanges?.settings?.currency_id || ''}
+              onChange={(value) => handleChange('settings.currency_id', value)}
+            />
+          </div>
+        )}
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave}>{t('save')}</Button>
+        {stepIndex === 1 && <Logo isSettingsPage={false} />}
+
+        {stepIndex === 2 && (
+          <div className="flex flex-col items-center">
+            <Div
+              className="flex w-full justify-center h-28 cursor-pointer"
+              theme={{ hoverColor: colors.$5 }}
+              onClick={() => handleConnectPaymentGateway('stripe_connect')}
+            >
+              <GatewayTypeIcon name="stripe" style={{ width: '64%' }} />
+            </Div>
+
+            <Div
+              className="flex w-full justify-center h-28 cursor-pointer"
+              theme={{ hoverColor: colors.$5 }}
+              onClick={() => handleConnectPaymentGateway('paypal_ppcp')}
+            >
+              <GatewayTypeIcon
+                name="paypal_ppcp"
+                style={{
+                  width: '38%',
+                  transform: 'scale(1.7)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </Div>
+
+            <Button
+              behavior="button"
+              className="w-full mt-4"
+              onClick={() => {
+                props.setIsModalOpen(false);
+                navigate('/settings/gateways/create');
+              }}
+            >
+              {t('all_payment_gateways')}
+            </Button>
+          </div>
+        )}
+
+        <div className="flex justify-end">
+          {(stepIndex !== 2 || isSelfHosted()) && (
+            <Button
+              behavior="button"
+              onClick={() => {
+                stepIndex === 0 && handleSave(isHosted());
+                stepIndex !== 0 && setStepIndex((current) => current + 1);
+              }}
+            >
+              {isHosted() ? t('next') : t('save')}
+            </Button>
+          )}
+        </div>
       </div>
     </Modal>
   );

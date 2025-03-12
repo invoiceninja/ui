@@ -8,27 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface Record {
-  trans: string;
-  value: string;
-}
+import { Record } from './client-map';
 
 export const itemMap: Record[] = [
-  { trans: 'quantity', value: 'item.quantity' },
-  { trans: 'discount', value: 'item.discount' },
-  { trans: 'cost', value: 'item.cost' },
-  { trans: 'product_key', value: 'item.product_key' },
-  { trans: 'notes', value: 'item.notes' },
-  { trans: 'custom_value1', value: 'item.custom_value1' },
-  { trans: 'custom_value2', value: 'item.custom_value2' },
-  { trans: 'custom_value3', value: 'item.custom_value3' },
-  { trans: 'custom_value4', value: 'item.custom_value4' },
-  { trans: 'item_tax1', value: 'item.tax_name1' },
-  { trans: 'item_tax_rate1', value: 'item.tax_rate1' },
-  { trans: 'item_tax2', value: 'item.tax_name2' },
-  { trans: 'item_tax_rate2', value: 'item.tax_rate2' },
-  { trans: 'item_tax3', value: 'item.tax_name3' },
-  { trans: 'item_tax_rate3', value: 'item.tax_rate3' },
-  { trans: 'type', value: 'item.type_id' },
-  { trans: 'tax_category', value: 'item.tax_id' },
+  { trans: 'quantity', value: 'item.quantity', map: '' },
+  { trans: 'discount', value: 'item.discount', map: '' },
+  { trans: 'cost', value: 'item.cost', map: '' },
+  { trans: 'product_key', value: 'item.product_key', map: '' },
+  { trans: 'notes', value: 'item.notes', map: '' },
+  { trans: 'custom_value1', value: 'item.custom_value1', map: '' },
+  { trans: 'custom_value2', value: 'item.custom_value2', map: '' },
+  { trans: 'custom_value3', value: 'item.custom_value3', map: '' },
+  { trans: 'custom_value4', value: 'item.custom_value4', map: '' },
+  { trans: 'item_tax1', value: 'item.tax_name1', map: '' },
+  { trans: 'item_tax_rate1', value: 'item.tax_rate1', map: '' },
+  { trans: 'item_tax2', value: 'item.tax_name2', map: '' },
+  { trans: 'item_tax_rate2', value: 'item.tax_rate2', map: '' },
+  { trans: 'item_tax3', value: 'item.tax_name3', map: '' },
+  { trans: 'item_tax_rate3', value: 'item.tax_rate3', map: '' },
+  { trans: 'type', value: 'item.type_id', map: '' },
+  { trans: 'tax_category', value: 'item.tax_id', map: '' },
+  { trans: 'tax_amount', value: 'item.tax_amount', map: '' },
 ];

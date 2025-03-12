@@ -13,10 +13,12 @@ import { InputField, InputLabel } from '$app/components/forms';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
+  nameFieldRef?: RefObject<HTMLInputElement | undefined>;
   errors: ValidationBag | undefined;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   setExpenseCategory: Dispatch<SetStateAction<ExpenseCategory | undefined>>;
@@ -26,7 +28,15 @@ interface Props {
 export function CreateExpenseCategoryForm(props: Props) {
   const [t] = useTranslation();
 
-  const { errors, setErrors, setExpenseCategory, expenseCategory } = props;
+  const {
+    errors,
+    setErrors,
+    setExpenseCategory,
+    expenseCategory,
+    nameFieldRef,
+  } = props;
+
+  const colors = useColorScheme();
 
   const handleChange = (
     property: keyof ExpenseCategory,
@@ -46,11 +56,19 @@ export function CreateExpenseCategoryForm(props: Props) {
   return (
     <CardContainer>
       <InputField
+        innerRef={nameFieldRef}
+        style={{
+          color: colors.$3,
+          colorScheme: colors.$0,
+          backgroundColor: colors.$1,
+          borderColor: colors.$4,
+        }}
         required
         label={t('name')}
         value={expenseCategory?.name}
         onValueChange={(value) => handleChange('name', value)}
         errorMessage={errors?.errors.name}
+        cypressRef="expenseCategoryNameField"
       />
 
       <InputLabel>{t('color')}</InputLabel>

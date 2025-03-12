@@ -10,11 +10,16 @@
 
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
+import { Guard } from '$app/common/guards/Guard';
+import { permission } from '$app/common/guards/guards/permission';
 
 const Reports = lazy(() => import('$app/pages/reports/index/Reports'));
 
 export const reportRoutes = (
-  <Route>
-    <Route path="/reports" element={<Reports />} />
-  </Route>
+  <Route
+    path="/reports"
+    element={
+      <Guard guards={[permission('view_reports')]} component={<Reports />} />
+    }
+  />
 );

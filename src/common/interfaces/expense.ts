@@ -8,9 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { ExpenseCategory } from './expense-category';
 import { Invoice } from './invoice';
+import { Project } from './project';
 import { Vendor } from './vendor';
 
 export interface Expense {
@@ -65,4 +67,6 @@ export interface Expense {
   vendor?: Vendor;
   category?: ExpenseCategory;
   invoice?: Invoice;
+  e_invoice?: EInvoiceType;
+  project?: Project;
 }

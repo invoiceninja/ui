@@ -10,6 +10,7 @@
 
 import { Statement } from '$app/pages/clients/statement/Statement';
 import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
+import { DEFAULT_SCHEDULE_PARAMETERS } from '$app/pages/settings/schedules/common/hooks/useHandleChange';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,6 +21,7 @@ export function useScheduleStatement() {
 
   return (statement: Statement) => {
     setScheduleParameters({
+      ...DEFAULT_SCHEDULE_PARAMETERS,
       clients: [statement.client_id],
       show_aging_table: statement.show_aging_table,
       show_credits_table: statement.show_credits_table,
@@ -31,7 +33,6 @@ export function useScheduleStatement() {
           ? 'last7_days'
           : statement.dateRangeId,
       entity: 'invoice',
-      entity_id: '',
     });
 
     navigate('/settings/schedules/create?template=email_statement');

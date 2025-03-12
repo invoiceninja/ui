@@ -25,20 +25,19 @@ import { useActions } from '../common/hooks/useActions';
 import { Upload } from '../../company/documents/components';
 import { endpoint } from '$app/common/helpers';
 import { DocumentsTable } from '$app/components/DocumentsTable';
-import { useQueryClient } from 'react-query';
 import { TabGroup } from '$app/components/TabGroup';
 import { Card } from '$app/components/cards';
-import { GroupSettingsProperties } from '../common/components/GroupSettingsProperties';
 import { Clients } from './components/Clients';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings as SettingsIcon } from 'react-feather';
 import { useConfigureGroupSettings } from '../common/hooks/useConfigureGroupSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const queryClient = useQueryClient();
 
   const { documentTitle } = useTitle('edit_group');
 
@@ -80,7 +79,7 @@ export function Edit() {
   }, [groupSettingsResponse]);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/group_settings/:id', { id }));
+    $refetch(['group_settings']);
   };
 
   return (
@@ -99,7 +98,18 @@ export function Edit() {
         )
       }
     >
-      <TabGroup tabs={[t('overview'), t('clients'), t('documents')]}>
+      <TabGroup
+        tabs={[t('overview'), t('clients'), t('documents')]}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 2) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={groupSettings?.documents.length}
+              />
+            );
+          }
+        }}
+      >
         <div>
           {groupSettings && groupSettingsResponse && (
             <Card
@@ -127,13 +137,6 @@ export function Edit() {
                 />
               </div>
             </Card>
-          )}
-
-          {groupSettings && (
-            <GroupSettingsProperties
-              groupSettings={groupSettings}
-              handleChange={handleChange}
-            />
           )}
         </div>
 

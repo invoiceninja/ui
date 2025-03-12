@@ -13,12 +13,15 @@ import { InputField } from '$app/components/forms';
 import { Project } from '$app/common/interfaces/project';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useProjectQuery } from '$app/common/queries/projects';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { CustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -29,6 +32,8 @@ interface Context {
 
 export default function Edit() {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
 
   const { id } = useParams();
 
@@ -73,14 +78,11 @@ export default function Edit() {
         />
       </Element>
 
-      <Element leftSide={t('client')} required>
-        <ClientSelector
-          value={project?.client_id}
-          onChange={(id) => handleChange('client_id', id)}
-          readonly
-          staleTime={Infinity}
-        />
-      </Element>
+      {project?.client && (
+        <Element leftSide={t('client')} required>
+          <ClientActionButtons displayClientName client={project.client} />
+        </Element>
+      )}
 
       <Element leftSide={t('user')}>
         <UserSelector
@@ -102,9 +104,8 @@ export default function Edit() {
       </Element>
 
       <Element leftSide={t('budgeted_hours')}>
-        <InputField
-          type="number"
-          value={project?.budgeted_hours}
+        <NumberInputField
+          value={project?.budgeted_hours || ''}
           onValueChange={(value) =>
             handleChange('budgeted_hours', parseFloat(value))
           }
@@ -113,9 +114,8 @@ export default function Edit() {
       </Element>
 
       <Element leftSide={t('task_rate')}>
-        <InputField
-          type="number"
-          value={project?.task_rate}
+        <NumberInputField
+          value={project?.task_rate || ''}
           onValueChange={(value) =>
             handleChange('task_rate', parseFloat(value))
           }
@@ -140,6 +140,50 @@ export default function Edit() {
           errorMessage={errors?.errors.private_notes}
         />
       </Element>
+
+      {project && company?.custom_fields?.project1 && (
+        <CustomField
+          field="project1"
+          defaultValue={project.custom_value1 || ''}
+          value={company.custom_fields.project1}
+          onValueChange={(value) =>
+            handleChange('custom_value1', value.toString())
+          }
+        />
+      )}
+
+      {project && company?.custom_fields?.project2 && (
+        <CustomField
+          field="project2"
+          defaultValue={project.custom_value2 || ''}
+          value={company.custom_fields.project2}
+          onValueChange={(value) =>
+            handleChange('custom_value2', value.toString())
+          }
+        />
+      )}
+
+      {project && company?.custom_fields?.project3 && (
+        <CustomField
+          field="project3"
+          defaultValue={project.custom_value3 || ''}
+          value={company.custom_fields.project3}
+          onValueChange={(value) =>
+            handleChange('custom_value3', value.toString())
+          }
+        />
+      )}
+
+      {project && company?.custom_fields?.project4 && (
+        <CustomField
+          field="project4"
+          defaultValue={project.custom_value4 || ''}
+          value={company.custom_fields.project4}
+          onValueChange={(value) =>
+            handleChange('custom_value4', value.toString())
+          }
+        />
+      )}
     </Card>
   );
 }

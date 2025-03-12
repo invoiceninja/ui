@@ -16,6 +16,12 @@ import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { useState } from 'react';
+import { useBulk } from '$app/common/queries/users';
+import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { isHosted } from '$app/common/helpers';
 
 export function Users() {
   useTitle('user_management');
@@ -23,6 +29,13 @@ export function Users() {
   const currentUser = useCurrentUser();
 
   const [t] = useTranslation();
+
+  const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
+    useState<boolean>(false);
+  const [action, setAction] = useState<'archive' | 'restore' | 'delete'>();
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+  const bulk = useBulk({ setIsPasswordConfirmModalOpen });
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -43,21 +56,42 @@ export function Users() {
   ];
 
   return (
-    <Settings
-      title={t('user_details')}
-      breadcrumbs={pages}
-      docsLink="/docs/advanced-settings/#user_management"
-      withoutBackButton
-    >
-      <DataTable
-        resource="user"
-        columns={columns}
-        endpoint={route('/api/v1/users?without=:userId&hideRemovedUsers=true&sort=id|desc', {
-          userId: currentUser?.id,
-        })}
-        linkToCreate="/settings/users/create"
-        bulkRoute="/api/v1/users/bulk"
+    <>
+      <Settings
+        title={t('user_details')}
+        breadcrumbs={pages}
+        docsLink="/docs/advanced-settings/#user_management"
+      >
+        {!enterprisePlan() && isHosted() && <UsersPlanAlert />}
+
+        <DataTable
+          resource="user"
+          columns={columns}
+          endpoint={route(
+            '/api/v1/users?hideOwnerUsers=true&without=:userId&sort=id|desc&status=active',
+            {
+              userId: currentUser?.id,
+            }
+          )}
+          linkToCreate="/settings/users/create"
+          bulkRoute="/api/v1/users/bulk"
+          onBulkActionCall={(selectedUserIds, action) => {
+            setSelectedUserIds(selectedUserIds);
+            setAction(action);
+            setIsPasswordConfirmModalOpen(true);
+          }}
+          enableSavingFilterPreference
+        />
+      </Settings>
+
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onClose={setIsPasswordConfirmModalOpen}
+        onSave={(password, isPasswordRequired) =>
+          action && bulk(selectedUserIds, action, password, isPasswordRequired)
+        }
+        tableActions
       />
-    </Settings>
+    </>
   );
 }

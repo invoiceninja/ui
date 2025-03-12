@@ -15,6 +15,8 @@ import { X } from 'react-feather';
 import { NavigationItem } from './DesktopSidebar';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 
 interface Props {
   navigation: NavigationItem[];
@@ -24,6 +26,11 @@ interface Props {
 
 export function MobileSidebar(props: Props) {
   const colors = useColorScheme();
+  const user = useInjectUserChanges();
+
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
+  );
 
   return (
     <Transition.Root show={props.sidebarOpen} as={Fragment}>
@@ -31,6 +38,7 @@ export function MobileSidebar(props: Props) {
         as="div"
         className="fixed inset-0 flex z-40 md:hidden"
         onClose={props.setSidebarOpen}
+        style={{ width: isMiniSidebar ? '4rem' : '19.4rem' }}
       >
         <Transition.Child
           as={Fragment}
@@ -52,7 +60,10 @@ export function MobileSidebar(props: Props) {
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <div className="relative flex-1 flex flex-col max-w-xs w-full pb-4 bg-ninja-gray dark:bg-gray-900">
+          <div
+            className="relative flex-1 flex flex-col max-w-xs w-full px-3"
+            style={{ backgroundColor: colors.$14 }}
+          >
             <Transition.Child
               as={Fragment}
               enter="ease-in-out duration-300"
@@ -74,16 +85,21 @@ export function MobileSidebar(props: Props) {
               </div>
             </Transition.Child>
 
-            <div className="flex-shrink-0 flex items-center px-4 bg-ninja-gray py-3 border-b border-gray-600">
+            <div
+              className="flex-shrink-0 flex items-center px-0 md:px-4 py-3 border-b h-16 justify-center border-gray-600"
+              style={{ backgroundColor: colors.$14, color: colors.$3 }}
+            >
               <CompanySwitcher />
             </div>
 
-            <div className="flex-1 h-0 overflow-y-auto mt-4">
-              <nav className="space-y-1">
+            <div className="flex flex-col flex-1 h-0 overflow-y-auto mt-4">
+              <nav className="flex-1 space-y-1">
                 {props.navigation.map((item, index) => (
-                  <SidebarItem key={index} item={item} colors={colors} />
+                  <SidebarItem key={index} item={item} />
                 ))}
               </nav>
+
+              <HelpSidebarIcons mobileNavbar />
             </div>
           </div>
         </Transition.Child>

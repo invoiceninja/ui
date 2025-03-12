@@ -20,11 +20,14 @@ import {
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
@@ -43,11 +46,10 @@ export default function RecurringExpenses() {
       title={t('recurring_expenses')}
       breadcrumbs={pages}
       docsLink="en/recurring-expenses"
-      withoutBackButton
     >
       <DataTable
         resource="recurring_expense"
-        endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc"
+        endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc&without_deleted_clients=true&without_deleted_vendors=true"
         columns={columns}
         bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"
@@ -63,6 +65,8 @@ export default function RecurringExpenses() {
           />
         }
         linkToCreateGuards={[permission('create_recurring_expense')]}
+        hideEditableOptions={!hasPermission('edit_recurring_expense')}
+        enableSavingFilterPreference
       />
     </Default>
   );

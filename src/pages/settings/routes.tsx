@@ -13,7 +13,7 @@ import { admin } from '$app/common/guards/guards/admin';
 import { Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
-import { isDemo } from '$app/common/helpers';
+import { isDemo, isHosted } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 import { or } from '$app/common/guards/guards/or';
 
@@ -58,7 +58,18 @@ export const settingsRoutes = (
       <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />
       <Route path="import_export" element={<Settings.ImportExport />} />
       <Route path="account_management" element={<Settings.AccountManagement />}>
-        <Route path="" element={<Settings.Plan />} />
+        <Route
+          path=""
+          element={
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
+            (import.meta.env.PROD ? isHosted() : true) ? (
+              <Settings.Plan2 />
+            ) : (
+              <Settings.Plan />
+            )
+          }
+        />
+
         <Route
           path="overview"
           element={<Settings.AccountManagementOverview />}
@@ -69,6 +80,7 @@ export const settingsRoutes = (
           path="security_settings"
           element={<Settings.SecuritySettings />}
         />
+        <Route path="referral_program" element={<Settings.ReferralProgram />} />
         {!isDemo() && (
           <Route path="danger_zone" element={<Settings.DangerZone />} />
         )}
@@ -134,6 +146,7 @@ export const settingsRoutes = (
         <Route path="messages" element={<Settings.Messages />} />
         <Route path="customize" element={<Settings.Customize />} />
       </Route>
+      <Route path="e_invoice" element={<Settings.EInvoice />} />
       <Route path="email_settings" element={<Settings.EmailSettings />} />
       <Route
         path="templates_and_reminders"
@@ -239,7 +252,8 @@ export const settingsRoutes = (
         <Route path="create" element={<Settings.CreateTransactionRule />} />
         <Route path=":id/edit" element={<Settings.EditTransactionRule />} />
       </Route>
+
+      {invoiceDesignRoutes}
     </Route>
-    {invoiceDesignRoutes}
   </Route>
 );

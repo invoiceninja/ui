@@ -21,4 +21,5 @@ export default interface CommonProps {
   disabled?: boolean;
   style?: CSSProperties;
   cypressRef?: string;
+  tabIndex?: number;
 }

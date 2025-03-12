@@ -13,7 +13,8 @@ import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { route } from '$app/common/helpers/route';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { Params } from '$app/common/queries/common/params.interface';
 
 interface BankAccountParams {
   id: string | undefined;
@@ -21,8 +22,10 @@ interface BankAccountParams {
 }
 
 export function useBankAccountQuery(params: BankAccountParams) {
+  const { isAdmin, isOwner } = useAdmin();
+
   return useQuery<BankAccount>(
-    route('/api/v1/bank_integrations/:id', { id: params.id }),
+    ['/api/v1/bank_integrations', params.id],
     () =>
       request(
         'GET',
@@ -31,15 +34,25 @@ export function useBankAccountQuery(params: BankAccountParams) {
         (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
+    {
+      enabled: (params.enabled ?? true) && (isAdmin || isOwner),
+      staleTime: Infinity,
+    }
   );
 }
 
-export function useBankAccountsQuery() {
+export function useBankAccountsQuery(params?: Params) {
+  const { perPage } = params || {};
+
   return useQuery<BankAccount[]>(
-    '/api/v1/bank_integrations',
+    ['/api/v1/bank_integrations'],
     () =>
-      request('GET', endpoint('/api/v1/bank_integrations')).then(
+      request(
+        'GET',
+        endpoint('/api/v1/bank_integrations?per_page=:perPage&status=active', {
+          perPage: perPage ?? 20,
+        })
+      ).then(
         (response: GenericSingleResourceResponse<BankAccount[]>) =>
           response.data.data
       ),
@@ -48,13 +61,15 @@ export function useBankAccountsQuery() {
 }
 
 export function useBlankBankAccountQuery() {
+  const { isAdmin, isOwner } = useAdmin();
+
   return useQuery<BankAccount>(
-    '/api/v1/bank_integrations/create',
+    ['/api/v1/bank_integrations', 'create'],
     () =>
       request('GET', endpoint('/api/v1/bank_integrations/create')).then(
         (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
 }

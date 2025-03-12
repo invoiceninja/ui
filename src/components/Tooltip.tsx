@@ -9,22 +9,39 @@
  */
 
 import classNames from 'classnames';
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react/headless';
+import { useColorScheme } from '$app/common/colors';
+import { Icon } from './icons/Icon';
+import { MdPlayArrow } from 'react-icons/md';
 
 interface Props {
   children: ReactElement;
-  message: string;
+  message?: string;
   className?: string;
   truncate?: boolean;
   size?: 'small' | 'regular' | 'large';
   width?: number | string;
-  placement?: 'top';
-  containsUnsafeHTMLTags?: boolean;
+  placement?: 'top' | 'bottom' | 'right';
+  withoutArrow?: boolean;
+  tooltipElement?: ReactNode;
+  disabled?: boolean;
+  withoutWrapping?: boolean;
+  centerVertically?: boolean;
 }
 
 export function Tooltip(props: Props) {
-  const { width, placement } = props;
+  const colors = useColorScheme();
+
+  const {
+    width,
+    placement,
+    withoutArrow,
+    tooltipElement,
+    message,
+    disabled,
+    withoutWrapping,
+  } = props;
 
   const parentChildrenElement = useRef<HTMLDivElement>(null);
 
@@ -61,38 +78,53 @@ export function Tooltip(props: Props) {
         placement={placement || 'top-start'}
         interactive={true}
         render={() => (
-          <div className="flex flex-col items-center whitespace-normal">
-            <span
+          <div
+            className="flex flex-col items-center"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div
               className={classNames(
-                'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 break-all',
+                'relative p-2 text-xs text-center text-white rounded-md',
                 {
                   'leading-1': includeLeading,
                   'leading-none': !includeLeading,
+                  'whitespace-normal break-all':
+                    Boolean(message) && !withoutWrapping,
+                  'whitespace-nowrap': withoutWrapping,
                 }
               )}
-              style={{ width: width || messageWidth }}
+              style={{
+                width: width || messageWidth,
+                backgroundColor: colors.$3,
+                color: colors.$1,
+              }}
             >
-              {props.containsUnsafeHTMLTags ? (
-                <span dangerouslySetInnerHTML={{ __html: props.message }} />
-              ) : (
-                props.message
-              )}
-            </span>
+              {message}
 
-            <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
+              {tooltipElement}
+            </div>
+
+            {!withoutArrow && (
+              <Icon
+                className="rotate-90"
+                element={MdPlayArrow}
+                size={24}
+                style={{ color: colors.$3, marginTop: '-0.51rem' }}
+              />
+            )}
           </div>
         )}
+        disabled={disabled}
       >
-        {
-          <div
-            ref={parentChildrenElement}
-            className={classNames('cursor-pointer', {
-              'truncate w-full': props.truncate,
-            })}
-          >
-            {props.children}
-          </div>
-        }
+        <div
+          ref={parentChildrenElement}
+          className={classNames('cursor-pointer', {
+            'truncate w-full': props.truncate,
+            'flex items-center': props.centerVertically,
+          })}
+        >
+          {props.children}
+        </div>
       </Tippy>
     </div>
   );

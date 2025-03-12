@@ -16,9 +16,8 @@ interface Props {
 export function Flutter(props: Props) {
   return (
     <svg
-      height={props.height}
+      style={{ width: props.width, height: props.height }}
       viewBox="0.29 0.22 77.26 95.75"
-      width={props.width}
       xmlns="http://www.w3.org/2000/svg"
     >
       <g fill="none" fillRule="evenodd">

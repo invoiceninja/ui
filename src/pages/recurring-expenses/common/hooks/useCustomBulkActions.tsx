@@ -62,9 +62,9 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<RecurringExpense>[] = [
-    (selectedIds, selectedRecurringExpenses, setSelected) =>
-      selectedRecurringExpenses &&
-      shouldShowStartAction(selectedRecurringExpenses) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      shouldShowStartAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'start');
@@ -76,26 +76,24 @@ export const useCustomBulkActions = () => {
           {t('start')}
         </DropdownElement>
       ),
-    (selectedIds, selectedRecurringExpenses, setSelected) =>
-      selectedRecurringExpenses &&
-      shouldShowStopAction(selectedRecurringExpenses) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      shouldShowStopAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'stop');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
       ),
-    (_, selectedRecurringExpenses, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedRecurringExpenses &&
-          shouldDownloadDocuments(selectedRecurringExpenses)
-            ? handleDownloadDocuments(selectedRecurringExpenses, setSelected)
+          selectedResources && shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

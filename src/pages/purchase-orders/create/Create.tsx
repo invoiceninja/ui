@@ -9,7 +9,6 @@
  */
 
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import {
   Invitation,
@@ -19,43 +18,44 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
-import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
-import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { Outlet, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { purchaseOrderAtom } from '../common/atoms';
 import { useCreate } from '../common/hooks';
-import { Details } from '../edit/components/Details';
-import { Footer } from '../edit/components/Footer';
-import { VendorSelector } from '../edit/components/VendorSelector';
-import { useHandleCreateLineItem } from '../edit/hooks/useHandleCreateLineItem';
-import { useHandleDeleteLineItem } from '../edit/hooks/useHandleDeleteLineItem';
-import { useHandleInvitationChange } from '../edit/hooks/useHandleInvitationChange';
-import { useHandleLineItemPropertyChange } from '../edit/hooks/useHandleLineItemPropertyChange';
-import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
 import { blankInvitation } from '$app/common/constants/blank-invitation';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { Card } from '$app/components/cards';
 import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import { Tab, Tabs } from '$app/components/Tabs';
+import { useCalculateInvoiceSum } from '../edit/hooks/useCalculateInvoiceSum';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+
+export interface PurchaseOrderContext {
+  purchaseOrder: PurchaseOrder | undefined;
+  setPurchaseOrder: Dispatch<SetStateAction<PurchaseOrder | undefined>>;
+  isDefaultTerms: boolean;
+  setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
+  isDefaultFooter: boolean;
+  setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
+  errors: ValidationBag | undefined;
+  invoiceSum: InvoiceSum | InvoiceSumInclusive | undefined;
+  setInvoiceSum: Dispatch<
+    SetStateAction<InvoiceSum | InvoiceSumInclusive | undefined>
+  >;
+}
 
 export default function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
-  const { t } = useTranslation();
-  const company = useCurrentCompany();
-
-  const reactSettings = useReactSettings();
-
-  const vendorResolver = useVendorResolver();
+  const [t] = useTranslation();
 
   const [searchParams] = useSearchParams();
+
+  const company = useCurrentCompany();
+  const vendorResolver = useVendorResolver();
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -65,11 +65,45 @@ export default function Create() {
     },
   ];
 
-  const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+  const tabs: Tab[] = [
+    {
+      name: t('create'),
+      href: '/purchase_orders/create',
+    },
+    {
+      name: t('documents'),
+      href: '/purchase_orders/create/documents',
+    },
+    {
+      name: t('settings'),
+      href: '/purchase_orders/create/settings',
+    },
+  ];
 
-  const { data } = useBlankPurchaseOrderQuery({
+  const [purchaseOrder, setPurchaseOrder] =
+    useAtomWithPrevent(purchaseOrderAtom);
+
+  const { data, isLoading } = useBlankPurchaseOrderQuery({
     enabled: typeof purchaseOrder === 'undefined',
   });
+
+  const [invoiceSum, setInvoiceSum] = useState<
+    InvoiceSum | InvoiceSumInclusive
+  >();
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+
+  const handleChange = <T extends keyof PurchaseOrder>(
+    property: T,
+    value: PurchaseOrder[typeof property]
+  ) => {
+    setPurchaseOrder((current) => current && { ...current, [property]: value });
+  };
+
+  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
+
+  const onSave = useCreate({ setErrors, isDefaultTerms, isDefaultFooter });
 
   useEffect(() => {
     setPurchaseOrder((current) => {
@@ -112,37 +146,11 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setPurchaseOrder(undefined);
+    };
   }, [data]);
-
-  const [invoiceSum, setInvoiceSum] = useState<
-    InvoiceSum | InvoiceSumInclusive
-  >();
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const productColumns = useProductColumns();
-
-  const handleChange = <T extends keyof PurchaseOrder>(
-    property: T,
-    value: PurchaseOrder[typeof property]
-  ) => {
-    setPurchaseOrder((current) => current && { ...current, [property]: value });
-  };
-
-  const handleInvitationChange = useHandleInvitationChange(handleChange);
-  const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
-  const handleDeleteLineItem = useHandleDeleteLineItem(setPurchaseOrder);
-
-  const handleProductChange = useHandleProductChange(
-    setPurchaseOrder,
-    setInvoiceSum
-  );
-
-  const handleLineItemPropertyChange = useHandleLineItemPropertyChange(
-    setPurchaseOrder,
-    setInvoiceSum
-  );
-
-  const onSave = useCreate({ setErrors });
 
   useEffect(() => {
     purchaseOrder &&
@@ -165,90 +173,37 @@ export default function Create() {
       });
   }, [purchaseOrder?.vendor_id]);
 
+  useEffect(() => {
+    purchaseOrder && calculateInvoiceSum(purchaseOrder);
+  }, [purchaseOrder]);
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
     >
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          <VendorSelector
-            resource={purchaseOrder}
-            onChange={(id) => handleChange('vendor_id', id)}
-            onClearButtonClick={() => handleChange('vendor_id', '')}
-            onContactCheckboxChange={(id, checked) =>
-              purchaseOrder &&
-              handleInvitationChange(purchaseOrder, id, checked)
-            }
-            errorMessage={errors?.errors.vendor_id}
-          />
-        </Card>
+      {!isLoading ? (
+        <div className="space-y-4">
+          <Tabs tabs={tabs} />
 
-        {purchaseOrder && (
-          <Details
-            purchaseOrder={purchaseOrder}
-            handleChange={handleChange}
-            errors={errors}
+          <Outlet
+            context={{
+              purchaseOrder,
+              setPurchaseOrder,
+              errors,
+              isDefaultTerms,
+              setIsDefaultTerms,
+              isDefaultFooter,
+              setIsDefaultFooter,
+              invoiceSum,
+              setInvoiceSum,
+            }}
           />
-        )}
-
-        <div className="col-span-12">
-          {purchaseOrder ? (
-            <ProductsTable
-              type="product"
-              resource={purchaseOrder}
-              items={purchaseOrder.line_items}
-              columns={productColumns}
-              relationType="vendor_id"
-              onLineItemChange={(index, lineItem) =>
-                handleProductChange(purchaseOrder, index, lineItem)
-              }
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={(key, value, index) =>
-                handleLineItemPropertyChange(purchaseOrder, key, value, index)
-              }
-              onCreateItemClick={() => handleCreateLineItem(purchaseOrder)}
-              onDeleteRowClick={(index) =>
-                handleDeleteLineItem(purchaseOrder, index)
-              }
-            />
-          ) : (
-            <Spinner />
-          )}
         </div>
-
-        {purchaseOrder && (
-          <>
-            <Footer
-              purchaseOrder={purchaseOrder}
-              handleChange={handleChange}
-              errors={errors}
-            />
-
-            <InvoiceTotals
-              relationType="vendor_id"
-              resource={purchaseOrder}
-              invoiceSum={invoiceSum}
-              onChange={(property, value) =>
-                handleChange(property as keyof PurchaseOrder, value as string)
-              }
-            />
-          </>
-        )}
-      </div>
-
-      {reactSettings?.show_pdf_preview && (
-        <div className="my-4">
-          {purchaseOrder && (
-            <InvoicePreview
-              for="create"
-              resource={purchaseOrder}
-              entity="purchase_order"
-              relationType="vendor_id"
-              endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
-            />
-          )}
+      ) : (
+        <div className="flex justify-center items-center">
+          <Spinner />
         </div>
       )}
     </Default>

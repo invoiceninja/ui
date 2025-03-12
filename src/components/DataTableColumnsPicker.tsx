@@ -14,7 +14,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
-import { updateUser } from '$app/common/stores/slices/user';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
 import { cloneDeep, set } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
@@ -36,6 +36,9 @@ import {
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Icon } from './icons/Icon';
+import { createPortal } from 'react-dom';
 
 interface Props {
   columns: string[];
@@ -95,7 +98,10 @@ export function DataTableColumnsPicker(props: Props) {
       set(user, 'company_user', response.data.data);
       setIsModalVisible(false);
 
+      $refetch(['company_users']);
+
       dispatch(updateUser(user));
+      dispatch(resetChanges());
 
       toast.success('saved_settings');
     });
@@ -103,7 +109,7 @@ export function DataTableColumnsPicker(props: Props) {
 
   const handleDelete = (columnKey: string) => {
     const updatedCurrentColumns = currentColumns.filter(
-      (columns) => !columns.includes(columnKey)
+      (column) => column !== columnKey
     );
 
     setCurrentColumns(updatedCurrentColumns);
@@ -135,27 +141,53 @@ export function DataTableColumnsPicker(props: Props) {
 
   return (
     <>
-      <Modal
-        title={t('edit_columns')}
-        visible={isModalVisible}
-        onClose={setIsModalVisible}
-      >
-        <SelectField
-          label={t('add_column')}
-          onValueChange={handleSelectChange}
-          value=""
-          withBlank
+      {createPortal(
+        <Modal
+          title={t('edit_columns')}
+          visible={isModalVisible}
+          onClose={setIsModalVisible}
         >
-          {filteredColumns.map((column, index) => (
-            <option key={index} value={column}>
-              {t(column)}
-            </option>
-          ))}
-        </SelectField>
+          <SelectField
+            label={t('add_column')}
+            onValueChange={handleSelectChange}
+            value=""
+            withBlank
+            cypressRef="columSelector"
+          >
+            {filteredColumns
+              .sort((a, b) => t(a).localeCompare(t(b)))
+              .map((column, index) => (
+                <option key={index} value={column}>
+                  {t(column)}
+                </option>
+              ))}
+          </SelectField>
 
-        <div className="max-h-64 overflow-y-auto">
           <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="columns">
+            <Droppable
+              droppableId="columns"
+              renderClone={(provided, _, rubric) => {
+                const column = currentColumns[rubric.source.index];
+
+                return (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className="flex items-center justify-between py-2 text-sm"
+                  >
+                    <div className="flex space-x-2 items-center">
+                      <Icon element={MdClose} size={20} />
+
+                      <p>{t(column)}</p>
+                    </div>
+
+                    <div {...provided.dragHandleProps}>
+                      <Icon element={MdDragHandle} size={23} />
+                    </div>
+                  </div>
+                );
+              }}
+            >
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {currentColumns.map((column, index) => (
@@ -168,46 +200,51 @@ export function DataTableColumnsPicker(props: Props) {
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="w-full inline-flex items-center justify-between pr-4 my-2"
+                          className="flex items-center justify-between py-2"
                         >
-                          <div className="space-x-2 inline-flex items-center">
-                            <button onClick={() => handleDelete(column)}>
-                              <MdClose size={20} />
-                            </button>
+                          <div className="flex space-x-2 items-center">
+                            <Icon
+                              className="cursor-pointer"
+                              element={MdClose}
+                              size={20}
+                              onClick={() => handleDelete(column)}
+                            />
+
                             <p>{t(column)}</p>
                           </div>
-                          <button className="cursor-grab">
-                            <MdDragHandle size={20} />
-                          </button>
+
+                          <div {...provided.dragHandleProps}>
+                            <Icon element={MdDragHandle} size={23} />
+                          </div>
                         </div>
                       )}
                     </Draggable>
                   ))}
+
                   {provided.placeholder}
                 </div>
               )}
             </Droppable>
           </DragDropContext>
-        </div>
 
-        <div className="flex lg:flex-row lg:justify-end">
-          <Inline>
-            <Button type="minimal" className="mx-2" onClick={handleReset}>
-              {t('reset')}
-            </Button>
+          <div className="flex lg:flex-row lg:justify-end">
+            <Inline>
+              <Button type="secondary" className="mx-2" onClick={handleReset}>
+                {t('reset')}
+              </Button>
 
-            <Button onClick={onSave}>{t('save')}</Button>
-          </Inline>
-        </div>
-      </Modal>
+              <Button onClick={onSave}>{t('save')}</Button>
+            </Inline>
+          </div>
+        </Modal>,
+        document.body
+      )}
 
-      <button
-        className="hidden lg:block lg:mx-4 text-sm"
-        onClick={() => setIsModalVisible(true)}
-      >
-        {t('columns')}
-      </button>
+      <div className="mr-2">
+        <Button type="secondary" onClick={() => setIsModalVisible(true)}>
+          {t('columns')}
+        </Button>
+      </div>
     </>
   );
 }

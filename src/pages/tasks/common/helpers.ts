@@ -10,6 +10,8 @@
 
 import dayjs from 'dayjs';
 import { parseTimeLog } from './helpers/calculate-time';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { LogPosition } from './components/TaskTable';
 
 export function parseTimeToDate(timestamp: number) {
   if (timestamp === 0) {
@@ -77,40 +79,74 @@ export function duration(
   }
 }
 
-export function handleTaskTimeChange(
-  log: string,
-  unix: number,
-  time: string,
-  position: number,
-  index: number
-) {
-  const date = unix ? parseTimeToDate(unix) : parseTimeToDate(dayjs().unix());
+export function useHandleTaskTimeChange() {
+  const company = useCurrentCompany();
 
-  const unixTimestamp = dayjs(`${date} ${time}`, 'YYYY-MM-DD HH:mm:ss').unix();
+  return (
+    log: string,
+    unix: number,
+    time: string,
+    position: number,
+    index: number
+  ) => {
+    const logs = parseTimeLog(log);
 
-  const logs = parseTimeLog(log);
+    const startLog = logs[index][LogPosition.Start];
 
-  logs[index][position] = unixTimestamp;
+    const date =
+      unix && company.show_task_end_date
+        ? parseTimeToDate(unix)
+        : parseTimeToDate(startLog || dayjs().unix());
 
-  return JSON.stringify(logs);
+    const unixTimestamp = dayjs(
+      `${date} ${time}`,
+      'YYYY-MM-DD HH:mm:ss'
+    ).unix();
+
+    logs[index][position] = unixTimestamp;
+
+    return JSON.stringify(logs);
+  };
 }
 
-export function handleTaskDateChange(
-  log: string,
-  unix: number,
-  value: string,
-  index: number,
-  position: number
-) {
-  const time = unix ? parseTime(unix) : parseTime(dayjs().unix());
+export function useHandleTaskDateChange() {
+  const company = useCurrentCompany();
 
-  const unixTimestamp = dayjs(`${value} ${time}`, 'YYYY-MM-DD HH:mm:ss').unix();
+  return (
+    log: string,
+    unix: number,
+    value: string,
+    index: number,
+    position: number
+  ) => {
+    const time = unix ? parseTime(unix) : parseTime(dayjs().unix());
 
-  const logs = parseTimeLog(log);
+    const unixTimestamp = dayjs(
+      `${value} ${time}`,
+      'YYYY-MM-DD HH:mm:ss'
+    ).unix();
 
-  logs[index][position] = unixTimestamp;
+    const logs = parseTimeLog(log);
 
-  return JSON.stringify(logs);
+    logs[index][position] = unixTimestamp;
+
+    if (
+      company &&
+      !company.show_task_end_date &&
+      logs[index][LogPosition.End]
+    ) {
+      const endTime = parseTime(logs[index][LogPosition.End]);
+
+      const unixTimestampEndLog = dayjs(
+        `${value} ${endTime}`,
+        'YYYY-MM-DD HH:mm:ss'
+      ).unix();
+
+      logs[index][LogPosition.End] = unixTimestampEndLog;
+    }
+
+    return JSON.stringify(logs);
+  };
 }
 
 export function handleTaskDurationChange(

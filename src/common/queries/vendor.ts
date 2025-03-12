@@ -10,12 +10,13 @@
 
 import { request } from '$app/common/helpers/request';
 import { Vendor } from '$app/common/interfaces/vendor';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
+import { useQuery } from 'react-query';
 import { endpoint } from '../helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
 import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
+import { useHasPermission } from '../hooks/permissions/useHasPermission';
 
 interface VendorParams {
   id: string | undefined;
@@ -24,7 +25,7 @@ interface VendorParams {
 
 export function useVendorQuery(params: VendorParams) {
   return useQuery<Vendor>(
-    route('/api/v1/vendors/:id', { id: params.id }),
+    ['/api/v1/vendors', params.id],
     () =>
       request('GET', endpoint('/api/v1/vendors/:id', { id: params.id })).then(
         (response) => response.data.data
@@ -34,13 +35,15 @@ export function useVendorQuery(params: VendorParams) {
 }
 
 export function useBlankVendorQuery() {
+  const hasPermission = useHasPermission();
+
   return useQuery<Vendor>(
-    '/api/v1/vendors/create',
+    ['/api/v1/vendors', 'create'],
     () =>
       request('GET', endpoint('/api/v1/vendors/create')).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: hasPermission('create_vendor') }
   );
 }
 
@@ -73,8 +76,6 @@ export function useVendorsQuery(params: VendorsParams) {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -84,7 +85,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_vendor`);
 
-      queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
+      $refetch(['vendors']);
     });
   };
 }

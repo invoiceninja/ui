@@ -13,36 +13,34 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankScheduleQuery } from '$app/common/queries/schedules';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
 import { AxiosError } from 'axios';
 import { useAtom } from 'jotai';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
 import { ScheduleForm } from '../common/components/ScheduleForm';
-import { useHandleChange } from '../common/hooks/useHandleChange';
+import {
+  DEFAULT_SCHEDULE_PARAMETERS,
+  useHandleChange,
+} from '../common/hooks/useHandleChange';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('new_schedule');
 
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();
-
-  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -60,7 +58,7 @@ export function Create() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
-  const formatSchedulePayload = useFormatSchedulePayload();
+  const formatSchedulePayload = useFormatSchedulePayload({ schedule });
 
   useEffect(() => {
     if (blankSchedule) {
@@ -77,37 +75,27 @@ export function Create() {
           template: searchParams.get('template') || 'email_statement',
           frequency_id: Frequency.Monthly,
           remaining_cycles: -1,
-          parameters: currentParameters || {
-            clients: [],
-            date_range: 'last7_days',
-            show_aging_table: false,
-            show_credits_table: false,
-            show_payments_table: false,
-            only_clients_with_invoices: false,
-            status: 'all',
-            entity: 'invoice',
-            entity_id: '',
-          },
+          parameters: currentParameters || { ...DEFAULT_SCHEDULE_PARAMETERS },
         };
       });
     }
   }, [blankSchedule]);
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = () => {
     if (!isFormBusy && schedule) {
       setIsFormBusy(true);
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayload(schedule);
-
-      request('POST', endpoint('/api/v1/task_schedulers'), formattedSchedule)
+      request(
+        'POST',
+        endpoint('/api/v1/task_schedulers'),
+        formatSchedulePayload()
+      )
         .then((response: GenericSingleResourceResponse<Schedule>) => {
           toast.success('created_schedule');
 
-          queryClient.invalidateQueries('/api/v1/task_schedulers');
+          $refetch(['task_schedulers']);
 
           navigate(
             route('/settings/schedules/:id/edit', {
@@ -129,11 +117,9 @@ export function Create() {
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={isFormBusy || !schedule || showPlanAlert}
+      disableSaveButton={isFormBusy || !schedule}
       onSaveClick={handleSave}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
-
       {schedule ? (
         <ScheduleForm
           schedule={schedule}

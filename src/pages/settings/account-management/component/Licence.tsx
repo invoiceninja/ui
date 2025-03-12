@@ -21,7 +21,9 @@ import { toast } from '$app/common/helpers/toast/toast';
 
 export function License() {
   const [t] = useTranslation();
-  const link = import.meta.env.VITE_WHITELABEL_INVOICE_URL as unknown as string;
+  const link =
+    import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
+    'https://invoiceninja.invoicing.co/client/subscriptions/O5xe7Rwd7r/purchase';
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -68,7 +70,7 @@ export function License() {
         </form>
       </Modal>
 
-      <Divider />
+      <Divider withoutPadding />
 
       <ClickableElement href={link}>{t('purchase_license')}</ClickableElement>
 

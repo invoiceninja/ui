@@ -13,15 +13,19 @@ import { AxiosResponse } from 'axios';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
 import { Modal } from '$app/components/Modal';
 import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   isModalOpen: boolean;
@@ -32,7 +36,11 @@ export function CompanyCreate(props: Props) {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  const { id } = useParams();
+  const location = useLocation();
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -54,7 +62,17 @@ export function CompanyCreate(props: Props) {
 
     queryClient.invalidateQueries();
 
-    window.location.href = route('/');
+    if (id) {
+      const basePage =
+        '/' +
+        (location.pathname.includes('/settings/gateways')
+          ? 'settings/online_payments'
+          : location.pathname.split('/')[1] || 'dashboard');
+
+      navigate(basePage);
+    }
+
+    window.location.reload();
   };
 
   const handleSave = async () => {
@@ -74,6 +92,8 @@ export function CompanyCreate(props: Props) {
               const companyUser = companyUsers[createdCompanyIndex];
 
               dispatch(updateCompanyUsers(companyUsers));
+
+              dispatch(resetChanges('company'));
 
               toast.success('created_new_company');
 
@@ -100,7 +120,16 @@ export function CompanyCreate(props: Props) {
       onClose={() => props.setIsModalOpen(false)}
       backgroundColor="white"
     >
-      <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+      <span
+        className="text-lg"
+        style={{
+          backgroundColor: colors.$2,
+          color: colors.$3,
+          colorScheme: colors.$0,
+        }}
+      >
+        {t('are_you_sure')}
+      </span>
 
       <div className="flex justify-end space-x-4 mt-5">
         <Button

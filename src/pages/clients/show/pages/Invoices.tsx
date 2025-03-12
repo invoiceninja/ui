@@ -14,33 +14,38 @@ import { useParams } from 'react-router-dom';
 import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustomBulkActions';
-
-export const dataTableStaleTime = 50;
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { permission } from '$app/common/guards/guards/permission';
+import { useFooterColumns } from '$app/pages/invoices/common/hooks/useFooterColumns';
 
 export default function Invoices() {
   const { id } = useParams();
 
-  const columns = useInvoiceColumns();
+  const hasPermission = useHasPermission();
 
   const actions = useActions();
-
+  const columns = useInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
       resource="invoice"
       endpoint={route(
-        '/api/v1/invoices?include=client&client_id=:id&sort=id|desc',
+        '/api/v1/invoices?include=client.group_settings&client_id=:id&sort=id|desc',
         { id }
       )}
       columns={columns}
+      footerColumns={footerColumns}
       customActions={actions}
       customBulkActions={customBulkActions}
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"
       linkToCreate={route('/invoices/create?client=:id', { id })}
       linkToEdit="/invoices/:id/edit"
-      staleTime={dataTableStaleTime}
+      excludeColumns={['client_id']}
+      linkToCreateGuards={[permission('create_invoice')]}
+      hideEditableOptions={!hasPermission('edit_invoice')}
     />
   );
 }

@@ -8,61 +8,40 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { v4 } from 'uuid';
-import { creditAtom, invoiceSumAtom } from '../common/atoms';
+import { useOutletContext } from 'react-router-dom';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
-import { useActions, useCreditUtilities, useSave } from '../common/hooks';
-import { useCreditQuery } from '../common/queries';
+import { useCreditUtilities } from '../common/hooks';
 import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import { CreditsContext } from '../create/Create';
 
 export default function Edit() {
-  const { documentTitle } = useTitle('edit_credit');
-  const { t } = useTranslation();
-  const { id } = useParams();
+  const [t] = useTranslation();
+
+  const context: CreditsContext = useOutletContext();
+  const {
+    credit,
+    errors,
+    client,
+    invoiceSum,
+    isDefaultTerms,
+    setIsDefaultTerms,
+    isDefaultFooter,
+    setIsDefaultFooter,
+  } = context;
 
   const reactSettings = useReactSettings();
-
-  const pages: Page[] = [
-    { name: t('credits'), href: '/credits' },
-    {
-      name: t('edit_credit'),
-      href: route('/credits/:id/edit', { id }),
-    },
-  ];
-
-  const { data } = useCreditQuery({ id: id! });
-
-  const [credit, setQuote] = useAtom(creditAtom);
-  const [invoiceSum] = useAtom(invoiceSumAtom);
-
-  const [client, setClient] = useState<Client>();
-  const [errors, setErrors] = useState<ValidationBag>();
-
   const productColumns = useProductColumns();
-  const clientResolver = useClientResolver();
 
   const {
     handleChange,
@@ -71,47 +50,10 @@ export default function Edit() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
-    calculateInvoiceSum,
   } = useCreditUtilities({ client });
 
-  useEffect(() => {
-    if (data) {
-      const _credit = cloneDeep(data);
-
-      _credit.line_items.map((item) => (item._id = v4()));
-
-      setQuote(_credit);
-
-      if (_credit && _credit.client) {
-        setClient(_credit.client);
-
-        clientResolver.cache(_credit.client);
-      }
-    }
-  }, [data]);
-
-  useEffect(() => {
-    credit && calculateInvoiceSum(credit);
-  }, [credit]);
-
-  const actions = useActions();
-  const save = useSave({ setErrors });
-
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onSaveClick={() => credit && save(credit)}
-      navigationTopRight={
-        credit && (
-          <ResourceActions
-            resource={credit}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
-    >
+    <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {credit && (
@@ -125,6 +67,9 @@ export default function Edit() {
             resource={credit}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
+            onLocationChange={(locationId) =>
+              handleChange('location_id', locationId)
+            }
             onContactCheckboxChange={handleInvitationChange}
             errorMessage={errors?.errors.client_id}
             readonly
@@ -160,7 +105,14 @@ export default function Edit() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} errors={errors} />
+        <CreditFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {credit && (
           <InvoiceTotals
@@ -183,10 +135,11 @@ export default function Edit() {
               entity="credit"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
         </div>
       )}
-    </Default>
+    </>
   );
 }

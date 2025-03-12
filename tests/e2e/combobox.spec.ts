@@ -8,11 +8,15 @@ test('ComboBox Async value selecting', async ({ page }) => {
 
   await page.waitForURL('/testing');
 
+  await page.waitForTimeout(1000);
+
   const comboBoxInputField = page
     .locator('[data-testid="combobox-input-field"]')
     .first();
 
   comboBoxInputField.click();
+
+  await page.waitForTimeout(200);
 
   await page.getByRole('option').first().click();
 
@@ -38,7 +42,11 @@ test('ComboBox Async available clearing', async ({ page }) => {
 
   await page.waitForURL('/testing');
 
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-testid="combobox-input-field"]').first().click();
+
+  await page.waitForTimeout(200);
 
   await page.getByRole('option').first().click();
 
@@ -68,6 +76,8 @@ test('ComboBox Async value clearing', async ({ page }) => {
   await page.goto('/testing');
 
   await page.waitForURL('/testing');
+
+  await page.waitForTimeout(1000);
 
   await page.locator('[data-testid="combobox-input-field"]').first().click();
 
@@ -103,16 +113,16 @@ test('ComboBox Async value clearing', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('ComboBox Async action opening modal', async ({ page }) => {
+test('ComboBox Async action opening slider', async ({ page }) => {
   await login(page);
 
   await page.goto('/testing');
 
   await page.waitForURL('/testing');
 
-  await page.locator('[data-testid="combobox-input-field"]').first().click();
+  await page.waitForTimeout(1000);
 
-  await page.getByRole('option').first().click();
+  await page.locator('[data-testid="combobox-input-field"]').first().click();
 
   const actionComboBoxButton = page
     .locator('[data-testid="combobox-action-button"]')
@@ -122,14 +132,8 @@ test('ComboBox Async action opening modal', async ({ page }) => {
 
   await actionComboBoxButton.click();
 
-  const actionText = await actionComboBoxButton.textContent();
-
   await expect(
-    page
-      .getByRole('heading', {
-        name: actionText?.toString(),
-      })
-      .first()
+    page.locator('[data-headlessui-state="open"]').getByText('New Client')
   ).toBeVisible();
 });
 
@@ -140,10 +144,14 @@ test('ComboBox Async filtering', async ({ page }) => {
 
   await page.waitForURL('/testing');
 
+  await page.waitForTimeout(1000);
+
   await page
     .locator('[data-testid="combobox-input-field"]')
     .first()
-    .fill('cypress');
+    .fill('test merge one');
+
+  await page.locator('[data-testid="combobox-input-field"]').first().click();
 
   await page.waitForTimeout(200);
 
@@ -155,7 +163,7 @@ test('ComboBox Async filtering', async ({ page }) => {
     .first()
     .textContent();
 
-  expect(firstOptionTextContent === 'cypress').toBeTruthy();
+  expect(firstOptionTextContent === 'test merge one').toBeTruthy();
 
   expect(numberOfAvailableOptions === 1).toBeTruthy();
 });

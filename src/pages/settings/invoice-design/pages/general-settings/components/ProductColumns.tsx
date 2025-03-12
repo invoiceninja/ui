@@ -14,15 +14,16 @@ import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 import { useCustomField } from '$app/components/CustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
-export function ProductColumns() {
+export default function ProductColumns() {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
-  const handleValueChange = useHandleSettingsValueChange();
-  const customField = useCustomField();
+  const company = useCompanyChanges();
 
-  const defaultVariables = [
+  const customField = useCustomField();
+  const handleValueChange = useHandleSettingsValueChange();
+
+  let defaultVariables = [
     { value: '$product.item', label: t('item') },
     { value: '$product.description', label: t('description') },
     { value: '$product.quantity', label: t('quantity') },
@@ -58,6 +59,14 @@ export function ProductColumns() {
     { value: '$product.tax_amount', label: t('tax_amount') },
   ];
 
+  if (!company?.enabled_item_tax_rates) {
+    defaultVariables = defaultVariables.filter(
+      (variable) =>
+        variable.value !== '$product.tax_amount' &&
+        variable.value !== '$product.tax'
+    );
+  }
+
   return (
     <Card
       title={
@@ -66,7 +75,6 @@ export function ProductColumns() {
           : t('invoice_product_columns')
       }
       padding="small"
-      collapsed={true}
     >
       <SortableVariableList
         for="product_columns"

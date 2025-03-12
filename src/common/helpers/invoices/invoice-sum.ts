@@ -49,8 +49,8 @@ export class InvoiceSum {
       .calculateCustomValues()
       .setTaxMap()
       .calculateTotals()
-      .calculateBalance()
-      .calculatePartial();
+      // .calculatePartial()
+      .calculateBalance();
 
     return this;
   }
@@ -76,7 +76,31 @@ export class InvoiceSum {
     return this;
   }
 
+  protected peppolSurchargeTaxes() {
+      const invoice_item = this.invoice.line_items[0];
+      const name = invoice_item?.tax_name1;
+      const rate = invoice_item?.tax_rate1 ?? 0;
+      const amount = this.invoice.custom_surcharge1+this.invoice.custom_surcharge2+this.invoice.custom_surcharge3+this.invoice.custom_surcharge4;
+      
+      if(rate > 0 && amount != 0){
+
+        const total = Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
+
+        let group = {};
+
+        const key = name + rate.toString().replace(' ', ''); // 'Tax Rate' + '5' => 'TaxRate5'
+
+        group = { key, total, name: `${name} ${parseFloat(rate.toString())} %` }; // 'Tax Rate 5.00%'
+
+        this.invoiceItems.taxCollection.push(collect(group));
+      
+      }
+      
+      return this;
+  }
+
   protected calculateInvoiceTaxes() {
+
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
 
@@ -89,7 +113,7 @@ export class InvoiceSum {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
-          this.invoice.tax_rate1.toFixed(this.currency.precision)
+          this.invoice.tax_rate1.toFixed(this.currency?.precision || 2)
         )} %`,
       });
     }
@@ -106,7 +130,7 @@ export class InvoiceSum {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
-          this.invoice.tax_rate2.toFixed(this.currency.precision)
+          this.invoice.tax_rate2.toFixed(this.currency?.precision || 2)
         )} %`,
       });
     }
@@ -123,7 +147,7 @@ export class InvoiceSum {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
-          this.invoice.tax_rate3.toFixed(this.currency.precision)
+          this.invoice.tax_rate3.toFixed(this.currency?.precision || 2)
         )} %`,
       });
     }
@@ -148,7 +172,7 @@ export class InvoiceSum {
     if (this.invoice.custom_surcharge_tax1) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -156,7 +180,7 @@ export class InvoiceSum {
     if (this.invoice.custom_surcharge_tax2) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -164,7 +188,7 @@ export class InvoiceSum {
     if (this.invoice.custom_surcharge_tax3) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -172,7 +196,7 @@ export class InvoiceSum {
     if (this.invoice.custom_surcharge_tax4) {
       taxComponent += parseFloat(
         (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(
-          this.currency.precision
+          this.currency?.precision || 2
         )
       );
     }
@@ -183,7 +207,11 @@ export class InvoiceSum {
   protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
-      this.invoice.line_items = this.invoiceItems.lineItems
+      this.invoice.line_items = this.invoiceItems.lineItems;
+    }
+    
+    if(this.invoice.tax_name1.length == 0 && this.invoice.custom_surcharge1 !=0 && this.invoice.custom_surcharge_tax1){
+      this.peppolSurchargeTaxes();
     }
 
     this.taxMap = collect();
@@ -217,7 +245,7 @@ export class InvoiceSum {
   protected calculateTotals() {
     this.total += this.totalTaxes;
 
-    this.total.toFixed(this.currency.precision);
+    this.total.toFixed(this.currency?.precision || 2);
 
     return this;
   }
@@ -229,42 +257,24 @@ export class InvoiceSum {
   }
 
   protected setCalculatedAttributes() {
-    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
-    if (this.invoice.amount !== this.invoice.balance) {
-      const paidToDate = this.invoice.amount - this.invoice.balance;
-
-      this.invoice.balance =
-        parseFloat(
-          NumberFormatter.formatValue(this.total, this.currency.precision)
-        ) - paidToDate;
-    } else {
-      this.invoice.balance = parseFloat(
-        NumberFormatter.formatValue(this.total, this.currency.precision)
-      );
-    }
-    // }
-
     this.invoice.amount = parseFloat(
-      NumberFormatter.formatValue(this.total, this.currency.precision)
+      NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
     );
+
+    this.invoice.balance =
+      parseFloat(
+        NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
+      ) - (this.invoice.paid_to_date ?? 0);
 
     this.invoice.total_taxes = this.totalTaxes;
 
     return this;
   }
 
-  protected calculatePartial() {
-    if (!this.invoice?.id && this.invoice.partial) {
-      this.invoice.partial = Math.max(
-        0,
-        Math.min(
-          parseFloat(NumberFormatter.formatValue(this.invoice.partial, 2)),
-          this.invoice.balance
-        )
-      );
-    }
-
-    return this;
+  public getBalanceDue() {
+    return this.invoice.partial && this.invoice.partial > 0
+      ? Math.min(this.invoice.partial, this.invoice.balance)
+      : this.invoice.balance;
   }
 
   /////////////
@@ -277,7 +287,9 @@ export class InvoiceSum {
     }
 
     return parseFloat(
-      (amount * (this.invoice.discount / 100)).toFixed(this.currency.precision)
+      (amount * (this.invoice.discount / 100)).toFixed(
+        this.currency?.precision || 2
+      )
     );
   }
 

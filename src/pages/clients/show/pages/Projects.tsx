@@ -11,18 +11,24 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import {
   useActions,
+  useCustomBulkActions,
   useProjectColumns,
 } from '$app/pages/projects/common/hooks';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Projects() {
   const { id } = useParams();
 
+  const hasPermission = useHasPermission();
+
   const columns = useProjectColumns();
 
   const actions = useActions();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <DataTable
@@ -33,11 +39,14 @@ export default function Projects() {
       )}
       columns={columns}
       customActions={actions}
+      customBulkActions={customBulkActions}
       withResourcefulActions
       bulkRoute="/api/v1/projects/bulk"
       linkToCreate={route('/projects/create?client=:id', { id: id })}
       linkToEdit="/projects/:id/edit"
-      staleTime={dataTableStaleTime}
+      excludeColumns={['client_id']}
+      linkToCreateGuards={[permission('create_project')]}
+      hideEditableOptions={!hasPermission('edit_project')}
     />
   );
 }

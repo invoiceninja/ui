@@ -9,8 +9,6 @@
  */
 
 import { useState } from 'react';
-import { useFormik } from 'formik';
-import { LoginForm } from '../../common/dtos/authentication';
 import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
 import { AxiosError } from 'axios';
 import { LoginValidation } from './common/ValidationInterface';
@@ -30,6 +28,9 @@ import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Disable2faModal } from './components/Disable2faModal';
 import { useColorScheme } from '$app/common/colors';
+import { version } from '$app/common/helpers/version';
+import { toast } from '$app/common/helpers/toast/toast';
+import classNames from 'classnames';
 
 export function Login() {
   useTitle('login');
@@ -41,41 +42,39 @@ export function Login() {
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
 
-  const [secret, setSecret] = useState<string>('');
-
   const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
     useState<boolean>(false);
 
   const login = useLogin();
 
-  const form = useFormik({
-    initialValues: {
-      email: '',
-      password: '',
-      one_time_password: '',
-    },
-    onSubmit: (values: LoginForm) => {
-      setMessage(undefined);
-      setErrors(undefined);
-      setIsFormBusy(true);
+  function handleSubmit(form: HTMLFormElement) {
+    const formData = new FormData(form);
 
-      request('POST', endpoint('/api/v1/login'), values, {
-        ...(secret && {
-          headers: { 'X-API-SECRET': secret },
-        }),
+    setMessage(undefined);
+    setErrors(undefined);
+    setIsFormBusy(true);
+
+    const secret = formData.get('secret') as string;
+
+    request('POST', endpoint('/api/v1/login'), Object.fromEntries(formData), {
+      ...(secret && {
+        headers: { 'X-API-SECRET': secret },
+      }),
+    })
+      .then((response) => login(response))
+      .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data.errors);
+        } else if (error.response?.status === 503) {
+          toast.error('app_maintenance');
+        } else {
+          setMessage(
+            error.response?.data.message ?? (t('invalid_credentials') as string)
+          );
+        }
       })
-        .then((response) => login(response))
-        .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
-          return error.response?.status === 422
-            ? setErrors(error.response.data.errors)
-            : setMessage(
-                error.response?.data.message ??
-                  (t('invalid_credentials') as string)
-              );
-        })
-        .finally(() => setIsFormBusy(false));
-    },
-  });
+      .finally(() => setIsFormBusy(false));
+  }
 
   const colors = useColorScheme();
 
@@ -83,17 +82,27 @@ export function Login() {
     <div className="h-screen">
       <Header />
       <div className="flex flex-col items-center">
-        <div className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border" style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}>
-          <h2 className="text-2xl" style={{ color: colors.$3 }}>{t('login')}</h2>
+        <div
+          className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+        >
+          <h2 className="text-2xl" style={{ color: colors.$3 }}>
+            {t('login')}
+          </h2>
 
-          <form onSubmit={form.handleSubmit} className="my-6 space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit(e.currentTarget);
+            }}
+            className="my-6 space-y-4"
+          >
             <InputField
               type="email"
               autoComplete="on"
               label={t('email_address')}
-              id="email"
-              onChange={form.handleChange}
               errorMessage={errors?.email}
+              name="email"
             />
 
             <InputField
@@ -101,8 +110,8 @@ export function Login() {
               autoComplete="on"
               label={t('password')}
               id="password"
-              onChange={form.handleChange}
               errorMessage={errors?.password}
+              name="password"
             />
 
             <div className="space-y-2">
@@ -116,21 +125,32 @@ export function Login() {
               type="text"
               autoComplete="on"
               id="one_time_password"
-              onChange={form.handleChange}
               placeholder={t('plaid_optional')}
               errorMessage={errors?.one_time_password}
+              name="one_time_password"
             />
 
             <div className="space-y-2">
-              <div className="flex flex-col lg:flex-row items-center justify-between">
-                <InputLabel>{t('secret')}</InputLabel>
-                <div
-                  className="text-sm hover:underline cursor-pointer"
-                  onClick={() => setIsDisable2faModalOpen(true)}
-                  style={{ color: accentColor }}
-                >
-                  {t('disable_2fa')}
-                </div>
+              <div
+                className={classNames(
+                  'flex flex-col lg:flex-row items-center',
+                  {
+                    'justify-between': isSelfHosted(),
+                    'justify-end': isHosted(),
+                  }
+                )}
+              >
+                {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
+
+                {isHosted() && (
+                  <div
+                    className="text-sm hover:underline cursor-pointer"
+                    onClick={() => setIsDisable2faModalOpen(true)}
+                    style={{ color: accentColor }}
+                  >
+                    {t('disable_2fa')}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -139,8 +159,7 @@ export function Login() {
                 type="password"
                 autoComplete="on"
                 placeholder={t('plaid_optional')}
-                value={secret}
-                onValueChange={(value) => setSecret(value)}
+                name="secret"
               />
             )}
 
@@ -169,6 +188,8 @@ export function Login() {
             </div>
           </>
         )}
+
+        <p className="mt-4 text-xs">{version}</p>
       </div>
 
       <Disable2faModal

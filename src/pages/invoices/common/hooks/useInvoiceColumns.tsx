@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -24,6 +23,18 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import classNames from 'classnames';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -110,13 +121,21 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const invoiceColumns = useAllInvoiceColumns();
   type InvoiceColumns = (typeof invoiceColumns)[number];
 
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
+  const reactSettings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
+
+  const formatNumber = useFormatNumber();
+  const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
-
-  const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -135,7 +154,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'number',
       label: t('number'),
       format: (value, invoice) => (
-        <Link to={`/invoices/${invoice.id}/edit`}>{value}</Link>
+        <DynamicLink
+          to={route('/invoices/:id/edit', { id: invoice.id })}
+          renderSpan={disableNavigation('invoice', invoice)}
+        >
+          {value}
+        </DynamicLink>
       ),
     },
     {
@@ -154,9 +178,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link to={route('/clients/:id', { id: invoice.client_id })}>
+        <DynamicLink
+          to={route('/clients/:id', { id: invoice.client_id })}
+          renderSpan={disableNavigation('client', invoice.client)}
+        >
           {invoice.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -250,32 +277,38 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('invoice1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('invoice2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('invoice3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('invoice4', value?.toString()),
     },
     {
       column: 'discount',
       id: 'discount',
       label: t('discount'),
       format: (value, invoice) =>
-        formatMoney(
-          value,
-          invoice.client?.country_id,
-          invoice.client?.settings.currency_id
-        ),
+        invoice.is_amount_discount
+          ? formatMoney(
+              value,
+              invoice.client?.country_id,
+              invoice.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -293,6 +326,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -325,7 +359,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'next_send_date',
       id: 'next_send_date',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value, invoice) =>
+        dateTime(
+          value,
+          '',
+          '',
+          getTimezone(getSetting(invoice.client, 'timezone_id')).timeZone
+        ),
     },
     {
       column: 'partial_due',
@@ -355,14 +395,23 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -372,14 +421,23 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

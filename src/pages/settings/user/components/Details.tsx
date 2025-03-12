@@ -19,6 +19,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { useAtom } from 'jotai';
+import { hasLanguageChanged } from '../../localization/common/atoms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 export function Details() {
   const [t] = useTranslation();
@@ -30,6 +34,8 @@ export function Details() {
   const dispatch = useDispatch();
 
   const company = useCurrentCompany();
+
+  const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
@@ -71,11 +77,30 @@ export function Details() {
             />
           </Element>
 
+          <Element leftSide={t('language')}>
+            <LanguageSelector
+              value={userChanges?.language_id || ''}
+              onChange={(v) => {
+                setHasLanguageIdChanged(true);
+                handleChange('language_id', v);
+              }}
+              errorMessage={(errors?.errors?.language_id ?? [])[0]}
+              dismissable
+            />
+          </Element>
+
           <Element leftSide={t('phone')}>
             <InputField
               value={userChanges?.phone || user?.phone || ''}
               onValueChange={(value) => handleChange('phone', value)}
               errorMessage={(errors?.errors?.phone ?? [])[0]}
+            />
+          </Element>
+
+          <Element leftSide={t('signature')}>
+            <MarkdownEditor
+              value={userChanges?.signature || ''}
+              onChange={(value) => handleChange('signature', value)}
             />
           </Element>
 

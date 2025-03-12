@@ -15,16 +15,20 @@ export function numberFormat(
   thousandSeparator = ','
 ) {
   const number = typeof value === 'string' ? parseFloat(value) : value;
-  const str = number.toFixed(decimals).toString().split('.');
+
+  const sign = number < 0 ? '-' : '';
+
+  const str = Math.abs(number).toFixed(decimals).toString().split('.');
+  const int = str[0];
+  const decimal = str[1] || '';
+
   const parts = [];
 
-  for (let i = str[0].length; i > 0; i -= 3) {
-    parts.unshift(str[0].substring(Math.max(0, i - 3), i));
+  for (let i = int.length; i > 0; i -= 3) {
+    parts.unshift(int.substring(Math.max(0, i - 3), i));
   }
 
-  if (number >= 1000 || number <= -1000) {
-    str[0] = parts.join(thousandSeparator);
-  }
+  const formatted = parts.join(thousandSeparator);
 
-  return str.join(decimalSeparator);
+  return sign + formatted + (decimal ? decimalSeparator + decimal : '');
 }

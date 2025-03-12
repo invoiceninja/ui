@@ -18,6 +18,8 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
+import { Page } from '$app/components/Breadcrumbs';
+import { route } from '$app/common/helpers/route';
 
 export default function Pdf() {
   const { id } = useParams();
@@ -52,8 +54,21 @@ export default function Pdf() {
 
   const onLink = (url: string) => setBlobUrl(url);
 
+  const pages: Page[] = [
+    { name: t('invoices'), href: '/invoices' },
+    {
+      name: t('edit_invoice'),
+      href: route('/invoices/:id/edit', { id }),
+    },
+    {
+      name: t('pdf'),
+      href: route('/invoices/:id/pdf', { id }),
+    },
+  ];
+
   return (
     <Default
+      breadcrumbs={pages}
       title={t('view_pdf')}
       navigationTopRight={
         invoice && (
@@ -74,7 +89,12 @@ export default function Pdf() {
       {pdfUrl ? (
         <InvoiceViewer onLink={onLink} link={pdfUrl} method="GET" />
       ) : (
-        <Spinner />
+        <div
+          className="flex justify-center items-center"
+          style={{ height: 1500 }}
+        >
+          <Spinner />
+        </div>
       )}
     </Default>
   );

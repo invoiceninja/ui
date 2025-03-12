@@ -10,12 +10,13 @@
 
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { defaultSettings } from '$app/common/constants/blank-company-settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -23,6 +24,7 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
@@ -46,22 +48,41 @@ export function useHandleUpdate(params: Params) {
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
-  const adjustGroupSettingsPayload = () => {
-    const adjustedSettings = { ...companyChanges?.settings };
+  const adjustPayload = () => {
+    const adjustedSettings = cloneDeep(companyChanges?.settings);
 
-    Object.entries(adjustedSettings).forEach(([property, value]) => {
-      if (Array.isArray(value) && !value.length) {
-        delete adjustedSettings[property];
-      } else if (
-        value &&
-        typeof value === 'object' &&
-        !Object.entries(value).length
+    if (adjustedSettings) {
+      if (
+        !adjustedSettings.email_template_custom1 ||
+        !adjustedSettings.email_subject_custom1
       ) {
-        delete adjustedSettings[property];
-      } else if (typeof value === 'string' && !value) {
-        delete adjustedSettings[property];
+        delete adjustedSettings.email_template_custom1;
+        delete adjustedSettings.email_subject_custom1;
       }
-    });
+
+      if (
+        !adjustedSettings.email_template_custom2 ||
+        !adjustedSettings.email_subject_custom2
+      ) {
+        delete adjustedSettings.email_template_custom2;
+        delete adjustedSettings.email_subject_custom2;
+      }
+
+      if (
+        !adjustedSettings.email_template_custom3 ||
+        !adjustedSettings.email_subject_custom3
+      ) {
+        delete adjustedSettings.email_template_custom3;
+        delete adjustedSettings.email_subject_custom3;
+      }
+
+      Object.entries(adjustedSettings).forEach(([property, value]) => {
+        if (value === null) {
+          adjustedSettings[property] =
+            defaultSettings[property as keyof typeof defaultSettings];
+        }
+      });
+    }
 
     return {
       ...activeGroupSettings,
@@ -80,16 +101,12 @@ export function useHandleUpdate(params: Params) {
         endpoint('/api/v1/group_settings/:id', {
           id: id || activeGroupSettings?.id,
         }),
-        groupSettings || adjustGroupSettingsPayload()
+        groupSettings || adjustPayload()
       )
         .then((response: GenericSingleResourceResponse<GroupSettings>) => {
           toast.success('updated_group');
 
-          queryClient.invalidateQueries(
-            route('/api/v1/group_settings/:id', {
-              id: id || activeGroupSettings?.id,
-            })
-          );
+          $refetch(['group_settings']);
 
           if (isGroupSettingsActive) {
             dispatch(

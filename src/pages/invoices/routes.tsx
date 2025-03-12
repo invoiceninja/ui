@@ -18,11 +18,36 @@ import { assigned } from '$app/common/guards/guards/assigned';
 import { lazy } from 'react';
 
 const Invoices = lazy(() => import('$app/pages/invoices/index/Invoices'));
+const Invoice = lazy(() => import('$app/pages/invoices/Invoice'));
 const Import = lazy(() => import('$app/pages/invoices/import/Import'));
 const Create = lazy(() => import('$app/pages/invoices/create/Create'));
 const Edit = lazy(() => import('$app/pages/invoices/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/invoices/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/invoices/email/Email'));
+const EInvoice = lazy(
+  () => import('$app/pages/invoices/edit/components/EInvoice')
+);
+const Documents = lazy(
+  () => import('$app/pages/invoices/edit/components/Documents')
+);
+const Payments = lazy(
+  () => import('$app/pages/invoices/edit/components/Payments')
+);
+const Settings = lazy(
+  () => import('$app/pages/invoices/edit/components/Settings')
+);
+const Activities = lazy(
+  () => import('$app/pages/invoices/edit/components/Activities')
+);
+const History = lazy(
+  () => import('$app/pages/invoices/edit/components/History')
+);
+const EmailHistory = lazy(
+  () => import('$app/pages/invoices/edit/components/EmailHistory')
+);
+const CreatePage = lazy(
+  () => import('$app/pages/invoices/create/components/CreatePage')
+);
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -54,6 +79,7 @@ export const invoiceRoutes = (
         />
       }
     />
+
     <Route
       path="create"
       element={
@@ -65,9 +91,14 @@ export const invoiceRoutes = (
           component={<Create />}
         />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+    </Route>
+
     <Route
-      path=":id/edit"
+      path=":id"
       element={
         <Guard
           guards={[
@@ -78,19 +109,43 @@ export const invoiceRoutes = (
               assigned('/api/v1/invoices/:id')
             ),
           ]}
-          component={<Edit />}
+          component={<Invoice />}
         />
       }
-    />
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="e_invoice" element={<EInvoice />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="activity" element={<Activities />} />
+      <Route path="history" element={<History />} />
+      <Route path="email_history" element={<EmailHistory />} />
+      <Route path="payments" element={<Payments />} />
+    </Route>
+
     <Route
       path=":id/pdf"
       element={
         <Guard
-          guards={[enabled(ModuleBitmask.Invoices), permission('view_invoice')]}
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            or(permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+          ]}
           component={<Pdf />}
         />
       }
     />
-    <Route path=":id/email" element={<Email />} />
+    <Route
+      path=":id/email"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            or(permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+          ]}
+          component={<Email />}
+        />
+      }
+    />
   </Route>
 );

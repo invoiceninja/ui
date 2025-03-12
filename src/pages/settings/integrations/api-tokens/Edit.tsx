@@ -18,7 +18,6 @@ import { date, endpoint } from '$app/common/helpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useApiTokenQuery } from '$app/common/queries/api-tokens';
-import { useQueryClient } from 'react-query';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Badge } from '$app/components/Badge';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -31,8 +30,8 @@ import { useHandleChange } from './common/hooks/hooks';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -53,13 +52,11 @@ export function Edit() {
     },
   ];
 
-  const queryClient = useQueryClient();
-
   const actions = useActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState<boolean>(false);
@@ -70,7 +67,7 @@ export function Edit() {
 
   const handleChange = useHandleChange({ setApiToken, setErrors });
 
-  const handleSave = (password: string) => {
+  const handleSave = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       setErrors(undefined);
       toast.processing();
@@ -82,9 +79,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_token');
 
-          queryClient.invalidateQueries('/api/v1/tokens');
-
-          queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }));
+          $refetch(['tokens']);
 
           navigate(route('/settings/integrations/api_tokens'));
         })
@@ -95,8 +90,8 @@ export function Edit() {
           }
 
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
+            setIsPasswordConfirmModalOpen(true);
           }
         })
         .finally(() => setIsFormBusy(false));

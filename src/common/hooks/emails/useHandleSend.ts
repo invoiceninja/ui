@@ -14,15 +14,14 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { $refetch, keys } from '../useRefetch';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
 }
 
 export function useHandleSend({ setErrors }: Params) {
-  const [t] = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -46,7 +45,9 @@ export function useHandleSend({ setErrors }: Params) {
       cc_email: ccEmail,
     })
       .then(() => {
-        toast.success(t(`emailed_${entity}`) || '');
+        $refetch([`${entity}s` as keyof typeof keys]);
+
+        toast.success('email_queued');
         navigate(redirectUrl);
       })
       .catch((error: AxiosError<ValidationBag>) => {

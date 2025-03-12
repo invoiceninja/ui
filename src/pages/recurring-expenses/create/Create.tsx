@@ -31,9 +31,14 @@ import { useBlankRecurringExpenseQuery } from '$app/common/queries/recurring-exp
 import { useHandleChange } from '../common/hooks';
 import { RecurringExpensesFrequency } from '$app/common/enums/recurring-expense-frequency';
 import { cloneDeep } from 'lodash';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import dayjs from 'dayjs';
 
 export default function Create() {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
 
   const navigate = useNavigate();
 
@@ -47,7 +52,7 @@ export default function Create() {
   ];
 
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
-    'by_rate'
+    company?.calculate_expense_tax_by_amount ? 'by_amount' : 'by_rate'
   );
 
   const [recurringExpense, setRecurringExpense] = useAtom(recurringExpenseAtom);
@@ -86,7 +91,16 @@ export default function Create() {
           _recurringExpense.vendor_id = searchParams.get('vendor')!;
         }
 
-        value = _recurringExpense;
+        value = {
+          ..._recurringExpense,
+          payment_date: company?.mark_expenses_paid
+            ? dayjs().format('YYYY-MM-DD')
+            : '',
+          should_be_invoiced: company?.mark_expenses_invoiceable,
+          invoice_documents: company?.invoice_expense_documents,
+          calculate_tax_by_amount: taxInputType === 'by_amount',
+          uses_inclusive_taxes: company.expense_inclusive_taxes,
+        };
       }
 
       return value;
@@ -101,6 +115,8 @@ export default function Create() {
     request('POST', endpoint('/api/v1/recurring_expenses'), recurringExpense)
       .then((response: GenericSingleResourceResponse<RecurringExpense>) => {
         toast.success('created_recurring_expense');
+
+        $refetch(['recurring_expenses']);
 
         navigate(
           route('/recurring_expenses/:id/edit', { id: response.data.data.id })

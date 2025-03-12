@@ -9,21 +9,23 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useVendorQuery } from '$app/common/queries/vendor';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 export default function Documents() {
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });
 
-  const queryClient = useQueryClient();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
+    $refetch(['vendors']);
   };
 
   return (
@@ -33,6 +35,9 @@ export default function Documents() {
           endpoint={endpoint('/api/v1/vendors/:id/upload', { id })}
           onSuccess={onSuccess}
           widgetOnly
+          disableUpload={
+            !hasPermission('edit_vendor') && !entityAssigned(vendor)
+          }
         />
       </div>
 
@@ -40,6 +45,9 @@ export default function Documents() {
         <DocumentsTable
           documents={vendor?.documents || []}
           onDocumentDelete={onSuccess}
+          disableEditableOptions={
+            !entityAssigned(vendor, true) && !hasPermission('edit_vendor')
+          }
         />
       </div>
     </div>

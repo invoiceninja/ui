@@ -19,6 +19,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface BlankQueryParams {
   enabled?: boolean;
@@ -47,7 +48,7 @@ interface ExpenseParams {
 
 export function useExpenseQuery(params: ExpenseParams) {
   return useQuery<Expense>(
-    route('/api/v1/expenses/:id', { id: params.id }),
+    ['/api/v1/expenses', params.id],
     () =>
       request(
         'GET',
@@ -89,23 +90,41 @@ export function useExpensesQuery(params: ExpensesParams) {
   );
 }
 
+const successMessages = {
+  bulk_update: 'updated_records',
+};
+
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (
+    ids: string[],
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'bulk_categorize'
+      | 'bulk_update',
+    rest?: Record<string, unknown>
+  ) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/expenses/bulk'), {
+    return request('POST', endpoint('/api/v1/expenses/bulk'), {
       action,
-      ids: [id],
+      ids,
+      ...rest,
     }).then(() => {
-      toast.success(`${action}d_expense`);
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_expense`;
+
+      toast.success(message);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
+      $refetch(['expenses']);
     });
   };
 }

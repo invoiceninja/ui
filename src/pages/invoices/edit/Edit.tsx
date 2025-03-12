@@ -8,27 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
-import { route } from '$app/common/helpers/route';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { v4 } from 'uuid';
-import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from 'react-router-dom';
+import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -38,109 +30,116 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
-import { useActions } from './components/Actions';
-import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Invoice as IInvoice, Invoice } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Client } from '$app/common/interfaces/client';
+import { Assigned } from '$app/components/Assigned';
+import { route } from '$app/common/helpers/route';
+import { Project } from '$app/common/interfaces/project';
+import { Icon } from '$app/components/icons/Icon';
+import { ExternalLink } from 'react-feather';
+
+export interface Context {
+  invoice: Invoice | undefined;
+  setInvoice: Dispatch<SetStateAction<Invoice | undefined>>;
+  isDefaultTerms: boolean;
+  setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
+  isDefaultFooter: boolean;
+  setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
+  errors: ValidationBag | undefined;
+  client: Client | undefined;
+}
 
 export default function Edit() {
-  const { t } = useTranslation();
-  const { id } = useParams();
+  const [t] = useTranslation();
+
   const [searchParams] = useSearchParams();
 
-  const reactSettings = useReactSettings();
+  const navigate = useNavigate();
 
-  const pages: Page[] = [
-    { name: t('invoices'), href: '/invoices' },
-    {
-      name: t('edit_invoice'),
-      href: route('/invoices/:id/edit', { id }),
-    },
-  ];
+  const context: Context = useOutletContext();
+  const {
+    invoice,
+    isDefaultTerms,
+    setIsDefaultTerms,
+    isDefaultFooter,
+    setIsDefaultFooter,
+    errors,
+    client,
+  } = context;
 
-  const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
+  const reactSettings = useReactSettings();
+  const productColumns = useProductColumns();
 
-  const { documentTitle } = useTitle('edit_invoice');
-  const { data } = useInvoiceQuery({ id });
-
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
-
-  const [client, setClient] = useState<Client | undefined>();
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const clientResolver = useClientResolver();
 
   const {
     handleChange,
     handleInvitationChange,
-    calculateInvoiceSum,
     handleLineItemChange,
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
   } = useInvoiceUtilities({ client });
 
-  useEffect(() => {
-    const isAnyAction = searchParams.get('action');
-
-    const currentInvoice = isAnyAction && invoice ? invoice : data;
-
-    if (currentInvoice) {
-      const _invoice = cloneDeep(currentInvoice);
-
-      _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
-
-      setInvoice(_invoice);
-
-      if (_invoice?.client) {
-        setClient(_invoice.client);
-
-        clientResolver.cache(_invoice.client);
-      }
-    }
-  }, [data]);
-
-  useEffect(() => {
-    invoice && calculateInvoiceSum(invoice);
-  }, [invoice]);
-
-  const actions = useActions();
-  const save = useHandleSave(setErrors);
+  const { changeTemplateVisible, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onSaveClick={() => invoice && save(invoice)}
-      disableSaveButton={
-        invoice &&
-        (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
-      }
-      navigationTopRight={
-        invoice && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={invoice}
-            actions={actions}
-          />
-        )
-      }
-    >
+    <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {invoice && (
             <div className="flex space-x-20">
               <span className="text-sm">{t('status')}</span>
+
               <InvoiceStatusBadge entity={invoice} />
             </div>
           )}
+
+          <Assigned
+            entityId={invoice?.project_id}
+            cacheEndpoint="/api/v1/projects"
+            apiEndpoint="/api/v1/projects/:id?include=client"
+            componentCallbackFn={(resource: Project) => (
+              <div className="flex space-x-20">
+                <span className="text-sm">{t('project')}</span>
+
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">{resource.name}</span>
+
+                  <div
+                    className="cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        route('/projects/:id', { id: invoice?.project_id })
+                      )
+                    }
+                  >
+                    <Icon
+                      element={ExternalLink}
+                      style={{ width: '1.17rem', height: '1.17rem' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          />
 
           <ClientSelector
             resource={invoice}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
+            onLocationChange={(locationId) =>
+              handleChange('location_id', locationId)
+            }
             onContactCheckboxChange={handleInvitationChange}
             errorMessage={errors?.errors.client_id}
             textOnly
@@ -222,6 +221,10 @@ export default function Edit() {
           invoice={invoice}
           handleChange={handleChange}
           errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
         />
 
         {invoice && (
@@ -245,10 +248,24 @@ export default function Edit() {
               entity="invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              observable={true}
+              initiallyVisible={false}
+              withRemoveLogoCTA
             />
           )}
         </div>
       )}
-    </Default>
+
+      {invoice ? (
+        <ChangeTemplateModal<IInvoice>
+          entity="invoice"
+          entities={[invoice]}
+          visible={changeTemplateVisible}
+          setVisible={setChangeTemplateVisible}
+          labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+          bulkUrl="/api/v1/invoices/bulk"
+        />
+      ) : null}
+    </>
   );
 }

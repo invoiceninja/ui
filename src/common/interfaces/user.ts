@@ -11,6 +11,12 @@
 import { CompanyUser } from './company-user';
 import { Timestamps } from './timestamps';
 
+interface ReferralMeta {
+  pro: number;
+  free: number;
+  enterprise: number;
+}
+
 export interface User extends Timestamps {
   id: string;
   custom_value1: string;
@@ -32,4 +38,8 @@ export interface User extends Timestamps {
   signature: string;
   verified_phone_number: boolean;
   company_user?: CompanyUser;
+  language_id: string;
+  user_logged_in_notification: boolean;
+  referral_code?: string;
+  referral_meta?: ReferralMeta;
 }

@@ -20,17 +20,15 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
-import { Container } from '$app/components/Container';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('new_task_status');
@@ -40,8 +38,6 @@ export function Create() {
   const navigate = useNavigate();
 
   const accentColor = useAccentColor();
-
-  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -79,7 +75,7 @@ export function Create() {
         .then((response) => {
           toast.success('created_task_status');
 
-          queryClient.invalidateQueries('/api/v1/task_statuses');
+          $refetch(['task_statuses']);
 
           if (actionType === 'save') {
             navigate(
@@ -117,10 +113,8 @@ export function Create() {
   ];
 
   return (
-    <Settings title={t('task_statuses')}>
-      <Container className="space-y-6">
-        <Breadcrumbs pages={pages} />
-
+    <Settings title={t('task_statuses')} breadcrumbs={pages}>
+      <div className="max-w-3xl">
         <Card
           title={documentTitle}
           withSaveButton
@@ -144,7 +138,7 @@ export function Create() {
             />
           </CardContainer>
         </Card>
-      </Container>
+      </div>
     </Settings>
   );
 }

@@ -9,12 +9,10 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, Link, SelectField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
-import { useQuery } from '$app/common/hooks/useQuery';
 import { Client } from '$app/common/interfaces/client';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useStaticsQuery } from '$app/common/queries/statics';
@@ -23,11 +21,18 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   client: Client | undefined;
@@ -41,9 +46,12 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
   const currencies = useCurrencies();
   const languages = useLanguages();
-  const queryClient = useQueryClient();
 
-  const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
+
   const { data: statics } = useStaticsQuery();
   const { id } = useParams();
 
@@ -79,8 +87,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
     t('settings'),
     t('notes'),
     t('classify'),
-    t('client_fields'),
-    t('contact_fields'),
     t('documents'),
   ]);
 
@@ -91,67 +97,60 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   }, []);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
+    $refetch(['clients']);
   };
 
   return (
     <Card title={t('additional_info')}>
-      <TabGroup className="px-5" tabs={tabs}>
+      <TabGroup
+        className="px-5"
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 3) {
+            return (
+              <DocumentsTabLabel numberOfDocuments={client?.documents.length} />
+            );
+          }
+        }}
+      >
         <div className="-mx-5">
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
-              <SelectField
-                id="settings.currency_id"
-                defaultValue={client?.settings?.currency_id || ''}
-                onValueChange={(value) =>
-                  handleSettingsChange('currency_id', value)
-                }
-                withBlank
+              <CurrencySelector
+                value={client?.settings?.currency_id || ''}
+                onChange={(v) => handleSettingsChange('currency_id', v)}
                 errorMessage={errors?.errors['settings.currency_id']}
-              >
-                {currencies.map((currency, index) => (
-                  <option key={index} value={currency.id}>
-                    {currency.name}
-                  </option>
-                ))}
-              </SelectField>
+                dismissable
+              />
             </Element>
           )}
 
           {languages.length > 1 && (
             <Element leftSide={t('language')}>
-              <SelectField
-                id="settings.language_id"
-                defaultValue={client?.settings?.language_id || ''}
-                onValueChange={(value) =>
-                  handleSettingsChange('language_id', value)
-                }
+              <LanguageSelector
+                value={client?.settings?.language_id || ''}
+                onChange={(v) => handleSettingsChange('language_id', v)}
                 errorMessage={errors?.errors['settings.language_id']}
-                withBlank
-              >
-                {languages.map((language, index) => (
-                  <option key={index} value={language.id}>
-                    {language.name}
-                  </option>
-                ))}
-              </SelectField>
+                dismissable
+              />
             </Element>
           )}
 
-          {paymentTerms && (
+          {paymentTermsResponse && (
             <Element leftSide={t('payment_terms')}>
               <SelectField
                 id="settings.payment_terms"
-                defaultValue={client?.settings?.payment_terms || ''}
+                value={client?.settings?.payment_terms || ''}
                 errorMessage={errors?.errors['settings.payment_terms']}
                 onValueChange={(value) =>
                   handleSettingsChange('payment_terms', value)
                 }
                 withBlank
+                customSelector
               >
-                {paymentTerms.data.data.map(
+                {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
+                    <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -160,20 +159,21 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             </Element>
           )}
 
-          {paymentTerms && (
+          {paymentTermsResponse && (
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
                 id="settings.valid_until"
-                defaultValue={client?.settings?.valid_until || ''}
+                value={client?.settings?.valid_until || ''}
                 onValueChange={(value) =>
                   handleSettingsChange('valid_until', value)
                 }
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
+                customSelector
               >
-                {paymentTerms.data.data.map(
+                {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
+                    <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -183,12 +183,10 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           )}
 
           <Element leftSide={t('task_rate')}>
-            <InputField
-              id="settings.default_task_rate"
-              type="number"
-              value={client?.settings?.default_task_rate}
+            <NumberInputField
+              value={client?.settings?.default_task_rate || ''}
               onValueChange={(value) =>
-                handleSettingsChange('default_task_rate', value)
+                handleSettingsChange('default_task_rate', parseFloat(value))
               }
               errorMessage={errors?.errors['settings.default_task_rate']}
             />
@@ -197,15 +195,12 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           <Element leftSide={t('send_reminders')}>
             <SelectField
               id="settings.send_reminders"
-              defaultValue={
+              value={
                 client?.settings?.send_reminders === true
                   ? 'enabled'
                   : client?.settings?.send_reminders === false
                   ? 'disabled'
                   : ''
-              }
-              className={
-                'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
               }
               onValueChange={(value) =>
                 handleSettingsChange(
@@ -215,6 +210,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               }
               withBlank
               errorMessage={errors?.errors['settings.send_reminders']}
+              customSelector
             >
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>
@@ -243,10 +239,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('size_id')}>
               <SelectField
                 id="size_id"
-                defaultValue={client?.size_id || ''}
+                value={client?.size_id || ''}
                 onValueChange={(value) => handleChange('size_id', value)}
                 errorMessage={errors?.errors.size_id}
                 withBlank
+                customSelector
               >
                 {statics?.sizes.map(
                   (size: { id: string; name: string }, index: number) => (
@@ -263,10 +260,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <Element leftSide={t('industry')}>
               <SelectField
                 id="industry_id"
-                defaultValue={client?.industry_id || ''}
+                value={client?.industry_id || ''}
                 errorMessage={errors?.errors.industry_id}
                 onValueChange={(value) => handleChange('industry_id', value)}
                 withBlank
+                customSelector
               >
                 {statics?.industries.map(
                   (size: { id: string; name: string }, index: number) => (
@@ -278,20 +276,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               </SelectField>
             </Element>
           )}
-        </div>
-
-        <div>
-          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
-            {t('click_here')}
-          </Link>
-        </div>
-
-        <div>
-          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
-            {t('click_here')}
-          </Link>
         </div>
 
         {id ? (
@@ -306,6 +290,9 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               <DocumentsTable
                 documents={client?.documents || []}
                 onDocumentDelete={onSuccess}
+                disableEditableOptions={
+                  !entityAssigned(client, true) && !hasPermission('edit_client')
+                }
               />
             </div>
           </div>

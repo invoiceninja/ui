@@ -14,17 +14,16 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { useQueryClient } from 'react-query';
 import { TransactionStatus } from '$app/common/enums/transactions';
-import { route } from '$app/common/helpers/route';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ListBox } from './ListBox';
 import { Button } from '$app/components/forms';
 import { MdContentCopy, MdLink } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { TabGroup } from '$app/components/TabGroup';
-import { Transaction } from '$app/common/interfaces/transactions';
 import { TransactionRule } from '$app/common/interfaces/transaction-rules';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export interface TransactionDetails {
   base_type: string;
@@ -87,12 +86,8 @@ export function TransactionMatchDetails(props: Props) {
       })
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
-          queryClient.invalidateQueries('/api/v1/invoices');
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
+
+          $refetch(['invoices', 'bank_transactions']);
 
           toast.success('converted_transaction');
         })
@@ -120,13 +115,8 @@ export function TransactionMatchDetails(props: Props) {
       })
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
-          queryClient.invalidateQueries('/api/v1/invoices');
-          queryClient.invalidateQueries('/api/v1/payments');
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
+
+          $refetch(['invoices', 'payments', 'bank_transactions']);
 
           toast.success('linked_transaction');
         })
@@ -153,20 +143,10 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+        .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
-
-          queryClient.invalidateQueries(
-            route('/api/v1/expenses/:id', {
-              id: response.data.data[0].expense_id,
-            })
-          );
+          $refetch(['bank_transactions', 'expenses']);
 
           toast.success('converted_transaction');
         })
@@ -192,22 +172,10 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+        .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          queryClient.invalidateQueries('/api/v1/expenses');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
-
-          queryClient.invalidateQueries(
-            route('/api/v1/expenses/:id', {
-              id: response.data.data[0].expense_id,
-            })
-          );
+          $refetch(['expenses', 'bank_transactions']);
 
           toast.success('linked_transaction');
         })
@@ -250,6 +218,8 @@ export function TransactionMatchDetails(props: Props) {
     }
   }, [transactionRule]);
 
+  const colors = useColorScheme();
+
   return (
     <div className="flex flex-col flex-1">
       <div className="flex flex-col flex-1">
@@ -263,20 +233,39 @@ export function TransactionMatchDetails(props: Props) {
             <div>
               {props.isCreditTransactionType ? (
                 <ListBox
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   transactionDetails={props.transactionDetails}
                   dataKey="invoices"
                   setSelectedIds={setInvoiceIds}
                   selectedIds={invoiceIds}
+                  calculateTotal
                 />
               ) : (
                 <>
                   <ListBox
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
                     transactionDetails={props.transactionDetails}
                     dataKey="vendors"
                     setSelectedIds={setVendorIds}
                     selectedIds={vendorIds}
                   />
                   <ListBox
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
                     transactionDetails={props.transactionDetails}
                     dataKey="categories"
                     setSelectedIds={setExpenseCategoryIds}
@@ -287,6 +276,12 @@ export function TransactionMatchDetails(props: Props) {
 
               <div className="px-3 py-3 w-full border-t border-gray-200">
                 <Button
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   className="w-full"
                   onClick={
                     props.isCreditTransactionType
@@ -319,22 +314,43 @@ export function TransactionMatchDetails(props: Props) {
             <div>
               {props.isCreditTransactionType ? (
                 <ListBox
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   transactionDetails={props.transactionDetails}
                   dataKey="payments"
                   setSelectedIds={setPaymentIds}
                   selectedIds={paymentIds}
+                  calculateTotal
                 />
               ) : (
                 <ListBox
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   transactionDetails={props.transactionDetails}
                   dataKey="expenses"
                   setSelectedIds={setExpenseIds}
                   selectedIds={expenseIds}
+                  calculateTotal
+                  addSelectAllButton
                 />
               )}
 
               <div className="px-3 py-3 w-full border-t border-gray-200">
                 <Button
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   className="w-full"
                   onClick={
                     props.isCreditTransactionType

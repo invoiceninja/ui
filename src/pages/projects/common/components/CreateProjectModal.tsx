@@ -30,8 +30,8 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { UserSelector } from '$app/components/users/UserSelector';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   visible: boolean;
@@ -41,7 +41,6 @@ interface Props {
 
 export function CreateProjectModal(props: Props) {
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const { data: blankProject } = useBlankProjectQuery();
 
@@ -91,7 +90,7 @@ export function CreateProjectModal(props: Props) {
         .then((response: GenericSingleResourceResponse<Project>) => {
           toast.success('created_project');
 
-          queryClient.invalidateQueries('/api/v1/projects');
+          $refetch(['projects']);
 
           window.dispatchEvent(
             new CustomEvent('invalidate.combobox.queries', {
@@ -143,7 +142,6 @@ export function CreateProjectModal(props: Props) {
               clearButton
               onClearButtonClick={() => handleChange('client_id', '')}
               errorMessage={errors?.errors.client_id}
-              staleTime={Infinity}
             />
 
             <UserSelector

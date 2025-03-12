@@ -22,6 +22,10 @@ export function useHandleSortingRows(props: Props) {
   const resource = props.resource;
 
   return (result: DropResult) => {
+    if (result.source.index === result.destination?.index) {
+      return;
+    }
+
     const sorted = resource
       ? arrayMoveImmutable(
           resource.line_items,

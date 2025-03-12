@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaskStatuses } from '..';
 import { Card, Element } from '../../../components/cards';
-import { InputField, SelectField } from '../../../components/forms';
+import { SelectField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -26,24 +26,41 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { trans } from '$app/common/helpers';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function TaskSettings() {
+  useTitle('task_settings');
   const [t] = useTranslation();
+
+  useInjectCompanyChanges();
+  const dispatch = useDispatch();
+  const onCancel = useDiscardChanges();
+  const onSave = useHandleCompanySave();
+  const disableSettingsField = useDisableSettingsField();
+  const handleSettingsChange = useHandleCurrentCompanyChangeProperty();
+
+  const companyChanges = useCompanyChanges();
+  const errors = useAtomValue(companySettingsErrorsAtom);
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('task_settings'), href: '/settings/task_settings' },
   ];
 
-  useTitle('task_settings');
-  useInjectCompanyChanges();
-
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
-
-  const dispatch = useDispatch();
-  const companyChanges = useCompanyChanges();
+  const isTaskRoundToNearestCustom = () => {
+    return Boolean(
+      companyChanges?.settings?.task_round_to_nearest === -1 ||
+        ![1, 60, 300, 900, 1800, 3600, 86400].find(
+          (value) => value === companyChanges?.settings?.task_round_to_nearest
+        )
+    );
+  };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
@@ -63,9 +80,6 @@ export function TaskSettings() {
       })
     );
 
-  const onSave = useHandleCompanySave();
-  const onCancel = useDiscardChanges();
-
   return (
     <Settings
       onSaveClick={onSave}
@@ -73,14 +87,25 @@ export function TaskSettings() {
       title={t('task_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#task_settings"
-      withoutBackButton
     >
       <Card title={t('settings')}>
-        <Element leftSide={t('default_task_rate')}>
-          <InputField
-            id="settings.default_task_rate"
-            onChange={handleChange}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="default_task_rate"
+              labelElement={<SettingsLabel label={t('default_task_rate')} />}
+            />
+          }
+        >
+          <NumberInputField
             value={companyChanges?.settings?.default_task_rate || ''}
+            onValueChange={(value) =>
+              handleSettingsChange(
+                'settings.default_task_rate',
+                parseFloat(value)
+              )
+            }
+            disabled={disableSettingsField('default_task_rate')}
             errorMessage={errors?.errors['settings.default_task_rate']}
           />
         </Element>
@@ -261,7 +286,17 @@ export function TaskSettings() {
 
         <Divider />
 
-        <Element leftSide={t('show_tasks_in_client_portal')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="enable_client_portal_tasks"
+              labelElement={
+                <SettingsLabel label={t('show_tasks_in_client_portal')} />
+              }
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             checked={Boolean(
               companyChanges?.settings?.enable_client_portal_tasks
@@ -269,17 +304,27 @@ export function TaskSettings() {
             onChange={(value: boolean) =>
               handleToggleChange('settings.enable_client_portal_tasks', value)
             }
+            disabled={disableSettingsField('enable_client_portal_tasks')}
           />
         </Element>
 
-        <Element leftSide={t('tasks_shown_in_portal')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="show_all_tasks_client_portal"
+              labelElement={
+                <SettingsLabel label={t('tasks_shown_in_portal')} />
+              }
+              defaultValue="invoiced"
+            />
+          }
+        >
           <SelectField
             id="settings.show_all_tasks_client_portal"
             onChange={handleChange}
             disabled={
-              companyChanges?.settings?.enable_client_portal_tasks
-                ? false
-                : true
+              Boolean(!companyChanges?.settings?.enable_client_portal_tasks) ||
+              disableSettingsField('show_all_tasks_client_portal')
             }
             value={
               companyChanges?.settings?.show_all_tasks_client_portal?.toString() ||
@@ -294,6 +339,97 @@ export function TaskSettings() {
             <option value="all">{t('all')}</option>
           </SelectField>
         </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="task_round_up"
+              labelElement={
+                <SettingsLabel
+                  label={t('round_tasks')}
+                  helpLabel={t('round_tasks_help')}
+                />
+              }
+              defaultValue={true}
+            />
+          }
+        >
+          <div className="flex items-center space-x-7">
+            <Toggle
+              checked={Boolean(companyChanges?.settings?.task_round_up ?? true)}
+              onChange={(value: boolean) =>
+                handleToggleChange('settings.task_round_up', value)
+              }
+              disabled={disableSettingsField('task_round_up')}
+            />
+            {companyChanges?.settings.task_round_up ? (
+              <span>{t('round_up')}</span>
+            ) : (
+              <span>{t('round_down')}</span>
+            )}
+          </div>
+        </Element>
+
+        <Element
+          leftSideHelp={t('task_round_to_nearest_help')}
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="task_round_to_nearest"
+              labelElement={
+                <SettingsLabel label={t('task_round_to_nearest')} />
+              }
+              defaultValue={1}
+            />
+          }
+        >
+          <SelectField
+            value={
+              typeof companyChanges?.settings?.task_round_to_nearest !==
+              'undefined'
+                ? isTaskRoundToNearestCustom()
+                  ? '-1'
+                  : companyChanges.settings.task_round_to_nearest.toString()
+                : '1'
+            }
+            onValueChange={(value) =>
+              handleSettingsChange(
+                'settings.task_round_to_nearest',
+                parseFloat(value)
+              )
+            }
+            disabled={disableSettingsField('task_round_to_nearest')}
+          >
+            <option value="1">
+              {t('1_second')} ({t('disabled')})
+            </option>
+            <option value="60">{t('1_minute')}</option>
+            <option value="300">{trans('count_minutes', { count: 5 })}</option>
+            <option value="900">{trans('count_minutes', { count: 15 })}</option>
+            <option value="1800">
+              {trans('count_minutes', { count: 30 })}
+            </option>
+            <option value="3600">{t('1_hour')}</option>
+            <option value="86400">{t('1_day')}</option>
+            <option value="-1">{t('custom')}</option>
+          </SelectField>
+        </Element>
+
+        {isTaskRoundToNearestCustom() && (
+          <Element leftSide={t('task_round_to_nearest')}>
+            <NumberInputField
+              precision={0}
+              value={companyChanges?.settings?.task_round_to_nearest || -1}
+              onValueChange={(value) =>
+                handleSettingsChange(
+                  'settings.task_round_to_nearest',
+                  parseFloat(value)
+                )
+              }
+              disabled={disableSettingsField('task_round_to_nearest')}
+              disablePrecision
+            />
+          </Element>
+        )}
       </Card>
 
       {isCompanySettingsActive && <TaskStatuses />}

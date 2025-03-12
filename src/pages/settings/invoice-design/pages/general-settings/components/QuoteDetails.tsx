@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
 
-export function QuoteDetails() {
+export default function QuoteDetails() {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -40,10 +40,11 @@ export function QuoteDetails() {
       label: customField('invoice4').label() || t('custom4'),
     },
     { value: '$client.balance', label: t('client_balance') },
+    { value: '$quote.project', label: t('project') },
   ];
 
   return (
-    <Card title={t('quote_details')} padding="small" collapsed={true}>
+    <Card title={t('quote_details')} padding="small">
       <SortableVariableList
         for="quote_details"
         defaultVariables={defaultVariables}

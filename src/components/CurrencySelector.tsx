@@ -10,24 +10,24 @@
 
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { GenericSelectorProps } from './CountrySelector';
-import { SelectField } from './forms';
+import { SearchableSelect } from './SearchableSelect';
 
 export function CurrencySelector(props: GenericSelectorProps) {
   const currencies = useCurrencies();
 
   return (
-    <SelectField
+    <SearchableSelect
       value={props.value}
       onValueChange={props.onChange}
       label={props.label}
       errorMessage={props.errorMessage}
-      withBlank
+      dismissable={props.dismissable}
     >
       {currencies.map((currency, index) => (
         <option key={index} value={currency.id}>
-          {currency.name}
+          {currency.name} ({currency.code})
         </option>
       ))}
-    </SelectField>
+    </SearchableSelect>
   );
 }

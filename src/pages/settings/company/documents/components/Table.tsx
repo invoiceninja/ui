@@ -42,13 +42,13 @@ import {
   MdPageview,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { toast } from '$app/common/helpers/toast/toast';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { AxiosResponse } from 'axios';
 import { DocumentUrl } from '$app/components/DocumentsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 export function Table() {
   const { t } = useTranslation();
@@ -57,13 +57,13 @@ export function Table() {
   const reactSettings = useReactSettings();
   const setDocumentVisibility = useSetDocumentVisibility();
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
-  const [document, setDocument] = useState('');
+  const [documentId, setDocumentId] = useState('');
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   const [documentsUrls, setDocumentsUrls] = useState<DocumentUrl[]>([]);
 
@@ -80,24 +80,63 @@ export function Table() {
   };
 
   const invalidateDocumentsQuery = () => {
-    queryClient.invalidateQueries('/api/v1/documents');
+    $refetch(['documents']);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const destroy = (password: string, isRequired = true) => {
+  const downloadDocument = async (doc: Document, inline: boolean) => {
+    toast.processing();
+
+    const response: AxiosResponse = await queryClient.fetchQuery(
+      ['/api/v1/documents', doc.hash],
+      () =>
+        request(
+          'GET',
+          endpoint('/documents/:hash', { hash: doc.hash }),
+          { headers: defaultHeaders() },
+          { responseType: 'arraybuffer' }
+        ),
+      { staleTime: Infinity }
+    );
+
+    toast.dismiss();
+
+    const blob = new Blob([response.data], {
+      type: response.headers['content-type'],
+    });
+    const url = URL.createObjectURL(blob);
+
+    if (inline) {
+      window.open(url);
+      return;
+    }
+
+    const link = document.createElement('a');
+
+    link.download = doc.name;
+    link.href = url;
+    link.target = '_blank';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+  };
+
+  const destroy = (password: string, isPasswordRequired: boolean) => {
     toast.processing();
 
     request(
       'delete',
-      endpoint('/api/v1/documents/:id', { id: document }),
+      endpoint('/api/v1/documents/:id', { id: documentId }),
       {},
       { headers: { 'X-Api-Password': password } }
     )
       .then(() => toast.success('deleted_document'))
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
+          setPasswordConfirmModalOpen(true);
         }
       })
       .finally(() => invalidateDocumentsQuery());
@@ -112,7 +151,7 @@ export function Table() {
 
         if (!alreadyExist && (type === 'png' || type === 'jpg')) {
           const response: AxiosResponse = await queryClient.fetchQuery(
-            ['documents', hash],
+            ['/api/v1/documents', hash],
             () =>
               request(
                 'GET',
@@ -194,29 +233,23 @@ export function Table() {
                 <Td>{document.type}</Td>
                 <Td>{prettyBytes(document.size)}</Td>
                 <Td>
-                  <Dropdown label={t('more_actions')}>
-                    <DropdownElement icon={<Icon element={MdPageview} />}>
-                      <a
-                        target="_blank"
-                        className="block w-full"
-                        href={endpoint('/documents/:hash?inline=true', {
-                          hash: document.hash,
-                        })}
-                        rel="noreferrer"
-                      >
-                        {t('view')}
-                      </a>
+                  <Dropdown label={t('actions')}>
+                    <DropdownElement
+                      onClick={() => {
+                        downloadDocument(document, true);
+                      }}
+                      icon={<Icon element={MdPageview} />}
+                    >
+                      {t('view')}
                     </DropdownElement>
 
-                    <DropdownElement icon={<Icon element={MdDownload} />}>
-                      <a
-                        className="block w-full"
-                        href={endpoint('/documents/:hash', {
-                          hash: document.hash,
-                        })}
-                      >
-                        {t('download')}
-                      </a>
+                    <DropdownElement
+                      onClick={() => {
+                        downloadDocument(document, false);
+                      }}
+                      icon={<Icon element={MdDownload} />}
+                    >
+                      {t('download')}
                     </DropdownElement>
 
                     {document.is_public ? (
@@ -245,7 +278,7 @@ export function Table() {
 
                     <DropdownElement
                       onClick={() => {
-                        setDocument(document.id);
+                        setDocumentId(document.id);
                         setPasswordConfirmModalOpen(true);
                       }}
                       icon={<Icon element={MdDelete} />}

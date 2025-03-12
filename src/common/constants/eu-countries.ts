@@ -27,6 +27,9 @@ export const euCountries: Record<string, string> = {
   LV: 'Latvia',
   LT: 'Lithuania',
   LU: 'Luxembourg',
+  NO: 'Norway', // Norway - EEA
+  IS: 'Iceland', // Iceland - EEA
+  LI: 'Liechtenstein', // Liechtenstein - EEA
   MT: 'Malta',
   NL: 'Netherlands',
   PL: 'Poland',
@@ -35,5 +38,8 @@ export const euCountries: Record<string, string> = {
   SK: 'Slovakia',
   SI: 'Slovenia',
   ES: 'Spain',
+  'ES-CN': 'Canary Islands',
+  'ES-ML': 'Melilla',
+  'ES-CE': 'Ceuta',
   SE: 'Sweden',
 };

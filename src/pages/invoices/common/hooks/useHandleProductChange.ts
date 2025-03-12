@@ -8,12 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
-import { ProductTableResource } from '../components/ProductsTable';
+import {
+  ProductTableResource,
+  RelationType,
+} from '../components/ProductsTable';
 
 interface Props {
+  relationType: RelationType;
   resource: ProductTableResource;
   type: 'product' | 'task';
   onChange: (index: number, lineItem: InvoiceItem) => unknown;
@@ -22,9 +28,16 @@ interface Props {
 export function useHandleProductChange(props: Props) {
   const company = useCurrentCompany();
 
+  const resolveCurrency = useResolveCurrency();
+  const resolveClient = useClientResolver();
+
   const resource = props.resource;
 
-  return (index: number, product_key: string, product: Product | null) => {
+  return async (
+    index: number,
+    product_key: string,
+    product: Product | null
+  ) => {
     const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
@@ -36,10 +49,45 @@ export function useHandleProductChange(props: Props) {
       return props.onChange(index, lineItem);
     }
 
-    lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
+    const currentPrice =
+      product?.cost > 0 && props.relationType === 'vendor_id'
+        ? product?.cost
+        : product?.price || 0;
 
     if (company.fill_products) {
-      lineItem.cost = product?.price || 0;
+      if (!company?.enable_product_quantity) {
+        lineItem.quantity = 1;
+      } else {
+        lineItem.quantity = company?.default_quantity
+          ? 1
+          : product?.quantity ?? 1;
+      }
+
+      if (resource.client_id) {
+        await resolveClient.find(resource.client_id).then((client) => {
+          const clientCurrencyId = client.settings.currency_id;
+
+          if (
+            company.convert_products &&
+            clientCurrencyId !== company.settings.currency_id
+          ) {
+            const clientCurrency = resolveCurrency(clientCurrencyId);
+            const companyCurrency = resolveCurrency(
+              company.settings.currency_id
+            );
+
+            if (clientCurrency && companyCurrency) {
+              lineItem.cost =
+                currentPrice *
+                (clientCurrency.exchange_rate / companyCurrency.exchange_rate);
+            }
+          } else {
+            lineItem.cost = currentPrice;
+          }
+        });
+      } else {
+        lineItem.cost = currentPrice;
+      }
     }
 
     if (!product) {
@@ -67,6 +115,8 @@ export function useHandleProductChange(props: Props) {
     lineItem.custom_value3 = product?.custom_value3 || '';
     lineItem.custom_value4 = product?.custom_value4 || '';
     lineItem.tax_id = product?.tax_id || '1';
+
+    lineItem.product_cost = product?.cost;
 
     return props.onChange(index, lineItem);
   };

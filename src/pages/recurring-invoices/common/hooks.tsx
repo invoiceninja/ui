@@ -19,15 +19,11 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Invoice } from '$app/common/interfaces/invoice';
 import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import {
-  Invitation,
-  PurchaseOrder,
-} from '$app/common/interfaces/purchase-order';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
@@ -35,19 +31,12 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
-import { quoteAtom } from '$app/pages/quotes/common/atoms';
-import { Quote } from '$app/common/interfaces/quote';
-import { creditAtom } from '$app/pages/credits/common/atoms';
-import { Credit } from '$app/common/interfaces/credit';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { StatusBadge } from '$app/components/StatusBadge';
@@ -57,12 +46,14 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdEdit,
   MdNotStarted,
   MdPictureAsPdf,
   MdRestore,
+  MdSend,
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -74,10 +65,28 @@ import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/componen
 
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { UpdatePricesAction } from './components/UpdatePricesAction';
 import { IncreasePricesAction } from './components/IncreasePricesAction';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import { confirmActionModalAtom } from './components/ConfirmActionModal';
+import classNames from 'classnames';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -143,6 +152,9 @@ export function useRecurringInvoiceUtilities(
   ) => {
     const lineItems = recurringInvoice?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -160,7 +172,7 @@ export function useRecurringInvoiceUtilities(
           ...recurringInvoice,
           line_items: [
             ...recurringInvoice.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );
@@ -208,7 +220,6 @@ interface RecurringInvoiceSaveProps {
 
 export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
-  const queryClient = useQueryClient();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -229,18 +240,21 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       recurringInvoice
     )
       .then(() => {
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_invoices/:id', {
-            id: recurringInvoice.id,
-          })
-        );
+        $refetch(['recurring_invoices']);
 
         toast.success('updated_recurring_invoice');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -264,13 +278,7 @@ export function useToggleStartStop() {
       endpoint(url, { id: recurringInvoice.id }),
       recurringInvoice
     ).then(() => {
-      queryClient.invalidateQueries('/api/v1/recurring_invoices');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/recurring_invoices/:id', {
-          id: recurringInvoice.id,
-        })
-      );
+      $refetch(['recurring_invoices']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
@@ -287,27 +295,30 @@ export function useToggleStartStop() {
 interface Params {
   showEditAction?: boolean;
   showCommonBulkActions?: boolean;
+  dropdown?: boolean;
 }
 
 export function useActions(params?: Params) {
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setInvoice] = useAtom(invoiceAtom);
-  const [, setQuote] = useAtom(quoteAtom);
-  const [, setCredit] = useAtom(creditAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
-
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const bulk = useBulkAction();
+  const navigate = useNavigate();
+  const hasPermission = useHasPermission();
+  const toggleStartStop = useToggleStartStop();
+  const setSendConfirmationVisible = useSetAtom(confirmActionModalAtom);
 
-  const { showEditAction, showCommonBulkActions } = params || {};
+  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
+
+  const {
+    showEditAction,
+    showCommonBulkActions,
+    dropdown = true,
+  } = params || {};
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'recurring_invoice',
+    editPageTabs: ['documents', 'settings', 'activity', 'history', 'schedule'],
   });
-
-  const navigate = useNavigate();
-  const toggleStartStop = useToggleStartStop();
 
   const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
     setRecurringInvoice({
@@ -318,85 +329,6 @@ export function useActions(params?: Params) {
     });
 
     navigate('/recurring_invoices/create?action=clone');
-  };
-
-  const cloneToInvoice = (recurringInvoice: RecurringInvoice) => {
-    setInvoice({
-      ...(recurringInvoice as unknown as Invoice),
-      id: '',
-      documents: [],
-      number: '',
-      due_date: '',
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-    });
-
-    navigate('/invoices/create?action=clone');
-  };
-
-  const cloneToQuote = (recurringInvoice: RecurringInvoice) => {
-    setQuote({
-      ...(recurringInvoice as unknown as Quote),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-    });
-
-    navigate('/quotes/create?action=clone');
-  };
-
-  const cloneToCredit = (recurringInvoice: RecurringInvoice) => {
-    setCredit({
-      ...(recurringInvoice as unknown as Credit),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-    });
-
-    navigate('/credits/create?action=clone');
-  };
-
-  const cloneToPurchaseOrder = (recurringInvoice: RecurringInvoice) => {
-    setPurchaseOrder({
-      ...(recurringInvoice as unknown as PurchaseOrder),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<RecurringInvoice>[] = [
@@ -412,83 +344,139 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
-    (recurringInvoice) => (
-      <DropdownElement
-        to={route('/recurring_invoices/:id/pdf', {
-          id: recurringInvoice.id,
-        })}
-        icon={<Icon element={MdPictureAsPdf} />}
-      >
-        {t('view_pdf')}
-      </DropdownElement>
-    ),
+
     (recurringInvoice) =>
       (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
         recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'start',
+          })}
+          entity="recurring_invoice"
+          actionKey="start"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('start')}
           onClick={() => toggleStartStop(recurringInvoice, 'start')}
-          icon={<Icon element={MdNotStarted} />}
+          icon={MdNotStarted}
         >
           {t('start')}
-        </DropdownElement>
+        </EntityActionElement>
+      ),
+
+    (recurringInvoice) =>
+      recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'send_now',
+          })}
+          entity="recurring_invoice"
+          actionKey="send_now"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('start')}
+          onClick={() => setSendConfirmationVisible(true)}
+          icon={MdSend}
+        >
+          {t('send_now')}
+        </EntityActionElement>
       ),
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'stop',
+          })}
+          entity="recurring_invoice"
+          actionKey="stop"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('stop')}
           onClick={() => toggleStartStop(recurringInvoice, 'stop')}
-          icon={<Icon element={MdStopCircle} />}
+          icon={MdStopCircle}
         >
           {t('stop')}
-        </DropdownElement>
+        </EntityActionElement>
+      ),
+    (recurringInvoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="recurring_invoice"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
+        to={route('/recurring_invoices/:id/pdf', { id: recurringInvoice.id })}
+        icon={MdPictureAsPdf}
+      >
+        {t('view_pdf')}
+      </EntityActionElement>
+    ),
+
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <UpdatePricesAction
+          {...(!dropdown && {
+            key: 'update_prices',
+          })}
+          selectedIds={[recurringInvoice.id]}
+          dropdown={dropdown}
+        />
       ),
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
-        <UpdatePricesAction selectedIds={[recurringInvoice.id]} />
+        <IncreasePricesAction
+          {...(!dropdown && {
+            key: 'increase_prices',
+          })}
+          selectedIds={[recurringInvoice.id]}
+          dropdown={dropdown}
+        />
       ),
-    (recurringInvoice) =>
-      !recurringInvoice.is_deleted && (
-        <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
-      ),
+    (recurringInvoice) => (
+      <AddActivityComment
+        {...(!dropdown && {
+          key: 'add_comment',
+        })}
+        entity="recurring_invoice"
+        entityId={recurringInvoice.id}
+        label={`#${recurringInvoice.number}`}
+        labelElement={
+          <EntityActionElement
+            entity="recurring_invoice"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+          >
+            {t('add_comment')}
+          </EntityActionElement>
+        }
+      />
+    ),
     () => <Divider withoutPadding />,
+    (recurringInvoice) =>
+      hasPermission('create_recurring_invoice') && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'clone_to_recurring',
+          })}
+          entity="recurring_invoice"
+          actionKey="clone_to_recurring"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_recurring')}
+          onClick={() => cloneToRecurringInvoice(recurringInvoice)}
+          icon={MdControlPointDuplicate}
+        >
+          {t('clone_to_recurring')}
+        </EntityActionElement>
+      ),
     (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringInvoice(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToInvoice(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToQuote(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_quote')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToCredit(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_credit')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
+      <CloneOptionsModal
+        {...(!dropdown && {
+          key: 'clone_to_other',
+        })}
+        recurringInvoice={recurringInvoice}
+        dropdown={dropdown}
+      />
     ),
     () =>
       (isEditPage || Boolean(showCommonBulkActions)) && (
@@ -497,34 +485,61 @@ export function useActions(params?: Params) {
     (recurringInvoice) =>
       (isEditPage || Boolean(showCommonBulkActions)) &&
       getEntityState(recurringInvoice) === EntityState.Active && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'archive',
+          })}
+          entity="recurring_invoice"
+          actionKey="archive"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('archive')}
           onClick={() => bulk([recurringInvoice.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
+          icon={MdArchive}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (recurringInvoice) =>
       (isEditPage || Boolean(showCommonBulkActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Archived ||
         getEntityState(recurringInvoice) === EntityState.Deleted) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'restore',
+          })}
+          entity="recurring_invoice"
+          actionKey="restore"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('restore')}
           onClick={() => bulk([recurringInvoice.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
+          icon={MdRestore}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('restore')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (recurringInvoice) =>
       (isEditPage || Boolean(showCommonBulkActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Active ||
         getEntityState(recurringInvoice) === EntityState.Archived) && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'delete',
+          })}
+          entity="recurring_invoice"
+          actionKey="delete"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('delete')}
           onClick={() => bulk([recurringInvoice.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
+          icon={MdDelete}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('delete')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
   ];
 
@@ -551,6 +566,8 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
       .then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
         toast.success('created_recurring_invoice');
 
+        $refetch(['recurring_invoices']);
+
         navigate(
           route('/recurring_invoices/:id/edit', {
             id: response.data.data.id,
@@ -559,8 +576,15 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -619,13 +643,21 @@ export function useAllRecurringInvoiceColumns() {
 
 export function useRecurringInvoiceColumns() {
   const { t } = useTranslation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const getSetting = useGetSetting();
+  const getTimezone = useGetTimezone();
+  const formatNumber = useFormatNumber();
+  const disableNavigation = useDisableNavigation();
+  const dateTime = useDateTime({ withTimezone: true });
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -649,13 +681,14 @@ export function useRecurringInvoiceColumns() {
       id: 'number',
       label: t('number'),
       format: (value, recurringInvoice) => (
-        <Link
+        <DynamicLink
           to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
+          renderSpan={disableNavigation('recurring_invoice', recurringInvoice)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -663,9 +696,12 @@ export function useRecurringInvoiceColumns() {
       id: 'client_id',
       label: t('client'),
       format: (value, recurringInvoice) => (
-        <Link to={route('/clients/:id', { id: recurringInvoice.client_id })}>
+        <DynamicLink
+          to={route('/clients/:id', { id: recurringInvoice.client_id })}
+          renderSpan={disableNavigation('client', recurringInvoice.client)}
+        >
           {recurringInvoice.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -687,9 +723,16 @@ export function useRecurringInvoiceColumns() {
     },
     {
       column: 'next_send_date',
-      id: 'next_send_date',
+      id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value, recurringInvoice) =>
+        dateTime(
+          value,
+          '',
+          '',
+          getTimezone(getSetting(recurringInvoice.client, 'timezone_id'))
+            .timeZone
+        ),
     },
     {
       column: 'frequency',
@@ -731,21 +774,25 @@ export function useRecurringInvoiceColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('invoice1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('invoice2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('invoice3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('invoice4', value?.toString()),
     },
     {
       column: 'discount',
@@ -758,7 +805,7 @@ export function useRecurringInvoiceColumns() {
               recurringInvoice.client?.country_id,
               recurringInvoice.client?.settings.currency_id
             )
-          : `${recurringInvoice.discount}%`,
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -778,6 +825,7 @@ export function useRecurringInvoiceColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -796,12 +844,23 @@ export function useRecurringInvoiceColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -811,12 +870,23 @@ export function useRecurringInvoiceColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -839,30 +909,26 @@ export function useRecurringInvoiceColumns() {
 export function useRecurringInvoiceFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('active'),
       value: 'active',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('paused'),
       value: 'paused',
       color: 'white',
-      backgroundColor: '#F97316',
+      backgroundColor: statusThemeColors.$4 || '#F97316',
     },
     {
       label: t('completed'),
       value: 'completed',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
   ];
 

@@ -71,7 +71,9 @@ export function RecoverPassword() {
           className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
           style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
         >
-          <h2 className="text-2xl" style={{ color: colors.$3 }}>{t('recover_password')}</h2>
+          <h2 className="text-2xl" style={{ color: colors.$3 }}>
+            {t('recover_password')}
+          </h2>
 
           <form onSubmit={form.handleSubmit} className="my-6">
             <InputField

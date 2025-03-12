@@ -20,13 +20,17 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { Tab, Tabs } from '$app/components/Tabs';
-import { FormEvent, useState } from 'react';
+import { Tabs } from '$app/components/Tabs';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTabs } from './common/hooks/useTabs';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Product() {
   const [t] = useTranslation();
@@ -35,7 +39,8 @@ export default function Product() {
 
   const { id } = useParams();
 
-  const queryClient = useQueryClient();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { data: productData } = useProductQuery({ id });
 
@@ -55,47 +60,28 @@ export default function Product() {
     },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('edit'),
-      href: route('/products/:id/edit', { id }),
-    },
-    {
-      name: t('documents'),
-      href: route('/products/:id/documents', { id }),
-    },
-    {
-      name: t('product_fields'),
-      href: route('/products/:id/product_fields', { id }),
-    },
-  ];
+  const tabs = useTabs({ product: productData?.data.data });
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = async () => {
     if (!isFormBusy) {
       setErrors(undefined);
       setIsFormBusy(true);
 
       toast.processing();
 
-      await saveCompany(true);
+      await saveCompany({ excludeToasters: true });
 
       const url = searchParams.has('update_in_stock_quantity')
         ? endpoint('/api/v1/products/:id?update_in_stock_quantity=true', { id })
         : endpoint('/api/v1/products/:id', { id });
 
       request('PUT', url, productValue)
-        .then((response) => {
+        .then(() => {
           toast.success('updated_product');
 
-          queryClient.invalidateQueries('/api/v1/products');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/products/:id', { id: response.data.data.id })
-          );
+          $refetch(['products']);
 
           searchParams.delete('update_in_stock_quantity');
           setSearchParams(searchParams);
@@ -110,23 +96,32 @@ export default function Product() {
     }
   };
 
+  useEffect(() => {
+    if (productData) {
+      setProductValue(productData.data.data);
+    }
+  }, [productData]);
+
   return (
     <Default
       title={t('edit_product')}
       breadcrumbs={pages}
       disableSaveButton={!productData || isFormBusy}
-      onSaveClick={handleSave}
-      navigationTopRight={
-        productData && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={productData.data.data}
-            actions={actions}
-          />
-        )
-      }
+      {...(productData &&
+        (hasPermission('edit_product') ||
+          entityAssigned(productData.data.data)) && {
+          navigationTopRight: (
+            <ResourceActions
+              onSaveClick={handleSave}
+              resource={productData.data.data}
+              actions={actions}
+              cypressRef="productActionDropdown"
+            />
+          ),
+        })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="product" />}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} />
 
         <Outlet

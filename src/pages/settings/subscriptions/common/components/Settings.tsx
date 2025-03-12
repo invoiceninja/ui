@@ -16,11 +16,24 @@ import { InputField, SelectField } from '$app/components/forms';
 import { Inline } from '$app/components/Inline';
 import Toggle from '$app/components/forms/Toggle';
 import { Subscription } from '$app/common/interfaces/subscription';
+import { trans } from '$app/common/helpers';
+import { useEffect } from 'react';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Settings(props: SubscriptionProps) {
   const [t] = useTranslation();
 
   const { subscription, handleChange, errors } = props;
+
+  useEffect(() => {
+    if (!subscription.allow_cancellation) {
+      handleChange('refund_period', 0);
+    }
+
+    if (!subscription.trial_enabled) {
+      handleChange('trial_duration', 0);
+    }
+  }, [subscription.trial_enabled, subscription.allow_cancellation]);
 
   return (
     <Card title={t('settings')}>
@@ -38,6 +51,25 @@ export function Settings(props: SubscriptionProps) {
           ))}
         </SelectField>
       </Element>
+
+
+      <Element leftSide={t('remaining_cycles')}>
+        <SelectField
+          value={subscription?.remaining_cycles}
+          onValueChange={(value) => handleChange('remaining_cycles', value)}
+          errorMessage={errors?.errors.remaining_cycles}
+        >
+          <option value="-1">{t('endless')}</option>
+          {[...Array(37).keys()].map((number, index) => (
+            <option value={number} key={index}>
+              {number}
+            </option>
+          ))}
+        </SelectField>
+      </Element>
+
+
+
 
       <Element leftSide={t('auto_bill')}>
         <SelectField
@@ -64,10 +96,10 @@ export function Settings(props: SubscriptionProps) {
       <Element leftSide={t('promo_discount')}>
         <Inline>
           <div className="w-full lg:w-1/2">
-            <InputField
-              value={subscription.promo_discount}
+            <NumberInputField
+              value={subscription.promo_discount || ''}
               onValueChange={(value) =>
-                handleChange('promo_discount', parseFloat(value) || 0)
+                handleChange('promo_discount', parseFloat(value))
               }
               errorMessage={errors?.errors.promo_discount}
             />
@@ -150,14 +182,30 @@ export function Settings(props: SubscriptionProps) {
 
       {subscription.allow_cancellation && (
         <Element>
-          <InputField
+          <SelectField
             label={t('refund_period')}
             value={subscription.refund_period}
             onValueChange={(value) =>
               handleChange('refund_period', parseFloat(value) || 0)
             }
+            withBlank
+            blankOptionValue={0}
             errorMessage={errors?.errors.refund_period}
-          />
+          >
+            <option value={86400}>{t('count_day')}</option>
+            <option value={172800}>{trans('count_days', { count: 2 })}</option>
+            <option value={259200}>{trans('count_days', { count: 3 })}</option>
+            <option value={604800}>{trans('count_days', { count: 7 })}</option>
+            <option value={1209600}>
+              {trans('count_days', { count: 14 })}
+            </option>
+            <option value={2592000}>
+              {trans('count_days', { count: 30 })}
+            </option>
+            <option value={5184000}>
+              {trans('count_days', { count: 60 })}
+            </option>
+          </SelectField>
         </Element>
       )}
 
@@ -170,14 +218,30 @@ export function Settings(props: SubscriptionProps) {
 
       {subscription.trial_enabled && (
         <Element>
-          <InputField
+          <SelectField
             label={t('trial_duration')}
             value={subscription.trial_duration}
             onValueChange={(value) =>
               handleChange('trial_duration', parseFloat(value) || 0)
             }
+            withBlank
+            blankOptionValue={0}
             errorMessage={errors?.errors.trial_duration}
-          />
+          >
+            <option value={86400}>{t('count_day')}</option>
+            <option value={172800}>{trans('count_days', { count: 2 })}</option>
+            <option value={259200}>{trans('count_days', { count: 3 })}</option>
+            <option value={604800}>{trans('count_days', { count: 7 })}</option>
+            <option value={1209600}>
+              {trans('count_days', { count: 14 })}
+            </option>
+            <option value={2592000}>
+              {trans('count_days', { count: 30 })}
+            </option>
+            <option value={5184000}>
+              {trans('count_days', { count: 60 })}
+            </option>
+          </SelectField>
         </Element>
       )}
 

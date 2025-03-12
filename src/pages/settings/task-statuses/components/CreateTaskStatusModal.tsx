@@ -19,23 +19,23 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useHandleChange } from '../common/hooks';
 import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
+  onCreatedTaskStatus?: (taskStatus: TaskStatus) => void;
 }
 
 export function CreateTaskStatusModal(props: Props) {
   const [t] = useTranslation();
 
   const accentColor = useAccentColor();
-
-  const queryClient = useQueryClient();
 
   const { data: blankTaskStatus } = useBlankTaskStatusQuery();
 
@@ -50,23 +50,21 @@ export function CreateTaskStatusModal(props: Props) {
     setTaskStatus,
   });
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = () => {
     if (!isFormBusy) {
       toast.processing();
-
       setErrors(undefined);
-
       setIsFormBusy(true);
 
       request('POST', endpoint('/api/v1/task_statuses'), taskStatus)
-        .then(() => {
+        .then((response: GenericSingleResourceResponse<TaskStatus>) => {
           toast.success('created_task_status');
 
-          queryClient.invalidateQueries('/api/v1/task_statuses');
+          $refetch(['task_statuses']);
 
           setTaskStatus(blankTaskStatus);
+
+          props.onCreatedTaskStatus?.(response.data.data);
 
           props.setVisible(false);
         })
@@ -109,7 +107,12 @@ export function CreateTaskStatusModal(props: Props) {
         onValueChange={(color) => handleChange('color', color)}
       />
 
-      <Button className="self-end" disabled={isFormBusy} onClick={handleSave}>
+      <Button
+        className="self-end"
+        behavior="button"
+        disabled={isFormBusy}
+        onClick={handleSave}
+      >
         {t('save')}
       </Button>
     </Modal>

@@ -13,6 +13,7 @@ import { DataTable } from '$app/components/DataTable';
 import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionColumns } from '../common/hooks/useSubscriptionColumns';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
 export function Subscriptions() {
   const { documentTitle } = useTitle('payment_links');
@@ -31,8 +32,9 @@ export function Subscriptions() {
       title={documentTitle}
       docsLink="en/advanced-settings/#subscriptions"
       breadcrumbs={pages}
-      withoutBackButton
     >
+      <AdvancedSettingsPlanAlert />
+
       <DataTable
         resource="payment_link"
         endpoint="/api/v1/subscriptions?sort=id|desc"
@@ -41,6 +43,7 @@ export function Subscriptions() {
         linkToCreate="/settings/subscriptions/create"
         linkToEdit="/settings/subscriptions/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

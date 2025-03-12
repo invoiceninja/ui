@@ -18,6 +18,7 @@ interface Props {
 
 export function ImportButton(props: Props) {
   const { t } = useTranslation();
+
   return (
     <ReactRouterLink to={props.route}>
       <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">

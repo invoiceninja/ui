@@ -19,14 +19,14 @@ export default function Import() {
   const { documentTitle } = useTitle('import');
 
   const pages: Page[] = [
-    { name: t('quotes'), href: '/quote' },
+    { name: t('quotes'), href: '/quotes' },
     { name: t('import'), href: '/quotes/import' },
   ];
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12">
-        <div className="col-span-12 xl:col-span-10">
+        <div className="col-span-12 xl:col-span-8">
           <UploadImport entity="quote" onSuccess={false} type="csv" />
         </div>
       </div>

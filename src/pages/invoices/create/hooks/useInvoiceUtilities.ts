@@ -91,6 +91,10 @@ export function useInvoiceUtilities(props: Props) {
   ) => {
     const lineItems = invoice?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -105,7 +109,7 @@ export function useInvoiceUtilities(props: Props) {
           ...invoice,
           line_items: [
             ...invoice.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );

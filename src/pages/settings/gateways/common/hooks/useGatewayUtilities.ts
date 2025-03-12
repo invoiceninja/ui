@@ -12,10 +12,9 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
-import { updateChanges } from '$app/common/stores/slices/company-users';
 import { SelectOption } from '$app/components/datatables/Actions';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { MultiValue, SingleValue } from 'react-select';
 
 interface Params {
@@ -23,13 +22,13 @@ interface Params {
   setCurrentGateways: Dispatch<SetStateAction<CompanyGateway[]>>;
 }
 export function useGatewayUtilities(params: Params) {
-  const dispatch = useDispatch();
-
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { currentGateways, setCurrentGateways } = params;
 
   const companyChanges = useCompanyChanges();
+
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const [currentSettingGateways, setCurrentSettingGateways] = useState<
     CompanyGateway[]
@@ -51,16 +50,6 @@ export function useGatewayUtilities(params: Params) {
     setStatus(values.join(','));
   };
 
-  const handleChange = (property: string, value: string) => {
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property,
-        value,
-      })
-    );
-  };
-
   const handleRemoveGateway = (gatewayId: string) => {
     const filteredGateways = currentGateways.filter(
       ({ id }) => id !== gatewayId
@@ -68,10 +57,14 @@ export function useGatewayUtilities(params: Params) {
 
     setCurrentGateways(filteredGateways);
 
-    handleChange(
-      'settings.company_gateway_ids',
-      filteredGateways.map(({ id }) => id).join(',')
-    );
+    if (filteredGateways.length) {
+      handleChange(
+        'settings.company_gateway_ids',
+        filteredGateways.map(({ id }) => id).join(',')
+      );
+    } else {
+      handleChange('settings.company_gateway_ids', '0');
+    }
   };
 
   const handleReset = () => {
@@ -88,46 +81,65 @@ export function useGatewayUtilities(params: Params) {
     }
   };
 
+  const removeDuplicatedGateways = (gateways: CompanyGateway[]) => {
+    const uniqueGateways: Record<string, CompanyGateway> = {};
+
+    gateways.forEach((item) => {
+      if (!uniqueGateways[item.id]) {
+        uniqueGateways[item.id] = item;
+      }
+    });
+
+    return Object.values(uniqueGateways);
+  };
+
   useEffect(() => {
     if (companyGatewaysResponse) {
-      if (companyChanges?.settings.company_gateway_ids) {
-        let filteredCompanyGateways =
-          companyChanges.settings.company_gateway_ids
-            .split(',')
-            .map((id: string) =>
-              companyGatewaysResponse.data.data.find(
-                (gateway: CompanyGateway) => gateway.id === id
-              )
-            );
-
-        filteredCompanyGateways = filteredCompanyGateways.filter(
-          (companyGateway: CompanyGateway) => companyGateway
-        );
-
-        if (isCompanySettingsActive) {
-          (companyGatewaysResponse.data.data as CompanyGateway[]).forEach(
-            (companyGateway) => {
-              const isAlreadyAdded = filteredCompanyGateways.some(
-                (gateway: CompanyGateway) => gateway.id === companyGateway.id
+      if (companyChanges?.settings.company_gateway_ids !== '0') {
+        if (companyChanges?.settings.company_gateway_ids) {
+          let filteredCompanyGateways =
+            companyChanges.settings.company_gateway_ids
+              .split(',')
+              .map((id: string) =>
+                companyGatewaysResponse.data.data.find(
+                  (gateway: CompanyGateway) => gateway.id === id
+                )
               );
 
-              if (!isAlreadyAdded) {
-                filteredCompanyGateways.push(companyGateway);
+          filteredCompanyGateways = filteredCompanyGateways.filter(
+            (companyGateway: CompanyGateway) => companyGateway
+          );
+
+          if (isCompanySettingsActive) {
+            (companyGatewaysResponse.data.data as CompanyGateway[]).forEach(
+              (companyGateway) => {
+                const isAlreadyAdded = filteredCompanyGateways.some(
+                  (gateway: CompanyGateway) => gateway.id === companyGateway.id
+                );
+
+                if (!isAlreadyAdded) {
+                  filteredCompanyGateways.push(companyGateway);
+                }
               }
-            }
+            );
+          }
+
+          setCurrentSettingGateways(
+            removeDuplicatedGateways(filteredCompanyGateways)
+          );
+        } else {
+          setCurrentSettingGateways(
+            removeDuplicatedGateways(companyGatewaysResponse.data.data)
           );
         }
-
-        setCurrentSettingGateways(filteredCompanyGateways);
       } else {
-        setCurrentSettingGateways(companyGatewaysResponse.data.data);
+        setCurrentSettingGateways([]);
       }
     }
   }, [companyGatewaysResponse]);
 
   return {
     gateways: currentSettingGateways,
-    handleChange,
     handleRemoveGateway,
     handleReset,
     onStatusChange,

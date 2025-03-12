@@ -14,8 +14,10 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { useEffect, useRef, useState } from 'react';
 import { InvoiceViewer } from './InvoiceViewer';
 import { RelationType } from './ProductsTable';
+import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
 
 export type Resource =
   | Invoice
@@ -37,20 +39,61 @@ interface Props {
   endpoint?:
     | '/api/v1/live_preview?entity=:entity'
     | '/api/v1/live_preview/purchase_order?entity=:entity';
+  initiallyVisible?: boolean;
+  observable?: boolean;
+  withRemoveLogoCTA?: boolean;
 }
 
 export function InvoicePreview(props: Props) {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
   const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!props.observable) {
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(
+        (entry) => {
+          if (entry.isIntersecting) {
+            setIsIntersecting(true);
+          } else {
+            setIsIntersecting(false);
+          }
+        },
+        { threshold: 0.1 }
+      );
+    });
+
+    if (divRef.current) {
+      observer.observe(divRef.current!);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [divRef.current]);
+
+  useEffect(() => {
+    if (!props.observable) {
+      return;
+    }
+  }, [props.resource]);
 
   if (props.resource?.[props.relationType] && props.for === 'create') {
     return (
-      <InvoiceViewer
-        link={previewEndpoint(endpoint, {
-          entity: props.entity,
-        })}
-        resource={props.resource}
-        method="POST"
-      />
+      <div ref={divRef}>
+        <InvoiceViewer
+          link={previewEndpoint(endpoint, {
+            entity: props.entity,
+          })}
+          resource={props.resource}
+          method="POST"
+        />
+      </div>
     );
   }
 
@@ -60,17 +103,21 @@ export function InvoicePreview(props: Props) {
     props.entity === 'purchase_order'
   ) {
     return (
-      <InvoiceViewer
-        link={previewEndpoint(
-          '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
-          {
-            entity: props.entity,
-            id: props.resource?.id,
-          }
-        )}
-        resource={props.resource}
-        method="POST"
-      />
+      <div className="flex flex-col space-y-3">
+        <InvoiceViewer
+          link={previewEndpoint(
+            '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
+            {
+              entity: props.entity,
+              id: props.resource?.id,
+            }
+          )}
+          resource={props.resource}
+          method="POST"
+        />
+
+        {props.withRemoveLogoCTA && <RemoveLogoCTA />}
+      </div>
     );
   }
 
@@ -80,17 +127,24 @@ export function InvoicePreview(props: Props) {
     props.for === 'invoice'
   ) {
     return (
-      <InvoiceViewer
-        link={previewEndpoint(
-          '/api/v1/live_preview?entity=:entity&entity_id=:id',
-          {
-            entity: props.entity,
-            id: props.resource?.id,
-          }
-        )}
-        resource={props.resource}
-        method="POST"
-      />
+      <div className="flex flex-col space-y-3">
+        <div ref={divRef}>
+          <InvoiceViewer
+            link={previewEndpoint(
+              '/api/v1/live_preview?entity=:entity&entity_id=:id',
+              {
+                entity: props.entity,
+                id: props.resource?.id,
+              }
+            )}
+            method="POST"
+            resource={props.resource}
+            enabled={props.observable ? isIntersecting : true}
+          />
+        </div>
+
+        {props.withRemoveLogoCTA && <RemoveLogoCTA />}
+      </div>
     );
   }
 

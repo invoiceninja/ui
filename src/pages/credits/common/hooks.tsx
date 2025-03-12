@@ -25,46 +25,35 @@ import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import {
-  Invitation,
-  PurchaseOrder,
-} from '$app/common/interfaces/purchase-order';
-import { Quote } from '$app/common/interfaces/quote';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useSetAtom } from 'jotai';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import {
   DataTableColumnsExtended,
   resourceViewedAt,
 } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
-import { quoteAtom } from '$app/pages/quotes/common/atoms';
-import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useMarkSent } from './hooks/useMarkSent';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
@@ -87,6 +76,27 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { useMarkPaid } from './hooks/useMarkPaid';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/credits';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import classNames from 'classnames';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -145,6 +155,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
   ) => {
     const lineItems = credit?.line_items || [];
 
+    if (lineItems[index][key] === value) {
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -159,7 +172,11 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+            {
+              ...blankLineItem(),
+              type_id: InvoiceItemType.Product,
+              quantity: 1,
+            },
           ],
         }
     );
@@ -199,38 +216,63 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
 }
 
 interface CreateProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
 
   const navigate = useNavigate();
 
   const saveCompany = useHandleCompanySave();
-
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (credit: Credit) => {
     toast.processing();
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
-    request('POST', endpoint('/api/v1/credits'), credit)
-      .then((response: GenericSingleResourceResponse<Credit>) => {
+    let apiEndpoint = '/api/v1/credits?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), credit)
+      .then(async (response: GenericSingleResourceResponse<Credit>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_credit');
+
+        $refetch(['credits']);
 
         navigate(route('/credits/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
+          const errorMessages = error.response.data;
 
-          if (error.response.data.errors.invoice_id) {
-            toast.error(error.response.data.errors.invoice_id[0]);
+          if (errorMessages.errors.amount || errorMessages.errors.invoice_id) {
+            toast.error(
+              errorMessages.errors.amount[0] ||
+                errorMessages.errors.invoice_id[0]
+            );
+          } else {
+            toast.dismiss();
           }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -238,12 +280,11 @@ export function useCreate(props: CreateProps) {
 }
 
 export function useSave(props: CreateProps) {
-  const { setErrors } = props;
-
-  const queryClient = useQueryClient();
+  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const saveCompany = useHandleCompanySave();
 
   return async (credit: Credit) => {
@@ -251,47 +292,82 @@ export function useSave(props: CreateProps) {
 
     setErrors(undefined);
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
-    request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
-      .then(() => {
+    let apiEndpoint = '/api/v1/credits/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: credit.id }), credit)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('updated_credit');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/credits/:id', { id: credit.id })
-        );
+        $refetch(['credits']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }
 
-export function useActions() {
-  const [, setCredit] = useAtom(creditAtom);
-  const [, setInvoice] = useAtom(invoiceAtom);
-  const [, setQuote] = useAtom(quoteAtom);
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+interface Params {
+  dropdown?: boolean;
+}
 
-  const { t } = useTranslation();
+export function useActions(params?: Params) {
+  const [t] = useTranslation();
 
   const navigate = useNavigate();
+  const hasPermission = useHasPermission();
 
+  const { dropdown = true } = params || {};
+
+  const company = useCurrentCompany();
+  const { isAdmin, isOwner } = useAdmin();
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'credit',
+    editPageTabs: ['documents', 'settings', 'activity', 'history'],
   });
 
-  const downloadPdf = useDownloadPdf({ resource: 'credit' });
-  const printPdf = usePrintPdf({ entity: 'credit' });
+  const setCredit = useSetAtom(creditAtom);
+
+  const bulk = useBulk();
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
-  const bulk = useBulk();
+  const printPdf = usePrintPdf({ entity: 'credit' });
+  const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
+  const downloadECredit = useDownloadEInvoice({
+    resource: 'credit',
+    downloadType: 'download_e_credit',
+  });
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({
@@ -315,250 +391,304 @@ export function useActions() {
     navigate('/credits/create?action=clone');
   };
 
-  const cloneToInvoice = (credit: Credit) => {
-    setInvoice({
-      ...credit,
-      id: '',
-      number: '',
-      documents: [],
-      due_date: '',
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-      po_number: '',
-    });
-
-    navigate('/invoices/create?action=clone');
-  };
-
-  const cloneToQuote = (credit: Credit) => {
-    setQuote({
-      ...(credit as Quote),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-      po_number: '',
-    });
-
-    navigate('/quotes/create?action=clone');
-  };
-
-  const cloneToRecurringInvoice = (credit: Credit) => {
-    setRecurringInvoice({
-      ...(credit as unknown as RecurringInvoice),
-      id: '',
-      number: '',
-      documents: [],
-      frequency_id: '5',
-      paid_to_date: 0,
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      po_number: '',
-    });
-
-    navigate('/recurring_invoices/create?action=clone');
-  };
-
-  const cloneToPurchaseOrder = (credit: Credit) => {
-    setPurchaseOrder({
-      ...(credit as unknown as PurchaseOrder),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      vendor_id: '',
-      po_number: '',
-    });
-
-    navigate('/purchase_orders/create?action=clone');
-  };
-
   const actions: Action<Credit>[] = [
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="credit"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
         to={route('/credits/:id/pdf', { id: credit.id })}
-        icon={<Icon element={MdPictureAsPdf} />}
+        icon={MdPictureAsPdf}
       >
         {t('view_pdf')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (credit) =>
       getEntityState(credit) !== EntityState.Deleted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'print_pdf',
+          })}
+          entity="credit"
+          actionKey="print_pdf"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('print_pdf')}
           onClick={() => printPdf([credit.id])}
-          icon={<Icon element={MdPrint} />}
+          icon={MdPrint}
+          disablePreventNavigation
         >
           {t('print_pdf')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'download_pdf',
+        })}
+        entity="credit"
+        actionKey="download_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('download_pdf')}
         onClick={() => downloadPdf(credit)}
-        icon={<Icon element={MdDownload} />}
+        icon={MdDownload}
+        disablePreventNavigation
       >
         {t('download_pdf')}
-      </DropdownElement>
+      </EntityActionElement>
+    ),
+    (credit) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'download_e_credit',
+          })}
+          entity="credit"
+          actionKey="download_e_credit"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('download_e_credit')}
+          onClick={() => downloadECredit(credit)}
+          icon={MdDownload}
+          disablePreventNavigation
+        >
+          {t('download_e_credit')}
+        </EntityActionElement>
+      ),
+    (credit) =>
+      (isAdmin || isOwner) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'schedule',
+          })}
+          entity="credit"
+          actionKey="schedule"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('schedule')}
+          onClick={() => scheduleEmailRecord(credit.id)}
+          icon={MdSchedule}
+        >
+          {t('schedule')}
+        </EntityActionElement>
+      ),
+    (credit) => (
+      <AddActivityComment
+        {...(!dropdown && {
+          key: 'add_comment',
+        })}
+        entity="credit"
+        entityId={credit.id}
+        label={`#${credit.number}`}
+        labelElement={
+          <EntityActionElement
+            entity="credit"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+            disablePreventNavigation
+          >
+            {t('add_comment')}
+          </EntityActionElement>
+        }
+      />
     ),
     (credit) => (
-      <DropdownElement
-        onClick={() => scheduleEmailRecord(credit.id)}
-        icon={<Icon element={MdSchedule} />}
-      >
-        {t('schedule')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'email_credit',
+        })}
+        entity="credit"
+        actionKey="email_credit"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('email_credit')}
         to={route('/credits/:id/email', { id: credit.id })}
-        icon={<Icon element={MdSend} />}
+        icon={MdSend}
       >
         {t('email_credit')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (credit) => (
-      <DropdownElement
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'client_portal',
+        })}
+        entity="credit"
+        actionKey="client_portal"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('client_portal')}
         onClick={() => credit && openClientPortal(credit)}
-        icon={<Icon element={MdCloudCircle} />}
+        icon={MdCloudCircle}
+        disablePreventNavigation
       >
         {t('client_portal')}
-      </DropdownElement>
+      </EntityActionElement>
     ),
     (credit) =>
       credit.client_id &&
-      credit.amount > 0 && (
-        <DropdownElement
+      credit.amount > 0 &&
+      hasPermission('create_payment') && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'apply_credit',
+          })}
+          entity="credit"
+          actionKey="apply_credit"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('apply_credit')}
           to={route(
             '/payments/create?client=:clientId&credit=:creditId&type=1',
             { clientId: credit.client_id, creditId: credit.id }
           )}
-          icon={<Icon element={MdCreditScore} />}
+          icon={MdCreditScore}
         >
           {t('apply_credit')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) =>
       credit.status_id === CreditStatus.Draft && (
-        <div>
-          <DropdownElement
-            onClick={() => markSent(credit)}
-            icon={<Icon element={MdMarkEmailRead} />}
-          >
-            {t('mark_sent')}
-          </DropdownElement>
-        </div>
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_sent',
+          })}
+          entity="credit"
+          actionKey="mark_sent"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_sent')}
+          onClick={() => markSent(credit)}
+          icon={MdMarkEmailRead}
+          disablePreventNavigation
+        >
+          {t('mark_sent')}
+        </EntityActionElement>
       ),
     (credit) =>
       (credit.status_id === CreditStatus.Draft ||
         credit.status_id === CreditStatus.Sent ||
         credit.status_id === CreditStatus.Partial) &&
       credit.amount < 0 && (
-        <div>
-          <DropdownElement
-            onClick={() => markPaid(credit)}
-            icon={<Icon element={MdPaid} />}
-          >
-            {t('mark_paid')}
-          </DropdownElement>
-        </div>
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_paid',
+          })}
+          entity="credit"
+          actionKey="mark_paid"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_paid')}
+          onClick={() => markPaid(credit)}
+          icon={MdPaid}
+          disablePreventNavigation
+        >
+          {t('mark_paid')}
+        </EntityActionElement>
       ),
+    (credit) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'run_template',
+        })}
+        entity="credit"
+        actionKey="run_template"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('run_template')}
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([credit]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/credits/bulk',
+            entity: 'credit',
+          });
+        }}
+        icon={MdDesignServices}
+      >
+        {t('run_template')}
+      </EntityActionElement>
+    ),
     () => <Divider withoutPadding />,
+    (credit) =>
+      hasPermission('create_credit') && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'clone_to_credit',
+          })}
+          entity="credit"
+          actionKey="clone_to_credit"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_credit')}
+          onClick={() => cloneToCredit(credit)}
+          icon={MdControlPointDuplicate}
+        >
+          {t('clone_to_credit')}
+        </EntityActionElement>
+      ),
     (credit) => (
-      <DropdownElement
-        onClick={() => cloneToCredit(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
+      <CloneOptionsModal
+        {...(!dropdown && {
+          key: 'clone_to_other',
+        })}
+        dropdown={dropdown}
+        credit={credit}
+      />
     ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToInvoice(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToQuote(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_quote')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringInvoice(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_recurring_invoice')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
-    ),
-    () => isEditPage && <Divider withoutPadding />,
+    () => Boolean(isEditPage && dropdown) && <Divider withoutPadding />,
     (credit) =>
       isEditPage &&
       credit.archived_at === 0 && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'archive',
+          })}
+          entity="credit"
+          actionKey="archive"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('archive')}
           onClick={() => bulk([credit.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
+          icon={MdArchive}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) =>
       isEditPage &&
       credit.archived_at > 0 && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'restore',
+          })}
+          entity="credit"
+          actionKey="restore"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('restore')}
           onClick={() => bulk([credit.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
+          icon={MdRestore}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('restore')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (credit) =>
       isEditPage &&
       !credit?.is_deleted && (
-        <DropdownElement
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'delete',
+          })}
+          entity="credit"
+          actionKey="delete"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('delete')}
           onClick={() => bulk([credit.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
+          icon={MdDelete}
+          excludePreferences
+          disablePreventNavigation
         >
           {t('delete')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
   ];
 
@@ -627,13 +757,16 @@ export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
+  const disableNavigation = useDisableNavigation();
+
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
 
   const formatMoney = useFormatMoney();
-  const resolveCountry = useResolveCountry();
-
   const reactSettings = useReactSettings();
+  const resolveCountry = useResolveCountry();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -651,8 +784,17 @@ export function useCreditColumns() {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (field, credit) => (
-        <Link to={route('/credits/:id/edit', { id: credit.id })}>{field}</Link>
+      format: (value, credit) => (
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/credits/:id/edit', { id: credit.id })}
+            renderSpan={disableNavigation('credit', credit)}
+          >
+            {value}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={credit.number} />
+        </div>
       ),
     },
     {
@@ -660,9 +802,12 @@ export function useCreditColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, credit) => (
-        <Link to={route('/clients/:id', { id: credit.client_id })}>
+        <DynamicLink
+          to={route('/clients/:id', { id: credit.client_id })}
+          renderSpan={disableNavigation('client', credit.client)}
+        >
           {credit.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -754,32 +899,38 @@ export function useCreditColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('invoice1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('invoice2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('invoice3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('invoice4', value?.toString()),
     },
     {
       column: 'discount',
       id: 'discount',
       label: t('discount'),
       format: (value, credit) =>
-        formatMoney(
-          value,
-          credit.client?.country_id,
-          credit.client?.settings.currency_id
-        ),
+        credit.is_amount_discount
+          ? formatMoney(
+              value,
+              credit.client?.country_id,
+              credit.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -797,6 +948,7 @@ export function useCreditColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -847,14 +999,23 @@ export function useCreditColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -864,14 +1025,23 @@ export function useCreditColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -894,9 +1064,9 @@ export function useCreditColumns() {
     },
     {
       column: 'valid_until',
-      id: 'id',
+      id: 'due_date',
       label: t('valid_until'),
-      format: (value, credit) => date(credit.due_date, dateFormat),
+      format: (value) => date(value, dateFormat),
     },
   ];
 

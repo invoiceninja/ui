@@ -17,6 +17,11 @@ import frequencies from '$app/common/constants/frequency';
 import { Divider } from '$app/components/cards/Divider';
 import { EmailStatement } from './EmailStatement';
 import { EmailRecord } from '$app/pages/settings/schedules/common/components/EmailRecord';
+import {
+  Template,
+  useDisplayTemplateField,
+} from '../hooks/useDisplayTemplateField';
+import { EmailReport } from './EmailReport';
 
 interface Props {
   schedule: Schedule;
@@ -31,6 +36,7 @@ interface Props {
 export enum Templates {
   EMAIL_STATEMENT = 'email_statement',
   EMAIL_RECORD = 'email_record',
+  EMAIL_REPORT = 'email_report',
 }
 
 export function ScheduleForm(props: Props) {
@@ -38,29 +44,38 @@ export function ScheduleForm(props: Props) {
 
   const { schedule, handleChange, errors, page } = props;
 
+  const displayTemplateField = useDisplayTemplateField({
+    template: schedule.template as Template,
+  });
+
   return (
     <Card title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}>
-      <Element leftSide={t('template')} required>
-        <SelectField
-          value={schedule.template}
-          onValueChange={(value) => handleChange('template', value)}
-          errorMessage={errors?.errors.template}
-        >
-          <option value="email_statement">{t('email_statement')}</option>
-          <option value="email_record">{t('email_record')}</option>
-        </SelectField>
-      </Element>
+      {displayTemplateField('template') && (
+        <Element leftSide={t('template')} required>
+          <SelectField
+            value={schedule.template}
+            onValueChange={(value) => handleChange('template', value)}
+            errorMessage={errors?.errors.template}
+          >
+            <option value="email_statement">{t('email_statement')}</option>
+            <option value="email_record">{t('email_record')}</option>
+            <option value="email_report">{t('email_report')}</option>
+          </SelectField>
+        </Element>
+      )}
 
-      <Element leftSide={t('next_run')} required>
-        <InputField
-          type="date"
-          value={schedule.next_run}
-          onValueChange={(value) => handleChange('next_run', value)}
-          errorMessage={errors?.errors.next_run}
-        />
-      </Element>
+      {displayTemplateField('next_run') && (
+        <Element leftSide={t('next_run')} required>
+          <InputField
+            type="date"
+            value={schedule.next_run}
+            onValueChange={(value) => handleChange('next_run', value)}
+            errorMessage={errors?.errors.next_run}
+          />
+        </Element>
+      )}
 
-      {schedule.template === Templates.EMAIL_STATEMENT && (
+      {displayTemplateField('frequency') && (
         <Element leftSide={t('frequency')}>
           <SelectField
             value={schedule.frequency_id}
@@ -76,7 +91,7 @@ export function ScheduleForm(props: Props) {
         </Element>
       )}
 
-      {schedule.template === Templates.EMAIL_STATEMENT && (
+      {displayTemplateField('remaining_cycles') && (
         <Element leftSide={t('remaining_cycles')}>
           <SelectField
             value={schedule.remaining_cycles}
@@ -108,6 +123,14 @@ export function ScheduleForm(props: Props) {
 
       {schedule.template === Templates.EMAIL_RECORD && (
         <EmailRecord
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      )}
+
+      {schedule.template === Templates.EMAIL_REPORT && (
+        <EmailReport
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}

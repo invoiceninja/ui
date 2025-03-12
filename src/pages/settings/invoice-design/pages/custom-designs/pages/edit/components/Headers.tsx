@@ -8,36 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom } from 'jotai';
-import { payloadAtom } from '../Edit';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDesignUtilities } from '../common/hooks';
 import { useDebounce } from 'react-use';
 import { Card } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
+import { useColorScheme } from '$app/common/colors';
+import { useOutletContext } from 'react-router-dom';
+import { Context } from './Settings';
 
-export function Header() {
-  const [payload] = useAtom(payloadAtom);
+export default function Header() {
+  const context: Context = useOutletContext();
+
+  const { payload, setPayload } = context;
+
   const [value, setValue] = useState(payload.design?.design.header);
 
   const { t } = useTranslation();
-  const { handleBlockChange } = useDesignUtilities();
+  const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
 
-  useDebounce(() => value && handleBlockChange('header', value), 1000, [value]);
+  useDebounce(() => handleBlockChange('header', value || ''), 500, [value]);
+  const colors = useColorScheme();
 
   return (
-    <Card title={t('header')} padding="small" collapsed={true}>
+    <Card title={t('header')} padding="small" height="full">
       <Editor
-        height="25rem"
-        defaultLanguage="html"
+        theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
+        defaultLanguage="twig"
+        language="twig"
         value={payload.design?.design.header}
         options={{
           minimap: {
             enabled: false,
           },
         }}
-        onChange={(markup) => markup && setValue(markup)}
+        onChange={(markup) => setValue(markup)}
       />
     </Card>
   );

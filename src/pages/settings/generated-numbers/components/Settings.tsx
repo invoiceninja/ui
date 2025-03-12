@@ -16,6 +16,9 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export const COUNTER_PADDINGS = [
   '1',
@@ -49,6 +52,8 @@ export const RESECT_COUNTER_FREQUENCIES = [
 export function Settings() {
   const [t] = useTranslation();
 
+  const disableSettingsField = useDisableSettingsField();
+
   const companyChanges = useInjectCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -56,13 +61,22 @@ export function Settings() {
 
   return (
     <Card title={t('settings')}>
-      <Element leftSide={t('number_padding')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="counter_padding"
+            labelElement={<SettingsLabel label={t('number_padding')} />}
+            defaultValue="1"
+          />
+        }
+      >
         <SelectField
           id="settings.counter_padding"
           value={companyChanges?.settings?.counter_padding || '1'}
           onValueChange={(value) =>
             handleChange('settings.counter_padding', value)
           }
+          disabled={disableSettingsField('counter_padding')}
           errorMessage={errors?.errors['settings.counter_padding']}
         >
           {COUNTER_PADDINGS.map((value, index) => (
@@ -73,7 +87,15 @@ export function Settings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('generate_number')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="counter_number_applied"
+            labelElement={<SettingsLabel label={t('generate_number')} />}
+            defaultValue="when_saved"
+          />
+        }
+      >
         <SelectField
           id="settings.counter_number_applied"
           value={
@@ -82,6 +104,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.counter_number_applied', value)
           }
+          disabled={disableSettingsField('counter_number_applied')}
           errorMessage={errors?.errors['settings.counter_number_applied']}
         >
           <option value="when_saved">{t('when_saved')}</option>
@@ -89,17 +112,35 @@ export function Settings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('recurring_prefix')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="recurring_number_prefix"
+            labelElement={<SettingsLabel label={t('recurring_prefix')} />}
+          />
+        }
+      >
         <InputField
           value={companyChanges?.settings?.recurring_number_prefix || ''}
           onValueChange={(value) =>
             handleChange('settings.recurring_number_prefix', value)
           }
+          disabled={disableSettingsField('recurring_number_prefix')}
           errorMessage={errors?.errors['settings.recurring_number_prefix']}
         />
       </Element>
 
-      <Element leftSide={t('shared_invoice_quote_counter')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="shared_invoice_quote_counter"
+            labelElement={
+              <SettingsLabel label={t('shared_invoice_quote_counter')} />
+            }
+            defaultValue={false}
+          />
+        }
+      >
         <Toggle
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_quote_counter', value)
@@ -107,10 +148,21 @@ export function Settings() {
           checked={Boolean(
             companyChanges?.settings?.shared_invoice_quote_counter
           )}
+          disabled={disableSettingsField('shared_invoice_quote_counter')}
         />
       </Element>
 
-      <Element leftSide={t('shared_invoice_credit_counter')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="shared_invoice_credit_counter"
+            labelElement={
+              <SettingsLabel label={t('shared_invoice_credit_counter')} />
+            }
+            defaultValue={false}
+          />
+        }
+      >
         <Toggle
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_credit_counter', value)
@@ -118,15 +170,32 @@ export function Settings() {
           checked={Boolean(
             companyChanges?.settings?.shared_invoice_credit_counter
           )}
+          disabled={disableSettingsField('shared_invoice_credit_counter')}
         />
       </Element>
 
-      <Element leftSide={t('reset_counter')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="reset_counter_frequency_id"
+            labelElement={<SettingsLabel label={t('reset_counter')} />}
+            defaultValue="0"
+          />
+        }
+      >
         <SelectField
           value={companyChanges?.settings?.reset_counter_frequency_id || '0'}
-          onValueChange={(value) =>
-            handleChange('settings.reset_counter_frequency_id', parseInt(value))
-          }
+          onValueChange={(value) => {
+            handleChange(
+              'settings.reset_counter_frequency_id',
+              parseInt(value)
+            );
+
+            if (value === '0') {
+              handleChange('settings.reset_counter_date', '');
+            }
+          }}
+          disabled={disableSettingsField('reset_counter_frequency_id')}
           errorMessage={errors?.errors['settings.reset_counter_frequency_id']}
         >
           {RESECT_COUNTER_FREQUENCIES.map((value, index) => (
@@ -139,13 +208,21 @@ export function Settings() {
 
       {companyChanges?.settings &&
         companyChanges?.settings?.reset_counter_frequency_id > 0 && (
-          <Element leftSide={t('next_reset')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="reset_counter_date"
+                labelElement={<SettingsLabel label={t('next_reset')} />}
+              />
+            }
+          >
             <InputField
               type="date"
               value={companyChanges?.settings?.reset_counter_date || ''}
               onValueChange={(value) =>
                 handleChange('settings.reset_counter_date', value)
               }
+              disabled={disableSettingsField('reset_counter_date')}
               errorMessage={errors?.errors['settings.reset_counter_date']}
             />
           </Element>

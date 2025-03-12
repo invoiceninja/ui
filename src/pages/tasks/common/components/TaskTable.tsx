@@ -12,19 +12,23 @@ import { Checkbox, InputField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   duration,
-  handleTaskDateChange,
   handleTaskDurationChange,
-  handleTaskTimeChange,
   parseTimeToDate,
+  useHandleTaskDateChange,
+  useHandleTaskTimeChange,
 } from '../helpers';
 import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 import { parseTime } from '../helpers';
+import { useColorScheme } from '$app/common/colors';
+import { DurationClock } from './DurationClock';
+import { isTaskRunning } from '../helpers/calculate-entity-state';
+import { useStart } from '../hooks/useStart';
+import dayjs from 'dayjs';
 
 interface Props {
   task: Task;
@@ -43,7 +47,12 @@ export function TaskTable(props: Props) {
 
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+  const start = useStart();
   const company = useCurrentCompany();
+
+  const handleTaskTimeChange = useHandleTaskTimeChange();
+  const handleTaskDateChange = useHandleTaskDateChange();
 
   const [lastChangedIndex, setLastChangedIndex] = useState<number>();
 
@@ -135,6 +144,18 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
+  const isValidTimeFormat = (value: string) => {
+    const parts = value.split(':');
+
+    return parts.length === 3 && parts.every((part) => part.length === 2);
+  };
+
+  const isValidDateFormat = (value: string) => {
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+    return datePattern.test(value);
+  };
+
   const getDescriptionColSpan = () => {
     let colSpan = 4;
 
@@ -189,21 +210,39 @@ export function TaskTable(props: Props) {
                 <Tr>
                   <Td>
                     <InputField
+                      key={`${dayjs().unix().toString()}StartDate`}
+                      style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="date"
                       value={parseTimeToDate(start)}
                       onValueChange={(value) =>
-                        handleDateChange(start, value, index, LogPosition.Start)
+                        handleDateChange(
+                          start,
+                          isValidDateFormat(value)
+                            ? value
+                            : parseTimeToDate(start) || '',
+                          index,
+                          LogPosition.Start
+                        )
                       }
                     />
                   </Td>
 
                   <Td>
                     <InputField
+                      key={`${dayjs().unix().toString()}StartTime`}
+                      style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
                       value={parseTime(start)}
                       onValueChange={(value) =>
-                        handleTimeChange(start, value, LogPosition.Start, index)
+                        handleTimeChange(
+                          start,
+                          isValidTimeFormat(value)
+                            ? value
+                            : parseTime(start) || '',
+                          LogPosition.Start,
+                          index
+                        )
                       }
                     />
                   </Td>
@@ -211,10 +250,23 @@ export function TaskTable(props: Props) {
                   {company?.show_task_end_date && (
                     <Td>
                       <InputField
+                        key={`${dayjs().unix().toString()}EndDate`}
+                        style={{ color: colors.$3, colorScheme: colors.$0 }}
                         type="date"
                         value={parseTimeToDate(stop)}
                         onValueChange={(value) =>
-                          handleDateChange(stop, value, index, LogPosition.End)
+                          handleDateChange(
+                            stop,
+                            value
+                              ? isValidDateFormat(value)
+                                ? value
+                                : parseTimeToDate(stop) || ''
+                              : parseTimeToDate(stop) ||
+                                  parseTimeToDate(start) ||
+                                  '',
+                            index,
+                            LogPosition.End
+                          )
                         }
                       />
                     </Td>
@@ -222,30 +274,54 @@ export function TaskTable(props: Props) {
 
                   <Td>
                     <InputField
+                      key={`${dayjs().unix().toString()}EndTime`}
+                      style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
-                      value={parseTime(stop) || 0}
+                      value={parseTime(stop)}
                       onValueChange={(value) =>
-                        handleTimeChange(stop, value, LogPosition.End, index)
+                        handleTimeChange(
+                          stop,
+                          value
+                            ? isValidTimeFormat(value)
+                              ? value
+                              : parseTime(stop) || ''
+                            : parseTime(stop) || parseTime(start) || '',
+                          LogPosition.End,
+                          index
+                        )
                       }
                     />
                   </Td>
 
                   <Td>
-                    <InputField
-                      debounceTimeout={1000}
-                      value={duration(start, stop, company?.show_task_end_date)}
-                      onValueChange={(value) =>
-                        handleDurationChange(value, start, index)
-                      }
-                    />
+                    {stop !== 0 || task.created_at === 0 ? (
+                      <InputField
+                        debounceTimeout={1000}
+                        value={duration(
+                          start,
+                          stop,
+                          company?.show_task_end_date
+                        )}
+                        onValueChange={(value) =>
+                          handleDurationChange(value, start, index)
+                        }
+                      />
+                    ) : (
+                      <DurationClock
+                        start={start}
+                        key={`duration-clock-${index}`}
+                        task={task}
+                      />
+                    )}
                   </Td>
 
                   {company?.settings.allow_billable_task_items && (
                     <Td>
                       <Checkbox
+                        style={{ color: colors.$3, colorScheme: colors.$0 }}
                         checked={billable || typeof billable === 'undefined'}
-                        onValueChange={(value, checked) =>
+                        onValueChange={(_, checked) =>
                           handleBillableChange(
                             checked || false,
                             index,
@@ -262,6 +338,7 @@ export function TaskTable(props: Props) {
                     }
                   >
                     <button
+                      style={{ color: colors.$3 }}
                       className="ml-2 text-gray-600 hover:text-red-600"
                       onClick={() => deleteTableRow(index)}
                     >
@@ -295,11 +372,17 @@ export function TaskTable(props: Props) {
         <Tr className="bg-slate-100 hover:bg-slate-200">
           <Td colSpan={100}>
             <button
-              onClick={createTableRow}
-              className="w-full py-2 inline-flex justify-center items-center space-x-2"
+              onClick={() => (task.created_at ? start(task) : createTableRow())}
+              className="w-full py-2 inline-flex justify-center items-center space-x-2 disabled:cursor-not-allowed"
+              disabled={isTaskRunning(task) && task.created_at !== 0}
             >
-              <Plus size={18} />
-              <span>{t('add_item')}</span>
+              {isTaskRunning(task) && task.created_at !== 0 ? (
+                <span>{t('stop_task_to_add_task_entry')}</span>
+              ) : (
+                <>
+                  <Plus size={18} /> <span>{t('add_item')}</span>
+                </>
+              )}
             </button>
           </Td>
         </Tr>

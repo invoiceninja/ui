@@ -12,8 +12,11 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
-export function ClientDetails() {
+export default function ClientDetails() {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -67,11 +70,16 @@ export function ClientDetails() {
   ];
 
   return (
-    <Card title={t('client_details')} padding="small" collapsed={true}>
-      <SortableVariableList
-        for="client_details"
-        defaultVariables={defaultVariables}
-      />
-    </Card>
+    <>
+      <AdvancedSettingsPlanAlert />
+
+      <Card title={t('client_details')} padding="small">
+        <SortableVariableList
+          for="client_details"
+          defaultVariables={defaultVariables}
+          disabled={!proPlan() && !enterprisePlan()}
+        />
+      </Card>
+    </>
   );
 }

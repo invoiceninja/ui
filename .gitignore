@@ -24,9 +24,14 @@ yarn-debug.log*
 yarn-error.log*
 
 .env
+.vscode/*
 
 cypress/videos
 cypress/screenshots
 /test-results/
 /playwright-report/
+/playwright/.cache/
+/test-results/
+/playwright-report/
+/blob-report/
 /playwright/.cache/

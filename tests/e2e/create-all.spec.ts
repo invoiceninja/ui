@@ -31,7 +31,7 @@ test('can create a product', async ({ page }) => {
   await page.getByText('New Product').click();
 
   await expect(
-    page.getByRole('heading', { name: 'New Product' })
+    page.getByRole('heading', { name: 'New Product' }).first()
   ).toBeVisible();
 });
 

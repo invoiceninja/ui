@@ -12,16 +12,17 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
-import { updateChanges } from '$app/common/stores/slices/company-users';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useDispatch } from 'react-redux';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { ChangeEvent } from 'react';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function RecurringInvoices() {
   const [t] = useTranslation();
@@ -30,20 +31,11 @@ export function RecurringInvoices() {
 
   const companyChanges = useCompanyChanges();
 
+  const disableSettingsField = useDisableSettingsField();
+
   const errors = useAtomValue(companySettingsErrorsAtom);
 
-  const dispatch = useDispatch();
-
-  useInjectCompanyChanges();
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const variables = [
     '{$counter}',
@@ -58,25 +50,47 @@ export function RecurringInvoices() {
 
   return (
     <Card title={t('recurring_invoices')}>
-      <Element leftSide={t('number_pattern')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="recurring_invoice_number_pattern"
+            labelElement={<SettingsLabel label={t('number_pattern')} />}
+          />
+        }
+      >
         <InputField
-          id="settings.recurring_invoice_number_pattern"
           value={
             companyChanges?.settings?.recurring_invoice_number_pattern || ''
           }
-          onChange={handleChange}
+          onValueChange={(value) =>
+            handleChange('settings.recurring_invoice_number_pattern', value)
+          }
+          disabled={disableSettingsField('recurring_invoice_number_pattern')}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_pattern']
           }
         />
       </Element>
-      <Element leftSide={t('number_counter')}>
-        <InputField
-          id="settings.recurring_invoice_number_counter"
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="recurring_invoice_number_counter"
+            labelElement={<SettingsLabel label={t('number_counter')} />}
+          />
+        }
+      >
+        <NumberInputField
+          precision={0}
           value={
             companyChanges?.settings?.recurring_invoice_number_counter || ''
           }
-          onChange={handleChange}
+          onValueChange={(value) =>
+            handleChange(
+              'settings.recurring_invoice_number_counter',
+              parseFloat(value) || 0
+            )
+          }
+          disabled={disableSettingsField('recurring_invoice_number_counter')}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_counter']
           }

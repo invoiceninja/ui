@@ -10,7 +10,6 @@
 
 import { ClickableElement, Element } from '$app/components/cards';
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -26,18 +25,23 @@ import {
   calculateHours,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { TaskClock } from './TaskClock';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export function ViewSlider() {
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
   const company = useCurrentCompany();
-  const queryClient = useQueryClient();
   const accentColor = useAccentColor();
   const formatMoney = useFormatMoney();
   const formatTimeLog = useFormatTimeLog();
@@ -50,13 +54,23 @@ export function ViewSlider() {
     currentTask && formatTimeLog(currentTask.time_log);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/tasks/:id', { id: currentTask?.id })
-    );
+    $refetch(['tasks']);
   };
 
   return (
-    <TabGroup tabs={[t('overview'), t('documents')]} width="full">
+    <TabGroup
+      tabs={[t('overview'), t('documents')]}
+      width="full"
+      formatTabLabel={(tabIndex) => {
+        if (tabIndex === 1) {
+          return (
+            <DocumentsTabLabel
+              numberOfDocuments={currentTask?.documents.length}
+            />
+          );
+        }
+      }}
+    >
       <div>
         {currentTask && (
           <>
@@ -84,31 +98,33 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {currentTaskTimeLogs?.map(([date, start, end], i) => (
-              <ClickableElement key={i}>
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <p>{formatDate(date, dateFormat)}</p>
+            <div className="divide-y">
+              {currentTaskTimeLogs?.map(([date, start, end], i) => (
+                <ClickableElement key={i}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p>{formatDate(date, dateFormat)}</p>
 
-                    <small>
-                      {start} - {end}
-                    </small>
-                  </div>
+                      <small>
+                        {start} - {end}
+                      </small>
+                    </div>
 
-                  <div>
-                    {isTaskRunning(currentTask) &&
-                    i === currentTaskTimeLogs.length - 1 ? (
-                      <TaskClock
-                        task={currentTask}
-                        calculateLastTimeLog={true}
-                      />
-                    ) : (
-                      calculateDifferenceBetweenLogs(currentTask.time_log, i)
-                    )}
+                    <div>
+                      {isTaskRunning(currentTask) &&
+                      i === currentTaskTimeLogs.length - 1 ? (
+                        <TaskClock
+                          task={currentTask}
+                          calculateLastTimeLog={true}
+                        />
+                      ) : (
+                        calculateDifferenceBetweenLogs(currentTask.time_log, i)
+                      )}
+                    </div>
                   </div>
-                </div>
-              </ClickableElement>
-            ))}
+                </ClickableElement>
+              ))}
+            </div>
           </>
         )}
       </div>
@@ -120,11 +136,17 @@ export function ViewSlider() {
           })}
           onSuccess={onSuccess}
           widgetOnly
+          disableUpload={
+            !hasPermission('edit_task') && !entityAssigned(currentTask)
+          }
         />
 
         <DocumentsTable
           documents={currentTask?.documents || []}
           onDocumentDelete={onSuccess}
+          disableEditableOptions={
+            !entityAssigned(currentTask, true) && !hasPermission('edit_task')
+          }
         />
       </div>
     </TabGroup>

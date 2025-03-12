@@ -15,7 +15,8 @@ import { enabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { or } from '$app/common/guards/guards/or';
 import { assigned } from '$app/common/guards/guards/assigned';
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
+import { TabLoader } from '$app/components/TabLoader';
 
 const Vendors = lazy(() => import('$app/pages/vendors/index/Vendors'));
 const Import = lazy(() => import('$app/pages/vendors/import/Import'));
@@ -30,6 +31,9 @@ const RecurringExpenses = lazy(
 const Documents = lazy(() => import('$app/pages/vendors/show/pages/Documents'));
 const Edit = lazy(() => import('$app/pages/vendors/edit/Edit'));
 const Create = lazy(() => import('$app/pages/vendors/create/Create'));
+const Activities = lazy(
+  () => import('$app/pages/vendors/show/pages/Activities')
+);
 
 export const vendorRoutes = (
   <Route path="vendors">
@@ -55,7 +59,7 @@ export const vendorRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Vendors),
-            or(permission('edit_vendor'), permission('view_vendor')),
+            or(permission('create_vendor'), permission('edit_vendor')),
           ]}
           component={<Import />}
         />
@@ -77,11 +81,54 @@ export const vendorRoutes = (
         />
       }
     >
-      <Route path="" element={<PurchaseOrders />} />
-      <Route path="purchase_orders" element={<PurchaseOrders />} />
-      <Route path="expenses" element={<Expenses />} />
-      <Route path="recurring_expenses" element={<RecurringExpenses />} />
-      <Route path="documents" element={<Documents />} />
+      <Route
+        path=""
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <PurchaseOrders />
+          </Suspense>
+        }
+      />
+      <Route
+        path="purchase_orders"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <PurchaseOrders />
+          </Suspense>
+        }
+      />
+      <Route
+        path="expenses"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Expenses />
+          </Suspense>
+        }
+      />
+      <Route
+        path="recurring_expenses"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <RecurringExpenses />
+          </Suspense>
+        }
+      />
+      <Route
+        path="activities"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Activities />
+          </Suspense>
+        }
+      />
+      <Route
+        path="documents"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <Documents />
+          </Suspense>
+        }
+      />
     </Route>
     <Route
       path=":id/edit"
@@ -89,11 +136,7 @@ export const vendorRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Vendors),
-            or(
-              permission('view_vendor'),
-              permission('edit_vendor'),
-              assigned('/api/v1/vendors/:id')
-            ),
+            or(permission('edit_vendor'), assigned('/api/v1/vendors/:id')),
           ]}
           component={<Edit />}
         />

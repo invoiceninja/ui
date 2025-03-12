@@ -15,23 +15,28 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
-  initiallyVisible?: boolean;
+  initiallyVisibleModal?: boolean;
   setVisible?: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
   staleTime?: number;
+  initiallyVisible?: boolean;
+  exclude?: string[];
+  withoutAction?: boolean;
 }
 
 export function VendorSelector(props: VendorSelectorProps) {
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <CreateVendorModal
-        visible={props.initiallyVisible || isModalOpen}
+        visible={props.initiallyVisibleModal || isModalOpen}
         setVisible={props.setVisible || setIsModalOpen}
         setSelectedIds={props.setSelectedIds}
         onVendorCreated={(vendor) => props.onChange(vendor)}
@@ -39,7 +44,7 @@ export function VendorSelector(props: VendorSelectorProps) {
 
       {!props.setSelectedIds && (
         <ComboboxAsync<Vendor>
-          endpoint={new URL(endpoint('/api/v1/vendors?status=active&per_page=500'))}
+          endpoint={endpoint('/api/v1/vendors?status=active&per_page=500')}
           onChange={(vendor: Entry<Vendor>) =>
             vendor.resource && props.onChange(vendor.resource)
           }
@@ -55,14 +60,15 @@ export function VendorSelector(props: VendorSelectorProps) {
           action={{
             label: t('new_vendor'),
             onClick: () => setIsModalOpen(true),
-            visible: true,
+            visible: hasPermission('create_vendor') && !props.withoutAction,
           }}
           readonly={props.readonly}
           onDismiss={props.onClearButtonClick}
           initiallyVisible={props.initiallyVisible}
           sortBy="name|asc"
-          staleTime={props.staleTime || 500}
+          staleTime={props.staleTime || Infinity}
           errorMessage={props.errorMessage}
+          exclude={props.exclude}
         />
       )}
     </>

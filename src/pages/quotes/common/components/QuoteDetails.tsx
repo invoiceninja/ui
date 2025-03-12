@@ -17,6 +17,7 @@ import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -52,13 +53,12 @@ export function QuoteDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('partial')}>
-          <InputField
-            id="partial"
-            type="number"
+          <NumberInputField
+            value={quote?.partial || ''}
             onValueChange={(value) =>
               handleChange('partial', parseFloat(value))
             }
-            value={quote?.partial || ''}
+            changeOverride
             errorMessage={errors?.errors.partial}
           />
         </Element>
@@ -119,23 +119,24 @@ export function QuoteDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <InputField
-                type="number"
+              <NumberInputField
+                value={quote?.discount || ''}
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value))
                 }
-                value={quote?.discount || ''}
                 errorMessage={errors?.errors.discount}
               />
             </div>
 
             <div className="w-full lg:w-1/2">
               <SelectField
+                value={quote?.is_amount_discount.toString()}
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
-                value={quote?.is_amount_discount.toString()}
                 errorMessage={errors?.errors.is_amount_discount}
+                customSelector
+                dismissable={false}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>

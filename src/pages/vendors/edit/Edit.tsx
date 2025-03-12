@@ -21,7 +21,6 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { Form } from './components/Form';
 import { ResourceActions } from '$app/components/ResourceActions';
@@ -29,6 +28,8 @@ import { useActions } from '../common/hooks/useActions';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { cloneDeep, set } from 'lodash';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_vendor');
@@ -43,8 +44,6 @@ export default function Edit() {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [contacts, setContacts] = useState<Partial<VendorContact>[]>([]);
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 
@@ -67,14 +66,13 @@ export default function Edit() {
     set(vendor as Vendor, 'contacts', contacts);
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request('PUT', endpoint('/api/v1/vendors/:id', { id }), vendor)
       .then(() => {
         toast.success('updated_vendor');
 
-        queryClient.invalidateQueries('/api/v1/vendors');
-        queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
+        $refetch(['vendors']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -88,16 +86,16 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={onSave}
       navigationTopRight={
         vendor && (
           <ResourceActions
-            label={t('more_actions')}
+            onSaveClick={onSave}
             resource={vendor}
             actions={actions}
           />
         )
       }
+      afterBreadcrumbs={<PreviousNextNavigation entity="vendor" />}
     >
       {vendor && (
         <Form

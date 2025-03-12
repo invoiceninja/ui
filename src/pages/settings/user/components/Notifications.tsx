@@ -17,6 +17,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { SelectField } from '$app/components/forms';
 import { useNotificationOptions } from '../common/hooks/useNotificationOptions';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
+import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
 
 export function Notifications() {
   const [t] = useTranslation();
@@ -26,6 +29,8 @@ export function Notifications() {
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
+  const handleChange = useHandleCurrentUserChangeProperty();
+
   const [allEvents, setAllEvents] = useState<string>('');
 
   const handleAllEventsChange = (allEventsValue: string) => {
@@ -33,8 +38,16 @@ export function Notifications() {
 
     const user = cloneDeep(userChanges);
 
-    const updatedAllEvents =
-      allEventsValue === 'custom' ? [] : [allEventsValue];
+    let updatedAllEvents = allEventsValue === 'custom' ? [] : [allEventsValue];
+
+    const isTaskAssignedNotificationIncluded =
+      user?.company_user?.notifications?.email?.find(
+        (key: string) => key === 'task_assigned'
+      );
+
+    if (isTaskAssignedNotificationIncluded) {
+      updatedAllEvents = [...updatedAllEvents, 'task_assigned'];
+    }
 
     set(user, 'company_user.notifications.email', updatedAllEvents);
 
@@ -87,6 +100,32 @@ export function Notifications() {
     dispatch(injectInChangesWithData(user));
   };
 
+  const handleTaskAssignedNotificationChange = (value: boolean) => {
+    const emailNotifications = userChanges?.company_user?.notifications?.email;
+
+    let updatedNotifications: string[] = [...emailNotifications];
+
+    if (!value) {
+      updatedNotifications = updatedNotifications.filter(
+        (notificationKey) => notificationKey !== 'task_assigned'
+      );
+    } else {
+      const isAlreadyAdded = updatedNotifications.find(
+        (notificationKey) => notificationKey === 'task_assigned'
+      );
+
+      if (!isAlreadyAdded) {
+        updatedNotifications = [...updatedNotifications, 'task_assigned'];
+      }
+    }
+
+    const user = cloneDeep(userChanges);
+
+    set(user, 'company_user.notifications.email', updatedNotifications);
+
+    dispatch(injectInChangesWithData(user));
+  };
+
   useEffect(() => {
     const emailNotifications = userChanges?.company_user?.notifications?.email;
 
@@ -104,10 +143,41 @@ export function Notifications() {
 
   return (
     <Card title={t('notifications')}>
-      <Element className="mb-4" leftSide={t('all_events')}>
+      <Element
+        leftSide={t('login_notification')}
+        leftSideHelp={t('login_notification_help')}
+      >
+        <Toggle
+          checked={userChanges?.user_logged_in_notification}
+          onChange={(value) =>
+            handleChange('user_logged_in_notification', value)
+          }
+        />
+      </Element>
+
+      <Element
+        className="mb-4"
+        leftSide={t('task_assigned_notification')}
+        leftSideHelp={t('task_assigned_notification_help')}
+      >
+        <Toggle
+          checked={Boolean(
+            userChanges?.company_user?.notifications?.email?.find(
+              (key: string) => key === 'task_assigned'
+            )
+          )}
+          onChange={(value) => handleTaskAssignedNotificationChange(value)}
+        />
+      </Element>
+
+      <Divider withoutPadding />
+
+      <Element className="my-4" leftSide={t('all_events')}>
         <SelectField
           value={allEvents}
           onValueChange={(value) => handleAllEventsChange(value)}
+          customSelector
+          dismissable={false}
         >
           <option value="all_notifications">{t('all_records')}</option>
           <option value="all_user_notifications">{t('owned_by_user')}</option>
@@ -115,7 +185,9 @@ export function Notifications() {
         </SelectField>
       </Element>
 
-      <div className="flex flex-col border-t border-gray-200 pt-4">
+      <Divider withoutPadding />
+
+      <div className="flex flex-col">
         {options.map((notification, index) => (
           <Element key={index} className="mt-0" leftSide={notification.label}>
             <SelectField
@@ -124,6 +196,8 @@ export function Notifications() {
                 handleNotificationChange(notification.key, value)
               }
               disabled={Boolean(allEvents) && allEvents !== 'custom'}
+              customSelector
+              dismissable={false}
             >
               <option value={`${notification.key}_all`}>
                 {t('all_records')}

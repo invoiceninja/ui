@@ -11,8 +11,8 @@
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { date as formatDate } from '$app/common/helpers';
-import { ChartData, TotalColors } from './Totals';
+import { date as formatDate, useParseDayjs } from '$app/common/helpers';
+import { ChartData } from './Totals';
 import {
   Line,
   CartesianGrid,
@@ -26,10 +26,33 @@ import dayjs from 'dayjs';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
+import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
+import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
+import { TooltipProps } from 'recharts';
+
+interface PayloadItem {
+  color: string;
+  name: string;
+  value: number;
+  dataKey: string;
+  payload: {
+    date: string;
+    invoices: number;
+    outstanding: number;
+    payments: number;
+    expenses: number;
+  };
+}
+
+type CustomTooltipProps = TooltipProps<any, any> & {
+  active?: boolean;
+  payload?: PayloadItem[];
+  label?: string;
+};
 
 type Props = {
   data: ChartData;
-  dates: any;
+  dates: { start_date: string; end_date: string };
   chartSensitivity: 'day' | 'week' | 'month';
   currency: string;
 };
@@ -43,52 +66,88 @@ type LineChartData = {
 }[];
 
 export function Chart(props: Props) {
-  const { t } = useTranslation();
-  const { currency } = props;
+  const [t] = useTranslation();
+  const { currency, chartSensitivity } = props;
 
   const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const parseDayjs = useParseDayjs();
+  const generateWeekDateRange = useGenerateWeekDateRange();
 
   const formatMoney = useFormatMoney();
 
   const [chartData, setChartData] = useState<LineChartData>([]);
 
-  const generateDateRange = (start: Date, end: Date, range: 1 | 7 | 30) => {
-    const date = new Date(start.getTime());
+  const generateDateRange = (
+    startDate: Date,
+    endDate: Date,
+    period: 'day' | 'week' | 'month'
+  ) => {
+    let dates = [];
 
-    const dates = [];
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
 
-    while (date <= end) {
-      dates.push(new Date(date));
-      date.setDate(date.getDate() + range);
+    let currentDate = start.clone();
+
+    switch (period) {
+      case 'day':
+        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+          dates.push(currentDate.toDate());
+          currentDate = currentDate.add(1, 'day');
+        }
+        break;
+
+      case 'week':
+        dates = generateWeekDateRange(startDate, endDate);
+        break;
+
+      case 'month':
+        dates = generateMonthDateRange(start, end);
+        break;
+
+      default:
+        return [];
     }
 
-    return dates;
+    return ensureUniqueDates(dates, end);
   };
 
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
     if (!data || !date) return -1;
 
+    let isEntryDateMatch = false;
+
     const recordIndex = data.findIndex((entry, index) => {
       const nextEntry = data[index + 1];
 
       if (nextEntry) {
-        const dateToCheck = dayjs(date);
+        const dateToCheck = parseDayjs(date);
 
-        const startDate = dayjs(entry.date);
-        const endDate = dayjs(nextEntry.date);
+        const startDate = parseDayjs(entry.date);
+        const endDate = parseDayjs(nextEntry.date);
 
         const isDateInRange =
           dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
-        const isEntryDateMatch = entry.date === date;
+
+        isEntryDateMatch = entry.date === date;
 
         return isDateInRange || isEntryDateMatch;
+      }
+
+      if (!nextEntry && entry) {
+        isEntryDateMatch = entry.date === date;
+
+        return isEntryDateMatch;
       }
 
       return false;
     });
 
-    return recordIndex;
+    return chartSensitivity !== 'day' && recordIndex > -1 && !isEntryDateMatch
+      ? recordIndex + 1
+      : recordIndex;
   };
 
   const yAxisWidth = useMemo(() => {
@@ -97,7 +156,9 @@ export function Chart(props: Props) {
     const largestTick = chartData.reduce((maxTick, data) => {
       return properties.reduce((currentMax, property) => {
         const currentTickLength = formatMoney(
-          Number(data[property as keyof typeof data]) ?? 0,
+          typeof data[property as keyof typeof data] === 'number'
+            ? Number((data[property as keyof typeof data] as number) * 10)
+            : 0,
           company?.settings.country_id,
           currency
         ).toString().length;
@@ -110,61 +171,19 @@ export function Chart(props: Props) {
   }, [chartData]);
 
   useEffect(() => {
-    const data: LineChartData = [];
+    const dates = generateDateRange(
+      new Date(props.dates.start_date),
+      new Date(props.dates.end_date),
+      props.chartSensitivity
+    );
 
-    if (props.chartSensitivity === 'day') {
-      const dates = generateDateRange(
-        new Date(props.dates.start_date),
-        new Date(props.dates.end_date),
-        1
-      );
-
-      dates.map((date) => {
-        data.push({
-          date: formatDate(date.toString(), dateFormat),
-          invoices: 0,
-          outstanding: 0,
-          payments: 0,
-          expenses: 0,
-        });
-      });
-    }
-
-    if (props.chartSensitivity === 'week') {
-      const dates = generateDateRange(
-        new Date(props.dates.start_date),
-        new Date(props.dates.end_date),
-        7
-      );
-
-      dates.map((date) => {
-        data.push({
-          date: formatDate(date.toString(), dateFormat),
-          invoices: 0,
-          outstanding: 0,
-          payments: 0,
-          expenses: 0,
-        });
-      });
-    }
-
-    if (props.chartSensitivity === 'month') {
-      const dates = generateDateRange(
-        new Date(props.dates.start_date),
-        new Date(props.dates.end_date),
-        30
-      );
-
-      dates.map((date) => {
-        data.push({
-          date: formatDate(date.toString(), dateFormat),
-          invoices: 0,
-          outstanding: 0,
-          payments: 0,
-          expenses: 0,
-        });
-      });
-    }
+    const data: LineChartData = dates.map((date) => ({
+      date: formatDate(date.toString(), dateFormat),
+      invoices: 0,
+      outstanding: 0,
+      payments: 0,
+      expenses: 0,
+    }));
 
     props.data?.invoices.forEach((invoice) => {
       const date = formatDate(invoice.date, dateFormat);
@@ -203,7 +222,7 @@ export function Chart(props: Props) {
     });
 
     setChartData(data);
-  }, [props]);
+  }, [props.data, props.dates, props.chartSensitivity]);
 
   const colors = useColorScheme();
 
@@ -211,8 +230,49 @@ export function Chart(props: Props) {
     return formatMoney(
       Number(number) || 0,
       company.settings.country_id,
-      currency
+      currency,
+      2
     ).toString();
+  };
+
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+    if (!active || !payload || !payload.length) {
+      return null;
+    }
+
+    return (
+      <div
+        className="p-4 shadow-lg rounded-md border"
+        style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+      >
+        <p className="font-semibold mb-2">{label}</p>
+
+        {payload.map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between space-x-10 py-1"
+          >
+            <div className="flex items-center space-x-2">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: item.color }}
+              />
+
+              <span style={{ color: colors.$3 }}>{item.name}</span>
+            </div>
+
+            <span className="font-medium font-mono">
+              {formatMoney(
+                item.value,
+                company.settings.country_id,
+                currency,
+                2
+              )}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -223,7 +283,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('invoices') || ''}
           dataKey="invoices"
-          stroke={TotalColors.Blue}
+          stroke="#2276ff"
           dot={false}
           strokeWidth={2}
         />
@@ -233,7 +293,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('payments') || ''}
           dataKey="payments"
-          stroke={TotalColors.Green}
+          stroke="#22c55e"
           dot={false}
           strokeWidth={2}
         />
@@ -243,7 +303,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('outstanding') || ''}
           dataKey="outstanding"
-          stroke={TotalColors.Red}
+          stroke="#EF4444"
           dot={false}
           strokeWidth={2}
         />
@@ -253,15 +313,24 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('expenses') || ''}
           dataKey="expenses"
-          stroke={TotalColors.Gray}
+          stroke="#A1A1AA"
           dot={false}
           strokeWidth={2}
         />
 
         <CartesianGrid strokeDasharray="0" vertical={false} />
-        <Tooltip formatter={formatTooltipValues} />
+        <Tooltip
+          content={<CustomTooltip />}
+          wrapperStyle={{ outline: 'none' }}
+        />
 
-        <XAxis dataKey="date" tickMargin={8} tick={{ fontSize: 14 }} stroke={colors.$3} />
+        <XAxis
+          dataKey="date"
+          tickMargin={8}
+          tick={{ fontSize: 14 }}
+          stroke={colors.$3}
+        />
+
         <YAxis
           interval={0}
           tickCount={6}

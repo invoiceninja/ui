@@ -13,11 +13,13 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '$app/components/icons/Icon';
-import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
+import { MdArchive, MdComment, MdDelete, MdRestore } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulkAction } from '$app/common/queries/vendor';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { MergeVendorsAction } from '../components/MergeVendorsAction';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -29,6 +31,19 @@ export function useActions() {
   });
 
   const actions: Action<Vendor>[] = [
+    (vendor) => (
+      <AddActivityComment
+        entity="vendor"
+        entityId={vendor.id}
+        label={`#${vendor.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
+    (vendor) => vendor && <MergeVendorsAction mergeFromVendorId={vendor.id} />,
     (vendor) =>
       isEditOrShowPage &&
       getEntityState(vendor) === EntityState.Active && (

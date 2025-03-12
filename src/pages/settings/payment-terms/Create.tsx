@@ -9,7 +9,6 @@
  */
 
 import { ButtonOption, Card, CardContainer } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -19,29 +18,28 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankPaymentTermQuery } from '$app/common/queries/payment-terms';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Create() {
   const { documentTitle } = useTitle('create_payment_term');
 
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const { data: blankPaymentTerm } = useBlankPaymentTermQuery();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('company_details'), href: '/settings/company_details' },
+    { name: t('payment_settings'), href: '/settings/online_payments' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
     { name: t('create_payment_term'), href: '/settings/payment_terms/create' },
   ];
@@ -66,7 +64,7 @@ export function Create() {
         .then((response: AxiosResponse) => {
           toast.success('created_payment_term');
 
-          queryClient.invalidateQueries('/api/v1/payment_terms');
+          $refetch(['payment_terms']);
 
           if (actionType === 'save') {
             navigate(
@@ -106,10 +104,8 @@ export function Create() {
   }, [blankPaymentTerm]);
 
   return (
-    <Settings title={t('payment_terms')}>
-      <Container className="space-y-6">
-        <Breadcrumbs pages={pages} />
-
+    <Settings title={t('payment_terms')} breadcrumbs={pages}>
+      <Container breadcrumbs={[]}>
         <Card
           title={documentTitle}
           withSaveButton
@@ -119,13 +115,14 @@ export function Create() {
           additionalSaveOptions={saveOptions}
         >
           <CardContainer>
-            <InputField
+            <NumberInputField
+              precision={0}
               required
-              value={paymentTerm?.num_days}
-              type="number"
+              value={paymentTerm?.num_days || ''}
               label={t('number_of_days')}
               onValueChange={(value) => handleChange('num_days', Number(value))}
               errorMessage={errors?.errors.num_days}
+              disablePrecision
             />
           </CardContainer>
         </Card>

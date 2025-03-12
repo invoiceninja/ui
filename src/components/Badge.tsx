@@ -25,7 +25,8 @@ interface Props extends CommonProps {
     | 'dark-blue'
     | 'green'
     | 'black'
-    | 'purple';
+    | 'purple'
+    | 'transparent';
 }
 
 const defaultProps: Props = {
@@ -40,26 +41,32 @@ export function Badge(props: Props) {
   const styles: React.CSSProperties = { ...props.style };
 
   if (props.variant === 'primary') {
-    styles.backgroundColor = accentColor;
+    styles.backgroundColor = styles.backgroundColor || accentColor;
     styles.color = 'white';
   }
 
   return (
     <span
       style={styles}
-      className={classNames('text-xs px-2 py-1 rounded', {
-        'bg-gray-500 text-white': props.variant === 'generic',
-        'bg-white border text-gray-900 hover:bg-white': props.variant === 'white',
-        'bg-yellow-600 text-white': props.variant === 'yellow',
-        'bg-red-600 text-white': props.variant === 'red',
-        'bg-blue-300 text-white': props.variant === 'light-blue',
-        'bg-blue-400 text-white': props.variant === 'blue',
-        'bg-blue-700 text-white': props.variant === 'dark-blue',
-        'bg-orange-500 text-white': props.variant === 'orange',
-        'bg-green-500 text-white': props.variant === 'green',
-        'bg-black text-white': props.variant === 'black',
-        'bg-purple text-white': props.variant === 'purple',
-      })}
+      className={classNames(
+        'text-xs px-2 py-1 rounded',
+        {
+          'bg-transparent': props.variant === 'transparent',
+          'bg-gray-500 text-white': props.variant === 'generic',
+          'bg-white border text-gray-900 hover:bg-white':
+            props.variant === 'white',
+          'bg-yellow-600 text-white': props.variant === 'yellow',
+          'bg-red-600 text-white': props.variant === 'red',
+          'bg-blue-300 text-white': props.variant === 'light-blue',
+          'bg-blue-400 text-white': props.variant === 'blue',
+          'bg-blue-700 text-white': props.variant === 'dark-blue',
+          'bg-orange-500 text-white': props.variant === 'orange',
+          'bg-green-500 text-white': props.variant === 'green',
+          'bg-black text-white': props.variant === 'black',
+          'bg-purple text-white': props.variant === 'purple',
+        },
+        props.className
+      )}
     >
       {props.children}
     </span>

@@ -25,10 +25,11 @@ interface Props extends CommonProps {
   withContainer?: boolean;
   withoutActionContainer?: boolean;
   topRight?: ReactNode;
+  withoutDivider?: boolean;
 }
 
 export function Slider(props: Props) {
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <Transition.Root show={props.visible} as={Fragment}>
@@ -58,15 +59,23 @@ export function Slider(props: Props) {
                 style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
               >
                 <div className="flex flex-col flex-1 h-0 overflow-y-auto">
-                  <div className="py-6 px-4 sm:px-6 border-b" style={{ borderColor: colors.$4 }}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-medium" style={{ color: colors.$3 }}>{props.title}</span>
+                  <div
+                    className="py-4 px-4 sm:px-6 border-b"
+                    style={{ borderColor: colors.$4 }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span
+                        className="text-lg font-medium max-w-sm truncate"
+                        style={{ color: colors.$3 }}
+                      >
+                        {props.title}
+                      </span>
 
                       <Inline>
                         {props.topRight}
 
                         <MdClose
-                          fontSize={24}
+                          fontSize={20}
                           className="cursor-pointer"
                           onClick={() => props.onClose()}
                           color={colors.$3}
@@ -76,12 +85,10 @@ export function Slider(props: Props) {
                   </div>
                   <div className="flex flex-1 flex-col justify-between items-center">
                     <div
-                      className={classNames(
-                        'flex flex-col flex-1 divide-y divide-gray-200 w-full',
-                        {
-                          'p-4': props.withContainer,
-                        }
-                      )}
+                      className={classNames('flex flex-col flex-1 w-full', {
+                        'p-4': props.withContainer,
+                        'divide-y divide-gray-200': !props.withoutDivider,
+                      })}
                     >
                       {props.children}
                     </div>

@@ -14,50 +14,52 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { generate64CharHash } from '$app/common/hooks/useGenerateHash';
+import { Dispatch, SetStateAction } from 'react';
 
-export function useSave(
-  setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
-) {
+interface Params {
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+  isFormBusy: boolean;
+}
+export function useSave(params: Params) {
+  const { setErrors, setIsFormBusy, isFormBusy } = params;
+
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   return (payment: Payment, sendEmail: boolean) => {
-    setErrors(undefined);
+    if (!isFormBusy) {
+      toast.processing();
 
-    toast.processing();
+      setErrors(undefined);
+      setIsFormBusy(true);
 
-    request(
-      'POST',
-      endpoint('/api/v1/payments?email_receipt=:email', {
-        email: sendEmail,
-      }),
-      payment
-    )
-      .then((data) => {
-        toast.success('created_payment');
-        navigate(route('/payments/:id/edit', { id: data.data.data.id }));
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
-        }
-      })
-      .finally(() => {
-        queryClient.invalidateQueries(route('/api/v1/payments'));
-        queryClient.invalidateQueries(route('/api/v1/credits'));
-        queryClient.invalidateQueries(route('/api/v1/invoices'));
-        queryClient.invalidateQueries(route('/api/v1/clients'));
-        queryClient.invalidateQueries('/api/v1/clients');
-        queryClient.invalidateQueries(route('/api/v1/clients/:id/', { id: payment.client_id}))
+      const idempotencyKey = generate64CharHash();
 
-        payment?.invoices?.forEach((paymentable: any) => {
-          queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id: paymentable.invoice_id }));
+      request(
+        'POST',
+        endpoint('/api/v1/payments?email_receipt=:email', {
+          email: sendEmail,
+        }),
+        { ...payment, idempotency_key: idempotencyKey }
+      )
+        .then((data) => {
+          toast.success('created_payment');
+          navigate(route('/payments/:id/edit', { id: data.data.data.id }));
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        })
+        .finally(() => {
+          setIsFormBusy(false);
+          $refetch(['payments', 'credits', 'invoices', 'clients']);
         });
-
-      });
+    }
   };
 }

@@ -56,4 +56,6 @@ export interface Subscription {
   use_inventory_management: boolean;
   user_id: string;
   webhook_configuration: Webhook;
+  steps: string,
+  remaining_cycles: number;
 }

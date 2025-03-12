@@ -27,7 +27,7 @@ export function useDownloadPdfs({ entity }: Props) {
 
     toast.processing();
 
-    queryClient.fetchQuery(endpoint(`/api/v1/${entity}s/bulk`), () =>
+    queryClient.fetchQuery([`/api/v1/${entity}s/bulk`], () =>
       request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
         action: 'bulk_download',
         ids: resourceIds,

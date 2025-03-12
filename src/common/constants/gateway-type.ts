@@ -32,5 +32,12 @@ export default {
   [GatewayType.ACSS]: 'acss',
   [GatewayType.BECS]: 'becs',
   [GatewayType.InstantBankPay]: 'instant_bank_pay',
+  [GatewayType.KLARNA]: 'klarna',
+  [GatewayType.BACS]: 'bacs',
   [GatewayType.FPX]: 'fpx',
+  [GatewayType.VENMO]: 'venmo',
+  [GatewayType.MERCADOPAGO]: 'mercadopago',
+  [GatewayType.MYBANK]: 'mybank',
+  [GatewayType.PAYLATER]: 'paylater',
+  [GatewayType.PAYPAL_ADVANCED_CARDS]: 'paypal_advanced_cards',
 };

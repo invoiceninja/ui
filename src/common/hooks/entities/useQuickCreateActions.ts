@@ -17,7 +17,7 @@ import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '../useCurrentCompany';
-import { useHasPermission } from '../permissions/useHasPermission';
+import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
@@ -34,6 +34,8 @@ export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
   const hasPermission = useHasPermission();
   const enabled = useEnabled();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const { data: gatewaysData } = useCompanyGatewaysQuery();
   const { data: bankAccountsData } = useBankAccountsQuery();
@@ -105,9 +107,9 @@ export function useQuickCreateActions() {
     },
     {
       key: 'subscription',
-      url: '/settings/subscription/create',
+      url: '/settings/subscriptions/create',
       section: 'income',
-      visible: proPlan() || enterprisePlan(),
+      visible: (proPlan() || enterprisePlan()) && (isAdmin || isOwner),
     },
     {
       key: 'expense',
@@ -134,37 +136,43 @@ export function useQuickCreateActions() {
       key: 'transaction',
       url: '/transactions/create',
       section: 'expense',
-      visible: hasPermission('create_bank_transaction'),
+      visible:
+        hasPermission('create_bank_transaction') &&
+        enabled(ModuleBitmask.Transactions),
     },
     {
       key: 'add_stripe',
       url: '/settings/gateways/create',
       section: 'settings',
-      visible: Boolean(!gateways?.length),
+      visible: Boolean(!gateways?.length) && (isAdmin || isOwner),
     },
     {
       key: 'add_bank_account',
       url: '/settings/bank_accounts/create',
       section: 'settings',
-      visible: enterprisePlan() && Boolean(!bankAccounts?.length),
+      visible:
+        enterprisePlan() &&
+        Boolean(!bankAccounts?.length) &&
+        (isAdmin || isOwner),
     },
     {
       key: 'tax_settings',
       url: '/settings/tax_rates/create',
       section: 'settings',
-      visible: Boolean(!taxRates?.length),
+      visible: Boolean(!taxRates?.length) && (isAdmin || isOwner),
     },
     {
       key: 'add_company_logo',
       url: '/settings/company_details/logo',
       section: 'settings',
-      visible: Boolean(!currentCompany?.settings.company_logo),
+      visible:
+        Boolean(!currentCompany?.settings.company_logo) && (isAdmin || isOwner),
     },
     {
       key: 'templates_and_reminders',
       url: '/settings/templates_and_reminders',
       section: 'settings',
-      visible: proPlan() || enterprisePlan(),
+      visible: (proPlan() || enterprisePlan()) && (isAdmin || isOwner),
     },
   ];
 

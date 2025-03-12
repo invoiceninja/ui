@@ -20,33 +20,36 @@ interface Props {
 export function Address(props: Props) {
   const { t } = useTranslation();
 
-  const resolveCountry = useResolveCountry();
-
   const { client } = props;
+
+  const resolveCountry = useResolveCountry();
 
   return (
     <>
       {client && (
-        <div className="col-span-12 lg:col-span-3">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoCard
             title={t('address')}
             value={
               <>
-                <p>
+                <p className="break-all">
                   {client.address1.length > 0 && client.address1}
                   {client.address1.length > 0 && <br />}
                   {client.address2}
                 </p>
 
-                <p>
+                <p className="break-all">
                   {client.city.length > 0 && client.city} &nbsp;
-                  {client.postal_code.length > 0 && client.postal_code} &nbsp;
-                  {client.state}
+                  {client.state} &nbsp;
+                  {client.postal_code.length > 0 && client.postal_code}
                 </p>
 
-                <p>{resolveCountry(client.country_id)?.name}</p>
+                <p className="break-all">
+                  {resolveCountry(client.country_id)?.name}
+                </p>
               </>
             }
+            withoutTruncate
             className="h-full"
           />
         </div>

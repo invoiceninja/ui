@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { DataTable } from '$app/components/DataTable';
 import {
   useActions,
@@ -18,10 +20,10 @@ import {
 import { useCustomBulkActions } from '$app/pages/purchase-orders/common/hooks/useCustomBulkActions';
 import { useParams } from 'react-router-dom';
 
-const dataTableStaleTime = 50;
-
 export default function PurchaseOrders() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const columns = usePurchaseOrderColumns();
 
@@ -49,7 +51,9 @@ export default function PurchaseOrders() {
       bulkRoute="/api/v1/purchase_orders/bulk"
       linkToCreate={route('/purchase_orders/create?vendor=:id', { id })}
       linkToEdit="/purchase_orders/:id/edit"
-      staleTime={dataTableStaleTime}
+      excludeColumns={['vendor_id']}
+      linkToCreateGuards={[permission('create_purchase_order')]}
+      hideEditableOptions={!hasPermission('edit_purchase_order')}
     />
   );
 }

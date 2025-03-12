@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { License } from '.';
 import { Card, Element } from '../../../../components/cards';
 import { Link } from '../../../../components/forms';
+import dayjs from 'dayjs';
 
 export function Plan() {
   const [t] = useTranslation();
@@ -25,20 +26,35 @@ export function Plan() {
 
   return (
     <Card title={t('plan')}>
-      <Element leftSide={t('plan')}>
-        <span>
-          {account?.plan
-            ? `${t(account.plan)} ${t('plan')} `
-            : `${t('free')} ${t('plan')} `}
-        </span>
-        <span>
-          / {account.num_users} {t('users')}
-        </span>
+      <Element className="mb-3" leftSide={t('plan')}>
+        {isHosted() ? (
+          <>
+            <span>
+              {account?.plan
+                ? `${t(account.plan)} ${t('plan')} `
+                : `${t('free')} ${t('plan')} `}
+            </span>
+            <span>
+              / {account.num_users} {t('users')}
+            </span>
+          </>
+        ) : (
+          <span>
+            {t(
+              account?.plan_expires !== '' &&
+                !dayjs(account.plan_expires).isBefore(dayjs())
+                ? 'licensed'
+                : 'plan_free_self_hosted'
+            )}
+          </span>
+        )}
       </Element>
 
       {account?.plan_expires !== '' && (
         <Element leftSide={t('expires_on')}>
-          {date(account?.plan_expires, dateFormat)}
+          {dayjs(account.plan_expires).year() > 2000
+            ? date(account.plan_expires, dateFormat)
+            : t('forever_free')}
         </Element>
       )}
 

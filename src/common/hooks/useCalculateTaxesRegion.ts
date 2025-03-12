@@ -14,7 +14,41 @@ export function useCalculateTaxesRegion() {
   /**
    * Supported tax regions
    */
-  const supportedCountries: string[] = ['AU', 'US', 'DE'];
+  const supportedCountries: string[] = [
+    'AU', // Australia
+    'US', // United States
+    'AT', // Austria
+    'BE', // Belgium
+    'BG', // Bulgaria
+    'CY', // Cyprus
+    'CZ', // Czech Republic
+    'DE', // Germany
+    'DK', // Denmark
+    'EE', // Estonia
+    'ES', // Spain
+    'FI', // Finland
+    'FR', // France
+    'GR', // Greece
+    'HR', // Croatia
+    'HU', // Hungary
+    'IE', // Ireland
+    'IT', // Italy
+    'LT', // Lithuania
+    'LU', // Luxembourg
+    'LV', // Latvia
+    'MT', // Malta
+    'NL', // Netherlands
+    'PL', // Poland
+    'PT', // Portugal
+    'RO', // Romania
+    'SE', // Sweden
+    'SI', // Slovenia
+    'SK', // Slovakia
+    'GB', // Great Britain
+    'NO', // Norway - EEA
+    'IS', // Iceland - EEA
+    'LI', // Liechtenstein - EEA
+  ];
 
   const resolveCountry = useResolveCountry();
 

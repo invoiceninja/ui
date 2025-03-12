@@ -9,13 +9,13 @@
  */
 
 import { Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
-import { useCountries } from '$app/common/hooks/useCountries';
+import { Button, InputField } from '$app/components/forms';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CountrySelector } from '$app/components/CountrySelector';
 
 interface Props {
   client: Client | undefined;
@@ -26,8 +26,6 @@ interface Props {
 
 export function ShippingAddress(props: Props) {
   const [t] = useTranslation();
-  const countries = useCountries();
-
   const { errors, setErrors, setClient } = props;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -63,10 +61,10 @@ export function ShippingAddress(props: Props) {
       >
         {t('copy_billing')}
       </Button>
-      <Element leftSide={t('billing_address1')}>
+      <Element leftSide={t('shipping_address1')}>
         <InputField
           id="shipping_address1"
-          value={props.client?.shipping_address1}
+          value={props.client?.shipping_address1 || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_address1}
         />
@@ -75,7 +73,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('address2')}>
         <InputField
           id="shipping_address2"
-          value={props.client?.shipping_address2}
+          value={props.client?.shipping_address2 || ''}
           onChange={handleChange}
         />
       </Element>
@@ -83,7 +81,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('city')}>
         <InputField
           id="shipping_city"
-          value={props.client?.shipping_city}
+          value={props.client?.shipping_city || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_city}
         />
@@ -92,7 +90,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('state')}>
         <InputField
           id="shipping_state"
-          value={props.client?.shipping_state}
+          value={props.client?.shipping_state || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_state}
         />
@@ -101,29 +99,22 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('postal_code')}>
         <InputField
           id="shipping_postal_code"
-          value={props.client?.shipping_postal_code}
+          value={props.client?.shipping_postal_code || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_postal_code}
         />
       </Element>
-      {countries.length > 1 && (
-        <Element leftSide={t('country')}>
-          <SelectField
-            id="shipping_country_id"
-            defaultValue={props.client?.shipping_country_id}
-            onChange={handleChange}
-            errorMessage={errors?.errors.shipping_country_id}
-          >
-            <option value=""></option>
 
-            {countries.map((country, index) => (
-              <option key={index} value={country.id}>
-                {country.name}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
-      )}
+      <Element leftSide={t('country')}>
+        <CountrySelector
+          onChange={(id) =>
+            setClient((c) => c && { ...c, shipping_country_id: id })
+          }
+          value={props.client?.shipping_country_id || ''}
+          errorMessage={errors?.errors.shipping_country_id}
+          dismissable
+        />
+      </Element>
     </>
   );
 }

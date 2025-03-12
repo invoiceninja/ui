@@ -35,6 +35,7 @@ import { Expense } from '$app/common/interfaces/expense';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date as formatDate } from '$app/common/helpers';
 import { useTransactionQuery } from '$app/common/queries/transactions';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   transactionId: string;
@@ -131,9 +132,18 @@ export function Details(props: Props) {
     props.transactionId,
     expensesResponse,
   ]);
+  const colors = useColorScheme();
 
   return (
-    <div className="flex flex-col flex-1 border-b border-gray-200">
+    <div
+      className="flex flex-col flex-1 border-b"
+      style={{
+        color: colors.$3,
+        colorScheme: colors.$0,
+        backgroundColor: colors.$1,
+        borderColor: colors.$4,
+      }}
+    >
       <div>
         <Element leftSide={t('type')}>
           {isCreditTransactionType
@@ -153,11 +163,14 @@ export function Details(props: Props) {
           {formatDate(transaction?.date || '', dateFormat)}
         </Element>
 
-        <Element
-          leftSide={t('bank_account')}
-          className="hover:bg-gray-100 cursor-pointer"
-        >
+        <Element leftSide={t('bank_account')} className="cursor-pointer">
           <Link
+            style={{
+              color: colors.$3,
+              colorScheme: colors.$0,
+              backgroundColor: colors.$1,
+              borderColor: colors.$4,
+            }}
             to={route('/settings/bank_accounts/:id/details', {
               id: bankAccountResponse?.id,
             })}
@@ -165,6 +178,18 @@ export function Details(props: Props) {
             {bankAccountResponse?.bank_account_name}
           </Link>
         </Element>
+
+        {transaction?.participant && (
+          <Element leftSide={t('participant')}>
+            {transaction.participant}
+          </Element>
+        )}
+
+        {transaction?.participant_name && (
+          <Element leftSide={t('participant_name')}>
+            {transaction.participant_name}
+          </Element>
+        )}
       </div>
 
       {!showTransactionMatchDetails ? (
@@ -173,9 +198,15 @@ export function Details(props: Props) {
             <Element
               key={id}
               leftSide={t('invoice')}
-              className="hover:bg-gray-100 cursor-pointer"
+              className="cursor-pointer"
             >
               <Link
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
                 to={route('/invoices/:id/edit', {
                   id,
                 })}
@@ -186,11 +217,9 @@ export function Details(props: Props) {
           ))}
 
           {transaction?.payment_id && (
-            <Element
-              leftSide={t('payment')}
-              className="hover:bg-gray-100 cursor-pointer"
-            >
+            <Element leftSide={t('payment')} className="cursor-pointer">
               <Link
+                style={{ color: colors.$3, colorScheme: colors.$0 }}
                 to={route('/payments/:id/edit', {
                   id: matchedPayment?.id,
                 })}
@@ -201,11 +230,14 @@ export function Details(props: Props) {
           )}
 
           {transaction?.vendor_id && (
-            <Element
-              leftSide={t('vendor')}
-              className="hover:bg-gray-100 cursor-pointer"
-            >
+            <Element leftSide={t('vendor')} className="cursor-pointer">
               <Link
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
                 to={route('/vendors/:id', {
                   id: vendorResponse?.id,
                 })}
@@ -216,11 +248,9 @@ export function Details(props: Props) {
           )}
 
           {transaction?.ninja_category_id && (
-            <Element
-              leftSide={t('category')}
-              className="hover:bg-gray-100 cursor-pointer"
-            >
+            <Element leftSide={t('category')} className="cursor-pointer">
               <Link
+                style={{ color: colors.$3, colorScheme: colors.$0 }}
                 to={route('/settings/expense_categories/:id/edit', {
                   id: matchedExpenseCategory?.id,
                 })}
@@ -234,9 +264,10 @@ export function Details(props: Props) {
             <Element
               key={id}
               leftSide={t('expense')}
-              className="hover:bg-gray-100 cursor-pointer"
+              className="cursor-pointer"
             >
               <Link
+                style={{ color: colors.$3, colorScheme: colors.$0 }}
                 to={route('/expenses/:id/edit', {
                   id,
                 })}

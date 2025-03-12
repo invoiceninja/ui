@@ -12,7 +12,8 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { getExchangeRate } from '$app/pages/payments/common/helpers/resolve-exchange-rate';
 import { useTranslation } from 'react-i18next';
 import { Element } from './cards';
-import { InputField, SelectField } from './forms';
+import { CurrencySelector } from './CurrencySelector';
+import { NumberInputField } from './forms/NumberInputField';
 
 interface Props {
   amount: number;
@@ -37,30 +38,31 @@ export function ConvertCurrency(props: Props) {
   return (
     <>
       <Element leftSide={t('currency')}>
-        <SelectField
-          withBlank
+        <CurrencySelector
           value={props.exchangeCurrencyId}
-          onValueChange={handleChange}
-        >
-          {statics?.currencies.map((element: any, index: any) => (
-            <option value={element.id} key={index}>
-              {element.name}
-            </option>
-          ))}
-        </SelectField>
+          onChange={handleChange}
+          dismissable
+        />
       </Element>
 
       <Element leftSide={t('exchange_rate')}>
-        <InputField
+        <NumberInputField
+          value={props.exchangeRate || ''}
           onValueChange={(value) =>
             props.onExchangeRateChange(parseFloat(value))
           }
-          value={props.exchangeRate}
+          disablePrecision
         />
       </Element>
 
       <Element leftSide={t('converted_amount')}>
-        <InputField value={props.amount * parseFloat(props.exchangeRate)} />
+        <NumberInputField
+          value={props.amount * parseFloat(props.exchangeRate) || ''}
+          onValueChange={(value) =>
+            props.onExchangeRateChange(parseFloat(value) / props.amount)
+          }
+          disablePrecision
+        />
       </Element>
     </>
   );

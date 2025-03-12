@@ -18,18 +18,21 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { useBlankVendorQuery } from '$app/common/queries/vendor';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Form } from '../edit/components/Form';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
 import { set } from 'lodash';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -50,7 +53,6 @@ export default function Create() {
   const { data } = useBlankVendorQuery();
   const { isAdmin } = useAdmin();
 
-  const queryClient = useQueryClient();
   const company = useInjectCompanyChanges();
 
   const [vendor, setVendor] = useState<Vendor>();
@@ -96,20 +98,13 @@ export default function Create() {
       .then((response) => {
         toast.success('created_vendor');
 
-        queryClient.invalidateQueries('/api/v1/vendors');
-
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: {
-              url: endpoint('/api/v1/vendors'),
-            },
-          })
-        );
+        $refetch(['vendors']);
 
         if (isAdmin) {
           dispatch(
             updateRecord({ object: 'company', data: response[1].data.data })
           );
+          dispatch(resetChanges('company'));
         }
 
         navigate(route('/vendors/:id', { id: response[0].data.data.id }));

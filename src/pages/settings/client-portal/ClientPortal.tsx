@@ -48,11 +48,10 @@ export function ClientPortal() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
-      withoutBackButton
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
-
       <Tabs tabs={tabs} className="mt-6" />
+
+      <AdvancedSettingsPlanAlert />
 
       <div className="my-4">
         <Outlet />

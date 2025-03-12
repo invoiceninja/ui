@@ -18,7 +18,10 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLogo } from '$app/common/hooks/useLogo';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -28,8 +31,12 @@ import { useAtomValue } from 'jotai';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
-export function Logo() {
+interface Props {
+  isSettingsPage?: boolean;
+}
+export function Logo({ isSettingsPage = true }: Props) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
@@ -82,13 +89,16 @@ export function Logo() {
             dispatch(
               updateRecord({ object: 'company', data: response.data.data })
             );
+            dispatch(resetChanges('company'));
           }
 
           if (isGroupSettingsActive) {
+            $refetch(['group_settings']);
             configureGroupSettings(response.data.data);
           }
 
           if (isClientSettingsActive) {
+            $refetch(['clients']);
             configureClientSettings(response.data.data);
           }
 
@@ -98,14 +108,17 @@ export function Logo() {
     },
   });
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    formData.append('company_logo', acceptedFiles[0]);
-    formData.append('_method', 'PUT');
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      formData.append('company_logo', acceptedFiles[0]);
+      formData.append('_method', 'PUT');
 
-    setFormData(formData);
+      setFormData(formData);
 
-    formik.submitForm();
-  }, []);
+      formik.submitForm();
+    },
+    [formData]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -116,7 +129,7 @@ export function Logo() {
     },
   });
 
-  return (
+  return isSettingsPage ? (
     <Card title={t('logo')}>
       <Element leftSide={t('logo')}>
         <div className="grid grid-cols-12 lg:gap-4 space-y-4 lg:space-y-0">
@@ -148,5 +161,40 @@ export function Logo() {
       </Element>
       <DeleteLogo />
     </Card>
+  ) : (
+    <div className="flex flex-col space-y-5">
+      <span className="text-lg font-medium">{t('upload_logo')}</span>
+
+      <div className="grid grid-cols-12 gap-x-4">
+        <div className="bg-gray-200 col-span-6 rounded-lg p-6">
+          <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
+        </div>
+
+        <div className="col-span-6 bg-gray-900 rounded-lg p-6">
+          <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
+        </div>
+      </div>
+
+      <div className="flex flex-col space-y-3">
+        <div
+          {...getRootProps()}
+          className="flex flex-col md:flex-row md:items-center"
+        >
+          <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <input {...getInputProps()} />
+            <Image className="mx-auto h-12 w-12 text-gray-400" />
+            <span className="mt-2 block text-sm font-medium">
+              {isDragActive
+                ? 'drop_your_logo_here'
+                : t('dropzone_default_message')}
+            </span>
+          </div>
+        </div>
+
+        <div className="self-start">
+          <DeleteLogo isSettingsPage={false} />
+        </div>
+      </div>
+    </div>
   );
 }

@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import VerificationInput from 'react-verification-input';
 
 interface Props {
   visible: boolean;
@@ -23,94 +24,47 @@ interface Props {
 export function SmsVerificationModal(props: Props) {
   const [t] = useTranslation();
 
-  const digitFieldsBox = useRef<HTMLDivElement>(null);
+  const { resendSmsCode, verifyPhoneNumber, setVisible } = props;
 
-  const digitFields = [
-    'digit1',
-    'digit2',
-    'digit3',
-    'digit4',
-    'digit5',
-    'digit6',
-  ];
-
-  const initialCodeValue = ['', '', '', '', '', ''];
-
-  const [code, setCode] = useState<string[]>(initialCodeValue);
-
-  const [isCodeEntered, setIsCodeEntered] = useState<boolean>(false);
-
-  const handleChangeValue = (value: string, fieldIndex: number) => {
-    const updatedCode = code.map((currentValue, index) =>
-      index === fieldIndex ? value : currentValue
-    );
-
-    const isCodeFullyEntered = updatedCode.every((value) => value);
-
-    setIsCodeEntered(isCodeFullyEntered);
-
-    setCode(updatedCode);
-
-    if (value) {
-      if (fieldIndex === digitFields.length - 1) {
-        (
-          digitFieldsBox.current?.children[0].children[0]
-            .children[0] as HTMLInputElement
-        ).focus();
-      } else {
-        (
-          digitFieldsBox.current?.children[fieldIndex + 1].children[0]
-            .children[0] as HTMLInputElement
-        ).focus();
-      }
-    }
-  };
-
-  const handleCodeClear = () => {
-    (
-      digitFieldsBox.current?.children[0].children[0]
-        .children[0] as HTMLInputElement
-    ).focus();
-
-    setIsCodeEntered(false);
-
-    setCode(initialCodeValue);
-  };
+  const [code, setCode] = useState<string>('');
 
   return (
     <Modal
       title={t('sms_code')}
       visible={props.visible}
-      onClose={() => props.setVisible(false)}
+      onClose={() => {
+        setVisible(false);
+        setCode('');
+      }}
     >
       <div>
         <div className="flex justify-end mb-1">
-          <Button type="minimal" onClick={handleCodeClear}>
+          <Button behavior="button" type="minimal" onClick={() => setCode('')}>
             {t('clear')}
           </Button>
         </div>
 
-        <div ref={digitFieldsBox} className="grid grid-flow-col gap-x-2">
-          {digitFields.map((field, index) => (
-            <InputField
-              key={field}
-              className="text-center border-gray-800 text-xl"
-              maxLength={1}
-              value={code[index]}
-              onValueChange={(value) => handleChangeValue(value, index)}
-            />
-          ))}
+        <div className="flex justify-center">
+          <VerificationInput value={code} onChange={setCode} />
         </div>
 
         <div className="flex justify-between mt-8">
-          <Button type="minimal" onClick={() => props.resendSmsCode()}>
+          <Button
+            behavior="button"
+            type="minimal"
+            onClick={() => {
+              resendSmsCode();
+              setCode('');
+            }}
+          >
             {t('resend_code')}
           </Button>
 
           <Button
-            onClick={() => props.verifyPhoneNumber(code.join(''))}
+            behavior="button"
+            onClick={() => verifyPhoneNumber(code)}
             disableWithoutIcon
-            disabled={!isCodeEntered}
+            disabled={code.length !== 6}
           >
             {t('verify')}
           </Button>

@@ -31,7 +31,6 @@ export function Schedules() {
       title={documentTitle}
       docsLink="en/advanced-settings/#schedules"
       breadcrumbs={pages}
-      withoutBackButton
     >
       <DataTable
         resource="schedule"
@@ -41,6 +40,7 @@ export function Schedules() {
         linkToCreate="/settings/schedules/create"
         linkToEdit="/settings/schedules/:id/edit"
         withResourcefulActions
+        enableSavingFilterPreference
       />
     </Settings>
   );

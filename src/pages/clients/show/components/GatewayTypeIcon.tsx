@@ -26,18 +26,14 @@ import stripeLogo from '/gateway-card-images/stripe.svg';
 import ewayLogo from '/gateway-card-images/eway.png';
 import forteLogo from '/gateway-card-images/forte.png';
 import wepayLogo from '/gateway-card-images/wepay.svg';
-
-interface Props {
-  name: string;
-  style?: CSSProperties;
-}
+import BTCPayLogo from '/gateway-card-images/btcpay.png';
 
 export const availableGatewayLogos = [
+  'paypal_ppcp',
   'visa',
   'american_express',
   'mastercard',
-  'paypal',
-  'paypal_express',
+  'paypal_platform',
   'authorize',
   'braintree',
   'checkoutcom',
@@ -51,7 +47,36 @@ export const availableGatewayLogos = [
   'wepay',
   'eway',
   'forte',
+  'paypal_rest',
+  'btcpay',
 ];
+
+export type GatewayLogoName =
+  | 'paypal_ppcp'
+  | 'visa'
+  | 'american_express'
+  | 'mastercard'
+  | 'paypal_platform'
+  | 'authorize'
+  | 'braintree'
+  | 'checkoutcom'
+  | 'gocardless'
+  | 'mollie'
+  | 'payfast'
+  | 'paytrace'
+  | 'razorpay'
+  | 'square'
+  | 'stripe'
+  | 'wepay'
+  | 'eway'
+  | 'forte'
+  | 'paypal_rest'
+  | 'btcpay';
+
+interface Props {
+  name: GatewayLogoName;
+  style?: CSSProperties;
+}
 
 export function GatewayTypeIcon(props: Props) {
   switch (props.name) {
@@ -82,20 +107,29 @@ export function GatewayTypeIcon(props: Props) {
         />
       );
 
-    case 'paypal':
+    case 'paypal_platform':
       return (
         <img
           src={paypalLogo}
-          alt="Paypal"
+          alt="PayPal"
           style={props.style || { width: 40, height: 40 }}
         />
       );
 
-    case 'paypal_express':
+    case 'paypal_rest':
       return (
         <img
           src={paypalLogo}
-          alt="Paypal"
+          alt="PayPal Rest"
+          style={props.style || { width: 40, height: 40 }}
+        />
+      );
+
+    case 'paypal_ppcp':
+      return (
+        <img
+          src={paypalLogo}
+          alt="PayPal"
           style={props.style || { width: 40, height: 40 }}
         />
       );
@@ -213,6 +247,15 @@ export function GatewayTypeIcon(props: Props) {
         <img
           src={wepayLogo}
           alt="Wepay"
+          style={props.style || { width: 30, height: 30 }}
+        />
+      );
+
+    case 'btcpay':
+      return (
+        <img
+          src={BTCPayLogo}
+          alt="BTCPay"
           style={props.style || { width: 30, height: 30 }}
         />
       );

@@ -9,8 +9,6 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Banner } from '../Banner';
-import { buttonStyles } from './VerifyEmail';
 import { Modal } from '../Modal';
 import { useEffect, useState } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -23,14 +21,19 @@ import { request } from '$app/common/helpers/request';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import VerificationInput from 'react-verification-input';
-import { useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useDispatch } from 'react-redux';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
+import { Popover } from '@headlessui/react';
 
 interface VerificationProps {
   visible: boolean;
@@ -51,7 +54,6 @@ function Confirmation({
   const [t] = useTranslation();
   const [code, setCode] = useState<string | null>(null);
 
-  const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
   const handleConfirmation = () => {
@@ -62,12 +64,12 @@ function Confirmation({
     }).then(() => {
       toast.success('verified_phone_number');
 
-      queryClient.invalidateQueries('/api/v1/users');
-      queryClient.invalidateQueries('/api/v1/company_users');
+      $refetch(['users', 'company_users']);
 
       request('POST', endpoint('/api/v1/refresh')).then(
         (response: GenericSingleResourceResponse<CompanyUser>) => {
           dispatch(updateCompanyUsers(response.data.data));
+          dispatch(resetChanges('company'));
           onComplete();
         }
       );
@@ -138,6 +140,7 @@ function Verification({ visible, onClose }: VerificationProps) {
         }
       });
   };
+  const colors = useColorScheme();
 
   return (
     <>
@@ -146,7 +149,14 @@ function Verification({ visible, onClose }: VerificationProps) {
         visible={visible}
         onClose={onClose}
       >
-        <div className="flex flex-col text-gray-900 mb-1">
+        <div
+          className="flex flex-col mb-1"
+          style={{
+            backgroundColor: colors.$2,
+            color: colors.$3,
+            colorScheme: colors.$0,
+          }}
+        >
           <PhoneInput
             international
             placeholder={t('phone')}
@@ -187,7 +197,8 @@ function Verification({ visible, onClose }: VerificationProps) {
 
 export function VerifyPhone() {
   const [t] = useTranslation();
-  const [isVerificationVisible, setIsVerificationVisible] = useState(false);
+  const [isVerificationVisible, setIsVerificationVisible] =
+    useState<boolean>(false);
 
   const user = useCurrentUser();
   const account = useCurrentAccount();
@@ -211,18 +222,20 @@ export function VerifyPhone() {
 
   return (
     <>
-      <Banner variant="orange">
-        <div className="flex space-x-1">
-          <span>{t('verify_phone_number_help')}.</span>
+      <Popover className="relative">
+        <div className="max-w-max rounded-lg bg-[#FCD34D] px-6 py-4 shadow-lg">
+          <div className="flex items-center justify-center space-x-1">
+            <span className="text-sm">{t('verify_phone_number_help')}.</span>
 
-          <button
-            className={buttonStyles}
-            onClick={() => setIsVerificationVisible(true)}
-          >
-            {t('verify_phone_number')}
-          </button>
+            <button
+              className="cursor-pointer text-sm font-semibold underline hover:no-underline"
+              onClick={() => setIsVerificationVisible(true)}
+            >
+              {t('verify_phone_number')}
+            </button>
+          </div>
         </div>
-      </Banner>
+      </Popover>
 
       <Verification
         visible={isVerificationVisible}

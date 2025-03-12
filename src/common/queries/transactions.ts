@@ -11,12 +11,13 @@
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useAtomValue } from 'jotai';
 import { useQuery, useQueryClient } from 'react-query';
+import { $refetch } from '../hooks/useRefetch';
+import { useHasPermission } from '../hooks/permissions/useHasPermission';
 
 interface TransactionParams {
   id: string | undefined;
@@ -25,7 +26,7 @@ interface TransactionParams {
 
 export function useTransactionQuery(params: TransactionParams) {
   return useQuery<Transaction>(
-    route('/api/v1/bank_transactions/:id', { id: params.id }),
+    ['/api/v1/bank_transactions', params.id],
     () =>
       request(
         'GET',
@@ -39,19 +40,22 @@ export function useTransactionQuery(params: TransactionParams) {
 }
 
 export function useBlankTransactionQuery() {
+  const hasPermission = useHasPermission();
+
   return useQuery<Transaction>(
-    '/api/v1/bank_transactions/create',
+    ['/api/v1/bank_transactions', 'create'],
     () =>
       request('GET', endpoint('/api/v1/bank_transactions/create')).then(
         (response: GenericSingleResourceResponse<Transaction>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: hasPermission('create_bank_transaction') }
   );
 }
 
 const successMessages = {
   convert_matched: 'converted_transactions',
+  unlink: 'unlinked_payment',
 };
 
 export const useBulk = () => {
@@ -60,7 +64,7 @@ export const useBulk = () => {
 
   return (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'convert_matched'
+    action: 'archive' | 'restore' | 'delete' | 'convert_matched' | 'unlink'
   ) => {
     toast.processing();
 
@@ -74,13 +78,7 @@ export const useBulk = () => {
 
       toast.success(message);
 
-      queryClient.invalidateQueries('/api/v1/bank_transactions');
-
-      ids.forEach((id) => {
-        queryClient.invalidateQueries(
-          route('/api/v1/bank_transactions/:id', { id })
-        );
-      });
+      $refetch(['bank_transactions']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

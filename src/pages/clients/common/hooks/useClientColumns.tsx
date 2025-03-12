@@ -28,6 +28,14 @@ import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'name',
@@ -70,7 +78,7 @@ export function useAllClientColumns() {
     fourthCustom,
     'documents',
     'entity_state',
-    //   'group',
+    'group',
     'id_number',
     'is_deleted',
     'language',
@@ -83,6 +91,7 @@ export function useAllClientColumns() {
     'updated_at',
     'vat_number',
     'website',
+    'city',
   ] as const;
 
   return clientColumns;
@@ -92,6 +101,8 @@ export function useClientColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -99,6 +110,7 @@ export function useClientColumns() {
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
   const resolveLanguage = useResolveLanguage();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const getContactsColumns = useCallback((client: Client) => {
     const names: string[] = [];
@@ -122,14 +134,19 @@ export function useClientColumns() {
     {
       column: 'number',
       id: 'number',
-      label: t('id_number'),
+      label: t('number'),
     },
     {
       column: 'name',
       id: 'display_name',
       label: t('name'),
       format: (value, client) => (
-        <Link to={route('/clients/:id', { id: client.id })}>{value}</Link>
+        <DynamicLink
+          to={route('/clients/:id', { id: client.id })}
+          renderSpan={disableNavigation('client', client)}
+        >
+          {value}
+        </DynamicLink>
       ),
     },
     {
@@ -160,9 +177,12 @@ export function useClientColumns() {
       label: t('contact_name'),
       format: (value, resource) =>
         resource.contacts.length > 0 && (
-          <Link to={route('/clients/:id', { id: resource.id })}>
+          <DynamicLink
+            to={route('/clients/:id', { id: resource.id })}
+            renderSpan={disableNavigation('client', resource)}
+          >
             {resource.contacts[0].first_name} {resource.contacts[0].last_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -238,21 +258,25 @@ export function useClientColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('client1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('client2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('client3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('client4', value?.toString()),
     },
     {
       column: 'documents',
@@ -297,12 +321,23 @@ export function useClientColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -312,12 +347,23 @@ export function useClientColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -366,6 +412,26 @@ export function useClientColumns() {
           </Inline>
         </Link>
       ),
+    },
+    {
+      column: 'group',
+      id: 'group_settings_id',
+      label: t('group'),
+      format: (value, client) =>
+        Boolean(value) && (
+          <Link
+            to={route('/settings/group_settings/:id/edit', {
+              id: value,
+            })}
+          >
+            {client.group_settings?.name}
+          </Link>
+        ),
+    },
+    {
+      column: 'city',
+      id: 'city',
+      label: t('city'),
     },
   ];
 

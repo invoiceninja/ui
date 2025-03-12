@@ -17,14 +17,27 @@ import { AxiosResponse } from 'axios';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { route } from '$app/common/helpers/route';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useFreePlanDesigns } from '../hooks/useFreePlanDesigns';
+import { enterprisePlan } from '../guards/guards/enterprise-plan';
+import { proPlan } from '../guards/guards/pro-plan';
+import { useAdmin } from '../hooks/permissions/useHasPermission';
 
 export function useDesignsQuery() {
+  const freePlanDesigns = useFreePlanDesigns();
+
   return useQuery<Design[]>(
     ['/api/v1/designs'],
     () =>
-      request('GET', endpoint('/api/v1/designs?status=active')).then(
-        (response: AxiosResponse<GenericManyResponse<Design>>) =>
-          response.data.data
+      request(
+        'GET',
+        endpoint('/api/v1/designs?status=active&sort=name|asc&per_page=100')
+      ).then((response: AxiosResponse<GenericManyResponse<Design>>) =>
+        response.data.data.filter(
+          (design) =>
+            freePlanDesigns.includes(design.name) ||
+            proPlan() ||
+            enterprisePlan()
+        )
       ),
     { staleTime: Infinity }
   );
@@ -36,7 +49,7 @@ interface DesignQueryOptions extends GenericQueryOptions {
 
 export function useDesignQuery(params: DesignQueryOptions) {
   return useQuery<Design>(
-    route('/api/v1/designs/:id', { id: params.id }),
+    ['/api/v1/designs', params.id],
     () =>
       request(
         'GET',
@@ -49,6 +62,8 @@ export function useDesignQuery(params: DesignQueryOptions) {
 }
 
 export function useBlankDesignQuery(options?: GenericQueryOptions) {
+  const { isAdmin } = useAdmin();
+
   return useQuery<Design>(
     route('/api/v1/designs/create'),
     () =>
@@ -58,6 +73,25 @@ export function useBlankDesignQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
+      enabled: isAdmin ? options?.enabled ?? true : false,
     }
+  );
+}
+
+export function useTemplateQuery(entity: string) {
+  return useQuery<Design[]>(
+    ['/api/v1/designs', '?template=true&entities=', entity],
+    () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/designs?template=true&status=active&sort=name|asc&entities=' +
+            entity
+        )
+      ).then(
+        (response: AxiosResponse<GenericManyResponse<Design>>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
   );
 }

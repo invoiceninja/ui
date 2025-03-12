@@ -10,19 +10,30 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms/Link';
 import { Payment } from '$app/common/interfaces/payment';
 import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
 import { Badge } from '$app/components/Badge';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { CreditCardChecked } from '$app/components/icons/CreditCardChecked';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
 
 export function RecentPayments() {
+  const [t] = useTranslation();
   const formatMoney = useFormatMoney();
+
+  const colors = useColorScheme();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const disableNavigation = useDisableNavigation();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -30,9 +41,12 @@ export function RecentPayments() {
       label: t('number'),
       format: (value, payment) => {
         return (
-          <Link to={route('/payments/:id/edit', { id: payment.id })}>
+          <DynamicLink
+            to={route('/payments/:id/edit', { id: payment.id })}
+            renderSpan={disableNavigation('payment', payment)}
+          >
             {payment.number}
-          </Link>
+          </DynamicLink>
         );
       },
     },
@@ -40,9 +54,12 @@ export function RecentPayments() {
       id: 'client_id',
       label: t('client'),
       format: (value, payment) => (
-        <Link to={route('/clients/:id', { id: payment.client_id })}>
+        <DynamicLink
+          to={route('/clients/:id', { id: payment.client_id })}
+          renderSpan={disableNavigation('client', payment.client)}
+        >
           {payment.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -51,13 +68,14 @@ export function RecentPayments() {
       format: (value, payment) =>
         payment.invoices &&
         payment.invoices[0] && (
-          <Link
+          <DynamicLink
             to={generatePath('/invoices/:id/edit', {
               id: payment.invoices[0].id,
             })}
+            renderSpan={disableNavigation('invoice', payment.invoices[0])}
           >
             {payment.invoices[0].number}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -69,7 +87,7 @@ export function RecentPayments() {
       id: 'amount',
       label: t('amount'),
       format: (value, payment) => (
-        <Badge variant="green">
+        <Badge variant="green" className="font-mono">
           {formatMoney(
             value,
             payment.client?.country_id,
@@ -82,34 +100,54 @@ export function RecentPayments() {
 
   return (
     <Card
-      title={t('recent_payments')}
-      className="h-96 relative"
+      title={
+        <div className="flex items-center gap-2">
+          <CreditCardChecked size="1.4rem" color="#22C55E" />
+
+          <span>{t('recent_payments')}</span>
+        </div>
+      }
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
+      style={{ borderColor: colors.$5 }}
+      headerStyle={{ borderColor: colors.$5 }}
+      withoutHeaderPadding
     >
-      <div className="pl-6 pr-4">
+      <div className="px-4 pt-4">
         <DataTable
           resource="payment"
           columns={columns}
           className="pr-4"
-          endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
+          endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&without_deleted_clients=true&page=1"
           withoutActions
           withoutPagination
-          staleTime={Infinity}
           withoutPadding
+          withoutPerPageAsPreference
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,
             withoutTopBorder: true,
             withoutLeftBorder: true,
             withoutRightBorder: true,
+            disableThUppercase: true,
+            withoutThVerticalPadding: true,
+            useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
+            thChildrenClassName: 'text-gray-500',
+            tdClassName: 'first:pl-2 py-3',
+            thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },
+            thTextSize: 'small',
+            thStyle: {
+              borderBottom: `1px solid ${colors.$5}`,
+            },
+            rowSeparatorColor: colors.$5,
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
           }}
           style={{
-            height: '19.9rem',
+            height: '18.9rem',
           }}
         />
       </div>

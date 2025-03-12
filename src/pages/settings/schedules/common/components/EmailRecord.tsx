@@ -66,9 +66,9 @@ export function EmailRecord(props: Props) {
       {schedule.parameters.entity === 'invoice' && (
         <Element leftSide={t('invoice')}>
           <ComboboxAsync<Invoice>
-            endpoint={
-              new URL(endpoint('/api/v1/invoices?include=client&status=active'))
-            }
+            endpoint={endpoint(
+              '/api/v1/invoices?include=client.group_settings&filter_deleted_clients=true&status=active'
+            )}
             onChange={(invoice: Entry<Invoice>) =>
               invoice.resource &&
               handleChange(
@@ -98,9 +98,9 @@ export function EmailRecord(props: Props) {
       {schedule.parameters.entity === 'quote' && (
         <Element leftSide={t('quote')}>
           <ComboboxAsync<Quote>
-            endpoint={
-              new URL(endpoint('/api/v1/quotes?include=client&status=active'))
-            }
+            endpoint={endpoint(
+              '/api/v1/quotes?include=client&filter_deleted_clients=true&status=active'
+            )}
             onChange={(quote: Entry<Quote>) =>
               quote.resource &&
               handleChange(
@@ -129,9 +129,9 @@ export function EmailRecord(props: Props) {
       {schedule.parameters.entity === 'credit' && (
         <Element leftSide={t('credit')}>
           <ComboboxAsync<Credit>
-            endpoint={
-              new URL(endpoint('/api/v1/credits?include=client&status=active'))
-            }
+            endpoint={endpoint(
+              '/api/v1/credits?include=client&filter_deleted_clients=true&status=active'
+            )}
             onChange={(credit: Entry<Credit>) =>
               credit.resource &&
               handleChange(
@@ -161,11 +161,9 @@ export function EmailRecord(props: Props) {
       {schedule.parameters.entity === 'purchase_order' && (
         <Element leftSide={t('purchase_order')}>
           <ComboboxAsync<PurchaseOrder>
-            endpoint={
-              new URL(
-                endpoint('/api/v1/purchase_orders?include=vendor&status=active')
-              )
-            }
+            endpoint={endpoint(
+              '/api/v1/purchase_orders?include=vendor&status=active'
+            )}
             onChange={(value: Entry<PurchaseOrder>) =>
               value.resource &&
               handleChange(

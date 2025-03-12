@@ -10,47 +10,75 @@
 
 import { endpoint } from '$app/common/helpers';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Dispatch, SetStateAction } from 'react';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useSearchParams } from 'react-router-dom';
 
-export function useHandleSave(
-  setErrors: (errors: ValidationBag | undefined) => unknown
-) {
-  const queryClient = useQueryClient();
-  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+interface Params {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+export function useHandleSave(params: Params) {
+  const { setErrors, isDefaultTerms, isDefaultFooter } = params;
+
+  const [searchParams] = useSearchParams();
+
   const saveCompany = useHandleCompanySave();
+  const refreshCompanyUsers = useRefreshCompanyUsers();
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (invoice: Invoice) => {
     setErrors(undefined);
-
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
-    request(
-      'PUT',
-      endpoint('/api/v1/invoices/:id', { id: invoice.id }),
-      invoice
-    )
-      .then(() => toast.success('updated_invoice'))
-      .catch((error) => {
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+    let apiEndpoint = '/api/v1/invoices/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: invoice.id }), invoice)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
+        toast.success('updated_invoice');
+
+        $refetch(['products', 'invoices']);
+
+        if (searchParams.get('action') === 'add_tasks') {
+          $refetch(['tasks']);
         }
       })
-      .finally(() => {
-        setIsDeleteActionTriggered(undefined);
+      .catch((error) => {
+        if (error.response?.status === 422) {
+          const errorMessages = error.response.data;
 
-        queryClient.invalidateQueries(
-          route('/api/v1/invoices/:id', { id: invoice.id })
-        );
-      });
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
+        }
+      })
+      .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }

@@ -12,37 +12,42 @@ import { Button } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Client } from '$app/common/interfaces/client';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Modal } from '$app/components/Modal';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
   mergeFromClientId: string;
-  editPage?: boolean;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function MergeClientModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+  const { isEditOrShowPage } = useEntityPageIdentifier({
+    entity: 'client',
+  });
+
+  const { setIsPurgeOrMergeActionCalled } = props;
+
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
   const [mergeIntoClientId, setMergeIntoClientId] = useState<string>('');
 
@@ -51,10 +56,11 @@ export function MergeClientModal(props: Props) {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const handleMergeClient = (password: string) => {
+  const handleMergeClient = (password: string, isPasswordRequired: boolean) => {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
+      setIsPurgeOrMergeActionCalled?.(true);
 
       request(
         'POST',
@@ -68,34 +74,33 @@ export function MergeClientModal(props: Props) {
         {},
         { headers: { 'X-Api-Password': password } }
       )
-        .then((response: GenericSingleResourceResponse<Client>) => {
-          queryClient.invalidateQueries('/api/v1/clients');
+        .then(() => {
+          $refetch(['clients']);
 
-          queryClient.invalidateQueries(
-            route('/api/v1/clients/:id', { id: response.data.data.id })
-          );
-
-          request('POST', endpoint('/api/v1/refresh')).then(
-            (response: AxiosResponse) => {
+          request('POST', endpoint('/api/v1/refresh'))
+            .then((response: AxiosResponse) => {
               toast.success('merged_clients');
 
               dispatch(updateCompanyUsers(response.data.data));
+              dispatch(resetChanges('company'));
 
               setMergeIntoClientId('');
 
               props.setVisible(false);
 
-              if (props.editPage) {
+              if (isEditOrShowPage) {
                 navigate('/clients');
               }
-            }
-          );
+            })
+            .catch(() => setIsPurgeOrMergeActionCalled?.(false));
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
-            toast.error('password_error_incorrect');
-            setLastPasswordEntryTime(0);
+            onWrongPasswordEnter(isPasswordRequired);
+            setPasswordConfirmModalOpen(true);
           }
+
+          setIsPurgeOrMergeActionCalled?.(false);
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -119,7 +124,16 @@ export function MergeClientModal(props: Props) {
         onClearButtonClick={() => setMergeIntoClientId('')}
         withoutAction
         exclude={[props.mergeFromClientId]}
-        staleTime={Infinity}
+        dropdownLabelFn={(client) => (
+          <div className="flex items-center space-x-1">
+            <span>{client.display_name}</span>
+
+            {client.contacts[0]?.email && (
+              <span className="text-xs">({client.contacts[0].email})</span>
+            )}
+          </div>
+        )}
+        initiallyVisible
       />
 
       <div className="self-end pt-2">

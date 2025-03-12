@@ -13,8 +13,6 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { useTitle } from '$app/common/hooks/useTitle';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
-import { InputField } from '$app/components/forms/InputField';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
@@ -24,6 +22,8 @@ import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function ProductSettings() {
   const [t] = useTranslation();
@@ -52,14 +52,7 @@ export function ProductSettings() {
     );
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
@@ -71,7 +64,6 @@ export function ProductSettings() {
       title={t('product_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#product_settings"
-      withoutBackButton
     >
       <Card title={t('Settings')}>
         <Element
@@ -99,11 +91,17 @@ export function ProductSettings() {
         {companyChanges?.stock_notification === true ? (
           <>
             <Element leftSide={t('notification_threshold')}>
-              <InputField
-                id="inventory_notification_threshold"
-                onChange={handleChange}
+              <NumberInputField
+                precision={0}
                 value={companyChanges?.inventory_notification_threshold || ''}
+                onValueChange={(value) =>
+                  handleChange(
+                    'inventory_notification_threshold',
+                    parseFloat(value)
+                  )
+                }
                 errorMessage={errors?.errors.inventory_notification_threshold}
+                disablePrecision
               />
             </Element>
           </>

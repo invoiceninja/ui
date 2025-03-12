@@ -11,7 +11,7 @@ import { PaymentType } from '$app/common/enums/payment-type';
 
 export default {
   [PaymentType.ACH]: 'payment_type_ACH',
-  [PaymentType.ACSS]: 'acss',
+  [PaymentType.ACSS]: 'payment_type_ACSS',
   [PaymentType.ALIPAY]: 'payment_type_Alipay',
   [PaymentType.AMERICAN_EXPRESS]: 'payment_type_American Express',
   [PaymentType.BANCONTACT]: 'bancontact',
@@ -35,6 +35,7 @@ export default {
   [PaymentType.GOCARDLESS]: 'payment_type_GoCardless',
   [PaymentType.HOSTED_PAGE]: 'payment_type_Hosted Page',
   [PaymentType.IDEAL]: 'ideal',
+  [PaymentType.IZETTLE]: 'payment_type_iZettle',
   [PaymentType.INSTANT_BANK_PAY]: 'instant_bank_pay',
   [PaymentType.INTERAC]: 'payment_type_Interac E-Transfer',
   [PaymentType.JCB]: 'payment_type_JCB',
@@ -43,7 +44,7 @@ export default {
   [PaymentType.LASER]: 'payment_type_Laser',
   [PaymentType.MAESTRO]: 'payment_type_Maestro',
   [PaymentType.MASTERCARD]: 'payment_type_MasterCard',
-  [PaymentType.MOLLIE_BANK_TRANSFER]: 'payment_type_Bank Transfer',
+  [PaymentType.MOLLIE_BANK_TRANSFER]: 'payment_type_Mollie Bank Transfer',
   [PaymentType.NOVA]: 'payment_type_Nova',
   [PaymentType.PAYPAL]: 'payment_type_PayPal',
   [PaymentType.PRZELEWY24]: 'przelewy24',
@@ -55,4 +56,8 @@ export default {
   [PaymentType.VENMO]: 'payment_type_Venmo',
   [PaymentType.VISA]: 'payment_type_Visa Card',
   [PaymentType.ZELLE]: 'payment_type_Zelle',
+  [PaymentType.DEBIT]: 'payment_type_Debit',
+  [PaymentType.GOOGLE_WALLET]: 'payment_type_Google Wallet',
+  [PaymentType.MONEY_ORDER]: 'payment_type_Money Order',
+  [PaymentType.SWISH]: 'payment_type_Swish',
 };

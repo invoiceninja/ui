@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import paymentType from '$app/common/constants/payment-type';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Payment } from '$app/common/interfaces/payment';
@@ -24,6 +23,8 @@ import { useOutletContext } from 'react-router-dom';
 import { PaymentOverview } from './PaymentOverview';
 import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useColorScheme } from '$app/common/colors';
+import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -36,13 +37,19 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_payment');
   const [t] = useTranslation();
 
+  const paymentTypes = usePaymentTypes();
+
   const context = useOutletContext<Context>();
 
   const { setPayment, payment, errors } = context;
 
-  const [convertCurrency, setConvertCurrency] = useState(false);
+  const [convertCurrency, setConvertCurrency] = useState(
+    Boolean(payment?.exchange_currency_id)
+  );
 
   const company = useCurrentCompany();
+
+  const colors = useColorScheme();
 
   const handleChange = <
     TField extends keyof Payment,
@@ -63,6 +70,7 @@ export default function Edit() {
 
       <Element leftSide={t('payment_number')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           id="number"
           value={payment?.number}
           onValueChange={(value) => handleChange('number', value)}
@@ -72,6 +80,7 @@ export default function Edit() {
 
       <Element leftSide={t('payment_date')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           id="date"
           type="date"
           value={payment?.date}
@@ -82,24 +91,24 @@ export default function Edit() {
 
       <Element leftSide={t('payment_type')}>
         <SelectField
-          id="type_id"
           value={payment?.type_id}
           onValueChange={(value) => handleChange('type_id', value)}
           errorMessage={errors?.errors.type_id}
           withBlank
+          customSelector
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
         >
-          {Object.entries(paymentType).map((value: any, index: any) => {
-            return (
-              <option key={index} value={String(value[0])}>
-                {t(value[1])}
-              </option>
-            );
-          })}
+          {paymentTypes.map(([key, value], index) => (
+            <option value={key} key={index}>
+              {value}
+            </option>
+          ))}
         </SelectField>
       </Element>
 
       <Element leftSide={t('transaction_reference')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           id="transaction_reference"
           onValueChange={(value) =>
             handleChange('transaction_reference', value)
@@ -111,6 +120,7 @@ export default function Edit() {
 
       <Element leftSide={t('private_notes')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           element="textarea"
           id="private_notes"
           value={payment?.private_notes}
@@ -165,29 +175,35 @@ export default function Edit() {
 
       <Element leftSide={t('convert_currency')}>
         <Toggle
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           checked={Boolean(payment?.exchange_currency_id)}
           onChange={(value) => {
             setConvertCurrency(value);
 
-            handleChange('exchange_currency_id', '');
-            handleChange('exchange_rate', 1);
+            if (!value) {
+              handleChange('exchange_currency_id', '');
+              handleChange('exchange_rate', 1);
+            }
           }}
         />
       </Element>
 
-      {convertCurrency && payment && (
-        <ConvertCurrency
-          exchangeRate={payment.exchange_rate.toString() || '1'}
-          exchangeCurrencyId={payment.exchange_currency_id || '1'}
-          currencyId={payment.currency_id || '1'}
-          amount={payment?.amount}
-          onChange={(exchangeRate, exchangeCurrencyId) => {
-            handleChange('exchange_rate', exchangeRate);
-            handleChange('exchange_currency_id', exchangeCurrencyId);
-          }}
-          onExchangeRateChange={(value) => handleChange('exchange_rate', value)}
-        />
-      )}
+      {payment &&
+        (Boolean(payment?.exchange_currency_id) || convertCurrency) && (
+          <ConvertCurrency
+            exchangeRate={payment.exchange_rate.toString() || '1'}
+            exchangeCurrencyId={payment.exchange_currency_id || '1'}
+            currencyId={payment.currency_id || '1'}
+            amount={payment?.amount}
+            onChange={(exchangeRate, exchangeCurrencyId) => {
+              handleChange('exchange_rate', exchangeRate);
+              handleChange('exchange_currency_id', exchangeCurrencyId);
+            }}
+            onExchangeRateChange={(value) =>
+              handleChange('exchange_rate', value)
+            }
+          />
+        )}
     </Card>
   );
 }

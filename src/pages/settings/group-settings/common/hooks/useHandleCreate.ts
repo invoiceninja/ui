@@ -13,6 +13,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -46,7 +47,7 @@ export function useHandleCreate(params: Params) {
         .then((response: GenericSingleResourceResponse<GroupSettings>) => {
           toast.success('created_group');
 
-          queryClient.invalidateQueries('/api/v1/group_settings');
+          $refetch(['group_settings']);
 
           invalidateQueryValue &&
             queryClient.invalidateQueries([invalidateQueryValue]);

@@ -32,6 +32,8 @@ import { Index } from '$app/pages/Index';
 import { TestingRoute } from '$app/components/TestingRoute';
 import { TestingPage } from '$app/components/TestingPage';
 import { activityRoutes } from '$app/pages/activities/routes';
+import { Guard } from './guards/Guard';
+import { permission } from './guards/guards/permission';
 
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
 const NotFound = lazy(() => import('$app/components/NotFound'));
@@ -41,7 +43,15 @@ export const routes = (
     <Route path="/" element={<Index />} />
     {authenticationRoutes}
     <Route element={<PrivateRoute />}>
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route
+        path="/dashboard"
+        element={
+          <Guard
+            guards={[permission('view_dashboard')]}
+            component={<Dashboard />}
+          />
+        }
+      />
       {invoiceRoutes}
       {clientRoutes}
       {productRoutes}

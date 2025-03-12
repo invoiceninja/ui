@@ -8,19 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
 import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal';
-import { ValidationBag } from '../interfaces/validation-bag';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
+import { $refetch } from '../hooks/useRefetch';
 
 export interface GenericQueryOptions {
   id?: string;
@@ -28,17 +27,34 @@ export interface GenericQueryOptions {
   enabled: boolean;
 }
 
-export function useInvoiceQuery(params: { id: string | undefined }) {
+interface InvoiceQueryParams {
+  id: string | undefined;
+  includeIsLocked?: boolean;
+}
+
+export function useInvoiceQuery(params: InvoiceQueryParams) {
+  const { includeIsLocked } = params;
+
+  const isLockedParam = includeIsLocked ? '&is_locked=true' : '';
+
   return useQuery<Invoice>(
-    route('/api/v1/invoices/:id', { id: params.id }),
+    ['/api/v1/invoices', params.id],
     () =>
       request(
         'GET',
-        endpoint('/api/v1/invoices/:id?include=client', { id: params.id })
+        endpoint(
+          `/api/v1/invoices/:id?include=payments,client.group_settings${isLockedParam}`,
+          {
+            id: params.id,
+          }
+        )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    { staleTime: Infinity, enabled: Boolean(params.id) }
+    {
+      staleTime: Infinity,
+      enabled: Boolean(params.id),
+    }
   );
 }
 
@@ -46,7 +62,7 @@ export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
   return useQuery<Invoice>(
-    route('/api/v1/invoices/create'),
+    ['/api/v1/invoices/create'],
     () =>
       request('GET', endpoint('/api/v1/invoices/create')).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
@@ -54,7 +70,9 @@ export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: hasPermission('create_invoice'),
+      enabled: hasPermission('create_invoice')
+        ? options?.enabled ?? true
+        : false,
     }
   );
 }
@@ -106,30 +124,19 @@ export function useBulk(params?: Params) {
       action,
       ids,
       ...(emailType && { email_type: emailType }),
-    })
-      .then(() => {
-        const message =
-          successMessages[action as keyof typeof successMessages] ||
-          `${action}d_invoice`;
-          
-        toast.success(message);
+    }).then(() => {
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_invoice`;
 
-        params?.onSuccess?.();
+      toast.success(message);
 
-        ids.forEach((id) => {
-          queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }));
-        });
+      params?.onSuccess?.();
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (
-          error.response?.status === 422 &&
-          error.response.data.errors.ids?.length
-        ) {
-          toast.error(error.response.data.errors.ids[0]);
-        }
-      });
+      $refetch(['invoices']);
+
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

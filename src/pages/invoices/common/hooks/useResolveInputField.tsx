@@ -1,4 +1,4 @@
-/* eslint-disable react/display-name */
+ 
 
 /**
  * Invoice Ninja (https://invoiceninja.com).
@@ -19,7 +19,6 @@ import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -42,6 +41,14 @@ import {
 import { Inline } from '$app/components/Inline';
 import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useLocation } from 'react-router-dom';
+import { cloneDeep } from 'lodash';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import {
+  getTaxRateComboValue,
+  TaxNamePropertyType,
+} from '$app/common/helpers/tax-rates/tax-rates-combo';
 
 const numberInputs = [
   'discount',
@@ -53,6 +60,12 @@ const numberInputs = [
 ];
 
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
+
+const defaultCurrencySeparators: DecimalInputSeparators = {
+  decimalSeparator: '.',
+  precision: 2,
+  thousandSeparator: ',',
+};
 
 interface Props {
   resource: ProductTableResource;
@@ -82,6 +95,8 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 };
 
 export function useResolveInputField(props: Props) {
+  const location = useLocation();
+
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
 
@@ -97,7 +112,7 @@ export function useResolveInputField(props: Props) {
     return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const cleanLineItemsList = useCallback(
     (lineItems: InvoiceItem[]) => {
       let typeId = InvoiceItemType.Product;
@@ -140,6 +155,7 @@ export function useResolveInputField(props: Props) {
   );
 
   const handleProductChange = useHandleProductChange({
+    relationType: props.relationType,
     resource: props.resource,
     type: props.type,
     onChange: props.onLineItemChange,
@@ -161,6 +177,10 @@ export function useResolveInputField(props: Props) {
     await props.onLineItemPropertyChange(key, value, index);
   };
 
+  const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
+  const resource = props.resource;
+
   const onProductChange = async (
     index: number,
     value: string,
@@ -168,12 +188,31 @@ export function useResolveInputField(props: Props) {
   ) => {
     setIsDeleteActionTriggered(false);
 
-    await handleProductChange(index, value, product);
-  };
+    const updatedProduct = cloneDeep(product) as Product;
 
-  const company = useCurrentCompany();
-  const reactSettings = useReactSettings();
-  const resource = props.resource;
+    if (product && company && company.enabled_item_tax_rates === 0) {
+      updatedProduct.tax_name1 = '';
+      updatedProduct.tax_rate1 = 0;
+      updatedProduct.tax_name2 = '';
+      updatedProduct.tax_rate2 = 0;
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
+    }
+
+    if (product && company && company.enabled_item_tax_rates === 1) {
+      updatedProduct.tax_name2 = '';
+      updatedProduct.tax_rate2 = 0;
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
+    }
+
+    if (product && company && company.enabled_item_tax_rates === 2) {
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
+    }
+
+    await handleProductChange(index, value, updatedProduct);
+  };
 
   const formatMoney = useFormatMoney({
     resource: props.resource,
@@ -183,8 +222,11 @@ export function useResolveInputField(props: Props) {
   const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {
-    resource[props.relationType] &&
+    if (resource[props.relationType]) {
       getCurrency(resource[props.relationType], props.relationType);
+    } else {
+      setInputCurrencySeparators(defaultCurrencySeparators);
+    }
   }, [resource?.[props.relationType]]);
 
   useEffect(() => {
@@ -194,6 +236,7 @@ export function useResolveInputField(props: Props) {
   }, [resource?.line_items, isDeleteActionTriggered]);
 
   const taxCategories = useTaxCategories();
+  const { preferences } = usePreferences();
 
   const showTaxRateSelector = (
     property: 'tax_rate1' | 'tax_rate2' | 'tax_rate3',
@@ -216,11 +259,10 @@ export function useResolveInputField(props: Props) {
               onTaxCreated={(taxRate) =>
                 handleTaxRateChange(property, index, taxRate)
               }
-              defaultValue={
-                resource?.line_items[index][
-                  property.replace('rate', 'name') as keyof InvoiceItem
-                ]
-              }
+              defaultValue={getTaxRateComboValue(
+                resource?.line_items[index],
+                property.replace('rate', 'name') as TaxNamePropertyType
+              )}
               onClearButtonClick={() => handleTaxRateChange(property, index)}
             />
 
@@ -266,11 +308,10 @@ export function useResolveInputField(props: Props) {
         onTaxCreated={(taxRate) =>
           handleTaxRateChange(property, index, taxRate)
         }
-        defaultValue={
-          resource?.line_items[index][
-            property.replace('rate', 'name') as keyof InvoiceItem
-          ]
-        }
+        defaultValue={getTaxRateComboValue(
+          resource?.line_items[index],
+          property.replace('rate', 'name') as TaxNamePropertyType
+        )}
         onClearButtonClick={() => handleTaxRateChange(property, index)}
       />
     );
@@ -292,7 +333,9 @@ export function useResolveInputField(props: Props) {
             product && onProductChange(index, product.product_key, product)
           }
           clearButton
+          onInputValueChange={(value) => onChange('product_key', value, index)}
           onClearButtonClick={() => handleProductChange(index, '', null)}
+          displayStockQuantity={location.pathname.startsWith('/invoices')}
         />
       );
     }
@@ -307,6 +350,8 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+          style={{ marginTop: '4px' }}
+          textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
       );
     }
@@ -314,7 +359,7 @@ export function useResolveInputField(props: Props) {
     if (numberInputs.includes(property)) {
       return (
         inputCurrencySeparators && (
-          <DecimalNumberInput
+          <NumberInputField
             precision={
               property === 'quantity'
                 ? 6
@@ -325,10 +370,9 @@ export function useResolveInputField(props: Props) {
                 : inputCurrencySeparators?.precision || 2
             }
             id={property}
-            currency={inputCurrencySeparators}
-            initialValue={resource?.line_items[index][property] as string}
+            value={resource?.line_items[index][property] || ''}
             className="auto"
-            onBlurValue={(value: string) => {
+            onValueChange={(value: string) => {
               onChange(
                 property,
                 isNaN(parseFloat(value)) ? 0 : parseFloat(value),
@@ -373,6 +417,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          selectMenuPosition="fixed"
         />
       ) : (
         <InputField
@@ -398,6 +443,7 @@ export function useResolveInputField(props: Props) {
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
+          selectMenuPosition="fixed"
         />
       ) : (
         <InputField

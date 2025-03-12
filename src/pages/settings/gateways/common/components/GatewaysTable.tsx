@@ -42,8 +42,12 @@ import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { SelectOption } from '$app/components/datatables/Actions';
-import Select, { StylesConfig } from 'react-select';
-import { useColorScheme } from '$app/common/colors';
+import Select from 'react-select';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useSelectorCustomStyles } from '$app/pages/reports/common/hooks/useSelectorCustomStyles';
+import { BsQuestionCircle } from 'react-icons/bs';
 
 interface Params {
   includeRemoveAction: boolean;
@@ -52,7 +56,11 @@ interface Params {
 export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
+  const customStyles = useSelectorCustomStyles();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { includeRemoveAction, includeResetAction } = params;
 
@@ -66,21 +74,18 @@ export function GatewaysTable(params: Params) {
 
   const [currentGateways, setCurrentGateways] = useState<CompanyGateway[]>([]);
 
+  const [updateCompany, setUpdateCompany] = useState<boolean>(false);
+
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<CompanyGateway[]>(
     []
   );
 
-  const {
-    gateways,
-    handleChange,
-    handleRemoveGateway,
-    handleReset,
-    onStatusChange,
-  } = useGatewayUtilities({
-    currentGateways,
-    setCurrentGateways,
-  });
+  const { gateways, handleRemoveGateway, handleReset, onStatusChange } =
+    useGatewayUtilities({
+      currentGateways,
+      setCurrentGateways,
+    });
 
   const handleDeselect = () => {
     setSelected([]);
@@ -119,15 +124,23 @@ export function GatewaysTable(params: Params) {
 
   const handleSaveBulkActionsChanges = (ids: string[]) => {
     if (companyChanges?.settings.company_gateway_ids) {
-      handleChange(
-        'settings.company_gateway_ids',
-        currentGateways
-          .filter(({ id }) => !ids.includes(id))
-          .map(({ id }) => id)
-          .join(',')
-      );
+      const numberOfGateways: number = (
+        companyChanges?.settings as Settings
+      ).company_gateway_ids.split(',').length;
 
-      handleCompanySave();
+      if (numberOfGateways > 1 || isCompanySettingsActive) {
+        handleChange(
+          'settings.company_gateway_ids',
+          currentGateways
+            .filter(({ id }) => !ids.includes(id))
+            .map(({ id }) => id)
+            .join(',')
+        );
+      } else {
+        handleChange('settings.company_gateway_ids', '0');
+      }
+
+      setUpdateCompany(true);
     }
   };
 
@@ -152,48 +165,13 @@ export function GatewaysTable(params: Params) {
     },
   ];
 
-  const customStyles: StylesConfig<SelectOption, true> = {
-    multiValue: (styles, { data }) => {
-      return {
-        ...styles,
-        backgroundColor: data.backgroundColor,
-        color: data.color,
-        borderRadius: '3px',
-      };
-    },
-    multiValueLabel: (styles, { data }) => ({
-      ...styles,
-      color: data.color,
-    }),
-    multiValueRemove: (styles) => ({
-      ...styles,
-      ':hover': {
-        color: 'white',
-      },
-      color: '#999999',
-    }),
-    menu: (base) => ({
-      ...base,
-      width: 'max-content',
-      minWidth: '100%',
-      backgroundColor: colors.$4,
-      borderColor: colors.$4,
-    }),
-    control: (base) => ({
-      ...base,
-      borderRadius: '3px',
-      backgroundColor: colors.$1,
-      color: colors.$3,
-      borderColor: colors.$5,
-    }),
-    option: (base) => ({
-      ...base,
-      backgroundColor: colors.$1,
-      ':hover': {
-        backgroundColor: colors.$7,
-      },
-    }),
-  };
+  useEffect(() => {
+    if (updateCompany) {
+      handleCompanySave({ excludeToasters: true });
+
+      setUpdateCompany(false);
+    }
+  }, [updateCompany]);
 
   useEffect(() => {
     if (gateways) {
@@ -273,9 +251,7 @@ export function GatewaysTable(params: Params) {
             </Button>
           )}
 
-          <Button to="/settings/gateways/create">
-            {t('new_company_gateway')}
-          </Button>
+          <Button to="/settings/gateways/create">{t('add_gateway')}</Button>
         </div>
       </div>
 
@@ -302,7 +278,15 @@ export function GatewaysTable(params: Params) {
           <Th>{t('status')}</Th>
           <Th>{t('label')}</Th>
           <Th>{t('test_mode')}</Th>
-          <Th></Th>
+          <Th disableUppercase>
+            <Tooltip
+              placement="top"
+              message={t('priority') as string}
+              width="auto"
+            >
+              <Icon element={BsQuestionCircle} color="white" size={20} />
+            </Tooltip>
+          </Th>
         </Thead>
 
         <DragDropContext onDragEnd={onDragEnd}>

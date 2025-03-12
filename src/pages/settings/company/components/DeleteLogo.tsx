@@ -11,7 +11,10 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { updateRecord } from '$app/common/stores/slices/company-users';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { Button } from '$app/components/forms/Button';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -24,8 +27,12 @@ import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
-export function DeleteLogo() {
+interface Props {
+  isSettingsPage?: boolean;
+}
+export function DeleteLogo({ isSettingsPage = true }: Props) {
   const [t] = useTranslation();
 
   const companyChanges = useCompanyChanges();
@@ -79,13 +86,16 @@ export function DeleteLogo() {
           dispatch(
             updateRecord({ object: 'company', data: response.data.data })
           );
+          dispatch(resetChanges('company'));
         }
 
         if (isGroupSettingsActive) {
+          $refetch(['group_settings']);
           configureGroupSettings(response.data.data);
         }
 
         if (isClientSettingsActive) {
+          $refetch(['clients']);
           configureClientSettings(response.data.data);
         }
 
@@ -99,11 +109,15 @@ export function DeleteLogo() {
     formik.submitForm();
   };
 
-  return (
+  return isSettingsPage ? (
     <Element>
       <Button behavior="button" type="minimal" onClick={() => deleteLogo()}>
         {t('remove_logo')}
       </Button>
     </Element>
+  ) : (
+    <Button behavior="button" type="minimal" onClick={() => deleteLogo()}>
+      {t('remove_logo')}
+    </Button>
   );
 }

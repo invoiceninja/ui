@@ -25,26 +25,47 @@ import {
 import { route } from '$app/common/helpers/route';
 import { Task } from '$app/common/interfaces/task';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { t } from 'i18next';
+import { cloneDeep } from 'lodash';
+import { useTranslation } from 'react-i18next';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
+import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
 
 interface Params {
   tasks: Task[];
 }
 
 export function useAddTasksOnInvoice(params: Params) {
-  const navigate = useNavigate();
+  const [t] = useTranslation();
 
   const { tasks } = params;
-  const company = useCurrentCompany();
 
-  const { dateFormat } = useCurrentCompanyDateFormats();
+  const navigate = useNavigate();
+  const numericFormatter = useNumericFormatter();
+  const getCurrencySeparators = useGetCurrencySeparators();
+  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat();
+
+  const company = useCurrentCompany();
   const { timeFormat } = useCompanyTimeFormat();
+  const userNumberPrecision = useUserNumberPrecision();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const setInvoiceAtom = useSetAtom(invoiceAtom);
 
-  return (invoice: Invoice) => {
+  return async (invoice: Invoice) => {
+    const updatedInvoice = cloneDeep(invoice);
+
     if (tasks) {
-      tasks.forEach( (task: Task) => {
+      const currencySeparators = await getCurrencySeparators(
+        tasks[0]?.client_id,
+        'client_id'
+      );
+
+      const { dateFormat: clientDateFormat, timeFormat: clientTimeFormat } =
+        await resolveDateAndTimeClientFormat(tasks[0]?.client_id);
+
+      tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
@@ -60,9 +81,12 @@ export function useAddTasksOnInvoice(params: Params) {
               const unixStart = dayjs.unix(start);
               const unixStop = dayjs.unix(stop);
 
-              const hours = (
-                unixStop.diff(unixStart, 'seconds') / 3600
-              ).toFixed(4);
+              const hours = numericFormatter(
+                (unixStop.diff(unixStart, 'seconds') / 3600).toString(),
+                currencySeparators?.thousandSeparator,
+                currencySeparators?.decimalSeparator,
+                currencySeparators?.precision
+              );
 
               hoursDescription = `• ${hours} ${t('hours')}`;
             }
@@ -70,30 +94,49 @@ export function useAddTasksOnInvoice(params: Params) {
             const description = [];
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
-              description.push('<div class="task-time-details">');
+              description.push('<div class="task-time-details">\n');
             }
 
             if (company.invoice_task_datelog) {
-              description.push(dayjs.unix(start).format(dateFormat));
+              description.push(
+                dayjs
+                  .unix(start)
+                  .format(
+                    clientDateFormat?.format_moment
+                      ? clientDateFormat.format_moment
+                      : dateFormat
+                  )
+              );
             }
 
             if (company.invoice_task_timelog) {
-              description.push(dayjs.unix(start).format(timeFormat) + ' - ');
+              description.push(
+                dayjs
+                  .unix(start)
+                  .format(clientTimeFormat ? clientTimeFormat : timeFormat) +
+                  ' - '
+              );
             }
 
             if (company.invoice_task_timelog) {
-              description.push(dayjs.unix(stop).format(timeFormat));
+              description.push(
+                dayjs
+                  .unix(stop)
+                  .format(clientTimeFormat ? clientTimeFormat : timeFormat)
+              );
             }
 
             if (company.invoice_task_hours) {
               description.push(hoursDescription);
             }
 
-            if (company.invoice_task_item_description) {
-              description.push(intervalDescription);
+            if (company.invoice_task_item_description && intervalDescription) {
+              description.push(`\n\n${intervalDescription}`);
             }
 
             if (company.invoice_task_datelog || company.invoice_task_timelog) {
+              description.push('\n');
+
               description.push('</div>\n');
             }
 
@@ -101,16 +144,25 @@ export function useAddTasksOnInvoice(params: Params) {
           }
         });
 
-        const taskQuantity = calculateTaskHours(task.time_log);
+        const taskQuantity = calculateTaskHours(
+          task.time_log,
+          userNumberPrecision
+        );
 
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
           cost: task.rate,
           quantity: taskQuantity,
-          line_total: Number((task.rate * taskQuantity).toFixed(2)),
+          line_total: Number(
+            (task.rate * taskQuantity).toFixed(userNumberPrecision)
+          ),
           task_id: task.id,
           tax_id: '',
+          custom_value1: task.custom_value1,
+          custom_value2: task.custom_value2,
+          custom_value3: task.custom_value3,
+          custom_value4: task.custom_value4,
         };
 
         const projectName =
@@ -119,25 +171,23 @@ export function useAddTasksOnInvoice(params: Params) {
             : '';
 
         if (parsed.length) {
-          item.notes =
-            projectName + '### ' + task?.description + ' ' + parsed.join(' ');
+          item.notes = projectName + task?.description + ' ' + parsed.join(' ');
         }
 
-        if (typeof invoice.line_items === 'string') {
-          invoice.line_items = [];
+        if (typeof updatedInvoice.line_items === 'string') {
+          updatedInvoice.line_items = [];
         }
 
-        invoice.line_items.push(item);
+        updatedInvoice.line_items.push(item);
       });
 
-      setInvoiceAtom(invoice);
+      setInvoiceAtom(updatedInvoice);
 
       navigate(
         route('/invoices/:id/edit?action=add_tasks&table=tasks', {
-          id: invoice.id,
+          id: updatedInvoice.id,
         })
       );
-    
     }
   };
 }

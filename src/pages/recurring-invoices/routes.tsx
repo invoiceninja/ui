@@ -23,8 +23,29 @@ const Import = lazy(
 const RecurringInvoices = lazy(
   () => import('$app/pages/recurring-invoices/index/RecurringInvoices')
 );
+const RecurringInvoice = lazy(
+  () => import('$app/pages/recurring-invoices/RecurringInvoice')
+);
 const Create = lazy(
   () => import('$app/pages/recurring-invoices/create/Create')
+);
+const CreatePage = lazy(
+  () => import('$app/pages/recurring-invoices/create/components/CreatePage')
+);
+const Documents = lazy(
+  () => import('$app/pages/recurring-invoices/edit/components/Documents')
+);
+const Settings = lazy(
+  () => import('$app/pages/recurring-invoices/edit/components/Settings')
+);
+const Activities = lazy(
+  () => import('$app/pages/recurring-invoices/edit/components/Activities')
+);
+const History = lazy(
+  () => import('$app/pages/recurring-invoices/edit/components/History')
+);
+const Schedule = lazy(
+  () => import('$app/pages/recurring-invoices/edit/components/Schedule')
 );
 const Edit = lazy(() => import('$app/pages/recurring-invoices/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/recurring-invoices/pdf/Pdf'));
@@ -58,37 +79,52 @@ export const recurringInvoiceRoutes = (
           component={<Create />}
         />
       }
-    />
-    <Route path=":id">
-      <Route
-        path="edit"
-        element={
-          <Guard
-            guards={[
-              enabled(ModuleBitmask.RecurringInvoices),
-              or(
-                permission('edit_recurring_invoice'),
-                permission('view_recurring_invoice'),
-                assigned('/api/v1/recurring_invoices/:id')
-              ),
-            ]}
-            component={<Edit />}
-          />
-        }
-      />
-      <Route
-        path="pdf"
-        element={
-          <Guard
-            guards={[
-              enabled(ModuleBitmask.RecurringInvoices),
-              permission('view_recurring_invoice'),
-            ]}
-            component={<Pdf />}
-          />
-        }
-      />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
     </Route>
+
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.RecurringInvoices),
+            or(
+              permission('view_recurring_invoice'),
+              permission('edit_recurring_invoice'),
+              assigned('/api/v1/recurring_invoices/:id')
+            ),
+          ]}
+          component={<RecurringInvoice />}
+        />
+      }
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="activity" element={<Activities />} />
+      <Route path="history" element={<History />} />
+      <Route path="schedule" element={<Schedule />} />
+    </Route>
+
+    <Route
+      path=":id/pdf"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.RecurringInvoices),
+            or(
+              permission('edit_recurring_invoice'),
+              assigned('/api/v1/recurring_invoices/:id')
+            ),
+          ]}
+          component={<Pdf />}
+        />
+      }
+    />
+
     <Route
       path="import"
       element={

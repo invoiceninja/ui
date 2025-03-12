@@ -9,10 +9,19 @@
  */
 
 import { ReactNode } from 'react';
+import { Breadcrumbs, Page } from './Breadcrumbs';
 
-export function Container(props: { children: ReactNode; className?: string }) {
+export interface ContainerProps {
+  breadcrumbs: Page[];
+  children: ReactNode;
+  className?: string;
+}
+
+export function Container(props: ContainerProps) {
   return (
     <div className="flex justify-center">
+      <Breadcrumbs pages={props.breadcrumbs} />
+
       <div className={`container max-w-3xl space-y-6 ${props.className}`}>
         {props.children}
       </div>

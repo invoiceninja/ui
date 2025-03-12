@@ -11,10 +11,46 @@
 import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 import { useInjectUserChanges } from './useInjectUserChanges';
-import { merge } from 'lodash';
+import { cloneDeep, merge } from 'lodash';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
+import { Entity } from '$app/components/CommonActionsPreferenceModal';
+import { PerPage } from '$app/components/DataTable';
+import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
+
+export interface TableFiltersPreference {
+  filter?: string;
+  customFilter?: string[];
+  currentPage: number;
+  sort?: string;
+  status: string[];
+  sortedBy?: string;
+  perPage?: PerPage;
+}
+
+export interface Preferences {
+  dashboard_charts: {
+    default_view: 'day' | 'week' | 'month';
+    range: string;
+    currency: number;
+  };
+  datatables: {
+    clients: {
+      sort: string;
+    };
+  };
+  reports: {
+    columns: Record<string, ClientMapRecord[][]>;
+  };
+  auto_expand_product_table_notes: boolean;
+  enable_public_notifications: boolean | null;
+  use_system_fonts: boolean;
+}
+
+export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
+
+type ColorTheme = Record<ThemeColorField, string>;
 
 export interface ReactSettings {
   show_pdf_preview: boolean;
@@ -22,21 +58,15 @@ export interface ReactSettings {
   react_notification_link: boolean;
   number_precision?: number;
   show_document_preview?: boolean;
-  preferences: {
-    dashboard_charts: {
-      default_view: 'day' | 'week' | 'month';
-      range: string;
-      currency: number;
-    };
-    datatables: {
-      clients: {
-        sort: string;
-      };
-    };
-    reports: {
-      columns: Record<string, ClientMapRecord[][]>;
-    };
-  };
+  preferences: Preferences;
+  table_filters?: Record<string, TableFiltersPreference>;
+  common_actions?: Record<Entity, string[]>;
+  show_mini_sidebar?: boolean;
+  import_templates?: ImportTemplates;
+  table_footer_columns?: Record<ReactTableColumns, string[]>;
+  show_table_footer?: boolean;
+  dark_mode?: boolean;
+  color_theme?: ColorTheme;
 }
 
 export type ReactTableColumns =
@@ -52,10 +82,35 @@ export type ReactTableColumns =
   | 'vendor'
   | 'purchaseOrder'
   | 'expense'
-  | 'recurringExpense';
+  | 'recurringExpense'
+  | 'clientDocument'
+  | 'transaction';
 
-export function useReactSettings() {
-  const user = useInjectUserChanges();
+export const preferencesDefaults: Preferences = {
+  dashboard_charts: {
+    default_view: 'month',
+    currency: 1,
+    range: 'this_month',
+  },
+  datatables: {
+    clients: {
+      sort: 'id|desc',
+    },
+  },
+  reports: {
+    columns: {},
+  },
+  auto_expand_product_table_notes: false,
+  enable_public_notifications: null,
+  use_system_fonts: false,
+};
+
+interface Options {
+  overwrite?: boolean;
+}
+
+export function useReactSettings(options?: Options) {
+  const user = useInjectUserChanges({ overwrite: options?.overwrite });
 
   const reactSettings =
     useSelector(
@@ -73,21 +128,7 @@ export function useReactSettings() {
       ...previousReactTableColumns,
       ...reactSettings.react_table_columns,
     },
-    preferences: {
-      dashboard_charts: {
-        default_view: 'month',
-        currency: 1,
-        range: 'this_month',
-      },
-      datatables: {
-        clients: {
-          sort: 'id|desc',
-        },
-      },
-      reports: {
-        columns: {},
-      },
-    },
+    preferences: cloneDeep(preferencesDefaults),
   };
 
   return merge<ReactSettings, ReactSettings>(

@@ -14,13 +14,14 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -28,7 +29,7 @@ interface RecurringInvoiceQueryParams {
 
 export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
   return useQuery<RecurringInvoice>(
-    route('/api/v1/recurring_invoices/:id', { id: params.id }),
+    ['/api/v1/recurring_invoices', params.id],
     () =>
       request(
         'GET',
@@ -44,14 +45,22 @@ export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
 }
 
 export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery<RecurringInvoice>(
-    '/api/v1/recurring_invoice/create',
+    ['/api/v1/recurring_invoices', 'create'],
     () =>
       request('GET', endpoint('/api/v1/recurring_invoices/create')).then(
         (response: GenericSingleResourceResponse<RecurringInvoice>) =>
           response.data.data
       ),
-    { ...options, staleTime: Infinity }
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_recurring_invoice')
+        ? options?.enabled ?? true
+        : false,
+    }
   );
 }
 
@@ -62,13 +71,15 @@ type Action =
   | 'start'
   | 'stop'
   | 'update_prices'
-  | 'increase_prices';
+  | 'increase_prices'
+  | 'bulk_update';
 
 const successMessages = {
   start: 'started_recurring_invoice',
   stop: 'stopped_recurring_invoice',
   update_prices: 'updated_prices',
   increase_prices: 'updated_prices',
+  bulk_update: 'updated_records',
 };
 
 interface Params {
@@ -82,20 +93,22 @@ export function useBulkAction(params?: Params) {
 
   const { onSuccess, setErrors } = params || {};
 
-  return (ids: string[], action: Action, increasePercentage?: number) => {
+  return async (
+    ids: string[],
+    action: Action,
+    rest?: Record<string, unknown>
+  ) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
+    return request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
       action,
       ids,
-      ...(typeof increasePercentage === 'number' && {
-        percentage_increase: increasePercentage,
-      }),
+      ...rest,
     })
       .then(() => {
         const message =
           successMessages[action as keyof typeof successMessages] ||
-          `${action}d_invoice`;
+          `${action}d_recurring_invoice`;
 
         toast.success(message);
 
@@ -104,11 +117,7 @@ export function useBulkAction(params?: Params) {
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
 
-        ids.forEach((id) =>
-          queryClient.invalidateQueries(
-            route('/api/v1/recurring_invoices/:id', { id })
-          )
-        );
+        $refetch(['recurring_invoices']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

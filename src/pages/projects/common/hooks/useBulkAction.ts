@@ -11,26 +11,33 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+
+type Action = 'archive' | 'restore' | 'delete' | 'invoice';
 
 export function useBulkAction() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return async (ids: string[], action: Action) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/projects/bulk'), {
+    return request('POST', endpoint('/api/v1/projects/bulk'), {
       action,
-      ids: [id],
+      ids,
     })
-      .then(() => toast.success(`${action}d_project`))
+      .then((response) => {
+        if (action !== 'invoice') {
+          toast.success(`${action}d_project`);
+        }
+
+        return response;
+      })
       .finally(() => {
-        queryClient.invalidateQueries('/api/v1/projects');
-        queryClient.invalidateQueries(route('/api/v1/projects/:id', { id }));
+        $refetch(['projects']);
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);

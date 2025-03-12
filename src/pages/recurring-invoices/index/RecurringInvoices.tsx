@@ -26,7 +26,7 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import {
   RecurringInvoiceSlider,
   recurringInvoiceSliderAtom,
@@ -36,11 +36,20 @@ import { useEffect, useState } from 'react';
 import { useRecurringInvoiceQuery } from '../common/queries';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const [sliderRecurringInvoiceId, setSliderRecurringInvoiceId] =
     useState<string>('');
@@ -54,15 +63,16 @@ export default function RecurringInvoices() {
   ];
 
   const actions = useActions();
-
+  const reactSettings = useReactSettings();
   const filters = useRecurringInvoiceFilters();
-
-  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
-
   const columns = useRecurringInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
+  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
-  const setRecurringInvoiceSlider = useSetAtom(recurringInvoiceSliderAtom);
+  const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
+    recurringInvoiceSliderAtom
+  );
   const [
     recurringInvoiceSliderVisibility,
     setRecurringInvoiceSliderVisibility,
@@ -74,16 +84,20 @@ export default function RecurringInvoices() {
     }
   }, [recurringInvoiceResponse, recurringInvoiceSliderVisibility]);
 
+  useEffect(() => {
+    return () => setRecurringInvoiceSliderVisibility(false);
+  }, []);
+
   return (
     <Default
       title={t('recurring_invoices')}
       breadcrumbs={pages}
       docsLink="en/recurring-invoices/"
-      withoutBackButton
     >
       <DataTable
         resource="recurring_invoice"
         columns={columns}
+        footerColumns={footerColumns}
         endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
@@ -106,22 +120,43 @@ export default function RecurringInvoices() {
           />
         }
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={recurringInvoiceColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="recurringInvoice"
-          />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="recurringInvoice"
+                  columns={allFooterColumns}
+                />
+
+                <span>|</span>
+              </>
+            )}
+
+            <DataTableColumnsPicker
+              columns={recurringInvoiceColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="recurringInvoice"
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_recurring_invoice')]}
+        hideEditableOptions={!hasPermission('edit_recurring_invoice')}
         onTableRowClick={(recurringInvoice) => {
           setSliderRecurringInvoiceId(
             (recurringInvoice as RecurringInvoice).id
           );
           setRecurringInvoiceSliderVisibility(true);
         }}
+        enableSavingFilterPreference
       />
 
-      <RecurringInvoiceSlider />
+      {!disableNavigation('recurring_invoice', recurringInvoiceSlider) && (
+        <RecurringInvoiceSlider />
+      )}
     </Default>
   );
 }

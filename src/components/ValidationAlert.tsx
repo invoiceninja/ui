@@ -7,21 +7,32 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import { useValidationMessageAlias } from '$app/common/hooks/useValidationMessageAlias';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Alert } from './Alert';
 
 interface Props {
   errors: ValidationBag;
+  entity?: 'client';
+  withoutTopMessage?: boolean;
+  withoutListBullets?: boolean;
 }
 
 export function ValidationAlert(props: Props) {
+  const { entity, withoutTopMessage, withoutListBullets } = props;
+
+  const validationMessageAlias = useValidationMessageAlias({ entity });
+
   return (
     <Alert className="mb-6" type="danger">
-      <p>{props.errors.message}</p>
+      {!withoutTopMessage && <p>{props.errors.message}</p>}
 
       <ul>
         {Object.keys(props.errors.errors).map((key, index) => (
-          <li key={index}>&#8211; {props.errors.errors[key]}</li>
+          <li key={index}>
+            {!withoutListBullets && <>&#8211; </>}
+            {validationMessageAlias(key, props.errors.errors[key])}
+          </li>
         ))}
       </ul>
     </Alert>

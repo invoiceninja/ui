@@ -24,22 +24,27 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { useActions } from '$app/pages/recurring-expenses/common/hooks';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 export default function RecurringExpense() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('edit_recurring_expense');
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
   const actions = useActions();
 
   const { id } = useParams();
 
   const { data } = useRecurringExpenseQuery({ id });
-
-  const queryClient = useQueryClient();
 
   const pages: Page[] = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
@@ -57,6 +62,11 @@ export default function RecurringExpense() {
     {
       name: t('documents'),
       href: route('/recurring_expenses/:id/documents', { id }),
+      formatName: () => (
+        <DocumentsTabLabel
+          numberOfDocuments={recurringExpense?.documents.length}
+        />
+      ),
     },
   ];
 
@@ -91,11 +101,7 @@ export default function RecurringExpense() {
       .then(() => {
         toast.success('updated_recurring_expense');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_expenses/:id', {
-            id: recurringExpense!.id,
-          })
-        );
+        $refetch(['recurring_expenses']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -109,17 +115,20 @@ export default function RecurringExpense() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={handleSave}
-      navigationTopRight={
-        recurringExpense && (
-          <ResourceActions
-            resource={recurringExpense}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
-      disableSaveButton={!recurringExpense}
+      {...((hasPermission('edit_recurring_expense') ||
+        entityAssigned(recurringExpense)) &&
+        recurringExpense && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={recurringExpense}
+              actions={actions}
+              onSaveClick={handleSave}
+              disableSaveButton={!recurringExpense}
+              cypressRef="recurringExpenseActionDropdown"
+            />
+          ),
+        })}
+      afterBreadcrumbs={<PreviousNextNavigation entity="recurring_expense" />}
     >
       {recurringExpense ? (
         <div className="space-y-4">

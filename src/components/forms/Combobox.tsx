@@ -13,7 +13,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -21,6 +21,7 @@ import { useClickAway, useDebounce } from 'react-use';
 import { Alert } from '../Alert';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
+import { Spinner } from '../Spinner';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -36,7 +37,7 @@ type EventType = 'internal' | 'external';
 interface InputOptions {
   value: string | number | boolean | null;
   label?: string;
-  placeholder?: string
+  placeholder?: string;
 }
 
 interface Action {
@@ -53,12 +54,18 @@ export interface ComboboxStaticProps<T = any> {
   nullable?: boolean;
   initiallyVisible?: boolean;
   exclude?: (string | number | boolean)[];
+  includeOnly?: (string | number | boolean)[];
+  includeByLabel?: boolean;
   action?: Action;
   onChange: (entry: Entry<T>) => unknown;
-  onEmptyValues: (query: string) => unknown;
+  onEmptyValues?: (query: string) => unknown;
   onDismiss?: () => unknown;
+  onFocus?: () => any;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
+  isDataLoading?: boolean;
+  onInputValueChange?: (value: string) => void;
+  compareOnlyByValue?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -75,13 +82,382 @@ const ActionButtonStyled = styled.button`
   }
 `;
 
-export function ComboboxStatic<T =any>({
+const LiStyled = styled.li`
+  background-color: ${(props) => props.theme.backgroundColor};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
+export function Combobox<T = any>({
   inputOptions,
   entries,
   readonly,
   nullable,
   initiallyVisible = false,
   exclude = [],
+  includeOnly = [],
+  includeByLabel,
+  action,
+  onChange,
+  onDismiss,
+  entryOptions,
+  errorMessage,
+  clearInputAfterSelection,
+  onEmptyValues,
+  onFocus,
+  onInputValueChange,
+}: ComboboxStaticProps<T>) {
+  const [inputValue, setInputValue] = useState(
+    String(inputOptions.value ?? '')
+  );
+  const [isOpen, setIsOpen] = useState(initiallyVisible);
+  const [selectedOption, setSelectedOption] = useState<Entry | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
+  const comboboxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  let filteredOptions =
+    inputValue === ''
+      ? entries
+      : entries.filter(
+          (entry) =>
+            entry.label?.toLowerCase()?.includes(inputValue?.toLowerCase()) ||
+            entry.value
+              ?.toString()
+              ?.toLowerCase()
+              ?.includes(inputValue?.toLowerCase()) ||
+            entry.searchable.toLowerCase().includes(inputValue?.toLowerCase())
+        );
+
+  filteredOptions = filteredOptions.filter((entry) =>
+    exclude.length > 0 ? !exclude.includes(entry.value) : true
+  );
+
+  filteredOptions = filteredOptions.filter((entry) =>
+    includeOnly.length > 0
+      ? includeOnly.includes(entry[includeByLabel ? 'label' : 'value'])
+      : true
+  );
+
+  useEffect(() => {
+    const entry = entries.findIndex(
+      (entry) =>
+        entry.value === inputOptions.value || entry.label === inputOptions.value
+    );
+
+    if (entry >= 0) {
+      setSelectedOption(entries[entry]);
+      setHighlightedIndex(entry);
+
+      return;
+    }
+
+    if (nullable) {
+      setSelectedOption({
+        id: -1,
+        label: inputOptions.value ? inputOptions.value.toString() : '',
+        value: inputOptions.value ? inputOptions.value.toString() : '',
+        resource: null,
+        eventType: 'internal',
+        searchable: entryOptions.searchable || entryOptions.value,
+      });
+
+      return;
+    }
+  }, [entries]);
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    setSelectedOption(null);
+    setIsOpen(true);
+    setHighlightedIndex(-1);
+  };
+
+  const handleOptionClick = (option: Entry) => {
+    if (selectedOption && selectedOption.value === option.value) {
+      return;
+    }
+
+    setSelectedOption(option);
+    setInputValue(option.label);
+    onChange(option);
+
+    if (clearInputAfterSelection) {
+      setInputValue('');
+      setSelectedOption(null);
+    }
+
+    setTimeout(() => setIsOpen(false), 100);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (
+      event.key === 'ArrowDown' &&
+      highlightedIndex < filteredOptions.length - 1
+    ) {
+      event.preventDefault();
+      setHighlightedIndex(highlightedIndex + 1);
+
+      return;
+    }
+
+    if (event.key === 'ArrowUp' && highlightedIndex > 0) {
+      event.preventDefault();
+
+      setHighlightedIndex(highlightedIndex - 1);
+
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      setIsOpen(false);
+
+      if (highlightedIndex >= 0) {
+        handleOptionClick(filteredOptions[highlightedIndex]);
+
+        return;
+      }
+
+      if (highlightedIndex === -1 && nullable) {
+        handleOptionClick({
+          id: Date.now(),
+          label: inputValue,
+          value: inputValue,
+          resource: null,
+          eventType: 'internal',
+          searchable: inputValue.toLowerCase(),
+        });
+      }
+
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      setIsOpen(false);
+
+      return;
+    }
+
+    if (event.key === 'Tab' && nullable) {
+      setIsOpen(false);
+
+      handleOptionClick({
+        id: Date.now(),
+        label: inputValue,
+        value: inputValue,
+        resource: null,
+        eventType: 'internal',
+        searchable: inputValue.toLowerCase(),
+      });
+
+      return;
+    }
+  };
+
+  useClickAway(comboboxRef, () => {
+    setIsOpen(false);
+    onInputValueChange?.(inputValue);
+
+    if (
+      selectedOption &&
+      selectedOption.value &&
+      inputValue === selectedOption.value
+    ) {
+      return;
+    }
+
+    if (inputValue === '') {
+      return;
+    }
+
+    const option: Entry = {
+      id: Date.now(),
+      label: inputValue,
+      value: inputValue,
+      resource: null,
+      eventType: 'internal',
+      searchable: inputValue.toLowerCase(),
+    };
+
+    handleOptionClick(option);
+    onChange(option);
+  });
+
+  useDebounce(
+    () => {
+      if (!onEmptyValues) {
+        return;
+      }
+
+      if (inputValue === '' && filteredOptions.length > 0) {
+        return onEmptyValues(inputValue);
+      }
+
+      if (filteredOptions.length <= 3) {
+        return onEmptyValues(inputValue);
+      }
+    },
+    600,
+    [inputValue, filteredOptions]
+  );
+
+  useEffect(() => {
+    const element = document.querySelector(
+      `[data-combobox-element-id="${highlightedIndex + 1}"]`
+    );
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start',
+      });
+    }
+  }, [highlightedIndex]);
+
+  const colors = useColorScheme();
+
+  return (
+    <div ref={comboboxRef} className="w-full" tabIndex={-1}>
+      {inputOptions.label ? (
+        <p className="text-sm font-medium block">{inputOptions.label}</p>
+      ) : null}
+
+      <div className="relative mt-1">
+        <div
+          className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm"
+          style={{ borderColor: colors.$5 }}
+        >
+          <input
+            type="text"
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => {
+              setIsOpen(true);
+
+              if (onFocus) {
+                onFocus();
+              }
+            }}
+            placeholder={inputOptions.placeholder}
+            disabled={readonly}
+            defaultValue={
+              selectedOption ? selectedOption.label : inputValue?.toString()
+            }
+            className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+            ref={inputRef}
+            style={{
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+              color: colors.$3,
+            }}
+            data-cy="comboboxInput"
+            tabIndex={-1}
+          />
+
+          {!readonly && (
+            <button
+              tabIndex={-1}
+              type="button"
+              onClick={(e) => {
+                if (onDismiss) {
+                  e.preventDefault();
+
+                  setIsOpen(false);
+
+                  return onDismiss();
+                }
+              }}
+              className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+            >
+              {onDismiss && selectedOption ? (
+                <X
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                  data-testid="combobox-clear-icon"
+                  style={{ color: colors.$3 }}
+                />
+              ) : (
+                <ChevronDown
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                  data-testid="combobox-chevrondown-icon"
+                  style={{ color: colors.$3 }}
+                />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isOpen && (
+        <ul
+          className="border absolute z-10 mt-1 max-h-60 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          tabIndex={-1}
+        >
+          {action && action.visible && (
+            <ActionButtonStyled
+              theme={{
+                hoverColor: colors.$2,
+              }}
+              data-testid="combobox-action-button"
+              type="button"
+              onClick={action.onClick}
+              className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9"
+              tabIndex={-1}
+              style={{ color: colors.$3 }}
+            >
+              {action.label}
+            </ActionButtonStyled>
+          )}
+
+          {filteredOptions.map((option, index) => (
+            <LiStyled
+              theme={{
+                backgroundColor:
+                  highlightedIndex === index ? colors.$2 : colors.$1,
+              }}
+              key={option.id}
+              className={classNames(
+                'min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 hover:font-semibold',
+                {
+                  'font-medium': highlightedIndex === index,
+                }
+              )}
+              onClick={() => handleOptionClick(option)}
+              data-combobox-element-id={index}
+              tabIndex={-1}
+            >
+              {option.resource &&
+              typeof entryOptions.dropdownLabelFn !== 'undefined'
+                ? entryOptions.dropdownLabelFn(option.resource)
+                : option.label}
+            </LiStyled>
+          ))}
+        </ul>
+      )}
+
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
+      )}
+    </div>
+  );
+}
+
+export function ComboboxStatic<T = any>({
+  inputOptions,
+  entries,
+  readonly,
+  nullable,
+  initiallyVisible = false,
+  exclude = [],
+  includeOnly = [],
+  includeByLabel,
   action,
   onEmptyValues,
   onChange,
@@ -89,6 +465,8 @@ export function ComboboxStatic<T =any>({
   entryOptions,
   errorMessage,
   clearInputAfterSelection,
+  isDataLoading,
+  compareOnlyByValue,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -112,6 +490,12 @@ export function ComboboxStatic<T =any>({
     exclude.length > 0 ? !exclude.includes(entry.value) : true
   );
 
+  filteredValues = filteredValues.filter((entry) =>
+    includeOnly.length > 0
+      ? includeOnly.includes(entry[includeByLabel ? 'label' : 'value'])
+      : true
+  );
+
   const comboboxRef = useRef<HTMLDivElement>(null);
   const comboboxInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +505,10 @@ export function ComboboxStatic<T =any>({
 
   useDebounce(
     () => {
+      if (!onEmptyValues) {
+        return;
+      }
+
       if (query === '' && filteredValues.length > 0) {
         return onEmptyValues(query);
       }
@@ -161,9 +549,11 @@ export function ComboboxStatic<T =any>({
   }, [selectedValue]);
 
   useEffect(() => {
-    const entry = entries.find(
-      (entry) =>
-        entry.value === inputOptions.value || entry.label === inputOptions.value
+    const entry = entries.find((entry) =>
+      compareOnlyByValue
+        ? entry.value === inputOptions.value
+        : entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
     );
 
     entry
@@ -197,7 +587,7 @@ export function ComboboxStatic<T =any>({
       <HeadlessCombobox
         as="div"
         value={selectedValue}
-        onChange={(value) => handleChangeValue(value)}
+        onChange={(value: Entry | null) => handleChangeValue(value)}
         disabled={readonly}
         ref={comboboxRef}
       >
@@ -222,9 +612,9 @@ export function ComboboxStatic<T =any>({
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
                 entryOptions.inputLabelFn?.(entry?.resource) ??
-                (entry?.label || '')
+                (entry?.label || query)
               }
-              onFocus={() => setIsOpen(true)}
+              onClick={() => setIsOpen(true)}
               placeholder={inputOptions.placeholder}
               style={{
                 backgroundColor: colors.$1,
@@ -235,13 +625,19 @@ export function ComboboxStatic<T =any>({
 
             {!readonly && (
               <HeadlessCombobox.Button
-                onClick={(e) => {
+                onClick={(e: MouseEvent<HTMLButtonElement>) => {
                   if (onDismiss) {
                     e.preventDefault();
 
-                    setIsOpen(false);
+                    setQuery('');
+
+                    selectedValue && setIsOpen(false);
+
+                    !selectedValue && setIsOpen((current) => !current);
 
                     return onDismiss();
+                  } else {
+                    setIsOpen((current) => !current);
                   }
                 }}
                 className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
@@ -288,7 +684,19 @@ export function ComboboxStatic<T =any>({
               </ActionButtonStyled>
             )}
 
-            {nullable && query.length > 0 && (
+            {Boolean(isDataLoading) && (
+              <div className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9">
+                <Spinner />
+              </div>
+            )}
+
+            {!isDataLoading && !filteredValues.length && (
+              <div className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9">
+                {t('no_records_found')}
+              </div>
+            )}
+
+            {nullable && query.length > 0 && !isDataLoading && (
               <HeadlessCombobox.Option
                 key="combobox-not-found"
                 className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
@@ -314,6 +722,7 @@ export function ComboboxStatic<T =any>({
             )}
 
             {filteredValues.length > 0 &&
+              !isDataLoading &&
               filteredValues.map((entry) => (
                 <HeadlessOptionStyled
                   theme={{
@@ -372,10 +781,12 @@ interface EntryOptions<T = any> {
   searchable?: string;
   dropdownLabelFn?: (resource: T) => string | JSX.Element;
   inputLabelFn?: (resource?: T) => string;
+  customSearchableValue?: (resource: T) => string;
+  customValue?: (entry: T) => string;
 }
 
 export interface ComboboxAsyncProps<T> {
-  endpoint: URL;
+  endpoint: string;
   inputOptions: InputOptions;
   entryOptions: EntryOptions<T>;
   readonly?: boolean;
@@ -384,6 +795,8 @@ export interface ComboboxAsyncProps<T> {
   querySpecificEntry?: string;
   sortBy?: string | null;
   exclude?: (string | number | boolean)[];
+  includeOnly?: (string | number | boolean)[];
+  includeByLabel?: boolean;
   action?: Action;
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
@@ -391,6 +804,8 @@ export interface ComboboxAsyncProps<T> {
   disableWithQueryParameter?: boolean;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
+  onInputValueChange?: (value: string) => void;
+  compareOnlyByValue?: boolean;
 }
 
 export function ComboboxAsync<T = any>({
@@ -402,6 +817,8 @@ export function ComboboxAsync<T = any>({
   initiallyVisible,
   sortBy = 'created_at|desc',
   exclude,
+  includeOnly,
+  includeByLabel,
   action,
   nullable,
   onChange,
@@ -409,24 +826,37 @@ export function ComboboxAsync<T = any>({
   disableWithQueryParameter,
   errorMessage,
   clearInputAfterSelection,
+  onInputValueChange,
+  compareOnlyByValue,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
+  const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
-  const { data, refetch } = useQuery(
-    [url.pathname, url.searchParams.toString()],
-    () => {
-      if (sortBy) {
-        url.searchParams.set('sort', sortBy);
-      }
+  useEffect(() => {
+    setUrl(endpoint);
+  }, [endpoint]);
 
-      url.searchParams.set('status', 'active');
+  const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
-      if (inputOptions.value && !disableWithQueryParameter) {
-        url.searchParams.set('with', inputOptions.value.toString());
-      }
+  const isEntryAvailable = () => {
+    if (entries.length) {
+      const entry = entries.find(
+        (entry) =>
+          entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
+      );
 
-      return request('GET', url.href).then(
+      return Boolean(entry);
+    }
+
+    return true;
+  };
+
+  const { data, isLoading } = useQuery(
+    [new URL(url).pathname, new URL(url).pathname + new URL(url).search],
+    () =>
+      request('GET', new URL(url).href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
@@ -434,21 +864,78 @@ export function ComboboxAsync<T = any>({
             data.push({
               id: entry[entryOptions.id],
               label: entry[entryOptions.label],
-              value: entry[entryOptions.value],
+              value: entryOptions.customValue
+                ? entryOptions.customValue(entry)
+                : entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
-              searchable: entry[entryOptions.searchable || entryOptions.id],
+              searchable:
+                entryOptions.customSearchableValue?.(entry) ||
+                entry[entryOptions.searchable || entryOptions.id],
             })
           );
 
           return data;
         }
-      );
-    },
+      ),
     {
       staleTime: staleTime ?? Infinity,
+      enabled: enableQuery,
     }
   );
+
+  useEffect(() => {
+    if (url.includes('/api/v1/products')) {
+      return;
+    }
+
+    if (!enableQuery) {
+      clearTimeout(enableQueryTimeOut.current);
+
+      const currentTimeout = setTimeout(() => setEnableQuery(true), 100);
+
+      enableQueryTimeOut.current = currentTimeout;
+    }
+  }, [inputOptions.value]);
+
+  useEffect(() => {
+    if (
+      enableQuery &&
+      inputOptions.value &&
+      !disableWithQueryParameter &&
+      !isEntryAvailable()
+    ) {
+      setUrl((c) => {
+        const currentUrl = new URL(c);
+
+        if (inputOptions.value && inputOptions.value.toString().length > 0) {
+          currentUrl.searchParams.set('with', inputOptions.value.toString());
+
+          if (currentUrl.searchParams.get('sort')) {
+            currentUrl.searchParams.delete('sort');
+          }
+        }
+
+        return currentUrl.href;
+      });
+    }
+
+    if (enableQuery && !inputOptions.value) {
+      setUrl((c) => {
+        const currentUrl = new URL(c);
+
+        if (currentUrl.searchParams.get('with')) {
+          currentUrl.searchParams.delete('with');
+        }
+
+        if (sortBy) {
+          currentUrl.searchParams.set('sort', sortBy);
+        }
+
+        return currentUrl.href;
+      });
+    }
+  }, [entries, enableQuery, inputOptions.value]);
 
   useEffect(() => {
     if (data) {
@@ -457,21 +944,62 @@ export function ComboboxAsync<T = any>({
   }, [data]);
 
   useEffect(() => {
-    return () => setEntries([]);
+    setUrl((c) => {
+      const currentUrl = new URL(c);
+
+      if (sortBy) {
+        currentUrl.searchParams.set('sort', sortBy);
+      }
+
+      currentUrl.searchParams.set('status', 'active');
+
+      currentUrl.searchParams.set('filter', '');
+
+      return currentUrl.href;
+    });
+
+    return () => {
+      setEntries([]);
+      setEnableQuery(false);
+      enableQueryTimeOut.current = undefined;
+    };
   }, []);
 
-  useEffect(() => {
-    setUrl(() => new URL(endpoint.href));
-    refetch();
-  }, [endpoint.href]);
-
   const onEmptyValues = (query: string) => {
-    setUrl((current) => {
-      current.searchParams.set('filter', query);
+    setUrl((c) => {
+      const url = new URL(c);
 
-      return new URL(current.href);
+      url.searchParams.set('filter', query);
+
+      return url.href;
     });
   };
+
+  if (url.includes('/api/v1/products')) {
+    return (
+      <Combobox
+        entries={entries}
+        inputOptions={inputOptions}
+        readonly={readonly}
+        onChange={onChange}
+        onDismiss={onDismiss}
+        initiallyVisible={initiallyVisible}
+        exclude={exclude}
+        includeOnly={includeOnly}
+        includeByLabel={includeByLabel}
+        action={action}
+        nullable={nullable}
+        entryOptions={entryOptions}
+        errorMessage={errorMessage}
+        clearInputAfterSelection={clearInputAfterSelection}
+        isDataLoading={isLoading}
+        onFocus={() => setEnableQuery(true)}
+        onInputValueChange={onInputValueChange}
+        onEmptyValues={onEmptyValues}
+        compareOnlyByValue={compareOnlyByValue}
+      />
+    );
+  }
 
   return (
     <ComboboxStatic
@@ -483,11 +1011,16 @@ export function ComboboxAsync<T = any>({
       onDismiss={onDismiss}
       initiallyVisible={initiallyVisible}
       exclude={exclude}
+      includeOnly={includeOnly}
+      includeByLabel={includeByLabel}
       action={action}
       nullable={nullable}
       entryOptions={entryOptions}
       errorMessage={errorMessage}
       clearInputAfterSelection={clearInputAfterSelection}
+      isDataLoading={isLoading}
+      onInputValueChange={onInputValueChange}
+      compareOnlyByValue={compareOnlyByValue}
     />
   );
 }

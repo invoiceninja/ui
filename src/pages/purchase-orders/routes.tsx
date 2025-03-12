@@ -22,6 +22,27 @@ const Edit = lazy(() => import('./edit/Edit'));
 const Email = lazy(() => import('./email/Email'));
 const Pdf = lazy(() => import('./pdf/Pdf'));
 const Create = lazy(() => import('./create/Create'));
+const PurchaseOrder = lazy(
+  () => import('$app/pages/purchase-orders/PurchaseOrder')
+);
+const CreatePage = lazy(
+  () => import('$app/pages/purchase-orders/create/components/CreatePage')
+);
+const Documents = lazy(
+  () => import('$app/pages/purchase-orders/edit/components/Documents')
+);
+const Settings = lazy(
+  () => import('$app/pages/purchase-orders/edit/components/Settings')
+);
+const Activities = lazy(
+  () => import('$app/pages/purchase-orders/edit/components/Activities')
+);
+const History = lazy(
+  () => import('$app/pages/purchase-orders/edit/components/History')
+);
+const EmailHistory = lazy(
+  () => import('$app/pages/purchase-orders/edit/components/EmailHistory')
+);
 
 export const purchaseOrderRoutes = (
   <Route path="/purchase_orders">
@@ -41,6 +62,7 @@ export const purchaseOrderRoutes = (
         />
       }
     />
+
     <Route
       path=":id"
       element={
@@ -53,14 +75,37 @@ export const purchaseOrderRoutes = (
               assigned('/api/v1/purchase_orders/:id')
             ),
           ]}
-          component={<Outlet />}
+          component={<PurchaseOrder />}
         />
       }
     >
       <Route path="edit" element={<Edit />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="activity" element={<Activities />} />
+      <Route path="history" element={<History />} />
+      <Route path="email_history" element={<EmailHistory />} />
+    </Route>
+
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.PurchaseOrders),
+            or(
+              permission('edit_purchase_order'),
+              assigned('/api/v1/purchase_orders/:id')
+            ),
+          ]}
+          component={<Outlet />}
+        />
+      }
+    >
       <Route path="email" element={<Email />} />
       <Route path="pdf" element={<Pdf />} />
     </Route>
+
     <Route
       path="create"
       element={
@@ -72,6 +117,10 @@ export const purchaseOrderRoutes = (
           component={<Create />}
         />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+    </Route>
   </Route>
 );

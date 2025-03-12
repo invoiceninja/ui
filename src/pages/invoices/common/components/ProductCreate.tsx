@@ -13,7 +13,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useBlankProductQuery } from '$app/common/queries/products';
 import { Modal } from '$app/components/Modal';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Product } from '$app/common/interfaces/product';
 import { request } from '$app/common/helpers/request';
@@ -21,8 +21,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleChange } from '$app/pages/products/common/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ProductForm } from '$app/pages/products/common/components/ProductForm';
-import { useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   isModalOpen: boolean;
@@ -35,8 +35,6 @@ export function ProductCreate(props: Props) {
 
   const { data: blankProduct } = useBlankProductQuery();
 
-  const queryClient = useQueryClient();
-
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [isFormBusy, setIsFormBusy] = useState(false);
@@ -45,9 +43,7 @@ export function ProductCreate(props: Props) {
 
   const handleChange = useHandleChange({ setErrors, setProduct });
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = () => {
     if (!isFormBusy) {
       setIsFormBusy(true);
 
@@ -55,18 +51,13 @@ export function ProductCreate(props: Props) {
         .then((response: GenericSingleResourceResponse<Product>) => {
           toast.success('created_product');
 
-          queryClient.invalidateQueries('/api/v1/products');
+          $refetch(['products']);
 
-          window.dispatchEvent(
-            new CustomEvent('invalidate.combobox.queries', {
-              detail: {
-                url: endpoint('/api/v1/products'),
-              },
-            })
-          );
+          setTimeout(() => {
+            props.onProductCreated?.(response.data.data);
+          }, 200);
 
           props.setIsModalOpen(false);
-          props.onProductCreated?.(response.data.data);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

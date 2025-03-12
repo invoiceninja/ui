@@ -20,9 +20,10 @@ import { useParams } from 'react-router-dom';
 import { useQuoteQuery } from '../common/queries';
 
 export default function Email() {
+  const { documentTitle } = useTitle('email_quote');
+
   const [t] = useTranslation();
 
-  const { documentTitle } = useTitle('email_quote');
   const { id } = useParams();
 
   const { data: quote } = useQuoteQuery({ id: id! });
@@ -31,6 +32,7 @@ export default function Email() {
 
   const list = {
     email_template_quote: 'initial_email',
+    email_quote_template_reminder1: 'reminder1',
   };
 
   const pages: Page[] = [

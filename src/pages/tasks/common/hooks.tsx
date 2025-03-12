@@ -28,13 +28,14 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
+  MdEdit,
   MdNotStarted,
   MdRestore,
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
@@ -62,6 +63,21 @@ import {
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { User } from '$app/common/interfaces/user';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'status',
@@ -104,6 +120,8 @@ export function useAllTaskColumns() {
     'is_running',
     'rate',
     'updated_at',
+    'user',
+    'assigned_user',
   ] as const;
 
   return taskColumns;
@@ -112,13 +130,30 @@ export function useAllTaskColumns() {
 export function useTaskColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const accentColor = useAccentColor();
+
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+
+  const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
+
+  const formatUserName = (user: User) => {
+    const firstName = user?.first_name ?? '';
+    const lastName = user?.last_name ?? '';
+
+    if (firstName.length === 0 && lastName.length === 0)
+      return user?.email ?? 'Unknown User';
+
+    return `${firstName} ${lastName}`;
+  };
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -131,23 +166,60 @@ export function useTaskColumns() {
       id: 'project_id',
       label: t('project'),
       format: (value, task) => (
-        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>
-          {task?.project?.name}
-        </Link>
+        <Assigned
+          entityId={task.project_id}
+          cacheEndpoint="/api/v1/projects"
+          apiEndpoint="/api/v1/projects/:id?include=client"
+          preCheck={
+            hasPermission('view_project') || hasPermission('edit_project')
+          }
+          component={
+            <Link to={route('/projects/:id', { id: task?.project?.id })}>
+              {task?.project?.name}
+            </Link>
+          }
+        />
       ),
     },
     {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (value, task) => <TaskStatus entity={task} />,
+      format: (value, task) => (
+        <div className="flex items-center space-x-2">
+          <TaskStatus entity={task} />
+
+          {task.invoice_id && (
+            <Tooltip
+              width="auto"
+              message={t('view_invoice') as string}
+              withoutArrow
+              placement="bottom"
+            >
+              <MdTextSnippet
+                className="cursor-pointer"
+                fontSize={19}
+                color={accentColor}
+                onClick={() =>
+                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+                }
+              />
+            </Tooltip>
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',
       id: 'number',
       label: t('number'),
       format: (value, task) => (
-        <Link to={route('/tasks/:id/edit', { id: task.id })}>{value}</Link>
+        <DynamicLink
+          to={route('/tasks/:id/edit', { id: task.id })}
+          renderSpan={disableNavigation('task', task)}
+        >
+          {value}
+        </DynamicLink>
       ),
     },
     {
@@ -156,9 +228,12 @@ export function useTaskColumns() {
       label: t('client'),
       format: (value, task) =>
         task.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
+          <DynamicLink
+            to={route('/clients/:id', { id: value.toString() })}
+            renderSpan={disableNavigation('client', task.client)}
+          >
             {task.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -167,12 +242,23 @@ export function useTaskColumns() {
       label: t('description'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -215,21 +301,25 @@ export function useTaskColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('task1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('task2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('task3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('task4', value?.toString()),
     },
     {
       column: 'date',
@@ -278,6 +368,19 @@ export function useTaskColumns() {
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, task) => formatUserName(task?.user),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, task) =>
+        task?.assigned_user ? formatUserName(task?.assigned_user) : '',
+    },
   ];
 
   const list: string[] =
@@ -289,24 +392,12 @@ export function useTaskColumns() {
 }
 
 export function useSave() {
-  const queryClient = useQueryClient();
-
   return (task: Task) => {
     request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
       () => {
         toast.success('updated_task');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId: task.project_id,
-          })
-        );
-
-        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id: task.id })
-        );
+        $refetch(['tasks']);
       }
     );
   };
@@ -316,6 +407,7 @@ export function useTaskFilters() {
   const [t] = useTranslation();
 
   const adjustColorDarkness = useAdjustColorDarkness();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const { data: taskStatuses } = useTaskStatusesQuery({
     status: 'active',
@@ -323,16 +415,16 @@ export function useTaskFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
-    {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
+    },
+    {
+      label: t('uninvoiced'),
+      value: 'uninvoiced',
+      color: 'white',
+      backgroundColor: statusThemeColors.$4 || '#F87171',
     },
   ];
 
@@ -353,13 +445,22 @@ export function useTaskFilters() {
   return filters;
 }
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+
+  const { showCommonBulkAction, showEditAction } = params || {};
+
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'task',
+    editPageTabs: ['documents'],
   });
 
   const start = useStart();
@@ -378,7 +479,23 @@ export function useActions() {
     navigate('/tasks/create?action=clone');
   };
 
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const actions = [
+    (task: Task) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/tasks/:id/edit', { id: task.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
@@ -401,7 +518,8 @@ export function useActions() {
       ),
     (task: Task) =>
       !isTaskRunning(task) &&
-      !task.invoice_id && (
+      !task.invoice_id &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => invoiceTask([task])}
           icon={<Icon element={MdTextSnippet} />}
@@ -410,17 +528,36 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) => <AddTasksOnInvoiceAction tasks={[task]} />,
+    (task: Task) =>
+      hasPermission('create_task') && (
+        <DropdownElement
+          onClick={() => cloneToTask(task)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
     (task: Task) => (
       <DropdownElement
-        onClick={() => cloneToTask(task)}
-        icon={<Icon element={MdControlPointDuplicate} />}
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([task]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/tasks/bulk',
+            entity: 'task',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
       >
-        {t('clone')}
+        {t('run_template')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       getEntityState(task) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk([task.id], 'archive')}
@@ -430,7 +567,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(task) === EntityState.Archived ||
         getEntityState(task) === EntityState.Deleted) && (
         <DropdownElement
@@ -441,7 +578,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(task) === EntityState.Active ||
         getEntityState(task) === EntityState.Archived) && (
         <DropdownElement
@@ -461,6 +598,8 @@ export const useCustomBulkActions = () => {
   const invoiceTask = useInvoiceTask();
 
   const bulk = useBulk();
+
+  const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
 
@@ -506,59 +645,87 @@ export const useCustomBulkActions = () => {
     setSelected?.([]);
   };
 
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Task>[] = [
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStartAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStartAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'start');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStopAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStopAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'stop');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
       ),
-    (_, selectedTasks) =>
-      selectedTasks &&
-      showAddToInvoiceAction(selectedTasks) && (
-        <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
+    ({ selectedResources, setSelected }) =>
+      selectedResources &&
+      showAddToInvoiceAction(selectedResources) && (
+        <AddTasksOnInvoiceAction
+          tasks={selectedResources}
+          isBulkAction
+          setSelected={setSelected}
+        />
       ),
-    (_, selectedTasks) =>
-      selectedTasks && showInvoiceTaskAction(selectedTasks) ? (
+    ({ selectedResources, setSelected }) =>
+      selectedResources &&
+      showInvoiceTaskAction(selectedResources) &&
+      hasPermission('create_invoice') ? (
         <DropdownElement
-          onClick={() => invoiceTask(selectedTasks)}
+          onClick={() => {
+            invoiceTask(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_task')}
         </DropdownElement>
       ) : null,
-    (_, selectedTasks, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedTasks && shouldDownloadDocuments(selectedTasks)
-            ? handleDownloadDocuments(selectedTasks, setSelected)
+          selectedResources && shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/tasks/bulk',
+            entity: 'task',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];

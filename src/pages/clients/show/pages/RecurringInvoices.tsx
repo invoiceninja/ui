@@ -11,18 +11,22 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import {
   useActions,
   useRecurringInvoiceColumns,
 } from '$app/pages/recurring-invoices/common/hooks';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useFooterColumns } from '$app/pages/recurring-invoices/common/hooks/useFooterColumns';
 
 export default function RecurringInvoices() {
   const { id } = useParams();
 
-  const columns = useRecurringInvoiceColumns();
+  const hasPermission = useHasPermission();
 
   const actions = useActions();
+  const columns = useRecurringInvoiceColumns();
+  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -34,6 +38,7 @@ export default function RecurringInvoices() {
         }
       )}
       columns={columns}
+      footerColumns={footerColumns}
       customActions={actions}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
@@ -41,7 +46,9 @@ export default function RecurringInvoices() {
         id,
       })}
       linkToEdit="/recurring_invoices/:id/edit"
-      staleTime={dataTableStaleTime}
+      excludeColumns={['client_id']}
+      linkToCreateGuards={[permission('create_recurring_invoice')]}
+      hideEditableOptions={!hasPermission('edit_recurring_invoice')}
     />
   );
 }

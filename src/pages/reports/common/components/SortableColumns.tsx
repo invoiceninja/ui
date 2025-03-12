@@ -16,10 +16,8 @@ import {
   Draggable,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
-import { clientMap } from '$app/common/constants/exports/client-map';
-import { invoiceMap } from '$app/common/constants/exports/invoice-map';
+import { Record, clientMap } from '$app/common/constants/exports/client-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
-import { t } from 'i18next';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import { useTranslation } from 'react-i18next';
@@ -31,13 +29,63 @@ import { taskMap } from '$app/common/constants/exports/task-map';
 import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Identifier } from '../../index/Reports';
+import { Identifier } from '../useReports';
+import { contactMap } from '$app/common/constants/exports/contact-map';
+import { useColorScheme } from '$app/common/colors';
+import { Entity } from '$app/common/hooks/useEntityCustomFields';
+import { invoiceMap } from '$app/common/constants/exports/invoice-map';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { customField } from '$app/components/CustomField';
 
-export const reportColumn = 10;
+export const reportColumn = 11;
 
-interface Record {
-  trans: string;
-  value: string;
+export function useTranslationAlias() {
+  const [t] = useTranslation();
+  const company = useCurrentCompany();
+  const customFields = company?.custom_fields;
+
+  const entityAlias = {
+    credit: 'invoice',
+    quote: 'invoice',
+    recurring_invoice: 'invoice',
+    purchase_order: 'invoice',
+    recurring_expense: 'expense',
+    item: 'product',
+  };
+
+  const findCustomField = (field: string, isVendorContactField?: boolean) => {
+    const updatedField = field.includes('custom_value')
+      ? field.replace('custom_value', 'custom')
+      : field;
+
+    return customFields[updatedField]
+      ? customField(customFields[updatedField]).label()
+      : `${
+          isVendorContactField ? 'contact_custom_value' : 'custom'
+        }${updatedField.charAt(updatedField.length - 1)}`;
+  };
+
+  return (field: string, entity: Entity) => {
+    const updatedEntity =
+      entityAlias[entity as keyof typeof entityAlias] || entity;
+
+    const fields = {
+      custom_value1: findCustomField(`${updatedEntity}1`),
+      custom_value2: findCustomField(`${updatedEntity}2`),
+      custom_value3: findCustomField(`${updatedEntity}3`),
+      custom_value4: findCustomField(`${updatedEntity}4`),
+      surcharge1: customFields.surcharge1,
+      surcharge2: customFields.surcharge2,
+      surcharge3: customFields.surcharge3,
+      surcharge4: customFields.surcharge4,
+      contact_custom_value1: findCustomField('vendor_contact1', true),
+      contact_custom_value2: findCustomField('vendor_contact2', true),
+      contact_custom_value3: findCustomField('vendor_contact3', true),
+      contact_custom_value4: findCustomField('vendor_contact4', true),
+    };
+
+    return fields[field as keyof typeof fields] || t(field);
+  };
 }
 
 interface ColumnProps {
@@ -57,10 +105,17 @@ export function Column({
 }: ColumnProps) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
+  const findTranslationAlias = useTranslationAlias();
+
   const translateLabel = (record: Record) => {
     const parts = record.value.split('.');
 
-    return `${t(`${parts[0]}`)} - ${t(`${record.trans}`)}`;
+    return `${t(`${parts[0]}`)} - ${findTranslationAlias(
+      record.trans,
+      parts[0] as Entity
+    )}`;
   };
 
   return (
@@ -72,42 +127,63 @@ export function Column({
       <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
         {(provided) => (
           <div
+            style={{
+              color: colors.$3,
+              colorScheme: colors.$0,
+              backgroundColor: colors.$1,
+              borderColor: colors.$4,
+            }}
             className="w-80 flex-column"
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
             <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
-              {data.map((record: Record, i: number) => (
-                <Draggable
-                  key={record.value}
-                  index={i}
-                  draggableId={`left-word-${record.value}`}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <span
-                        className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
-                        key={i}
+              {data &&
+                data.map((record: Record, i: number) => (
+                  <Draggable
+                    key={record.value}
+                    index={i}
+                    draggableId={`left-word-${record.value}`}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
                       >
-                        {translateLabel(record)}
+                        <span
+                          style={{
+                            color: colors.$3,
+                            colorScheme: colors.$0,
+                            backgroundColor: colors.$1,
+                            borderColor: colors.$4,
+                          }}
+                          className="p-2 flex justify-between items-center cursor-move ml-2 text-sm"
+                          key={i}
+                        >
+                          {translateLabel(record)}
 
-                        {droppableId === reportColumn.toString() && (
-                          <button
-                            type="button"
-                            onClick={() => (onRemove ? onRemove(record) : null)}
-                          >
-                            <X size={15} />
-                          </button>
-                        )}
-                      </span>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
+                          {droppableId === reportColumn.toString() && (
+                            <button
+                              style={{
+                                color: colors.$3,
+                                colorScheme: colors.$0,
+                                backgroundColor: colors.$1,
+                                borderColor: colors.$4,
+                              }}
+                              type="button"
+                              onClick={() =>
+                                onRemove ? onRemove(record) : null
+                              }
+                            >
+                              <X size={15} />
+                            </button>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
             </div>
             {provided.placeholder}
           </div>
@@ -133,82 +209,99 @@ const positions = [
   'task',
   'expense',
   'recurring_invoice',
-];
+  'contact',
+] as const;
 
-export function SortableColumns({ report, columns }: Props) {
-  const { preferences, update } = usePreferences();
+export function useColumns({ report, columns }: Props) {
+  const { preferences } = usePreferences();
+
+  const defaultColumns = [
+    columns.includes('client') ? clientMap : [],
+    columns.includes('invoice')
+      ? columns.includes('item')
+        ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
+        : invoiceMap
+      : [],
+    columns.includes('credit')
+      ? columns.includes('item')
+        ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
+        : creditMap
+      : [],
+    columns.includes('quote')
+      ? columns.includes('item')
+        ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
+        : quoteMap
+      : [],
+    columns.includes('payment') ? paymentMap : [],
+    columns.includes('vendor') ? vendorMap : [],
+    columns.includes('purchase_order')
+      ? columns.includes('item')
+        ? purchaseorderMap.concat(
+            itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+          )
+        : purchaseorderMap
+      : [],
+    columns.includes('task') ? taskMap : [],
+    columns.includes('expense') ? expenseMap : [],
+    columns.includes('recurring_invoice')
+      ? columns.includes('item')
+        ? recurringinvoiceMap.concat(
+            itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+          )
+        : recurringinvoiceMap
+      : [],
+    columns.includes('contact') ? contactMap : [],
+    [],
+  ];
 
   const data =
     report in preferences.reports.columns &&
     preferences.reports.columns[report as Identifier].length !== 0
       ? preferences.reports.columns[report]
-      : [
-          columns.includes('client') ? clientMap : [],
-          columns.includes('invoice')
-            ? columns.includes('item')
-              ? invoiceMap.concat(itemMap)
-              : invoiceMap
-            : [],
-          columns.includes('credit')
-            ? columns.includes('item')
-              ? creditMap.concat(itemMap)
-              : creditMap
-            : [],
-          columns.includes('quote')
-            ? columns.includes('item')
-              ? quoteMap.concat(itemMap)
-              : quoteMap
-            : [],
-          columns.includes('payment') ? paymentMap : [],
-          columns.includes('vendor') ? vendorMap : [],
-          columns.includes('purchase_order')
-            ? columns.includes('item')
-              ? purchaseorderMap.concat(itemMap)
-              : purchaseorderMap
-            : [],
-          columns.includes('task') ? taskMap : [],
-          columns.includes('expense') ? expenseMap : [],
-          columns.includes('recurring_invoice')
-            ? columns.includes('item')
-              ? recurringinvoiceMap.concat(itemMap)
-              : recurringinvoiceMap
-            : [],
-          [],
-        ];
+      : defaultColumns;
+
+  return { data, defaultColumns };
+}
+
+export function SortableColumns({ report, columns }: Props) {
+  const [t] = useTranslation();
+  const { update } = usePreferences();
+  const { data, defaultColumns } = useColumns({ report, columns });
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
-    // Create a copy of the data array
-    const $data = cloneDeep(data);
 
-    // Find a source index
-    const sourceIndex = parseInt(result.source.droppableId);
+    try {
+      // Create a copy of the data array
+      const $data = cloneDeep(data);
 
-    // Find a string
-    const word = $data[sourceIndex][result.source.index];
+      // Find a source index
+      const sourceIndex = parseInt(result.source.droppableId);
 
-    // Cut a word from the original array
-    $data[sourceIndex].splice(result.source.index, 1);
+      // Find a string
+      const word = $data[sourceIndex][result.source.index];
 
-    // Find a destination index
-    const destinationIndex = parseInt(result.destination.droppableId);
+      // Cut a word from the original array
+      $data[sourceIndex].splice(result.source.index, 1);
 
-    // Then we can insert the word into new array at specific index
-    $data[destinationIndex].splice(result.destination.index, 0, word);
+      // Find a destination index
+      const destinationIndex = parseInt(result.destination.droppableId);
 
-    update(`preferences.reports.columns.${report}`, [...$data]);
+      // Then we can insert the word into new array at specific index
+      $data[destinationIndex].splice(result.destination.index, 0, word);
+
+      update(`preferences.reports.columns.${report}`, [...$data]);
+    } catch (e) {
+      // In case we hit any error, due to wrong data or something similar, we should just reset the state.
+
+      update(`preferences.reports.columns.${report}`, defaultColumns);
+    }
   };
 
   const onRemove = (record: Record) => {
-    // Find where's the original
-    const type =
-      record.value.split('.')[0] === 'item'
-        ? 'invoice' // Workaround for items as they're part of invoices.
-        : record.value.split('.')[0];
-
-    const index = positions.indexOf(type);
+    const index = positions.indexOf(record.map as (typeof positions)[number]);
 
     // Remove it from the reports
     const $data = cloneDeep(data);
@@ -224,39 +317,7 @@ export function SortableColumns({ report, columns }: Props) {
   };
 
   const onRemoveAll = () => {
-    update(`preferences.reports.columns.${report}`, [
-      columns.includes('client') ? clientMap : [],
-      columns.includes('invoice')
-        ? columns.includes('item')
-          ? invoiceMap.concat(itemMap)
-          : invoiceMap
-        : [],
-      columns.includes('credit')
-        ? columns.includes('item')
-          ? creditMap.concat(itemMap)
-          : creditMap
-        : [],
-      columns.includes('quote')
-        ? columns.includes('item')
-          ? quoteMap.concat(itemMap)
-          : quoteMap
-        : [],
-      columns.includes('payment') ? paymentMap : [],
-      columns.includes('vendor') ? vendorMap : [],
-      columns.includes('purchase_order')
-        ? columns.includes('item')
-          ? purchaseorderMap.concat(itemMap)
-          : purchaseorderMap
-        : [],
-      columns.includes('task') ? taskMap : [],
-      columns.includes('expense') ? expenseMap : [],
-      columns.includes('recurring_invoice')
-        ? columns.includes('item')
-          ? recurringinvoiceMap.concat(itemMap)
-          : recurringinvoiceMap
-        : [],
-      [],
-    ]);
+    update(`preferences.reports.columns.${report}`, defaultColumns);
   };
 
   const onAddAll = (index: number) => {
@@ -268,19 +329,53 @@ export function SortableColumns({ report, columns }: Props) {
 
     update(`preferences.reports.columns.${report}`, [...$data]);
   };
+  const colors = useColorScheme();
 
   return (
-    <div className="min-w-min">
+    <div
+      className="min-w-min"
+      style={{
+        color: colors.$3,
+        colorScheme: colors.$0,
+        backgroundColor: colors.$1,
+        borderColor: colors.$4,
+      }}
+    >
       <Card className="my-6">
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="flex w-full py-2 px-6 space-x-4">
+          <div
+            className="flex w-full py-2 px-6 space-x-4"
+            style={{
+              color: colors.$3,
+              colorScheme: colors.$0,
+              backgroundColor: colors.$1,
+              borderColor: colors.$4,
+            }}
+          >
             {columns.includes('client') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('client')}</p>
 
-                    <button type="button" onClick={() => onAddAll(0)}>
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(0)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -297,7 +392,16 @@ export function SortableColumns({ report, columns }: Props) {
                   <div className="flex justify-between items-center">
                     <p>{t('invoice')}</p>
 
-                    <button type="button" onClick={() => onAddAll(1)}>
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(1)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -311,10 +415,27 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('credit') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('credit')}</p>
 
-                    <button type="button" onClick={() => onAddAll(2)}>
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(2)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -328,7 +449,15 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('quote') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('quote')}</p>
 
                     <button type="button" onClick={() => onAddAll(3)}>
@@ -345,10 +474,27 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('payment') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('payment')}</p>
 
-                    <button type="button" onClick={() => onAddAll(4)}>
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(4)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -362,10 +508,27 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('vendor') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('vendor')}</p>
 
-                    <button type="button" onClick={() => onAddAll(5)}>
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(5)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -379,7 +542,15 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('purchase_order') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('purchase_order')}</p>
 
                     <button type="button" onClick={() => onAddAll(6)}>
@@ -396,10 +567,27 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('task') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('task')}</p>
 
-                    <button type="button" onClick={() => onAddAll(7)}>
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(7)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -413,7 +601,15 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('expense') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('expense')}</p>
 
                     <button type="button" onClick={() => onAddAll(8)}>
@@ -430,10 +626,27 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('recurring_invoice') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <p>{t('recurring_invoice')}</p>
 
-                    <button type="button" onClick={() => onAddAll(9)}>
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(9)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -444,16 +657,68 @@ export function SortableColumns({ report, columns }: Props) {
               />
             )}
 
+            {columns.includes('contact') && (
+              <Column
+                title={() => (
+                  <div
+                    className="flex justify-between items-center"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
+                    <p>{t('contact')}</p>
+
+                    <button
+                      type="button"
+                      onClick={() => onAddAll(10)}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[10]}
+                droppableId="10"
+                isDropDisabled={true}
+              />
+            )}
+
             <Column
               title={() => (
-                <div className="flex items-center justify-between">
+                <div
+                  className="flex items-center justify-between"
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
+                >
                   <p>
                     {t('report')} {t('columns')}
                   </p>
 
-                  <button type="button" onClick={onRemoveAll}>
-                    <X size={16} />
-                  </button>
+                  <div
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                    className="flex items-end space-x-1 cursor-pointer"
+                    onClick={onRemoveAll}
+                  >
+                    <X size={19} />
+                    <span className="text-xs">({t('reset')})</span>
+                  </div>
                 </div>
               )}
               data={data[reportColumn]}

@@ -21,6 +21,7 @@ import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
+import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
 
 interface Props {
   contacts: Partial<ClientContact>[];
@@ -47,7 +48,7 @@ export function Contacts(props: Props) {
 
     set(props.contacts[contactIndex], propertyId, value);
 
-    props.setContacts(props.contacts);
+    props.setContacts([...props.contacts]);
   };
 
   const destroy = (index: number) => {
@@ -74,12 +75,16 @@ export function Contacts(props: Props) {
     props.setContacts(contacts);
   };
 
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <Card className="mt-4 xl:mt-0" title={t('contacts')}>
       {props.contacts.map((contact, index, row) => (
-        <div key={index} className="pb-4 mb-4 border-b" style={{ borderColor: colors.$5 }}>
+        <div
+          key={index}
+          className="pb-4 mb-4 border-b"
+          style={{ borderColor: colors.$5 }}
+        >
           <Element leftSide={t('first_name')}>
             <InputField
               id={`first_name_${index}`}
@@ -229,9 +234,17 @@ export function Contacts(props: Props) {
             />
           )}
 
-          <Element>
+          <Element
+            {...(contact.is_locked && {
+              leftSide: (
+                <div className="flex">
+                  <UserUnsubscribedTooltip size={25} />
+                </div>
+              ),
+            })}
+          >
             <div className="flex items-center">
-              <div className="w-1/2">
+              <div className="flex items-center justify-between w-1/2">
                 {props.contacts.length >= 2 && (
                   <button
                     type="button"

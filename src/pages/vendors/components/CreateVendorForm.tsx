@@ -18,24 +18,27 @@ import { useBlankVendorQuery } from '$app/common/queries/vendor';
 import { Form } from '$app/pages/vendors/edit/components/Form';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { set } from 'lodash';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import classNames from 'classnames';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
   onVendorCreated?: (vendor: Vendor) => unknown;
+  fundamentalConceptVisible: boolean;
+  setFundamentalConceptVisible: Dispatch<SetStateAction<boolean>>;
 }
 
 export function CreateVendorForm(props: Props) {
   const [t] = useTranslation();
 
-  const { data } = useBlankVendorQuery();
+  const { fundamentalConceptVisible, setFundamentalConceptVisible } = props;
 
-  const queryClient = useQueryClient();
+  const { data } = useBlankVendorQuery();
 
   const [vendor, setVendor] = useState<Vendor>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -65,21 +68,13 @@ export function CreateVendorForm(props: Props) {
     set(vendor as Vendor, 'contacts', contacts);
     toast.processing();
 
-    await saveCompany(true);
+    await saveCompany({ excludeToasters: true });
 
     request('POST', endpoint('/api/v1/vendors'), vendor)
       .then((response) => {
         toast.success('created_vendor');
 
-        queryClient.invalidateQueries('/api/v1/vendors');
-
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: {
-              url: endpoint('/api/v1/vendors'),
-            },
-          })
-        );
+        $refetch(['vendors']);
 
         if (props.setSelectedIds) {
           props.setSelectedIds([response.data.data.id]);
@@ -109,11 +104,27 @@ export function CreateVendorForm(props: Props) {
           errors={errors}
           setContacts={setContacts}
           contacts={contacts}
+          fundamentalConceptVisible={fundamentalConceptVisible}
         />
       )}
 
-      <div className="flex justify-end space-x-4 mt-5">
-        <Button onClick={handleSave}>{t('save')}</Button>
+      <div
+        className={classNames('flex', {
+          'justify-between': fundamentalConceptVisible,
+          'justify-end space-x-5': !fundamentalConceptVisible,
+        })}
+      >
+        <Button
+          behavior="button"
+          type="secondary"
+          onClick={() => setFundamentalConceptVisible((current) => !current)}
+        >
+          {fundamentalConceptVisible ? t('more_fields') : t('less_fields')}
+        </Button>
+
+        <Button behavior="button" onClick={handleSave}>
+          {t('save')}
+        </Button>
       </div>
     </>
   );

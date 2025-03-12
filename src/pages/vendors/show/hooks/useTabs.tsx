@@ -10,14 +10,21 @@
 
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { route } from '$app/common/helpers/route';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { modules } from '$app/pages/settings';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-export function useTabs() {
+interface Params {
+  vendor: Vendor | undefined;
+}
+export function useTabs(params: Params) {
   const [t] = useTranslation();
   const enabled = useEnabled();
+
+  const { vendor } = params;
 
   const { id } = useParams();
 
@@ -35,8 +42,15 @@ export function useTabs() {
       href: route('/vendors/:id/recurring_expenses', { id }),
     },
     {
+      name: t('activity'),
+      href: route('/vendors/:id/activities', { id }),
+    },
+    {
       name: t('documents'),
       href: route('/vendors/:id/documents', { id }),
+      formatName: () => (
+        <DocumentsTabLabel numberOfDocuments={vendor?.documents.length} />
+      ),
     },
   ];
 

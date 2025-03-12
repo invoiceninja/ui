@@ -15,6 +15,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface ExpenseCategorySelectorProps
   extends GenericSelectorProps<ExpenseCategory> {
@@ -29,6 +30,11 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const hasPermission = useHasPermission();
+
+  const perPageParameter =
+    import.meta.env.VITE_IS_TEST === 'true' ? '&per_page=1' : '&per_page=500';
+
   return (
     <>
       <CreateExpenseCategoryModal
@@ -42,9 +48,9 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
 
       {!props.setSelectedIds && (
         <ComboboxAsync<ExpenseCategory>
-          endpoint={
-            new URL(endpoint('/api/v1/expense_categories?status=active'))
-          }
+          endpoint={endpoint(
+            `/api/v1/expense_categories?status=active${perPageParameter}`
+          )}
           onChange={(category: Entry<ExpenseCategory>) =>
             category.resource && props.onChange(category.resource)
           }
@@ -60,7 +66,7 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
           action={{
             label: t('new_expense_category'),
             onClick: () => setIsModalOpen(true),
-            visible: true,
+            visible: hasPermission('create_expense'),
           }}
           readonly={props.readonly}
           onDismiss={props.onClearButtonClick}

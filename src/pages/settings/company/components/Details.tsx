@@ -21,11 +21,16 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 
 export function Details() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -50,83 +55,160 @@ export function Details() {
     <>
       {companyChanges?.settings && (
         <Card title={t('details')}>
-          <Element leftSide={t('company_name')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="name"
+                labelElement={<SettingsLabel label={t('company_name')} />}
+              />
+            }
+          >
             <InputField
               value={companyChanges?.settings?.name || ''}
               onValueChange={(value) =>
                 handleChange('settings.name', value.toString())
               }
+              disabled={disableSettingsField('name')}
               errorMessage={errors?.errors['settings.name']}
             />
           </Element>
 
-          <Element leftSide={t('id_number')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="id_number"
+                labelElement={<SettingsLabel label={t('id_number')} />}
+              />
+            }
+          >
             <InputField
               value={companyChanges?.settings?.id_number || ''}
               onValueChange={(value) =>
                 handleChange('settings.id_number', value.toString())
               }
+              disabled={
+                disableSettingsField('id_number') ||
+                companyChanges?.legal_entity_id !== null
+              }
               errorMessage={errors?.errors['settings.id_number']}
             />
           </Element>
 
-          <Element leftSide={t('vat_number')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="vat_number"
+                labelElement={<SettingsLabel label={t('vat_number')} />}
+              />
+            }
+          >
             <InputField
               value={companyChanges?.settings?.vat_number || ''}
               onValueChange={(value) =>
                 handleChange('settings.vat_number', value.toString())
               }
+              disabled={
+                disableSettingsField('vat_number') ||
+                companyChanges?.legal_entity_id !== null
+              }
               errorMessage={errors?.errors['settings.vat_number']}
             />
+
+            {companyChanges?.legal_entity_id ? (
+              <p className="mt-2">{t('changing_vat_and_id_number_note')}</p>
+            ) : null}
           </Element>
 
-          <Element leftSide={t('website')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="website"
+                labelElement={<SettingsLabel label={t('website')} />}
+              />
+            }
+          >
             <InputField
               value={companyChanges?.settings?.website || ''}
               onValueChange={(value) =>
                 handleChange('settings.website', value.toString())
               }
+              disabled={disableSettingsField('website')}
               errorMessage={errors?.errors['settings.website']}
             />
           </Element>
 
-          <Element leftSide={t('email')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="email"
+                labelElement={<SettingsLabel label={t('email')} />}
+              />
+            }
+          >
             <InputField
               value={companyChanges?.settings?.email || ''}
               onValueChange={(value) =>
                 handleChange('settings.email', value.toString())
               }
+              disabled={disableSettingsField('email')}
               errorMessage={errors?.errors['settings.email']}
             />
           </Element>
 
-          <Element leftSide={`${t('company')} ${t('phone')}`}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="phone"
+                labelElement={
+                  <SettingsLabel label={`${t('company')} ${t('phone')}`} />
+                }
+              />
+            }
+          >
             <InputField
               value={companyChanges?.settings?.phone || ''}
               onValueChange={(value) =>
                 handleChange('settings.phone', value.toString())
               }
+              disabled={disableSettingsField('phone')}
               errorMessage={errors?.errors['settings.phone']}
             />
           </Element>
 
           {companyChanges?.settings.country_id == '756' ? (
             <>
-              <Element leftSide={t('qr_iban')}>
+              <Element
+                leftSide={
+                  <PropertyCheckbox
+                    propertyKey="qr_iban"
+                    labelElement={<SettingsLabel label={t('qr_iban')} />}
+                  />
+                }
+              >
                 <InputField
                   value={companyChanges?.settings?.qr_iban || ''}
                   onValueChange={(value) =>
                     handleChange('settings.qr_iban', value.toString())
                   }
+                  disabled={disableSettingsField('qr_iban')}
                   errorMessage={errors?.errors['settings.qr_iban']}
                 />
               </Element>
-              <Element leftSide={t('besr_id')}>
+
+              <Element
+                leftSide={
+                  <PropertyCheckbox
+                    propertyKey="besr_id"
+                    labelElement={<SettingsLabel label={t('besr_id')} />}
+                  />
+                }
+              >
                 <InputField
                   value={companyChanges?.settings?.besr_id || ''}
                   onValueChange={(value) =>
                     handleChange('settings.besr_id', value.toString())
                   }
+                  disabled={disableSettingsField('besr_id')}
                   errorMessage={errors?.errors['settings.besr_id']}
                 />
               </Element>
@@ -143,6 +225,8 @@ export function Details() {
                   handleChange('size_id', value.toString())
                 }
                 errorMessage={errors?.errors.size_id}
+                customSelector
+                dismissable={false}
               >
                 {statics?.sizes.map((size: { id: string; name: string }) => (
                   <option key={size.id} value={size.id}>
@@ -161,6 +245,8 @@ export function Details() {
                   handleChange('industry_id', value.toString())
                 }
                 errorMessage={errors?.errors.industry_id}
+                customSelector
+                dismissable={false}
               >
                 {statics?.industries.map(
                   (industry: { id: string; name: string }) => (
@@ -173,23 +259,31 @@ export function Details() {
             </Element>
           )}
 
-          <Element leftSide={t('classification')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="classification"
+                labelElement={<SettingsLabel label={t('classification')} />}
+              />
+            }
+          >
             <SelectField
-              id="classification"
               value={companyChanges?.settings?.classification ?? ''}
               onValueChange={(value) =>
                 handleChange('settings.classification', value.toString())
               }
+              disabled={disableSettingsField('classification')}
+              withBlank
+              customSelector
             >
-              <option value=""></option>
               <option value="individual">{t('individual')}</option>
               <option value="business">{t('business')}</option>
+              <option value="company">{t('company')}</option>
               <option value="partnership">{t('partnership')}</option>
               <option value="trust">{t('trust')}</option>
               <option value="charity">{t('charity')}</option>
               <option value="government">{t('government')}</option>
               <option value="other">{t('other')}</option>
-
             </SelectField>
           </Element>
 

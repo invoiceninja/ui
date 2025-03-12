@@ -39,6 +39,7 @@ type PurchaseOrderPermissions =
   | 'edit_purchase_order';
 type ReportPermissions = 'view_reports';
 type DashboardPermissions = 'view_dashboard';
+type EmailPermissions = 'disable_emails';
 
 export type Permissions =
   | AllPermissions
@@ -57,7 +58,8 @@ export type Permissions =
   | BankTransactionsPermissions
   | PurchaseOrderPermissions
   | ReportPermissions
-  | DashboardPermissions;
+  | DashboardPermissions
+  | EmailPermissions;
 
 export function useHasPermission() {
   const user = useCurrentCompanyUser();
@@ -70,7 +72,9 @@ export function useHasPermission() {
       user?.is_admin ||
         user?.is_owner ||
         permissions.includes(permission) ||
-        permissions.includes(`${action}_all`)
+        (permissions.includes(`${action}_all`) &&
+          permission !== 'view_reports' &&
+          permission !== 'view_dashboard')
     );
   };
 }

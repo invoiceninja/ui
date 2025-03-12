@@ -25,25 +25,31 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useActions } from '../common/hooks/useActions';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import {
+  defaultColumns,
+  useAllTransactionColumns,
+} from '../common/hooks/useAllTransactionColumns';
 
 export default function Transactions() {
   useTitle('transactions');
 
   const [t] = useTranslation();
-
-  const columns = useTransactionColumns();
-
-  const filters = useTransactionFilters();
-
-  const customBulkActions = useCustomBulkActions();
-
-  const { dateFormat } = useCurrentCompanyDateFormats();
+  const hasPermission = useHasPermission();
 
   const pages = [{ name: t('transactions'), href: '/transactions' }];
 
-  const [transactionId, setTransactionId] = useState<string>('');
+  const actions = useActions();
+  const filters = useTransactionFilters();
+  const columns = useTransactionColumns();
+  const customBulkActions = useCustomBulkActions();
+  const transactionColumns = useAllTransactionColumns();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [sliderTitle, setSliderTitle] = useState<string>();
+  const [transactionId, setTransactionId] = useState<string>('');
 
   const getSelectedTransaction = (transaction: Transaction) => {
     setTransactionId(transaction.id);
@@ -77,7 +83,6 @@ export default function Transactions() {
         title={t('transactions')}
         breadcrumbs={pages}
         docsLink="en/transactions/"
-        withoutBackButton
       >
         <DataTable
           resource="transaction"
@@ -87,6 +92,7 @@ export default function Transactions() {
           linkToCreate="/transactions/create"
           linkToEdit="/transactions/:id/edit"
           onTableRowClick={getSelectedTransaction}
+          customActions={actions}
           customFilters={filters}
           customBulkActions={customBulkActions}
           customFilterPlaceholder="status"
@@ -102,8 +108,17 @@ export default function Transactions() {
               component={<ImportButton route="/transactions/import" />}
             />
           }
+          leftSideChevrons={
+            <DataTableColumnsPicker
+              table="transaction"
+              columns={transactionColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+            />
+          }
           withResourcefulActions
           linkToCreateGuards={[permission('create_bank_transaction')]}
+          hideEditableOptions={!hasPermission('edit_bank_transaction')}
+          enableSavingFilterPreference
         />
       </Default>
     </>

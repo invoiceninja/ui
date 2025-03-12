@@ -13,7 +13,6 @@ import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
@@ -21,18 +20,24 @@ import { Alert } from '$app/components/Alert';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Gateway } from '$app/common/interfaces/statics';
 import { toast } from '$app/common/helpers/toast/toast';
+import collect from 'collect.js';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export default function Refund() {
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
+
+  const formatMoney = useFormatMoney();
 
   const { data: companyGateway } = useCompanyGatewayQuery({
     id: payment?.company_gateway_id,
@@ -49,7 +54,6 @@ export default function Refund() {
   const [refundGateway, setRefundGateway] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -82,23 +86,32 @@ export default function Refund() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          queryClient.invalidateQueries(
-            route('/api/v1/payments/refund?email_receipt=:email', {
-              email: String(email),
-            })
-          );
-          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-          queryClient.invalidateQueries(route('/api/v1/payments'));
+
+          $refetch(['payments']);
         });
     },
   });
 
   const getInvoiceAmount = (invoiceItem: Invoice) => {
-    if (payment) {
-      return invoiceItem?.paid_to_date > payment.amount - payment.refunded
-        ? payment.amount - payment.refunded
-        : invoiceItem?.paid_to_date;
-    }
+    const paymentable = payment?.paymentables.find(
+      ({ invoice_id }) => invoice_id === invoiceItem.id
+    );
+
+    return paymentable ? paymentable.amount - paymentable.refunded : 0;
+  };
+
+  const getInvoiceLabel = (invoice: Invoice) => {
+    const paymentable = payment?.paymentables.find(
+      ({ invoice_id }) => invoice_id === invoice.id
+    );
+
+    return paymentable
+      ? `${t('invoice')} #${invoice.number} - ${t('refundable')} (${formatMoney(
+          paymentable.amount - paymentable.refunded,
+          payment?.client?.country_id,
+          payment?.client?.settings.currency_id
+        )})`
+      : '';
   };
 
   useEffect(() => {
@@ -143,14 +156,24 @@ export default function Refund() {
     }
   }, [companyGateway]);
 
+  const refundableInvoices = () => {
+    const $invoices = collect(formik?.values.invoices).pluck('invoice_id');
+
+    return payment?.invoices?.filter(
+      (invoice: Invoice) => !$invoices.contains(invoice.id)
+    );
+  };
+
+  useSaveBtn(
+    {
+      onClick: () => formik.handleSubmit(),
+      disableSaveButton: formik.isSubmitting || !formik.values.invoices.length,
+    },
+    [formik.values, formik.isSubmitting]
+  );
+
   return (
-    <Card
-      title={t('refund_payment')}
-      disableSubmitButton={formik.isSubmitting}
-      onFormSubmit={formik.handleSubmit}
-      withSaveButton
-      saveButtonLabel={t('refund')}
-    >
+    <Card title={t('refund_payment')}>
       <Element leftSide={t('number')}>
         <InputField disabled value={payment?.number} />
       </Element>
@@ -175,7 +198,7 @@ export default function Refund() {
 
       <Element leftSide={t('invoices')}>
         <SelectField
-          onChange={(event: any) => {
+          onChange={(event: ChangeEvent<HTMLSelectElement>) => {
             if (
               formik.values.invoices.filter(
                 (invoice: { invoice_id: string }) =>
@@ -183,15 +206,15 @@ export default function Refund() {
               ).length < 1
             )
               setInvoices([...invoices, event.target.value]);
+            event.target.value = '';
           }}
+          withBlank
         >
-          <option value=""></option>
-          {payment?.invoices &&
-            payment?.invoices.map((invoice: Invoice, index: number) => (
-              <option key={index} value={invoice.id}>
-                {invoice.number}
-              </option>
-            ))}
+          {refundableInvoices()?.map((invoice: Invoice, index: number) => (
+            <option key={index} value={invoice.id}>
+              {getInvoiceLabel(invoice)}
+            </option>
+          ))}
         </SelectField>
 
         {errors?.errors.invoices && (
@@ -213,44 +236,51 @@ export default function Refund() {
 
             if (invoiceItem)
               return (
-                <Element
-                  key={index}
-                  leftSide={`${t('invoice')}: ${invoiceItem?.number}`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <InputField
-                      id={`invoices[${index}].amount`}
-                      type="number"
-                      value={
-                        invoiceItem?.paid_to_date >
-                        payment?.amount - payment?.refunded
-                          ? payment?.amount - payment?.refunded
-                          : invoiceItem?.paid_to_date
-                      }
-                      onChange={formik.handleChange}
-                      errorMessage={
-                        errors?.errors[`invoices.${[index]}.invoice_id`]
-                      }
-                    />
-
-                    <Button
-                      behavior="button"
-                      type="minimal"
-                      onClick={() => {
-                        formik.setFieldValue(
-                          'invoices',
-                          formik.values.invoices.filter(
-                            (invoice: any) =>
-                              invoice.invoice_id !=
-                              requestInvoiceItem.invoice_id
+                <div key={index} className="flex flex-col">
+                  <Element leftSide={`${t('invoice')}: ${invoiceItem?.number}`}>
+                    <div className="flex items-center space-x-2">
+                      <NumberInputField
+                        value={
+                          (formik.values.invoices[index] as Invoice).amount ||
+                          ''
+                        }
+                        onValueChange={(value) =>
+                          formik.setFieldValue(
+                            `invoices.${index}.amount`,
+                            parseFloat(value)
                           )
-                        );
-                      }}
-                    >
-                      <X />
-                    </Button>
-                  </div>
-                </Element>
+                        }
+                      />
+
+                      <Button
+                        behavior="button"
+                        type="minimal"
+                        onClick={() => {
+                          formik.setFieldValue(
+                            'invoices',
+                            formik.values.invoices.filter(
+                              (invoice: any) =>
+                                invoice.invoice_id !=
+                                requestInvoiceItem.invoice_id
+                            )
+                          );
+                        }}
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                  </Element>
+
+                  {(errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                    errors?.errors[`invoices.${[index]}.amount`]) && (
+                    <div className="px-6">
+                      <Alert className="mt-2 break-all" type="danger">
+                        {errors?.errors[`invoices.${[index]}.invoice_id`] ||
+                          errors?.errors[`invoices.${[index]}.amount`]}
+                      </Alert>
+                    </div>
+                  )}
+                </div>
               );
           }
         )}

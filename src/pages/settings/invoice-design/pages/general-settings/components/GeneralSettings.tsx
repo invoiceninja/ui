@@ -10,7 +10,7 @@
 
 import colors from '$app/common/constants/colors';
 import { Design } from '$app/common/interfaces/design';
-import { useDesignsQuery } from '$app/common/queries/designs';
+import { useDesignsQuery, useTemplateQuery } from '$app/common/queries/designs';
 import { Divider } from '$app/components/cards/Divider';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useAtom, useAtomValue } from 'jotai';
@@ -19,13 +19,19 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updatingRecordsAtom as updatingRecordsAtom } from '../../../common/atoms';
 import { Card, Element } from '$app/components/cards';
-import { InputField, Radio, SelectField } from '$app/components/forms';
+import { Radio, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Company } from '$app/common/interfaces/company.interface';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import classNames from 'classnames';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -763,11 +769,13 @@ const fonts = [
   { value: 'Zeyada', label: 'Zeyada' },
 ];
 
-export function GeneralSettings() {
+export default function GeneralSettings() {
   const [t] = useTranslation();
 
-  const currentCompany = useCurrentCompany();
   const company = useCompanyChanges();
+  const currentCompany = useCurrentCompany();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -775,6 +783,9 @@ export function GeneralSettings() {
   const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
 
   const { data: designs } = useDesignsQuery();
+  const { data: invoiceDesigns } = useTemplateQuery('invoice');
+  const { data: paymentDesigns } = useTemplateQuery('payment');
+  const { data: statementDesigns } = useTemplateQuery('statement');
 
   const isDesignChanged = (property: keyof Company['settings']) => {
     return currentCompany?.settings[property] !== company?.settings[property];
@@ -814,347 +825,754 @@ export function GeneralSettings() {
         ?.replaceAll('%', '')
         ?.replaceAll('px', '');
 
-      handleChange('company_logo_size', `${value}${logoSizeType}`);
+      if (value) {
+        handleChange('company_logo_size', `${value}${logoSizeType}`);
+      } else {
+        handleChange('company_logo_size', '');
+      }
     }
   }, [logoSizeType]);
+
+  useEffect(() => {
+    if (
+      company?.settings &&
+      company?.settings.company_logo_size?.includes('px')
+    ) {
+      setLogoSizeType('px');
+    }
+  }, [company?.settings?.company_logo_size]);
 
   useEffect(() => {
     setUpdatingRecords([]);
   }, []);
 
+  const designsFilter = (entity: string, designs: Design[]) => {
+    return (
+      designs.filter(
+        (design: Design) =>
+          design.is_template === false || design.entities.match(entity)
+      ) ?? designs
+    );
+  };
+
   return (
-    <Card title={t('general_settings')} padding="small" collapsed={false}>
-      <Element leftSide={t('invoice_design')}>
-        <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.invoice_design_id"
-            value={company?.settings?.invoice_design_id || 'VolejRejNm'}
-            onValueChange={(value) => handleChange('invoice_design_id', value)}
-            errorMessage={errors?.errors['settings.invoice_design_id']}
-          >
-            {designs &&
-              designs.map((design: Design) => (
-                <option key={design.id} value={design.id}>
-                  {design.name}
-                </option>
-              ))}
-          </SelectField>
+    <>
+      <AdvancedSettingsPlanAlert />
 
-          {isDesignChanged('invoice_design_id') && (
-            <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
-              <Toggle
-                checked={isUpdateAllRecordsChecked('invoice')}
-                onValueChange={(value) =>
-                  handleUpdateAllRecordsChange(
-                    'invoice',
-                    'invoice_design_id',
-                    value
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
-      </Element>
-
-      <Element leftSide={t('quote_design')}>
-        <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.quote_design_id"
-            value={company?.settings?.quote_design_id || 'VolejRejNm'}
-            onValueChange={(value) => handleChange('quote_design_id', value)}
-            errorMessage={errors?.errors['settings.quote_design_id']}
-          >
-            {designs &&
-              designs.map((design: Design) => (
-                <option key={design.id} value={design.id}>
-                  {design.name}
-                </option>
-              ))}
-          </SelectField>
-
-          {isDesignChanged('quote_design_id') && (
-            <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
-              <Toggle
-                checked={isUpdateAllRecordsChecked('quote')}
-                onValueChange={(value) =>
-                  handleUpdateAllRecordsChange(
-                    'quote',
-                    'quote_design_id',
-                    value
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
-      </Element>
-
-      <Element leftSide={t('credit_design')}>
-        <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.credit_design_id"
-            value={company?.settings?.credit_design_id || 'VolejRejNm'}
-            onValueChange={(value) => handleChange('credit_design_id', value)}
-            errorMessage={errors?.errors['settings.credit_design_id']}
-          >
-            {designs &&
-              designs.map((design: Design) => (
-                <option key={design.id} value={design.id}>
-                  {design.name}
-                </option>
-              ))}
-          </SelectField>
-
-          {isDesignChanged('credit_design_id') && (
-            <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
-              <Toggle
-                checked={isUpdateAllRecordsChecked('credit')}
-                onValueChange={(value) =>
-                  handleUpdateAllRecordsChange(
-                    'credit',
-                    'credit_design_id',
-                    value
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
-      </Element>
-
-      <Element leftSide={t('purchase_order_design')}>
-        <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.purchase_order_design_id"
-            value={company?.settings?.purchase_order_design_id || 'VolejRejNm'}
-            onValueChange={(value) =>
-              handleChange('purchase_order_design_id', value)
-            }
-            errorMessage={errors?.errors['settings.purchase_order_design_id']}
-          >
-            {designs &&
-              designs.map((design: Design) => (
-                <option key={design.id} value={design.id}>
-                  {design.name}
-                </option>
-              ))}
-          </SelectField>
-
-          {isDesignChanged('purchase_order_design_id') && (
-            <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
-              <Toggle
-                checked={isUpdateAllRecordsChecked('purchase_order')}
-                onValueChange={(value) =>
-                  handleUpdateAllRecordsChange(
-                    'purchase_order',
-                    'purchase_order_design_id',
-                    value
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
-      </Element>
-
-      <Element leftSide={t('page_layout')}>
-        <SelectField
-          id="settings.page_layout"
-          value={company?.settings?.page_layout || 'portrait'}
-          onValueChange={(value) => handleChange('page_layout', value)}
-          errorMessage={errors?.errors['settings.page_layout']}
-        >
-          <option value="portrait">{t('portrait')}</option>
-          <option value="landscape">{t('landscape')}</option>
-        </SelectField>
-      </Element>
-
-      <Element leftSide={t('page_size')}>
-        <SelectField
-          id="settings.page_size"
-          value={company?.settings?.page_size || 'A4'}
-          onValueChange={(value) => handleChange('page_size', value)}
-          errorMessage={errors?.errors['settings.page_size']}
-        >
-          <option value="A5">A5</option>
-          <option value="A4">A4</option>
-          <option value="A3">A3</option>
-          <option value="B5">B5</option>
-          <option value="B4">B4</option>
-          <option value="JIS-B5">JIS-B5</option>
-          <option value="JIS-B4">JIS-B4</option>
-          <option value="letter">Letter</option>
-          <option value="legal">Legal</option>
-          <option value="ledger">Ledger</option>
-        </SelectField>
-      </Element>
-
-      <Element leftSide={t('font_size')}>
-        <SelectField
-          id="settings.font_size"
-          value={company?.settings?.font_size || 16}
-          onValueChange={(value) => handleChange('font_size', parseInt(value))}
-          errorMessage={errors?.errors['settings.font_size']}
-        >
-          {range(6, 41, 2).map((number) => (
-            <option key={number} value={number}>
-              {number}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
-
-      <Element leftSide={t('logo_size')}>
-        <div className="w-full inline-flex items-center space-x-2">
-          <div className="w-full">
-            <InputField
-              value={company.settings.company_logo_size
-                ?.replaceAll('px', '')
-                ?.replaceAll('%', '')}
-              onValueChange={(value) =>
-                handleChange('company_logo_size', `${value}${logoSizeType}`)
-              }
-              errorMessage={errors?.errors['settings.company_logo_size']}
+      <Card title={t('general_settings')} padding="small">
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="invoice_design_id"
+              labelElement={<SettingsLabel label={t('invoice_design')} />}
+              defaultValue="VolejRejNm"
             />
-          </div>
-
-          <div className="w-1/3">
+          }
+        >
+          <div className="flex flex-col space-y-3">
             <SelectField
-              value={logoSizeType}
-              onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
+              id="settings.invoice_design_id"
+              value={company?.settings?.invoice_design_id || 'VolejRejNm'}
+              onValueChange={(value) =>
+                handleChange('invoice_design_id', value)
+              }
+              disabled={disableSettingsField('invoice_design_id')}
+              errorMessage={errors?.errors['settings.invoice_design_id']}
+              customSelector
+              dismissable={false}
             >
-              <option value="%">{t('percent')}</option>
-              <option value="px">{t('pixels')}</option>
+              {designs &&
+                designsFilter('invoice', designs).map((design: Design) => (
+                  <option key={design.id} value={design.id}>
+                    {design.name}
+                  </option>
+                ))}
+            </SelectField>
+
+            {isDesignChanged('invoice_design_id') && (
+              <div className="flex space-x-10">
+                <span
+                  className={classNames({
+                    'opacity-75': disableSettingsField('invoice_design_id'),
+                  })}
+                >
+                  {t('update_all_records')}
+                </span>
+                <Toggle
+                  checked={isUpdateAllRecordsChecked('invoice')}
+                  disabled={disableSettingsField('invoice_design_id')}
+                  onValueChange={(value) =>
+                    handleUpdateAllRecordsChange(
+                      'invoice',
+                      'invoice_design_id',
+                      value
+                    )
+                  }
+                />
+              </div>
+            )}
+          </div>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="quote_design_id"
+              labelElement={<SettingsLabel label={t('quote_design')} />}
+              defaultValue="VolejRejNm"
+            />
+          }
+        >
+          <div className="flex flex-col space-y-3">
+            <SelectField
+              id="settings.quote_design_id"
+              value={company?.settings?.quote_design_id || 'VolejRejNm'}
+              onValueChange={(value) => handleChange('quote_design_id', value)}
+              disabled={disableSettingsField('quote_design_id')}
+              errorMessage={errors?.errors['settings.quote_design_id']}
+              customSelector
+              dismissable={false}
+            >
+              {designs &&
+                designsFilter('quote', designs).map((design: Design) => (
+                  <option key={design.id} value={design.id}>
+                    {design.name}
+                  </option>
+                ))}
+            </SelectField>
+
+            {isDesignChanged('quote_design_id') && (
+              <div className="flex space-x-10">
+                <span
+                  className={classNames({
+                    'opacity-75': disableSettingsField('quote_design_id'),
+                  })}
+                >
+                  {t('update_all_records')}
+                </span>
+                <Toggle
+                  checked={isUpdateAllRecordsChecked('quote')}
+                  onValueChange={(value) =>
+                    handleUpdateAllRecordsChange(
+                      'quote',
+                      'quote_design_id',
+                      value
+                    )
+                  }
+                  disabled={disableSettingsField('quote_design_id')}
+                />
+              </div>
+            )}
+          </div>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="credit_design_id"
+              labelElement={<SettingsLabel label={t('credit_design')} />}
+              defaultValue="VolejRejNm"
+            />
+          }
+        >
+          <div className="flex flex-col space-y-3">
+            <SelectField
+              id="settings.credit_design_id"
+              value={company?.settings?.credit_design_id || 'VolejRejNm'}
+              onValueChange={(value) => handleChange('credit_design_id', value)}
+              disabled={disableSettingsField('credit_design_id')}
+              errorMessage={errors?.errors['settings.credit_design_id']}
+              customSelector
+              dismissable={false}
+            >
+              {designs &&
+                designsFilter('credit', designs).map((design: Design) => (
+                  <option key={design.id} value={design.id}>
+                    {design.name}
+                  </option>
+                ))}
+            </SelectField>
+
+            {isDesignChanged('credit_design_id') && (
+              <div className="flex space-x-10">
+                <span
+                  className={classNames({
+                    'opacity-75': disableSettingsField('credit_design_id'),
+                  })}
+                >
+                  {t('update_all_records')}
+                </span>
+                <Toggle
+                  checked={isUpdateAllRecordsChecked('credit')}
+                  onValueChange={(value) =>
+                    handleUpdateAllRecordsChange(
+                      'credit',
+                      'credit_design_id',
+                      value
+                    )
+                  }
+                  disabled={disableSettingsField('credit_design_id')}
+                />
+              </div>
+            )}
+          </div>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="purchase_order_design_id"
+              labelElement={
+                <SettingsLabel label={t('purchase_order_design')} />
+              }
+              defaultValue="VolejRejNm"
+            />
+          }
+        >
+          <div className="flex flex-col space-y-3">
+            <SelectField
+              id="settings.purchase_order_design_id"
+              value={
+                company?.settings?.purchase_order_design_id || 'VolejRejNm'
+              }
+              onValueChange={(value) =>
+                handleChange('purchase_order_design_id', value)
+              }
+              disabled={disableSettingsField('purchase_order_design_id')}
+              errorMessage={errors?.errors['settings.purchase_order_design_id']}
+              customSelector
+              dismissable={false}
+            >
+              {designs &&
+                designsFilter('purchase_order', designs).map(
+                  (design: Design) => (
+                    <option key={design.id} value={design.id}>
+                      {design.name}
+                    </option>
+                  )
+                )}
+            </SelectField>
+
+            {isDesignChanged('purchase_order_design_id') && (
+              <div className="flex space-x-10">
+                <span
+                  className={classNames({
+                    'opacity-75': disableSettingsField(
+                      'purchase_order_design_id'
+                    ),
+                  })}
+                >
+                  {t('update_all_records')}
+                </span>
+                <Toggle
+                  checked={isUpdateAllRecordsChecked('purchase_order')}
+                  onValueChange={(value) =>
+                    handleUpdateAllRecordsChange(
+                      'purchase_order',
+                      'purchase_order_design_id',
+                      value
+                    )
+                  }
+                  disabled={disableSettingsField('purchase_order_design_id')}
+                />
+              </div>
+            )}
+          </div>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="statement_design_id"
+              labelElement={<SettingsLabel label={t('statement_design')} />}
+              defaultValue=""
+            />
+          }
+        >
+          <div className="flex flex-col space-y-3">
+            <SelectField
+              id="settings.statement_design_id"
+              value={company?.settings?.statement_design_id || ''}
+              onValueChange={(value) =>
+                handleChange('statement_design_id', value)
+              }
+              disabled={disableSettingsField('statement_design_id')}
+              errorMessage={errors?.errors['settings.statement_design_id']}
+              customSelector
+              withBlank
+            >
+              {statementDesigns &&
+                statementDesigns.map((design: Design) => (
+                  <option key={design.id} value={design.id}>
+                    {design.name}
+                  </option>
+                ))}
             </SelectField>
           </div>
-        </div>
-      </Element>
+        </Element>
 
-      <Divider />
-
-      <Element leftSide={t('primary_font')}>
-        <SelectField
-          id="settings.primary_font"
-          value={company?.settings?.primary_font || 'roboto'}
-          onValueChange={(value) => handleChange('primary_font', value)}
-          errorMessage={errors?.errors['settings.primary_font']}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="delivery_note_design_id"
+              labelElement={<SettingsLabel label={t('delivery_note_design')} />}
+              defaultValue=""
+            />
+          }
         >
-          {fonts.map((font) => (
-            <option key={font.label} value={font.value}>
-              {font.label}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
+          <div className="flex flex-col space-y-3">
+            <SelectField
+              id="settings.delivery_note_design_id"
+              value={company?.settings?.delivery_note_design_id || ''}
+              onValueChange={(value) =>
+                handleChange('delivery_note_design_id', value)
+              }
+              disabled={disableSettingsField('delivery_note_design_id')}
+              errorMessage={errors?.errors['settings.delivery_note_design_id']}
+              customSelector
+              withBlank
+            >
+              {invoiceDesigns &&
+                invoiceDesigns.map((design: Design) => (
+                  <option key={design.id} value={design.id}>
+                    {design.name}
+                  </option>
+                ))}
+            </SelectField>
+          </div>
+        </Element>
 
-      <Element leftSide={t('secondary_font')}>
-        <SelectField
-          id="settings.secondary_font"
-          value={company?.settings?.secondary_font || 'roboto'}
-          onValueChange={(value) => handleChange('secondary_font', value)}
-          errorMessage={errors?.errors['settings.secondary_font']}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="payment_receipt_design_id"
+              labelElement={
+                <SettingsLabel label={t('payment_receipt_design')} />
+              }
+              defaultValue=""
+            />
+          }
         >
-          {fonts.map((font) => (
-            <option key={font.label} value={font.value}>
-              {font.label}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
+          <div className="flex flex-col space-y-3">
+            <SelectField
+              id="settings.payment_receipt_design_id"
+              value={company?.settings?.payment_receipt_design_id || ''}
+              onValueChange={(value) =>
+                handleChange('payment_receipt_design_id', value)
+              }
+              disabled={disableSettingsField('payment_receipt_design_id')}
+              errorMessage={
+                errors?.errors['settings.payment_receipt_design_id']
+              }
+              customSelector
+              withBlank
+            >
+              {paymentDesigns &&
+                paymentDesigns.map((design: Design) => (
+                  <option key={design.id} value={design.id}>
+                    {design.name}
+                  </option>
+                ))}
+            </SelectField>
+          </div>
+        </Element>
 
-      <Element leftSide={t('primary_color')}>
-        <ColorPicker
-          value={company?.settings?.primary_color || colors.primary}
-          onValueChange={(value) => {
-            const currentColor = company?.settings?.primary_color;
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="payment_refund_design_id"
+              labelElement={
+                <SettingsLabel label={t('payment_refund_design')} />
+              }
+              defaultValue=""
+            />
+          }
+        >
+          <div className="flex flex-col space-y-3">
+            <SelectField
+              id="settings.payment_refund_design_id"
+              value={company?.settings?.payment_refund_design_id || ''}
+              onValueChange={(value) =>
+                handleChange('payment_refund_design_id', value)
+              }
+              disabled={disableSettingsField('payment_refund_design_id')}
+              errorMessage={errors?.errors['settings.payment_refund_design_id']}
+              customSelector
+              withBlank
+            >
+              {paymentDesigns &&
+                paymentDesigns.map((design: Design) => (
+                  <option key={design.id} value={design.id}>
+                    {design.name}
+                  </option>
+                ))}
+            </SelectField>
+          </div>
+        </Element>
 
-            if ((!currentColor && value !== colors.primary) || currentColor) {
-              handleChange('primary_color', value);
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="page_layout"
+              labelElement={<SettingsLabel label={t('page_layout')} />}
+              defaultValue="portrait"
+            />
+          }
+        >
+          <SelectField
+            id="settings.page_layout"
+            value={company?.settings?.page_layout || 'portrait'}
+            onValueChange={(value) => handleChange('page_layout', value)}
+            disabled={disableSettingsField('page_layout')}
+            errorMessage={errors?.errors['settings.page_layout']}
+            customSelector
+            dismissable={false}
+          >
+            <option value="portrait">{t('portrait')}</option>
+            <option value="landscape">{t('landscape')}</option>
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="page_size"
+              labelElement={<SettingsLabel label={t('page_size')} />}
+              defaultValue="A4"
+            />
+          }
+        >
+          <SelectField
+            id="settings.page_size"
+            value={company?.settings?.page_size || 'A4'}
+            onValueChange={(value) => handleChange('page_size', value)}
+            disabled={disableSettingsField('page_size')}
+            errorMessage={errors?.errors['settings.page_size']}
+            customSelector
+            dismissable={false}
+          >
+            <option value="A5">A5</option>
+            <option value="A4">A4</option>
+            <option value="A3">A3</option>
+            <option value="B5">B5</option>
+            <option value="B4">B4</option>
+            <option value="JIS-B5">JIS-B5</option>
+            <option value="JIS-B4">JIS-B4</option>
+            <option value="letter">Letter</option>
+            <option value="legal">Legal</option>
+            <option value="ledger">Ledger</option>
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="font_size"
+              labelElement={<SettingsLabel label={t('font_size')} />}
+              defaultValue={16}
+            />
+          }
+        >
+          <SelectField
+            id="settings.font_size"
+            value={company?.settings?.font_size || 16}
+            onValueChange={(value) =>
+              handleChange('font_size', parseInt(value))
             }
-          }}
-        />
-      </Element>
+            disabled={disableSettingsField('font_size')}
+            errorMessage={errors?.errors['settings.font_size']}
+            customSelector
+            dismissable={false}
+          >
+            {range(6, 41, 2).map((number) => (
+              <option key={number} value={number}>
+                {number}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
 
-      <Element leftSide={t('secondary_color')}>
-        <ColorPicker
-          value={company?.settings?.secondary_color || colors.secondary}
-          onValueChange={(value) => {
-            const currentColor = company?.settings?.secondary_color;
-
-            if ((!currentColor && value !== colors.secondary) || currentColor) {
-              handleChange('secondary_color', value);
-            }
-          }}
-        />
-      </Element>
-
-      <Divider />
-
-      <Element leftSide={t('show_paid_stamp')}>
-        <Toggle
-          onValueChange={(value) => handleChange('show_paid_stamp', value)}
-          checked={Boolean(company?.settings.show_paid_stamp)}
-        />
-      </Element>
-
-      <Element leftSide={t('show_shipping_address')}>
-        <Toggle
-          onValueChange={(value) =>
-            handleChange('show_shipping_address', value)
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="company_logo_size"
+              labelElement={<SettingsLabel label={t('logo_size')} />}
+            />
           }
-          checked={Boolean(company?.settings.show_shipping_address)}
-        />
-      </Element>
-
-      <Divider />
-
-      <Element leftSide={t('empty_columns')}>
-        <Radio
-          name="empty_columns"
-          options={[
-            { id: 'hide', title: t('hide'), value: 'true' },
-            { id: 'show', title: t('show'), value: 'false' },
-          ]}
-          onValueChange={(value) =>
-            handleChange(
-              'hide_empty_columns_on_pdf',
-              value === 'true' ? true : false
-            )
-          }
-          defaultSelected={
-            company?.settings?.hide_empty_columns_on_pdf?.toString() ?? 'false'
-          }
-        />
-      </Element>
-
-      <Element leftSide={t('page_numbering')}>
-        <Toggle
-          checked={Boolean(company?.settings?.page_numbering)}
-          id="settings.page_numbering"
-          onChange={(value) => handleChange('page_numbering', value)}
-        />
-      </Element>
-
-      <Element leftSide={t('page_numbering_alignment')}>
-        <SelectField
-          id="settings.page_numbering_alignment"
-          disabled={company?.settings?.page_numbering ? false : true}
-          value={company?.settings?.page_numbering_alignment?.toString() || 'C'}
-          onValueChange={(value) =>
-            handleChange('page_numbering_alignment', value)
-          }
-          errorMessage={errors?.errors['settings.page_numbering_alignment']}
         >
-          <option value="C">{t('center')}</option>
-          <option value="R">{t('right')}</option>
-          <option value="L">{t('left')}</option>
-        </SelectField>
-      </Element>
-    </Card>
+          <div className="w-full inline-flex items-center space-x-2">
+            <div className="w-full">
+              <NumberInputField
+                value={(company?.settings.company_logo_size || '')
+                  ?.replaceAll('px', '')
+                  ?.replaceAll('%', '')}
+                onValueChange={(value) =>
+                  handleChange(
+                    'company_logo_size',
+                    value ? `${parseFloat(value) || 0}${logoSizeType}` : ''
+                  )
+                }
+                disabled={disableSettingsField('company_logo_size')}
+                errorMessage={errors?.errors['settings.company_logo_size']}
+              />
+            </div>
+
+            <div className="w-1/3">
+              <SelectField
+                value={logoSizeType}
+                onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
+                disabled={disableSettingsField('company_logo_size')}
+                customSelector
+                dismissable={false}
+              >
+                <option value="%">{t('percent')}</option>
+                <option value="px">{t('pixels')}</option>
+              </SelectField>
+            </div>
+          </div>
+        </Element>
+
+        <Divider />
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="primary_font"
+              labelElement={<SettingsLabel label={t('primary_font')} />}
+              defaultValue="roboto"
+            />
+          }
+        >
+          <SelectField
+            id="settings.primary_font"
+            value={company?.settings?.primary_font || 'roboto'}
+            onValueChange={(value) => handleChange('primary_font', value)}
+            disabled={disableSettingsField('primary_font')}
+            errorMessage={errors?.errors['settings.primary_font']}
+            customSelector
+            dismissable={false}
+          >
+            {fonts.map((font) => (
+              <option key={font.label} value={font.value}>
+                {font.label}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="secondary_font"
+              labelElement={<SettingsLabel label={t('secondary_font')} />}
+              defaultValue="roboto"
+            />
+          }
+        >
+          <SelectField
+            id="settings.secondary_font"
+            value={company?.settings?.secondary_font || 'roboto'}
+            onValueChange={(value) => handleChange('secondary_font', value)}
+            disabled={disableSettingsField('secondary_font')}
+            errorMessage={errors?.errors['settings.secondary_font']}
+            customSelector
+            dismissable={false}
+          >
+            {fonts.map((font) => (
+              <option key={font.label} value={font.value}>
+                {font.label}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="primary_color"
+              labelElement={<SettingsLabel label={t('primary_color')} />}
+              defaultValue={colors.primary}
+            />
+          }
+        >
+          <ColorPicker
+            value={company?.settings?.primary_color || colors.primary}
+            onValueChange={(value) => {
+              const currentColor = company?.settings?.primary_color;
+
+              if ((!currentColor && value !== colors.primary) || currentColor) {
+                handleChange('primary_color', value);
+              }
+            }}
+            disabled={disableSettingsField('primary_color')}
+            includeDefaultPalette
+          />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="secondary_color"
+              labelElement={<SettingsLabel label={t('secondary_color')} />}
+              defaultValue={colors.secondary}
+            />
+          }
+        >
+          <ColorPicker
+            value={company?.settings?.secondary_color || colors.secondary}
+            onValueChange={(value) => {
+              const currentColor = company?.settings?.secondary_color;
+
+              if (
+                (!currentColor && value !== colors.secondary) ||
+                currentColor
+              ) {
+                handleChange('secondary_color', value);
+              }
+            }}
+            disabled={disableSettingsField('secondary_color')}
+            includeDefaultPalette
+          />
+        </Element>
+
+        <Divider />
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="show_paid_stamp"
+              labelElement={<SettingsLabel label={t('show_paid_stamp')} />}
+              defaultValue={false}
+            />
+          }
+        >
+          <Toggle
+            onValueChange={(value) => handleChange('show_paid_stamp', value)}
+            checked={Boolean(company?.settings.show_paid_stamp)}
+            disabled={disableSettingsField('show_paid_stamp')}
+          />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="show_shipping_address"
+              labelElement={
+                <SettingsLabel label={t('show_shipping_address')} />
+              }
+              defaultValue={false}
+            />
+          }
+        >
+          <Toggle
+            onValueChange={(value) =>
+              handleChange('show_shipping_address', value)
+            }
+            checked={Boolean(company?.settings.show_shipping_address)}
+            disabled={disableSettingsField('show_shipping_address')}
+          />
+        </Element>
+
+        <Element
+          leftSideHelp={t('invoice_embed_documents_help')}
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="embed_documents"
+              labelElement={
+                <SettingsLabel label={t('invoice_embed_documents')} />
+              }
+              defaultValue={false}
+            />
+          }
+        >
+          <Toggle
+            onValueChange={(value) => handleChange('embed_documents', value)}
+            checked={Boolean(company?.settings.embed_documents)}
+            disabled={disableSettingsField('embed_documents')}
+          />
+        </Element>
+
+        <Divider />
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="hide_empty_columns_on_pdf"
+              labelElement={<SettingsLabel label={t('empty_columns')} />}
+              defaultValue="false"
+            />
+          }
+        >
+          <Radio
+            name="empty_columns"
+            options={[
+              { id: 'hide', title: t('hide'), value: 'true' },
+              { id: 'show', title: t('show'), value: 'false' },
+            ]}
+            onValueChange={(value) =>
+              handleChange(
+                'hide_empty_columns_on_pdf',
+                value === 'true' ? true : false
+              )
+            }
+            defaultSelected={
+              company?.settings?.hide_empty_columns_on_pdf?.toString() ??
+              'false'
+            }
+            disabled={disableSettingsField('hide_empty_columns_on_pdf')}
+          />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="page_numbering"
+              labelElement={<SettingsLabel label={t('page_numbering')} />}
+              defaultValue={false}
+            />
+          }
+        >
+          <Toggle
+            checked={Boolean(company?.settings?.page_numbering)}
+            id="settings.page_numbering"
+            onChange={(value) => handleChange('page_numbering', value)}
+            disabled={disableSettingsField('page_numbering')}
+          />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="page_numbering_alignment"
+              labelElement={
+                <SettingsLabel label={t('page_numbering_alignment')} />
+              }
+              defaultValue="C"
+            />
+          }
+        >
+          <SelectField
+            id="settings.page_numbering_alignment"
+            disabled={
+              !company?.settings?.page_numbering ||
+              disableSettingsField('page_numbering_alignment')
+            }
+            value={
+              company?.settings?.page_numbering_alignment?.toString() || 'C'
+            }
+            onValueChange={(value) =>
+              handleChange('page_numbering_alignment', value)
+            }
+            errorMessage={errors?.errors['settings.page_numbering_alignment']}
+            customSelector
+            dismissable={false}
+          >
+            <option value="C">{t('center')}</option>
+            <option value="R">{t('right')}</option>
+            <option value="L">{t('left')}</option>
+          </SelectField>
+        </Element>
+      </Card>
+    </>
   );
 }

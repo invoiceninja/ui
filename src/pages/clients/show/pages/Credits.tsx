@@ -11,12 +11,15 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import { useActions, useCreditColumns } from '$app/pages/credits/common/hooks';
 import { useCustomBulkActions } from '$app/pages/credits/common/hooks/useCustomBulkActions';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Credits() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const columns = useCreditColumns();
 
@@ -38,7 +41,9 @@ export default function Credits() {
       bulkRoute="/api/v1/credits/bulk"
       linkToCreate={route('/credits/create?client=:id', { id })}
       linkToEdit="/credits/:id/edit"
-      staleTime={dataTableStaleTime}
+      excludeColumns={['client_id']}
+      linkToCreateGuards={[permission('create_credit')]}
+      hideEditableOptions={!hasPermission('edit_credit')}
     />
   );
 }

@@ -33,11 +33,11 @@ interface Props {
   children: ReactNode;
   onSaveClick?: any;
   onCancelClick?: any;
-  breadcrumbs?: Page[];
+  breadcrumbs: Page[];
   docsLink?: string;
   navigationTopRight?: ReactNode;
   disableSaveButton?: boolean;
-  withoutBackButton?: boolean;
+  aboveMainContainer?: ReactNode;
 }
 
 const LinkStyled = styled(Link)`
@@ -76,7 +76,8 @@ export function Settings(props: Props) {
       docsLink={props.docsLink}
       navigationTopRight={props.navigationTopRight}
       disableSaveButton={props.disableSaveButton}
-      withoutBackButton={props.withoutBackButton}
+      breadcrumbs={[]}
+      aboveMainContainer={props.aboveMainContainer}
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
@@ -162,9 +163,10 @@ export function Settings(props: Props) {
           </nav>
 
           {advanced.filter((route) => route.enabled).length > 0 && (
-            <a className="flex items-center py-4 px-3 text-xs uppercase font-medium mt-8">
-              <span className="truncate">{t('advanced_settings')}</span>
-            </a>
+            <div className="flex items-center py-4 px-3 text-xs uppercase font-medium mt-8 truncate space-x-1">
+              <span>{t('advanced_settings')}</span>
+              <sup>{t('pro')}</sup>
+            </div>
           )}
 
           <SelectField

@@ -11,7 +11,6 @@
 import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { transactionTypes } from '$app/common/constants/transactions';
-import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import {
   ApiTransactionType,
   TransactionType,
@@ -20,9 +19,11 @@ import { BankAccountSelector } from '../components/BankAccountSelector';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
-import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { EntityStatus } from './EntityStatus';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useColorScheme } from '$app/common/colors';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   transaction: Transaction;
@@ -38,7 +39,7 @@ interface Props {
 export function TransactionForm(props: Props) {
   const [t] = useTranslation();
 
-  const currencies = useCurrencies();
+  const colors = useColorScheme();
 
   return (
     <>
@@ -50,6 +51,7 @@ export function TransactionForm(props: Props) {
 
       <Element required leftSide={t('type')}>
         <SelectField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           value={
             props.transaction.base_type === ApiTransactionType.Credit
               ? TransactionType.Deposit
@@ -64,6 +66,7 @@ export function TransactionForm(props: Props) {
             )
           }
           errorMessage={props.errors?.errors.base_type}
+          cypressRef="transactionTypeSelector"
         >
           {Object.values(transactionTypes).map((transactionType) => (
             <option key={transactionType} value={transactionType}>
@@ -75,6 +78,7 @@ export function TransactionForm(props: Props) {
 
       <Element leftSide={t('date')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           type="date"
           value={props.transaction.date}
           onValueChange={(value) => props.handleChange('date', value)}
@@ -83,14 +87,12 @@ export function TransactionForm(props: Props) {
       </Element>
 
       <Element leftSide={t('amount')}>
-        <DecimalNumberInput
+        <NumberInputField
           border
           precision={props.currencySeparators.precision}
-          currency={props.currencySeparators}
           className="auto"
-          initialValue={props.transaction.amount.toString()}
-          value={props.transaction.amount.toString()}
-          onChange={(value: string) =>
+          value={props.transaction.amount || ''}
+          onValueChange={(value: string) =>
             props.handleChange('amount', Number(value))
           }
           errorMessage={props.errors?.errors.amount}
@@ -98,17 +100,11 @@ export function TransactionForm(props: Props) {
       </Element>
 
       <Element required leftSide={t('currency')}>
-        <SelectField
+        <CurrencySelector
           value={props.transaction.currency_id}
-          onValueChange={(value) => props.handleChange('currency_id', value)}
+          onChange={(v) => props.handleChange('currency_id', v)}
           errorMessage={props.errors?.errors.currency_id}
-        >
-          {currencies?.map(({ id, name }) => (
-            <option key={id} value={id}>
-              {t(name)}
-            </option>
-          ))}
-        </SelectField>
+        />
       </Element>
 
       <Element required leftSide={t('bank_account')}>
@@ -126,12 +122,29 @@ export function TransactionForm(props: Props) {
 
       <Element leftSide={t('description')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           element="textarea"
           value={props.transaction.description}
           onValueChange={(value) => props.handleChange('description', value)}
           errorMessage={props.errors?.errors.description}
         />
       </Element>
+
+      {props.page === 'edit' && (
+        <>
+          {props.transaction.participant && (
+            <Element leftSide={t('participant')}>
+              <InputField value={props.transaction.participant} readOnly />
+            </Element>
+          )}
+
+          {props.transaction.participant_name && (
+            <Element leftSide={t('participant_name')}>
+              <InputField value={props.transaction.participant_name} readOnly />
+            </Element>
+          )}
+        </>
+      )}
     </>
   );
 }

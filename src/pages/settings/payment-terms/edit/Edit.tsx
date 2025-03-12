@@ -9,7 +9,6 @@
  */
 
 import { Card, CardContainer, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -17,16 +16,16 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { usePaymentTermQuery } from '$app/common/queries/payment-terms';
 import { Badge } from '$app/components/Badge';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Edit() {
   useTitle('payment_terms');
@@ -36,7 +35,7 @@ export function Edit() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('company_details'), href: '/settings/company_details' },
+    { name: t('payment_settings'), href: '/settings/online_payments' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
     {
       name: t('edit_payment_term'),
@@ -45,10 +44,9 @@ export function Edit() {
   ];
 
   const { data } = usePaymentTermQuery({ id });
-  const queryClient = useQueryClient();
 
   const invalidatePaymentTermCache = () => {
-    queryClient.invalidateQueries(route('/api/v1/payment_terms/:id', { id }));
+    $refetch(['payment_terms']);
   };
 
   const formik = useFormik({
@@ -73,7 +71,11 @@ export function Edit() {
   });
 
   return (
-    <Settings title={t('payment_terms')}>
+    <Settings
+      title={t('payment_terms')}
+      breadcrumbs={pages}
+      navigationTopRight={data && <Actions paymentTerm={data.data.data} />}
+    >
       {!data && (
         <div className="flex justify-center">
           <Spinner />
@@ -81,14 +83,11 @@ export function Edit() {
       )}
 
       {data && (
-        <Container className="space-y-6">
-          <Breadcrumbs pages={pages} />
-
+        <Container breadcrumbs={[]}>
           <Card
             title={data.data.data.name}
             disableSubmitButton={formik.isSubmitting}
             onFormSubmit={formik.handleSubmit}
-            additionalAction={<Actions paymentTerm={data.data.data} />}
             withSaveButton
           >
             <Element leftSide="Status">
@@ -106,12 +105,14 @@ export function Edit() {
             </Element>
 
             <CardContainer>
-              <InputField
-                value={formik.values.num_days}
-                type="number"
-                id="num_days"
+              <NumberInputField
+                precision={0}
+                value={formik.values.num_days || ''}
                 label={t('number_of_days')}
-                onChange={formik.handleChange}
+                onValueChange={(value) =>
+                  formik.setFieldValue('num_days', value)
+                }
+                disablePrecision
               />
             </CardContainer>
           </Card>

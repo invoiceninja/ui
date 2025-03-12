@@ -29,18 +29,18 @@ import { FileIcon } from './FileIcon';
 import { Icon } from './icons/Icon';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
-import { useSetAtom } from 'jotai';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useQueryClient } from 'react-query';
 import { Spinner } from './Spinner';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AxiosResponse } from 'axios';
 import { useSetDocumentVisibility } from '$app/common/queries/documents';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Props {
   documents: Document[];
   onDocumentDelete?: () => unknown;
+  disableEditableOptions?: boolean;
 }
 
 export interface DocumentUrl {
@@ -52,12 +52,13 @@ export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
   const reactSettings = useReactSettings();
 
+  const { disableEditableOptions = false } = props;
+
+  const onWrongPasswordEnter = useOnWrongPasswordEnter();
   const setDocumentVisibility = useSetDocumentVisibility();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
-    useState(false);
-
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+    useState<boolean>(false);
 
   const [documentId, setDocumentId] = useState<string>();
 
@@ -74,43 +75,46 @@ export function DocumentsTable(props: Props) {
   const downloadDocument = (doc: Document, inline: boolean) => {
     toast.processing();
 
-    queryClient.fetchQuery(
-      endpoint('/documents/:hash', { hash: doc.hash }),
-      () =>
-        request(
-          'GET',
-          endpoint('/documents/:hash', { hash: doc.hash }),
-          { headers: defaultHeaders() },
-          { responseType: 'arraybuffer' }
-        ).then((response) => {
-          const blob = new Blob([response.data], {
-            type: response.headers['content-type'],
-          });
-          const url = URL.createObjectURL(blob);
+    queryClient
+      .fetchQuery(
+        ['/api/v1/documents', doc.hash],
+        () =>
+          request(
+            'GET',
+            endpoint('/documents/:hash', { hash: doc.hash }),
+            { headers: defaultHeaders() },
+            { responseType: 'arraybuffer' }
+          ),
+        { staleTime: Infinity }
+      )
+      .then((response) => {
+        const blob = new Blob([response.data], {
+          type: response.headers['content-type'],
+        });
+        const url = URL.createObjectURL(blob);
 
-          if (inline) {
-            window.open(url);
-            return;
-          }
+        if (inline) {
+          window.open(url);
+          return;
+        }
 
-          const link = document.createElement('a');
+        const link = document.createElement('a');
 
-          link.download = doc.name;
-          link.href = url;
-          link.target = '_blank';
+        link.download = doc.name;
+        link.href = url;
+        link.target = '_blank';
 
-          document.body.appendChild(link);
+        document.body.appendChild(link);
 
-          link.click();
+        link.click();
 
-          document.body.removeChild(link);
+        document.body.removeChild(link);
 
-          toast.dismiss();
-        })
-    );
+        toast.dismiss();
+      });
   };
 
-  const destroy = (password: string) => {
+  const destroy = (password: string, isPasswordRequired: boolean) => {
     toast.processing();
 
     request(
@@ -125,8 +129,8 @@ export function DocumentsTable(props: Props) {
       })
       .catch((error) => {
         if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
+          onWrongPasswordEnter(isPasswordRequired);
+          setIsPasswordConfirmModalOpen(true);
         }
       });
   };
@@ -173,7 +177,7 @@ export function DocumentsTable(props: Props) {
           <Th>{t('date')}</Th>
           <Th>{t('type')}</Th>
           <Th>{t('size')}</Th>
-          <Th>{/* Placeholder for actions */}</Th>
+          {!disableEditableOptions && <Th>{/* Placeholder for actions */}</Th>}
         </Thead>
 
         <Tbody>
@@ -219,61 +223,63 @@ export function DocumentsTable(props: Props) {
               <Td>{date(document.updated_at, dateFormat)}</Td>
               <Td>{document.type}</Td>
               <Td>{prettyBytes(document.size)}</Td>
-              <Td>
-                <Dropdown label={t('more_actions')}>
-                  <DropdownElement
-                    onClick={() => {
-                      downloadDocument(document, true);
-                    }}
-                    icon={<Icon element={MdPageview} />}
-                  >
-                    {t('view')}
-                  </DropdownElement>
-
-                  <DropdownElement
-                    onClick={() => {
-                      downloadDocument(document, false);
-                    }}
-                    icon={<Icon element={MdDownload} />}
-                  >
-                    {t('download')}
-                  </DropdownElement>
-
-                  {document.is_public ? (
+              {!disableEditableOptions && (
+                <Td>
+                  <Dropdown label={t('actions')}>
                     <DropdownElement
                       onClick={() => {
-                        setDocumentVisibility(document.id, false).then(() =>
-                          props.onDocumentDelete?.()
-                        );
+                        downloadDocument(document, true);
                       }}
-                      icon={<Icon element={MdLockOutline} />}
+                      icon={<Icon element={MdPageview} />}
                     >
-                      {t('set_private')}
+                      {t('view')}
                     </DropdownElement>
-                  ) : (
+
                     <DropdownElement
                       onClick={() => {
-                        setDocumentVisibility(document.id, true).then(() =>
-                          props.onDocumentDelete?.()
-                        );
+                        downloadDocument(document, false);
                       }}
-                      icon={<Icon element={MdOutlineLockOpen} />}
+                      icon={<Icon element={MdDownload} />}
                     >
-                      {t('set_public')}
+                      {t('download')}
                     </DropdownElement>
-                  )}
 
-                  <DropdownElement
-                    onClick={() => {
-                      setDocumentId(document.id);
-                      setIsPasswordConfirmModalOpen(true);
-                    }}
-                    icon={<Icon element={MdDelete} />}
-                  >
-                    {t('delete')}
-                  </DropdownElement>
-                </Dropdown>
-              </Td>
+                    {document.is_public ? (
+                      <DropdownElement
+                        onClick={() => {
+                          setDocumentVisibility(document.id, false).then(() =>
+                            props.onDocumentDelete?.()
+                          );
+                        }}
+                        icon={<Icon element={MdLockOutline} />}
+                      >
+                        {t('set_private')}
+                      </DropdownElement>
+                    ) : (
+                      <DropdownElement
+                        onClick={() => {
+                          setDocumentVisibility(document.id, true).then(() =>
+                            props.onDocumentDelete?.()
+                          );
+                        }}
+                        icon={<Icon element={MdOutlineLockOpen} />}
+                      >
+                        {t('set_public')}
+                      </DropdownElement>
+                    )}
+
+                    <DropdownElement
+                      onClick={() => {
+                        setDocumentId(document.id);
+                        setIsPasswordConfirmModalOpen(true);
+                      }}
+                      icon={<Icon element={MdDelete} />}
+                    >
+                      {t('delete')}
+                    </DropdownElement>
+                  </Dropdown>
+                </Td>
+              )}
             </Tr>
           ))}
         </Tbody>

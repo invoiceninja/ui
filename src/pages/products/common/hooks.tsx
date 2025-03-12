@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { EntityState } from '$app/common/enums/entity-state';
 import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -32,7 +31,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
-import { useQueryClient } from 'react-query';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -42,6 +40,17 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './hooks/useInvoiceProducts';
 import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -95,8 +104,10 @@ export function useProductColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
+  const disableNavigation = useDisableNavigation();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -112,9 +123,12 @@ export function useProductColumns() {
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
 
-          <Link to={route('/products/:id/edit', { id: product.id })}>
+          <DynamicLink
+            to={route('/products/:id/edit', { id: product.id })}
+            renderSpan={disableNavigation('product', product)}
+          >
             {value}
-          </Link>
+          </DynamicLink>
         </span>
       ),
     },
@@ -122,18 +136,27 @@ export function useProductColumns() {
       column: 'description',
       id: 'notes',
       label: t('notes'),
-      format: (value) => {
-        return (
-          <Tooltip
-            size="regular"
-            truncate
-            containsUnsafeHTMLTags
-            message={value as string}
-          >
-            <span dangerouslySetInnerHTML={{ __html: value as string }} />
-          </Tooltip>
-        );
-      },
+      format: (value) => (
+        <Tooltip
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': !reactSettings?.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
+        >
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       column: 'price',
@@ -150,6 +173,7 @@ export function useProductColumns() {
       column: 'quantity',
       id: 'quantity',
       label: t('default_quantity'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'archived_at',
@@ -167,21 +191,25 @@ export function useProductColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('product1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('product2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('product3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('product4', value?.toString()),
     },
     {
       column: 'documents',
@@ -227,6 +255,24 @@ export function useProductColumns() {
       label: t('tax_name3'),
     },
     {
+      column: 'tax_rate1',
+      id: 'tax_rate1',
+      label: t('tax_rate1'),
+      format: (value) => formatNumber(value),
+    },
+    {
+      column: 'tax_rate2',
+      id: 'tax_rate2',
+      label: t('tax_rate2'),
+      format: (value) => formatNumber(value),
+    },
+    {
+      column: 'tax_rate3',
+      id: 'tax_rate3',
+      label: t('tax_rate3'),
+      format: (value) => formatNumber(value),
+    },
+    {
       column: 'updated_at',
       id: 'updated_at',
       label: t('updated_at'),
@@ -246,7 +292,8 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+
+  const hasPermission = useHasPermission();
 
   const setProduct = useSetAtom(productAtom);
 
@@ -274,14 +321,14 @@ export function useActions() {
     bulk([id], action).then(() => {
       toast.success(`${action}d_product`);
 
-      queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
-      queryClient.invalidateQueries('/api/v1/products');
+      $refetch(['products']);
     });
   };
 
   const actions = [
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => invoiceProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -290,7 +337,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_purchase_order') && (
         <DropdownElement
           onClick={() => purchaseOrderProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -299,7 +347,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_product') && (
         <DropdownElement
           onClick={() => cloneToProduct(product)}
           icon={<Icon element={MdControlPointDuplicate} />}

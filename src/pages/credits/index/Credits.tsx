@@ -21,28 +21,48 @@ import {
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useCreditsFilters } from '../common/hooks/useCreditsFilters';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Credit } from '$app/common/interfaces/credit';
+import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Credits() {
   useTitle('credits');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages = [{ name: t('credits'), href: '/credits' }];
 
   const actions = useActions();
   const columns = useCreditColumns();
-
+  const filters = useCreditsFilters();
   const creditColumns = useAllCreditColumns();
-
+  const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
+  useSocketEvent({
+    on: [
+      'App\\Events\\Credit\\CreditWasCreated',
+      'App\\Events\\Credit\\CreditWasUpdated',
+    ],
+    callback: () => $refetch(['credits']),
+  });
+
   return (
-    <Default
-      title={t('credits')}
-      breadcrumbs={pages}
-      docsLink="en/credits/"
-      withoutBackButton
-    >
+    <Default title={t('credits')} breadcrumbs={pages} docsLink="en/credits/">
       <DataTable
         resource="credit"
         endpoint="/api/v1/credits?include=client&without_deleted_clients=true&sort=id|desc"
@@ -52,6 +72,8 @@ export default function Credits() {
         linkToEdit="/credits/:id/edit"
         customActions={actions}
         customBulkActions={customBulkActions}
+        customFilters={filters}
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker
@@ -60,7 +82,19 @@ export default function Credits() {
             table="credit"
           />
         }
+        dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_credit')]}
+        hideEditableOptions={!hasPermission('edit_credit')}
+        enableSavingFilterPreference
+      />
+
+      <ChangeTemplateModal<Credit>
+        entity="credit"
+        entities={changeTemplateResources as Credit[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(credit) => `${t('number')}: ${credit.number}`}
+        bulkUrl="/api/v1/credits/bulk"
       />
     </Default>
   );

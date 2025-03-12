@@ -17,10 +17,19 @@ import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { Alert } from '../Alert';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
-export function ProjectSelector(props: GenericSelectorProps<Project>) {
+interface Props extends GenericSelectorProps<Project> {
+  clientId?: string;
+}
+
+export function ProjectSelector(props: Props) {
   const [t] = useTranslation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const hasPermission = useHasPermission();
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const clientIdParam = props.clientId ? `&client_id=${props.clientId}` : '';
 
   return (
     <>
@@ -35,7 +44,9 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
           label: props.inputLabel?.toString(),
           value: props.value ?? null,
         }}
-        endpoint={new URL(endpoint('/api/v1/projects?status=active'))}
+        endpoint={endpoint(
+          `/api/v1/projects?status=active&filter_deleted_clients=true${clientIdParam}`
+        )}
         entryOptions={{ id: 'id', label: 'name', value: 'id' }}
         onChange={(entry) =>
           entry.resource ? props.onChange(entry.resource) : null
@@ -45,7 +56,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
         action={{
           label: t('new_project'),
           onClick: () => setIsModalOpen(true),
-          visible: true,
+          visible: hasPermission('create_project'),
         }}
       />
 
