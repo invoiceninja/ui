@@ -30,8 +30,6 @@ export default function EInvoice() {
     setRecurringInvoice(updatedInvoice);
   };
 
-  console.log(recurringInvoice);
-
   return (
     <Card title={t('date_range')}>
       <Element leftSide={t('start_date')}>
