@@ -41,18 +41,18 @@ export default function EInvoice() {
             (
               get(
                 recurringInvoice,
-                'e_invoice.Invoice.InvoicePeriod.Description'
+                'e_invoice.Invoice.InvoicePeriod.0.Description'
               ) as unknown as string
             )?.split('|')?.[0] || ''
           }
           onValueChange={(value) =>
             handleChange(
-              'e_invoice.Invoice.InvoicePeriod.Description',
+              'e_invoice.Invoice.InvoicePeriod.0.Description',
               `${value}|${
                 (
                   get(
                     recurringInvoice,
-                    'e_invoice.Invoice.InvoicePeriod.Description'
+                    'e_invoice.Invoice.InvoicePeriod.0.Description'
                   ) as unknown as string
                 )?.split('|')?.[1] || ''
               }`
@@ -60,7 +60,7 @@ export default function EInvoice() {
           }
           errorMessage={get(
             errors?.errors,
-            'e_invoice.Invoice.InvoicePeriod.StartDate'
+            'e_invoice.Invoice.InvoicePeriod.0.StartDate'
           )}
         />
       </Element>
@@ -72,18 +72,18 @@ export default function EInvoice() {
             (
               get(
                 recurringInvoice,
-                'e_invoice.Invoice.InvoicePeriod.Description'
+                'e_invoice.Invoice.InvoicePeriod.0.Description'
               ) as unknown as string
             )?.split('|')?.[1] || ''
           }
           onValueChange={(value) =>
             handleChange(
-              'e_invoice.Invoice.InvoicePeriod.Description',
+              'e_invoice.Invoice.InvoicePeriod.0.Description',
               `${
                 (
                   get(
                     recurringInvoice,
-                    'e_invoice.Invoice.InvoicePeriod.Description'
+                    'e_invoice.Invoice.InvoicePeriod.0.Description'
                   ) as unknown as string
                 )?.split('|')?.[0] || ''
               }|${value}`
@@ -91,7 +91,7 @@ export default function EInvoice() {
           }
           errorMessage={get(
             errors?.errors,
-            'e_invoice.Invoice.InvoicePeriod.EndDate'
+            'e_invoice.Invoice.InvoicePeriod.0.EndDate'
           )}
         />
       </Element>

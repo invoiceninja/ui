@@ -298,14 +298,14 @@ export default function EInvoice() {
           <InputField
             type="date"
             value={
-              get(invoice, 'e_invoice.Invoice.InvoicePeriod.StartDate') || ''
+              get(invoice, 'e_invoice.Invoice.InvoicePeriod.0.StartDate') || ''
             }
             onValueChange={(value) =>
-              handleChange('e_invoice.Invoice.InvoicePeriod.StartDate', value)
+              handleChange('e_invoice.Invoice.InvoicePeriod.0.StartDate', value)
             }
             errorMessage={get(
               errors?.errors,
-              'e_invoice.Invoice.InvoicePeriod.StartDate'
+              'e_invoice.Invoice.InvoicePeriod.0.StartDate'
             )}
           />
         </Element>
@@ -314,14 +314,14 @@ export default function EInvoice() {
           <InputField
             type="date"
             value={
-              get(invoice, 'e_invoice.Invoice.InvoicePeriod.EndDate') || ''
+              get(invoice, 'e_invoice.Invoice.InvoicePeriod.0.EndDate') || ''
             }
             onValueChange={(value) =>
-              handleChange('e_invoice.Invoice.InvoicePeriod.EndDate', value)
+              handleChange('e_invoice.Invoice.InvoicePeriod.0.EndDate', value)
             }
             errorMessage={get(
               errors?.errors,
-              'e_invoice.Invoice.InvoicePeriod.EndDate'
+              'e_invoice.Invoice.InvoicePeriod.0.EndDate'
             )}
           />
         </Element>
