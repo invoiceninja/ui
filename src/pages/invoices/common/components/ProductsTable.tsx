@@ -86,6 +86,21 @@ export function ProductsTable(props: Props) {
     return resource.line_items.indexOf(lineItem);
   };
 
+  const handleManualBlur = () => {
+    if (document.activeElement) {
+      try {
+        if (
+          document.activeElement.tagName === 'INPUT' ||
+          document.activeElement.tagName === 'TEXTAREA'
+        ) {
+          (document.activeElement as HTMLElement).blur();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   // This portion of the code pertains to the automatic creation of line items.
   // Currently, we do not support this functionality, and we will comment it out until we begin providing support for it.
 
@@ -143,22 +158,7 @@ export function ProductsTable(props: Props) {
                                 <button
                                   {...provided.dragHandleProps}
                                   onMouseDown={() => {
-                                    if (document.activeElement) {
-                                      try {
-                                        if (
-                                          document.activeElement.tagName ===
-                                            'INPUT' ||
-                                          document.activeElement.tagName ===
-                                            'TEXTAREA'
-                                        ) {
-                                          (
-                                            document.activeElement as HTMLElement
-                                          ).blur();
-                                        }
-                                      } catch (error) {
-                                        console.error(error);
-                                      }
-                                    }
+                                    handleManualBlur();
                                   }}
                                 >
                                   <AlignJustify size={18} />
