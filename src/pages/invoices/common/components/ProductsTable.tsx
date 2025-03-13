@@ -140,7 +140,27 @@ export function ProductsTable(props: Props) {
                               })}
                             >
                               {columnIndex === 0 ? (
-                                <button {...provided.dragHandleProps}>
+                                <button
+                                  {...provided.dragHandleProps}
+                                  onMouseDown={() => {
+                                    if (document.activeElement) {
+                                      try {
+                                        if (
+                                          document.activeElement.tagName ===
+                                            'INPUT' ||
+                                          document.activeElement.tagName ===
+                                            'TEXTAREA'
+                                        ) {
+                                          (
+                                            document.activeElement as HTMLElement
+                                          ).blur();
+                                        }
+                                      } catch (error) {
+                                        console.error(error);
+                                      }
+                                    }
+                                  }}
+                                >
                                   <AlignJustify size={18} />
                                 </button>
                               ) : null}
