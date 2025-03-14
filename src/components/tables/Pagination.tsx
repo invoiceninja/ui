@@ -18,6 +18,16 @@ import { ChevronLeft } from '../icons/ChevronLeft';
 import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
 import { DoubleChevronRight } from '../icons/DoubleChevronRight';
+import styled from 'styled-components';
+
+const PaginationButton = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
+  border-color: ${(props) => props.theme.borderColor};
+
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 interface Props extends CommonProps {
   totalPages: number;
@@ -42,6 +52,7 @@ export function Pagination(props: Props) {
   props = { ...defaultProps, ...props };
 
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const goToPage = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= props.totalPages) {
@@ -49,10 +60,8 @@ export function Pagination(props: Props) {
     }
   };
 
-  const colors = useColorScheme();
-
   return (
-    <div className="flex items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
+    <div className="flex items-center justify-between space-x-2 mt-3 pb-2">
       {props.totalRecords && (
         <span className="text-sm">
           {t('total_results')}: {props.totalRecords}
@@ -60,50 +69,63 @@ export function Pagination(props: Props) {
       )}
 
       <div
-        className="flex justify-center space-x-2 items-center"
+        className="flex justify-center space-x-4 items-center"
         style={{ color: colors.$3 }}
       >
         <div className="flex items-center">
-          <button
+          <PaginationButton
+            className="p-3 border rounded-l-md shadow-sm cursor-pointer"
+            theme={{
+              hoverColor: colors.$4,
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+            }}
             onClick={() => goToPage(1)}
-            className="py-1.5 px-2  border rounded-l"
-            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
           >
-            <DoubleChevronLeft />
-          </button>
+            <DoubleChevronLeft size="0.9rem" color={colors.$3} />
+          </PaginationButton>
 
-          <button
+          <PaginationButton
+            className="p-3 border-b border-t border-r rounded-r-md shadow-sm cursor-pointer"
+            theme={{
+              hoverColor: colors.$4,
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+            }}
             onClick={() => goToPage(props.currentPage - 1)}
-            className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
-            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
           >
-            <ChevronLeft />
-          </button>
+            <ChevronLeft size="0.9rem" color={colors.$3} />
+          </PaginationButton>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <span>{props.currentPage}</span>
-          <span>/</span>
-          <span>{props.totalPages}</span>
-        </div>
+        <span className="text-sm font-medium">
+          {props.currentPage} / {props.totalPages}
+        </span>
 
         <div className="flex">
-          <button
-            data-cy="dataTableChevronRight"
+          <PaginationButton
+            className="p-3 border-t border-b border-l rounded-l-md shadow-sm cursor-pointer"
+            theme={{
+              hoverColor: colors.$4,
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+            }}
             onClick={() => goToPage(props.currentPage + 1)}
-            className="py-1.5 px-2 bg-white border hover:bg-gray-50"
-            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
           >
-            <ChevronRight />
-          </button>
+            <ChevronRight size="0.9rem" color={colors.$3} />
+          </PaginationButton>
 
-          <button
+          <PaginationButton
+            className="p-3 border rounded-r-md shadow-sm cursor-pointer"
+            theme={{
+              hoverColor: colors.$4,
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+            }}
             onClick={() => goToPage(props.totalPages)}
-            className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50 rounded-r"
-            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
           >
-            <DoubleChevronRight />
-          </button>
+            <DoubleChevronRight size="0.9rem" color={colors.$3} />
+          </PaginationButton>
         </div>
       </div>
 
@@ -116,8 +138,14 @@ export function Pagination(props: Props) {
         </span>
 
         <SelectField
+          className="shadow-sm"
           value={props.currentPerPage}
           onValueChange={(value) => props.onRowsChange(value as PerPage)}
+          customSelector
+          dismissable={false}
+          withoutSeparator
+          searchable={false}
+          dropdownIndicatorClassName="pl-0"
         >
           <option value="10">10</option>
           <option value="50">50</option>
