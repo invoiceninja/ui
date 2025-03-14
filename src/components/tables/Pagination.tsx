@@ -8,19 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from '$app/common/helpers';
 import { ReactNode } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { SelectField } from '../forms';
 import { PerPage } from '../DataTable';
+import { ChevronLeft } from '../icons/ChevronLeft';
+import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
+import { ChevronRight } from '../icons/ChevronRight';
+import { DoubleChevronRight } from '../icons/DoubleChevronRight';
 
 interface Props extends CommonProps {
   totalPages: number;
@@ -56,82 +53,77 @@ export function Pagination(props: Props) {
 
   return (
     <div className="flex items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
-      <div className="flex justify-center md:justify-start items-center space-x-4">
-        <div className="flex items-center space-x-2 flex-wrap">
-          <SelectField
-            value={props.currentPerPage}
-            onValueChange={(value) => props.onRowsChange(value as PerPage)}
-          >
-            <option value="10">10</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </SelectField>
+      {props.totalRecords && (
+        <span className="text-sm">
+          {t('total_results')}: {props.totalRecords}
+        </span>
+      )}
 
-          <label
-            htmlFor="location"
-            className="block text-sm font-medium"
-            style={{ color: colors.$3 }}
+      <div
+        className="flex justify-center space-x-2 items-center"
+        style={{ color: colors.$3 }}
+      >
+        <div className="flex items-center">
+          <button
+            onClick={() => goToPage(1)}
+            className="py-1.5 px-2  border rounded-l"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
           >
-            {t('rows')}
-          </label>
+            <DoubleChevronLeft />
+          </button>
+
+          <button
+            onClick={() => goToPage(props.currentPage - 1)}
+            className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          >
+            <ChevronLeft />
+          </button>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <span>{props.currentPage}</span>
+          <span>/</span>
+          <span>{props.totalPages}</span>
+        </div>
+
+        <div className="flex">
+          <button
+            data-cy="dataTableChevronRight"
+            onClick={() => goToPage(props.currentPage + 1)}
+            className="py-1.5 px-2 bg-white border hover:bg-gray-50"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          >
+            <ChevronRight />
+          </button>
+
+          <button
+            onClick={() => goToPage(props.totalPages)}
+            className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50 rounded-r"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          >
+            <DoubleChevronRight />
+          </button>
         </div>
       </div>
 
-      <p
-        className="hidden lg:block text-sm font-medium"
-        style={{ color: colors.$3 }}
-      >
-        {trans('pdf_page_info', {
-          current: props.currentPage,
-          total: props.totalPages,
-        })}
-        .
-        {props.totalRecords && (
-          <span className="ml-1">
-            {t('total_results')}: {props.totalRecords}
-          </span>
-        )}
-      </p>
-
-      <nav
-        className="flex justify-center md:justify-end my-4 md:my-0 items-center"
-        style={{ color: colors.$3 }}
-      >
-        {props.leftSideChevrons}
-
-        <button
-          onClick={() => goToPage(1)}
-          className="py-1.5 px-2  border rounded-l"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+      <div className="flex items-center space-x-2 flex-wrap">
+        <span
+          className="block text-sm font-medium"
+          style={{ color: colors.$3 }}
         >
-          <ChevronsLeft />
-        </button>
+          {t('rows')}:
+        </span>
 
-        <button
-          onClick={() => goToPage(props.currentPage - 1)}
-          className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+        <SelectField
+          value={props.currentPerPage}
+          onValueChange={(value) => props.onRowsChange(value as PerPage)}
         >
-          <ChevronLeft />
-        </button>
-
-        <button
-          data-cy="dataTableChevronRight"
-          onClick={() => goToPage(props.currentPage + 1)}
-          className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
-        >
-          <ChevronRight />
-        </button>
-
-        <button
-          onClick={() => goToPage(props.totalPages)}
-          className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50 rounded-r"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
-        >
-          <ChevronsRight />
-        </button>
-      </nav>
+          <option value="10">10</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </SelectField>
+      </div>
     </div>
   );
 }
