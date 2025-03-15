@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
@@ -36,7 +35,6 @@ interface Props extends CommonProps {
   currentPerPage?: PerPage;
   onRowsChange: (rows: PerPage) => any;
   totalRecords?: number;
-  leftSideChevrons?: ReactNode;
 }
 
 const defaultProps: Props = {

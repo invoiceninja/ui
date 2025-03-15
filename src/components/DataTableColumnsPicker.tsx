@@ -39,6 +39,8 @@ import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Icon } from './icons/Icon';
 import { createPortal } from 'react-dom';
+import { TableColumns } from './icons/TableColumns';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   columns: string[];
@@ -53,11 +55,12 @@ export function DataTableColumnsPicker(props: Props) {
 
   const dispatch = useDispatch();
 
-  const { t } = useTranslation();
+  const [t] = useTranslation();
   const { table, defaultColumns } = props;
 
   useInjectUserChanges();
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const [filteredColumns, setFilteredColumns] = useState(props.columns);
@@ -240,11 +243,17 @@ export function DataTableColumnsPicker(props: Props) {
         document.body
       )}
 
-      <div className="mr-2">
-        <Button type="secondary" onClick={() => setIsModalVisible(true)}>
-          {t('columns')}
-        </Button>
-      </div>
+      <Button
+        className="shadow-sm"
+        type="secondary"
+        onClick={() => setIsModalVisible(true)}
+      >
+        <div className="flex items-center space-x-2">
+          <TableColumns size="1.3rem" color={colors.$3} />
+
+          <span>{t('columns')}</span>
+        </div>
+      </Button>
     </>
   );
 }

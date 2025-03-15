@@ -504,8 +504,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                   type="component"
                   guards={props.linkToCreateGuards || []}
                   component={
-                    <Button to={props.linkToCreate}>
-                      <span>{t(`new_${props.resource}`)}</span>
+                    <Button to={props.linkToCreate} className="shadow-sm">
+                      {t(`new_${props.resource}`)}
                     </Button>
                   }
                 />
@@ -515,7 +515,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           beforeFilter={props.beforeFilter}
           withoutStatusFilter={props.withoutStatusFilter}
         >
-          {!hideEditableOptions && (
+          {Boolean(!hideEditableOptions && selectedResources.length) && (
             <Dropdown
               label={t('actions')}
               disabled={!selected.length}
@@ -924,7 +924,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           onRowsChange={setPerPage}
           totalPages={data.data.meta.pagination.total_pages}
           totalRecords={data.data.meta.pagination.total}
-          leftSideChevrons={props.leftSideChevrons}
         />
       )}
     </div>

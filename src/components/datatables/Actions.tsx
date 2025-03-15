@@ -142,7 +142,7 @@ export function Actions(props: Props) {
       width: 'max-content',
       minWidth: '100%',
       backgroundColor: colors.$4,
-      borderColor: colors.$4,
+      borderColor: colors.$5,
     }),
     control: (base) => ({
       ...base,
@@ -166,20 +166,30 @@ export function Actions(props: Props) {
       style={{
         color: colors.$3,
         colorScheme: colors.$0,
-        backgroundColor: colors.$2,
         borderColor: colors.$4,
       }}
     >
       <div
-        className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0"
+        className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-2 lg:space-y-0"
         style={{
           color: colors.$3,
           colorScheme: colors.$0,
-          backgroundColor: colors.$1,
           borderColor: colors.$4,
         }}
       >
         {props.children}
+
+        <InputField
+          id="filter"
+          changeOverride={true}
+          placeholder={t('filter')}
+          value={props.filter}
+          onValueChange={(value) =>
+            props.onFilterChange && props.onFilterChange(value)
+          }
+          debounceTimeout={800}
+        />
+
         {props.options &&
           props.defaultOptions &&
           !props.withoutStatusFilter && (
@@ -220,19 +230,9 @@ export function Actions(props: Props) {
             )
         )}
       </div>
-      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
-        {props.beforeFilter}
 
-        <InputField
-          id="filter"
-          changeOverride={true}
-          placeholder={t('filter')}
-          value={props.filter}
-          onValueChange={(value) =>
-            props.onFilterChange && props.onFilterChange(value)
-          }
-          debounceTimeout={800}
-        />
+      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-2 lg:space-y-0">
+        {props.beforeFilter}
 
         {props.rightSide}
       </div>
