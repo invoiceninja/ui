@@ -61,9 +61,9 @@ export function Pagination(props: Props) {
   };
 
   return (
-    <div className="flex items-center justify-between space-x-2 mt-3 pb-2">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-3 pb-2">
       {props.totalRecords && (
-        <span className="text-sm">
+        <span className="text-sm font-medium">
           {t('total_results')}: {props.totalRecords}
         </span>
       )}
@@ -74,7 +74,7 @@ export function Pagination(props: Props) {
       >
         <div className="flex items-center">
           <PaginationButton
-            className="p-3 border rounded-l-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border rounded-l-md shadow-sm cursor-pointer"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
@@ -86,7 +86,7 @@ export function Pagination(props: Props) {
           </PaginationButton>
 
           <PaginationButton
-            className="p-3 border-b border-t border-r rounded-r-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border-b border-t border-r rounded-r-md shadow-sm cursor-pointer"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
@@ -104,7 +104,7 @@ export function Pagination(props: Props) {
 
         <div className="flex">
           <PaginationButton
-            className="p-3 border-t border-b border-l rounded-l-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border-t border-b border-l rounded-l-md shadow-sm cursor-pointer"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
@@ -116,7 +116,7 @@ export function Pagination(props: Props) {
           </PaginationButton>
 
           <PaginationButton
-            className="p-3 border rounded-r-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border rounded-r-md shadow-sm cursor-pointer"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
@@ -129,11 +129,8 @@ export function Pagination(props: Props) {
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 flex-wrap">
-        <span
-          className="block text-sm font-medium"
-          style={{ color: colors.$3 }}
-        >
+      <div className="flex items-center space-x-2">
+        <span className="text-sm font-medium" style={{ color: colors.$3 }}>
           {t('rows')}:
         </span>
 
