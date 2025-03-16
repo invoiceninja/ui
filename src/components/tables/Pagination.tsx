@@ -60,7 +60,7 @@ export function Pagination(props: Props) {
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-3 pb-2">
-      {props.totalRecords && (
+      {typeof props.totalRecords === 'number' && (
         <span className="text-sm font-medium">
           {t('total_results')}: {props.totalRecords}
         </span>
