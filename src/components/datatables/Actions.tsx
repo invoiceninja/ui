@@ -18,11 +18,16 @@ import Select, {
   StylesConfig,
   MenuProps,
   OptionProps,
+  ControlProps,
 } from 'react-select';
-import React, { ReactNode, Dispatch, SetStateAction } from 'react';
+import React, { ReactNode, Dispatch, SetStateAction, useRef } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import collect from 'collect.js';
 import { Button, Checkbox } from '../forms';
+import { ChevronDown } from '../icons/ChevronDown';
+import classNames from 'classnames';
+import { useClickAway } from 'react-use';
+import styled from 'styled-components';
 
 export interface SelectOption {
   value: string;
@@ -52,19 +57,19 @@ interface Props extends CommonProps {
   customFilter: string[] | undefined;
 }
 
-// Don't render the default multi-value containers
+const ResetButton = styled.button`
+  background-color: ${(props) => props.theme.backgroundColor};
+  color: ${(props) => props.theme.textColor};
+  border-color: ${(props) => props.theme.borderColor};
+`;
+
 const MultiValueContainer = () => null;
 
-// Custom ValueContainer to show selected values as a comma-separated list
-const ValueContainer = ({ children, getValue, ...props }: any) => {
+const ValueContainer = ({ getValue, ...props }: any) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const values = getValue();
-
-  // Get the label from data-label attribute or placeholder
-  let label = props.selectProps['data-label'] || '';
-
-  if (!label && props.selectProps.placeholder) {
-    label = props.selectProps.placeholder;
-  }
+  const label = props.selectProps.placeholder;
 
   let valueDisplay = '';
 
@@ -72,52 +77,65 @@ const ValueContainer = ({ children, getValue, ...props }: any) => {
     valueDisplay = values.map((value: SelectOption) => value.label).join(', ');
   }
 
-  const inputComponent = React.Children.toArray(children).find(
-    (child: any) => child?.type?.name === 'Input'
-  );
+  const handleOpenCloseMenu = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (props.selectProps.menuIsOpen) {
+      props.selectProps.onMenuClose();
+    } else {
+      props.selectProps.onMenuOpen();
+    }
+  };
+
+  useClickAway(containerRef, () => {
+    props.selectProps.onMenuClose();
+  });
 
   return (
     <components.ValueContainer {...props}>
-      <div className="flex">
+      <div
+        className="flex"
+        ref={containerRef}
+        onClick={handleOpenCloseMenu}
+        style={{
+          cursor: 'pointer',
+          width: '100%',
+        }}
+      >
         {label && <span className="font-medium mr-1">{label}:</span>}
-        <span>{valueDisplay}</span>
+
+        <span className="truncate" style={{ maxWidth: '6.5rem' }}>
+          {valueDisplay}
+        </span>
       </div>
-      {inputComponent}
     </components.ValueContainer>
   );
 };
 
-// Custom dropdown indicator (arrow)
 const DropdownIndicator = (props: any) => {
+  const colors = useColorScheme();
+
   return (
-    <components.DropdownIndicator {...props}>
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+    <components.DropdownIndicator className="cursor-pointer" {...props}>
+      <div
+        className={classNames(
+          'flex items-center justify-center hover:opacity-75 h-full w-full'
+        )}
+        style={{ color: colors.$3 }}
       >
-        <path
-          d="M4 6L8 10L12 6"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+        <ChevronDown color={colors.$3} size="1rem" />
+      </div>
     </components.DropdownIndicator>
   );
 };
 
-// Custom Option component with checkbox
 const Option = (props: OptionProps<SelectOption, true>) => {
   const { isSelected, label } = props;
 
   return (
     <components.Option {...props}>
-      <div className="flex items-center">
-        <Checkbox checked={isSelected} />
+      <div className="flex items-center w-full truncate">
+        <Checkbox className="h-5 w-5" checked={isSelected} />
 
         <span>{label}</span>
       </div>
@@ -127,6 +145,8 @@ const Option = (props: OptionProps<SelectOption, true>) => {
 
 const Menu = (props: MenuProps<SelectOption, true>) => {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const resetAndClose = () => {
     props.clearValue();
@@ -142,18 +162,22 @@ const Menu = (props: MenuProps<SelectOption, true>) => {
       <div className="flex flex-col space-y-3 pb-3">
         <div>{props.children}</div>
 
-        <div className="flex px-3">
-          <Button
-            type="secondary"
+        <div className="flex w-full px-3 space-x-2">
+          <ResetButton
+            className="w-1/2 py-2 rounded-md text-sm font-medium border"
             onClick={resetAndClose}
-            className="flex-1 py-2 mr-1 text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+            theme={{
+              textColor: colors.$3,
+              backgroundColor: '#09090B1A',
+              borderColor: colors.$5,
+            }}
           >
             {t('reset')}
-          </Button>
+          </ResetButton>
 
           <Button
+            className="w-1/2 py-2 rounded-md font-medium"
             onClick={applyAndClose}
-            className="flex-1 py-2 ml-1 text-white bg-gray-800 rounded hover:bg-gray-700"
           >
             {t('apply')}
           </Button>
@@ -161,6 +185,10 @@ const Menu = (props: MenuProps<SelectOption, true>) => {
       </div>
     </components.Menu>
   );
+};
+
+const Control = (props: ControlProps<SelectOption, true>) => {
+  return <components.Control className="shadow-sm" {...props} />;
 };
 
 export function Actions(props: Props) {
@@ -234,15 +262,10 @@ export function Actions(props: Props) {
   const customStyles: StylesConfig<SelectOption, true> = {
     control: (base) => ({
       ...base,
-      backgroundColor: 'white',
-      borderColor: '#e5e7eb',
+      backgroundColor: colors.$1,
+      borderColor: colors.$5,
       borderRadius: '0.5rem',
-      minHeight: '46px',
-      boxShadow: 'none',
       padding: '0 6px',
-      '&:hover': {
-        borderColor: '#d1d5db',
-      },
     }),
     valueContainer: (base) => ({
       ...base,
@@ -262,13 +285,13 @@ export function Actions(props: Props) {
     }),
     menu: (base) => ({
       ...base,
-      backgroundColor: 'white',
-      borderColor: colors.$5,
+      backgroundColor: colors.$1,
+      border: `1px solid ${colors.$5}`,
       zIndex: 10,
       padding: '8px',
       boxShadow:
         '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-      minWidth: '240px',
+      width: '16rem',
     }),
     option: (base) => ({
       ...base,
@@ -277,7 +300,7 @@ export function Actions(props: Props) {
       padding: '8px 12px',
       cursor: 'pointer',
       '&:hover': {
-        backgroundColor: colors.$5,
+        backgroundColor: colors.$4,
       },
     }),
   };
@@ -319,7 +342,7 @@ export function Actions(props: Props) {
               styles={customStyles}
               defaultValue={props.defaultOptions}
               onChange={(options) => onStatusChange(options)}
-              placeholder={t('status')}
+              placeholder={t('lifecycle')}
               options={props.options}
               isMulti={props.optionsMultiSelect}
               closeMenuOnSelect={false}
@@ -330,8 +353,8 @@ export function Actions(props: Props) {
                 DropdownIndicator,
                 Option,
                 Menu,
+                Control,
               }}
-              data-label={t('status')}
               menuPosition="fixed"
             />
           )}
@@ -361,6 +384,7 @@ export function Actions(props: Props) {
                   DropdownIndicator,
                   Option,
                   Menu,
+                  Control,
                 }}
                 options={props.customFilters.filter(
                   (value) => (value.dropdownKey ?? '0') === dropDownKey
@@ -368,11 +392,6 @@ export function Actions(props: Props) {
                 isMulti={props.optionsMultiSelect}
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
-                data-label={
-                  props.customFilters.filter(
-                    (value) => value.dropdownKey === dropDownKey
-                  )[0]?.placeHolder ?? props.customFilterPlaceholder
-                }
                 menuPosition="fixed"
               />
             )
