@@ -106,7 +106,7 @@ export function Connect() {
   };
 
   if (!msal) {
-    return null; // or some fallback UI
+    return null; 
   }
 
   return (
@@ -135,6 +135,8 @@ export function Connect() {
               <Element leftSide="Microsoft">
                 <SignInProviderButton
                   onClick={async () => {
+                    if (!msal) return;
+                    
                     await msal.handleRedirectPromise();
 
                     msal
