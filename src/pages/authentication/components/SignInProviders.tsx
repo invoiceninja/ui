@@ -25,14 +25,18 @@ import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
 
-export const msal = new PublicClientApplication({
-  auth: {
-    clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
-    redirectUri: import.meta.env.VITE_MICROSOFT_REDIRECT_URI,
-  },
-});
+export const msal = typeof window !== 'undefined' 
+  ? new PublicClientApplication({
+      auth: {
+        clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
+        redirectUri: import.meta.env.VITE_MICROSOFT_REDIRECT_URI,
+      },
+    })
+  : null;
 
-msal.initialize();
+if (msal) {
+  msal.initialize();
+}
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -111,6 +115,8 @@ export function SignInProviders() {
 
         <SignInProviderButton
           onClick={async () => {
+            if (!msal) return;
+            
             await msal.handleRedirectPromise();
 
             msal
