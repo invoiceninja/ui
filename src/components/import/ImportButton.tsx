@@ -35,7 +35,7 @@ export function ImportButton(props: Props) {
   return (
     <ReactRouterLink to={props.route}>
       <Button
-        className="flex items-center space-x-2.5 border rounded-md px-4 py-2 shadow-sm"
+        className="flex items-center space-x-2.5 border rounded-md px-3 2xl:px-4 py-2 shadow-sm"
         theme={{
           hoverColor: colors.$4,
           borderColor: colors.$5,
@@ -44,7 +44,7 @@ export function ImportButton(props: Props) {
       >
         <Import size="1.3rem" color={colors.$3} />
 
-        <span className="hidden lg:flex text-sm font-medium">
+        <span className="hidden 2xl:flex text-sm font-medium">
           {t('import')}
         </span>
       </Button>

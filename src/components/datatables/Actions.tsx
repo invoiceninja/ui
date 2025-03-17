@@ -19,8 +19,15 @@ import Select, {
   MenuProps,
   OptionProps,
   ControlProps,
+  ValueContainerProps,
 } from 'react-select';
-import React, { ReactNode, Dispatch, SetStateAction, useRef } from 'react';
+import React, {
+  ReactNode,
+  Dispatch,
+  SetStateAction,
+  useRef,
+  useState,
+} from 'react';
 import { useColorScheme } from '$app/common/colors';
 import collect from 'collect.js';
 import { Button, Checkbox } from '../forms';
@@ -28,6 +35,7 @@ import { ChevronDown } from '../icons/ChevronDown';
 import classNames from 'classnames';
 import { useClickAway } from 'react-use';
 import styled from 'styled-components';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export interface SelectOption {
   value: string;
@@ -65,17 +73,67 @@ const ResetButton = styled.button`
 
 const MultiValueContainer = () => null;
 
-const ValueContainer = ({ getValue, ...props }: any) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const values = getValue();
+const ValueContainer = (props: ValueContainerProps<SelectOption, true>) => {
+  const colors = useColorScheme();
+  const values = props.getValue();
   const label = props.selectProps.placeholder;
 
-  let valueDisplay = '';
+  const valueDisplay =
+    values.length > 0
+      ? values.map((value: SelectOption) => value.label).join(', ')
+      : '';
 
-  if (values.length > 0) {
-    valueDisplay = values.map((value: SelectOption) => value.label).join(', ');
-  }
+  return (
+    <components.ValueContainer {...props}>
+      <div className="flex 2xl:space-x-1 cursor-pointer w-full">
+        <span
+          className="hidden 2xl:inline-block font-medium text-sm"
+          style={{ color: colors.$17 }}
+        >
+          {label && `${label}:`}
+        </span>
+
+        <span className="truncate text-sm" style={{ maxWidth: '6.5rem' }}>
+          {valueDisplay}
+        </span>
+      </div>
+    </components.ValueContainer>
+  );
+};
+
+const DropdownIndicator = () => {
+  const colors = useColorScheme();
+
+  return (
+    <div
+      className={classNames(
+        'flex items-center justify-center hover:opacity-75 h-full w-full pr-2 cursor-pointer'
+      )}
+      style={{ color: colors.$3 }}
+    >
+      <ChevronDown color={colors.$3} size="1rem" />
+    </div>
+  );
+};
+
+const Option = (props: OptionProps<SelectOption, true>) => {
+  const { isSelected, label } = props;
+
+  return (
+    <components.Option className="rounded-sm" {...props}>
+      <div className="flex items-center w-full truncate">
+        <Checkbox className="rounded-md" checked={isSelected} />
+
+        <span className="text-sm">{label}</span>
+      </div>
+    </components.Option>
+  );
+};
+
+const Control = (props: ControlProps<SelectOption, true>) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const colors = useColorScheme();
+  const label = props.selectProps.placeholder;
 
   const handleOpenCloseMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -92,104 +150,115 @@ const ValueContainer = ({ getValue, ...props }: any) => {
   });
 
   return (
-    <components.ValueContainer {...props}>
-      <div
-        className="flex"
-        ref={containerRef}
-        onClick={handleOpenCloseMenu}
-        style={{
-          cursor: 'pointer',
-          width: '100%',
-        }}
-      >
-        {label && <span className="font-medium mr-1">{label}:</span>}
-
-        <span className="truncate" style={{ maxWidth: '6.5rem' }}>
-          {valueDisplay}
+    <div className="relative">
+      {label && (
+        <span
+          className="2xl:hidden absolute left-3 px-1 text-xs font-medium z-10"
+          style={{
+            color: colors.$17,
+            backgroundColor: colors.$2,
+            top: '-0.35rem',
+          }}
+        >
+          {label}
         </span>
-      </div>
-    </components.ValueContainer>
-  );
-};
+      )}
 
-const DropdownIndicator = (props: any) => {
-  const colors = useColorScheme();
-
-  return (
-    <components.DropdownIndicator className="cursor-pointer" {...props}>
-      <div
-        className={classNames(
-          'flex items-center justify-center hover:opacity-75 h-full w-full'
-        )}
-        style={{ color: colors.$3 }}
+      <components.Control
+        className={classNames('shadow-sm', { 'pt-1': label })}
+        {...props}
       >
-        <ChevronDown color={colors.$3} size="1rem" />
-      </div>
-    </components.DropdownIndicator>
-  );
-};
-
-const Option = (props: OptionProps<SelectOption, true>) => {
-  const { isSelected, label } = props;
-
-  return (
-    <components.Option {...props}>
-      <div className="flex items-center w-full truncate">
-        <Checkbox className="h-5 w-5" checked={isSelected} />
-
-        <span>{label}</span>
-      </div>
-    </components.Option>
-  );
-};
-
-const Menu = (props: MenuProps<SelectOption, true>) => {
-  const [t] = useTranslation();
-
-  const colors = useColorScheme();
-
-  const resetAndClose = () => {
-    props.clearValue();
-  };
-
-  const applyAndClose = () => {
-    props.setValue(props.getValue(), 'select-option');
-    props.selectProps.onMenuClose();
-  };
-
-  return (
-    <components.Menu {...props}>
-      <div className="flex flex-col space-y-3 pb-3">
-        <div>{props.children}</div>
-
-        <div className="flex w-full px-3 space-x-2">
-          <ResetButton
-            className="w-1/2 py-2 rounded-md text-sm font-medium border"
-            onClick={resetAndClose}
-            theme={{
-              textColor: colors.$3,
-              backgroundColor: '#09090B1A',
-              borderColor: colors.$5,
-            }}
-          >
-            {t('reset')}
-          </ResetButton>
-
-          <Button
-            className="w-1/2 py-2 rounded-md font-medium"
-            onClick={applyAndClose}
-          >
-            {t('apply')}
-          </Button>
+        <div
+          ref={containerRef}
+          className="flex items-center w-full"
+          onClick={handleOpenCloseMenu}
+        >
+          {props.children}
         </div>
-      </div>
-    </components.Menu>
+      </components.Control>
+    </div>
   );
 };
 
-const Control = (props: ControlProps<SelectOption, true>) => {
-  return <components.Control className="shadow-sm" {...props} />;
-};
+function SelectWithApplyButton(props: any) {
+  const {
+    options,
+    defaultValue,
+    onChange,
+    components: customComponents,
+    ...restProps
+  } = props;
+
+  const [tempValue, setTempValue] = useState(defaultValue);
+
+  const CustomMenu = (menuProps: MenuProps<SelectOption, true>) => {
+    const [t] = useTranslation();
+    const colors = useColorScheme();
+    const reactSettings = useReactSettings();
+
+    const handleReset = () => {
+      menuProps.clearValue();
+      setTempValue([]);
+    };
+
+    const handleApply = () => {
+      const selectedValues = menuProps.getValue();
+      onChange(selectedValues);
+      menuProps.selectProps.onMenuClose();
+    };
+
+    return (
+      <components.Menu className="px-1" {...menuProps}>
+        <div className="flex flex-col space-y-3 pb-3">
+          <div>{menuProps.children}</div>
+
+          <div className="flex w-full px-3 space-x-2">
+            <ResetButton
+              className={classNames('w-1/2 rounded-md text-sm font-medium', {
+                border: reactSettings?.dark_mode,
+              })}
+              onClick={handleReset}
+              theme={{
+                textColor: colors.$3,
+                backgroundColor: '#09090B1A',
+                borderColor: colors.$5,
+              }}
+            >
+              {t('reset')}
+            </ResetButton>
+
+            <Button
+              className="w-1/2 rounded-md font-medium"
+              onClick={handleApply}
+            >
+              {t('apply')}
+            </Button>
+          </div>
+        </div>
+      </components.Menu>
+    );
+  };
+
+  // Handle internal value changes without propagating to parent
+  const handleChange = (newValue: any) => {
+    setTempValue(newValue);
+  };
+
+  return (
+    <Select
+      {...restProps}
+      options={options}
+      value={tempValue}
+      defaultValue={defaultValue}
+      onChange={handleChange}
+      components={{
+        ...customComponents,
+        Menu: CustomMenu,
+      }}
+      className="sm:w-auto w-full" // Full width on mobile, auto on desktop
+    />
+  );
+}
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
@@ -269,7 +338,7 @@ export function Actions(props: Props) {
     }),
     valueContainer: (base) => ({
       ...base,
-      padding: '8px 8px',
+      padding: '0px 8px',
     }),
     placeholder: (base) => ({
       ...base,
@@ -288,9 +357,6 @@ export function Actions(props: Props) {
       backgroundColor: colors.$1,
       border: `1px solid ${colors.$5}`,
       zIndex: 10,
-      padding: '8px',
-      boxShadow:
-        '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       width: '16rem',
     }),
     option: (base) => ({
@@ -303,6 +369,14 @@ export function Actions(props: Props) {
         backgroundColor: colors.$4,
       },
     }),
+  };
+
+  const commonComponents = {
+    MultiValueContainer,
+    ValueContainer,
+    DropdownIndicator,
+    Option,
+    Control,
   };
 
   return (
@@ -326,6 +400,7 @@ export function Actions(props: Props) {
 
         <InputField
           id="filter"
+          className="shadow-sm"
           changeOverride={true}
           placeholder={t('filter')}
           value={props.filter}
@@ -338,23 +413,17 @@ export function Actions(props: Props) {
         {props.options &&
           props.defaultOptions &&
           !props.withoutStatusFilter && (
-            <Select
+            <SelectWithApplyButton
               styles={customStyles}
               defaultValue={props.defaultOptions}
-              onChange={(options) => onStatusChange(options)}
+              onChange={onStatusChange}
               placeholder={t('lifecycle')}
               options={props.options}
               isMulti={props.optionsMultiSelect}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
-              components={{
-                MultiValueContainer,
-                ValueContainer,
-                DropdownIndicator,
-                Option,
-                Menu,
-                Control,
-              }}
+              components={commonComponents}
+              isClearable={false}
               menuPosition="fixed"
             />
           )}
@@ -364,13 +433,13 @@ export function Actions(props: Props) {
             props.customFilters &&
             props.customFilterPlaceholder &&
             props.defaultCustomFilterOptions && (
-              <Select
+              <SelectWithApplyButton
                 key={index}
                 styles={customStyles}
                 defaultValue={props.defaultCustomFilterOptions.filter(
                   (value) => (value.dropdownKey ?? '0') === dropDownKey
                 )}
-                onChange={(options) =>
+                onChange={(options: any) =>
                   onCustomFilterChange(options, dropDownKey)
                 }
                 placeholder={t(
@@ -378,20 +447,14 @@ export function Actions(props: Props) {
                     (value) => value.dropdownKey === dropDownKey
                   )[0]?.placeHolder ?? props.customFilterPlaceholder
                 )}
-                components={{
-                  MultiValueContainer,
-                  ValueContainer,
-                  DropdownIndicator,
-                  Option,
-                  Menu,
-                  Control,
-                }}
+                components={commonComponents}
                 options={props.customFilters.filter(
                   (value) => (value.dropdownKey ?? '0') === dropDownKey
                 )}
                 isMulti={props.optionsMultiSelect}
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
+                isClearable={false}
                 menuPosition="fixed"
               />
             )

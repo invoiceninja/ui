@@ -113,7 +113,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
         <div className="flex items-center space-x-2">
           <TableColumns size="1.3rem" color={colors.$3} />
 
-          <span>
+          <span className="hidden 2xl:flex">
             {t('footer')} {t('columns')}
           </span>
         </div>
