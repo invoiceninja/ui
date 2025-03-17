@@ -25,19 +25,6 @@ import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
 
-export const msal = typeof window !== 'undefined' 
-  ? new PublicClientApplication({
-      auth: {
-        clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
-        redirectUri: import.meta.env.VITE_MICROSOFT_REDIRECT_URI,
-      },
-    })
-  : null;
-
-if (msal) {
-  msal.initialize();
-}
-
 interface SignInProviderButtonProps {
   disabled?: boolean;
   onClick?: () => unknown;
@@ -103,6 +90,8 @@ export function SignInProviders() {
     }).then((response) => login(response));
   };
 
+  const msal = createMsal();
+
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
       <div className="col-span-3 flex flex-col items-center space-y-3">
@@ -116,7 +105,7 @@ export function SignInProviders() {
         <SignInProviderButton
           onClick={async () => {
             if (!msal) return;
-            
+
             await msal.handleRedirectPromise();
 
             msal
@@ -172,4 +161,21 @@ export function SignInProviders() {
       </div>
     </div>
   );
+}
+
+export function createMsal() {
+  const msal =
+    typeof window !== 'undefined'
+      ? new PublicClientApplication({
+          auth: {
+            clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
+          },
+        })
+      : null;
+
+  if (msal) {
+    msal.initialize();
+  }
+
+  return msal;
 }
