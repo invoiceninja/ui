@@ -105,6 +105,10 @@ export function Connect() {
       .finally(() => setIsMailerConnected('false'));
   };
 
+  if (!msal) {
+    return null; // or some fallback UI
+  }
+
   return (
     <>
       <SelectProviderModal />
