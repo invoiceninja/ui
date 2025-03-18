@@ -16,6 +16,7 @@ import { InputLabel } from './forms';
 import { Alert } from './Alert';
 import { useColorScheme } from '$app/common/colors';
 import { SelectOption } from './datatables/Actions';
+import { merge } from 'lodash';
 
 interface Props {
   children: ReactNode;
@@ -83,39 +84,44 @@ export function SearchableSelect({
   const colors = useColorScheme();
 
   const customStyles: StylesConfig<SelectOption, false> = {
-    input: (styles) => ({
-      ...styles,
-      color: colors.$3,
-    }),
-    singleValue: (styles) => ({
-      ...styles,
-      color: colors.$3,
-    }),
-    menu: (base) => ({
-      ...base,
-      width: 'max-content',
-      minWidth: '100%',
-      backgroundColor: colors.$4,
-      borderColor: colors.$4,
-      zIndex: 50,
-    }),
-    control: (base, { isDisabled }) => ({
-      ...base,
-      borderRadius: '3px',
-      backgroundColor: colors.$1,
-      color: colors.$3,
-      borderColor: colors.$5,
-      cursor: isDisabled ? 'not-allowed' : 'pointer',
-      pointerEvents: isDisabled ? 'auto' : 'unset',
-    }),
-    option: (base, { isSelected, isFocused }) => ({
-      ...base,
-      color: colors.$3,
-      backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
-      ':hover': {
-        backgroundColor: colors.$7,
-      },
-    }),
+    input: (styles) => {
+      return merge(styles, {
+        color: colors.$3,
+      });
+    },
+    singleValue: (styles) => {
+      return merge(styles, {
+        color: colors.$3,
+      });
+    },
+    menu: (base) => {
+      return merge(base, {
+        width: 'max-content',
+        minWidth: '100%',
+        backgroundColor: colors.$4,
+        borderColor: colors.$4,
+        zIndex: 50,
+      });
+    },
+    control: (base, { isDisabled }) => {
+      return merge(base, {
+        borderRadius: '3px',
+        backgroundColor: colors.$1,
+        color: colors.$3,
+        borderColor: colors.$5,
+        cursor: isDisabled ? 'not-allowed' : 'pointer',
+        pointerEvents: isDisabled ? 'auto' : 'unset',
+      });
+    },
+    option: (base, { isSelected, isFocused }) => {
+      return merge(base, {
+        color: colors.$3,
+        backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
+        ':hover': {
+          backgroundColor: colors.$7,
+        },
+      });
+    },
   };
 
   return (

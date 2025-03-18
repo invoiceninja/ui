@@ -9,7 +9,7 @@
  */
 
 import DefaultLogo from '../../resources/images/invoiceninja-logo@light.png';
-import SmallLogo from 'public/logo180.png';
+import SmallLogo from '/logo180.png?url';
 
 export default {
   logo: DefaultLogo,
