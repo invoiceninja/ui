@@ -219,7 +219,7 @@ export function Totals() {
         .map((value) => parseInt(value as string))
         .toArray() as number[];
 
-      if (!$currencies.includes(currency)) {
+      if (!$currencies.includes(currency) && currency !== 999) {
         update('preferences.dashboard_charts.currency', $currencies[0]);
       }
 
@@ -369,6 +369,7 @@ export function Totals() {
                 onChange={(v) =>
                   update('preferences.dashboard_charts.currency', parseInt(v))
                 }
+                additionalCurrencies={[{ id: '999', label: t('all') }]}
               />
 
               <SelectField
