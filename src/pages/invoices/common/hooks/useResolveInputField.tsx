@@ -1,4 +1,4 @@
-/* eslint-disable react/display-name */
+ 
 
 /**
  * Invoice Ninja (https://invoiceninja.com).
@@ -112,7 +112,7 @@ export function useResolveInputField(props: Props) {
     return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const cleanLineItemsList = useCallback(
     (lineItems: InvoiceItem[]) => {
       let typeId = InvoiceItemType.Product;
