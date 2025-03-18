@@ -85,9 +85,9 @@ const ValueContainer = (props: ValueContainerProps<SelectOption, true>) => {
 
   return (
     <components.ValueContainer {...props}>
-      <div className="flex 2xl:space-x-1 cursor-pointer w-full">
+      <div className="flex xl:space-x-1 cursor-pointer w-full">
         <span
-          className="hidden 2xl:inline-block font-medium text-sm"
+          className="hidden xl:inline-block font-medium text-sm"
           style={{ color: colors.$17 }}
         >
           {label && `${label}:`}
@@ -153,7 +153,7 @@ const Control = (props: ControlProps<SelectOption, true>) => {
     <div className="relative">
       {label && (
         <span
-          className="2xl:hidden absolute left-3 px-1 text-xs font-medium z-10"
+          className="xl:hidden absolute left-3 px-1 text-xs font-medium z-10 rounded-sm"
           style={{
             color: colors.$17,
             backgroundColor: colors.$2,

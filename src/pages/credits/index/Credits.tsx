@@ -75,7 +75,7 @@ export default function Credits() {
         customFilters={filters}
         customFilterPlaceholder="status"
         withResourcefulActions
-        leftSideChevrons={
+        rightSide={
           <DataTableColumnsPicker
             columns={creditColumns as unknown as string[]}
             defaultColumns={defaultColumns}

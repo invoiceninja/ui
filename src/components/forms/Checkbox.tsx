@@ -28,6 +28,11 @@ const Input = styled.input`
     background-color: #000000 !important;
     border-color: ${(props) => props.theme.checkedBorderColor} !important;
   }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
 `;
 
 const getCheckmarkSvgUrl = (color: string): string => {

@@ -106,18 +106,19 @@ export default function Tasks() {
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={
-          <Guard
-            type="component"
-            component={<ImportButton route="/tasks/import" />}
-            guards={[or(permission('create_task'), permission('edit_task'))]}
-          />
-        }
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={taskColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="task"
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              columns={taskColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="task"
+            />
+
+            <Guard
+              type="component"
+              component={<ImportButton route="/tasks/import" />}
+              guards={[or(permission('create_task'), permission('edit_task'))]}
+            />
+          </div>
         }
         beforeFilter={
           (hasPermission('view_task') || hasPermission('edit_task')) && (

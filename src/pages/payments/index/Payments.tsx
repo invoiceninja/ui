@@ -109,21 +109,22 @@ export default function Payments() {
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         showRestore={(resource: Payment) => !resource.is_deleted}
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={paymentColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="payment"
-          />
-        }
         rightSide={
-          <Guard
-            type="component"
-            component={<ImportButton route="/payments/import" />}
-            guards={[
-              or(permission('create_payment'), permission('edit_payment')),
-            ]}
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              columns={paymentColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="payment"
+            />
+
+            <Guard
+              type="component"
+              component={<ImportButton route="/payments/import" />}
+              guards={[
+                or(permission('create_payment'), permission('edit_payment')),
+              ]}
+            />
+          </div>
         }
         onTableRowClick={(payment) => {
           setSliderPaymentId(payment.id);

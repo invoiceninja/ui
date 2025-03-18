@@ -57,20 +57,21 @@ export default function Products() {
         customActions={actions}
         customBulkActions={customBulkActions}
         rightSide={
-          <Guard
-            type="component"
-            guards={[
-              or(permission('create_product'), permission('edit_product')),
-            ]}
-            component={<ImportButton route="/products/import" />}
-          />
-        }
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            table="product"
-            columns={productColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              table="product"
+              columns={productColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(permission('create_product'), permission('edit_product')),
+              ]}
+              component={<ImportButton route="/products/import" />}
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_product')]}
         hideEditableOptions={!hasPermission('edit_product')}

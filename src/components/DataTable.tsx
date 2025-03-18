@@ -129,7 +129,6 @@ interface Props<T> extends CommonProps {
   withoutPagination?: boolean;
   rightSide?: ReactNode;
   withoutPadding?: boolean;
-  leftSideChevrons?: ReactNode;
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
@@ -620,6 +619,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             >
               <Checkbox
                 innerRef={mainCheckbox}
+                checked={selected.length === data?.data.data.length}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   Array.from(
                     document.querySelectorAll('.child-checkbox')
