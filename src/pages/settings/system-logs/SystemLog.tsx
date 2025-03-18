@@ -146,7 +146,7 @@ export function SystemLog() {
   };
 
   const getLog = (src: string) => {
-    return <JSONTree data={JSON.parse(src)} theme={jsonTreeTheme} /> || src;
+    return <JSONTree data={JSON.parse(src)} theme={jsonTreeTheme} />;
   };
 
   return (

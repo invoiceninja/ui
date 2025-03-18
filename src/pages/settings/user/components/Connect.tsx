@@ -16,8 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Button } from '../../../../components/forms';
 import {
+  createMsal,
   SignInProviderButton,
-  msal,
 } from '$app/pages/authentication/components/SignInProviders';
 import { GoogleLogin } from '@react-oauth/google';
 import classNames from 'classnames';
@@ -105,6 +105,12 @@ export function Connect() {
       .finally(() => setIsMailerConnected('false'));
   };
 
+  const msal = createMsal();
+
+  if (!msal) {
+    return null;
+  }
+
   return (
     <>
       <SelectProviderModal />
@@ -131,6 +137,8 @@ export function Connect() {
               <Element leftSide="Microsoft">
                 <SignInProviderButton
                   onClick={async () => {
+                    if (!msal) return;
+
                     await msal.handleRedirectPromise();
 
                     msal

@@ -18,12 +18,8 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Alert } from '$app/components/Alert';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import {
-  loadStripe,
-  Stripe,
-  StripeCardElement,
-  StripeElements,
-} from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js/pure';
+import { Stripe, StripeCardElement, StripeElements } from '@stripe/stripe-js';
 import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
