@@ -303,10 +303,9 @@ export default function EInvoice() {
             onValueChange={(value) =>
               handleChange('e_invoice.Invoice.InvoicePeriod.0.StartDate', value)
             }
-            errorMessage={get(
-              errors?.errors,
-              'e_invoice.Invoice.InvoicePeriod.0.StartDate'
-            )}
+            errorMessage={
+              errors?.errors?.['e_invoice.InvoicePeriod.0.StartDate']
+            }
           />
         </Element>
 
@@ -319,10 +318,7 @@ export default function EInvoice() {
             onValueChange={(value) =>
               handleChange('e_invoice.Invoice.InvoicePeriod.0.EndDate', value)
             }
-            errorMessage={get(
-              errors?.errors,
-              'e_invoice.Invoice.InvoicePeriod.0.EndDate'
-            )}
+            errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.0.EndDate']}
           />
         </Element>
       </Card>

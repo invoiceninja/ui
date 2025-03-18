@@ -56,10 +56,9 @@ export default function EInvoice() {
               }`
             )
           }
-          errorMessage={get(
-            errors?.errors,
-            'e_invoice.Invoice.InvoicePeriod.0.StartDate'
-          )}
+          errorMessage={
+            errors?.errors?.['e_invoice.InvoicePeriod.Description.0.StartDate']
+          }
         />
       </Element>
 
@@ -87,10 +86,9 @@ export default function EInvoice() {
               }|${value}`
             )
           }
-          errorMessage={get(
-            errors?.errors,
-            'e_invoice.Invoice.InvoicePeriod.0.EndDate'
-          )}
+          errorMessage={
+            errors?.errors?.['e_invoice.InvoicePeriod.Description.0.EndDate']
+          }
         />
       </Element>
     </Card>
