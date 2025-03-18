@@ -253,6 +253,8 @@ export function Totals() {
     };
   }, []);
 
+  console.log('testing commmit');
+
   return (
     <>
       {totals.isLoading && (
