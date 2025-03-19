@@ -59,7 +59,7 @@ export const UpdatePricesAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <span className="text-lg">{t('are_you_sure')}</span>
 
         <Button className="self-end" onClick={handleSave}>
           {t('yes')}
