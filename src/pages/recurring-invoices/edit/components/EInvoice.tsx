@@ -30,30 +30,27 @@ export default function EInvoice() {
     setRecurringInvoice(updatedInvoice);
   };
 
+  const getDateValue = (date: 'start' | 'end') => {
+    return (
+      (
+        get(
+          recurringInvoice,
+          'e_invoice.Invoice.InvoicePeriod.0.Description'
+        ) as unknown as string
+      )?.split('|')?.[date === 'start' ? 0 : 1] || ''
+    );
+  };
+
   return (
     <Card title={t('date_range')}>
       <Element leftSide={t('start_date')}>
         <InputField
           element="textarea"
-          value={
-            (
-              get(
-                recurringInvoice,
-                'e_invoice.Invoice.InvoicePeriod.0.Description'
-              ) as unknown as string
-            )?.split('|')?.[0] || ''
-          }
+          value={getDateValue('start')}
           onValueChange={(value) =>
             handleChange(
               'e_invoice.Invoice.InvoicePeriod.0.Description',
-              `${value}|${
-                (
-                  get(
-                    recurringInvoice,
-                    'e_invoice.Invoice.InvoicePeriod.0.Description'
-                  ) as unknown as string
-                )?.split('|')?.[1] || ''
-              }`
+              `${value}|${getDateValue('end')}`
             )
           }
           errorMessage={
@@ -65,25 +62,11 @@ export default function EInvoice() {
       <Element leftSide={t('end_date')}>
         <InputField
           element="textarea"
-          value={
-            (
-              get(
-                recurringInvoice,
-                'e_invoice.Invoice.InvoicePeriod.0.Description'
-              ) as unknown as string
-            )?.split('|')?.[1] || ''
-          }
+          value={getDateValue('end')}
           onValueChange={(value) =>
             handleChange(
               'e_invoice.Invoice.InvoicePeriod.0.Description',
-              `${
-                (
-                  get(
-                    recurringInvoice,
-                    'e_invoice.Invoice.InvoicePeriod.0.Description'
-                  ) as unknown as string
-                )?.split('|')?.[0] || ''
-              }|${value}`
+              `${getDateValue('start')}|${value}`
             )
           }
           errorMessage={
