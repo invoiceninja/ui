@@ -10,6 +10,7 @@
 
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
@@ -22,6 +23,8 @@ interface Params {
 }
 export function useTabs(params: Params) {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -39,6 +42,15 @@ export function useTabs(params: Params) {
     {
       name: t('edit'),
       href: route('/recurring_invoices/:id/edit', { id }),
+    },
+    {
+      name: t('e_invoice'),
+      href: route('/recurring_invoices/:id/e_invoice', { id }),
+      enabled: Boolean(
+        company?.settings.e_invoice_type === 'PEPPOL' &&
+          company?.settings.enable_e_invoice &&
+          company?.tax_data?.acts_as_sender
+      ),
     },
     {
       name: t('documents'),
