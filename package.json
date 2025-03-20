@@ -5,7 +5,7 @@
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
     "@emotion/styled": "^11.14.0",
-    "@headlessui/react": "^1.7.19",
+    "@headlessui/react": "^2.0.0",
     "@headlessui/tailwindcss": "^0.2.2",
     "@hello-pangea/dnd": "^16.6.0",
     "@monaco-editor/react": "^4.7.0",
