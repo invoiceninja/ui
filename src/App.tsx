@@ -44,6 +44,7 @@ import {
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
+import { refreshEntityDataBannerAtom } from './components/banners/RefreshEntityData';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';
@@ -76,6 +77,7 @@ export function App() {
 
   const colorScheme = useAtomValue(colorSchemeAtom);
   const setIsPasswordRequired = useSetAtom(isPasswordRequiredAtom);
+  const setRefreshEntityDataBanner = useSetAtom(refreshEntityDataBannerAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
@@ -241,7 +243,15 @@ export function App() {
     callback: ({ data }) => {
       const currentData = data as RefreshEntityData;
 
-      $refetch([currentData.entity]);
+      if (currentData.entity_id !== id) {
+        $refetch([currentData.entity]);
+      } else {
+        setRefreshEntityDataBanner({
+          visible: true,
+          refetchEntity: currentData.entity,
+          refetchEntityId: currentData.entity_id || '',
+        });
+      }
     },
   });
 

@@ -64,6 +64,7 @@ import { CurrencyExchange } from '../icons/CurrencyExchange';
 import { ChartLine } from '../icons/ChartLine';
 import { ArrowsTransaction } from '../icons/ArrowsTransaction';
 import { Gear } from '../icons/Gear';
+import { RefreshEntityData } from '../banners/RefreshEntityData';
 
 export interface SaveOption {
   label: string;
@@ -411,6 +412,7 @@ export function Default(props: Props) {
   return (
     <div>
       <div className="fixed bottom-4 right-4 z-50 flex items-end flex-col-reverse space-y-4 space-y-reverse">
+        <RefreshEntityData />
         <ActivateCompany />
         <VerifyEmail />
         <VerifyPhone />
