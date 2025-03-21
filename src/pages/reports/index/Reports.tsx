@@ -269,9 +269,16 @@ export default function Reports() {
   const [preview, setPreview] = useAtom(previewAtom);
 
   const adjustCellValue = (currentCell: Cell) => {
-    if (currentCell.identifier.endsWith('_notes')) {
+    if (
+      currentCell.identifier.endsWith('_notes') ||
+      currentCell.identifier.endsWith('description') ||
+      currentCell.identifier.endsWith('terms') ||
+      currentCell.identifier.endsWith('footer') ||
+      currentCell.identifier.endsWith('reminder_schedule') ||
+      currentCell.identifier.endsWith('notes')
+    ) {
       return extractTextFromHTML(
-        sanitizeHTML(currentCell.display_value as string)
+        sanitizeHTML(currentCell.display_value?.toString())
       );
     }
 
