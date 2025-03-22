@@ -19,7 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
@@ -44,12 +44,21 @@ import {
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
-import { refreshEntityDataBannerAtom } from './components/banners/RefreshEntityData';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';
   entity_id?: string;
 }
+
+export const refreshEntityDataBannerAtom = atom<{
+  refetchEntityId: string;
+  refetchEntity: 'invoices' | 'recurring_invoices';
+  visible: boolean;
+}>({
+  refetchEntityId: '',
+  refetchEntity: 'recurring_invoices',
+  visible: false,
+});
 
 export function App() {
   const [t] = useTranslation();

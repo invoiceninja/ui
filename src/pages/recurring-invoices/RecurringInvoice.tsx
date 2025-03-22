@@ -16,7 +16,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +39,8 @@ import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { Banner } from '$app/components/Banner';
+import { refreshEntityDataBannerAtom } from '$app/App';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -46,6 +48,7 @@ export default function RecurringInvoice() {
 
   const { id } = useParams();
   const actions = useActions();
+
   const { data } = useRecurringInvoiceQuery({ id: id! });
 
   const hasPermission = useHasPermission();
@@ -60,6 +63,11 @@ export default function RecurringInvoice() {
   ];
 
   const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const {
+    visible: refetchBannerVisible,
+    refetchEntityId,
+    refetchEntity,
+  } = useAtomValue(refreshEntityDataBannerAtom);
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -94,16 +102,23 @@ export default function RecurringInvoice() {
       {...((hasPermission('edit_recurring_invoice') ||
         entityAssigned(recurringInvoice)) &&
         recurringInvoice && {
-        navigationTopRight: (
-          <ResourceActions
-            resource={recurringInvoice}
-            onSaveClick={() => save(recurringInvoice)}
-            // label={t('more_actions')}
-            actions={actions}
-            cypressRef="recurringInvoiceActionDropdown"
-          />
-        ),
-      })}
+          navigationTopRight: (
+            <ResourceActions
+              resource={recurringInvoice}
+              onSaveClick={() => save(recurringInvoice)}
+              // label={t('more_actions')}
+              actions={actions}
+              cypressRef="recurringInvoiceActionDropdown"
+            />
+          ),
+        })}
+      aboveMainContainer={
+        Boolean(
+          refetchBannerVisible &&
+            refetchEntityId === id &&
+            refetchEntity === 'recurring_invoices'
+        ) && <Banner variant="orange">{t('recurring_invoice_updated')}</Banner>
+      }
       afterBreadcrumbs={<PreviousNextNavigation entity="recurring_invoice" />}
     >
       {recurringInvoice?.id === id ? (
