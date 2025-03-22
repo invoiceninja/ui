@@ -23,6 +23,7 @@ interface Props extends CommonProps {
   external?: boolean;
   withoutDefaultStyling?: boolean;
   setBaseFont?: boolean;
+  disableHoverUnderline?: boolean;
 }
 
 export function Link(props: Props) {
@@ -32,10 +33,11 @@ export function Link(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const { withoutDefaultStyling, setBaseFont } = props;
+  const { withoutDefaultStyling, setBaseFont, disableHoverUnderline } = props;
 
   const css: React.CSSProperties = {
     color: accentColor,
+    ...props.style,
   };
 
   const getAdjustedHref = () => {
@@ -52,7 +54,7 @@ export function Link(props: Props) {
         className={classNames(`text-center ${props.className}`, {
           'text-sm': !setBaseFont,
           'text-base': setBaseFont,
-          'hover:underline': !withoutDefaultStyling,
+          'hover:underline': !withoutDefaultStyling && !disableHoverUnderline,
         })}
         style={!withoutDefaultStyling ? css : undefined}
         rel="noreferrer"
@@ -74,7 +76,7 @@ export function Link(props: Props) {
       className={classNames(`${props.className}`, {
         'text-sm': !setBaseFont,
         'text-base': setBaseFont,
-        'hover:underline': !withoutDefaultStyling,
+        'hover:underline': !withoutDefaultStyling && !disableHoverUnderline,
       })}
       style={!withoutDefaultStyling ? css : undefined}
       to={props.to}

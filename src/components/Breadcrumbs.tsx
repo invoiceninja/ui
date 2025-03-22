@@ -9,8 +9,8 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { ChevronRight, Home } from 'react-feather';
 import { Link } from './forms';
+import { House } from './icons/House';
 
 export type Page = { name: string; href: string };
 
@@ -20,19 +20,14 @@ export function Breadcrumbs(props: { pages: Page[] }) {
   if (props.pages.length === 0) {
     return null;
   }
-  
+
   return (
-    <nav
-      className="flex"
-      aria-label="Breadcrumb"
-      style={{ color: colors.$3, opacity: colors.$10 }}
-    >
+    <nav className="flex" aria-label="Breadcrumb">
       <ol role="list" className="flex items-center space-x-4">
         <li>
           <div>
             <Link to="/dashboard" withoutDefaultStyling>
-              <Home className="flex-shrink-0 h-5 w-5" aria-hidden="true" />
-              <span className="sr-only">Home</span>
+              <House size="1.3rem" color={colors.$17} />
             </Link>
           </div>
         </li>
@@ -40,14 +35,13 @@ export function Breadcrumbs(props: { pages: Page[] }) {
         {props.pages.map((page) => (
           <li key={page.name}>
             <div className="flex items-center">
-              <ChevronRight
-                className="flex-shrink-0 h-5 w-5"
-                aria-hidden="true"
-              />
+              <span style={{ color: colors.$17 }}>/</span>
+
               <Link
                 to={page.href}
                 className="ml-4 text-sm font-medium"
-                withoutDefaultStyling
+                style={{ color: colors.$17 }}
+                disableHoverUnderline
               >
                 {page.name}
               </Link>
