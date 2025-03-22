@@ -619,7 +619,10 @@ export function DataTable<T extends object>(props: Props<T>) {
             >
               <Checkbox
                 innerRef={mainCheckbox}
-                checked={selected.length === data?.data.data.length}
+                checked={
+                  selected.length === data?.data.data.length &&
+                  data?.data.data.length > 0
+                }
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   Array.from(
                     document.querySelectorAll('.child-checkbox')
