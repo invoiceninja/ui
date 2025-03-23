@@ -117,7 +117,7 @@ export default function RecurringInvoice() {
           refetchBannerVisible &&
             refetchEntityId === id &&
             refetchEntity === 'recurring_invoices'
-        ) && <Banner variant="orange">{t('recurring_invoice_updated')}</Banner>
+        ) && <Banner variant="orange">{t('invoice_status_changed')}</Banner>
       }
       afterBreadcrumbs={<PreviousNextNavigation entity="recurring_invoice" />}
     >
