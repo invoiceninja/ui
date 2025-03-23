@@ -25,11 +25,9 @@ export function Breadcrumbs(props: { pages: Page[] }) {
     <nav className="flex" aria-label="Breadcrumb">
       <ol role="list" className="flex items-center space-x-4">
         <li>
-          <div>
-            <Link to="/dashboard" withoutDefaultStyling>
-              <House size="1.3rem" color={colors.$17} />
-            </Link>
-          </div>
+          <Link to="/dashboard" withoutDefaultStyling>
+            <House size="1.3rem" color={colors.$17} />
+          </Link>
         </li>
 
         {props.pages.map((page) => (
