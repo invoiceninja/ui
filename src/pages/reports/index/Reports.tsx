@@ -108,8 +108,6 @@ export const ranges: Range[] = [
 ];
 
 const download = (data: BlobPart, identifier: string) => {
-  console.log('Download data type:', typeof data, data);
-  
   let isPDF = false;
 
   // Check if data is ArrayBuffer or Uint8Array
@@ -121,26 +119,19 @@ const download = (data: BlobPart, identifier: string) => {
       view[2] === 0x44 && // D
       view[3] === 0x46;   // F
   } else if (typeof data === 'string') {
-    // If it's a string, check if it starts with PDF signature
     isPDF = data.startsWith('%PDF');
   }
 
-  console.log('Detected as PDF:', isPDF);
-
   const fileType = isPDF ? 'pdf' : 'csv';
   const mimeType = isPDF ? 'application/pdf' : 'text/csv';
-  
+
   const blob = new Blob([data], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
   link.download = `${identifier}.${fileType}`;
   link.href = url;
-  link.target = '_blank';
-
-  document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
   
   URL.revokeObjectURL(url);
 };
@@ -251,7 +242,9 @@ export default function Reports() {
           .fetchQuery({
             queryKey: ['exports', hash],
             queryFn: () =>
-              request('POST', endpoint(`/api/v1/exports/preview/${hash}`)).then(
+              request('POST', endpoint(`/api/v1/exports/preview/${hash}`), null, {
+                responseType: 'arraybuffer'
+              }).then(
                 (response) => response.data
               ),
             retry: 50,
