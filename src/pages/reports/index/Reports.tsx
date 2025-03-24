@@ -108,20 +108,41 @@ export const ranges: Range[] = [
 ];
 
 const download = (data: BlobPart, identifier: string) => {
-  const blob = new Blob([data], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
+  console.log('Download data type:', typeof data, data);
+  
+  let isPDF = false;
 
+  // Check if data is ArrayBuffer or Uint8Array
+  if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
+    const view = new Uint8Array(data instanceof ArrayBuffer ? data : data);
+    isPDF = view.length > 4 &&
+      view[0] === 0x25 && // %
+      view[1] === 0x50 && // P
+      view[2] === 0x44 && // D
+      view[3] === 0x46;   // F
+  } else if (typeof data === 'string') {
+    // If it's a string, check if it starts with PDF signature
+    isPDF = data.startsWith('%PDF');
+  }
+
+  console.log('Detected as PDF:', isPDF);
+
+  const fileType = isPDF ? 'pdf' : 'csv';
+  const mimeType = isPDF ? 'application/pdf' : 'text/csv';
+  
+  const blob = new Blob([data], { type: mimeType });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
-  link.download = `${identifier}.csv`;
+  link.download = `${identifier}.${fileType}`;
   link.href = url;
   link.target = '_blank';
 
   document.body.appendChild(link);
-
   link.click();
-
   document.body.removeChild(link);
+  
+  URL.revokeObjectURL(url);
 };
 
 export default function Reports() {
