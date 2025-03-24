@@ -55,6 +55,8 @@ import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { numberFormattableColumns } from '../common/constants/columns';
+import { extractTextFromHTML } from '$app/common/helpers/html-string';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 
 interface Range {
   identifier: string;
@@ -103,7 +105,7 @@ export const ranges: Range[] = [
     identifier: 'last_year',
     label: 'last_year',
     scheduleIdentifier: 'last_year',
-  }, 
+  },
   { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
@@ -267,6 +269,19 @@ export default function Reports() {
   const [preview, setPreview] = useAtom(previewAtom);
 
   const adjustCellValue = (currentCell: Cell) => {
+    if (
+      currentCell.identifier.endsWith('_notes') ||
+      currentCell.identifier.endsWith('description') ||
+      currentCell.identifier.endsWith('terms') ||
+      currentCell.identifier.endsWith('footer') ||
+      currentCell.identifier.endsWith('reminder_schedule') ||
+      currentCell.identifier.endsWith('notes')
+    ) {
+      return extractTextFromHTML(
+        sanitizeHTML(currentCell.display_value?.toString())
+      );
+    }
+
     if (typeof currentCell.display_value !== 'string') {
       return currentCell.display_value;
     }
