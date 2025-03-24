@@ -118,24 +118,53 @@ export function Plan2() {
           >
             <div className="flex flex-col space-y-2">
               <p className="font-semibold text-center 2xl:text-left">
-                Increase your efficiency with these features
+                Upgrade to Pro or Enterprise Plans for advanced features!
               </p>
 
-              <div className="flex flex-col 2xl:flex-row items-center space-x-2 text-sm">
-                <p className="flex items-center space-x-1">
-                  <Check size={18} style={{ color: accentColor }} />
-                  <span className="block">Developer Direct Concierge</span>
-                </p>
+              <div className="grid grid-cols-2 gap-20 text-sm">
+                <div className="space-y-2">
+                  <h3 className="font-semibold mb-3">Pro</h3>
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">Remove Invoice Ninja logo</span>
+                  </p>
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">Unlimited Clients</span>
+                  </p>
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">Advanced Customization</span>
+                  </p>
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">REST API Access</span>
+                  </p>
 
-                <p className="flex items-center space-x-1">
-                  <Check size={18} style={{ color: accentColor }} />
-                  <span className="block">Priority Direct Support</span>
-                </p>
+                </div>
 
-                <p className="flex items-center space-x-1">
-                  <Check size={18} style={{ color: accentColor }} />
-                  <span className="block">Feature Request Priority</span>
-                </p>
+                <div className="space-y-2">
+                  <h3 className="font-semibold mb-3">Enterprise</h3>
+                
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">Additional Account Users</span>
+                  </p>
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">Attach Files to Emails (pdf, jpg, xls..)</span>
+                  </p>
+
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">Custom URL “invoice.company.com”</span>
+                  </p>
+
+                  <p className="flex items-center space-x-1">
+                    <Check size={18} style={{ color: accentColor }} />
+                    <span className="block">Auto-sync Bank Transactions</span>
+                  </p>
+                </div>
               </div>
             </div>
 
