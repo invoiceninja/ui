@@ -66,35 +66,39 @@ export function TaskStatusesDropdown(props: Props) {
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$4,
-              minWidth: '14rem',
-              maxWidth: '15rem',
+              minWidth: '13rem',
+              maxWidth: '20rem',
             }}
           >
-            {taskStatuses?.data.map((taskStatus, index) => (
-              <OptionElement
-                key={index}
-                className="flex items-center p-2 space-x-2 rounded-sm"
-                onClick={() => {
-                  setVisible(false);
-                  handleUpdateTask({ ...task, status_id: taskStatus.id });
-                }}
-                theme={{
-                  hoverColor: colors.$7,
-                }}
-              >
-                {taskStatus.id === task.status_id ? (
-                  <RadioChecked
-                    size="1.1rem"
-                    filledColor={colors.$1}
-                    borderColor={colors.$3}
-                  />
-                ) : (
-                  <RadioUnchecked size="1.1rem" color={colors.$5} />
-                )}
+            <div className="flex flex-col max-h-80 overflow-y-auto">
+              {taskStatuses?.data.map((taskStatus, index) => (
+                <OptionElement
+                  key={index}
+                  className="flex items-center p-2 space-x-2 rounded-sm"
+                  onClick={() => {
+                    setVisible(false);
+                    handleUpdateTask({ ...task, status_id: taskStatus.id });
+                  }}
+                  theme={{
+                    hoverColor: colors.$7,
+                  }}
+                >
+                  <div>
+                    {taskStatus.id === task.status_id ? (
+                      <RadioChecked
+                        size="1.2rem"
+                        filledColor={colors.$1}
+                        borderColor={colors.$3}
+                      />
+                    ) : (
+                      <RadioUnchecked size="1.2rem" color={colors.$17} />
+                    )}
+                  </div>
 
-                <span>{taskStatus.name}</span>
-              </OptionElement>
-            ))}
+                  <span className="truncate">{taskStatus.name}</span>
+                </OptionElement>
+              ))}
+            </div>
 
             {Boolean(!taskStatuses?.data.length) && (
               <div className="font-medium text-center py-2 text-xs">
@@ -114,7 +118,7 @@ export function TaskStatusesDropdown(props: Props) {
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <Plus color={colors.$5} size="1.1rem" />
+                  <Plus color={colors.$17} size="1.2rem" />
 
                   <span>{t('create_new')}</span>
                 </div>

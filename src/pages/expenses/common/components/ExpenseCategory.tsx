@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { StatusBadge } from '$app/components/StatusBadge';
 import {
   hexToRGB,
   isColorLight,
@@ -19,7 +18,6 @@ import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { Expense } from '$app/common/interfaces/expense';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import Tippy from '@tippyjs/react/headless';
 import { Dispatch, SetStateAction } from 'react';
 import { useSave } from '../../edit/hooks/useSave';
@@ -27,6 +25,11 @@ import { useTranslation } from 'react-i18next';
 import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
 import { ExpenseCategory as ExpenseCategoryType } from '$app/common/interfaces/expense-category';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import styled from 'styled-components';
+import { RadioChecked } from '$app/components/icons/RadioChecked';
+import { RadioUnchecked } from '$app/components/icons/RadioUnchecked';
+import { Plus } from '$app/components/icons/Plus';
+import { ChevronDown } from '$app/components/icons/ChevronDown';
 
 interface DropdownProps {
   visible: boolean;
@@ -35,6 +38,12 @@ interface DropdownProps {
   setVisible: Dispatch<SetStateAction<boolean>>;
   expense: Expense;
 }
+
+const OptionElement = styled.div`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 function ExpenseCategoriesDropdown(props: DropdownProps) {
   const [t] = useTranslation();
@@ -65,7 +74,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
         interactive={true}
         render={() => (
           <div
-            className="border box rounded-md shadow-lg focus:outline-none"
+            className="border box rounded-md shadow-lg focus:outline-none p-1"
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$4,
@@ -74,52 +83,100 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
             }}
             onClick={(event) => event.stopPropagation()}
           >
+            <div className="flex flex-col max-h-80 overflow-y-auto">
+              {expenseCategories?.map((expenseCategory, index) => (
+                <OptionElement
+                  key={index}
+                  className="flex items-center p-2 space-x-2 rounded-sm cursor-pointer"
+                  onClick={() => {
+                    setVisible(false);
+                    save({ ...expense, category_id: expenseCategory.id });
+                  }}
+                  theme={{
+                    hoverColor: colors.$7,
+                  }}
+                >
+                  <div>
+                    {expenseCategory.id === expense.category_id ? (
+                      <RadioChecked
+                        size="1.2rem"
+                        filledColor={colors.$1}
+                        borderColor={colors.$3}
+                      />
+                    ) : (
+                      <RadioUnchecked size="1.2rem" color={colors.$17} />
+                    )}
+                  </div>
+
+                  <span className="truncate">{expenseCategory.name}</span>
+                </OptionElement>
+              ))}
+            </div>
+
+            {Boolean(!expenseCategories?.length) && (
+              <div className="font-medium text-center py-2 text-xs">
+                {t('no_records_found')}
+              </div>
+            )}
+
             {hasPermission('create_expense') && (
-              <DropdownElement
-                className="font-medium text-center py-3"
+              <OptionElement
+                className="flex items-center font-medium text-center p-2 rounded-sm cursor-pointer"
                 onClick={() => {
                   setIsModalOpen(true);
                   setVisible(false);
                 }}
-                cypressRef="newExpenseCategoryAction"
+                theme={{
+                  hoverColor: colors.$7,
+                }}
               >
-                {t('new_expense_category')}
-              </DropdownElement>
-            )}
+                <div className="flex items-center gap-2">
+                  <Plus color={colors.$17} size="1.2rem" />
 
-            <div className="flex flex-col max-h-80 overflow-y-auto">
-              {expenseCategories?.map(
-                (expenseCategory, index) =>
-                  expenseCategory.id !== expense.category_id && (
-                    <DropdownElement
-                      key={index}
-                      onClick={() => {
-                        setVisible(false);
-                        save({ ...expense, category_id: expenseCategory.id });
-                      }}
-                    >
-                      {expenseCategory.name}
-                    </DropdownElement>
-                  )
-              )}
-            </div>
+                  <span>{t('create_new')}</span>
+                </div>
+              </OptionElement>
+            )}
           </div>
         )}
         visible={visible}
       >
-        <div className="cursor-pointer" data-cy="expenseCategoryBadge">
-          <StatusBadge
-            for={{}}
-            code={expense.category?.name || (t('uncategorized') as string)}
+        <div
+          className="flex items-center cursor-pointer"
+          data-cy="expenseCategoryBadge"
+        >
+          <div
+            className="text-xs rounded-l px-2 py-1 border-r border-white font-medium"
             style={{
-              color: adjustColorDarkness(hex, darknessAmount),
-              backgroundColor: expense.category?.color || '',
+              color: expense.category?.color
+                ? adjustColorDarkness(hex, darknessAmount)
+                : '#1f2937',
+              backgroundColor: expense.category?.color || '#f3f4f6',
+            }}
+          >
+            {expense.category?.name || (t('uncategorized') as string)}
+          </div>
+
+          <div
+            className="flex items-center justify-center rounded-r py-1 h-full"
+            style={{
+              backgroundColor: expense.category?.color || '#f3f4f6',
+              width: '1.5rem',
             }}
             onClick={() =>
               !isFormBusy &&
               setVisible((currentVisibility) => !currentVisibility)
             }
-          />
+          >
+            <ChevronDown
+              color={
+                expense.category?.color
+                  ? adjustColorDarkness(hex, darknessAmount)
+                  : '#1f2937'
+              }
+              size="1rem"
+            />
+          </div>
         </div>
       </Tippy>
 
