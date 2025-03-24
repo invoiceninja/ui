@@ -198,6 +198,7 @@ export function Actions(props: Props) {
           !props.withoutStatusFilter && (
             <Select
               styles={{
+                ...customStyles,
                 multiValue: (styles, { data }) =>
                   merge(styles, {
                     backgroundColor: data.backgroundColor,
