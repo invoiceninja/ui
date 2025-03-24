@@ -66,20 +66,20 @@ export function TaskStatusesDropdown(props: Props) {
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$4,
-              minWidth: '12rem',
-              maxWidth: '14.7rem',
+              minWidth: '14rem',
+              maxWidth: '15rem',
             }}
           >
             {taskStatuses?.data.map((taskStatus, index) => (
               <OptionElement
                 key={index}
-                className="flex items-center p-2 space-x-2"
+                className="flex items-center p-2 space-x-2 rounded-sm"
                 onClick={() => {
                   setVisible(false);
                   handleUpdateTask({ ...task, status_id: taskStatus.id });
                 }}
                 theme={{
-                  hoverColor: colors.$4,
+                  hoverColor: colors.$7,
                 }}
               >
                 {taskStatus.id === task.status_id ? (
@@ -110,7 +110,7 @@ export function TaskStatusesDropdown(props: Props) {
                   setVisible(false);
                 }}
                 theme={{
-                  hoverColor: colors.$4,
+                  hoverColor: colors.$7,
                 }}
               >
                 <div className="flex items-center gap-2">

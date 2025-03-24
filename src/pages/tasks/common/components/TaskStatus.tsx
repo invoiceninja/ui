@@ -23,6 +23,8 @@ import { useClickAway } from 'react-use';
 import { TaskStatusesDropdown } from './TaskStatusesDropdown';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { Tooltip } from '$app/components/Tooltip';
+import { ChevronDown } from '$app/components/icons/ChevronDown';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   entity: Task;
@@ -32,6 +34,8 @@ export function TaskStatus(props: Props) {
   const [t] = useTranslation();
 
   const ref = useRef(null);
+
+  const colors = useColorScheme();
 
   const adjustColorDarkness = useAdjustColorDarkness();
   const statusThemeColors = useStatusThemeColorScheme();
@@ -87,15 +91,19 @@ export function TaskStatus(props: Props) {
 
     return (
       <div ref={ref} onClick={(event) => event.stopPropagation()}>
-        <Tooltip
-          width="auto"
-          message={t('change_status') as string}
-          withoutArrow
-          placement="bottom"
-        >
-          <StatusBadge
-            for={{}}
-            code={status.name}
+        <div className="flex items-center">
+          <div
+            className="text-xs rounded-l px-2 py-1 border-r border-white font-medium"
+            style={{
+              color: adjustColorDarkness(hex, darknessAmount),
+              backgroundColor: status.color,
+            }}
+          >
+            {status.name}
+          </div>
+
+          <div
+            className="flex items-center justify-center rounded-r px-1 py-1 h-full"
             style={{
               color: adjustColorDarkness(hex, darknessAmount),
               backgroundColor: status.color,
@@ -103,8 +111,13 @@ export function TaskStatus(props: Props) {
             onClick={() =>
               !isFormBusy && setVisibleDropdown((current) => !current)
             }
-          />
-        </Tooltip>
+          >
+            <ChevronDown
+              color={adjustColorDarkness(hex, darknessAmount)}
+              size="1rem"
+            />
+          </div>
+        </div>
 
         <TaskStatusesDropdown
           visible={visibleDropdown}
