@@ -20,10 +20,9 @@ import { cloneDeep, set } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, SelectField } from './forms';
+import { Button, InputLabel, SelectField } from './forms';
 import { Inline } from './Inline';
 import { Modal } from './Modal';
-import { MdDragHandle, MdClose } from 'react-icons/md';
 import {
   DragDropContext,
   Draggable,
@@ -37,8 +36,10 @@ import {
 } from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Icon } from './icons/Icon';
 import { createPortal } from 'react-dom';
+import { GridDotsVertical } from './icons/GridDotsVertical';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from './icons/CircleXMark';
 
 interface Props {
   columns: string[];
@@ -53,11 +54,12 @@ export function DataTableColumnsPicker(props: Props) {
 
   const dispatch = useDispatch();
 
-  const { t } = useTranslation();
+  const [t] = useTranslation();
   const { table, defaultColumns } = props;
 
   useInjectUserChanges();
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const [filteredColumns, setFilteredColumns] = useState(props.columns);
@@ -147,94 +149,116 @@ export function DataTableColumnsPicker(props: Props) {
           visible={isModalVisible}
           onClose={setIsModalVisible}
         >
-          <SelectField
-            label={t('add_column')}
-            onValueChange={handleSelectChange}
-            value=""
-            withBlank
-            cypressRef="columSelector"
-          >
-            {filteredColumns
-              .sort((a, b) => t(a).localeCompare(t(b)))
-              .map((column, index) => (
-                <option key={index} value={column}>
-                  {t(column)}
-                </option>
-              ))}
-          </SelectField>
-
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable
-              droppableId="columns"
-              renderClone={(provided, _, rubric) => {
-                const column = currentColumns[rubric.source.index];
-
-                return (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    className="flex items-center justify-between py-2 text-sm"
-                  >
-                    <div className="flex space-x-2 items-center">
-                      <Icon element={MdClose} size={20} />
-
-                      <p>{t(column)}</p>
-                    </div>
-
-                    <div {...provided.dragHandleProps}>
-                      <Icon element={MdDragHandle} size={23} />
-                    </div>
-                  </div>
-                );
-              }}
+          <div className="flex flex-col">
+            <SelectField
+              className="shadow-sm"
+              label={t('add_column')}
+              onValueChange={handleSelectChange}
+              value=""
+              withBlank
+              customSelector
+              cypressRef="columSelector"
             >
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {currentColumns.map((column, index) => (
-                    <Draggable
-                      key={index}
-                      draggableId={`item-${index}`}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          className="flex items-center justify-between py-2"
-                        >
-                          <div className="flex space-x-2 items-center">
-                            <Icon
-                              className="cursor-pointer"
-                              element={MdClose}
-                              size={20}
-                              onClick={() => handleDelete(column)}
-                            />
+              {filteredColumns
+                .sort((a, b) => t(a).localeCompare(t(b)))
+                .map((column, index) => (
+                  <option key={index} value={column}>
+                    {t(column)}
+                  </option>
+                ))}
+            </SelectField>
 
-                            <p>{t(column)}</p>
-                          </div>
+            <InputLabel className="mt-4">{t('order_columns')}</InputLabel>
 
+            <div className="mt-3">
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable
+                  droppableId="columns"
+                  renderClone={(provided, _, rubric) => {
+                    const column = currentColumns[rubric.source.index];
+
+                    return (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="flex items-center justify-between py-[0.4rem] text-sm"
+                      >
+                        <div className="flex space-x-2 items-center">
                           <div {...provided.dragHandleProps}>
-                            <Icon element={MdDragHandle} size={23} />
+                            <GridDotsVertical
+                              size="1.2rem"
+                              color={colors.$17}
+                            />
                           </div>
+
+                          <p style={{ color: colors.$3 }}>{t(column)}</p>
                         </div>
-                      )}
-                    </Draggable>
-                  ))}
 
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+                        <CircleXMark
+                          color={colors.$3}
+                          borderColor={colors.$17}
+                          size="1.6rem"
+                        />
+                      </div>
+                    );
+                  }}
+                >
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {currentColumns.map((column, index) => (
+                        <Draggable
+                          key={index}
+                          draggableId={`item-${index}`}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className="flex items-center justify-between py-[0.4rem]"
+                            >
+                              <div className="flex space-x-2 items-center">
+                                <div {...provided.dragHandleProps}>
+                                  <GridDotsVertical
+                                    size="1.2rem"
+                                    color={colors.$17}
+                                  />
+                                </div>
 
-          <div className="flex lg:flex-row lg:justify-end">
-            <Inline>
-              <Button type="secondary" className="mx-2" onClick={handleReset}>
-                {t('reset')}
-              </Button>
+                                <p style={{ color: colors.$3 }}>{t(column)}</p>
+                              </div>
 
-              <Button onClick={onSave}>{t('save')}</Button>
-            </Inline>
+                              <div
+                                className="cursor-pointer"
+                                onClick={() => handleDelete(column)}
+                              >
+                                <CircleXMark
+                                  color={colors.$3}
+                                  borderColor={colors.$17}
+                                  size="1.6rem"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </div>
+
+            <div className="flex mt-4 lg:flex-row lg:justify-end">
+              <Inline>
+                <Button type="secondary" className="mx-2" onClick={handleReset}>
+                  {t('reset')}
+                </Button>
+
+                <Button onClick={onSave}>{t('save')}</Button>
+              </Inline>
+            </div>
           </div>
         </Modal>,
         document.body
