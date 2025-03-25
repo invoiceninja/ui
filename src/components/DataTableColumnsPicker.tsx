@@ -195,8 +195,10 @@ export function DataTableColumnsPicker(props: Props) {
                         </div>
 
                         <CircleXMark
-                          color={colors.$3}
-                          borderColor={colors.$17}
+                          color={colors.$16}
+                          hoverColor={colors.$3}
+                          borderColor={colors.$5}
+                          hoverBorderColor={colors.$17}
                           size="1.6rem"
                         />
                       </div>
@@ -233,8 +235,10 @@ export function DataTableColumnsPicker(props: Props) {
                                 onClick={() => handleDelete(column)}
                               >
                                 <CircleXMark
-                                  color={colors.$3}
-                                  borderColor={colors.$17}
+                                  color={colors.$16}
+                                  hoverColor={colors.$3}
+                                  borderColor={colors.$5}
+                                  hoverBorderColor={colors.$17}
                                   size="1.6rem"
                                 />
                               </div>

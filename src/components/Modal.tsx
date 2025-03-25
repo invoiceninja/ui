@@ -163,7 +163,7 @@ export function Modal(props: Props) {
                         onClick={() => props.onClose(false)}
                         data-cy={props.closeButtonCypressRef}
                       >
-                        <XMark color={colors.$3} size="1.1rem" />
+                        <XMark color={colors.$3} size="1rem" />
                       </div>
                     )}
                   </div>
