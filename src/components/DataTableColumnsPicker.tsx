@@ -40,7 +40,6 @@ import { createPortal } from 'react-dom';
 import { TableColumns } from './icons/TableColumns';
 import { useColorScheme } from '$app/common/colors';
 import { GridDotsVertical } from './icons/GridDotsVertical';
-import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from './icons/CircleXMark';
 
 interface Props {
