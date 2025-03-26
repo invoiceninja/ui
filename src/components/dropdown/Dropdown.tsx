@@ -51,6 +51,7 @@ export function Dropdown(props: Props) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const [children, setChildren] = useState<ReactNode>();
@@ -76,8 +77,6 @@ export function Dropdown(props: Props) {
   useEffect(() => {
     setChildren(Children.toArray(props.children));
   }, [props.children]);
-
-  const colors = useColorScheme();
 
   return (
     <div ref={ref}>

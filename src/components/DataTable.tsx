@@ -60,6 +60,8 @@ import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { CircleDots } from './icons/CircleDots';
+import { useColorScheme } from '$app/common/colors';
 
 export interface DateRangeColumn {
   column: string;
@@ -168,10 +170,10 @@ export type PerPage = '10' | '50' | '100';
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const options = useDataTableOptions();
-
   const reactSettings = useReactSettings();
-
   const themeColors = useThemeColorScheme();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
@@ -681,7 +683,9 @@ export function DataTable<T extends object>(props: Props<T>) {
               )
           )}
 
-          {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
+          {props.withResourcefulActions && !hideEditableOptions && (
+            <Th>{t('action')}</Th>
+          )}
         </Thead>
 
         <Tbody style={styleOptions?.tBodyStyle}>
@@ -797,7 +801,21 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                 {props.withResourcefulActions && !hideEditableOptions && (
                   <Td>
-                    <Dropdown label={t('actions')}>
+                    <Dropdown
+                      label={t('actions')}
+                      customLabel={
+                        <div className="py-2 cursor-pointer">
+                          <CircleDots
+                            color={colors.$3}
+                            circleColor={colors.$1}
+                            hoverColor={colors.$3}
+                            hoverCircleColor={colors.$15}
+                            borderColor={colors.$15}
+                            size="1.75rem"
+                          />
+                        </div>
+                      }
+                    >
                       {props.linkToEdit &&
                         (props.showEdit?.(resource) || !props.showEdit) && (
                           <DropdownElement
