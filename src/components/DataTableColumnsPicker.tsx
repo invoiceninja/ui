@@ -256,7 +256,7 @@ export function DataTableColumnsPicker(props: Props) {
 
             <div className="flex mt-4 lg:flex-row lg:justify-end">
               <Inline>
-                <Button type="secondary" className="mx-2" onClick={handleReset}>
+                <Button type="secondary" onClick={handleReset}>
                   {t('reset')}
                 </Button>
 
