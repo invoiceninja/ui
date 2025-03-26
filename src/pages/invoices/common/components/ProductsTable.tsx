@@ -140,7 +140,10 @@ export function ProductsTable(props: Props) {
                               })}
                             >
                               {columnIndex === 0 ? (
-                                <button {...provided.dragHandleProps}>
+                                <button
+                                  {...provided.dragHandleProps}
+                                  onMouseEnter={(e) => e.currentTarget.focus()}
+                                >
                                   <AlignJustify size={18} />
                                 </button>
                               ) : null}
