@@ -30,7 +30,7 @@ export function Icon(props: Props) {
   if (isValidElement(iconElement)) {
     return cloneElement(iconElement, {
       fontSize: props.size || 20,
-      color: props.color || colors.$17,
+      color: props.color || accentColor,
       className: props.className,
       onClick: props.onClick,
       style: props.style,

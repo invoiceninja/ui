@@ -47,7 +47,8 @@ export const $1 = {
   $15: '#323236', // Light gray background
   $16: '#A1A1AA', // Dark gray icon
   $17: '#9D9DA8', // Placeholder text
-  $18: '#09090B13', // Dropdown element hover background color
+  $18: '#323236', // Dropdown element hover background color
+  $19: '#1f2e41', // Divider color
 };
 
 export const $2 = {
@@ -71,6 +72,7 @@ export const $2 = {
   $16: '#717179', // Dark gray icon
   $17: '#A1A1AA', // Placeholder text
   $18: '#09090B13', // Dropdown element hover background color
+  $19: '#09090B1A', // Divider color
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);
