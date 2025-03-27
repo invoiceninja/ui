@@ -71,9 +71,11 @@ const ResetButton = styled.button`
   border-color: ${(props) => props.theme.borderColor};
 `;
 
-const MultiValueContainer = () => null;
+function MultiValueContainer() {
+  return null;
+}
 
-const ValueContainer = (props: ValueContainerProps<SelectOption, true>) => {
+function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
   const colors = useColorScheme();
   const values = props.getValue();
   const label = props.selectProps.placeholder;
@@ -99,9 +101,9 @@ const ValueContainer = (props: ValueContainerProps<SelectOption, true>) => {
       </div>
     </components.ValueContainer>
   );
-};
+}
 
-const DropdownIndicator = () => {
+function DropdownIndicator() {
   const colors = useColorScheme();
 
   return (
@@ -114,9 +116,9 @@ const DropdownIndicator = () => {
       <ChevronDown color={colors.$3} size="1rem" />
     </div>
   );
-};
+}
 
-const Option = (props: OptionProps<SelectOption, true>) => {
+function Option(props: OptionProps<SelectOption, true>) {
   const { isSelected, label } = props;
 
   return (
@@ -128,9 +130,9 @@ const Option = (props: OptionProps<SelectOption, true>) => {
       </div>
     </components.Option>
   );
-};
+}
 
-const Control = (props: ControlProps<SelectOption, true>) => {
+function Control(props: ControlProps<SelectOption, true>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const colors = useColorScheme();
   const label = props.selectProps.placeholder;
@@ -178,7 +180,7 @@ const Control = (props: ControlProps<SelectOption, true>) => {
       </components.Control>
     </div>
   );
-};
+}
 
 function SelectWithApplyButton(props: any) {
   const {
@@ -221,7 +223,6 @@ function SelectWithApplyButton(props: any) {
               theme={{
                 textColor: colors.$3,
                 backgroundColor: '#09090B1A',
-                borderColor: colors.$5,
               }}
             >
               {t('reset')}
@@ -333,7 +334,7 @@ export function Actions(props: Props) {
       ...base,
       backgroundColor: colors.$1,
       borderColor: colors.$5,
-      borderRadius: '0.5rem',
+      borderRadius: '0.375rem',
       padding: '0 6px',
     }),
     valueContainer: (base) => ({
@@ -355,7 +356,7 @@ export function Actions(props: Props) {
     menu: (base) => ({
       ...base,
       backgroundColor: colors.$1,
-      border: `1px solid ${colors.$5}`,
+      border: `1px solid ${colors.$19}`,
       zIndex: 10,
       width: '16rem',
     }),
@@ -365,6 +366,7 @@ export function Actions(props: Props) {
       backgroundColor: colors.$1,
       padding: '8px 12px',
       cursor: 'pointer',
+      borderRadius: '0.1875rem',
       '&:hover': {
         backgroundColor: colors.$4,
       },
