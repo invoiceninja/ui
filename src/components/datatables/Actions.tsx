@@ -197,14 +197,7 @@ export function Actions(props: Props) {
           props.defaultOptions &&
           !props.withoutStatusFilter && (
             <Select
-              styles={{
-                multiValue: (styles, { data }) =>
-                  merge(styles, {
-                    backgroundColor: data.backgroundColor,
-                    color: data.color,
-                    borderRadius: '3px',
-                  }),
-              }}
+              styles={customStyles}
               defaultValue={props.defaultOptions}
               onChange={(options) => onStatusChange(options)}
               placeholder={t('status')}

@@ -67,7 +67,8 @@ export type Identifier =
   | 'aged_receivable_detailed_report'
   | 'aged_receivable_summary_report'
   | 'user_sales_report'
-  | 'tax_summary_report';
+  | 'tax_summary_report'
+  | 'project';
 
 export function useReports() {
   const reports: Report[] = [
@@ -570,6 +571,29 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/user_sales_report?output=json',
+      supports_previews: false,
+    },
+    {
+      identifier: 'project',
+      label: 'project',
+      schedule_identifier: 'project',
+      endpoint: '/api/v1/reports/projects',
+      allow_custom_column: false,
+      custom_columns: [],
+      payload: {
+        start_date: '',
+        end_date: '',
+        date_key: '',
+        date_range: 'all',
+        report_keys: [],
+        send_email: false,
+        is_expense_billed: false,
+        is_income_billed: false,
+        include_tax: false,
+        clients: '',
+        projects: '',
+      },
+      preview: '/api/v1/reports/project?output=json',
       supports_previews: false,
     },
   ];

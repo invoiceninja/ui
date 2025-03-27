@@ -12,7 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Dialog, Transition } from '@headlessui/react';
 import classNames from 'classnames';
 import { Fragment, useState, useEffect, ReactNode, RefObject } from 'react';
-import { X } from 'react-feather';
+import { XMark } from './icons/XMark';
 
 interface Props {
   visible: boolean;
@@ -106,12 +106,12 @@ export function Modal(props: Props) {
           >
             <div
               style={{
-                backgroundColor: colors.$2,
+                backgroundColor: colors.$1,
                 color: colors.$3,
                 colorScheme: colors.$0,
               }}
               className={classNames(
-                'inline-block align-bottom rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
+                'inline-block align-bottom rounded-md text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
                 {
                   'max-w-sm':
                     props.size === 'extraSmall' ||
@@ -122,7 +122,7 @@ export function Modal(props: Props) {
                   'bg-white': props.backgroundColor === 'white',
                   'bg-gray-50': props.backgroundColor === 'gray',
                   'overflow-hidden': !props.overflowVisible,
-                  'px-4 pt-5 pb-4 sm:p-6': !props.withoutPadding,
+                  'pt-5 pb-5': !props.withoutPadding,
                 }
               )}
               onClick={(event) =>
@@ -131,19 +131,25 @@ export function Modal(props: Props) {
             >
               {props.title && (
                 <div
-                  className="flex flex-col justify-between items-start"
+                  className={classNames(
+                    'flex flex-col justify-between items-start pb-5 border-b',
+                    {
+                      'px-5': !props.withoutPadding,
+                    }
+                  )}
                   style={{
-                    backgroundColor: colors.$2,
+                    backgroundColor: colors.$1,
                     color: colors.$3,
                     colorScheme: colors.$0,
+                    borderColor: colors.$5,
                   }}
                 >
                   <div className="flex w-full justify-between isolate">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg leading-6 font-medium"
+                      className="text-lg leading-6 font-semibold"
                       style={{
-                        backgroundColor: colors.$2,
+                        backgroundColor: colors.$1,
                         color: colors.$3,
                         colorScheme: colors.$0,
                       }}
@@ -152,20 +158,21 @@ export function Modal(props: Props) {
                     </Dialog.Title>
 
                     {!props.disableClosing && (
-                      <X
+                      <div
                         className="cursor-pointer"
                         onClick={() => props.onClose(false)}
-                        fontSize={22}
                         data-cy={props.closeButtonCypressRef}
-                      />
+                      >
+                        <XMark color={colors.$3} size="1rem" />
+                      </div>
                     )}
                   </div>
 
-                  <div className="mt-2">
-                    {props.text && (
+                  {props.text && (
+                    <div className="mt-2">
                       <p
                         style={{
-                          backgroundColor: colors.$2,
+                          backgroundColor: colors.$1,
                           color: colors.$3,
                           colorScheme: colors.$0,
                         }}
@@ -173,21 +180,22 @@ export function Modal(props: Props) {
                       >
                         {props.text}
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
 
               {props.children && (
                 <div
                   style={{
-                    backgroundColor: colors.$2,
+                    backgroundColor: colors.$1,
                     color: colors.$3,
                     colorScheme: colors.$0,
                   }}
                   className={classNames('text-sm flex flex-col space-y-4', {
                     'justify-center items-center': props.centerContent,
                     'mt-5 sm:mt-6': !props.disableClosing,
+                    'px-5': !props.withoutPadding,
                   })}
                 >
                   {props.children}
