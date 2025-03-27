@@ -19,7 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
@@ -32,15 +32,33 @@ import {
 } from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
-import { useRefetch } from './common/hooks/useRefetch';
+import { $refetch, useRefetch } from './common/hooks/useRefetch';
 import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 import { useSockets } from './common/hooks/useSockets';
-import { usePrivateSocketEvents } from './common/queries/sockets';
+import {
+  usePrivateSocketEvents,
+  useSocketEvent,
+} from './common/queries/sockets';
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
+
+interface RefreshEntityData {
+  entity: 'invoices' | 'recurring_invoices';
+  entity_id?: string;
+}
+
+export const refreshEntityDataBannerAtom = atom<{
+  refetchEntityId: string;
+  refetchEntity: 'invoices' | 'recurring_invoices';
+  visible: boolean;
+}>({
+  refetchEntityId: '',
+  refetchEntity: 'recurring_invoices',
+  visible: false,
+});
 
 export function App() {
   const [t] = useTranslation();
@@ -68,6 +86,7 @@ export function App() {
 
   const colorScheme = useAtomValue(colorSchemeAtom);
   const setIsPasswordRequired = useSetAtom(isPasswordRequiredAtom);
+  const setRefreshEntityDataBanner = useSetAtom(refreshEntityDataBannerAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
@@ -227,6 +246,23 @@ export function App() {
   }, [company?.company_key]);
 
   useSystemFonts();
+
+  useSocketEvent({
+    on: 'App\\Events\\Socket\\RefreshEntity',
+    callback: ({ data }) => {
+      const currentData = data as RefreshEntityData;
+
+      if (currentData.entity_id !== id) {
+        $refetch([currentData.entity]);
+      } else {
+        setRefreshEntityDataBanner({
+          visible: true,
+          refetchEntity: currentData.entity,
+          refetchEntityId: currentData.entity_id || '',
+        });
+      }
+    },
+  });
 
   return (
     <>
