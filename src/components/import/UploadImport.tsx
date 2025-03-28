@@ -32,6 +32,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
 import { Icon } from '../icons/Icon';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import Papa from 'papaparse';
 
 interface Props {
   entity: string;
@@ -47,6 +48,10 @@ export interface ImportMap extends Record<string, any> {
   import_type: string;
   skip_header: boolean;
   bank_integration_id?: string;
+}
+
+interface CSVRow {
+  [key: string]: string | number | boolean | null;
 }
 
 export function UploadImport(props: Props) {
@@ -283,11 +288,66 @@ export function UploadImport(props: Props) {
     });
   };
 
+  const validateCSVWithPapaParse = (file: File): Promise<boolean> => {
+    return new Promise((resolve) => {
+      Papa.parse<CSVRow>(file, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: true,
+        complete: (results: Papa.ParseResult<CSVRow>) => {
+          if (results.errors && results.errors.length > 0) {
+            toast.error('invalid_csv_file');
+            resolve(false);
+            return;
+          }
+
+          if (!results.data || results.data.length === 0) {
+            toast.error('invalid_csv_file');
+            resolve(false);
+            return;
+          }
+
+          const firstRowFields = Object.keys(results.data[0]).length;
+          const hasInconsistentRows = results.data.some((row: CSVRow) => {
+            const keysLength = Object.keys(row).length;
+
+            if (keysLength !== firstRowFields) {
+              return true;
+            }
+
+            return Object.values(row).every(
+              (val: string | number | boolean | null) =>
+                val === null || val === ''
+            );
+          });
+
+          if (hasInconsistentRows) {
+            toast.error('invalid_csv_file');
+            resolve(false);
+            return;
+          }
+
+          resolve(true);
+        },
+        error: () => {
+          toast.error('invalid_csv_file');
+          resolve(false);
+        },
+      });
+    });
+  };
+
   const shouldUploadFiles = async (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
       const hasCorrectRowsLength = await checkRowsLengthInCSV(files[i]);
 
       if (!hasCorrectRowsLength) {
+        return false;
+      }
+
+      const isValidCSV = await validateCSVWithPapaParse(files[i]);
+
+      if (!isValidCSV) {
         return false;
       }
     }
