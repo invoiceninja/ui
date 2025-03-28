@@ -58,7 +58,7 @@ export function DropdownElement(props: Props) {
         <StyledLink
           theme={{
             color: colors.$3,
-            hoverColor: colors.$18,
+            hoverColor: colors.$20,
           }}
           to={props.to}
           className={classNames(
@@ -94,7 +94,7 @@ export function DropdownElement(props: Props) {
       <Button
         theme={{
           color: colors.$3,
-          hoverColor: colors.$18,
+          hoverColor: colors.$20,
         }}
         type="button"
         onClick={(event) =>
