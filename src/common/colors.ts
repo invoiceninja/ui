@@ -49,6 +49,7 @@ export const $1 = {
   $17: '#9D9DA8', // Placeholder text
   $18: '#FFFFFF', // Button background color
   $19: '#323236', // Light border color
+  $20: '#a1a1aa', // Label color
 };
 
 export const $2 = {
@@ -73,6 +74,7 @@ export const $2 = {
   $17: '#A1A1AA', // Placeholder text
   $18: '#27272A', // Button background color
   $19: '#09090B12', // Light border color
+  $20: '#717179', // Label color
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);

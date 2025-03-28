@@ -594,7 +594,7 @@ export function ComboboxStatic<T = any>({
         {inputOptions.label && (
           <HeadlessCombobox.Label
             className="text-sm font-medium block"
-            style={{ color: colors.$3 }}
+            style={{ color: colors.$20 }}
           >
             {inputOptions.label}
           </HeadlessCombobox.Label>
@@ -602,13 +602,13 @@ export function ComboboxStatic<T = any>({
 
         <div className="relative mt-1">
           <div
-            className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm"
+            className="relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm shadow-sm"
             style={{ borderColor: colors.$5 }}
           >
             <HeadlessCombobox.Input
               data-testid="combobox-input-field"
               ref={comboboxInputRef}
-              className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+              className="w-full rounded-md py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
                 entryOptions.inputLabelFn?.(entry?.resource) ??

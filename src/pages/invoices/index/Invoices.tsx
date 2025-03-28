@@ -46,6 +46,7 @@ import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterCol
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { InputLabel } from '$app/components/forms';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -155,7 +156,13 @@ export default function Invoices() {
         entities={changeTemplateResources as Invoice[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+        labelFn={(invoice) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{invoice.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/invoices/bulk"
       />
     </Default>

@@ -38,6 +38,7 @@ import { useActions } from './common/hooks/useActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useTabs } from './common/hooks/useTabs';
+import { InputLabel } from '$app/components/forms';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -176,7 +177,13 @@ export default function Client() {
             entities={changeTemplateResources as ClientType[]}
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
-            labelFn={(client) => `${t('number')}: ${client.number}`}
+            labelFn={(client) => (
+              <div className="flex flex-col space-y-1">
+                <InputLabel>{t('number')}</InputLabel>
+
+                <span>{client.number}</span>
+              </div>
+            )}
             bulkUrl="/api/v1/clients/bulk"
           />
         </div>

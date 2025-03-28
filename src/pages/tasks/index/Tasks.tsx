@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
+import { InputLabel, Link } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
@@ -146,7 +146,13 @@ export default function Tasks() {
         entities={changeTemplateResources as Task[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(task) => `${t('number')}: ${task.number}`}
+        labelFn={(task) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{task.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/tasks/bulk"
       />
     </Default>

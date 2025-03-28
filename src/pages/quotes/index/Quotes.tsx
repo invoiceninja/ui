@@ -46,6 +46,7 @@ import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import { InputLabel } from '$app/components/forms';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -145,7 +146,13 @@ export default function Quotes() {
         entities={changeTemplateResources as Quote[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        labelFn={(quote) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{quote.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/quotes/bulk"
       />
     </Default>

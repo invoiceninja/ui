@@ -45,6 +45,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Guard } from '$app/common/guards/Guard';
 import { ImportButton } from '$app/components/import/ImportButton';
+import { InputLabel } from '$app/components/forms';
 
 export default function Payments() {
   useTitle('payments');
@@ -147,7 +148,13 @@ export default function Payments() {
         entities={changeTemplateResources as Payment[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(payment) => `${t('number')}: ${payment.number}`}
+        labelFn={(payment) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{payment.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/payments/bulk"
       />
     </Default>
