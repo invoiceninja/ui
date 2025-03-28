@@ -65,20 +65,21 @@ export default function Clients() {
         bottomActionsKeys={['purge']}
         customBulkActions={customBulkActions}
         rightSide={
-          <Guard
-            type="component"
-            guards={[
-              or(permission('create_client'), permission('edit_client')),
-            ]}
-            component={<ImportButton route="/clients/import" />}
-          />
-        }
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            table="client"
-            columns={clientColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              table="client"
+              columns={clientColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(permission('create_client'), permission('edit_client')),
+              ]}
+              component={<ImportButton route="/clients/import" />}
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_client')]}
         hideEditableOptions={!hasPermission('edit_client')}

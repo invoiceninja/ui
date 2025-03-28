@@ -129,7 +129,6 @@ interface Props<T> extends CommonProps {
   withoutPagination?: boolean;
   rightSide?: ReactNode;
   withoutPadding?: boolean;
-  leftSideChevrons?: ReactNode;
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
@@ -504,8 +503,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                   type="component"
                   guards={props.linkToCreateGuards || []}
                   component={
-                    <Button to={props.linkToCreate}>
-                      <span>{t(`new_${props.resource}`)}</span>
+                    <Button to={props.linkToCreate} className="shadow-sm">
+                      {t(`new_${props.resource}`)}
                     </Button>
                   }
                 />
@@ -515,7 +514,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           beforeFilter={props.beforeFilter}
           withoutStatusFilter={props.withoutStatusFilter}
         >
-          {!hideEditableOptions && (
+          {Boolean(!hideEditableOptions && selectedResources.length) && (
             <Dropdown
               label={t('actions')}
               disabled={!selected.length}
@@ -620,6 +619,10 @@ export function DataTable<T extends object>(props: Props<T>) {
             >
               <Checkbox
                 innerRef={mainCheckbox}
+                checked={
+                  selected.length === data?.data.data.length &&
+                  data?.data.data.length > 0
+                }
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   Array.from(
                     document.querySelectorAll('.child-checkbox')
@@ -924,7 +927,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           onRowsChange={setPerPage}
           totalPages={data.data.meta.pagination.total_pages}
           totalRecords={data.data.meta.pagination.total}
-          leftSideChevrons={props.leftSideChevrons}
         />
       )}
     </div>

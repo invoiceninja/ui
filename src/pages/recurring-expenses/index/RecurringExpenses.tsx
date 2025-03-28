@@ -57,7 +57,7 @@ export default function RecurringExpenses() {
         customActions={actions}
         customBulkActions={customBulkActions}
         withResourcefulActions
-        leftSideChevrons={
+        rightSide={
           <DataTableColumnsPicker
             columns={recurringExpenseColumns as unknown as string[]}
             defaultColumns={defaultColumns}
