@@ -60,7 +60,6 @@ import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { CircleDots } from './icons/CircleDots';
 import { useColorScheme } from '$app/common/colors';
 
 export interface DateRangeColumn {
@@ -686,9 +685,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               )
           )}
 
-          {props.withResourcefulActions && !hideEditableOptions && (
-            <Th>{t('action')}</Th>
-          )}
+          {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
         </Thead>
 
         <Tbody style={styleOptions?.tBodyStyle}>
@@ -804,21 +801,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                 {props.withResourcefulActions && !hideEditableOptions && (
                   <Td>
-                    <Dropdown
-                      label={t('actions')}
-                      customLabel={
-                        <div className="py-2 cursor-pointer">
-                          <CircleDots
-                            color={colors.$3}
-                            circleColor={colors.$1}
-                            hoverColor={colors.$3}
-                            hoverCircleColor={colors.$15}
-                            borderColor={colors.$15}
-                            size="1.75rem"
-                          />
-                        </div>
-                      }
-                    >
+                    <Dropdown label={t('actions')}>
                       {props.linkToEdit &&
                         (props.showEdit?.(resource) || !props.showEdit) && (
                           <DropdownElement
