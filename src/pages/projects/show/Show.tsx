@@ -244,7 +244,7 @@ export default function Show() {
             customBulkActions={customBulkActions}
             customFilterPlaceholder="status"
             withResourcefulActions
-            leftSideChevrons={
+            rightSide={
               <DataTableColumnsPicker
                 columns={taskColumns as unknown as string[]}
                 defaultColumns={defaultColumns}

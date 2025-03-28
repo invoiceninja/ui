@@ -69,7 +69,7 @@ export default function PurchaseOrders() {
         customFilters={filters}
         customFilterPlaceholder="status"
         withResourcefulActions
-        leftSideChevrons={
+        rightSide={
           <DataTableColumnsPicker
             columns={purchaseOrderColumns as unknown as string[]}
             defaultColumns={defaultColumns}

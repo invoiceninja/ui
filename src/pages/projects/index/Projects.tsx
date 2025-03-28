@@ -62,7 +62,7 @@ export default function Projects() {
         linkToCreate="/projects/create"
         linkToEdit="/projects/:id/edit"
         withResourcefulActions
-        leftSideChevrons={
+        rightSide={
           <DataTableColumnsPicker
             columns={projectColumns as unknown as string[]}
             defaultColumns={defaultColumns}

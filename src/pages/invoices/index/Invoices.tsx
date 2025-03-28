@@ -44,7 +44,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import classNames from 'classnames';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -116,20 +115,7 @@ export default function Invoices() {
         customFilters={filters}
         customFilterPlaceholder="status"
         rightSide={
-          <Guard
-            type="component"
-            component={<ImportButton route="/invoices/import" />}
-            guards={[
-              or(permission('create_invoice'), permission('edit_invoice')),
-            ]}
-          />
-        }
-        leftSideChevrons={
-          <div
-            className={classNames('flex items-center space-x-1', {
-              'pr-4': Boolean(reactSettings.show_table_footer),
-            })}
-          >
+          <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (
               <DataTableFooterColumnsPicker
                 table="invoice"
@@ -141,6 +127,14 @@ export default function Invoices() {
               table="invoice"
               columns={invoiceColumns as unknown as string[]}
               defaultColumns={defaultColumns}
+            />
+
+            <Guard
+              type="component"
+              component={<ImportButton route="/invoices/import" />}
+              guards={[
+                or(permission('create_invoice'), permission('edit_invoice')),
+              ]}
             />
           </div>
         }

@@ -45,7 +45,6 @@ import { Quote } from '$app/common/interfaces/quote';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import classNames from 'classnames';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 
 export default function Quotes() {
@@ -106,33 +105,26 @@ export default function Quotes() {
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={
-          <Guard
-            type="component"
-            guards={[or(permission('create_quote'), permission('edit_quote'))]}
-            component={<ImportButton route="/quotes/import" />}
-          />
-        }
-        leftSideChevrons={
-          <div
-            className={classNames('flex items-center space-x-1', {
-              'pr-4': Boolean(reactSettings.show_table_footer),
-            })}
-          >
+          <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (
-              <>
-                <DataTableFooterColumnsPicker
-                  table="quote"
-                  columns={allFooterColumns}
-                />
-
-                <span>|</span>
-              </>
+              <DataTableFooterColumnsPicker
+                table="quote"
+                columns={allFooterColumns}
+              />
             )}
 
             <DataTableColumnsPicker
               columns={quoteColumns as unknown as string[]}
               defaultColumns={defaultColumns}
               table="quote"
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(permission('create_quote'), permission('edit_quote')),
+              ]}
+              component={<ImportButton route="/quotes/import" />}
             />
           </div>
         }

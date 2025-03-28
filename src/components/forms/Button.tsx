@@ -43,8 +43,12 @@ const StyledLink = styled(Link)`
 
 const StyledButton = styled.button`
   color: ${(props) => props.theme.color} !important;
-  background-color: ${(props) => props.theme.backgroundColor} !important;
   border-color: ${(props) => props.theme.borderColor} !important;
+  background-color: ${(props) => props.theme.backgroundColor} !important;
+
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor} !important;
+  }
 `;
 
 export function Button(props: Props) {
@@ -69,12 +73,13 @@ export function Button(props: Props) {
       <StyledLink
         to={props.to}
         theme={{
-          backgroundColor: props.type === 'primary' ? accentColor : colors.$1,
-          color: props.type === 'primary' ? colors.$9 : colors.$3,
+          backgroundColor: props.type === 'primary' ? colors.$18 : colors.$1,
+          color: props.type === 'primary' ? colors.$1 : colors.$3,
           borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
+          hoverColor: props.type === 'primary' ? colors.$18 : colors.$4,
         }}
         className={classNames(
-          `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
+          `border inline-flex items-center space-x-2 px-4 justify-center rounded-md text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
           {
             'py-2 px-4': props.type !== 'minimal',
             'w-full': props.variant === 'block',
@@ -93,12 +98,13 @@ export function Button(props: Props) {
       type={props.behavior}
       disabled={props.disabled}
       theme={{
-        backgroundColor: props.type === 'primary' ? accentColor : colors.$1,
-        color: props.type === 'primary' ? colors.$9 : colors.$3,
+        backgroundColor: props.type === 'primary' ? colors.$18 : colors.$1,
+        color: props.type === 'primary' ? colors.$1 : colors.$3,
         borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
+        hoverColor: props.type === 'primary' ? colors.$18 : colors.$4,
       }}
       className={classNames(
-        `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
+        `border inline-flex items-center space-x-2 px-4 justify-center rounded-md text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
         {
           'py-2 px-4': props.type !== 'minimal',
           'w-full': props.variant === 'block',

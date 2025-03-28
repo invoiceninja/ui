@@ -78,7 +78,7 @@ export default function Documents() {
         customBulkActions={customBulkActions}
         customFilterPlaceholder="type"
         withResourcefulActions
-        leftSideChevrons={
+        rightSide={
           <DataTableColumnsPicker
             table="clientDocument"
             columns={documentColumns as unknown as string[]}

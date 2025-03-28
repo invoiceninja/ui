@@ -37,8 +37,9 @@ import {
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { createPortal } from 'react-dom';
-import { GridDotsVertical } from './icons/GridDotsVertical';
+import { TableColumns } from './icons/TableColumns';
 import { useColorScheme } from '$app/common/colors';
+import { GridDotsVertical } from './icons/GridDotsVertical';
 import { CircleXMark } from './icons/CircleXMark';
 
 interface Props {
@@ -268,11 +269,17 @@ export function DataTableColumnsPicker(props: Props) {
         document.body
       )}
 
-      <div className="mr-2">
-        <Button type="secondary" onClick={() => setIsModalVisible(true)}>
-          {t('columns')}
-        </Button>
-      </div>
+      <Button
+        className="shadow-sm"
+        type="secondary"
+        onClick={() => setIsModalVisible(true)}
+      >
+        <div className="flex items-center space-x-2">
+          <TableColumns size="1.3rem" color={colors.$3} />
+
+          <span className="hidden 2xl:flex">{t('columns')}</span>
+        </div>
+      </Button>
     </>
   );
 }
