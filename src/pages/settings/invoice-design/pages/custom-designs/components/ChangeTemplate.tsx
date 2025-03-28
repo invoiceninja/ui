@@ -177,7 +177,7 @@ export function ChangeTemplateModal<T = any>({
         ))}
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center pb-1">
         <Checkbox
           checked={sendEmail}
           onValueChange={(_, value) => setSendEmail(Boolean(value))}
