@@ -7,7 +7,7 @@
     "@emotion/styled": "^11.14.0",
     "@headlessui/react": "^1.7.19",
     "@headlessui/tailwindcss": "^0.2.2",
-    "@hello-pangea/dnd": "^16.6.0",
+    "@hello-pangea/dnd": "^18.0.0",
     "@monaco-editor/react": "^4.7.0",
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^1.9.7",
