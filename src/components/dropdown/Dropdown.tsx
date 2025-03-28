@@ -90,7 +90,7 @@ export function Dropdown(props: Props) {
             className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal ${props.className}`}
             style={{
               backgroundColor: colors.$1,
-              borderColor: colors.$5,
+              borderColor: colors.$19,
               minWidth: props.minWidth ?? '12rem',
               maxWidth: props.maxWidth ?? '14.7rem',
             }}

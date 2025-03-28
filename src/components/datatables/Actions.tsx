@@ -359,6 +359,7 @@ export function Actions(props: Props) {
       border: `1px solid ${colors.$19}`,
       zIndex: 10,
       width: '16rem',
+      boxShadow: 'none',
     }),
     option: (base) => ({
       ...base,
