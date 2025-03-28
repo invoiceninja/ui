@@ -327,7 +327,7 @@ export function Combobox<T = any>({
 
       <div className="relative mt-1">
         <div
-          className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm"
+          className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm shadow-sm"
           style={{ borderColor: colors.$5 }}
         >
           <input
