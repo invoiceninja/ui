@@ -95,6 +95,13 @@ export default function PurchaseOrders() {
             <span>{purchase_order.number}</span>
           </div>
         )}
+        bulkLabelFn={(purchase_order) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{purchase_order.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/purchase_orders/bulk"
       />
     </Default>

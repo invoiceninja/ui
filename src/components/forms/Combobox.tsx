@@ -346,12 +346,12 @@ export function Combobox<T = any>({
             defaultValue={
               selectedOption ? selectedOption.label : inputValue?.toString()
             }
-            className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+            className="w-full rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
             ref={inputRef}
             style={{
               backgroundColor: colors.$1,
-              borderColor: colors.$5,
               color: colors.$3,
+              border: 'none',
             }}
             data-cy="comboboxInput"
             tabIndex={-1}
@@ -608,7 +608,7 @@ export function ComboboxStatic<T = any>({
             <HeadlessCombobox.Input
               data-testid="combobox-input-field"
               ref={comboboxInputRef}
-              className="w-full rounded-md py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+              className="w-full rounded-md py-1.5 pl-3 pr-10 sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
                 entryOptions.inputLabelFn?.(entry?.resource) ??
@@ -618,8 +618,8 @@ export function ComboboxStatic<T = any>({
               placeholder={inputOptions.placeholder}
               style={{
                 backgroundColor: colors.$1,
-                borderColor: colors.$5,
                 color: colors.$3,
+                border: 'none',
               }}
             />
 

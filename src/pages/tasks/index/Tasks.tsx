@@ -153,6 +153,13 @@ export default function Tasks() {
             <span>{task.number}</span>
           </div>
         )}
+        bulkLabelFn={(task) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{task.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/tasks/bulk"
       />
     </Default>

@@ -101,6 +101,13 @@ export default function Credits() {
             <span>{credit.number}</span>
           </div>
         )}
+        bulkLabelFn={(credit) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{credit.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/credits/bulk"
       />
     </Default>

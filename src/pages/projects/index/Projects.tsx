@@ -87,6 +87,13 @@ export default function Projects() {
             <span>{project.number}</span>
           </div>
         )}
+        bulkLabelFn={(project) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{project.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/projects/bulk"
       />
     </Default>

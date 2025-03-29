@@ -58,6 +58,7 @@ interface Props<T = any> {
   bulkUrl: string;
   setVisible: (visible: boolean) => void;
   labelFn: (entity: T) => string | ReactNode;
+  bulkLabelFn?: (entity: T) => string | ReactNode;
 }
 
 export function ChangeTemplateModal<T = any>({
@@ -67,6 +68,7 @@ export function ChangeTemplateModal<T = any>({
   bulkUrl,
   setVisible,
   labelFn,
+  bulkLabelFn,
 }: Props<T>) {
   const [t] = useTranslation();
   const [templateId, setTemplateId] = useState<string | null>(null);
@@ -173,7 +175,11 @@ export function ChangeTemplateModal<T = any>({
 
       <div className="flex flex-col space-y-2">
         {entities.map((entity, i) => (
-          <div key={i}>{labelFn(entity)}</div>
+          <div key={i}>
+            {entities.length > 1 && bulkLabelFn
+              ? bulkLabelFn(entity)
+              : labelFn(entity)}
+          </div>
         ))}
       </div>
 

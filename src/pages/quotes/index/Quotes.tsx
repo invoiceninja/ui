@@ -153,6 +153,13 @@ export default function Quotes() {
             <span>{quote.number}</span>
           </div>
         )}
+        bulkLabelFn={(quote) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{quote.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/quotes/bulk"
       />
     </Default>

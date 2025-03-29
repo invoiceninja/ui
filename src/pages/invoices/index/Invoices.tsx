@@ -163,6 +163,13 @@ export default function Invoices() {
             <span>{invoice.number}</span>
           </div>
         )}
+        bulkLabelFn={(invoice) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{invoice.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/invoices/bulk"
       />
     </Default>

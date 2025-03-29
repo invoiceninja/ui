@@ -184,6 +184,13 @@ export default function Client() {
                 <span>{client.number}</span>
               </div>
             )}
+            bulkLabelFn={(client) => (
+              <div className="flex space-x-2">
+                <InputLabel>{t('number')}:</InputLabel>
+
+                <span>{client.number}</span>
+              </div>
+            )}
             bulkUrl="/api/v1/clients/bulk"
           />
         </div>

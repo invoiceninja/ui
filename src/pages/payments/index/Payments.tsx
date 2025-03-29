@@ -155,6 +155,13 @@ export default function Payments() {
             <span>{payment.number}</span>
           </div>
         )}
+        bulkLabelFn={(payment) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{payment.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/payments/bulk"
       />
     </Default>
