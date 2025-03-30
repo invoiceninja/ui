@@ -32,7 +32,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
 import { Icon } from '../icons/Icon';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import Papa from 'papaparse';
+import { parse as papaParse, ParseResult } from 'papaparse';
 
 interface Props {
   entity: string;
@@ -290,11 +290,11 @@ export function UploadImport(props: Props) {
 
   const validateCSVWithPapaParse = (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
-      Papa.parse<CSVRow>(file, {
+      papaParse<CSVRow>(file, {
         header: true,
         skipEmptyLines: true,
         dynamicTyping: true,
-        complete: (results: Papa.ParseResult<CSVRow>) => {
+        complete: (results: ParseResult<CSVRow>) => {
           if (results.errors && results.errors.length > 0) {
             resolve(false);
             return;
