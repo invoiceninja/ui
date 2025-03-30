@@ -296,33 +296,11 @@ export function UploadImport(props: Props) {
         dynamicTyping: true,
         complete: (results: Papa.ParseResult<CSVRow>) => {
           if (results.errors && results.errors.length > 0) {
-            toast.error('invalid_csv_file');
             resolve(false);
             return;
           }
 
           if (!results.data || results.data.length === 0) {
-            toast.error('invalid_csv_file');
-            resolve(false);
-            return;
-          }
-
-          const firstRowFields = Object.keys(results.data[0]).length;
-          const hasInconsistentRows = results.data.some((row: CSVRow) => {
-            const keysLength = Object.keys(row).length;
-
-            if (keysLength !== firstRowFields) {
-              return true;
-            }
-
-            return Object.values(row).every(
-              (val: string | number | boolean | null) =>
-                val === null || val === ''
-            );
-          });
-
-          if (hasInconsistentRows) {
-            toast.error('invalid_csv_file');
             resolve(false);
             return;
           }
@@ -330,7 +308,6 @@ export function UploadImport(props: Props) {
           resolve(true);
         },
         error: () => {
-          toast.error('invalid_csv_file');
           resolve(false);
         },
       });
@@ -344,7 +321,13 @@ export function UploadImport(props: Props) {
       if (!hasCorrectRowsLength) {
         return false;
       }
+    }
 
+    return true;
+  };
+
+  const areCSVsValid = async (files: File[]) => {
+    for (let i = 0; i < files.length; i++) {
       const isValidCSV = await validateCSVWithPapaParse(files[i]);
 
       if (!isValidCSV) {
@@ -358,6 +341,15 @@ export function UploadImport(props: Props) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: acceptableFileExtensions,
     onDrop: async (acceptedFiles) => {
+      if (acceptedFiles.every(({ type }) => type.includes('csv'))) {
+        const areCSVsFilesValid = await areCSVsValid(acceptedFiles);
+
+        if (!areCSVsFilesValid) {
+          toast.error('invalid_csv_data');
+          return;
+        }
+      }
+
       const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
 
       if (shouldAddFiles) {
