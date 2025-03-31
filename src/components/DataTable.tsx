@@ -60,6 +60,7 @@ import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useColorScheme } from '$app/common/colors';
 
 export interface DateRangeColumn {
   column: string;
@@ -167,10 +168,10 @@ export type PerPage = '10' | '50' | '100';
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const options = useDataTableOptions();
-
   const reactSettings = useReactSettings();
-
   const themeColors = useThemeColorScheme();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =

@@ -51,6 +51,7 @@ export function Dropdown(props: Props) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const [children, setChildren] = useState<ReactNode>();
@@ -77,8 +78,6 @@ export function Dropdown(props: Props) {
     setChildren(Children.toArray(props.children));
   }, [props.children]);
 
-  const colors = useColorScheme();
-
   return (
     <div ref={ref}>
       <Tippy
@@ -91,7 +90,7 @@ export function Dropdown(props: Props) {
             className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal ${props.className}`}
             style={{
               backgroundColor: colors.$1,
-              borderColor: colors.$4,
+              borderColor: colors.$19,
               minWidth: props.minWidth ?? '12rem',
               maxWidth: props.maxWidth ?? '14.7rem',
             }}
