@@ -10,7 +10,7 @@
     "@hello-pangea/dnd": "^16.6.0",
     "@monaco-editor/react": "^4.7.0",
     "@react-oauth/google": "^0.12.1",
-    "@reduxjs/toolkit": "^1.9.7",
+    "@reduxjs/toolkit": "^2.0.0",
     "@sentry/react": "^7.120.3",
     "@sentry/tracing": "^7.120.3",
     "@stripe/stripe-js": "^4.10.0",
