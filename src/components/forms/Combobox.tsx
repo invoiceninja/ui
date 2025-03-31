@@ -594,7 +594,7 @@ export function ComboboxStatic<T = any>({
         {inputOptions.label && (
           <HeadlessCombobox.Label
             className="text-sm font-medium block"
-            style={{ color: colors.$20 }}
+            style={{ color: colors.$22 }}
           >
             {inputOptions.label}
           </HeadlessCombobox.Label>

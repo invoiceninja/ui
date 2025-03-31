@@ -24,7 +24,7 @@ export function InputLabel(props: Props) {
     <label
       className={`text-sm font-medium block ${props.className}`}
       htmlFor={props.for}
-      style={{ color: colors.$20 }}
+      style={{ color: colors.$22 }}
     >
       {props.children}
     </label>
