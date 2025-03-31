@@ -12,8 +12,9 @@ import React, { useState, useCallback, ReactNode } from 'react';
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
-import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
 import { useResizeColumn } from '$app/common/hooks/useResizeColumn';
+import { ChevronDown } from '../icons/ChevronDown';
+import { ChevronUp } from '../icons/ChevronUp';
 
 export interface ColumnSortPayload {
   sort: string;
@@ -41,6 +42,8 @@ const defaultProps: Props = {
 export function Th$(props: Props) {
   props = { ...defaultProps, ...props };
 
+  const colors = useColorScheme();
+
   const {
     thRef,
     currentWidth,
@@ -61,8 +64,6 @@ export function Th$(props: Props) {
       });
     }
   }, [order, props.onColumnClick, props.id]);
-
-  const colors = useColorScheme();
 
   return (
     <th
@@ -120,23 +121,41 @@ export function Th$(props: Props) {
               ) : (
                 <>
                   {props.isCurrentlyUsed ? (
-                    <div className="flex flex-col items-center justify-center -space-y-4">
-                      <FaSortUp
-                        className={classNames({
-                          'opacity-30': order !== 'asc',
-                        })}
-                        size={16}
-                      />
+                    <div className="flex flex-col items-center justify-center -space-y-1">
+                      <div>
+                        <ChevronUp
+                          size="0.7rem"
+                          strokeWidth="3"
+                          color={order === 'asc' ? colors.$3 : colors.$17}
+                        />
+                      </div>
 
-                      <FaSortDown
-                        className={classNames({
-                          'opacity-30': order !== 'desc',
-                        })}
-                        size={16}
-                      />
+                      <div>
+                        <ChevronDown
+                          size="0.7rem"
+                          strokeWidth="3"
+                          color={order === 'desc' ? colors.$3 : colors.$17}
+                        />
+                      </div>
                     </div>
                   ) : (
-                    <FaSort size={16} className="opacity-30" />
+                    <div className="flex flex-col items-center justify-center -space-y-1">
+                      <div>
+                        <ChevronUp
+                          size="0.7rem"
+                          color={colors.$17}
+                          strokeWidth="3"
+                        />
+                      </div>
+
+                      <div>
+                        <ChevronDown
+                          size="0.7rem"
+                          color={colors.$17}
+                          strokeWidth="3"
+                        />
+                      </div>
+                    </div>
                   )}
                 </>
               )}

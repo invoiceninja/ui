@@ -8,21 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface Params {
-  size?: string;
+interface Props {
   color?: string;
-  withoutColor?: boolean;
+  size?: string;
   strokeWidth?: string;
 }
 
-export function ChevronDown(props: Params) {
-  const {
-    color = '#000',
-    size = '1.2rem',
-    withoutColor = false,
-    strokeWidth = '2',
-  } = props;
-
+export function ChevronUp({
+  color = '#000',
+  size = '1.2rem',
+  strokeWidth = '2',
+}: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -33,9 +29,9 @@ export function ChevronDown(props: Params) {
       viewBox="0 0 20 20"
     >
       <polyline
-        points="3.5 7.5 10 14 16.5 7.5"
+        points="16.5 12.5 10 6 3.5 12.5"
         fill="none"
-        {...(!withoutColor && { stroke: color })}
+        stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={strokeWidth}
