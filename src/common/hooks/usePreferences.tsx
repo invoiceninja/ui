@@ -144,7 +144,7 @@ export function usePreferences() {
               onClick={() => setIsVisible(true)}
               style={{
                 backgroundColor: colors.$1,
-                borderColor: colors.$5,
+                borderColor: colors.$20,
               }}
             >
               <Gear color={colors.$3} />

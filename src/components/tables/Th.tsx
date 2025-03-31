@@ -68,7 +68,7 @@ export function Th$(props: Props) {
     <th
       ref={thRef}
       style={{
-        color: props.textColor || colors.$9,
+        color: props.textColor || colors.$17,
         borderColor: colors.$4,
         width: currentWidth,
         ...props.style,
@@ -76,13 +76,12 @@ export function Th$(props: Props) {
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       className={classNames(
-        `px-2 lg:px-2.5 xl:px-4 text-left font-medium tracking-wider whitespace-nowrap ${props.className}`,
+        `px-2 lg:px-2.5 xl:px-4 text-left font-normal tracking-wider whitespace-nowrap ${props.className}`,
         {
           'border-r relative': props.resizable,
-          uppercase: !props.disableUppercase,
-          'py-2': !props.withoutVerticalPadding,
-          'text-xs': props.textSize === 'extraSmall' || !props.textSize,
-          'text-sm': props.textSize === 'small',
+          'py-2.5': !props.withoutVerticalPadding,
+          'text-xs': props.textSize === 'extraSmall',
+          'text-sm': props.textSize === 'small' || !props.textSize,
         }
       )}
       onMouseMove={handleMouseMove}

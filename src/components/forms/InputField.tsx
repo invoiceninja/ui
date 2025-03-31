@@ -81,7 +81,7 @@ export function InputField(props: Props) {
         <DebounceInput
           style={{
             backgroundColor: colors.$1,
-            borderColor: colors.$5,
+            borderColor: colors.$20,
             color: colors.$3,
             ...props.style,
           }}

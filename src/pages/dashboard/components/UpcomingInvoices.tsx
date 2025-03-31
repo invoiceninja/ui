@@ -99,8 +99,8 @@ export function UpcomingInvoices() {
       className="h-96 relative shadow-sm"
       headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
-      style={{ borderColor: colors.$5 }}
-      headerStyle={{ borderColor: colors.$5 }}
+      style={{ borderColor: colors.$20 }}
+      headerStyle={{ borderColor: colors.$20 }}
       withoutHeaderPadding
     >
       <div className="px-4 pt-4">
@@ -114,7 +114,6 @@ export function UpcomingInvoices() {
           withoutPadding
           withoutPerPageAsPreference
           styleOptions={{
-            addRowSeparator: true,
             withoutBottomBorder: true,
             withoutTopBorder: true,
             withoutLeftBorder: true,
@@ -129,9 +128,8 @@ export function UpcomingInvoices() {
             tBodyStyle: { border: 0 },
             thTextSize: 'small',
             thStyle: {
-              borderBottom: `1px solid ${colors.$5}`,
+              borderBottom: `1px solid ${colors.$20}`,
             },
-            rowSeparatorColor: colors.$5,
             ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
             descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
           }}

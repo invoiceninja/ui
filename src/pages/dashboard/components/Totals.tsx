@@ -295,7 +295,7 @@ export function Totals() {
 
             <div
               className="flex rounded-lg overflow-hidden border shadow-sm"
-              style={{ borderColor: colors.$5 }}
+              style={{ borderColor: colors.$20 }}
             >
               <ChartScaleBox
                 className="flex items-center px-4 cursor-pointer text-sm"
@@ -307,6 +307,7 @@ export function Totals() {
                   hoverBgColor: chartScale === 'day' ? colors.$3 : colors.$4,
                 }}
                 style={{
+                  borderColor: colors.$20,
                   color: chartScale === 'day' ? colors.$1 : colors.$3,
                 }}
               >
@@ -324,7 +325,7 @@ export function Totals() {
                   hoverBgColor: chartScale === 'week' ? colors.$3 : colors.$4,
                 }}
                 style={{
-                  borderColor: colors.$4,
+                  borderColor: colors.$20,
                   color: chartScale === 'week' ? colors.$1 : colors.$3,
                 }}
               >
@@ -342,7 +343,7 @@ export function Totals() {
                   hoverBgColor: chartScale === 'month' ? colors.$3 : colors.$4,
                 }}
                 style={{
-                  borderColor: colors.$4,
+                  borderColor: colors.$20,
                   color: chartScale === 'month' ? colors.$1 : colors.$3,
                 }}
               >
@@ -416,14 +417,14 @@ export function Totals() {
             className="col-span-10 xl:col-span-3 shadow-sm"
             headerClassName="px-3 sm:px-4 py-3 sm:py-4"
             withoutBodyPadding
-            style={{ borderColor: colors.$5 }}
-            headerStyle={{ borderColor: colors.$5 }}
+            style={{ borderColor: colors.$20 }}
+            headerStyle={{ borderColor: colors.$20 }}
             withoutHeaderPadding
           >
             <div className="flex flex-col px-4">
               <div
                 className="flex justify-between items-center border-b border-dashed py-5"
-                style={{ borderColor: colors.$5 }}
+                style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('invoices')}</span>
 
@@ -444,7 +445,7 @@ export function Totals() {
 
               <div
                 className="flex justify-between items-center border-b border-dashed py-5"
-                style={{ borderColor: colors.$5 }}
+                style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('payments')}</span>
 
@@ -465,7 +466,7 @@ export function Totals() {
 
               <div
                 className="flex justify-between items-center border-b border-dashed py-5"
-                style={{ borderColor: colors.$5 }}
+                style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('expenses')}</span>
 
@@ -486,7 +487,7 @@ export function Totals() {
 
               <div
                 className="flex justify-between items-center border-b border-dashed py-5"
-                style={{ borderColor: colors.$5 }}
+                style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('outstanding')}</span>
 
@@ -513,7 +514,7 @@ export function Totals() {
                 <Badge
                   variant="transparent"
                   className="border"
-                  style={{ borderColor: colors.$5 }}
+                  style={{ borderColor: colors.$20 }}
                 >
                   <span className="mx-2 text-base font-mono">
                     {totalsData[currency]?.outstanding?.outstanding_count || 0}
@@ -530,8 +531,8 @@ export function Totals() {
             className="col-span-10 xl:col-span-7 shadow-sm"
             headerClassName="px-3 sm:px-4 py-3 sm:py-4"
             childrenClassName="px-4"
-            style={{ borderColor: colors.$5 }}
-            headerStyle={{ borderColor: colors.$5 }}
+            style={{ borderColor: colors.$20 }}
+            headerStyle={{ borderColor: colors.$20 }}
             withoutHeaderPadding
           >
             <Chart

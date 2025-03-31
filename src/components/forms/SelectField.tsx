@@ -208,7 +208,7 @@ export function SelectField(props: SelectProps) {
                 style={{
                   height: '2.5rem',
                   backgroundColor: colors.$1,
-                  borderColor: isFocused ? '#2463eb' : colors.$5,
+                  borderColor: isFocused ? '#2463eb' : colors.$20,
                   ...controlStyle,
                 }}
                 {...innerProps}

@@ -23,10 +23,13 @@ interface Props extends CommonProps {
   isDataLoading?: boolean;
   resizable?: string;
   isReadyForHeightCalculation?: boolean;
+  withoutBorder?: boolean;
 }
 
 export function Table(props: Props) {
   const { onVerticalOverflowChange } = props;
+
+  const colors = useColorScheme();
 
   const [tableParentHeight, setTableParentHeight] = useState<number>();
   const [tableHeight, setTableHeight] = useState<number>();
@@ -87,8 +90,6 @@ export function Table(props: Props) {
     }
   }, [isVerticallyOverflow, props.isReadyForHeightCalculation]);
 
-  const colors = useColorScheme();
-
   return (
     <div
       className={classNames('flex flex-col', {
@@ -113,12 +114,12 @@ export function Table(props: Props) {
           style={{
             backgroundColor: colors.$1,
             color: colors.$3,
-            borderColor: colors.$4,
+            borderColor: colors.$20,
           }}
         >
           <div
             ref={handleTableParentHeight}
-            className={`overflow-auto min-w-full rounded ${props.className}`}
+            className={`overflow-auto min-w-full rounded-md shadow-sm ${props.className}`}
             style={{
               ...props.style,
               height: manualTableHeight,
