@@ -31,6 +31,7 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Client } from '$app/common/interfaces/client';
+import { InputLabel } from '$app/components/forms';
 
 export default function Clients() {
   useTitle('clients');
@@ -91,7 +92,20 @@ export default function Clients() {
         entities={changeTemplateResources as Client[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(client) => `${t('number')}: ${client.number}`}
+        labelFn={(client) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{client.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(client) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{client.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/clients/bulk"
       />
     </Default>

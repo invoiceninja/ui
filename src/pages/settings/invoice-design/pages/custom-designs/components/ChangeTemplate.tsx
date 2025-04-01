@@ -9,6 +9,7 @@
  */
 
 import { emitter } from '$app';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -20,10 +21,13 @@ import { Project } from '$app/common/interfaces/project';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Task } from '$app/common/interfaces/task';
 import { Modal } from '$app/components/Modal';
-import { Element } from '$app/components/cards';
-import { Button, SelectField, SelectProps } from '$app/components/forms';
+import {
+  Button,
+  Checkbox,
+  SelectField,
+  SelectProps,
+} from '$app/components/forms';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
-import Toggle from '$app/components/forms/Toggle';
 import collect from 'collect.js';
 import { atom, useAtom } from 'jotai';
 import { ReactNode, useRef, useState } from 'react';
@@ -54,6 +58,7 @@ interface Props<T = any> {
   bulkUrl: string;
   setVisible: (visible: boolean) => void;
   labelFn: (entity: T) => string | ReactNode;
+  bulkLabelFn?: (entity: T) => string | ReactNode;
 }
 
 export function ChangeTemplateModal<T = any>({
@@ -63,12 +68,14 @@ export function ChangeTemplateModal<T = any>({
   bulkUrl,
   setVisible,
   labelFn,
+  bulkLabelFn,
 }: Props<T>) {
   const [t] = useTranslation();
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [sendEmail, setSendEmail] = useState(false);
   const [pdfUrl, setPdfUrl] = useAtom(templatePdfUrlAtom);
 
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const submitBtn = useRef<HTMLButtonElement | null>(null);
@@ -152,37 +159,40 @@ export function ChangeTemplateModal<T = any>({
       title={t('load_template')}
       visible={visible}
       onClose={setVisible}
-      size="small"
+      size="extraSmall"
     >
-      <Element leftSide={t('design')} noExternalPadding>
-        <ComboboxAsync
-          endpoint={endpoint(
-            `/api/v1/designs?template=true&entities=${entity}`
-          )}
-          inputOptions={{
-            value: templateId ?? '',
-            label: '',
-          }}
-          entryOptions={{ id: 'id', label: 'name', value: 'id' }}
-          onChange={(entry) =>
-            entry.resource ? setTemplateId(entry.resource.id) : null
-          }
-        />
-      </Element>
-
-      <p className="capitalize">{t('entities')}:</p>
-
-      <ul>
-        {entities.map((entity, i) => (
-          <li key={i}>{labelFn(entity)}</li>
-        ))}
-      </ul>
-
-      <Toggle
-        label={t('send_email')}
-        checked={sendEmail}
-        onChange={setSendEmail}
+      <ComboboxAsync
+        endpoint={endpoint(`/api/v1/designs?template=true&entities=${entity}`)}
+        inputOptions={{
+          value: templateId ?? '',
+          label: t('design') as string,
+        }}
+        entryOptions={{ id: 'id', label: 'name', value: 'id' }}
+        onChange={(entry) =>
+          entry.resource ? setTemplateId(entry.resource.id) : null
+        }
       />
+
+      <div className="flex flex-col space-y-2">
+        {entities.map((entity, i) => (
+          <div key={i}>
+            {entities.length > 1 && bulkLabelFn
+              ? bulkLabelFn(entity)
+              : labelFn(entity)}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center pb-1">
+        <Checkbox
+          checked={sendEmail}
+          onValueChange={(_, value) => setSendEmail(Boolean(value))}
+        />
+
+        <span className="font-medium" style={{ color: colors.$3 }}>
+          {t('send_email')}
+        </span>
+      </div>
 
       <Button
         innerRef={submitBtn}
