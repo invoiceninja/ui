@@ -31,6 +31,7 @@ import { Credit } from '$app/common/interfaces/credit';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { InputLabel } from '$app/components/forms';
 
 export default function Credits() {
   useTitle('credits');
@@ -93,7 +94,20 @@ export default function Credits() {
         entities={changeTemplateResources as Credit[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(credit) => `${t('number')}: ${credit.number}`}
+        labelFn={(credit) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{credit.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(credit) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{credit.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/credits/bulk"
       />
     </Default>

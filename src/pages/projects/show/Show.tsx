@@ -18,7 +18,7 @@ import { Project } from '$app/common/interfaces/project';
 import { Page } from '$app/components/Breadcrumbs';
 import { InfoCard } from '$app/components/InfoCard';
 import { Spinner } from '$app/components/Spinner';
-import { Link } from '$app/components/forms';
+import { InputLabel, Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -262,7 +262,13 @@ export default function Show() {
         entities={changeTemplateResources as Project[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(project) => `${t('number')}: ${project.number}`}
+        labelFn={(project) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{project.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/projects/bulk"
       />
     </Default>

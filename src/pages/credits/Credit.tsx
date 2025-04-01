@@ -43,6 +43,7 @@ import {
 import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { InputLabel } from '$app/components/forms';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -172,7 +173,13 @@ export default function Credit() {
         entities={changeTemplateResources as ICredit[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(credit) => `${t('number')}: ${credit.number}`}
+        labelFn={(credit) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{credit.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/credits/bulk"
       />
     </Default>

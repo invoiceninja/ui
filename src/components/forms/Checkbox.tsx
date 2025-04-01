@@ -12,6 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import classNames from 'classnames';
+import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -84,13 +85,7 @@ export function Checkbox(props: Props) {
         />
       </div>
       <div className="ml-3 text-sm">
-        <label
-          htmlFor={props.id}
-          className="font-medium cursor-pointer"
-          style={{ color: colors.$3 }}
-        >
-          {props.label}
-        </label>
+        <InputLabel>{props.label}</InputLabel>
       </div>
     </div>
   );

@@ -51,6 +51,7 @@ export const $1 = {
   $19: '#323236', // Light border color
   $20: '#323236', // Dropdown element hover background color
   $21: '#1f2e41', // Divider color
+  $22: '#a1a1aa', // Label color
 };
 
 export const $2 = {
@@ -77,6 +78,7 @@ export const $2 = {
   $19: '#09090B12', // Light border color
   $20: '#09090B13', // Dropdown element hover background color
   $21: '#09090B1A', // Divider color
+  $22: '#717179', // Label color
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);

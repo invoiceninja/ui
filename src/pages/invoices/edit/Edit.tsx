@@ -44,6 +44,7 @@ import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
+import { InputLabel } from '$app/components/forms';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -262,7 +263,13 @@ export default function Edit() {
           entities={[invoice]}
           visible={changeTemplateVisible}
           setVisible={setChangeTemplateVisible}
-          labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+          labelFn={(invoice) => (
+            <div className="flex flex-col space-y-1">
+              <InputLabel>{t('number')}</InputLabel>
+
+              <span>{invoice.number}</span>
+            </div>
+          )}
           bulkUrl="/api/v1/invoices/bulk"
         />
       ) : null}

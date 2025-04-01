@@ -39,6 +39,7 @@ import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { purchaseOrderAtom } from './common/atoms';
+import { InputLabel } from '$app/components/forms';
 
 export default function PurchaseOrder() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -165,7 +166,13 @@ export default function PurchaseOrder() {
         entities={changeTemplateResources as PurchaseOrderType[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
+        labelFn={(purchase_order) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{purchase_order.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/purchase_orders/bulk"
       />
     </Default>
