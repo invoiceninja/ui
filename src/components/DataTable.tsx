@@ -742,6 +742,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                 backgroundColor={index % 2 === 0 ? colors.$7 : ''}
                 style={{
                   borderColor: colors.$20,
+                  backgroundColor: selected.includes(resource.id)
+                    ? colors.$7
+                    : 'transparent',
                 }}
               >
                 {!props.withoutActions && !hideEditableOptions && (
