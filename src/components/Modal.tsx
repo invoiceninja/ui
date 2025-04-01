@@ -17,7 +17,7 @@ import { XMark } from './icons/XMark';
 interface Props {
   visible: boolean;
   onClose: (status: boolean) => any;
-  title?: string | null;
+  title?: string | ReactNode | null;
   text?: string | null;
   children?: ReactNode;
   centerContent?: boolean;

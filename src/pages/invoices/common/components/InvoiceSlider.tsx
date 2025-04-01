@@ -502,7 +502,7 @@ export function InvoiceSlider() {
             <AddActivityComment
               entity="invoice"
               entityId={resource?.id}
-              label={`#${resource?.number}`}
+              label={resource?.number || ''}
             />
           </div>
 

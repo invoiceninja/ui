@@ -75,11 +75,11 @@ export function Button(props: Props) {
         theme={{
           backgroundColor: props.type === 'primary' ? colors.$18 : colors.$1,
           color: props.type === 'primary' ? colors.$1 : colors.$3,
-          borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
+          borderColor: props.type === 'primary' ? 'transparent' : colors.$20,
           hoverColor: props.type === 'primary' ? colors.$18 : colors.$4,
         }}
         className={classNames(
-          `border inline-flex items-center space-x-2 px-4 justify-center rounded-md text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
+          `border inline-flex items-center space-x-2 px-4 shadow-sm justify-center rounded-md text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
           {
             'py-2 px-4': props.type !== 'minimal',
             'w-full': props.variant === 'block',
@@ -100,11 +100,11 @@ export function Button(props: Props) {
       theme={{
         backgroundColor: props.type === 'primary' ? colors.$18 : colors.$1,
         color: props.type === 'primary' ? colors.$1 : colors.$3,
-        borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
+        borderColor: props.type === 'primary' ? 'transparent' : colors.$20,
         hoverColor: props.type === 'primary' ? colors.$18 : colors.$4,
       }}
       className={classNames(
-        `border inline-flex items-center space-x-2 px-4 justify-center rounded-md text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
+        `border inline-flex items-center space-x-2 px-4 shadow-sm justify-center rounded-md text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
         {
           'py-2 px-4': props.type !== 'minimal',
           'w-full': props.variant === 'block',
