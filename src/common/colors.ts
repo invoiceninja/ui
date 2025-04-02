@@ -46,12 +46,14 @@ export const $1 = {
   $14: '#121212', // Navigation bar background color
   $15: '#323236', // Light gray background
   $16: '#A1A1AA', // Dark gray icon
-  $17: '#9D9DA8', // Placeholder text
+  $17: '#9D9DA8', // Placeholder text, table header text color
   $18: '#FFFFFF', // Button background color
   $19: '#323236', // Light border color
   $20: '#323236', // Dropdown element hover background color
   $21: '#1f2e41', // Divider color
   $22: '#a1a1aa', // Label color
+  $23: '#121212', // Content background color
+  $24: '#323236', // Border color
 };
 
 export const $2 = {
@@ -73,12 +75,14 @@ export const $2 = {
   $14: '#27272A', // Navigation bar background color
   $15: '#E4E4E7', // Light gray background
   $16: '#717179', // Dark gray icon
-  $17: '#A1A1AA', // Placeholder text
+  $17: '#A1A1AA', // Placeholder text, table header text color
   $18: '#27272A', // Button background color
   $19: '#09090B12', // Light border color
   $20: '#09090B13', // Dropdown element hover background color
   $21: '#09090B1A', // Divider color
   $22: '#717179', // Label color
+  $23: '#F4F4F5', // Content background color
+  $24: '#09090B26', // Border color
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);

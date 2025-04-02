@@ -256,10 +256,15 @@ export function InvoiceSlider() {
       <TabGroup
         tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
         width="full"
+        withHorizontalPadding
       >
         <div className="space-y-2">
           <div>
-            <Element leftSide={t('invoice_amount')}>
+            <Element
+              leftSide={t('invoice_amount')}
+              pushContentToRight
+              withoutWrappingLeftSide
+            >
               {invoice
                 ? formatMoney(
                     invoice?.amount,
@@ -269,7 +274,11 @@ export function InvoiceSlider() {
                 : null}
             </Element>
 
-            <Element leftSide={t('balance_due')}>
+            <Element
+              leftSide={t('balance_due')}
+              pushContentToRight
+              withoutWrappingLeftSide
+            >
               {invoice
                 ? formatMoney(
                     invoice.balance,
@@ -279,15 +288,15 @@ export function InvoiceSlider() {
                 : null}
             </Element>
 
-            <Element leftSide={t('date')}>
+            <Element leftSide={t('date')} pushContentToRight>
               {invoice ? date(invoice?.date, dateFormat) : null}
             </Element>
 
-            <Element leftSide={t('due_date')}>
+            <Element leftSide={t('due_date')} pushContentToRight>
               {invoice ? date(invoice.due_date, dateFormat) : null}
             </Element>
 
-            <Element leftSide={t('status')}>
+            <Element leftSide={t('status')} pushContentToRight>
               {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
           </div>

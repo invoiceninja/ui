@@ -9,9 +9,9 @@
  */
 
 import classNames from 'classnames';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
+import styled from 'styled-components';
 
 interface Props {
   children: ReactElement[];
@@ -25,13 +25,22 @@ interface Props {
   onTabChange?: (index: number) => void;
   formatTabLabel?: (index: number) => ReactNode | undefined;
   withoutVerticalMargin?: boolean;
+  withHorizontalPadding?: boolean;
 }
+
+const StyledButton = styled.button`
+  border-color: ${({ theme }) => theme.borderColor};
+  color: ${({ theme }) => theme.textColor};
+
+  &:hover {
+    color: ${({ theme }) => theme.hoverTextColor};
+  }
+`;
 
 export function TabGroup(props: Props) {
   const colors = useColorScheme();
-  const accentColor = useAccentColor();
 
-  const { withoutVerticalMargin } = props;
+  const { withoutVerticalMargin, withHorizontalPadding = false } = props;
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
@@ -47,32 +56,43 @@ export function TabGroup(props: Props) {
 
   return (
     <div className={props.className} data-cy="tabs">
-      <div
-        className="-mb-px flex space-x-8 overflow-x-auto border-b"
-        style={{ borderColor: colors.$5 }}
-      >
+      <div className="-mb-px flex overflow-x-auto">
+        {withHorizontalPadding && (
+          <div
+            className="border-b"
+            style={{ borderColor: colors.$20, width: '7rem' }}
+          />
+        )}
+
         {props.tabs.map((tab, index) => (
           <div
             key={index}
             className={classNames({ 'w-full': props.width === 'full' })}
           >
-            <button
-              type="button"
-              onClick={() => handleTabChange(index)}
-              style={{
-                borderColor:
-                  currentIndex === index ? accentColor : 'transparent',
-                color: currentIndex === index ? accentColor : colors.$3,
-              }}
+            <StyledButton
               className={classNames(
                 'whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm',
                 { 'w-full': props.width === 'full' }
               )}
+              type="button"
+              onClick={() => handleTabChange(index)}
+              theme={{
+                borderColor: currentIndex === index ? colors.$3 : colors.$20,
+                textColor: currentIndex === index ? colors.$3 : colors.$17,
+                hoverTextColor: colors.$3,
+              }}
             >
               {props.formatTabLabel?.(index) || tab}
-            </button>
+            </StyledButton>
           </div>
         ))}
+
+        {withHorizontalPadding && (
+          <div
+            className="border-b"
+            style={{ borderColor: colors.$20, width: '7rem' }}
+          />
+        )}
       </div>
 
       <div
