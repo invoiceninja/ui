@@ -549,7 +549,7 @@ export function useActions(params: ActionsParams = {}) {
         })}
         entity="purchase_order"
         entityId={purchaseOrder.id}
-        label={`#${purchaseOrder.number}`}
+        label={purchaseOrder.number}
         labelElement={
           <EntityActionElement
             entity="purchase_order"

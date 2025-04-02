@@ -35,7 +35,7 @@ export function useActions() {
       <AddActivityComment
         entity="vendor"
         entityId={vendor.id}
-        label={`#${vendor.number}`}
+        label={vendor.number}
         labelElement={
           <DropdownElement icon={<Icon element={MdComment} />}>
             {t('add_comment')}

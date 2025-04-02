@@ -439,7 +439,7 @@ export function QuoteSlider() {
             <AddActivityComment
               entity="quote"
               entityId={resource?.id}
-              label={`#${resource?.number}`}
+              label={resource?.number || ''}
             />
           </div>
 

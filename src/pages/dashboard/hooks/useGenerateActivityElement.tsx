@@ -26,6 +26,7 @@ import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import dayjs from 'dayjs';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
@@ -266,6 +267,8 @@ interface Props {
 export function AddActivityComment(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   const { entity, entityId, label, labelElement } = props;
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -314,7 +317,19 @@ export function AddActivityComment(props: Props) {
 
       <Modal
         size="regular"
-        title={`${t('comment')} | ${t(entity)} | ${label}`}
+        title={
+          <div className="flex items-center space-x-2">
+            <span>{t('comment')}</span>
+
+            <div>
+              <ArrowRight color={colors.$17} />
+            </div>
+
+            <span>
+              {t(entity)} {label}
+            </span>
+          </div>
+        }
         visible={isModalOpen}
         onClose={handleOnClose}
       >
