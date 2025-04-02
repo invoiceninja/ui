@@ -15,6 +15,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useResizeColumn } from '$app/common/hooks/useResizeColumn';
 import { ChevronDown } from '../icons/ChevronDown';
 import { ChevronUp } from '../icons/ChevronUp';
+import styled from 'styled-components';
 
 export interface ColumnSortPayload {
   sort: string;
@@ -38,6 +39,14 @@ interface Props extends CommonProps {
 const defaultProps: Props = {
   isCurrentlyUsed: false,
 };
+
+const StyledSpan = styled.span`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function Th$(props: Props) {
   props = { ...defaultProps, ...props };
@@ -70,7 +79,7 @@ export function Th$(props: Props) {
       ref={thRef}
       style={{
         color: props.textColor || colors.$17,
-        borderColor: colors.$4,
+        borderColor: colors.$20,
         width: currentWidth,
         ...props.style,
       }}
@@ -167,14 +176,13 @@ export function Th$(props: Props) {
       </div>
 
       {props.resizable ? (
-        <span
-          className={classNames(
-            'column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:bg-white hover:transition duration-50',
-            {
-              'bg-white': isResizing,
-            }
-          )}
-        ></span>
+        <StyledSpan
+          className="column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:transition duration-50"
+          theme={{
+            backgroundColor: isResizing ? colors.$3 : 'transparent',
+            hoverBackgroundColor: colors.$3,
+          }}
+        ></StyledSpan>
       ) : null}
     </th>
   );

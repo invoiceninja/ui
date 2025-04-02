@@ -295,7 +295,7 @@ export function Totals() {
 
             <div
               className="flex rounded-lg overflow-hidden border shadow-sm"
-              style={{ borderColor: colors.$20 }}
+              style={{ borderColor: colors.$24 }}
             >
               <ChartScaleBox
                 className="flex items-center px-4 cursor-pointer text-sm"
@@ -307,7 +307,7 @@ export function Totals() {
                   hoverBgColor: chartScale === 'day' ? colors.$3 : colors.$4,
                 }}
                 style={{
-                  borderColor: colors.$20,
+                  borderColor: colors.$24,
                   color: chartScale === 'day' ? colors.$1 : colors.$3,
                 }}
               >
@@ -325,7 +325,7 @@ export function Totals() {
                   hoverBgColor: chartScale === 'week' ? colors.$3 : colors.$4,
                 }}
                 style={{
-                  borderColor: colors.$20,
+                  borderColor: colors.$24,
                   color: chartScale === 'week' ? colors.$1 : colors.$3,
                 }}
               >
@@ -343,7 +343,7 @@ export function Totals() {
                   hoverBgColor: chartScale === 'month' ? colors.$3 : colors.$4,
                 }}
                 style={{
-                  borderColor: colors.$20,
+                  borderColor: colors.$24,
                   color: chartScale === 'month' ? colors.$1 : colors.$3,
                 }}
               >
@@ -417,7 +417,7 @@ export function Totals() {
             className="col-span-10 xl:col-span-3 shadow-sm"
             headerClassName="px-3 sm:px-4 py-3 sm:py-4"
             withoutBodyPadding
-            style={{ borderColor: colors.$20 }}
+            style={{ borderColor: colors.$24 }}
             headerStyle={{ borderColor: colors.$20 }}
             withoutHeaderPadding
           >
@@ -514,7 +514,7 @@ export function Totals() {
                 <Badge
                   variant="transparent"
                   className="border"
-                  style={{ borderColor: colors.$20 }}
+                  style={{ borderColor: colors.$21 }}
                 >
                   <span className="mx-2 text-base font-mono">
                     {totalsData[currency]?.outstanding?.outstanding_count || 0}
@@ -531,7 +531,7 @@ export function Totals() {
             className="col-span-10 xl:col-span-7 shadow-sm"
             headerClassName="px-3 sm:px-4 py-3 sm:py-4"
             childrenClassName="px-4"
-            style={{ borderColor: colors.$20 }}
+            style={{ borderColor: colors.$24 }}
             headerStyle={{ borderColor: colors.$20 }}
             withoutHeaderPadding
           >

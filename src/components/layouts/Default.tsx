@@ -580,7 +580,7 @@ export function Default(props: Props) {
             )}
 
           <div
-            style={{ color: colors.$3, backgroundColor: colors.$2 }}
+            style={{ color: colors.$3, backgroundColor: colors.$23 }}
             className="p-4 md:py-8 xl:p-8 dark:text-gray-100"
           >
             {props.children}

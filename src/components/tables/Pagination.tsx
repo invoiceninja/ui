@@ -76,7 +76,7 @@ export function Pagination(props: Props) {
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
-              borderColor: colors.$20,
+              borderColor: colors.$24,
             }}
             onClick={() => goToPage(1)}
           >
@@ -88,7 +88,7 @@ export function Pagination(props: Props) {
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
-              borderColor: colors.$20,
+              borderColor: colors.$24,
             }}
             onClick={() => goToPage(props.currentPage - 1)}
           >
@@ -106,7 +106,7 @@ export function Pagination(props: Props) {
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
-              borderColor: colors.$20,
+              borderColor: colors.$24,
             }}
             onClick={() => goToPage(props.currentPage + 1)}
           >
@@ -118,7 +118,7 @@ export function Pagination(props: Props) {
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
-              borderColor: colors.$20,
+              borderColor: colors.$24,
             }}
             onClick={() => goToPage(props.totalPages)}
           >

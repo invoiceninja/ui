@@ -103,7 +103,7 @@ export function Table(props: Props) {
       >
         <div
           className={classNames(
-            'overflow-hidden border rounded border-b border-t',
+            'overflow-hidden border rounded-md border-b border-t',
             {
               'border-b-0': props.withoutBottomBorder,
               'border-t-0': props.withoutTopBorder,
@@ -114,7 +114,7 @@ export function Table(props: Props) {
           style={{
             backgroundColor: colors.$1,
             color: colors.$3,
-            borderColor: colors.$20,
+            borderColor: colors.$24,
           }}
         >
           <div

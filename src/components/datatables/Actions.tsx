@@ -333,7 +333,7 @@ export function Actions(props: Props) {
     control: (base) => ({
       ...base,
       backgroundColor: colors.$1,
-      borderColor: colors.$20,
+      borderColor: colors.$24,
       borderRadius: '0.375rem',
       padding: '0 6px',
     }),
