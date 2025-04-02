@@ -438,7 +438,7 @@ export function useActions(params?: Params) {
         })}
         entity="recurring_invoice"
         entityId={recurringInvoice.id}
-        label={`#${recurringInvoice.number}`}
+        label={recurringInvoice.number}
         labelElement={
           <EntityActionElement
             entity="recurring_invoice"

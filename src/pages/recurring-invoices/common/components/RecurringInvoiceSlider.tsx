@@ -371,7 +371,7 @@ export const RecurringInvoiceSlider = () => {
             <AddActivityComment
               entity="recurring_invoice"
               entityId={resource?.id}
-              label={`#${resource?.number}`}
+              label={resource?.number || ''}
             />
           </div>
 

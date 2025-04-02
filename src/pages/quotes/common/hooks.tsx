@@ -503,7 +503,7 @@ export function useActions(params?: Params) {
         })}
         entity="quote"
         entityId={quote.id}
-        label={`#${quote.number}`}
+        label={quote.number}
         labelElement={
           <EntityActionElement
             entity="quote"
