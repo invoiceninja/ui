@@ -11,8 +11,10 @@
 import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
 import { ReactNode } from 'react';
+import { CSSProperties } from 'styled-components';
 
 interface Props {
+  style?: CSSProperties;
   leftSide?: ReactNode;
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
@@ -31,6 +33,8 @@ interface Props {
 export function Element(props: Props) {
   const colors = useColorScheme();
 
+  const { style } = props;
+
   return (
     <div
       className={classNames(
@@ -44,7 +48,7 @@ export function Element(props: Props) {
         }
       )}
       onClick={props.onClick}
-      style={{ color: colors.$3, colorScheme: colors.$0 }}
+      style={{ color: colors.$3, colorScheme: colors.$0, ...style }}
     >
       <dt
         className={classNames('text-sm flex flex-col', {

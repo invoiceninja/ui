@@ -36,9 +36,7 @@ import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Inline } from '$app/components/Inline';
-import { Icon } from '$app/components/icons/Icon';
-import { MdCloudCircle, MdInfo, MdOutlineContentCopy } from 'react-icons/md';
+import { MdInfo } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
@@ -63,11 +61,22 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { CloudPlay } from '$app/components/icons/CloudPlay';
+import styled from 'styled-components';
+import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
+
+const PortalCard = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
@@ -259,11 +268,14 @@ export function InvoiceSlider() {
         withHorizontalPadding
       >
         <div className="space-y-2">
-          <div>
+          <div className="px-6">
             <Element
+              className="border-b border-dashed"
               leftSide={t('invoice_amount')}
               pushContentToRight
               withoutWrappingLeftSide
+              noExternalPadding
+              style={{ borderColor: colors.$21 }}
             >
               {invoice
                 ? formatMoney(
@@ -275,9 +287,12 @@ export function InvoiceSlider() {
             </Element>
 
             <Element
+              className="border-b border-dashed"
               leftSide={t('balance_due')}
               pushContentToRight
               withoutWrappingLeftSide
+              noExternalPadding
+              style={{ borderColor: colors.$21 }}
             >
               {invoice
                 ? formatMoney(
@@ -288,35 +303,66 @@ export function InvoiceSlider() {
                 : null}
             </Element>
 
-            <Element leftSide={t('date')} pushContentToRight>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('date')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$21 }}
+            >
               {invoice ? date(invoice?.date, dateFormat) : null}
             </Element>
 
-            <Element leftSide={t('due_date')} pushContentToRight>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('due_date')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$21 }}
+            >
               {invoice ? date(invoice.due_date, dateFormat) : null}
             </Element>
 
-            <Element leftSide={t('status')} pushContentToRight>
+            <Element
+              leftSide={t('status')}
+              pushContentToRight
+              noExternalPadding
+            >
               {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
           </div>
 
           <Divider withoutPadding />
 
-          <Inline className="w-full">
-            <ClickableElement
-              className="text-center"
+          <div className="flex space-x-4 items-center justify-center px-6 py-5">
+            <PortalCard
+              className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
               onClick={() => (invoice ? openClientPortal(invoice) : null)}
+              style={{
+                borderColor: colors.$21,
+              }}
+              theme={{
+                backgroundColor: colors.$1,
+                hoverBackgroundColor: colors.$4,
+              }}
             >
-              <div className="inline-flex items-center space-x-1">
-                <Icon element={MdCloudCircle} />
-                <p>{t('view_portal')}</p>
-              </div>
-            </ClickableElement>
+              <CloudPlay
+                color={colors.$17}
+                filledColor={colors.$17}
+                size="1.3rem"
+              />
+
+              <span
+                className="font-medium whitespace-nowrap"
+                style={{ color: colors.$3 }}
+              >
+                {t('view_portal')}
+              </span>
+            </PortalCard>
 
             {invoice ? (
-              <ClickableElement
-                className="text-center"
+              <PortalCard
+                className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
                 onClick={() => {
                   navigator.clipboard.writeText(
                     generateClientPortalUrl(invoice) ?? ''
@@ -324,14 +370,29 @@ export function InvoiceSlider() {
 
                   toast.success('copied_to_clipboard', { value: '' });
                 }}
+                style={{
+                  borderColor: colors.$21,
+                }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
               >
-                <div className="inline-flex items-center space-x-1">
-                  <Icon element={MdOutlineContentCopy} />
-                  <p>{t('copy_link')}</p>
-                </div>
-              </ClickableElement>
+                <CopyToClipboard
+                  color={colors.$17}
+                  filledColor={colors.$17}
+                  size="1.3rem"
+                />
+
+                <span
+                  className="font-medium whitespace-nowrap"
+                  style={{ color: colors.$3 }}
+                >
+                  {t('copy_link')}
+                </span>
+              </PortalCard>
             ) : null}
-          </Inline>
+          </div>
 
           <Divider withoutPadding />
 
