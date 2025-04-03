@@ -64,6 +64,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { CloudPlay } from '$app/components/icons/CloudPlay';
 import styled from 'styled-components';
 import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
+import { useNavigate } from 'react-router-dom';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -71,6 +72,14 @@ export const invoiceSliderVisibilityAtom = atom(false);
 dayjs.extend(relativeTime);
 
 const PortalCard = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
+const PaymentableBox = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
 
   &:hover {
@@ -171,6 +180,7 @@ export function InvoiceSlider() {
   const getTimezone = useGetTimezone();
   const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
 
+  const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
@@ -397,106 +407,168 @@ export function InvoiceSlider() {
           <Divider withoutPadding />
 
           {invoice && invoice.next_send_date ? (
-            <div className="space-y-2 whitespace-nowrap">
-              <Tooltip
-                size="regular"
-                width="auto"
-                tooltipElement={
-                  <article
-                    className={classNames('prose prose-sm', {
-                      'prose-invert': !reactSettings?.dark_mode,
-                    })}
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeHTML(
-                        (resource?.reminder_schedule as string) ?? ''
-                      ),
-                    }}
-                  />
-                }
-              >
-                <h3 className="flex ml-3 mt-2 italic">
-                  {t('reminders')} <MdInfo className="mt-1 ml-1" />
-                </h3>
-              </Tooltip>
+            <>
+              <div className="space-y-2 whitespace-nowrap px-6">
+                <Tooltip
+                  size="regular"
+                  width="auto"
+                  tooltipElement={
+                    <article
+                      className={classNames('prose prose-sm', {
+                        'prose-invert': !reactSettings?.dark_mode,
+                      })}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHTML(
+                          (resource?.reminder_schedule as string) ?? ''
+                        ),
+                      }}
+                    />
+                  }
+                >
+                  <h3 className="flex mt-2 italic">
+                    {t('reminders')} <MdInfo className="mt-1 ml-1" />
+                  </h3>
+                </Tooltip>
 
-              <Element leftSide={t('next_send_date')} twoGridColumns>
-                {invoice
-                  ? dateTime(
-                      invoice.next_send_date,
-                      '',
-                      '',
-                      getTimezone(getSetting(invoice.client, 'timezone_id'))
-                        .timeZone
-                    )
-                  : null}
-              </Element>
-
-              <Element leftSide={t('reminder_last_sent')} twoGridColumns>
-                {invoice ? date(invoice.reminder_last_sent, dateFormat) : null}
-              </Element>
-
-              {invoice.reminder1_sent ? (
-                <Element leftSide={t('first_reminder')} twoGridColumns>
-                  {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
+                <Element
+                  className="border-b border-dashed"
+                  leftSide={t('next_send_date')}
+                  pushContentToRight
+                  noExternalPadding
+                  withoutWrappingLeftSide
+                  style={{ borderColor: colors.$21 }}
+                >
+                  {invoice
+                    ? dateTime(
+                        invoice.next_send_date,
+                        '',
+                        '',
+                        getTimezone(getSetting(invoice.client, 'timezone_id'))
+                          .timeZone
+                      )
+                    : null}
                 </Element>
-              ) : null}
 
-              {invoice.reminder2_sent ? (
-                <Element leftSide={t('second_reminder')} twoGridColumns>
-                  {invoice ? date(invoice.reminder2_sent, dateFormat) : null}
+                <Element
+                  className="border-b border-dashed"
+                  leftSide={t('reminder_last_sent')}
+                  pushContentToRight
+                  noExternalPadding
+                  style={{ borderColor: colors.$21 }}
+                >
+                  {invoice
+                    ? date(invoice.reminder_last_sent, dateFormat)
+                    : null}
                 </Element>
-              ) : null}
 
-              {invoice.reminder3_sent ? (
-                <Element leftSide={t('third_reminder')} twoGridColumns>
-                  {invoice ? date(invoice.reminder3_sent, dateFormat) : null}
-                </Element>
-              ) : null}
-            </div>
+                {invoice.reminder1_sent ? (
+                  <Element
+                    className="border-b border-dashed"
+                    leftSide={t('first_reminder')}
+                    pushContentToRight
+                    noExternalPadding
+                    style={{ borderColor: colors.$21 }}
+                  >
+                    {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
+                  </Element>
+                ) : null}
+
+                {invoice.reminder2_sent ? (
+                  <Element
+                    className="border-b border-dashed"
+                    leftSide={t('second_reminder')}
+                    pushContentToRight
+                    noExternalPadding
+                    style={{ borderColor: colors.$21 }}
+                  >
+                    {invoice ? date(invoice.reminder2_sent, dateFormat) : null}
+                  </Element>
+                ) : null}
+
+                {invoice.reminder3_sent ? (
+                  <Element
+                    leftSide={t('third_reminder')}
+                    pushContentToRight
+                    noExternalPadding
+                  >
+                    {invoice ? date(invoice.reminder3_sent, dateFormat) : null}
+                  </Element>
+                ) : null}
+              </div>
+
+              <Divider withoutPadding />
+            </>
           ) : null}
 
-          <div className="divide-y">
-            {resource?.payments &&
-              resource.payments.map((payment: Payment) =>
-                payment.paymentables
-                  .filter(
-                    (item) =>
-                      item.invoice_id == invoice?.id && item.archived_at == 0
-                  )
-                  .map((paymentable: Paymentable) => (
-                    <ClickableElement
-                      key={payment.id}
-                      to={`/payments/${payment.id}/edit`}
-                      disableNavigation={disableNavigation('payment', payment)}
-                    >
-                      <div className="flex flex-col space-y-2">
-                        <p className="font-semibold">
+          {Boolean(resource?.payments?.length) && (
+            <div className="flex flex-col space-y-4 px-6 py-5">
+              {resource?.payments &&
+                resource.payments.map((payment: Payment) =>
+                  payment.paymentables
+                    .filter(
+                      (item) =>
+                        item.invoice_id === invoice?.id &&
+                        item.archived_at === 0
+                    )
+                    .map((paymentable: Paymentable) => (
+                      <PaymentableBox
+                        key={payment.id}
+                        className="flex flex-col items-start justify-center space-y-2 shadow-sm text-sm border p-5 w-full cursor-pointer rounded-md"
+                        onClick={() => {
+                          !disableNavigation('payment', payment) &&
+                            navigate(
+                              route('/payments/:id/edit', {
+                                id: payment.id,
+                              })
+                            );
+                        }}
+                        style={{
+                          borderColor: colors.$21,
+                        }}
+                        theme={{
+                          backgroundColor: colors.$1,
+                          hoverBackgroundColor: colors.$4,
+                        }}
+                      >
+                        <span
+                          className="font-medium"
+                          style={{ color: colors.$3 }}
+                        >
                           {t('payment')} {payment.number}
-                        </p>
+                        </span>
 
-                        <p className="inline-flex items-center space-x-1">
-                          <p>
+                        <div
+                          className="inline-flex items-center space-x-1"
+                          style={{ color: colors.$17 }}
+                        >
+                          <span>
                             {formatMoney(
                               paymentable.amount,
                               payment.client?.country_id,
                               payment.client?.settings.currency_id
                             )}
-                          </p>
-                          <p>&middot;</p>
-                          <p>{date(paymentable.created_at, dateFormat)}</p>
-                        </p>
+                          </span>
+
+                          <span>-</span>
+
+                          <span>
+                            {date(paymentable.created_at, dateFormat)}
+                          </span>
+                        </div>
 
                         <div>
                           <PaymentStatus entity={payment} />
                         </div>
-                      </div>
-                    </ClickableElement>
-                  ))
-              )}
-          </div>
+                      </PaymentableBox>
+                    ))
+                )}
+            </div>
+          )}
+
+          {Boolean(resource?.payments?.length) && <Divider withoutPadding />}
 
           {invoice && (
-            <div className="flex flex-col px-6 py-2">
+            <div className="flex flex-col px-6 py-5">
               {invoice.line_items.map(
                 (lineItem, index) =>
                   (lineItem.expense_id || lineItem.task_id) && (
