@@ -370,7 +370,7 @@ export function UploadCompanyImport(props: Props) {
             chunkFormData,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    // 'Content-Type': 'multipart/form-data', //could be overriding the default content type headers cause silent failure 2025-04-04
                 },
             }
         );
