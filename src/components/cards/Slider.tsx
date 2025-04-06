@@ -26,10 +26,13 @@ interface Props extends CommonProps {
   withoutActionContainer?: boolean;
   topRight?: ReactNode;
   withoutDivider?: boolean;
+  withoutHeaderBorder?: boolean;
 }
 
 export function Slider(props: Props) {
   const colors = useColorScheme();
+
+  const { withoutHeaderBorder } = props;
 
   return (
     <Transition.Root show={props.visible} as={Fragment}>
@@ -60,7 +63,9 @@ export function Slider(props: Props) {
               >
                 <div className="flex flex-col flex-1 h-0 overflow-y-auto">
                   <div
-                    className="py-4 px-4 sm:px-6 border-b"
+                    className={classNames('py-4 px-4 sm:px-6', {
+                      'border-b': !withoutHeaderBorder,
+                    })}
                     style={{ borderColor: colors.$4 }}
                   >
                     <div className="flex items-center justify-between gap-3">

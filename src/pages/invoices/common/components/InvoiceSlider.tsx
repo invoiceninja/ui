@@ -11,7 +11,7 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
-import { ClickableElement, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -65,6 +65,8 @@ import { CloudPlay } from '$app/components/icons/CloudPlay';
 import styled from 'styled-components';
 import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { History } from '$app/components/icons/History';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -72,6 +74,22 @@ export const invoiceSliderVisibilityAtom = atom(false);
 dayjs.extend(relativeTime);
 
 const PortalCard = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
+const HistoryBox = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
+const ActivityBox = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
 
   &:hover {
@@ -133,9 +151,7 @@ export function useGenerateActivityElement() {
 
       notes: activity?.notes && (
         <>
-          <br />
-
-          {activity?.notes}
+          <br />'{activity?.notes}'
         </>
       ),
 
@@ -271,6 +287,7 @@ export function InvoiceSlider() {
         ) : null
       }
       withoutActionContainer
+      withoutHeaderBorder
     >
       <TabGroup
         tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
@@ -285,7 +302,7 @@ export function InvoiceSlider() {
               pushContentToRight
               withoutWrappingLeftSide
               noExternalPadding
-              style={{ borderColor: colors.$21 }}
+              style={{ borderColor: colors.$20 }}
             >
               {invoice
                 ? formatMoney(
@@ -302,7 +319,7 @@ export function InvoiceSlider() {
               pushContentToRight
               withoutWrappingLeftSide
               noExternalPadding
-              style={{ borderColor: colors.$21 }}
+              style={{ borderColor: colors.$20 }}
             >
               {invoice
                 ? formatMoney(
@@ -318,7 +335,7 @@ export function InvoiceSlider() {
               leftSide={t('date')}
               pushContentToRight
               noExternalPadding
-              style={{ borderColor: colors.$21 }}
+              style={{ borderColor: colors.$20 }}
             >
               {invoice ? date(invoice?.date, dateFormat) : null}
             </Element>
@@ -328,7 +345,7 @@ export function InvoiceSlider() {
               leftSide={t('due_date')}
               pushContentToRight
               noExternalPadding
-              style={{ borderColor: colors.$21 }}
+              style={{ borderColor: colors.$20 }}
             >
               {invoice ? date(invoice.due_date, dateFormat) : null}
             </Element>
@@ -342,14 +359,14 @@ export function InvoiceSlider() {
             </Element>
           </div>
 
-          <Divider withoutPadding />
+          <Divider withoutPadding borderColor={colors.$20} />
 
           <div className="flex space-x-4 items-center justify-center px-6 py-5">
             <PortalCard
               className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
               onClick={() => (invoice ? openClientPortal(invoice) : null)}
               style={{
-                borderColor: colors.$21,
+                borderColor: colors.$20,
               }}
               theme={{
                 backgroundColor: colors.$1,
@@ -381,7 +398,7 @@ export function InvoiceSlider() {
                   toast.success('copied_to_clipboard', { value: '' });
                 }}
                 style={{
-                  borderColor: colors.$21,
+                  borderColor: colors.$20,
                 }}
                 theme={{
                   backgroundColor: colors.$1,
@@ -404,7 +421,7 @@ export function InvoiceSlider() {
             ) : null}
           </div>
 
-          <Divider withoutPadding />
+          <Divider withoutPadding borderColor={colors.$20} />
 
           {invoice && invoice.next_send_date ? (
             <>
@@ -436,7 +453,7 @@ export function InvoiceSlider() {
                   pushContentToRight
                   noExternalPadding
                   withoutWrappingLeftSide
-                  style={{ borderColor: colors.$21 }}
+                  style={{ borderColor: colors.$20 }}
                 >
                   {invoice
                     ? dateTime(
@@ -454,7 +471,7 @@ export function InvoiceSlider() {
                   leftSide={t('reminder_last_sent')}
                   pushContentToRight
                   noExternalPadding
-                  style={{ borderColor: colors.$21 }}
+                  style={{ borderColor: colors.$20 }}
                 >
                   {invoice
                     ? date(invoice.reminder_last_sent, dateFormat)
@@ -467,7 +484,7 @@ export function InvoiceSlider() {
                     leftSide={t('first_reminder')}
                     pushContentToRight
                     noExternalPadding
-                    style={{ borderColor: colors.$21 }}
+                    style={{ borderColor: colors.$20 }}
                   >
                     {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
                   </Element>
@@ -479,7 +496,7 @@ export function InvoiceSlider() {
                     leftSide={t('second_reminder')}
                     pushContentToRight
                     noExternalPadding
-                    style={{ borderColor: colors.$21 }}
+                    style={{ borderColor: colors.$20 }}
                   >
                     {invoice ? date(invoice.reminder2_sent, dateFormat) : null}
                   </Element>
@@ -496,7 +513,7 @@ export function InvoiceSlider() {
                 ) : null}
               </div>
 
-              <Divider withoutPadding />
+              <Divider withoutPadding borderColor={colors.$20} />
             </>
           ) : null}
 
@@ -523,7 +540,7 @@ export function InvoiceSlider() {
                             );
                         }}
                         style={{
-                          borderColor: colors.$21,
+                          borderColor: colors.$20,
                         }}
                         theme={{
                           backgroundColor: colors.$1,
@@ -565,7 +582,11 @@ export function InvoiceSlider() {
             </div>
           )}
 
-          {Boolean(resource?.payments?.length) && <Divider withoutPadding />}
+          {Boolean(
+            invoice?.line_items?.some(
+              (lineItem) => lineItem.expense_id || lineItem.task_id
+            )
+          ) && <Divider withoutPadding borderColor={colors.$20} />}
 
           {invoice && (
             <div className="flex flex-col px-6 py-5">
@@ -587,53 +608,100 @@ export function InvoiceSlider() {
           )}
         </div>
 
-        <div className="divide-y">
+        <div>
           {resource?.activities && resource.activities.length === 0 && (
             <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
 
-          {resource?.activities &&
-            resource.activities.map((activity) => (
-              <ClickableElement
-                key={activity.id}
-                to={`/activities/${activity.id}`}
-                disableNavigation={Boolean(!activity.history.id)}
-              >
-                <div className="flex flex-col">
-                  <div className="flex space-x-1">
-                    <span>
-                      {invoice?.client
-                        ? formatMoney(
-                            activity.history.amount,
-                            invoice?.client?.country_id,
-                            invoice?.client?.settings.currency_id
-                          )
-                        : null}
-                    </span>
-                    <span>&middot;</span>
-                    <DynamicLink
-                      to={`/clients/${activity.client_id}`}
-                      renderSpan={disableNavigation('client', invoice?.client)}
+          {Boolean(resource?.activities?.length) && (
+            <div className="flex flex-col px-3">
+              {resource?.activities &&
+                resource.activities.map((activity) => (
+                  <HistoryBox
+                    className={classNames(
+                      'flex items-center justify-start p-4 space-x-3 rounded-md',
+                      {
+                        'cursor-pointer': Boolean(activity.history.id),
+                      }
+                    )}
+                    key={activity.id}
+                    onClick={() => {
+                      Boolean(activity.history.id) &&
+                        navigate(
+                          route('/activities/:id/edit', {
+                            id: activity.id,
+                          })
+                        );
+                    }}
+                    theme={{
+                      backgroundColor: colors.$1,
+                      hoverBackgroundColor: activity.history.id
+                        ? colors.$4
+                        : 'transparent',
+                    }}
+                  >
+                    <div
+                      className="p-2 rounded-full"
+                      style={{ backgroundColor: colors.$15 }}
                     >
-                      {invoice?.client?.display_name}
-                    </DynamicLink>
-                  </div>
+                      <History
+                        size="1.3rem"
+                        color={colors.$3}
+                        filledColor={colors.$3}
+                      />
+                    </div>
 
-                  <div className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
-                    </p>
-                    <p>{dayjs.unix(activity.created_at).fromNow()}</p>
-                  </div>
-                </div>
-              </ClickableElement>
-            ))}
+                    <div className="flex flex-col items-start space-y-0.5 justify-center">
+                      <div className="flex space-x-1 text-sm">
+                        <span style={{ color: colors.$3 }}>
+                          {invoice?.client
+                            ? formatMoney(
+                                activity.history.amount,
+                                invoice?.client?.country_id,
+                                invoice?.client?.settings.currency_id
+                              )
+                            : null}
+                        </span>
+
+                        <div>
+                          <ArrowRight color={colors.$17} size="1.1rem" />
+                        </div>
+
+                        <DynamicLink
+                          to={`/clients/${activity.client_id}`}
+                          renderSpan={disableNavigation(
+                            'client',
+                            invoice?.client
+                          )}
+                        >
+                          {invoice?.client?.display_name}
+                        </DynamicLink>
+                      </div>
+
+                      <div
+                        className="flex items-center space-x-1 text-xs"
+                        style={{ color: colors.$17 }}
+                      >
+                        <span>
+                          {date(
+                            activity.created_at,
+                            `${dateFormat} ${timeFormat}`
+                          )}
+                        </span>
+
+                        <span>{dayjs.unix(activity.created_at).fromNow()}</span>
+                      </div>
+                    </div>
+                  </HistoryBox>
+                ))}
+            </div>
+          )}
         </div>
 
         <div>
           <div
             className="flex items-center border-b px-6 pb-4 justify-between"
-            style={{ borderColor: colors.$4 }}
+            style={{ borderColor: colors.$20 }}
           >
             <Toggle
               label={t('comments_only')}
@@ -648,7 +716,7 @@ export function InvoiceSlider() {
             />
           </div>
 
-          <div className="flex flex-col divide-y">
+          <div className="flex flex-col pt-3 px-3">
             {activities
               ?.filter(
                 (activity) =>
@@ -656,25 +724,54 @@ export function InvoiceSlider() {
                   !commentsOnly
               )
               .map((activity) => (
-                <NonClickableElement
+                <ActivityBox
                   key={activity.id}
-                  className="flex flex-col space-y-2"
+                  className="flex space-x-3 p-4 rounded-md flex-1 min-w-0"
+                  theme={{
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
                 >
-                  <p>{activityElement(activity)}</p>
+                  <div className="flex items-center justify-center">
+                    <div
+                      className="p-2 rounded-full"
+                      style={{ backgroundColor: colors.$15 }}
+                    >
+                      <History
+                        size="1.3rem"
+                        color={colors.$3}
+                        filledColor={colors.$3}
+                      />
+                    </div>
+                  </div>
 
-                  <p className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{activity.ip}</p>
-                  </p>
-                </NonClickableElement>
+                  <div className="flex flex-col space-y-0.5 flex-1 min-w-0">
+                    <div className="text-sm" style={{ color: colors.$3 }}>
+                      {activityElement(activity)}
+                    </div>
+
+                    <div
+                      className="flex w-full items-center space-x-1 text-xs truncate"
+                      style={{ color: colors.$17 }}
+                    >
+                      <span className="whitespace-nowrap">
+                        {date(
+                          activity.created_at,
+                          `${dateFormat} ${timeFormat}`
+                        )}
+                      </span>
+
+                      <span>-</span>
+
+                      <span>{activity.ip}</span>
+                    </div>
+                  </div>
+                </ActivityBox>
               ))}
           </div>
         </div>
 
-        <div className="flex flex-col divide-y">
+        <div className="flex flex-col space-y-2 px-6">
           {Boolean(!emailRecords.length) && (
             <span className="text-sm px-4">{t('email_history_empty')}</span>
           )}
@@ -685,6 +782,7 @@ export function InvoiceSlider() {
               className="py-4"
               emailRecord={emailRecord}
               index={index}
+              withAllBorders
             />
           ))}
         </div>

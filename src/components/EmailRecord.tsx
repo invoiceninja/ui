@@ -12,7 +12,6 @@ import { useColorScheme } from '$app/common/colors';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import classNames from 'classnames';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { styled } from 'styled-components';
 import { date, endpoint } from '$app/common/helpers';
@@ -25,12 +24,16 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from './forms';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { EnvelopArrowRight } from './icons/EnvelopArrowRight';
+import { ChevronDown } from './icons/ChevronDown';
+import { ChevronUp } from './icons/ChevronUp';
 
 interface Props extends CommonProps {
   emailRecord: EmailRecordType;
   index: number;
   withBottomBorder?: boolean;
   withEntityNavigationIcon?: boolean;
+  withAllBorders?: boolean;
 }
 
 const Div = styled.div`
@@ -39,21 +42,21 @@ const Div = styled.div`
   }
 `;
 
-const EventDiv = styled.div`
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
-`;
-
 export function EmailRecord(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
   const colors = useColorScheme();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { emailRecord, index, withBottomBorder, withEntityNavigationIcon } =
-    props;
+  const {
+    emailRecord,
+    index,
+    withBottomBorder,
+    withEntityNavigationIcon,
+    withAllBorders = false,
+  } = props;
 
   const [isCollapsed, setIsCollapsed] = useState<boolean>(
     !index ? false : true
@@ -70,16 +73,17 @@ export function EmailRecord(props: Props) {
     <div
       className={classNames('flex flex-col', {
         'border-b': withBottomBorder,
+        'border rounded-md shadow-sm': withAllBorders,
       })}
       style={{
-        borderColor: colors.$5,
+        borderColor: colors.$20,
         color: colors.$3,
         colorScheme: colors.$0,
       }}
     >
       <Div
         className={classNames(
-          'flex justify-between px-3 py-3',
+          'flex justify-between pl-4 pr-6 py-3',
           props.className,
           {
             'cursor-pointer': Boolean(emailRecord.events.length),
@@ -91,77 +95,103 @@ export function EmailRecord(props: Props) {
           setIsCollapsed((current) => !current)
         }
       >
-        <div className="flex flex-col flex-1 min-w-0 space-y-2 pr-5">
-          <div className="flex items-center space-x-3">
-            <span className="text-sm font-medium truncate">
-              {emailRecord.subject}
-            </span>
-
-            {withEntityNavigationIcon && (
-              <div>
-                <Icon
-                  className="cursor-pointer"
-                  element={MdTextSnippet}
-                  size={20}
-                  onClick={() =>
-                    navigate(
-                      route(`/:entity/:id/edit`, {
-                        id: emailRecord.entity_id,
-                        entity: `${emailRecord.entity}s`,
-                      })
-                    )
-                  }
-                />
-              </div>
-            )}
+        <div className="flex flex-1 min-w-0 space-x-2">
+          <div className="flex items-center justify-center">
+            <div
+              className="p-2 rounded-full"
+              style={{ backgroundColor: colors.$15 }}
+            >
+              <EnvelopArrowRight size="1.3rem" color={colors.$16} />
+            </div>
           </div>
 
-          <span className="text-sm truncate">
-            {t('to')}: {emailRecord.recipients}
-          </span>
+          <div className="flex flex-col flex-1 min-w-0 pr-5">
+            <div className="flex items-center space-x-3">
+              <span className="text-sm font-medium truncate">
+                {emailRecord.subject}
+              </span>
+
+              {withEntityNavigationIcon && (
+                <div>
+                  <Icon
+                    className="cursor-pointer"
+                    element={MdTextSnippet}
+                    size={20}
+                    onClick={() =>
+                      navigate(
+                        route(`/:entity/:id/edit`, {
+                          id: emailRecord.entity_id,
+                          entity: `${emailRecord.entity}s`,
+                        })
+                      )
+                    }
+                  />
+                </div>
+              )}
+            </div>
+
+            <span className="text-xs truncate" style={{ color: colors.$17 }}>
+              {t('to')} {emailRecord.recipients}
+            </span>
+          </div>
         </div>
 
         {Boolean(emailRecord.events.length) && (
           <div className="flex items-center">
-            {isCollapsed && <ChevronDown />}
+            {isCollapsed && <ChevronDown color={colors.$3} size="1.1rem" />}
 
-            {!isCollapsed && <ChevronUp />}
+            {!isCollapsed && <ChevronUp color={colors.$3} size="1.1rem" />}
           </div>
         )}
       </Div>
 
       <div
-        className={classNames({
+        className={classNames('pb-2', {
           hidden: isCollapsed,
         })}
       >
         {emailRecord.events.map((event, index) => (
-          <EventDiv
-            key={index}
-            className="flex flex-col flex-1 min-w-0 space-y-4 px-6 py-2"
-            theme={{ hoverColor: colors.$4 }}
-          >
-            <div className="flex justify-between space-x-2">
-              <span className="text-sm truncate">
-                {t('status')}: {event.status}
-              </span>
-              <span className="text-sm">{date(event.date, dateFormat)}</span>
-            </div>
-
-            <div className="flex space-x-2 justify-between">
-              <span className="text-sm truncate">{event.recipient}</span>
-
-              {event.bounce_id && (
-                <Button
-                  behavior="button"
-                  type="minimal"
-                  onClick={() => handleReactivateEmail(event.bounce_id)}
-                >
-                  {t('reactivate')}
-                </Button>
+          <div key={index} className="flex flex-1 min-w-0 px-5 text-sm">
+            <div
+              className={classNames(
+                'flex flex-col flex-1 min-w-0 space-y-2 py-2.5 border-b border-dashed',
+                {
+                  'border-none': index === emailRecord.events.length - 1,
+                }
               )}
+              style={{ borderColor: colors.$21 }}
+            >
+              <div className="flex space-x-4 items-center justify-between truncate">
+                <span style={{ color: colors.$17 }}>{t('recipient')}</span>
+
+                <div className="flex flex-col items-end space-y-0.5 space-x-2">
+                  <span className="text-sm">{event.recipient}</span>
+
+                  {event.bounce_id && (
+                    <Button
+                      behavior="button"
+                      type="minimal"
+                      onClick={() => handleReactivateEmail(event.bounce_id)}
+                    >
+                      {t('reactivate')}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex space-x-4 items-center justify-between truncate">
+                <span style={{ color: colors.$17 }}>{t('status')}</span>
+
+                <span>{event.status}</span>
+              </div>
+
+              <div className="flex space-x-4 items-center justify-between truncate">
+                <span style={{ color: colors.$17 }}>{t('date')}</span>
+
+                <span>{date(event.date, dateFormat)}</span>
+              </div>
             </div>
-          </EventDiv>
+          </div>
         ))}
       </div>
     </div>

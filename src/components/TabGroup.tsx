@@ -59,8 +59,7 @@ export function TabGroup(props: Props) {
       <div className="-mb-px flex overflow-x-auto">
         {withHorizontalPadding && (
           <div
-            className="border-b"
-            style={{ borderColor: colors.$20, width: '7rem' }}
+            style={{ borderBottom: `2px solid ${colors.$20}`, width: '7rem' }}
           />
         )}
 
@@ -89,8 +88,7 @@ export function TabGroup(props: Props) {
 
         {withHorizontalPadding && (
           <div
-            className="border-b"
-            style={{ borderColor: colors.$20, width: '7rem' }}
+            style={{ borderBottom: `2px solid ${colors.$20}`, width: '7rem' }}
           />
         )}
       </div>
