@@ -89,7 +89,7 @@ export function EmailRecord(props: Props) {
             'cursor-pointer': Boolean(emailRecord.events.length),
           }
         )}
-        theme={{ hoverColor: colors.$4 }}
+        theme={{ hoverColor: colors.$25 }}
         onClick={() =>
           Boolean(emailRecord.events.length) &&
           setIsCollapsed((current) => !current)

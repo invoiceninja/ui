@@ -67,6 +67,7 @@ import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { History } from '$app/components/icons/History';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -635,19 +636,17 @@ export function InvoiceSlider() {
                     }}
                     theme={{
                       backgroundColor: colors.$1,
-                      hoverBackgroundColor: activity.history.id
-                        ? colors.$4
-                        : 'transparent',
+                      hoverBackgroundColor: colors.$25,
                     }}
                   >
                     <div
                       className="p-2 rounded-full"
-                      style={{ backgroundColor: colors.$15 }}
+                      style={{ backgroundColor: colors.$20 }}
                     >
                       <History
                         size="1.3rem"
-                        color={colors.$3}
-                        filledColor={colors.$3}
+                        color={colors.$16}
+                        filledColor={colors.$16}
                       />
                     </div>
 
@@ -729,18 +728,18 @@ export function InvoiceSlider() {
                   className="flex space-x-3 p-4 rounded-md flex-1 min-w-0"
                   theme={{
                     backgroundColor: colors.$1,
-                    hoverBackgroundColor: colors.$4,
+                    hoverBackgroundColor: colors.$25,
                   }}
                 >
                   <div className="flex items-center justify-center">
                     <div
                       className="p-2 rounded-full"
-                      style={{ backgroundColor: colors.$15 }}
+                      style={{ backgroundColor: colors.$20 }}
                     >
-                      <History
+                      <SquareActivityChart
                         size="1.3rem"
-                        color={colors.$3}
-                        filledColor={colors.$3}
+                        color={colors.$16}
+                        filledColor={colors.$16}
                       />
                     </div>
                   </div>
@@ -773,7 +772,9 @@ export function InvoiceSlider() {
 
         <div className="flex flex-col space-y-2 px-6">
           {Boolean(!emailRecords.length) && (
-            <span className="text-sm px-4">{t('email_history_empty')}</span>
+            <span className="text-sm px-4" style={{ color: colors.$3 }}>
+              {t('email_history_empty')}
+            </span>
           )}
 
           {emailRecords.map((emailRecord, index) => (
