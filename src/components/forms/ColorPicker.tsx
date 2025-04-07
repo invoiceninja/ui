@@ -18,6 +18,7 @@ import { useDebounce } from 'react-use';
 import { Button } from './Button';
 import { Icon } from '../icons/Icon';
 import { MdDone } from 'react-icons/md';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   value?: string;
@@ -59,6 +60,7 @@ export function ColorPicker(props: Props) {
   const { includeDefaultPalette } = props;
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const [color, setColor] = useState(props.value || '#000000');
 
@@ -75,38 +77,55 @@ export function ColorPicker(props: Props) {
   return (
     <div>
       <Modal
-        title={t('color')}
+        title={t('select_color')}
         visible={isModalOpen}
         onClose={setIsModalOpen}
         centerContent
         disableClosing={isDefaultPaletteModalOpen}
+        size="micro"
       >
-        <HexColorPicker color={color} onChange={setColor} />
-        <HexColorInput
-          color={color}
-          onChange={setColor}
-          className="border rounded-md my-2 p-2 border-gray-300"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
-        />
+        <div className="flex flex-col space-y-2 w-full">
+          <HexColorPicker
+            color={color}
+            onChange={setColor}
+            style={{ width: '100%' }}
+          />
 
-        <div className="flex w-full justify-between">
-          {includeDefaultPalette && (
+          <HexColorInput
+            color={color}
+            onChange={setColor}
+            className={classNames(
+              'border rounded-md my-2 p-2 focus:outline-none focus:ring-0',
+              {
+                'border-[#d1d5db] focus:border-black': !reactSettings.dark_mode,
+                'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
+              }
+            )}
+            style={{
+              backgroundColor: colors.$1,
+              width: '100%',
+            }}
+          />
+
+          <div className="flex w-full justify-between">
+            {includeDefaultPalette && (
+              <Button
+                behavior="button"
+                type="secondary"
+                onClick={() => setIsDefaultPaletteModalOpen(true)}
+              >
+                {t('default')}
+              </Button>
+            )}
+
             <Button
+              className={classNames({ 'w-full': !includeDefaultPalette })}
               behavior="button"
-              type="secondary"
-              onClick={() => setIsDefaultPaletteModalOpen(true)}
+              onClick={() => setIsModalOpen(false)}
             >
-              {t('default')}
+              {t('done')}
             </Button>
-          )}
-
-          <Button
-            className={classNames({ 'w-full': !includeDefaultPalette })}
-            behavior="button"
-            onClick={() => setIsModalOpen(false)}
-          >
-            {t('done')}
-          </Button>
+          </div>
         </div>
       </Modal>
 
