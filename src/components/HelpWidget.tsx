@@ -153,8 +153,6 @@ export function $help(id: string, options?: HelpOptions) {
     `div#help-widget-${id}`
   ) as HTMLDivElement | null;
 
-  console.log(div);
-
   if (div) {
     div.classList.toggle('hidden');
 

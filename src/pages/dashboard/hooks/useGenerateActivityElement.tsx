@@ -233,7 +233,7 @@ export function useGenerateActivityElement() {
   return (activity: ActivityRecord) => (
     <div
       className="flex flex-col py-2.5 border border-t-0 border-x-0 last:border-b-0 border-dashed"
-      style={{ borderColor: colors.$5 }}
+      style={{ borderColor: colors.$21 }}
     >
       <div className="flex flex-col space-y-1">
         <span className="text-sm">{generate(activity)}</span>
