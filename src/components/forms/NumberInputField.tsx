@@ -34,6 +34,7 @@ interface Props extends CommonProps {
   withoutLabelWrapping?: boolean;
   placeholder?: string | null;
   disablePrecision?: boolean;
+  width?: string;
 }
 
 export function NumberInputField(props: Props) {
@@ -140,7 +141,7 @@ export function NumberInputField(props: Props) {
   }
 
   return (
-    <section>
+    <section style={{ width: props.width }}>
       {props.label && (
         <InputLabel
           className={classNames('mb-2', {
