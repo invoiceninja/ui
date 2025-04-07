@@ -32,6 +32,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
 import { Icon } from '../icons/Icon';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { sha256 } from 'js-sha256';
 
 interface Props {
     entity: string;
@@ -321,10 +322,21 @@ export function UploadCompanyImport(props: Props) {
 
     // Add this helper function for file hash calculation
     const calculateFileHash = async (file: File): Promise<string> => {
-        const buffer = await file.arrayBuffer();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return new Promise((resolve, reject) => {
+            const chunkSize = 2097152; // 2MB chunk size
+            const fileReader = new FileReader();
+            const fileHash = sha256.create();
+
+            fileReader.onload = () => {
+                fileHash.update(fileReader.result as string);
+                resolve(fileHash.hex());
+            };
+
+            fileReader.onerror = (error) => reject(error);
+
+            // Read file in chunks (just one chunk for simplicity)
+            fileReader.readAsArrayBuffer(file.slice(0, chunkSize));  // Just read the first 2MB (or adjust)
+        });
     };
 
     // Update the uploadChunk function
