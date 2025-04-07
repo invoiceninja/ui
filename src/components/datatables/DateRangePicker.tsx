@@ -96,13 +96,14 @@ export function DateRangePicker(props: Props) {
         visible={isVisible}
         placement="bottom"
         interactive={true}
+        popperOptions={{ strategy: 'fixed' }}
         render={() => (
           <div
             className="flex flex-col p-3"
             style={{
               backgroundColor: colors.$2,
               border: `1px solid ${colors.$5}`,
-              width: 300
+              width: 300,
             }}
             onClick={(event) => event.stopPropagation()}
           >
