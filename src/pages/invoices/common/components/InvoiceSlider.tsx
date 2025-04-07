@@ -629,7 +629,7 @@ export function InvoiceSlider() {
                     onClick={() => {
                       Boolean(activity.history.id) &&
                         navigate(
-                          route('/activities/:id/edit', {
+                          route('/activities/:id', {
                             id: activity.id,
                           })
                         );
