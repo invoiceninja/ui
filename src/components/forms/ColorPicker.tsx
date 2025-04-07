@@ -77,7 +77,7 @@ export function ColorPicker(props: Props) {
   return (
     <div>
       <Modal
-        title={t('select_color')}
+        title={t('color')}
         visible={isModalOpen}
         onClose={setIsModalOpen}
         centerContent
