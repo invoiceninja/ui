@@ -388,7 +388,9 @@ export function UploadCompanyImport(props: Props) {
         importData: boolean
     ) => {
         // Early return if not a zip file
-        if (!file.type.includes('zip') && !file.name.endsWith('.zip')) {
+        const validZipTypes = ['application/zip', 'application/x-zip-compressed'];
+        if (!validZipTypes.includes(file.type) && !file.name.endsWith('.zip')) {
+            toast.error('invalid_zip_file');
             return null;
         }
 
@@ -414,6 +416,7 @@ export function UploadCompanyImport(props: Props) {
 
             return fileHash;
         } catch (error) {
+            console.log('Chunk upload failed:', error);
             toast.error('chunk_upload_failed');
             setUploadProgress(0);
             throw error;
