@@ -11,9 +11,14 @@
 interface Props {
   color?: string;
   size?: string;
+  strokeWidth?: string;
 }
 
-export function ChevronUp({ color = '#000', size = '1.2rem' }: Props) {
+export function ChevronUp({
+  color = '#000',
+  size = '1.2rem',
+  strokeWidth = '2',
+}: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -21,15 +26,15 @@ export function ChevronUp({ color = '#000', size = '1.2rem' }: Props) {
       x="0px"
       y="0px"
       style={{ width: size, height: size }}
-      viewBox="0 0 18 18"
+      viewBox="0 0 20 20"
     >
       <polyline
-        points="2.75 11.5 9 5.25 15.25 11.5"
+        points="16.5 12.5 10 6 3.5 12.5"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
       ></polyline>
     </svg>
   );

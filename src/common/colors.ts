@@ -77,6 +77,7 @@ export const $2 = {
   $15: '#E4E4E7', // Light gray background
   $16: '#717179', // Dark gray icon
   $17: '#A1A1AA', // Placeholder text, table header text color
+  $17: '#A1A1AA', // Placeholder text, table header text color
   $18: '#27272A', // Button background color
   $19: '#09090B12', // Light border color
   $20: '#09090B13', // Dropdown element hover background color
