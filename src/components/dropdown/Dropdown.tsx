@@ -126,7 +126,7 @@ export function Dropdown(props: Props) {
             theme={{
               backgroundColor: colors.$18,
               color: colors.$1,
-              borderColor: colors.$5,
+              borderColor: colors.$24,
             }}
             type="button"
             disabled={props.disabled}

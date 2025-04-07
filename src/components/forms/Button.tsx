@@ -75,7 +75,7 @@ export function Button(props: Props) {
         theme={{
           backgroundColor: props.type === 'primary' ? colors.$18 : colors.$1,
           color: props.type === 'primary' ? colors.$1 : colors.$3,
-          borderColor: props.type === 'primary' ? 'transparent' : colors.$20,
+          borderColor: props.type === 'primary' ? 'transparent' : colors.$24,
           hoverColor: props.type === 'primary' ? colors.$18 : colors.$4,
         }}
         className={classNames(
@@ -100,7 +100,7 @@ export function Button(props: Props) {
       theme={{
         backgroundColor: props.type === 'primary' ? colors.$18 : colors.$1,
         color: props.type === 'primary' ? colors.$1 : colors.$3,
-        borderColor: props.type === 'primary' ? 'transparent' : colors.$20,
+        borderColor: props.type === 'primary' ? 'transparent' : colors.$24,
         hoverColor: props.type === 'primary' ? colors.$18 : colors.$4,
       }}
       className={classNames(
