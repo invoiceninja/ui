@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useColorScheme } from '$app/common/colors';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
@@ -18,12 +18,14 @@ interface Props extends CommonProps {
 export function Thead(props: Props) {
   const { backgroundColor } = props;
 
-  const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
   return (
     <thead
+      className="border-b"
       style={{
-        backgroundColor: backgroundColor || accentColor,
+        backgroundColor: backgroundColor || colors.$1,
+        borderColor: colors.$20,
         ...props.style,
       }}
     >

@@ -102,7 +102,6 @@ interface StyleOptions {
   tBodyStyle?: CSSProperties;
   thClassName?: string;
   tdClassName?: string;
-  addRowSeparator?: boolean;
   thStyle?: CSSProperties;
   withoutThVerticalPadding?: boolean;
   useOnlyCurrentSortDirectionIcon?: boolean;
@@ -110,7 +109,6 @@ interface StyleOptions {
   disableThUppercase?: boolean;
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
-  rowSeparatorColor?: string;
 }
 
 interface Props<T> extends CommonProps {
@@ -691,12 +689,11 @@ export function DataTable<T extends object>(props: Props<T>) {
         <Tbody style={styleOptions?.tBodyStyle}>
           {isLoading && (
             <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
+              className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
               style={{
-                borderColor: styleOptions?.rowSeparatorColor,
+                borderColor: colors.$20,
               }}
             >
               <Td colSpan={100}>
@@ -707,12 +704,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
           {isError && (
             <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
+              className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
               style={{
-                borderColor: styleOptions?.rowSeparatorColor,
+                borderColor: colors.$20,
               }}
             >
               <Td className="text-center" colSpan={100}>
@@ -723,12 +719,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
           {data && data.data.data.length === 0 && (
             <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
+              className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
               style={{
-                borderColor: styleOptions?.rowSeparatorColor,
+                borderColor: colors.$20,
               }}
             >
               <Td className={styleOptions?.tdClassName} colSpan={100}>
@@ -741,13 +736,15 @@ export function DataTable<T extends object>(props: Props<T>) {
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr
                 key={index}
-                className={classNames({
-                  'border-b border-gray-200': styleOptions?.addRowSeparator,
+                className={classNames('border-b', {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
-                backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
+                backgroundColor={index % 2 === 0 ? colors.$7 : ''}
                 style={{
-                  borderColor: styleOptions?.rowSeparatorColor,
+                  borderColor: colors.$20,
+                  backgroundColor: selected.includes(resource.id)
+                    ? colors.$7
+                    : 'transparent',
                 }}
               >
                 {!props.withoutActions && !hideEditableOptions && (
