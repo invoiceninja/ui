@@ -13,7 +13,6 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
 import { useEffect, useState } from 'react';
-import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   duration,
@@ -29,6 +28,10 @@ import { DurationClock } from './DurationClock';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { useStart } from '../hooks/useStart';
 import dayjs from 'dayjs';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import styled from 'styled-components';
+import classNames from 'classnames';
+import { Plus } from '$app/components/icons/Plus';
 
 interface Props {
   task: Task;
@@ -41,6 +44,14 @@ export enum LogPosition {
   Description = 2,
   Billable = 3,
 }
+
+const AddItemButton = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function TaskTable(props: Props) {
   const { task, handleChange } = props;
@@ -192,23 +203,42 @@ export function TaskTable(props: Props) {
   return (
     <Table>
       <Thead>
-        <Th>{t('start_date')}</Th>
-        <Th>{t('start_time')}</Th>
-        {company?.show_task_end_date && <Th>{t('end_date')}</Th>}
-        <Th>{t('end_time')}</Th>
-        <Th>{t('duration')}</Th>
-        {company?.settings.allow_billable_task_items && (
-          <Th>{t('billable')}</Th>
+        <Th className="px-3" withoutHorizontalPadding>
+          {t('start_date')}
+        </Th>
+        <Th className="px-3" withoutHorizontalPadding>
+          {t('start_time')}
+        </Th>
+        {company?.show_task_end_date && (
+          <Th className="px-3" withoutHorizontalPadding>
+            {t('end_date')}
+          </Th>
         )}
-        <Th></Th>
+        <Th className="px-3" withoutHorizontalPadding>
+          {t('end_time')}
+        </Th>
+        <Th className="px-3" withoutHorizontalPadding>
+          {t('duration')}
+        </Th>
+        {company?.settings.allow_billable_task_items && (
+          <Th className="pl-16 pr-3" withoutHorizontalPadding>
+            {t('billable')}
+          </Th>
+        )}
+        <Th withoutHorizontalPadding></Th>
       </Thead>
       <Tbody>
         {task.time_log &&
           (JSON.parse(task.time_log) as TimeLogsType).map(
             ([start, stop, description, billable], index) => (
               <>
-                <Tr>
-                  <Td>
+                <Tr
+                  className="border-b"
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                >
+                  <Td className="pl-3 py-3" withoutPadding>
                     <InputField
                       key={`${dayjs().unix().toString()}StartDate`}
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
@@ -227,7 +257,7 @@ export function TaskTable(props: Props) {
                     />
                   </Td>
 
-                  <Td>
+                  <Td className="pl-3 py-3" withoutPadding>
                     <InputField
                       key={`${dayjs().unix().toString()}StartTime`}
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
@@ -248,7 +278,7 @@ export function TaskTable(props: Props) {
                   </Td>
 
                   {company?.show_task_end_date && (
-                    <Td>
+                    <Td className="pl-3 py-3" withoutPadding>
                       <InputField
                         key={`${dayjs().unix().toString()}EndDate`}
                         style={{ color: colors.$3, colorScheme: colors.$0 }}
@@ -272,7 +302,7 @@ export function TaskTable(props: Props) {
                     </Td>
                   )}
 
-                  <Td>
+                  <Td className="pl-3 py-3" withoutPadding>
                     <InputField
                       key={`${dayjs().unix().toString()}EndTime`}
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
@@ -294,7 +324,7 @@ export function TaskTable(props: Props) {
                     />
                   </Td>
 
-                  <Td>
+                  <Td className="pl-3 py-3" withoutPadding>
                     {stop !== 0 || task.created_at === 0 ? (
                       <InputField
                         debounceTimeout={1000}
@@ -317,7 +347,7 @@ export function TaskTable(props: Props) {
                   </Td>
 
                   {company?.settings.allow_billable_task_items && (
-                    <Td>
+                    <Td className="pl-16 py-3" withoutPadding>
                       <Checkbox
                         style={{ color: colors.$3, colorScheme: colors.$0 }}
                         checked={billable || typeof billable === 'undefined'}
@@ -337,13 +367,18 @@ export function TaskTable(props: Props) {
                       company?.settings.show_task_item_description ? 2 : 1
                     }
                   >
-                    <button
-                      style={{ color: colors.$3 }}
-                      className="ml-2 text-gray-600 hover:text-red-600"
+                    <div
+                      className="cursor-pointer"
                       onClick={() => deleteTableRow(index)}
                     >
-                      <Trash2 size={18} />
-                    </button>
+                      <CircleXMark
+                        color={colors.$3}
+                        hoverColor={colors.$3}
+                        borderColor={colors.$5}
+                        hoverBorderColor={colors.$17}
+                        size="1.6rem"
+                      />
+                    </div>
                   </Td>
                 </Tr>
 
@@ -369,21 +404,46 @@ export function TaskTable(props: Props) {
             )
           )}
 
-        <Tr className="bg-slate-100 hover:bg-slate-200">
-          <Td colSpan={100}>
-            <button
-              onClick={() => (task.created_at ? start(task) : createTableRow())}
-              className="w-full py-2 inline-flex justify-center items-center space-x-2 disabled:cursor-not-allowed"
-              disabled={isTaskRunning(task) && task.created_at !== 0}
+        <Tr>
+          <Td colSpan={100} className="p-1" withoutPadding>
+            <AddItemButton
+              className={classNames(
+                'w-full py-3 inline-flex justify-center items-center space-x-2 rounded-[0.1875rem]',
+                {
+                  'cursor-not-allowed':
+                    isTaskRunning(task) && task.created_at !== 0,
+                  'cursor-pointer':
+                    !isTaskRunning(task) || task.created_at === 0,
+                }
+              )}
+              onClick={() => {
+                if (isTaskRunning(task) && task.created_at !== 0) {
+                  return;
+                }
+
+                if (task.created_at) {
+                  start(task);
+                } else {
+                  createTableRow();
+                }
+              }}
+              theme={{
+                backgroundColor: colors.$1,
+                hoverBackgroundColor: colors.$20,
+              }}
             >
               {isTaskRunning(task) && task.created_at !== 0 ? (
                 <span>{t('stop_task_to_add_task_entry')}</span>
               ) : (
-                <>
-                  <Plus size={18} /> <span>{t('add_item')}</span>
-                </>
+                <div className="flex items-center space-x-2">
+                  <div>
+                    <Plus size="1.15rem" color={colors.$17} />
+                  </div>
+
+                  <span className="font-medium">{t('add_item')}</span>
+                </div>
               )}
-            </button>
+            </AddItemButton>
           </Td>
         </Tr>
       </Tbody>

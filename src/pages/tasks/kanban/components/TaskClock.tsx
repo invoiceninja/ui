@@ -95,6 +95,8 @@ export function TaskClock(props: Props) {
   }, [props.task.updated_at]);
 
   return (
-    <p style={{ color: colors.$17 }}>{isTaskActive && formatTime(seconds)}</p>
+    <p className="text-sm font-mono" style={{ color: colors.$17 }}>
+      {isTaskActive && formatTime(seconds)}
+    </p>
   );
 }

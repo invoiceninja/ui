@@ -144,7 +144,7 @@ export function NumberInputField(props: Props) {
     <section style={{ width: props.width }}>
       {props.label && (
         <InputLabel
-          className={classNames('mb-2', {
+          className={classNames('mb-1', {
             'whitespace-nowrap': props.withoutLabelWrapping,
           })}
           for={props.id}
@@ -157,9 +157,11 @@ export function NumberInputField(props: Props) {
       <div className="relative">
         <NumericFormat
           className={classNames(
-            `w-full py-2 px-3 rounded text-sm disabled:opacity-75 disabled:cursor-not-allowed ${props.className}`,
+            `w-full py-2 px-3 rounded-md text-sm disabled:opacity-75 disabled:cursor-not-allowed focus:outline-none focus:ring-0 ${props.className}`,
             {
-              'border border-gray-300': props.border !== false,
+              border: props.border !== false,
+              'border-[#09090B26] focus:border-black': !reactSettings.dark_mode,
+              'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
             }
           )}
           value={currentValue || ''}
@@ -210,7 +212,6 @@ export function NumberInputField(props: Props) {
           allowNegative
           style={{
             backgroundColor: colors.$1,
-            borderColor: colors.$5,
             color: colors.$3,
             ...props.style,
           }}

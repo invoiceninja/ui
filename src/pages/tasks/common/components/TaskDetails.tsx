@@ -21,8 +21,6 @@ import { useTranslation } from 'react-i18next';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { TaskStatus as TaskStatusBadge } from './TaskStatus';
-import { PauseCircle, PlayCircle } from 'react-feather';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useStart } from '../hooks/useStart';
 import { useStop } from '../hooks/useStop';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
@@ -38,6 +36,9 @@ import { ClientActionButtons } from '$app/pages/invoices/common/components/Clien
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import classNames from 'classnames';
+import { MediaPlay } from '$app/components/icons/MediaPlay';
+import { MediaPause } from '$app/components/icons/MediaPause';
 
 dayjs.extend(duration);
 
@@ -59,9 +60,9 @@ export function TaskDetails(props: Props) {
   const { task, handleChange, errors, page } = props;
 
   const company = useCurrentCompany();
-  const accent = useAccentColor();
-  const start = useStart();
+
   const stop = useStop();
+  const start = useStart();
 
   const calculation = calculateTime(task.time_log, {
     inSeconds: true,
@@ -70,7 +71,15 @@ export function TaskDetails(props: Props) {
 
   return (
     <Card
-      title={t('task')}
+      title={
+        <div className="flex items-center space-x-4">
+          <span>{t('task')}</span>
+
+          {task && page === 'edit' && (
+            <TaskStatusBadge entity={task} withoutDropdown />
+          )}
+        </div>
+      }
       className="shadow-sm"
       topRight={
         task &&
@@ -79,7 +88,7 @@ export function TaskDetails(props: Props) {
             {isTaskRunning(task) && <TaskClock task={task} />}
 
             {!isTaskRunning(task) && calculation && (
-              <span style={{ color: colors.$17 }}>
+              <span className="text-sm font-mono" style={{ color: colors.$17 }}>
                 {formatTime(Number(calculation))}
               </span>
             )}
@@ -92,14 +101,13 @@ export function TaskDetails(props: Props) {
                 disabled={!hasPermission('edit_task') && !entityAssigned(task)}
               >
                 <div className="flex items-center gap-2">
-                  <PlayCircle
-                    color="#808080"
-                    size={15}
-                    stroke={accent}
-                    strokeWidth="1"
+                  <MediaPlay
+                    size="1.1rem"
+                    color={colors.$1}
+                    filledColor={colors.$1}
                   />
 
-                  <span>{t('start_task')}</span>
+                  <span style={{ color: colors.$1 }}>{t('start')}</span>
                 </div>
               </Button>
             )}
@@ -112,14 +120,13 @@ export function TaskDetails(props: Props) {
                 disableWithoutIcon
               >
                 <div className="flex items-center gap-2">
-                  <PauseCircle
-                    color="#808080"
-                    size={15}
-                    stroke={accent}
-                    strokeWidth="1"
+                  <MediaPause
+                    color={colors.$1}
+                    filledColor={colors.$1}
+                    size="1.1rem"
                   />
 
-                  <span>{t('stop_task')}</span>
+                  <span style={{ color: colors.$1 }}>{t('stop')}</span>
                 </div>
               </Button>
             )}
@@ -127,17 +134,14 @@ export function TaskDetails(props: Props) {
         )
       }
       style={{ borderColor: colors.$24 }}
-      headerClassName="px-6 py-2"
+      headerClassName={classNames('px-6', {
+        'py-2': page === 'edit',
+        'py-4': page !== 'edit',
+      })}
       headerStyle={{ borderColor: colors.$20 }}
       withoutHeaderPadding
     >
       <div className="flex flex-col space-y-4 items-center justify-start w-full px-6 pb-8 pt-2">
-        {task && page === 'edit' && (
-          <div className="flex w-full justify-start lg:w-3/5">
-            <TaskStatusBadge entity={task} withoutDropdown />
-          </div>
-        )}
-
         <div className="grid grid-cols-2 gap-4 lg:w-3/5 place-items-center">
           <div className="flex flex-col space-y-2 w-full">
             <ClientSelector
@@ -212,24 +216,6 @@ export function TaskDetails(props: Props) {
             readonly={!hasPermission('edit_task')}
           />
 
-          {task && company?.custom_fields?.task1 && (
-            <CustomField
-              field="task1"
-              defaultValue={task.custom_value1 || ''}
-              value={company.custom_fields.task1}
-              onValueChange={(value) => handleChange('custom_value1', value)}
-            />
-          )}
-
-          {task && company?.custom_fields?.task2 && (
-            <CustomField
-              field="task2"
-              defaultValue={task.custom_value2 || ''}
-              value={company.custom_fields.task2}
-              onValueChange={(value) => handleChange('custom_value2', value)}
-            />
-          )}
-
           <InputField
             label={t('task_number')}
             value={task.number}
@@ -256,6 +242,24 @@ export function TaskDetails(props: Props) {
             readonly={props.taskModal}
             errorMessage={errors?.errors.status_id}
           />
+
+          {task && company?.custom_fields?.task1 && (
+            <CustomField
+              field="task1"
+              defaultValue={task.custom_value1 || ''}
+              value={company.custom_fields.task1}
+              onValueChange={(value) => handleChange('custom_value1', value)}
+            />
+          )}
+
+          {task && company?.custom_fields?.task2 && (
+            <CustomField
+              field="task2"
+              defaultValue={task.custom_value2 || ''}
+              value={company.custom_fields.task2}
+              onValueChange={(value) => handleChange('custom_value2', value)}
+            />
+          )}
 
           {task && company?.custom_fields?.task3 && (
             <CustomField
