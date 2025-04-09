@@ -56,41 +56,54 @@ export function TabGroup(props: Props) {
 
   return (
     <div className={props.className} data-cy="tabs">
-      <div className="-mb-px flex overflow-x-auto">
-        {withHorizontalPadding && (
-          <div
-            style={{ borderBottom: `2px solid ${colors.$20}`, width: '7rem' }}
-          />
-        )}
+      <div
+        className="flex justify-between"
+        style={{ borderBottom: `1px solid ${colors.$20}` }}
+      >
+        <div className="flex overflow-x-auto -mb-px">
+          {withHorizontalPadding && <div style={{ width: '7rem' }} />}
 
-        {props.tabs.map((tab, index) => (
-          <div
-            key={index}
-            className={classNames({ 'w-full': props.width === 'full' })}
-          >
-            <StyledButton
-              className={classNames(
-                'whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm',
-                { 'w-full': props.width === 'full' }
-              )}
-              type="button"
-              onClick={() => handleTabChange(index)}
-              theme={{
-                borderColor: currentIndex === index ? colors.$3 : colors.$20,
-                textColor: currentIndex === index ? colors.$3 : colors.$17,
-                hoverTextColor: colors.$3,
-              }}
+          {props.tabs.map((tab, index) => (
+            <div
+              key={index}
+              className={classNames({
+                'w-full': props.width === 'full',
+              })}
             >
-              {props.formatTabLabel?.(index) || tab}
-            </StyledButton>
-          </div>
-        ))}
+              <div className="relative py-3 px-4">
+                <StyledButton
+                  className={classNames(
+                    'whitespace-nowrap font-medium text-sm',
+                    {
+                      'w-full': props.width === 'full',
+                    }
+                  )}
+                  type="button"
+                  onClick={() => handleTabChange(index)}
+                  theme={{
+                    textColor: currentIndex === index ? colors.$3 : colors.$17,
+                    hoverTextColor: colors.$3,
+                  }}
+                >
+                  {props.formatTabLabel?.(index) || tab}
+                </StyledButton>
 
-        {withHorizontalPadding && (
-          <div
-            style={{ borderBottom: `2px solid ${colors.$20}`, width: '7rem' }}
-          />
-        )}
+                {currentIndex === index && (
+                  <div
+                    className="absolute left-1/2 transform -translate-x-1/2 w-full"
+                    style={{
+                      height: '1px',
+                      backgroundColor: colors.$3,
+                      bottom: 0,
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          ))}
+
+          {withHorizontalPadding && <div style={{ width: '7rem' }} />}
+        </div>
       </div>
 
       <div
@@ -100,6 +113,7 @@ export function TabGroup(props: Props) {
           'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
+        {/* Ostali kod za djecu komponente ostaje isti */}
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&
