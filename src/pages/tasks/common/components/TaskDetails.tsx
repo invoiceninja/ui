@@ -39,6 +39,7 @@ import duration from 'dayjs/plugin/duration';
 import classNames from 'classnames';
 import { MediaPlay } from '$app/components/icons/MediaPlay';
 import { MediaPause } from '$app/components/icons/MediaPause';
+import { useMediaQuery } from 'react-responsive';
 
 dayjs.extend(duration);
 
@@ -60,6 +61,7 @@ export function TaskDetails(props: Props) {
   const { task, handleChange, errors, page } = props;
 
   const company = useCurrentCompany();
+  const isMediumScreen = useMediaQuery({ query: '(min-width: 768px)' });
 
   const stop = useStop();
   const start = useStart();
@@ -75,7 +77,7 @@ export function TaskDetails(props: Props) {
         <div className="flex items-center space-x-4">
           <span>{t('task')}</span>
 
-          {task && page === 'edit' && (
+          {task && page === 'edit' && isMediumScreen && (
             <TaskStatusBadge entity={task} withoutDropdown />
           )}
         </div>
@@ -83,7 +85,8 @@ export function TaskDetails(props: Props) {
       className="shadow-sm"
       topRight={
         task &&
-        page === 'edit' && (
+        page === 'edit' &&
+        isMediumScreen && (
           <div className="flex items-center space-x-5">
             {isTaskRunning(task) && <TaskClock task={task} />}
 
@@ -136,13 +139,74 @@ export function TaskDetails(props: Props) {
       style={{ borderColor: colors.$24 }}
       headerClassName={classNames('px-6', {
         'py-2': page === 'edit',
-        'py-4': page !== 'edit',
+        'py-4': page !== 'edit' || !isMediumScreen,
       })}
       headerStyle={{ borderColor: colors.$20 }}
       withoutHeaderPadding
     >
       <div className="flex flex-col space-y-4 items-center justify-start w-full px-6 pb-8 pt-2">
-        <div className="grid grid-cols-2 gap-4 lg:w-3/5 place-items-center">
+        {task && page === 'edit' && !isMediumScreen && (
+          <div className="flex justify-between items-center space-x-2 w-full">
+            <TaskStatusBadge entity={task} withoutDropdown />
+
+            <div className="flex items-center space-x-2">
+              {isTaskRunning(task) && <TaskClock task={task} />}
+
+              {!isTaskRunning(task) && calculation && (
+                <span
+                  className="text-sm font-mono"
+                  style={{ color: colors.$17 }}
+                >
+                  {formatTime(Number(calculation))}
+                </span>
+              )}
+
+              {!isTaskRunning(task) && !task.invoice_id && (
+                <Button
+                  behavior="button"
+                  onClick={() => start(task)}
+                  disableWithoutIcon
+                  disabled={
+                    !hasPermission('edit_task') && !entityAssigned(task)
+                  }
+                >
+                  <div className="flex items-center gap-2">
+                    <MediaPlay
+                      size="1.1rem"
+                      color={colors.$1}
+                      filledColor={colors.$1}
+                    />
+
+                    <span style={{ color: colors.$1 }}>{t('start')}</span>
+                  </div>
+                </Button>
+              )}
+
+              {isTaskRunning(task) && !task.invoice_id && (
+                <Button
+                  behavior="button"
+                  onClick={() => stop(task)}
+                  disabled={
+                    !hasPermission('edit_task') && !entityAssigned(task)
+                  }
+                  disableWithoutIcon
+                >
+                  <div className="flex items-center gap-2">
+                    <MediaPause
+                      color={colors.$1}
+                      filledColor={colors.$1}
+                      size="1.1rem"
+                    />
+
+                    <span style={{ color: colors.$1 }}>{t('stop')}</span>
+                  </div>
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full lg:w-3/5 place-items-center">
           <div className="flex flex-col space-y-2 w-full">
             <ClientSelector
               inputLabel={t('client')}
@@ -280,7 +344,7 @@ export function TaskDetails(props: Props) {
           )}
         </div>
 
-        <div className="lg:w-3/5">
+        <div className="w-full lg:w-3/5">
           <InputField
             label={t('description')}
             element="textarea"

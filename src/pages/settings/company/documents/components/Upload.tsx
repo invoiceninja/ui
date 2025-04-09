@@ -25,6 +25,7 @@ import { MdInfoOutline } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
 
 interface Props {
   endpoint: string;
@@ -39,6 +40,7 @@ export function Upload(props: Props) {
   const { disableUpload = false } = props;
 
   const user = useCurrentUser();
+  const colors = useColorScheme();
 
   const [formData, setFormData] = useState(new FormData());
 
@@ -85,8 +87,6 @@ export function Upload(props: Props) {
     },
   });
 
-  const colors = useColorScheme();
-
   if (props.widgetOnly) {
     return (
       <>
@@ -116,10 +116,14 @@ export function Upload(props: Props) {
         >
           <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <input {...getInputProps()} />
-            <Image className="mx-auto h-12 w-12 text-gray-400" />
+
+            <div className="flex justify-center">
+              <CloudUpload size="2.3rem" color={colors.$3} />
+            </div>
+
             <span
-              className="mt-2 block text-sm font-medium"
-              style={{ color: colors.$3 }}
+              className="mt-3 block text-sm font-medium"
+              style={{ color: colors.$17 }}
             >
               {isDragActive
                 ? t('drop_file_here')

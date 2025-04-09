@@ -408,7 +408,7 @@ export function TaskTable(props: Props) {
           <Td colSpan={100} className="p-1" withoutPadding>
             <AddItemButton
               className={classNames(
-                'w-full py-3 inline-flex justify-center items-center space-x-2 rounded-[0.1875rem]',
+                'w-full py-4 inline-flex justify-center items-center space-x-2 rounded-[0.1875rem]',
                 {
                   'cursor-not-allowed':
                     isTaskRunning(task) && task.created_at !== 0,
