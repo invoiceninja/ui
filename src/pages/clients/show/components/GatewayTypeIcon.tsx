@@ -27,6 +27,7 @@ import ewayLogo from '/gateway-card-images/eway.png';
 import forteLogo from '/gateway-card-images/forte.png';
 import wepayLogo from '/gateway-card-images/wepay.svg';
 import BTCPayLogo from '/gateway-card-images/btcpay.png';
+import BlockonomicsLogo from '/gateway-card-images/blockonomics.svg';
 
 export const availableGatewayLogos = [
   'paypal_ppcp',
@@ -49,6 +50,7 @@ export const availableGatewayLogos = [
   'forte',
   'paypal_rest',
   'btcpay',
+  'blockonomics',
 ];
 
 export type GatewayLogoName =
@@ -71,7 +73,8 @@ export type GatewayLogoName =
   | 'eway'
   | 'forte'
   | 'paypal_rest'
-  | 'btcpay';
+  | 'btcpay'
+  | 'blockonomics';
 
 interface Props {
   name: GatewayLogoName;
@@ -256,6 +259,15 @@ export function GatewayTypeIcon(props: Props) {
         <img
           src={BTCPayLogo}
           alt="BTCPay"
+          style={props.style || { width: 30, height: 30 }}
+        />
+      );
+
+    case 'blockonomics':
+      return (
+        <img
+          src={BlockonomicsLogo}
+          alt="Blockonomics"
           style={props.style || { width: 30, height: 30 }}
         />
       );
