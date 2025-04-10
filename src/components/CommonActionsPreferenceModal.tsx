@@ -195,7 +195,7 @@ export function CommonActionsPreferenceModal(props: Props) {
 
   return (
     <Modal
-      title={t('edit_quick_actions')}
+      title={`${t(`${entity}s`)} ${t('actions')} ${t('preferences')}`}
       visible={visible}
       onClose={() => {
         setVisible(false);
@@ -283,8 +283,11 @@ export function CommonActionsPreferenceModal(props: Props) {
                               ref={provided.innerRef}
                               key={index}
                             >
-                              <div className="flex items-center space-x-2">
-                                <div {...provided.dragHandleProps}>
+                              <div
+                                className="flex flex-1 items-center space-x-2 cursor-pointer"
+                                {...provided.dragHandleProps}
+                              >
+                                <div>
                                   <GridDotsVertical
                                     size="1.2rem"
                                     color={colors.$17}
