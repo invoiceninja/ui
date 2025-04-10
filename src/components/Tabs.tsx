@@ -147,7 +147,7 @@ export function Tabs(props: Props) {
             {props.tabs.map(
               (tab) =>
                 (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                  <div className="relative py-3 px-4">
+                  <div className="relative p-4">
                     <StyledLink
                       key={tab.name}
                       to={tab.href}
@@ -159,7 +159,7 @@ export function Tabs(props: Props) {
                       className="whitespace-nowrap font-medium text-sm"
                       aria-current={isActive(tab) ? 'page' : undefined}
                     >
-                      {tab.formatName?.() || tab.name}
+                      <div>{tab.formatName?.() || tab.name}</div>
                     </StyledLink>
 
                     {isActive(tab) && (

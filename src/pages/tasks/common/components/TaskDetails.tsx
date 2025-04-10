@@ -232,8 +232,8 @@ export function TaskDetails(props: Props) {
             )}
           </div>
 
-          <div className="flex items-center justify-center w-full">
-            <span
+          <div className="flex self-start items-center justify-center w-full">
+            <div
               className="flex flex-1 item-center gap-2"
               style={{ color: colors.$3, colorScheme: colors.$0 }}
             >
@@ -253,11 +253,11 @@ export function TaskDetails(props: Props) {
                 }}
                 errorMessage={errors?.errors.project_id}
               />
-            </span>
+            </div>
 
             {task?.project_id && (
-              <span
-                className="flex item-center gap-2 pl-2"
+              <div
+                className="flex item-center gap-2 pl-2 mt-6"
                 style={{ color: colors.$3, colorScheme: colors.$0 }}
               >
                 <Link
@@ -267,7 +267,7 @@ export function TaskDetails(props: Props) {
                 >
                   <Icon element={MdLaunch} size={18} />
                 </Link>
-              </span>
+              </div>
             )}
           </div>
 
