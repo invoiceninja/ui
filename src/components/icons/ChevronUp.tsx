@@ -17,7 +17,7 @@ interface Props {
 export function ChevronUp({
   color = '#000',
   size = '1.2rem',
-  strokeWidth = '2',
+  strokeWidth = '1.5',
 }: Props) {
   return (
     <svg

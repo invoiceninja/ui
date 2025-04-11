@@ -65,14 +65,17 @@ export default function EmailHistory() {
         <span className="px-6">{t('email_history_empty')}</span>
       )}
 
-      {emailRecords.map((emailRecord, index) => (
-        <EmailRecord
-          key={index}
-          className="py-4"
-          emailRecord={emailRecord}
-          index={index}
-        />
-      ))}
+      <div className="flex flex-col space-y-2 px-6">
+        {emailRecords.map((emailRecord, index) => (
+          <EmailRecord
+            key={index}
+            className="py-4"
+            emailRecord={emailRecord}
+            index={index}
+            withAllBorders
+          />
+        ))}
+      </div>
     </Card>
   );
 }

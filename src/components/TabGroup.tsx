@@ -122,6 +122,7 @@ export function TabGroup(props: Props) {
           'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
+        {/* Ostali kod za djecu komponente ostaje isti */}
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&
