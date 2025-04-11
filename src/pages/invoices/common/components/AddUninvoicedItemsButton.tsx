@@ -153,17 +153,22 @@ export function AddUninvoicedItemsButton(props: Props) {
       )}
 
       <Modal
-        size="small"
+        size="extraSmall"
         title={t('add_item')}
         visible={isModalOpen}
         onClose={handleOnClose}
         overflowVisible
+        withoutBorderLine
+        withoutVerticalMargin
+        withoutHorizontalPadding
       >
         <TabGroup
           tabs={[t('products'), t('tasks'), t('expenses')]}
           width="full"
+          withHorizontalPadding
+          horizontalPaddingWidth="3.5rem"
         >
-          <div className="flex flex-col space-y-4 pt-4">
+          <div className="flex flex-col space-y-4 pt-1 px-4">
             <ProductSelector
               label={t('products') as string}
               onChange={(product) =>
@@ -211,7 +216,7 @@ export function AddUninvoicedItemsButton(props: Props) {
             </div>
           </div>
 
-          <div className="flex flex-col space-y-4 pt-4">
+          <div className="flex flex-col space-y-4 pt-4 px-4">
             {invoice?.client_id ? (
               <>
                 <TaskSelector
@@ -287,7 +292,7 @@ export function AddUninvoicedItemsButton(props: Props) {
             )}
           </div>
 
-          <div className="flex flex-col space-y-4 pt-4">
+          <div className="flex flex-col space-y-4 pt-4 px-4">
             {invoice?.client_id ? (
               <>
                 <ExpenseSelector
@@ -364,7 +369,7 @@ export function AddUninvoicedItemsButton(props: Props) {
           </div>
         </TabGroup>
 
-        <div className="self-end">
+        <div className="self-end px-4">
           <Button
             behavior="button"
             onClick={() => {
