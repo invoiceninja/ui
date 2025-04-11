@@ -54,6 +54,7 @@ export const $1 = {
   $22: '#a1a1aa', // Label color
   $23: '#121212', // Content background color
   $24: '#323236', // Border color
+  $25: '#1f2e41', // Hover element background color
 };
 
 export const $2 = {
@@ -83,6 +84,7 @@ export const $2 = {
   $22: '#717179', // Label color
   $23: '#F4F4F5', // Content background color
   $24: '#09090B26', // Border color
+  $25: '#09090B0D', // Hover element background color
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);

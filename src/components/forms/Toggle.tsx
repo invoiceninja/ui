@@ -82,7 +82,9 @@ export default function Toggle(props: Props) {
       </StyledSwitch>
       {props.label && (
         <Switch.Label as="span" className="ml-3">
-          <span className="text-sm">{props.label}</span>
+          <span className="text-sm" style={{ color: colors.$3 }}>
+            {props.label}
+          </span>
         </Switch.Label>
       )}
     </Switch.Group>

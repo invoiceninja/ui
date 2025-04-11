@@ -134,7 +134,7 @@ export function SelectField(props: SelectProps) {
   return (
     <div className={classNames({ 'space-y-2': Boolean(customSelector) })}>
       {props.label && (
-        <InputLabel className="mb-2" for={props.id}>
+        <InputLabel className="mb-1" for={props.id}>
           {props.label}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </InputLabel>

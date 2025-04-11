@@ -23,9 +23,11 @@ import { TaskStatusesDropdown } from './TaskStatusesDropdown';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
 import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 interface Props {
   entity: Task;
+  withoutDropdown?: boolean;
 }
 
 export function TaskStatus(props: Props) {
@@ -91,7 +93,12 @@ export function TaskStatus(props: Props) {
       <div ref={ref} onClick={(event) => event.stopPropagation()}>
         <div className="flex items-center">
           <div
-            className="text-xs rounded-l px-2 py-1 border-r border-white font-medium"
+            className={classNames(
+              'text-xs rounded-l px-2 py-1 border-r border-white font-medium',
+              {
+                'rounded-r': props.withoutDropdown,
+              }
+            )}
             style={{
               color: adjustColorDarkness(hex, darknessAmount),
               backgroundColor: status.color,
@@ -100,22 +107,24 @@ export function TaskStatus(props: Props) {
             {status.name}
           </div>
 
-          <div
-            className="flex items-center justify-center rounded-r py-1 h-full"
-            style={{
-              color: adjustColorDarkness(hex, darknessAmount),
-              backgroundColor: status.color,
-              width: '1.5rem',
-            }}
-            onClick={() =>
-              !isFormBusy && setVisibleDropdown((current) => !current)
-            }
-          >
-            <ChevronDown
-              color={adjustColorDarkness(hex, darknessAmount)}
-              size="1rem"
-            />
-          </div>
+          {!props.withoutDropdown && (
+            <div
+              className="flex items-center justify-center rounded-r py-1 h-full"
+              style={{
+                color: adjustColorDarkness(hex, darknessAmount),
+                backgroundColor: status.color,
+                width: '1.5rem',
+              }}
+              onClick={() =>
+                !isFormBusy && setVisibleDropdown((current) => !current)
+              }
+            >
+              <ChevronDown
+                color={adjustColorDarkness(hex, darknessAmount)}
+                size="1rem"
+              />
+            </div>
+          )}
         </div>
 
         <TaskStatusesDropdown
@@ -132,21 +141,30 @@ export function TaskStatus(props: Props) {
   return (
     <div ref={ref} onClick={(event) => event.stopPropagation()}>
       <div className="flex items-center">
-        <div className="text-xs rounded-l px-2 py-1 border-r border-white font-medium bg-gray-100 text-gray-800">
+        <div
+          className={classNames(
+            'text-xs rounded-l px-2 py-1 border-r border-white font-medium bg-gray-100 text-gray-800',
+            {
+              'rounded-r': props.withoutDropdown,
+            }
+          )}
+        >
           {t('logged')}
         </div>
 
-        <div
-          className="flex items-center justify-center rounded-r py-1 h-full bg-gray-100"
-          onClick={() =>
-            !isFormBusy && setVisibleDropdown((current) => !current)
-          }
-          style={{
-            width: '1.5rem',
-          }}
-        >
-          <ChevronDown color="#1f2937" size="1rem" />
-        </div>
+        {!props.withoutDropdown && (
+          <div
+            className="flex items-center justify-center rounded-r py-1 h-full bg-gray-100"
+            onClick={() =>
+              !isFormBusy && setVisibleDropdown((current) => !current)
+            }
+            style={{
+              width: '1.5rem',
+            }}
+          >
+            <ChevronDown color="#1f2937" size="1rem" />
+          </div>
+        )}
       </div>
 
       <TaskStatusesDropdown

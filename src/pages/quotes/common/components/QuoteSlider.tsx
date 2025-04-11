@@ -469,7 +469,7 @@ export function QuoteSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col divide-y">
+        <div className="flex flex-col space-y-2 px-6">
           {Boolean(!emailRecords.length) && (
             <span className="px-4 text-sm">{t('email_history_empty')}</span>
           )}
@@ -480,6 +480,7 @@ export function QuoteSlider() {
               className="py-4"
               emailRecord={emailRecord}
               index={index}
+              withAllBorders
             />
           ))}
         </div>

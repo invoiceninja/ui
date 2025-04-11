@@ -602,13 +602,13 @@ export function ComboboxStatic<T = any>({
 
         <div className="relative mt-1">
           <div
-            className="relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm shadow-sm"
-            style={{ borderColor: colors.$5 }}
+            className="relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm"
+            style={{ borderColor: colors.$24 }}
           >
             <HeadlessCombobox.Input
               data-testid="combobox-input-field"
               ref={comboboxInputRef}
-              className="w-full rounded-md py-1.5 pl-3 pr-10 sm:text-sm sm:leading-6"
+              className="w-full rounded-md py-1.5 pl-3 pr-10 sm:text-sm sm:leading-6 focus:outline-none focus:ring-0"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
                 entryOptions.inputLabelFn?.(entry?.resource) ??

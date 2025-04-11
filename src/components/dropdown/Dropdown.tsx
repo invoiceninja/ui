@@ -33,6 +33,7 @@ interface Props extends CommonProps {
   customLabel?: ReactNode;
   minWidth?: string;
   maxWidth?: string;
+  labelButtonBorderColor?: string;
 }
 
 const LabelButton = styled.button`
@@ -126,7 +127,7 @@ export function Dropdown(props: Props) {
             theme={{
               backgroundColor: colors.$18,
               color: colors.$1,
-              borderColor: colors.$24,
+              borderColor: props.labelButtonBorderColor || colors.$24,
             }}
             type="button"
             disabled={props.disabled}
