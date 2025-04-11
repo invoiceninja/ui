@@ -12,6 +12,7 @@ import { Fragment, ReactNode } from 'react';
 import { Dropdown } from './dropdown/Dropdown';
 import { Button } from './forms';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 
 export type Action<T = unknown> = (resource: T) => ReactNode;
 
@@ -28,6 +29,8 @@ interface Props {
 
 export function ResourceActions(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const {
     onSaveClick,
@@ -56,6 +59,7 @@ export function ResourceActions(props: Props) {
             cardActions
             disabled={disableSaveButton}
             cypressRef={props.cypressRef}
+            labelButtonBorderColor={colors.$1}
           >
             {props.actions.map((action, index) => (
               <Fragment key={index}>{action(props.resource)}</Fragment>

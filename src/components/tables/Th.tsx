@@ -34,6 +34,7 @@ interface Props extends CommonProps {
   textSize?: 'extraSmall' | 'small';
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
+  withoutHorizontalPadding?: boolean;
 }
 
 const defaultProps: Props = {
@@ -86,12 +87,13 @@ export function Th$(props: Props) {
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       className={classNames(
-        `px-2 lg:px-2.5 xl:px-4 text-left font-normal tracking-wider whitespace-nowrap ${props.className}`,
+        `text-left font-normal tracking-wider whitespace-nowrap ${props.className}`,
         {
           'border-r relative': props.resizable,
           'py-2.5': !props.withoutVerticalPadding,
           'text-xs': props.textSize === 'extraSmall',
           'text-sm': props.textSize === 'small' || !props.textSize,
+          'px-2 lg:px-2.5 xl:px-4': !props.withoutHorizontalPadding,
         }
       )}
       onMouseMove={handleMouseMove}

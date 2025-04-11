@@ -67,7 +67,7 @@ export function InputField(props: Props) {
     <section style={{ width: props.width }}>
       {props.label && (
         <InputLabel
-          className={classNames('mb-2', {
+          className={classNames('mb-1', {
             'whitespace-nowrap': props.withoutLabelWrapping,
           })}
           for={props.id}
@@ -98,7 +98,7 @@ export function InputField(props: Props) {
           className={classNames(
             `w-full py-2 px-3 rounded-md text-sm disabled:opacity-75 disabled:cursor-not-allowed focus:outline-none focus:ring-0 ${props.className}`,
             {
-              'border border-gray-300': props.border !== false,
+              border: props.border !== false,
               'border-[#09090B26] focus:border-black': !reactSettings.dark_mode,
               'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
             }

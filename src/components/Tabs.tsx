@@ -21,6 +21,7 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom';
+import styled from 'styled-components';
 
 interface Props {
   className?: string;
@@ -40,6 +41,15 @@ export type Tab = {
   formatName?: () => ReactNode | undefined;
 };
 export type Matcher = (params: Readonly<Params<string>>) => string;
+
+const StyledLink = styled(Link)`
+  border-color: ${({ theme }) => theme.borderColor};
+  color: ${({ theme }) => theme.textColor};
+
+  &:hover {
+    color: ${({ theme }) => theme.hoverTextColor};
+  }
+`;
 
 export function Tabs(props: Props) {
   const navigate = useNavigate();
@@ -110,7 +120,9 @@ export function Tabs(props: Props) {
           {props.tabs.map(
             (tab) =>
               (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                <option key={tab.name} value={tab.href}>{tab.formatName?.() || tab.name}</option>
+                <option key={tab.name} value={tab.href}>
+                  {tab.formatName?.() || tab.name}
+                </option>
               )
           )}
         </select>
@@ -120,36 +132,47 @@ export function Tabs(props: Props) {
 
       <div className="hidden sm:block">
         <div
-          className="flex justify-between border-b"
-          style={{ borderColor: colors.$5 }}
+          className="flex justify-between"
+          style={{ borderBottom: `2px solid ${colors.$20}` }}
         >
           <nav
             ref={tabBar}
             className={classNames(
-              '-mb-px flex relative scroll-smooth overflow-x-auto',
-              {
-                'space-x-8': !withoutDefaultTabSpace,
-              },
+              'flex relative scroll-smooth overflow-x-auto',
               tabBarClassName
             )}
             aria-label="Tabs"
+            style={{ marginBottom: '-2px' }}
           >
             {props.tabs.map(
               (tab) =>
                 (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                  <Link
-                    key={tab.name}
-                    to={tab.href}
-                    onClick={(event) => handleScroll(event)}
-                    style={{
-                      borderColor: isActive(tab) ? accentColor : 'transparent',
-                      color: isActive(tab) ? accentColor : colors.$3,
-                    }}
-                    className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                    aria-current={isActive(tab) ? 'page' : undefined}
-                  >
-                    {tab.formatName?.() || tab.name}
-                  </Link>
+                  <div className="relative p-4">
+                    <StyledLink
+                      key={tab.name}
+                      to={tab.href}
+                      onClick={(event) => handleScroll(event)}
+                      theme={{
+                        textColor: isActive(tab) ? colors.$3 : colors.$17,
+                        hoverTextColor: colors.$3,
+                      }}
+                      className="whitespace-nowrap font-medium text-sm"
+                      aria-current={isActive(tab) ? 'page' : undefined}
+                    >
+                      <div>{tab.formatName?.() || tab.name}</div>
+                    </StyledLink>
+
+                    {isActive(tab) && (
+                      <div
+                        className="absolute left-1/2 transform -translate-x-1/2 w-full"
+                        style={{
+                          height: '2px',
+                          backgroundColor: colors.$3,
+                          bottom: 0,
+                        }}
+                      />
+                    )}
+                  </div>
                 )
             )}
           </nav>
