@@ -184,8 +184,11 @@ export function DataTableColumnsPicker(props: Props) {
                         {...provided.draggableProps}
                         className="flex items-center justify-between py-[0.4rem] text-sm"
                       >
-                        <div className="flex space-x-2 items-center">
-                          <div {...provided.dragHandleProps}>
+                        <div
+                          className="flex flex-1 space-x-2 items-center cursor-pointer"
+                          {...provided.dragHandleProps}
+                        >
+                          <div>
                             <GridDotsVertical
                               size="1.2rem"
                               color={colors.$17}
@@ -220,8 +223,11 @@ export function DataTableColumnsPicker(props: Props) {
                               {...provided.draggableProps}
                               className="flex items-center justify-between py-[0.4rem]"
                             >
-                              <div className="flex space-x-2 items-center">
-                                <div {...provided.dragHandleProps}>
+                              <div
+                                className="flex flex-1 space-x-2 items-center cursor-pointer"
+                                {...provided.dragHandleProps}
+                              >
+                                <div>
                                   <GridDotsVertical
                                     size="1.2rem"
                                     color={colors.$17}
