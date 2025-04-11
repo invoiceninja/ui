@@ -26,6 +26,7 @@ interface Props {
   formatTabLabel?: (index: number) => ReactNode | undefined;
   withoutVerticalMargin?: boolean;
   withHorizontalPadding?: boolean;
+  horizontalPaddingWidth?: string;
 }
 
 const StyledButton = styled.button`
@@ -40,7 +41,11 @@ const StyledButton = styled.button`
 export function TabGroup(props: Props) {
   const colors = useColorScheme();
 
-  const { withoutVerticalMargin, withHorizontalPadding = false } = props;
+  const {
+    withoutVerticalMargin,
+    withHorizontalPadding = false,
+    horizontalPaddingWidth = '7rem',
+  } = props;
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
@@ -61,7 +66,9 @@ export function TabGroup(props: Props) {
         style={{ borderBottom: `1px solid ${colors.$20}` }}
       >
         <div className="flex overflow-x-auto -mb-px">
-          {withHorizontalPadding && <div style={{ width: '7rem' }} />}
+          {withHorizontalPadding && (
+            <div style={{ width: horizontalPaddingWidth }} />
+          )}
 
           {props.tabs.map((tab, index) => (
             <div
@@ -102,7 +109,9 @@ export function TabGroup(props: Props) {
             </div>
           ))}
 
-          {withHorizontalPadding && <div style={{ width: '7rem' }} />}
+          {withHorizontalPadding && (
+            <div style={{ width: horizontalPaddingWidth }} />
+          )}
         </div>
       </div>
 
@@ -113,7 +122,6 @@ export function TabGroup(props: Props) {
           'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
-        {/* Ostali kod za djecu komponente ostaje isti */}
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&

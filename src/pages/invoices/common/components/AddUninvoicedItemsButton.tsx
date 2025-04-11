@@ -165,8 +165,10 @@ export function AddUninvoicedItemsButton(props: Props) {
         <TabGroup
           tabs={[t('products'), t('tasks'), t('expenses')]}
           width="full"
+          withHorizontalPadding
+          horizontalPaddingWidth="3.5rem"
         >
-          <div className="flex flex-col space-y-4 pt-4 px-4">
+          <div className="flex flex-col space-y-4 pt-1 px-4">
             <ProductSelector
               label={t('products') as string}
               onChange={(product) =>

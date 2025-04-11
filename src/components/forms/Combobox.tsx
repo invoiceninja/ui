@@ -38,6 +38,7 @@ interface InputOptions {
   value: string | number | boolean | null;
   label?: string;
   placeholder?: string;
+  className?: string;
 }
 
 interface Action {
@@ -322,13 +323,21 @@ export function Combobox<T = any>({
   return (
     <div ref={comboboxRef} className="w-full" tabIndex={-1}>
       {inputOptions.label ? (
-        <p className="text-sm font-medium block">{inputOptions.label}</p>
+        <p
+          className={classNames(
+            'text-sm font-medium block',
+            inputOptions.className
+          )}
+          style={{ color: colors.$16 }}
+        >
+          {inputOptions.label}
+        </p>
       ) : null}
 
       <div className="relative mt-1">
         <div
           className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm shadow-sm"
-          style={{ borderColor: colors.$5 }}
+          style={{ borderColor: colors.$24 }}
         >
           <input
             type="text"
@@ -346,7 +355,7 @@ export function Combobox<T = any>({
             defaultValue={
               selectedOption ? selectedOption.label : inputValue?.toString()
             }
-            className="w-full rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+            className="w-full rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6 focus:outline-none focus:ring-0"
             ref={inputRef}
             style={{
               backgroundColor: colors.$1,
@@ -593,8 +602,11 @@ export function ComboboxStatic<T = any>({
       >
         {inputOptions.label && (
           <HeadlessCombobox.Label
-            className="text-sm font-medium block"
-            style={{ color: colors.$22 }}
+            className={classNames(
+              'text-sm font-medium block',
+              inputOptions.className
+            )}
+            style={{ color: colors.$16 }}
           >
             {inputOptions.label}
           </HeadlessCombobox.Label>
@@ -602,13 +614,13 @@ export function ComboboxStatic<T = any>({
 
         <div className="relative mt-1">
           <div
-            className="relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm shadow-sm"
-            style={{ borderColor: colors.$5 }}
+            className="relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm"
+            style={{ borderColor: colors.$24 }}
           >
             <HeadlessCombobox.Input
               data-testid="combobox-input-field"
               ref={comboboxInputRef}
-              className="w-full rounded-md py-1.5 pl-3 pr-10 sm:text-sm sm:leading-6"
+              className="w-full rounded-md py-1.5 pl-3 pr-10 sm:text-sm sm:leading-6 focus:outline-none focus:ring-0"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
                 entryOptions.inputLabelFn?.(entry?.resource) ??
