@@ -9,9 +9,9 @@
  */
 
 import classNames from 'classnames';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
+import styled from 'styled-components';
 
 interface Props {
   children: ReactElement[];
@@ -25,13 +25,22 @@ interface Props {
   onTabChange?: (index: number) => void;
   formatTabLabel?: (index: number) => ReactNode | undefined;
   withoutVerticalMargin?: boolean;
+  withHorizontalPadding?: boolean;
 }
+
+const StyledButton = styled.button`
+  border-color: ${({ theme }) => theme.borderColor};
+  color: ${({ theme }) => theme.textColor};
+
+  &:hover {
+    color: ${({ theme }) => theme.hoverTextColor};
+  }
+`;
 
 export function TabGroup(props: Props) {
   const colors = useColorScheme();
-  const accentColor = useAccentColor();
 
-  const { withoutVerticalMargin } = props;
+  const { withoutVerticalMargin, withHorizontalPadding = false } = props;
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
@@ -48,31 +57,53 @@ export function TabGroup(props: Props) {
   return (
     <div className={props.className} data-cy="tabs">
       <div
-        className="-mb-px flex space-x-8 overflow-x-auto border-b"
-        style={{ borderColor: colors.$5 }}
+        className="flex justify-between"
+        style={{ borderBottom: `1px solid ${colors.$20}` }}
       >
-        {props.tabs.map((tab, index) => (
-          <div
-            key={index}
-            className={classNames({ 'w-full': props.width === 'full' })}
-          >
-            <button
-              type="button"
-              onClick={() => handleTabChange(index)}
-              style={{
-                borderColor:
-                  currentIndex === index ? accentColor : 'transparent',
-                color: currentIndex === index ? accentColor : colors.$3,
-              }}
-              className={classNames(
-                'whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm',
-                { 'w-full': props.width === 'full' }
-              )}
+        <div className="flex overflow-x-auto -mb-px">
+          {withHorizontalPadding && <div style={{ width: '7rem' }} />}
+
+          {props.tabs.map((tab, index) => (
+            <div
+              key={index}
+              className={classNames({
+                'w-full': props.width === 'full',
+              })}
             >
-              {props.formatTabLabel?.(index) || tab}
-            </button>
-          </div>
-        ))}
+              <div className="relative py-3 px-4">
+                <StyledButton
+                  className={classNames(
+                    'whitespace-nowrap font-medium text-sm',
+                    {
+                      'w-full': props.width === 'full',
+                    }
+                  )}
+                  type="button"
+                  onClick={() => handleTabChange(index)}
+                  theme={{
+                    textColor: currentIndex === index ? colors.$3 : colors.$17,
+                    hoverTextColor: colors.$3,
+                  }}
+                >
+                  {props.formatTabLabel?.(index) || tab}
+                </StyledButton>
+
+                {currentIndex === index && (
+                  <div
+                    className="absolute left-1/2 transform -translate-x-1/2 w-full"
+                    style={{
+                      height: '1px',
+                      backgroundColor: colors.$3,
+                      bottom: 0,
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          ))}
+
+          {withHorizontalPadding && <div style={{ width: '7rem' }} />}
+        </div>
       </div>
 
       <div
@@ -82,6 +113,7 @@ export function TabGroup(props: Props) {
           'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
+        {/* Ostali kod za djecu komponente ostaje isti */}
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&

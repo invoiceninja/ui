@@ -11,8 +11,10 @@
 import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
 import { ReactNode } from 'react';
+import { CSSProperties } from 'styled-components';
 
 interface Props {
+  style?: CSSProperties;
   leftSide?: ReactNode;
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
@@ -31,6 +33,8 @@ interface Props {
 export function Element(props: Props) {
   const colors = useColorScheme();
 
+  const { style } = props;
+
   return (
     <div
       className={classNames(
@@ -44,7 +48,7 @@ export function Element(props: Props) {
         }
       )}
       onClick={props.onClick}
-      style={{ color: colors.$3, colorScheme: colors.$0 }}
+      style={{ color: colors.$3, colorScheme: colors.$0, ...style }}
     >
       <dt
         className={classNames('text-sm flex flex-col', {
@@ -56,7 +60,7 @@ export function Element(props: Props) {
           className={classNames('font-medium', {
             'whitespace-nowrap': props.withoutWrappingLeftSide,
           })}
-          style={{ color: colors.$3, colorScheme: colors.$0 }}
+          style={{ color: colors.$22, colorScheme: colors.$0 }}
         >
           {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
@@ -70,7 +74,11 @@ export function Element(props: Props) {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               dangerouslySetInnerHTML={{ __html: props.leftSideHelp }}
-              style={{ color: colors.$3, colorScheme: colors.$0, opacity: 0.8 }}
+              style={{
+                color: colors.$22,
+                colorScheme: colors.$0,
+                opacity: 0.8,
+              }}
             ></span>
           ))}
       </dt>
