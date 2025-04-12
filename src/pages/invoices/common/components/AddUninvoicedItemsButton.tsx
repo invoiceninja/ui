@@ -21,7 +21,7 @@ import { Task } from '$app/common/interfaces/task';
 import { ExpenseSelector } from '$app/components/expenses/ExpenseSelector';
 import { Button } from '$app/components/forms';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
-import { Icon } from '$app/components/icons/Icon';
+import { Plus } from '$app/components/icons/Plus';
 import { Modal } from '$app/components/Modal';
 import { ProductSelector } from '$app/components/products/ProductSelector';
 import { TabGroup } from '$app/components/TabGroup';
@@ -32,7 +32,6 @@ import { useInvoiceProducts } from '$app/pages/products/common/hooks/useInvoiceP
 import { useInvoiceTask } from '$app/pages/tasks/common/hooks/useInvoiceTask';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd } from 'react-icons/md';
 import styled from 'styled-components';
 
 const RoundButton = styled.div`
@@ -151,12 +150,10 @@ export function AddUninvoicedItemsButton(props: Props) {
             <RoundButton
               onClick={() => setIsModalOpen(true)}
               style={{
-                backgroundColor: reactSettings?.dark_mode
-                  ? colors.$5
-                  : accentColor,
+                backgroundColor: colors.$3,
               }}
             >
-              <Icon element={MdAdd} size={25} color="white" />
+              <Plus size="1.2rem" color={colors.$1} />
             </RoundButton>
           </Tooltip>
         </div>
