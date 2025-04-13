@@ -28,7 +28,7 @@ export function MultiVendorSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const customStyles = useSelectorCustomStyles();
+  const { customStyles } = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
 

@@ -30,53 +30,76 @@ import { arrayMoveImmutable } from 'array-move';
 import { ChangeEvent, Fragment, useEffect, useRef, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import {
-  MdArchive,
-  MdDelete,
-  MdDragHandle,
-  MdRestore,
-  MdWarning,
-} from 'react-icons/md';
+import { MdArchive, MdDelete, MdRestore, MdWarning } from 'react-icons/md';
 import { STRIPE_CONNECT } from '../../index/Gateways';
 import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { SelectOption } from '$app/components/datatables/Actions';
-import Select from 'react-select';
+import {
+  Control,
+  DropdownIndicator,
+  MultiValueContainer,
+  Option,
+  SelectOption,
+  SelectWithApplyButton,
+  ValueContainer,
+} from '$app/components/datatables/Actions';
 import { Settings } from '$app/common/interfaces/company.interface';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useSelectorCustomStyles } from '$app/pages/reports/common/hooks/useSelectorCustomStyles';
-import { BsQuestionCircle } from 'react-icons/bs';
+import { useColorScheme } from '$app/common/colors';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { CircleQuestion } from '$app/components/icons/CircleQuestion';
 
 interface Params {
   includeRemoveAction: boolean;
   includeResetAction: boolean;
 }
+
+const BorderWrapper = ({
+  children,
+  color,
+}: {
+  children: React.ReactNode;
+  color: string;
+}) => (
+  <div className="relative">
+    {children}
+    <div
+      className="absolute left-0 right-0 bottom-0 h-px"
+      style={{ backgroundColor: color }}
+    />
+  </div>
+);
+
 export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
 
-  const customStyles = useSelectorCustomStyles();
-
+  const colors = useColorScheme();
+  const companyChanges = useCompanyChanges();
+  const { newCustomStyles } = useSelectorCustomStyles();
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
-
-  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { includeRemoveAction, includeResetAction } = params;
 
+  const commonComponents = {
+    MultiValueContainer,
+    ValueContainer,
+    DropdownIndicator,
+    Option,
+    Control,
+  };
+
   const bulk = useBulk();
-
-  const companyChanges = useCompanyChanges();
-
   const handleCompanySave = useHandleCompanySave();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
-  const [currentGateways, setCurrentGateways] = useState<CompanyGateway[]>([]);
-
-  const [updateCompany, setUpdateCompany] = useState<boolean>(false);
-
   const [selected, setSelected] = useState<string[]>([]);
+  const [updateCompany, setUpdateCompany] = useState<boolean>(false);
+  const [currentGateways, setCurrentGateways] = useState<CompanyGateway[]>([]);
   const [selectedResources, setSelectedResources] = useState<CompanyGateway[]>(
     []
   );
@@ -193,54 +216,61 @@ export function GatewaysTable(params: Params) {
     <div className="flex flex-col">
       <div className="flex justify-between">
         <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
-          <Dropdown label={t('more_actions')} disabled={!selected.length}>
-            <DropdownElement
-              onClick={() => {
-                bulk(selected, 'archive').then(() =>
-                  handleSaveBulkActionsChanges(selected)
-                );
-
-                handleDeselect();
-              }}
-              icon={<Icon element={MdArchive} />}
-            >
-              {t('archive')}
-            </DropdownElement>
-
-            <DropdownElement
-              onClick={() => {
-                bulk(selected, 'delete').then(() =>
-                  handleSaveBulkActionsChanges(selected)
-                );
-
-                handleDeselect();
-              }}
-              icon={<Icon element={MdDelete} />}
-            >
-              {t('delete')}
-            </DropdownElement>
-
-            {showRestoreBulkAction() && (
+          {Boolean(selected.length) && (
+            <Dropdown label={t('actions')}>
               <DropdownElement
                 onClick={() => {
-                  bulk(selected, 'restore');
+                  bulk(selected, 'archive').then(() =>
+                    handleSaveBulkActionsChanges(selected)
+                  );
 
                   handleDeselect();
                 }}
-                icon={<Icon element={MdRestore} />}
+                icon={<Icon element={MdArchive} />}
               >
-                {t('restore')}
+                {t('archive')}
               </DropdownElement>
-            )}
-          </Dropdown>
 
-          <Select
-            styles={customStyles}
+              <DropdownElement
+                onClick={() => {
+                  bulk(selected, 'delete').then(() =>
+                    handleSaveBulkActionsChanges(selected)
+                  );
+
+                  handleDeselect();
+                }}
+                icon={<Icon element={MdDelete} />}
+              >
+                {t('delete')}
+              </DropdownElement>
+
+              {showRestoreBulkAction() && (
+                <DropdownElement
+                  onClick={() => {
+                    bulk(selected, 'restore');
+
+                    handleDeselect();
+                  }}
+                  icon={<Icon element={MdRestore} />}
+                >
+                  {t('restore')}
+                </DropdownElement>
+              )}
+            </Dropdown>
+          )}
+
+          <SelectWithApplyButton
+            styles={newCustomStyles}
             defaultValue={options[0]}
-            onChange={(options) => onStatusChange(options)}
+            onChange={(options: SelectOption[]) => onStatusChange(options)}
             placeholder={t('status')}
             options={options}
             isMulti
+            components={commonComponents}
+            closeMenuOnSelect={false}
+            hideSelectedOptions={false}
+            isClearable={false}
+            menuPosition="fixed"
           />
         </div>
 
@@ -260,6 +290,10 @@ export function GatewaysTable(params: Params) {
           <Th>
             <Checkbox
               innerRef={mainCheckbox}
+              checked={
+                selected.length === currentGateways.length &&
+                currentGateways.length > 0
+              }
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
                 Array.from(
                   document.querySelectorAll('.child-checkbox')
@@ -280,11 +314,12 @@ export function GatewaysTable(params: Params) {
           <Th>{t('test_mode')}</Th>
           <Th disableUppercase>
             <Tooltip
-              placement="top"
+              placement="bottom"
               message={t('priority') as string}
               width="auto"
+              withoutArrow
             >
-              <Icon element={BsQuestionCircle} color="white" size={20} />
+              <CircleQuestion color={colors.$17} size="1.3rem" />
             </Tooltip>
           </Th>
         </Thead>
@@ -309,7 +344,15 @@ export function GatewaysTable(params: Params) {
                         innerRef={provided.innerRef}
                         key={index}
                       >
-                        <Td width="10%">
+                        <Td
+                          width="10%"
+                          style={{
+                            borderBottom:
+                              index !== currentGateways.length - 1
+                                ? `1px solid ${colors.$20}`
+                                : 'none',
+                          }}
+                        >
                           <Checkbox
                             checked={selected.includes(gateway.id)}
                             className="child-checkbox"
@@ -325,11 +368,27 @@ export function GatewaysTable(params: Params) {
                           />
                         </Td>
 
-                        <Td width="30%">
+                        <Td
+                          width="30%"
+                          style={{
+                            borderBottom:
+                              index !== currentGateways.length - 1
+                                ? `1px solid ${colors.$20}`
+                                : 'none',
+                          }}
+                        >
                           <EntityStatus entity={gateway} />
                         </Td>
 
-                        <Td width={includeRemoveAction ? '30%' : '35%'}>
+                        <Td
+                          width={includeRemoveAction ? '30%' : '35%'}
+                          style={{
+                            borderBottom:
+                              index !== currentGateways.length - 1
+                                ? `1px solid ${colors.$20}`
+                                : 'none',
+                          }}
+                        >
                           <div className="flex items-center space-x-2">
                             <Link
                               to={route(
@@ -360,11 +419,27 @@ export function GatewaysTable(params: Params) {
                           </div>
                         </Td>
 
-                        <Td width={includeRemoveAction ? '20%' : '25%'}>
+                        <Td
+                          width={includeRemoveAction ? '20%' : '25%'}
+                          style={{
+                            borderBottom:
+                              index !== currentGateways.length - 1
+                                ? `1px solid ${colors.$20}`
+                                : 'none',
+                          }}
+                        >
                           {gateway.test_mode ? <Check size={20} /> : ''}
                         </Td>
 
-                        <Td width="25%">
+                        <Td
+                          width="25%"
+                          style={{
+                            borderBottom:
+                              index !== currentGateways.length - 1
+                                ? `1px solid ${colors.$20}`
+                                : 'none',
+                          }}
+                        >
                           <div className="flex items-center space-x-7 py-1">
                             {includeRemoveAction && (
                               <Button
@@ -376,7 +451,12 @@ export function GatewaysTable(params: Params) {
                               </Button>
                             )}
 
-                            <Icon element={MdDragHandle} size={25} />
+                            <div className="cursor-grab">
+                              <GridDotsVertical
+                                size="1.2rem"
+                                color={colors.$17}
+                              />
+                            </div>
                           </div>
                         </Td>
                       </Tr>

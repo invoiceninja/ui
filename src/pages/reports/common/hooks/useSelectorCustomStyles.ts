@@ -63,5 +63,50 @@ export function useSelectorCustomStyles() {
     },
   };
 
-  return customStyles;
+  const newCustomStyles: StylesConfig<SelectOption, true> = {
+    control: (base) => ({
+      ...base,
+      backgroundColor: colors.$1,
+      borderColor: colors.$24,
+      borderRadius: '0.375rem',
+      padding: '0 6px',
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      padding: '0px 8px',
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: '#6b7280',
+    }),
+    indicatorSeparator: () => ({
+      display: 'none',
+    }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      color: '#6b7280',
+      padding: '0 8px',
+    }),
+    menu: (base) => ({
+      ...base,
+      backgroundColor: colors.$1,
+      border: `1px solid ${colors.$19}`,
+      zIndex: 10,
+      width: '16rem',
+      boxShadow: 'none',
+    }),
+    option: (base) => ({
+      ...base,
+      color: colors.$3,
+      backgroundColor: colors.$1,
+      padding: '8px 12px',
+      cursor: 'pointer',
+      borderRadius: '0.1875rem',
+      '&:hover': {
+        backgroundColor: colors.$4,
+      },
+    }),
+  };
+
+  return { customStyles, newCustomStyles };
 }

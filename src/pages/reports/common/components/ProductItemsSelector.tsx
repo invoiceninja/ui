@@ -33,7 +33,7 @@ export function ProductItemsSelector(props: Props) {
   const colors = useColorScheme();
   const queryClient = useQueryClient();
 
-  const customStyles = useSelectorCustomStyles();
+  const { customStyles } = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
 
