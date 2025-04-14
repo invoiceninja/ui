@@ -13,7 +13,7 @@ type Props = {
   size?: string;
 };
 
-export function Check({ color = '#18181B', size = '1.1rem' }: Props) {
+export function Check({ color = '#000', size = '1.1rem' }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -21,16 +21,16 @@ export function Check({ color = '#18181B', size = '1.1rem' }: Props) {
       x="0px"
       y="0px"
       style={{ width: size, height: size }}
-      viewBox="0 0 20 20"
+      viewBox="0 0 12 12"
     >
-      <polyline
-        points="4 11 8 15 16 5"
+      <path
+        d="m1.75,6c1.047,1.048,1.803,2.153,2.461,3.579,1.524-3.076,3.659-5.397,6.039-7.158"
         fill="none"
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
-      ></polyline>
+        strokeWidth="1.5"
+      ></path>
     </svg>
   );
 }
