@@ -429,7 +429,7 @@ export function Combobox<T = any>({
                   hoverColor: colors.$20,
                 }}
                 key={option.id}
-                className="flex items-center space-x-2 min-w-[14rem] max-w-[17rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                className="flex items-center space-x-2 min-w-[14rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
                 onClick={() => handleOptionClick(option)}
                 data-combobox-element-id={index}
                 tabIndex={-1}
@@ -441,7 +441,7 @@ export function Combobox<T = any>({
                 )}
 
                 <div
-                  className={classNames('truncate', {
+                  className={classNames({
                     'pl-6': highlightedIndex !== index && selectedOption?.value,
                   })}
                 >
@@ -721,13 +721,13 @@ export function ComboboxStatic<T = any>({
           >
             <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-60 p-1">
               {Boolean(isDataLoading) && (
-                <div className="min-w-[14rem] max-w-[17rem] relative cursor-default select-none py-2 pl-3 pr-9">
+                <div className="min-w-[14rem] relative cursor-default select-none py-2 pl-3 pr-9">
                   <Spinner />
                 </div>
               )}
 
               {!isDataLoading && !filteredValues.length && (
-                <div className="min-w-[14rem] max-w-[17rem] relative cursor-default select-none py-2 px-3 text-sm font-medium">
+                <div className="min-w-[14rem] relative cursor-default select-none py-2 px-3 text-sm font-medium">
                   {t('no_records_found')}.
                 </div>
               )}
@@ -738,7 +738,7 @@ export function ComboboxStatic<T = any>({
                     hoverColor: colors.$20,
                   }}
                   key="combobox-not-found"
-                  className="min-w-[14rem] max-w-[17rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                  className="min-w-[14rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
                   value={{
                     id: -1,
                     label: nullable ? query : null,
@@ -747,7 +747,7 @@ export function ComboboxStatic<T = any>({
                   }}
                 >
                   {() => (
-                    <div className="block truncate space-x-1">
+                    <div className="block space-x-1">
                       <span>{t('Select')}</span>
 
                       <q className="font-semibold">{query}</q>
@@ -765,7 +765,7 @@ export function ComboboxStatic<T = any>({
                     }}
                     key={entry.id}
                     value={entry}
-                    className="min-w-[14rem] max-w-[17rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                    className="min-w-[14rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
                     style={{ color: colors.$3 }}
                   >
                     {({ selected }) => (
@@ -780,7 +780,7 @@ export function ComboboxStatic<T = any>({
                         )}
 
                         <div
-                          className={classNames('block truncate', {
+                          className={classNames('block', {
                             'pl-6': !selected && selectedValue?.value,
                           })}
                         >
