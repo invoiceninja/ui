@@ -103,7 +103,7 @@ export class InvoiceSum {
 
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
-
+console.log(tax);
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name1,
         this.invoice.tax_rate1
@@ -120,7 +120,7 @@ export class InvoiceSum {
 
     if (this.invoice.tax_name2.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate2);
-
+      console.log(tax);
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name2,
         this.invoice.tax_rate2
@@ -137,7 +137,7 @@ export class InvoiceSum {
 
     if (this.invoice.tax_name3.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate3);
-
+      console.log(tax);
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name3,
         this.invoice.tax_rate3
@@ -294,7 +294,7 @@ export class InvoiceSum {
   }
 
   protected taxer(amount: number, tax_rate: number) {
-    return Math.round((amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100;
+    return Number((Math.round(amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100);
   }
 
   protected valuer(customValue: number | undefined): number {

@@ -32,6 +32,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
 import { Icon } from '../icons/Icon';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { parse as papaParse, ParseResult } from 'papaparse';
 
 interface Props {
   entity: string;
@@ -47,6 +48,10 @@ export interface ImportMap extends Record<string, any> {
   import_type: string;
   skip_header: boolean;
   bank_integration_id?: string;
+}
+
+interface CSVRow {
+  [key: string]: string | number | boolean | null;
 }
 
 export function UploadImport(props: Props) {
@@ -283,6 +288,32 @@ export function UploadImport(props: Props) {
     });
   };
 
+  const validateCSVWithPapaParse = (file: File): Promise<boolean> => {
+    return new Promise((resolve) => {
+      papaParse<CSVRow>(file, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: true,
+        complete: (results: ParseResult<CSVRow>) => {
+          if (results.errors && results.errors.length > 0) {
+            resolve(false);
+            return;
+          }
+
+          if (!results.data || results.data.length === 0) {
+            resolve(false);
+            return;
+          }
+
+          resolve(true);
+        },
+        error: () => {
+          resolve(false);
+        },
+      });
+    });
+  };
+
   const shouldUploadFiles = async (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
       const hasCorrectRowsLength = await checkRowsLengthInCSV(files[i]);
@@ -295,9 +326,30 @@ export function UploadImport(props: Props) {
     return true;
   };
 
+  const areCSVsValid = async (files: File[]) => {
+    for (let i = 0; i < files.length; i++) {
+      const isValidCSV = await validateCSVWithPapaParse(files[i]);
+
+      if (!isValidCSV) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: acceptableFileExtensions,
     onDrop: async (acceptedFiles) => {
+      if (acceptedFiles.every(({ type }) => type.includes('csv'))) {
+        const areCSVsFilesValid = await areCSVsValid(acceptedFiles);
+
+        if (!areCSVsFilesValid) {
+          toast.error('invalid_csv_data');
+          return;
+        }
+      }
+
       const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
 
       if (shouldAddFiles) {
