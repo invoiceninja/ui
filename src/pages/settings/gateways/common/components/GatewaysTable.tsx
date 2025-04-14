@@ -340,7 +340,6 @@ export function GatewaysTable(params: Params) {
                     {(provided) => (
                       <Tr
                         {...provided.draggableProps}
-                        {...provided.dragHandleProps}
                         innerRef={provided.innerRef}
                         key={index}
                       >
@@ -451,7 +450,10 @@ export function GatewaysTable(params: Params) {
                               </Button>
                             )}
 
-                            <div className="cursor-grab">
+                            <div
+                              className="cursor-grab"
+                              {...provided.dragHandleProps}
+                            >
                               <GridDotsVertical
                                 size="1.2rem"
                                 color={colors.$17}
