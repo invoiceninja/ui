@@ -10,11 +10,8 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Modal } from './Modal';
-import { Button } from '$app/components/forms';
+import { Button, SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
-import { Icon } from './icons/Icon';
-import { MdClose, MdDragHandle } from 'react-icons/md';
-import { SearchableSelect } from './SearchableSelect';
 import { useAllCommonActions } from '$app/common/hooks/useCommonActions';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { User } from '$app/common/interfaces/user';
@@ -33,6 +30,9 @@ import {
   Droppable,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
+import { GridDotsVertical } from './icons/GridDotsVertical';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from './icons/CircleXMark';
 
 export interface CommonAction {
   value: string;
@@ -54,9 +54,13 @@ interface Props {
 
 export function CommonActionsPreferenceModal(props: Props) {
   const [t] = useTranslation();
-  const user = useCurrentUser();
+
+  const { entity, visible, setVisible } = props;
+
   const dispatch = useDispatch();
 
+  const user = useCurrentUser();
+  const colors = useColorScheme();
   const commonActions = useAllCommonActions();
 
   const [commonActionsPreferences, setCommonActionsPreferences] = useState<
@@ -64,8 +68,6 @@ export function CommonActionsPreferenceModal(props: Props) {
   >(user?.company_user?.react_settings?.common_actions);
 
   const [availableActions, setAvailableActions] = useState<CommonAction[]>([]);
-
-  const { entity, visible, setVisible } = props;
 
   const allCommonActions = commonActions[entity];
 
@@ -139,6 +141,20 @@ export function CommonActionsPreferenceModal(props: Props) {
     );
   };
 
+  const handleReset = () => {
+    setCommonActionsPreferences((current) =>
+      current
+        ? {
+            ...current,
+            [entity]:
+              user?.company_user?.react_settings.common_actions?.[entity] || [],
+          }
+        : {
+            [entity]: [],
+          }
+    );
+  };
+
   useEffect(() => {
     if (selectedAction) {
       const commonAction = allCommonActions.find(
@@ -190,125 +206,142 @@ export function CommonActionsPreferenceModal(props: Props) {
       overflowVisible
     >
       <div className="flex flex-col space-y-4">
-        <SearchableSelect
+        <SelectField
+          className="shadow-sm"
+          label={t('actions')}
           value={selectedAction}
           onValueChange={(value) => setSelectedAction(value)}
-          label={t('actions')}
           clearAfterSelection
+          customSelector
         >
           {availableActions.map(({ label, value }) => (
             <option key={value} value={value}>
               {label}
             </option>
           ))}
-        </SearchableSelect>
+        </SelectField>
 
-        {Boolean((commonActionsPreferences?.[entity] || []).length) && (
-          <span className="font-medium">
-            {t('selected')} {t('actions')}:
-          </span>
-        )}
+        <div className="flex flex-col space-y-2">
+          {Boolean((commonActionsPreferences?.[entity] || []).length) && (
+            <span className="font-medium" style={{ color: colors.$16 }}>
+              {t('selected')} {t('actions')}
+            </span>
+          )}
 
-        {Boolean((commonActionsPreferences?.[entity] || []).length) && (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable
-              droppableId="preference-actions"
-              renderClone={(provided, _, rubric) => (
-                <div
-                  className="flex items-center justify-between text-sm"
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  ref={provided.innerRef}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdClose}
-                      size={25}
-                    />
+          {Boolean((commonActionsPreferences?.[entity] || []).length) && (
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable
+                droppableId="preference-actions"
+                renderClone={(provided, _, rubric) => (
+                  <div
+                    className="flex items-center justify-between text-sm"
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <GridDotsVertical size="1.2rem" color={colors.$17} />
 
-                    <span className="font-medium">
-                      {getActionLabel(
-                        (commonActionsPreferences?.[entity] || [])[
-                          rubric.source.index
-                        ] as string
-                      )}
-                    </span>
-                  </div>
-
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdDragHandle}
-                      size={25}
-                    />
-                  </div>
-                </div>
-              )}
-            >
-              {(droppableProvided) => (
-                <div
-                  className="flex flex-col"
-                  {...droppableProvided.droppableProps}
-                  ref={droppableProvided.innerRef}
-                >
-                  {(commonActionsPreferences?.[entity] || []).map(
-                    (actionKey, index) => (
-                      <Draggable
-                        key={index}
-                        draggableId={index.toString()}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            className="flex items-center justify-between py-1.5"
-                            {...provided.draggableProps}
-                            ref={provided.innerRef}
-                            key={index}
-                          >
-                            <div className="flex items-center space-x-2">
-                              <Icon
-                                className="cursor-pointer"
-                                element={MdClose}
-                                size={25}
-                                onClick={() => handleRemoveAction(actionKey)}
-                              />
-
-                              <span className="font-medium">
-                                {getActionLabel(actionKey)}
-                              </span>
-                            </div>
-
-                            <div {...provided.dragHandleProps}>
-                              <Icon
-                                className="cursor-pointer"
-                                element={MdDragHandle}
-                                size={25}
-                              />
-                            </div>
-                          </div>
+                      <span className="font-medium">
+                        {getActionLabel(
+                          (commonActionsPreferences?.[entity] || [])[
+                            rubric.source.index
+                          ] as string
                         )}
-                      </Draggable>
-                    )
-                  )}
+                      </span>
+                    </div>
 
-                  {droppableProvided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
+                    <div>
+                      <CircleXMark
+                        color={colors.$16}
+                        hoverColor={colors.$3}
+                        borderColor={colors.$5}
+                        hoverBorderColor={colors.$17}
+                        size="1.6rem"
+                      />
+                    </div>
+                  </div>
+                )}
+              >
+                {(droppableProvided) => (
+                  <div
+                    className="flex flex-col"
+                    {...droppableProvided.droppableProps}
+                    ref={droppableProvided.innerRef}
+                  >
+                    {(commonActionsPreferences?.[entity] || []).map(
+                      (actionKey, index) => (
+                        <Draggable
+                          key={index}
+                          draggableId={index.toString()}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <div
+                              className="flex items-center justify-between py-1.5"
+                              {...provided.draggableProps}
+                              ref={provided.innerRef}
+                              key={index}
+                            >
+                              <div
+                                className="flex flex-1 items-center space-x-2 cursor-pointer"
+                                {...provided.dragHandleProps}
+                              >
+                                <div>
+                                  <GridDotsVertical
+                                    size="1.2rem"
+                                    color={colors.$17}
+                                  />
+                                </div>
 
-        <Button
-          onClick={() => {
-            handleUpdateUserDetails();
-            setVisible(false);
-          }}
-          disabled={disableSaveButton()}
-          disableWithoutIcon
-        >
-          {t('save')}
-        </Button>
+                                <span className="font-medium">
+                                  {getActionLabel(actionKey)}
+                                </span>
+                              </div>
+
+                              <div
+                                className="cursor-pointer"
+                                onClick={() => handleRemoveAction(actionKey)}
+                              >
+                                <CircleXMark
+                                  color={colors.$16}
+                                  hoverColor={colors.$3}
+                                  borderColor={colors.$5}
+                                  hoverBorderColor={colors.$17}
+                                  size="1.6rem"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      )
+                    )}
+
+                    {droppableProvided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </div>
+
+        <div className="flex space-x-2 justify-end">
+          <Button behavior="button" type="secondary" onClick={handleReset}>
+            {t('reset')}
+          </Button>
+
+          <Button
+            behavior="button"
+            onClick={() => {
+              handleUpdateUserDetails();
+              setVisible(false);
+            }}
+            disabled={disableSaveButton()}
+            disableWithoutIcon
+          >
+            {t('save')}
+          </Button>
+        </div>
       </div>
     </Modal>
   );

@@ -146,7 +146,7 @@ export function Modal(props: Props) {
                     backgroundColor: colors.$1,
                     color: colors.$3,
                     colorScheme: colors.$0,
-                    borderColor: colors.$5,
+                    borderColor: colors.$20,
                   }}
                 >
                   <div className="flex w-full justify-between isolate">
