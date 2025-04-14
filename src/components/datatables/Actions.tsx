@@ -65,17 +65,17 @@ interface Props extends CommonProps {
   customFilter: string[] | undefined;
 }
 
-const ResetButton = styled.button`
+export const ResetButton = styled.button`
   background-color: ${(props) => props.theme.backgroundColor};
   color: ${(props) => props.theme.textColor};
   border-color: ${(props) => props.theme.borderColor};
 `;
 
-function MultiValueContainer() {
+export function MultiValueContainer() {
   return null;
 }
 
-function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
+export function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
   const colors = useColorScheme();
   const values = props.getValue();
   const label = props.selectProps.placeholder;
@@ -103,7 +103,7 @@ function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
   );
 }
 
-function DropdownIndicator() {
+export function DropdownIndicator() {
   const colors = useColorScheme();
 
   return (
@@ -118,7 +118,7 @@ function DropdownIndicator() {
   );
 }
 
-function Option(props: OptionProps<SelectOption, true>) {
+export function Option(props: OptionProps<SelectOption, true>) {
   const { isSelected, label } = props;
 
   return (
@@ -132,7 +132,7 @@ function Option(props: OptionProps<SelectOption, true>) {
   );
 }
 
-function Control(props: ControlProps<SelectOption, true>) {
+export function Control(props: ControlProps<SelectOption, true>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const colors = useColorScheme();
   const label = props.selectProps.placeholder;
@@ -182,7 +182,7 @@ function Control(props: ControlProps<SelectOption, true>) {
   );
 }
 
-function SelectWithApplyButton(props: any) {
+export function SelectWithApplyButton(props: any) {
   const {
     options,
     defaultValue,

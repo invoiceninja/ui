@@ -10,6 +10,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import React, { useEffect } from 'react';
 import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
 import classNames from 'classnames';
+import { CSSProperties } from 'styled-components';
 
 interface Props extends CommonProps {
   colSpan?: number;
@@ -18,6 +19,7 @@ interface Props extends CommonProps {
   customizeTextColor?: boolean;
   resizable?: string;
   withoutPadding?: boolean;
+  style?: CSSProperties;
 }
 
 export function Td$(props: Props) {
@@ -69,6 +71,7 @@ function HtmlTd(props: HtmlTdProps) {
       )}
       style={{
         color: props.color,
+        ...props.style,
       }}
       ref={tdRef}
     >

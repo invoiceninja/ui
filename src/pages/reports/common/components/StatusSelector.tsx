@@ -35,7 +35,7 @@ export function StatusSelector(props: Props) {
 
   const { value, onValueChange, errorMessage, report } = props;
 
-  const customStyles = useSelectorCustomStyles();
+  const { customStyles } = useSelectorCustomStyles();
 
   const taskFilters = useTaskFilters();
   const quoteFilters = useQuoteFilters();
