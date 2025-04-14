@@ -31,6 +31,9 @@ interface Props {
   initialFocusRef?: RefObject<HTMLElement>;
   enableCloseOnClickAway?: boolean;
   withoutPadding?: boolean;
+  withoutBorderLine?: boolean;
+  withoutVerticalMargin?: boolean;
+  withoutHorizontalPadding?: boolean;
 }
 
 interface TransitionChildProps {
@@ -133,9 +136,10 @@ export function Modal(props: Props) {
               {props.title && (
                 <div
                   className={classNames(
-                    'flex flex-col justify-between items-start pb-5 border-b',
+                    'flex flex-col justify-between items-start pb-5',
                     {
                       'px-5': !props.withoutPadding,
+                      'border-b': !props.withoutBorderLine,
                     }
                   )}
                   style={{
@@ -195,8 +199,10 @@ export function Modal(props: Props) {
                   }}
                   className={classNames('text-sm flex flex-col space-y-4', {
                     'justify-center items-center': props.centerContent,
-                    'mt-5 sm:mt-6': !props.disableClosing,
-                    'px-5': !props.withoutPadding,
+                    'mt-5 sm:mt-6':
+                      !props.disableClosing && !props.withoutVerticalMargin,
+                    'px-5':
+                      !props.withoutPadding && !props.withoutHorizontalPadding,
                   })}
                 >
                   {props.children}

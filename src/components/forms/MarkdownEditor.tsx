@@ -76,12 +76,20 @@ export function MarkdownEditor(props: Props) {
             'help',
             'wordcount',
             'mceCodeEditor',
+            'emoticons',
           ],
-          toolbar:
-            'undo redo | blocks | link ' +
-            'bold italic forecolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'removeformat | code | help',
+          toolbar: [
+            'blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | emoticons link image media',
+            'alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | table | searchreplace | removeformat | code | help',
+          ],
+          font_family_formats: 'Arial=arial,helvetica,sans-serif;' +
+            'Courier New=courier new,courier,monospace;' +
+            'Georgia=georgia,palatino;' +
+            'Helvetica=helvetica;' +
+            'Times New Roman=times new roman,times;' +
+            'Trebuchet MS=trebuchet ms,geneva;' +
+            'Verdana=verdana,geneva',
+          font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
           content_style:
             'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           contextmenu: '',

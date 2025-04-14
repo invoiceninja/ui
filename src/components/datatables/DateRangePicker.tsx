@@ -96,6 +96,7 @@ export function DateRangePicker(props: Props) {
         visible={isVisible}
         placement="bottom"
         interactive={true}
+        popperOptions={{ strategy: 'fixed' }}
         render={() => (
           <div
             className="flex flex-col p-3"

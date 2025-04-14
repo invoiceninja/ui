@@ -38,6 +38,7 @@ interface InputOptions {
   value: string | number | boolean | null;
   label?: string;
   placeholder?: string;
+  className?: string;
 }
 
 interface Action {
@@ -66,6 +67,7 @@ export interface ComboboxStaticProps<T = any> {
   isDataLoading?: boolean;
   onInputValueChange?: (value: string) => void;
   compareOnlyByValue?: boolean;
+  withShadow?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -107,6 +109,7 @@ export function Combobox<T = any>({
   onEmptyValues,
   onFocus,
   onInputValueChange,
+  withShadow,
 }: ComboboxStaticProps<T>) {
   const [inputValue, setInputValue] = useState(
     String(inputOptions.value ?? '')
@@ -322,13 +325,26 @@ export function Combobox<T = any>({
   return (
     <div ref={comboboxRef} className="w-full" tabIndex={-1}>
       {inputOptions.label ? (
-        <p className="text-sm font-medium block">{inputOptions.label}</p>
+        <p
+          className={classNames(
+            'text-sm font-medium block',
+            inputOptions.className
+          )}
+          style={{ color: colors.$16 }}
+        >
+          {inputOptions.label}
+        </p>
       ) : null}
 
       <div className="relative mt-1">
         <div
-          className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm shadow-sm"
-          style={{ borderColor: colors.$5 }}
+          className={classNames(
+            'relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm',
+            {
+              'shadow-sm': withShadow,
+            }
+          )}
+          style={{ borderColor: colors.$24 }}
         >
           <input
             type="text"
@@ -346,7 +362,7 @@ export function Combobox<T = any>({
             defaultValue={
               selectedOption ? selectedOption.label : inputValue?.toString()
             }
-            className="w-full rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+            className="w-full rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6 focus:outline-none focus:ring-0"
             ref={inputRef}
             style={{
               backgroundColor: colors.$1,
@@ -467,6 +483,7 @@ export function ComboboxStatic<T = any>({
   clearInputAfterSelection,
   isDataLoading,
   compareOnlyByValue,
+  withShadow,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -593,8 +610,11 @@ export function ComboboxStatic<T = any>({
       >
         {inputOptions.label && (
           <HeadlessCombobox.Label
-            className="text-sm font-medium block"
-            style={{ color: colors.$22 }}
+            className={classNames(
+              'text-sm font-medium block',
+              inputOptions.className
+            )}
+            style={{ color: colors.$16 }}
           >
             {inputOptions.label}
           </HeadlessCombobox.Label>
@@ -602,7 +622,12 @@ export function ComboboxStatic<T = any>({
 
         <div className="relative mt-1">
           <div
-            className="relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm"
+            className={classNames(
+              'relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm',
+              {
+                'shadow-sm': withShadow,
+              }
+            )}
             style={{ borderColor: colors.$24 }}
           >
             <HeadlessCombobox.Input
@@ -622,7 +647,6 @@ export function ComboboxStatic<T = any>({
                 border: 'none',
               }}
             />
-
             {!readonly && (
               <HeadlessCombobox.Button
                 onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -806,6 +830,7 @@ export interface ComboboxAsyncProps<T> {
   clearInputAfterSelection?: boolean;
   onInputValueChange?: (value: string) => void;
   compareOnlyByValue?: boolean;
+  withShadow?: boolean;
 }
 
 export function ComboboxAsync<T = any>({
@@ -828,6 +853,7 @@ export function ComboboxAsync<T = any>({
   clearInputAfterSelection,
   onInputValueChange,
   compareOnlyByValue,
+  withShadow,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -997,6 +1023,7 @@ export function ComboboxAsync<T = any>({
         onInputValueChange={onInputValueChange}
         onEmptyValues={onEmptyValues}
         compareOnlyByValue={compareOnlyByValue}
+        withShadow={withShadow}
       />
     );
   }
@@ -1021,6 +1048,7 @@ export function ComboboxAsync<T = any>({
       isDataLoading={isLoading}
       onInputValueChange={onInputValueChange}
       compareOnlyByValue={compareOnlyByValue}
+      withShadow={withShadow}
     />
   );
 }
