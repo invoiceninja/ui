@@ -73,31 +73,7 @@ export const quoteSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
 
-const PortalCard = styled.div`
-  background-color: ${({ theme }) => theme.backgroundColor};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.hoverBackgroundColor};
-  }
-`;
-
-const HistoryBox = styled.div`
-  background-color: ${({ theme }) => theme.backgroundColor};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.hoverBackgroundColor};
-  }
-`;
-
-const ActivityBox = styled.div`
-  background-color: ${({ theme }) => theme.backgroundColor};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.hoverBackgroundColor};
-  }
-`;
-
-const InvoiceBox = styled.div`
+const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
 
   &:hover {
@@ -331,7 +307,7 @@ export function QuoteSlider() {
           <Divider withoutPadding borderColor={colors.$20} />
 
           <div className="flex space-x-4 items-center justify-center px-6 py-5">
-            <PortalCard
+            <Box
               className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
               onClick={() => (quote ? openClientPortal(quote) : null)}
               style={{
@@ -354,10 +330,10 @@ export function QuoteSlider() {
               >
                 {t('view_portal')}
               </span>
-            </PortalCard>
+            </Box>
 
             {quote ? (
-              <PortalCard
+              <Box
                 className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
                 onClick={() => {
                   navigator.clipboard.writeText(
@@ -386,7 +362,7 @@ export function QuoteSlider() {
                 >
                   {t('copy_link')}
                 </span>
-              </PortalCard>
+              </Box>
             ) : null}
           </div>
 
@@ -486,7 +462,7 @@ export function QuoteSlider() {
 
           {invoiceResponse && (
             <div className="flex flex-col space-y-4 px-6 py-5">
-              <InvoiceBox
+              <Box
                 className="flex flex-col items-start justify-center space-y-2 shadow-sm text-sm border p-5 w-full cursor-pointer rounded-md"
                 onClick={() => {
                   !disableNavigation('invoice', invoiceResponse) &&
@@ -528,7 +504,7 @@ export function QuoteSlider() {
                 <div>
                   <InvoiceStatus entity={invoiceResponse} />
                 </div>
-              </InvoiceBox>
+              </Box>
             </div>
           )}
         </div>
@@ -544,7 +520,7 @@ export function QuoteSlider() {
                 resource.activities
                   .filter(({ history }) => history?.id)
                   .map((activity) => (
-                    <HistoryBox
+                    <Box
                       className="flex items-center justify-start p-4 space-x-3 rounded-md cursor-pointer"
                       key={activity.id}
                       onClick={() =>
@@ -613,7 +589,7 @@ export function QuoteSlider() {
                           </span>
                         </div>
                       </div>
-                    </HistoryBox>
+                    </Box>
                   ))}
             </div>
           )}
@@ -645,7 +621,7 @@ export function QuoteSlider() {
                   !commentsOnly
               )
               .map((activity) => (
-                <ActivityBox
+                <Box
                   key={activity.id}
                   className="flex space-x-3 p-4 rounded-md flex-1 min-w-0"
                   theme={{
@@ -687,7 +663,7 @@ export function QuoteSlider() {
                       <span>{activity.ip}</span>
                     </div>
                   </div>
-                </ActivityBox>
+                </Box>
               ))}
           </div>
         </div>
