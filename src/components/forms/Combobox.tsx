@@ -429,18 +429,22 @@ export function Combobox<T = any>({
                   hoverColor: colors.$20,
                 }}
                 key={option.id}
-                className="flex items-center space-x-2 min-w-[14rem] max-w-[17rem] relative cursor-pointer select-none py-2 px-3 rounded-sm"
+                className="flex items-center space-x-2 min-w-[14rem] max-w-[17rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
                 onClick={() => handleOptionClick(option)}
                 data-combobox-element-id={index}
                 tabIndex={-1}
               >
                 {highlightedIndex === index && (
                   <div className="self-start mt-1">
-                    <Check size="1.1rem" color={colors.$3} />
+                    <Check size="0.9rem" color={colors.$3} />
                   </div>
                 )}
 
-                <div className="truncate">
+                <div
+                  className={classNames('truncate', {
+                    'pl-6': highlightedIndex !== index && selectedOption?.value,
+                  })}
+                >
                   {option.resource &&
                   typeof entryOptions.dropdownLabelFn !== 'undefined'
                     ? entryOptions.dropdownLabelFn(option.resource)
@@ -462,12 +466,12 @@ export function Combobox<T = any>({
                 data-testid="combobox-action-button"
                 type="button"
                 onClick={action.onClick}
-                className="flex items-center space-x-2 justify-start w-full relative cursor-pointer select-none py-2 px-3 rounded-sm"
+                className="flex items-center space-x-2 justify-start w-full relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
                 tabIndex={-1}
                 style={{ color: colors.$3 }}
               >
                 <div>
-                  <Plus size="1.2rem" color={colors.$16} />
+                  <Plus size="1rem" color={colors.$16} />
                 </div>
 
                 <span className="text-sm font-medium">{action.label}</span>
@@ -506,9 +510,13 @@ export function ComboboxStatic<T = any>({
   withShadow,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+
+  const [query, setQuery] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(initiallyVisible);
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
-  const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(initiallyVisible);
 
   let filteredValues =
     query === ''
@@ -617,8 +625,6 @@ export function ComboboxStatic<T = any>({
     };
   }, [initiallyVisible]);
 
-  const colors = useColorScheme();
-
   return (
     <div className="w-full">
       <HeadlessCombobox
@@ -646,9 +652,12 @@ export function ComboboxStatic<T = any>({
               'relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm',
               {
                 'shadow-sm': withShadow,
+                'border-[#09090B26]': !reactSettings.dark_mode && !isOpen,
+                'border-black': !reactSettings.dark_mode && isOpen,
+                'border-[#1f2e41]': reactSettings.dark_mode && !isOpen,
+                'border-white': reactSettings.dark_mode && isOpen,
               }
             )}
-            style={{ borderColor: colors.$24 }}
           >
             <HeadlessCombobox.Input
               data-testid="combobox-input-field"
@@ -684,18 +693,18 @@ export function ComboboxStatic<T = any>({
                     setIsOpen((current) => !current);
                   }
                 }}
-                className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center rounded-r-md pl-2 pr-3 focus:outline-none"
               >
                 {onDismiss && selectedValue ? (
                   <XMark
-                    size="1rem"
+                    size="0.9rem"
                     color={colors.$3}
                     data-testid="combobox-clear-icon"
                   />
                 ) : (
                   <ChevronDown
                     color={colors.$3}
-                    size="1.3rem"
+                    size="1rem"
                     data-testid="combobox-chevrondown-icon"
                   />
                 )}
@@ -707,102 +716,109 @@ export function ComboboxStatic<T = any>({
         {isOpen && (
           <HeadlessCombobox.Options
             static
-            className="border absolute z-10 mt-1 max-h-60 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
-            style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+            className="border absolute z-10 mt-1 rounded-md shadow-2xl focus:outline-none sm:text-sm"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
           >
-            {action && action.visible && (
-              <ActionButtonStyled
-                theme={{
-                  hoverColor: colors.$2,
-                }}
-                data-testid="combobox-action-button"
-                type="button"
-                onClick={action.onClick}
-                className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9"
-                tabIndex={-1}
-                style={{ color: colors.$3 }}
-              >
-                {action.label}
-              </ActionButtonStyled>
-            )}
+            <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-60 p-1">
+              {Boolean(isDataLoading) && (
+                <div className="min-w-[14rem] max-w-[17rem] relative cursor-default select-none py-2 pl-3 pr-9">
+                  <Spinner />
+                </div>
+              )}
 
-            {Boolean(isDataLoading) && (
-              <div className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9">
-                <Spinner />
-              </div>
-            )}
+              {!isDataLoading && !filteredValues.length && (
+                <div className="min-w-[14rem] max-w-[17rem] relative cursor-default select-none py-2 px-3 text-sm font-medium">
+                  {t('no_records_found')}.
+                </div>
+              )}
 
-            {!isDataLoading && !filteredValues.length && (
-              <div className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9">
-                {t('no_records_found')}
-              </div>
-            )}
-
-            {nullable && query.length > 0 && !isDataLoading && (
-              <HeadlessCombobox.Option
-                key="combobox-not-found"
-                className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
-                value={{
-                  id: -1,
-                  label: nullable ? query : null,
-                  value: nullable ? query : null,
-                  resource: null,
-                }}
-              >
-                {({ active }) => (
-                  <span
-                    className={classNames(
-                      'block truncate space-x-1',
-                      active && 'font-semibold'
-                    )}
-                  >
-                    <span>{t('Select')}</span>
-                    <q className="font-semibold">{query}</q>
-                  </span>
-                )}
-              </HeadlessCombobox.Option>
-            )}
-
-            {filteredValues.length > 0 &&
-              !isDataLoading &&
-              filteredValues.map((entry) => (
+              {nullable && query.length > 0 && !isDataLoading && (
                 <HeadlessOptionStyled
                   theme={{
-                    hoverColor: colors.$2,
+                    hoverColor: colors.$20,
                   }}
-                  key={entry.id}
-                  value={entry}
-                  className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
-                  // active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
-                  style={{ color: colors.$3 }}
+                  key="combobox-not-found"
+                  className="min-w-[14rem] max-w-[17rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                  value={{
+                    id: -1,
+                    label: nullable ? query : null,
+                    value: nullable ? query : null,
+                    resource: null,
+                  }}
                 >
-                  {({ selected, active }) => (
-                    <>
-                      <span
-                        className={classNames(
-                          'block truncate',
-                          selected && 'font-semibold',
-                          active && 'font-semibold'
-                        )}
-                      >
-                        {entry.resource &&
-                        typeof entryOptions.dropdownLabelFn !== 'undefined'
-                          ? entryOptions.dropdownLabelFn(entry.resource)
-                          : entry.label}
-                      </span>
+                  {() => (
+                    <div className="block truncate space-x-1">
+                      <span>{t('Select')}</span>
 
-                      {selected && (
-                        <span
-                          className="absolute inset-y-0 right-0 flex items-center pr-4"
-                          style={{ color: colors.$3 }}
-                        >
-                          <Check size="1.2rem" color={colors.$3} />
-                        </span>
-                      )}
-                    </>
+                      <q className="font-semibold">{query}</q>
+                    </div>
                   )}
                 </HeadlessOptionStyled>
-              ))}
+              )}
+
+              {filteredValues.length > 0 &&
+                !isDataLoading &&
+                filteredValues.map((entry) => (
+                  <HeadlessOptionStyled
+                    theme={{
+                      hoverColor: colors.$20,
+                    }}
+                    key={entry.id}
+                    value={entry}
+                    className="min-w-[14rem] max-w-[17rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                    style={{ color: colors.$3 }}
+                  >
+                    {({ selected }) => (
+                      <div className="flex items-center space-x-2">
+                        {selected && (
+                          <div
+                            className="self-start mt-1"
+                            style={{ color: colors.$3 }}
+                          >
+                            <Check size="0.9rem" color={colors.$3} />
+                          </div>
+                        )}
+
+                        <div
+                          className={classNames('block truncate', {
+                            'pl-6': !selected && selectedValue?.value,
+                          })}
+                        >
+                          {entry.resource &&
+                          typeof entryOptions.dropdownLabelFn !== 'undefined'
+                            ? entryOptions.dropdownLabelFn(entry.resource)
+                            : entry.label}
+                        </div>
+                      </div>
+                    )}
+                  </HeadlessOptionStyled>
+                ))}
+            </div>
+
+            {action && action.visible && (
+              <div
+                className="border-t w-full p-1"
+                style={{ borderColor: colors.$21 }}
+              >
+                <ActionButtonStyled
+                  theme={{
+                    hoverColor: colors.$20,
+                  }}
+                  data-testid="combobox-action-button"
+                  type="button"
+                  onClick={action.onClick}
+                  className="flex items-center space-x-2 justify-start w-full relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                  tabIndex={-1}
+                  style={{ color: colors.$3 }}
+                >
+                  <div>
+                    <Plus size="1rem" color={colors.$16} />
+                  </div>
+
+                  <span className="text-sm font-medium">{action.label}</span>
+                </ActionButtonStyled>
+              </div>
+            )}
           </HeadlessCombobox.Options>
         )}
       </HeadlessCombobox>
