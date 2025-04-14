@@ -33,6 +33,7 @@ interface Props {
   label?: string | undefined;
   withoutAction?: boolean;
   clearInputAfterSelection?: boolean;
+  withShadow?: boolean;
 }
 
 export function ProductSelector(props: Props) {
@@ -98,6 +99,7 @@ export function ProductSelector(props: Props) {
         nullable
         key="product_selector"
         clearInputAfterSelection={props.clearInputAfterSelection}
+        withShadow={props.withShadow}
       />
 
       {props.errorMessage && (
