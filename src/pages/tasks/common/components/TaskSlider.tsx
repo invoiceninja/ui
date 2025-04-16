@@ -10,7 +10,7 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { TabGroup } from '$app/components/TabGroup';
-import { ClickableElement, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -22,7 +22,6 @@ import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -48,11 +47,22 @@ import { useFormatTimeLog } from '../../kanban/common/hooks';
 import { TaskClock } from '../../kanban/components/TaskClock';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 function useGenerateActivityElement() {
   const [t] = useTranslation();
@@ -98,6 +108,7 @@ function useGenerateActivityElement() {
 
 export function TaskSlider() {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const actions = useActions({
     showCommonBulkAction: true,
@@ -143,21 +154,32 @@ export function TaskSlider() {
       }}
       title={`${t('task')} ${task?.number}`}
       topRight={
-        task &&
-        (hasPermission('edit_task') || entityAssigned(task)) && (
+        task && (hasPermission('edit_task') || entityAssigned(task)) ? (
           <ResourceActions
             label={t('actions')}
             resource={task}
             actions={actions}
           />
-        )
+        ) : null
       }
       withoutActionContainer
+      withoutHeaderBorder
     >
-      <TabGroup tabs={[t('overview'), t('activity')]} width="full">
+      <TabGroup
+        tabs={[t('overview'), t('activity')]}
+        width="full"
+        withHorizontalPadding
+        horizontalPaddingWidth="3.5rem"
+      >
         <div className="space-y-2">
-          <div>
-            <Element leftSide={t('amount')}>
+          <div className="px-6">
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('amount')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {task
                 ? formatMoney(
                     task.rate *
@@ -168,64 +190,123 @@ export function TaskSlider() {
                 : null}
             </Element>
 
-            <Element leftSide={t('entity_state')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('entity_state')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {task ? t(calculateEntityState(task)) : null}
             </Element>
 
-            <Element leftSide={t('duration')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('duration')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {task ? calculateHours(task.time_log.toString(), true) : null}
             </Element>
 
-            <Element leftSide={t('status')}>
-              {task ? <TaskStatus entity={task} /> : null}
+            <Element
+              leftSide={t('status')}
+              pushContentToRight
+              noExternalPadding
+            >
+              {task ? <TaskStatus entity={task} withoutDropdown /> : null}
             </Element>
           </div>
 
-          <Divider withoutPadding />
+          <Divider withoutPadding borderColor={colors.$20} />
 
-          <div className="divide-y">
+          <div className="flex flex-col space-y-4 px-6 py-5">
             {task &&
               currentTaskTimeLogs?.map(([date, start, end], i) => (
-                <ClickableElement key={i}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <p>{formatDate(date, dateFormat)}</p>
+                <Box
+                  key={i}
+                  className="flex items-center justify-between p-4 w-full shadow-sm border rounded-md"
+                  style={{ borderColor: colors.$20 }}
+                  theme={{
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
+                >
+                  <div className="flex flex-col">
+                    <p
+                      className="text-sm font-medium"
+                      style={{ color: colors.$3 }}
+                    >
+                      {formatDate(date, dateFormat)}
+                    </p>
 
-                      <small>
-                        {start} - {end}
-                      </small>
-                    </div>
-
-                    <div>
-                      {isTaskRunning(task) &&
-                      i === currentTaskTimeLogs.length - 1 ? (
-                        <TaskClock task={task} calculateLastTimeLog={true} />
-                      ) : (
-                        calculateDifferenceBetweenLogs(task.time_log, i)
-                      )}
-                    </div>
+                    <span className="text-xs" style={{ color: colors.$17 }}>
+                      {start} - {end}
+                    </span>
                   </div>
-                </ClickableElement>
+
+                  <div
+                    className="text-sm font-medium"
+                    style={{ color: colors.$3 }}
+                  >
+                    {isTaskRunning(task) &&
+                    i === currentTaskTimeLogs.length - 1 ? (
+                      <TaskClock task={task} calculateLastTimeLog={true} />
+                    ) : (
+                      calculateDifferenceBetweenLogs(task.time_log, i)
+                    )}
+                  </div>
+                </Box>
               ))}
           </div>
         </div>
 
-        <div className='divide-y'>
-          {activities?.map((activity) => (
-            <NonClickableElement
-              key={activity.id}
-              className="flex flex-col space-y-2"
-            >
-              <p>{activityElement(activity)}</p>
-              <div className="inline-flex items-center space-x-1">
-                <p>
-                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
-                </p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </div>
-            </NonClickableElement>
-          ))}
+        <div>
+          <div className="flex flex-col pt-3 px-3">
+            {activities?.map((activity) => (
+              <Box
+                key={activity.id}
+                className="flex space-x-3 p-4 rounded-md flex-1 min-w-0"
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$25,
+                }}
+              >
+                <div className="flex items-center justify-center">
+                  <div
+                    className="p-2 rounded-full"
+                    style={{ backgroundColor: colors.$20 }}
+                  >
+                    <SquareActivityChart
+                      size="1.3rem"
+                      color={colors.$16}
+                      filledColor={colors.$16}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-0.5 flex-1 min-w-0">
+                  <div className="text-sm" style={{ color: colors.$3 }}>
+                    {activityElement(activity)}
+                  </div>
+
+                  <div
+                    className="flex w-full items-center space-x-1 text-xs truncate"
+                    style={{ color: colors.$17 }}
+                  >
+                    <span className="whitespace-nowrap">
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                    </span>
+
+                    <span>-</span>
+
+                    <span>{activity.ip}</span>
+                  </div>
+                </div>
+              </Box>
+            ))}
+          </div>
         </div>
       </TabGroup>
     </Slider>
