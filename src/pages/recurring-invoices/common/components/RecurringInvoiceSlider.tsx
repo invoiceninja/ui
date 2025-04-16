@@ -464,7 +464,7 @@ export const RecurringInvoiceSlider = () => {
         <div>
           <div
             className="flex px-6 pt-2 pb-3 font-medium text-sm"
-            style={{ color: colors.$3 }}
+            style={{ color: colors.$22 }}
           >
             <span className="w-1/2">{t('send_date')}</span>
             <span className="w-1/2">{t('due_date')}</span>
@@ -482,10 +482,11 @@ export const RecurringInvoiceSlider = () => {
                       : colors.$20,
                 }}
               >
-                <span className="w-1/2" style={{ color: colors.$17 }}>
+                <span className="w-1/2" style={{ color: colors.$3 }}>
                   {date(recurringDate.send_date, dateFormat)}
                 </span>
-                <span className="w-1/2" style={{ color: colors.$17 }}>
+
+                <span className="w-1/2" style={{ color: colors.$3 }}>
                   {date(recurringDate.due_date, dateFormat)}
                 </span>
               </div>
