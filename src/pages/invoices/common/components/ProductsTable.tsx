@@ -9,7 +9,7 @@
  */
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { AlignJustify, Plus, Trash2 } from 'react-feather';
+import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   isLineItemEmpty,
@@ -27,6 +27,7 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -104,8 +105,22 @@ export function ProductsTable(props: Props) {
   return (
     <Table>
       <Thead backgroundColor={themeColors.$5}>
+        <Th></Th>
+
         {columns.map((column, index) => (
-          <Th key={index} textColor={themeColors.$6}>
+          <Th
+            key={index}
+            textColor={themeColors.$6}
+            {...(index === 0
+              ? {
+                  withoutHorizontalPadding: true,
+                  className: 'pr-2 lg:pr-2.5 xl:pr-4',
+                }
+              : {
+                  withoutHorizontalPadding: true,
+                  className: 'px-2',
+                })}
+          >
             {resolveTranslation(column)}
           </Th>
         ))}
@@ -127,10 +142,35 @@ export function ProductsTable(props: Props) {
                       tabIndex={index + 1}
                       {...provided.draggableProps}
                     >
+                      <Td
+                        width="1.5%"
+                        className="px-2 border-b"
+                        style={{ borderColor: colors.$20 }}
+                        withoutPadding
+                      >
+                        <div
+                          className="flex justify-center items-center focus:outline-none focus:ring-0"
+                          {...provided.dragHandleProps}
+                          onMouseEnter={(e) => e.currentTarget.focus()}
+                        >
+                          <GridDotsVertical size="1.3rem" color={colors.$17} />
+                        </div>
+                      </Td>
+
                       {columns.map((column, columnIndex, { length }) => (
                         <Td
                           width={resolveColumnWidth(column)}
                           key={columnIndex}
+                          {...(columnIndex === 0
+                            ? {
+                                className: 'pr-2 py-4 border-b',
+                                withoutPadding: true,
+                              }
+                            : {
+                                className: 'px-2 py-4 border-b',
+                                withoutPadding: true,
+                              })}
+                          style={{ borderColor: colors.$20 }}
                         >
                           {length - 1 !== columnIndex && (
                             <div
@@ -139,15 +179,6 @@ export function ProductsTable(props: Props) {
                                   columnIndex === 0,
                               })}
                             >
-                              {columnIndex === 0 ? (
-                                <button
-                                  {...provided.dragHandleProps}
-                                  onMouseEnter={(e) => e.currentTarget.focus()}
-                                >
-                                  <AlignJustify size={18} />
-                                </button>
-                              ) : null}
-
                               {resolveInputField(
                                 column,
                                 getLineItemIndex(lineItem)

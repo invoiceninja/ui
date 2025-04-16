@@ -342,7 +342,11 @@ export function Combobox<T = any>({
         </p>
       ) : null}
 
-      <div className="relative mt-1">
+      <div
+        className={classNames('relative', {
+          'mt-1': inputOptions.label,
+        })}
+      >
         <div
           className={classNames(
             'relative w-full cursor-default overflow-hidden rounded-md border text-left sm:text-sm',

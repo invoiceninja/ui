@@ -1,5 +1,3 @@
- 
-
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -112,7 +110,6 @@ export function useResolveInputField(props: Props) {
     return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
-   
   const cleanLineItemsList = useCallback(
     (lineItems: InvoiceItem[]) => {
       let typeId = InvoiceItemType.Product;
@@ -350,7 +347,6 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
-          style={{ marginTop: '4px' }}
           textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
       );
