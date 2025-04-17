@@ -381,14 +381,18 @@ export function useResolveInputField(props: Props) {
     }
 
     if ('gross_line_total' === property) {
-      return formatMoney(
-        (resource?.line_items[index][property] ?? 0) as number
+      return (
+        <span className="font-mono">
+          {formatMoney((resource?.line_items[index][property] ?? 0) as number)}
+        </span>
       );
     }
 
     if ('tax_amount' === property) {
-      return formatMoney(
-        (resource?.line_items[index][property] ?? 0) as number
+      return (
+        <span className="font-mono">
+          {formatMoney((resource?.line_items[index][property] ?? 0) as number)}
+        </span>
       );
     }
 
@@ -397,7 +401,11 @@ export function useResolveInputField(props: Props) {
     }
 
     if (['line_total'].includes(property)) {
-      return formatMoney(resource?.line_items[index][property] as number);
+      return (
+        <span className="font-mono">
+          {formatMoney(resource?.line_items[index][property] as number)}
+        </span>
+      );
     }
 
     if (['product1', 'product2', 'product3', 'product4'].includes(property)) {
