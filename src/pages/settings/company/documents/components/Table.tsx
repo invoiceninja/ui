@@ -49,15 +49,21 @@ import { DocumentUrl } from '$app/components/DocumentsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { useColorScheme } from '$app/common/colors';
+import { LockOpen } from '$app/components/icons/LockOpen';
+import { Lock } from '$app/components/icons/Lock';
+import classNames from 'classnames';
 
 export function Table() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const queryClient = useQueryClient();
+  const reactSettings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const reactSettings = useReactSettings();
-  const setDocumentVisibility = useSetDocumentVisibility();
-
   const onWrongPasswordEnter = useOnWrongPasswordEnter();
+  const setDocumentVisibility = useSetDocumentVisibility();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
@@ -72,8 +78,6 @@ export function Table() {
     currentPage,
     companyDocuments: 'true',
   });
-
-  const queryClient = useQueryClient();
 
   const getDocumentUrlById = (id: string) => {
     return documentsUrls.find(({ documentId }) => documentId === id)?.url;
@@ -195,9 +199,28 @@ export function Table() {
             </Tr>
           )}
 
+          {Boolean(data && !data.data.data.length && !isLoading) && (
+            <Tr
+              className="border-b"
+              style={{
+                borderColor: colors.$20,
+              }}
+            >
+              <Td colSpan={5}>{t('no_records_found')}</Td>
+            </Tr>
+          )}
+
           {data &&
-            data.data.data.map((document: Document) => (
-              <Tr key={document.id}>
+            data.data.data.map((document: Document, index: number) => (
+              <Tr
+                key={document.id}
+                className={classNames({
+                  'border-b': index !== data.data.data.length - 1,
+                })}
+                style={{
+                  borderColor: colors.$20,
+                }}
+              >
                 <Td>
                   <div
                     className="flex items-center space-x-10"
@@ -208,9 +231,9 @@ export function Table() {
                       <span>{document.name}</span>
 
                       {document.is_public ? (
-                        <Icon element={MdOutlineLockOpen} size={27} />
+                        <LockOpen color={colors.$3} size="1.4rem" />
                       ) : (
-                        <Icon element={MdLockOutline} size={27} />
+                        <Lock color={colors.$3} size="1.4rem" />
                       )}
                     </div>
 
@@ -298,8 +321,10 @@ export function Table() {
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
           totalPages={data.data.meta.pagination.total_pages}
+          totalRecords={data.data.meta.pagination.total}
         />
       )}
+
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}
