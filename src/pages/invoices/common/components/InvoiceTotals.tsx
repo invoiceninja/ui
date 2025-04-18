@@ -11,7 +11,6 @@
 import { Card, Element } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useTotalVariables } from '../hooks/useTotalVariables';
@@ -26,6 +25,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   resource: ProductTableResource;
@@ -35,9 +35,13 @@ interface Props {
 }
 
 export function InvoiceTotals(props: Props) {
-  const variables = useTotalVariables();
-  const company = useCurrentCompany();
   const resource = props.resource;
+
+  const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const variables = useTotalVariables();
 
   const resolveVariable = useResolveTotalVariable({
     resource,
@@ -48,8 +52,6 @@ export function InvoiceTotals(props: Props) {
 
   const handleChange = (property: keyof ProductTableResource, value: unknown) =>
     props.onChange(property, value);
-
-  const [t] = useTranslation();
 
   const isAnyTaxHidden = () => {
     if (
@@ -73,7 +75,12 @@ export function InvoiceTotals(props: Props) {
   };
 
   return (
-    <Card className="col-span-12 xl:col-span-4 h-max">
+    <Card
+      className="col-span-12 xl:col-span-4 h-max shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      withoutBodyPadding
+      height="full"
+    >
       {isAnyTaxHidden() && (
         <div className="flex items-center space-x-3 px-6">
           <div>
@@ -94,13 +101,20 @@ export function InvoiceTotals(props: Props) {
 
       {variables.map(
         (variable, index) =>
-          (variable === '$subtotal' || variable === '$taxes') && (
-            <Fragment key={index}>{resolveVariable(variable)}</Fragment>
+          (variable === '$subtotal' || variable === '$taxes') &&
+          resolveVariable(variable) && (
+            <div key={index} className="px-6">
+              {resolveVariable(variable)}
+            </div>
           )
       )}
 
       {company && company.enabled_tax_rates > 0 && (
-        <Element leftSide={t('tax')}>
+        <Element
+          leftSide={t('tax')}
+          className="border-b border-dashed"
+          style={{ borderColor: colors.$21 }}
+        >
           <TaxRateSelector
             defaultValue={getTaxRateComboValue(resource, 'tax_name1')}
             onChange={(value: Entry<TaxRate>) => {
@@ -167,9 +181,14 @@ export function InvoiceTotals(props: Props) {
 
       {variables.map(
         (variable, index) =>
-          variable !== '$subtotal' &&
-          variable !== '$taxes' && (
-            <Fragment key={index}>{resolveVariable(variable)}</Fragment>
+          Boolean(
+            variable !== '$subtotal' &&
+              variable !== '$taxes' &&
+              resolveVariable(variable)
+          ) && (
+            <div key={index} className="px-6">
+              {resolveVariable(variable)}
+            </div>
           )
       )}
 

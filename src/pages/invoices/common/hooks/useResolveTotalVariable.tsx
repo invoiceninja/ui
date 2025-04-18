@@ -20,6 +20,7 @@ import {
   RelationType,
 } from '../components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useColorScheme } from '$app/common/colors';
 interface Props {
   resource?: ProductTableResource;
   relationType: RelationType;
@@ -28,19 +29,24 @@ interface Props {
 }
 
 export function useResolveTotalVariable(props: Props) {
+  const resource = props.resource;
+  const invoiceSum = props.invoiceSum;
+
+  const resolveTranslation = useResolveTranslation();
   const formatMoney = useFormatMoney({
     resource: props.resource,
     relationType: props.relationType,
   });
 
-  const resource = props.resource;
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  const handleChange = (property: keyof ProductTableResource, value: unknown) =>
+  const handleChange = (
+    property: keyof ProductTableResource,
+    value: unknown
+  ) => {
     props.onChange(property, value);
-
-  const resolveTranslation = useResolveTranslation();
-  const invoiceSum = props.invoiceSum;
+  };
 
   const aliases: Record<string, string> = {
     total: 'amount',
@@ -55,25 +61,36 @@ export function useResolveTotalVariable(props: Props) {
 
     if (variable == '$net_subtotal' && invoiceSum) {
       return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          noExternalPadding
+          noVerticalPadding
+        >
           {formatMoney(invoiceSum.subTotal)}
         </Element>
       );
     }
 
     if (variable == '$discount' && invoiceSum) {
-      return invoiceSum.totalDiscount != 0 ?
-      (
+      return invoiceSum.totalDiscount != 0 ? (
         <Element leftSide={resolveTranslation(variable, '$')}>
           {formatMoney(invoiceSum.totalDiscount)}
         </Element>
-      ) : 
-      '';
+      ) : (
+        ''
+      );
     }
 
     if (variable == '$subtotal' && invoiceSum) {
       return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          className="border-b border-dashed py-6"
+          style={{ borderColor: colors.$21 }}
+          noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+        >
           {formatMoney(invoiceSum.subTotal)}
         </Element>
       );
@@ -97,7 +114,14 @@ export function useResolveTotalVariable(props: Props) {
 
     if (variable == '$total' && invoiceSum) {
       return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          className="border-b border-dashed py-6"
+          style={{ borderColor: colors.$21 }}
+          noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+        >
           {formatMoney(invoiceSum.total)}
         </Element>
       );
@@ -105,7 +129,14 @@ export function useResolveTotalVariable(props: Props) {
 
     if (variable == '$paid_to_date' && invoiceSum) {
       return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          className="border-b border-dashed py-6"
+          style={{ borderColor: colors.$21 }}
+          noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+        >
           {formatMoney(invoiceSum.invoice.paid_to_date)}
         </Element>
       );
@@ -113,22 +144,29 @@ export function useResolveTotalVariable(props: Props) {
 
     if (variable == '$balance_due' && invoiceSum) {
       return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-            {formatMoney(invoiceSum.getBalanceDue())}
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          className="border-b border-dashed py-6"
+          style={{ borderColor: colors.$21 }}
+          noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+        >
+          {formatMoney(invoiceSum.getBalanceDue())}
         </Element>
       );
     }
 
     if (variable == '$taxes' && invoiceSum) {
-      return (
+      return invoiceSum.getTaxMap().count() > 0 ? (
         <>
-          {invoiceSum?.getTaxMap().map((item, index) => (
+          {invoiceSum.getTaxMap().map((item, index) => (
             <Element key={index} leftSide={item.name}>
               <span>{formatMoney(item.total)}</span>
             </Element>
           ))}
         </>
-      );
+      ) : null;
     }
 
     if (variable === '$custom_surcharge1') {
