@@ -15,7 +15,12 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import React, { CSSProperties, ReactNode, isValidElement } from 'react';
 import { SelectOption } from '../datatables/Actions';
-import Select, { StylesConfig } from 'react-select';
+import Select, {
+  components,
+  ControlProps,
+  DropdownIndicatorProps,
+  StylesConfig,
+} from 'react-select';
 import { ChevronDown } from '../icons/ChevronDown';
 import { merge } from 'lodash';
 
@@ -76,8 +81,12 @@ export function SelectField(props: SelectProps) {
       }
   );
 
-  const selectedEntry = $entries?.find((entry) => entry.value === value);
-  const defaultEntry = $entries?.find((entry) => entry.value === defaultValue);
+  const selectedEntry = $entries?.find((entry) => entry.value === value) as
+    | SelectOption
+    | undefined;
+  const defaultEntry = $entries?.find(
+    (entry) => entry.value === defaultValue
+  ) as SelectOption | undefined;
 
   const customStyles: StylesConfig<SelectOption, false> = {
     input: (styles) => {
@@ -99,14 +108,26 @@ export function SelectField(props: SelectProps) {
         zIndex: 50,
       });
     },
-    control: (base, { isDisabled }) => {
+    control: (base, { isDisabled, isFocused }) => {
       return merge(base, {
+        minHeight: '2rem',
+        height: '2.3rem',
+        paddingLeft: '4px',
+        paddingRight: '4px',
         borderRadius: '0.375rem',
         backgroundColor: colors.$1,
         color: colors.$3,
-        borderColor: colors.$5,
+        borderColor: isFocused ? colors.$3 : colors.$24,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
         pointerEvents: isDisabled ? 'auto' : 'unset',
+        boxShadow: 'none',
+        outline: 'none',
+        '&:focus': {
+          borderColor: colors.$24,
+        },
+        '&:hover': {
+          borderColor: isFocused ? colors.$3 : colors.$24,
+        },
         ...controlStyle,
       });
     },
@@ -122,6 +143,12 @@ export function SelectField(props: SelectProps) {
         minHeight: '1.875rem',
       });
     },
+    valueContainer: (base) => {
+      return merge(base, {
+        paddingLeft: '0.1rem',
+      });
+    },
+
     ...(props.withoutSeparator && {
       indicatorSeparator: () => {
         return {
@@ -129,6 +156,48 @@ export function SelectField(props: SelectProps) {
         };
       },
     }),
+  };
+
+  const CustomControl = ({
+    children,
+    ...props
+  }: ControlProps<SelectOption, false>) => {
+    return (
+      <components.Control {...props}>
+        <div
+          className={classNames('flex space-x-1 items-center w-full', {
+            'pl-2': controlIcon,
+            'pl-1': !controlIcon,
+          })}
+          style={{
+            height: '95%',
+            backgroundColor: colors.$1,
+            ...controlStyle,
+          }}
+        >
+          {controlIcon}
+          {children}
+        </div>
+      </components.Control>
+    );
+  };
+
+  const CustomDropdownIndicator = (
+    props: DropdownIndicatorProps<SelectOption, false>
+  ) => {
+    return (
+      <components.DropdownIndicator {...props}>
+        <div
+          className={classNames(
+            'flex items-center justify-center hover:opacity-75',
+            dropdownIndicatorClassName
+          )}
+          style={{ color: colors.$3 }}
+        >
+          <ChevronDown color={colors.$3} size="0.95rem" />
+        </div>
+      </components.DropdownIndicator>
+    );
   };
 
   return (
@@ -174,7 +243,11 @@ export function SelectField(props: SelectProps) {
           // @ts-ignore
           options={$entries}
           defaultValue={defaultEntry}
-          value={clearAfterSelection ? { label: '', value: '' } : selectedEntry}
+          value={
+            clearAfterSelection
+              ? ({ label: '', value: '' } as SelectOption)
+              : selectedEntry
+          }
           onChange={(v) => {
             if (v === null) {
               return onValueChange?.((blankOptionValue as string) ?? '');
@@ -196,39 +269,8 @@ export function SelectField(props: SelectProps) {
           blurInputOnSelect
           data-cy={cypressRef}
           components={{
-            Control: ({ children, innerProps, isFocused }) => (
-              <div
-                className={classNames(
-                  'flex items-center rounded-md border cursor-pointer',
-                  {
-                    'pl-2': controlIcon,
-                    'pl-1': !controlIcon,
-                  }
-                )}
-                style={{
-                  height: '2.5rem',
-                  backgroundColor: colors.$1,
-                  borderColor: isFocused ? colors.$3 : colors.$24,
-                  ...controlStyle,
-                }}
-                {...innerProps}
-              >
-                {controlIcon}
-                {children}
-              </div>
-            ),
-
-            DropdownIndicator: () => (
-              <div
-                className={classNames(
-                  'flex items-center justify-center px-3 hover:opacity-75 h-full w-full',
-                  dropdownIndicatorClassName
-                )}
-                style={{ color: colors.$3 }}
-              >
-                <ChevronDown color={colors.$3} size="1rem" />
-              </div>
-            ),
+            Control: CustomControl,
+            DropdownIndicator: CustomDropdownIndicator,
           }}
         />
       )}

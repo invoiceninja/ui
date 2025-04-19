@@ -9,7 +9,7 @@
  */
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { AlignJustify, Plus, Trash2 } from 'react-feather';
+import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   isLineItemEmpty,
@@ -27,6 +27,9 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import styled from 'styled-components';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -50,6 +53,14 @@ interface Props {
   onCreateItemClick: () => unknown;
   shouldCreateInitialLineItem?: boolean;
 }
+
+const AddLineItemButton = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
@@ -104,11 +115,27 @@ export function ProductsTable(props: Props) {
   return (
     <Table>
       <Thead backgroundColor={themeColors.$5}>
+        <Th></Th>
+
         {columns.map((column, index) => (
-          <Th key={index} textColor={themeColors.$6}>
+          <Th
+            key={index}
+            textColor={themeColors.$6}
+            {...(index === 0
+              ? {
+                  withoutHorizontalPadding: true,
+                  className: 'pr-2 lg:pr-2.5 xl:pr-4',
+                }
+              : {
+                  withoutHorizontalPadding: true,
+                  className: 'px-2',
+                })}
+          >
             {resolveTranslation(column)}
           </Th>
         ))}
+
+        <Th></Th>
       </Thead>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="product-table">
@@ -127,60 +154,73 @@ export function ProductsTable(props: Props) {
                       tabIndex={index + 1}
                       {...provided.draggableProps}
                     >
+                      <Td
+                        width="1.5%"
+                        className="px-2 border-b"
+                        style={{ borderColor: colors.$20 }}
+                        withoutPadding
+                      >
+                        <div
+                          className="flex justify-center items-center focus:outline-none focus:ring-0"
+                          {...provided.dragHandleProps}
+                          onMouseEnter={(e) => e.currentTarget.focus()}
+                        >
+                          <GridDotsVertical size="1.3rem" color={colors.$17} />
+                        </div>
+                      </Td>
+
                       {columns.map((column, columnIndex, { length }) => (
                         <Td
                           width={resolveColumnWidth(column)}
                           key={columnIndex}
-                        >
-                          {length - 1 !== columnIndex && (
-                            <div
-                              className={classNames({
-                                'flex justify-between items-center space-x-3':
-                                  columnIndex === 0,
+                          {...(columnIndex === 0
+                            ? {
+                                className: 'pr-2 py-4 border-b',
+                                withoutPadding: true,
+                              }
+                            : {
+                                className: 'px-2 py-4 border-b',
+                                withoutPadding: true,
                               })}
-                            >
-                              {columnIndex === 0 ? (
-                                <button
-                                  {...provided.dragHandleProps}
-                                  onMouseEnter={(e) => e.currentTarget.focus()}
-                                >
-                                  <AlignJustify size={18} />
-                                </button>
-                              ) : null}
-
-                              {resolveInputField(
-                                column,
-                                getLineItemIndex(lineItem)
-                              )}
-                            </div>
-                          )}
-
-                          {length - 1 === columnIndex && (
-                            <div className="flex justify-between items-center">
-                              {resolveInputField(
-                                column,
-                                getLineItemIndex(lineItem)
-                              )}
-
-                              {resource && (
-                                <button
-                                  style={{ color: colors.$3 }}
-                                  className="ml-2 text-gray-600 hover:text-red-600"
-                                  onClick={() => {
-                                    setIsDeleteActionTriggered(true);
-
-                                    props.onDeleteRowClick(
-                                      getLineItemIndex(lineItem)
-                                    );
-                                  }}
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              )}
-                            </div>
-                          )}
+                          style={{ borderColor: colors.$20 }}
+                        >
+                          <div>
+                            {resolveInputField(
+                              column,
+                              getLineItemIndex(lineItem)
+                            )}
+                          </div>
                         </Td>
                       ))}
+
+                      <Td
+                        width="5%"
+                        className="px-2 py-4 border-b"
+                        withoutPadding
+                      >
+                        <div className="flex justify-end">
+                          {resource && (
+                            <button
+                              className="px-2"
+                              onClick={() => {
+                                setIsDeleteActionTriggered(true);
+
+                                props.onDeleteRowClick(
+                                  getLineItemIndex(lineItem)
+                                );
+                              }}
+                            >
+                              <CircleXMark
+                                color={colors.$16}
+                                hoverColor={colors.$3}
+                                borderColor={colors.$5}
+                                hoverBorderColor={colors.$17}
+                                size="1.6rem"
+                              />
+                            </button>
+                          )}
+                        </div>
+                      </Td>
                     </Tr>
                   )}
                 </Draggable>
@@ -188,19 +228,34 @@ export function ProductsTable(props: Props) {
 
               {provided.placeholder}
 
-              <Tr className="bg-slate-100 hover:bg-slate-200">
-                <Td colSpan={100}>
-                  <button
-                    onClick={() =>
-                      !isAnyLineItemEmpty() && props.onCreateItemClick()
-                    }
-                    className="w-full py-2 inline-flex justify-center items-center space-x-2"
+              <Tr>
+                <Td colSpan={100} className="p-1" withoutPadding>
+                  <AddLineItemButton
+                    className={classNames(
+                      'w-full py-4 inline-flex justify-center items-center space-x-2 rounded-[0.1875rem]',
+                      {
+                        'cursor-not-allowed': isAnyLineItemEmpty(),
+                        'cursor-pointer': !isAnyLineItemEmpty(),
+                      }
+                    )}
+                    onClick={(event) => {
+                      event.stopPropagation();
+
+                      !isAnyLineItemEmpty() && props.onCreateItemClick();
+                    }}
+                    theme={{
+                      backgroundColor: colors.$1,
+                      hoverBackgroundColor: colors.$20,
+                    }}
                   >
-                    <Plus size={18} />
-                    <span>
+                    <div>
+                      <Plus size="1.15rem" color={colors.$17} />
+                    </div>
+
+                    <span className="font-medium">
                       {props.type === 'product' ? t('add_item') : t('add_line')}
                     </span>
-                  </button>
+                  </AddLineItemButton>
                 </Td>
               </Tr>
             </Tbody>
