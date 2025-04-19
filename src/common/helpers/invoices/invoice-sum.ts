@@ -101,16 +101,18 @@ export class InvoiceSum {
 
   protected calculateInvoiceTaxes() {
 
+    var calculatedTax = 0;
+
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
-console.log(tax);
+
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name1,
         this.invoice.tax_rate1
       );
 
-      this.totalTaxes += tax;
-
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
           this.invoice.tax_rate1.toFixed(this.currency?.precision || 2)
@@ -120,14 +122,14 @@ console.log(tax);
 
     if (this.invoice.tax_name2.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate2);
-      console.log(tax);
+
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name2,
         this.invoice.tax_rate2
       );
 
-      this.totalTaxes += tax;
-
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
           this.invoice.tax_rate2.toFixed(this.currency?.precision || 2)
@@ -137,13 +139,14 @@ console.log(tax);
 
     if (this.invoice.tax_name3.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate3);
-      console.log(tax);
+
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name3,
         this.invoice.tax_rate3
       );
 
-      this.totalTaxes += tax;
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
@@ -151,6 +154,8 @@ console.log(tax);
         )} %`,
       });
     }
+
+    this.totalTaxes = parseFloat(calculatedTax.toFixed(this.currency?.precision || 2));
 
     return this;
   }
