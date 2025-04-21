@@ -63,18 +63,34 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          noExternalPadding
+          className="border-b border-dashed py-5"
+          style={{ borderColor: colors.$21 }}
           noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+          withoutWrappingLeftSide
         >
-          {formatMoney(invoiceSum.subTotal)}
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.subTotal)}
+          </span>
         </Element>
       );
     }
 
     if (variable == '$discount' && invoiceSum) {
       return invoiceSum.totalDiscount != 0 ? (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.totalDiscount)}
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          className="border-b border-dashed py-5"
+          style={{ borderColor: colors.$21 }}
+          noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+          withoutWrappingLeftSide
+        >
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.totalDiscount)}
+          </span>
         </Element>
       ) : (
         ''
@@ -85,29 +101,52 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-6"
+          className="border-b border-dashed py-5"
           style={{ borderColor: colors.$21 }}
           noVerticalPadding
           noExternalPadding
           pushContentToRight
+          withoutWrappingLeftSide
         >
-          {formatMoney(invoiceSum.subTotal)}
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.subTotal)}
+          </span>
         </Element>
       );
     }
 
     if (variable == '$total_taxes' && invoiceSum) {
       return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.totalTaxes)}
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          className="border-b border-dashed py-5"
+          style={{ borderColor: colors.$21 }}
+          noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+          withoutWrappingLeftSide
+        >
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.totalTaxes)}
+          </span>
         </Element>
       );
     }
 
     if (variable == '$line_taxes' && invoiceSum) {
       return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.invoiceItems.totalTaxes)}
+        <Element
+          leftSide={resolveTranslation(variable, '$')}
+          className="border-b border-dashed py-5"
+          style={{ borderColor: colors.$21 }}
+          noVerticalPadding
+          noExternalPadding
+          pushContentToRight
+          withoutWrappingLeftSide
+        >
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.invoiceItems.totalTaxes)}
+          </span>
         </Element>
       );
     }
@@ -116,13 +155,16 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-6"
+          className="border-b border-dashed py-5"
           style={{ borderColor: colors.$21 }}
           noVerticalPadding
           noExternalPadding
           pushContentToRight
+          withoutWrappingLeftSide
         >
-          {formatMoney(invoiceSum.total)}
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.total)}
+          </span>
         </Element>
       );
     }
@@ -131,13 +173,16 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-6"
+          className="border-b border-dashed py-5"
           style={{ borderColor: colors.$21 }}
           noVerticalPadding
           noExternalPadding
           pushContentToRight
+          withoutWrappingLeftSide
         >
-          {formatMoney(invoiceSum.invoice.paid_to_date)}
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.invoice.paid_to_date)}
+          </span>
         </Element>
       );
     }
@@ -146,13 +191,16 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-6"
+          className="border-b border-dashed py-5"
           style={{ borderColor: colors.$21 }}
           noVerticalPadding
           noExternalPadding
           pushContentToRight
+          withoutWrappingLeftSide
         >
-          {formatMoney(invoiceSum.getBalanceDue())}
+          <span className="text-sm font-medium font-mono">
+            {formatMoney(invoiceSum.getBalanceDue())}
+          </span>
         </Element>
       );
     }
@@ -161,8 +209,19 @@ export function useResolveTotalVariable(props: Props) {
       return invoiceSum.getTaxMap().count() > 0 ? (
         <>
           {invoiceSum.getTaxMap().map((item, index) => (
-            <Element key={index} leftSide={item.name}>
-              <span>{formatMoney(item.total)}</span>
+            <Element
+              key={index}
+              leftSide={item.name}
+              className="border-b border-dashed py-5"
+              style={{ borderColor: colors.$21 }}
+              noVerticalPadding
+              noExternalPadding
+              pushContentToRight
+              withoutWrappingLeftSide
+            >
+              <span className="text-sm font-medium font-mono">
+                {formatMoney(item.total)}
+              </span>
             </Element>
           ))}
         </>
@@ -220,8 +279,18 @@ export function useResolveTotalVariable(props: Props) {
     }
 
     return (
-      <Element leftSide={resolveTranslation(identifier, '$')}>
-        {formatMoney(value)}
+      <Element
+        leftSide={resolveTranslation(identifier, '$')}
+        className="border-b border-dashed py-5"
+        style={{ borderColor: colors.$21 }}
+        noVerticalPadding
+        noExternalPadding
+        pushContentToRight
+        withoutWrappingLeftSide
+      >
+        <span className="text-sm font-medium font-mono">
+          {formatMoney(value)}
+        </span>
       </Element>
     );
   };

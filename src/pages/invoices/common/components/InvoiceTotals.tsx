@@ -26,6 +26,7 @@ import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { useColorScheme } from '$app/common/colors';
+import { useEffect, useRef } from 'react';
 
 interface Props {
   resource: ProductTableResource;
@@ -38,6 +39,8 @@ export function InvoiceTotals(props: Props) {
   const resource = props.resource;
 
   const [t] = useTranslation();
+
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
@@ -74,12 +77,27 @@ export function InvoiceTotals(props: Props) {
     return false;
   };
 
+  useEffect(() => {
+    if (cardRef.current) {
+      const dashedBorders = cardRef.current.querySelectorAll('.border-dashed');
+
+      if (dashedBorders.length > 0) {
+        const lastElement = dashedBorders[
+          dashedBorders.length - 1
+        ] as HTMLElement;
+
+        lastElement.style.borderBottom = 'none';
+      }
+    }
+  }, [variables, company, resource]);
+
   return (
     <Card
-      className="col-span-12 xl:col-span-4 h-max shadow-sm"
-      style={{ borderColor: colors.$24 }}
+      className="col-span-12 xl:col-span-4 shadow-sm pb-6"
       withoutBodyPadding
       height="full"
+      style={{ borderColor: colors.$24, height: '100%' }}
+      innerRef={cardRef}
     >
       {isAnyTaxHidden() && (
         <div className="flex items-center space-x-3 px-6">
@@ -110,73 +128,90 @@ export function InvoiceTotals(props: Props) {
       )}
 
       {company && company.enabled_tax_rates > 0 && (
-        <Element
-          leftSide={t('tax')}
-          className="border-b border-dashed"
-          style={{ borderColor: colors.$21 }}
-        >
-          <TaxRateSelector
-            defaultValue={getTaxRateComboValue(resource, 'tax_name1')}
-            onChange={(value: Entry<TaxRate>) => {
-              handleChange('tax_name1', value.resource?.name);
-              handleChange('tax_rate1', value.resource?.rate);
-            }}
-            onClearButtonClick={() => {
-              handleChange('tax_name1', '');
-              handleChange('tax_rate1', 0);
-            }}
-            onTaxCreated={(taxRate) => {
-              handleChange('tax_name1', taxRate.name);
-              handleChange('tax_rate1', taxRate.rate);
-            }}
-            resourceTaxName={resource.tax_name1}
-            resourceTaxRate={resource.tax_rate1}
-          />
-        </Element>
+        <div className="px-6">
+          <Element
+            leftSide={t('tax')}
+            className="border-b border-dashed"
+            style={{ borderColor: colors.$21 }}
+            noExternalPadding
+          >
+            <TaxRateSelector
+              defaultValue={getTaxRateComboValue(resource, 'tax_name1')}
+              onChange={(value: Entry<TaxRate>) => {
+                handleChange('tax_name1', value.resource?.name);
+                handleChange('tax_rate1', value.resource?.rate);
+              }}
+              onClearButtonClick={() => {
+                handleChange('tax_name1', '');
+                handleChange('tax_rate1', 0);
+              }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_name1', taxRate.name);
+                handleChange('tax_rate1', taxRate.rate);
+              }}
+              resourceTaxName={resource.tax_name1}
+              resourceTaxRate={resource.tax_rate1}
+            />
+          </Element>
+        </div>
       )}
 
       {company && company.enabled_tax_rates > 1 && (
-        <Element leftSide={t('tax')}>
-          <TaxRateSelector
-            defaultValue={getTaxRateComboValue(resource, 'tax_name2')}
-            onChange={(value: Entry<TaxRate>) => {
-              handleChange('tax_name2', value.resource?.name);
-              handleChange('tax_rate2', value.resource?.rate);
-            }}
-            onClearButtonClick={() => {
-              handleChange('tax_name2', '');
-              handleChange('tax_rate2', 0);
-            }}
-            onTaxCreated={(taxRate) => {
-              handleChange('tax_name2', taxRate.name);
-              handleChange('tax_rate2', taxRate.rate);
-            }}
-            resourceTaxName={resource.tax_name2}
-            resourceTaxRate={resource.tax_rate2}
-          />
-        </Element>
+        <div className="px-6">
+          <Element
+            leftSide={t('tax')}
+            className="border-b border-dashed"
+            style={{ borderColor: colors.$21 }}
+            noExternalPadding
+          >
+            <TaxRateSelector
+              defaultValue={getTaxRateComboValue(resource, 'tax_name2')}
+              onChange={(value: Entry<TaxRate>) => {
+                handleChange('tax_name2', value.resource?.name);
+                handleChange('tax_rate2', value.resource?.rate);
+              }}
+              onClearButtonClick={() => {
+                handleChange('tax_name2', '');
+                handleChange('tax_rate2', 0);
+              }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_name2', taxRate.name);
+                handleChange('tax_rate2', taxRate.rate);
+              }}
+              resourceTaxName={resource.tax_name2}
+              resourceTaxRate={resource.tax_rate2}
+            />
+          </Element>
+        </div>
       )}
 
       {company && company.enabled_tax_rates > 2 && (
-        <Element leftSide={t('tax')}>
-          <TaxRateSelector
-            defaultValue={getTaxRateComboValue(resource, 'tax_name3')}
-            onChange={(value: Entry<TaxRate>) => {
-              handleChange('tax_name3', value.resource?.name);
-              handleChange('tax_rate3', value.resource?.rate);
-            }}
-            onClearButtonClick={() => {
-              handleChange('tax_name3', '');
-              handleChange('tax_rate3', 0);
-            }}
-            onTaxCreated={(taxRate) => {
-              handleChange('tax_name3', taxRate.name);
-              handleChange('tax_rate3', taxRate.rate);
-            }}
-            resourceTaxName={resource.tax_name3}
-            resourceTaxRate={resource.tax_rate3}
-          />
-        </Element>
+        <div className="px-6">
+          <Element
+            leftSide={t('tax')}
+            className="border-b border-dashed"
+            style={{ borderColor: colors.$21 }}
+            noExternalPadding
+          >
+            <TaxRateSelector
+              defaultValue={getTaxRateComboValue(resource, 'tax_name3')}
+              onChange={(value: Entry<TaxRate>) => {
+                handleChange('tax_name3', value.resource?.name);
+                handleChange('tax_rate3', value.resource?.rate);
+              }}
+              onClearButtonClick={() => {
+                handleChange('tax_name3', '');
+                handleChange('tax_rate3', 0);
+              }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_name3', taxRate.name);
+                handleChange('tax_rate3', taxRate.rate);
+              }}
+              resourceTaxName={resource.tax_name3}
+              resourceTaxRate={resource.tax_rate3}
+            />
+          </Element>
+        </div>
       )}
 
       {variables.map(
@@ -193,51 +228,75 @@ export function InvoiceTotals(props: Props) {
       )}
 
       {company && company?.custom_fields?.surcharge1 && (
-        <CustomSurchargeField
-          field="surcharge1"
-          type="number"
-          defaultValue={resource?.custom_surcharge1}
-          value={resource?.custom_surcharge1}
-          onValueChange={(value) =>
-            handleChange('custom_surcharge1', parseFloat(value as string))
-          }
-        />
+        <div className="px-6">
+          <CustomSurchargeField
+            field="surcharge1"
+            type="number"
+            defaultValue={resource?.custom_surcharge1}
+            value={resource?.custom_surcharge1}
+            onValueChange={(value) =>
+              handleChange('custom_surcharge1', parseFloat(value as string))
+            }
+            elementNoExternalPadding
+            elementClassName="border-b border-dashed py-5"
+            elementStyle={{ borderColor: colors.$21 }}
+            elementWithoutWrappingLeftSide
+          />
+        </div>
       )}
 
       {company && company?.custom_fields?.surcharge2 && (
-        <CustomSurchargeField
-          field="surcharge2"
-          type="number"
-          defaultValue={resource?.custom_surcharge2}
-          value={resource?.custom_surcharge2}
-          onValueChange={(value) =>
-            handleChange('custom_surcharge2', parseFloat(value as string))
-          }
-        />
+        <div className="px-6">
+          <CustomSurchargeField
+            field="surcharge2"
+            type="number"
+            defaultValue={resource?.custom_surcharge2}
+            value={resource?.custom_surcharge2}
+            onValueChange={(value) =>
+              handleChange('custom_surcharge2', parseFloat(value as string))
+            }
+            elementNoExternalPadding
+            elementClassName="border-b border-dashed py-5"
+            elementStyle={{ borderColor: colors.$21 }}
+            elementWithoutWrappingLeftSide
+          />
+        </div>
       )}
 
       {company && company?.custom_fields?.surcharge3 && (
-        <CustomSurchargeField
-          field="surcharge3"
-          type="number"
-          defaultValue={resource?.custom_surcharge3}
-          value={resource?.custom_surcharge3}
-          onValueChange={(value) =>
-            handleChange('custom_surcharge3', parseFloat(value as string))
-          }
-        />
+        <div className="px-6">
+          <CustomSurchargeField
+            field="surcharge3"
+            type="number"
+            defaultValue={resource?.custom_surcharge3}
+            value={resource?.custom_surcharge3}
+            onValueChange={(value) =>
+              handleChange('custom_surcharge3', parseFloat(value as string))
+            }
+            elementNoExternalPadding
+            elementClassName="border-b border-dashed py-5"
+            elementStyle={{ borderColor: colors.$21 }}
+            elementWithoutWrappingLeftSide
+          />
+        </div>
       )}
 
       {company && company?.custom_fields?.surcharge4 && (
-        <CustomSurchargeField
-          field="surcharge4"
-          type="number"
-          defaultValue={resource?.custom_surcharge4}
-          value={resource?.custom_surcharge4}
-          onValueChange={(value) =>
-            handleChange('custom_surcharge4', parseFloat(value as string))
-          }
-        />
+        <div className="px-6">
+          <CustomSurchargeField
+            field="surcharge4"
+            type="number"
+            defaultValue={resource?.custom_surcharge4}
+            value={resource?.custom_surcharge4}
+            onValueChange={(value) =>
+              handleChange('custom_surcharge4', parseFloat(value as string))
+            }
+            elementNoExternalPadding
+            elementClassName="border-b border-dashed py-5"
+            elementStyle={{ borderColor: colors.$21 }}
+            elementWithoutWrappingLeftSide
+          />
+        </div>
       )}
     </Card>
   );
