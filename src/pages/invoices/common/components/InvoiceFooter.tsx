@@ -19,6 +19,7 @@ import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { Dispatch, SetStateAction } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   invoice?: Invoice;
@@ -31,7 +32,9 @@ interface Props {
 }
 
 export function InvoiceFooter(props: Props) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -53,23 +56,33 @@ export function InvoiceFooter(props: Props) {
   ];
 
   return (
-    <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs} withoutVerticalMargin>
-        <div className="mb-4">
+    <Card
+      className="col-span-12 xl:col-span-8 shadow-sm h-max"
+      style={{ borderColor: colors.$24 }}
+    >
+      <TabGroup
+        tabs={tabs}
+        withoutVerticalMargin
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
+        width="full"
+        fullRightPadding
+      >
+        <div className="mb-4 px-6">
           <MarkdownEditor
             value={invoice?.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 px-6">
           <MarkdownEditor
             value={invoice?.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
         </div>
 
-        <div>
+        <div className="px-6">
           <MarkdownEditor
             value={invoice?.terms || ''}
             onChange={(value) => handleChange('terms', value)}
@@ -90,7 +103,7 @@ export function InvoiceFooter(props: Props) {
           </Element>
         </div>
 
-        <div>
+        <div className="px-6">
           <MarkdownEditor
             value={invoice?.footer || ''}
             onChange={(value) => handleChange('footer', value)}
@@ -111,7 +124,7 @@ export function InvoiceFooter(props: Props) {
           </Element>
         </div>
 
-        <div className="my-4">
+        <div className="my-4 px-6">
           <span className="text-sm">{t('custom_fields')} &nbsp;</span>
           <Link to="/settings/custom_fields/invoices" className="capitalize">
             {t('click_here')}

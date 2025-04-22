@@ -27,6 +27,7 @@ interface Props {
   withoutVerticalMargin?: boolean;
   withHorizontalPadding?: boolean;
   horizontalPaddingWidth?: string;
+  fullRightPadding?: boolean;
 }
 
 const StyledButton = styled.button`
@@ -45,6 +46,7 @@ export function TabGroup(props: Props) {
     withoutVerticalMargin,
     withHorizontalPadding = false,
     horizontalPaddingWidth = '7rem',
+    fullRightPadding = false,
   } = props;
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
@@ -60,7 +62,12 @@ export function TabGroup(props: Props) {
   }, [props.defaultTabIndex]);
 
   return (
-    <div className={props.className} data-cy="tabs">
+    <div
+      className={classNames(props.className, {
+        'w-full': props.width === 'full',
+      })}
+      data-cy="tabs"
+    >
       <div className="flex justify-between relative">
         <div className="flex flex-1 overflow-x-auto relative">
           {withHorizontalPadding && (
@@ -74,19 +81,9 @@ export function TabGroup(props: Props) {
           )}
 
           {props.tabs.map((tab, index) => (
-            <div
-              key={index}
-              className={classNames({
-                'w-full': props.width === 'full',
-              })}
-            >
+            <div key={index}>
               <StyledButton
-                className={classNames(
-                  'whitespace-nowrap font-medium text-sm py-3 px-4',
-                  {
-                    'w-full': props.width === 'full',
-                  }
-                )}
+                className="whitespace-nowrap font-medium text-sm py-3 px-4"
                 type="button"
                 onClick={() => handleTabChange(index)}
                 theme={{
@@ -107,10 +104,10 @@ export function TabGroup(props: Props) {
 
           <div
             className={classNames({
-              'flex-1': !withHorizontalPadding,
+              'flex-1': !withHorizontalPadding || fullRightPadding,
             })}
             style={{
-              ...(withHorizontalPadding && {
+              ...(Boolean(withHorizontalPadding && !fullRightPadding) && {
                 width: horizontalPaddingWidth,
               }),
               height: '100%',
