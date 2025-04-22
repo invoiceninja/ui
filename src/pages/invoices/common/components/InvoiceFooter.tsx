@@ -65,7 +65,6 @@ export function InvoiceFooter(props: Props) {
         withoutVerticalMargin
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
-        width="full"
         fullRightPadding
       >
         <div className="mb-4 px-6">

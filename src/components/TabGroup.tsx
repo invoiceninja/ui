@@ -81,9 +81,19 @@ export function TabGroup(props: Props) {
           )}
 
           {props.tabs.map((tab, index) => (
-            <div key={index}>
+            <div
+              key={index}
+              className={classNames({
+                'flex-1': props.width === 'full',
+              })}
+            >
               <StyledButton
-                className="whitespace-nowrap font-medium text-sm py-3 px-4"
+                className={classNames(
+                  'whitespace-nowrap font-medium text-sm py-3 px-4',
+                  {
+                    'w-full': props.width === 'full',
+                  }
+                )}
                 type="button"
                 onClick={() => handleTabChange(index)}
                 theme={{
