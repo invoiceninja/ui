@@ -26,7 +26,7 @@ import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { useColorScheme } from '$app/common/colors';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
@@ -79,20 +79,6 @@ export function InvoiceTotals(props: Props) {
 
     return false;
   };
-
-  useEffect(() => {
-    if (cardRef.current) {
-      const dashedBorders = cardRef.current.querySelectorAll('.border-dashed');
-
-      if (dashedBorders.length > 0) {
-        const lastElement = dashedBorders[
-          dashedBorders.length - 1
-        ] as HTMLElement;
-
-        lastElement.style.borderBottom = 'none';
-      }
-    }
-  }, [variables, company, resource]);
 
   return (
     <Card
