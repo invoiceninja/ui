@@ -101,7 +101,7 @@ export class InvoiceSum {
 
   protected calculateInvoiceTaxes() {
 
-    var calculatedTax = 0;
+    let calculatedTax = 0;
 
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
