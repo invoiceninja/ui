@@ -238,6 +238,7 @@ export function QuoteSlider() {
         tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
         width="full"
         withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
       >
         <div className="space-y-2">
           <div className="px-6">

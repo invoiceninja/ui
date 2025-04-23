@@ -208,6 +208,7 @@ export const RecurringInvoiceSlider = () => {
         tabs={[t('overview'), t('history'), t('schedule'), t('activity')]}
         width="full"
         withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
       >
         <div className="space-y-2">
           <div className="px-6">
