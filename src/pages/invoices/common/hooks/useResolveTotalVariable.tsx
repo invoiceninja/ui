@@ -63,8 +63,7 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -81,8 +80,7 @@ export function useResolveTotalVariable(props: Props) {
       return invoiceSum.totalDiscount != 0 ? (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -101,8 +99,7 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -119,8 +116,7 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -137,8 +133,7 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -155,8 +150,7 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -173,8 +167,7 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -191,8 +184,7 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element
           leftSide={resolveTranslation(variable, '$')}
-          className="border-b border-dashed py-5"
-          style={{ borderColor: colors.$21 }}
+          className="py-5"
           noVerticalPadding
           noExternalPadding
           pushContentToRight
@@ -212,8 +204,7 @@ export function useResolveTotalVariable(props: Props) {
             <Element
               key={index}
               leftSide={item.name}
-              className="border-b border-dashed py-5"
-              style={{ borderColor: colors.$21 }}
+              className="py-5"
               noVerticalPadding
               noExternalPadding
               pushContentToRight
@@ -281,8 +272,7 @@ export function useResolveTotalVariable(props: Props) {
     return (
       <Element
         leftSide={resolveTranslation(identifier, '$')}
-        className="border-b border-dashed py-5"
-        style={{ borderColor: colors.$21 }}
+        className="py-5"
         noVerticalPadding
         noExternalPadding
         pushContentToRight
