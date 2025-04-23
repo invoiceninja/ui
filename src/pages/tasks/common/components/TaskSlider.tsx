@@ -169,7 +169,7 @@ export function TaskSlider() {
         tabs={[t('overview'), t('activity')]}
         width="full"
         withHorizontalPadding
-        horizontalPaddingWidth="3.5rem"
+        horizontalPaddingWidth="1.5rem"
       >
         <div className="space-y-2">
           <div className="px-6">

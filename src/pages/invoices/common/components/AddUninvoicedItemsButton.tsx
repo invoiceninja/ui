@@ -175,7 +175,7 @@ export function AddUninvoicedItemsButton(props: Props) {
           tabs={[t('products'), t('tasks'), t('expenses')]}
           width="full"
           withHorizontalPadding
-          horizontalPaddingWidth="3.5rem"
+          horizontalPaddingWidth="1.5rem"
           onTabChange={(tab) => setCurrentTabIndex(tab)}
         >
           <div className="flex flex-col space-y-4 pt-1 px-4">
