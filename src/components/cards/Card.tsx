@@ -15,6 +15,7 @@ import {
   FormEvent,
   ReactElement,
   ReactNode,
+  RefObject,
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +60,7 @@ interface Props {
   headerStyle?: CSSProperties;
   headerClassName?: string;
   withoutHeaderPadding?: boolean;
+  innerRef?: RefObject<HTMLDivElement>;
 }
 
 export function Card(props: Props) {
@@ -72,6 +74,7 @@ export function Card(props: Props) {
 
   return (
     <div
+      ref={props.innerRef}
       className={classNames(
         `border rounded-md overflow-visible ${props.className}`,
         {
