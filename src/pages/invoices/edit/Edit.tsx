@@ -98,7 +98,10 @@ export default function Edit() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max px-6 py-2">
+        <Card
+          className="col-span-12 xl:col-span-4 h-max px-6 py-2 shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
           <div className="flex flex-col space-y-4">
             {invoice && (
               <div className="flex flex-col space-y-1.5">

@@ -10,7 +10,8 @@
 
 import { toast } from '$app/common/helpers/toast/toast';
 import { MouseEvent } from 'react';
-import { MdOutlineContentCopy } from 'react-icons/md';
+import { CopyToClipboard } from './icons/CopyToClipboard';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   text: string;
@@ -28,6 +29,8 @@ export function CopyToClipboardIconOnly({
   iconColor,
 }: Props) {
   const value = text || '';
+
+  const colors = useColorScheme();
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -48,7 +51,11 @@ export function CopyToClipboardIconOnly({
 
       {value.length > 0 && (
         <button type="button" onClick={handleClick}>
-          <MdOutlineContentCopy size={18} color={iconColor} />
+          <CopyToClipboard
+            size="1.2rem"
+            color={colors.$3}
+            filledColor="transparent"
+          />
         </button>
       )}
     </div>

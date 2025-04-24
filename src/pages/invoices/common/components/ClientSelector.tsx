@@ -69,9 +69,15 @@ export function ClientSelector(props: Props) {
         style={{ color: colors.$3 }}
       >
         {props.textOnly ? (
-          <p className="text-sm font-medium">
-            {resource?.client?.display_name}
-          </p>
+          <div className="flex flex-col space-y-1">
+            <span className="text-sm" style={{ color: colors.$22 }}>
+              {t('client')}
+            </span>
+
+            <span className="text-sm font-medium">
+              {resource?.client?.display_name}
+            </span>
+          </div>
         ) : (
           <Selector
             inputLabel={t('client')}
@@ -79,7 +85,10 @@ export function ClientSelector(props: Props) {
             value={resource?.client_id}
             readonly={props.readonly || !resource}
             clearButton={Boolean(resource?.client_id)}
-            onClearButtonClick={props.onClearButtonClick}
+            onClearButtonClick={() => {
+              setClient(undefined);
+              props.onClearButtonClick();
+            }}
             initiallyVisible={!resource?.client_id}
             errorMessage={props.errorMessage}
             disableWithSpinner={props.disableWithSpinner}
@@ -160,7 +169,7 @@ export function ClientSelector(props: Props) {
                     )}
 
                     {resource.invitations.length >= 1 && (
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-0">
                         <Link
                           className="font-medium"
                           to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
@@ -175,9 +184,11 @@ export function ClientSelector(props: Props) {
                           message={t('copy_link') as string}
                           withoutArrow
                         >
-                          <CopyToClipboardIconOnly
-                            text={resource.invitations[0].link}
-                          />
+                          <div className="mt-0.5">
+                            <CopyToClipboardIconOnly
+                              text={resource.invitations[0].link}
+                            />
+                          </div>
                         </Tooltip>
                       </div>
                     )}
