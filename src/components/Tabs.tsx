@@ -132,7 +132,7 @@ export function Tabs(props: Props) {
 
       <div className="hidden sm:block">
         <div
-          className="flex justify-between"
+          className="flex items-center justify-between space-x-4"
           style={{ borderBottom: `1px solid ${colors.$20}` }}
         >
           <nav

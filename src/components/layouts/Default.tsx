@@ -566,7 +566,7 @@ export function Default(props: Props) {
         <main className="flex-1">
           {(props.breadcrumbs || props.topRight || props.afterBreadcrumbs) &&
             props.breadcrumbs.length > 0 && (
-              <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+              <div className="pt-4 px-4 md:px-6 md:pt-6 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
                 <div className="flex items-center">
                   {props.breadcrumbs && (
                     <Breadcrumbs pages={props.breadcrumbs} />
@@ -581,7 +581,7 @@ export function Default(props: Props) {
 
           <div
             style={{ color: colors.$3, backgroundColor: colors.$23 }}
-            className="p-4 md:py-8 xl:p-8 dark:text-gray-100"
+            className="p-4 xl:px-6 dark:text-gray-100"
           >
             {props.children}
           </div>
