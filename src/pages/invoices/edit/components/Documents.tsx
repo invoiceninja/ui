@@ -37,7 +37,9 @@ export default function Documents() {
     <Card title={t('documents')}>
       <div className="flex flex-col items-center w-full px-4 sm:px-6 py-2">
         {location.pathname.includes('/create') ? (
-          <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
+          <div className="text-sm self-start">
+            {t('save_to_upload_documents')}.
+          </div>
         ) : (
           <>
             <div className="w-full lg:w-2/3">
