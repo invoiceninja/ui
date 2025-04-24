@@ -21,6 +21,8 @@ import { useColorScheme } from '$app/common/colors';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
 import { ClientActionButtons } from './ClientActionButtons';
 import { Tooltip } from '$app/components/Tooltip';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
 
 interface Props {
   readonly?: boolean;
@@ -38,12 +40,12 @@ export function ClientSelector(props: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+  const clientResolver = useClientResolver();
 
   const [client, setClient] = useState<Client>();
 
   const { resource } = props;
-
-  const clientResolver = useClientResolver();
 
   const handleCheckedState = (contactId: string) => {
     const potential = resource?.invitations.find(
@@ -61,13 +63,15 @@ export function ClientSelector(props: Props) {
   }, [resource?.client_id]);
 
   return (
-    <>
+    <div className="flex flex-col space-y-4">
       <div
-        className="flex flex-col justify-between space-y-2"
+        className="flex flex-col justify-between space-y-0.5"
         style={{ color: colors.$3 }}
       >
         {props.textOnly ? (
-          <p className="text-sm">{resource?.client?.display_name}</p>
+          <p className="text-sm font-medium">
+            {resource?.client?.display_name}
+          </p>
         ) : (
           <Selector
             inputLabel={t('client')}
@@ -87,7 +91,7 @@ export function ClientSelector(props: Props) {
         {Boolean(resource?.client_id) && (
           <>
             {Boolean(client?.locations?.length) && props.onLocationChange && (
-              <div className="pt-4">
+              <div className="pt-3">
                 <SelectField
                   label={t('location')}
                   value={resource?.location_id}
@@ -111,64 +115,81 @@ export function ClientSelector(props: Props) {
           {Boolean(
             (props.onLocationChange && Boolean(client?.locations?.length)) ||
               location
-          ) && <InputLabel className="mb-2">{t('contacts')}</InputLabel>}
+          ) && <InputLabel className="mb-2.5">{t('contacts')}</InputLabel>}
 
-          {client.contacts.map((contact, index) => (
-            <div key={index} className="flex justify-between items-center">
-              <div>
-                <Checkbox
-                  id={contact.id}
-                  value={contact.id}
-                  label={
-                    contact.first_name.length >= 1
-                      ? `${contact.first_name} ${contact.last_name}`
-                      : contact.email || client.display_name
-                  }
-                  checked={handleCheckedState(contact.id)}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    props.onContactCheckboxChange(
-                      event.target.value,
-                      event.target.checked
-                    )
-                  }
-                />
+          <div
+            className={classNames('divide-y divide-dashed', {
+              'divide-[#09090B1A]': !reactSettings.dark_mode,
+              'divide-[#1f2e41]': reactSettings.dark_mode,
+            })}
+          >
+            {client.contacts.map((contact, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center first:pt-0 pt-3 pb-2"
+              >
+                <div className="flex flex-col space-y-1.5">
+                  <div className="flex space-x-2.5">
+                    <Checkbox
+                      id={contact.id}
+                      value={contact.id}
+                      checked={handleCheckedState(contact.id)}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        props.onContactCheckboxChange(
+                          event.target.value,
+                          event.target.checked
+                        )
+                      }
+                    />
 
-                <div className="relative">
-                  {contact.first_name && (
-                    <p className="text-sm" style={{ color: colors.$3 }}>
-                      {contact.email}
-                    </p>
-                  )}
+                    <span
+                      className="text-sm font-medium"
+                      style={{ color: colors.$3 }}
+                    >
+                      {contact.first_name.length >= 1
+                        ? `${contact.first_name} ${contact.last_name}`
+                        : contact.email || client.display_name}
+                    </span>
+                  </div>
 
-                  {resource.invitations.length >= 1 && (
-                    <div className="flex space-x-2 mt-1">
-                      <Link
-                        to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
-                        external
-                      >
-                        {t('view_in_portal')}
-                      </Link>
+                  <div className="flex flex-col space-y-1.5 relative left-7">
+                    {contact.first_name && (
+                      <p className="text-sm" style={{ color: colors.$22 }}>
+                        {contact.email}
+                      </p>
+                    )}
 
-                      <Tooltip
-                        width="auto"
-                        placement="bottom"
-                        message={t('copy_link') as string}
-                        withoutArrow
-                      >
-                        <CopyToClipboardIconOnly
-                          text={resource.invitations[0].link}
-                        />
-                      </Tooltip>
-                    </div>
-                  )}
+                    {resource.invitations.length >= 1 && (
+                      <div className="flex space-x-2">
+                        <Link
+                          className="font-medium"
+                          to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
+                          external
+                        >
+                          {t('view_in_portal')}
+                        </Link>
+
+                        <Tooltip
+                          width="auto"
+                          placement="bottom"
+                          message={t('copy_link') as string}
+                          withoutArrow
+                        >
+                          <CopyToClipboardIconOnly
+                            text={resource.invitations[0].link}
+                          />
+                        </Tooltip>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
-            </div>
-          ))}
+                {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
+              </div>
+            ))}
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
