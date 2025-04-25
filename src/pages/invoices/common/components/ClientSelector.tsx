@@ -113,60 +113,65 @@ export function ClientSelector(props: Props) {
               location
           ) && <InputLabel className="mb-2">{t('contacts')}</InputLabel>}
 
-          {client.contacts.map((contact, index) => (
-            <div key={index} className="flex justify-between items-center">
-              <div>
-                <Checkbox
-                  id={contact.id}
-                  value={contact.id}
-                  label={
-                    contact.first_name.length >= 1
-                      ? `${contact.first_name} ${contact.last_name}`
-                      : contact.email || client.display_name
-                  }
-                  checked={handleCheckedState(contact.id)}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    props.onContactCheckboxChange(
-                      event.target.value,
-                      event.target.checked
-                    )
-                  }
-                />
+          <div className="flex flex-col space-y-2">
+            {client.contacts.map((contact, index) => (
+              <div key={index} className="flex justify-between items-center">
+                <div>
+                  <Checkbox
+                    id={contact.id}
+                    value={contact.id}
+                    label={
+                      contact.first_name.length >= 1
+                        ? `${contact.first_name} ${contact.last_name}`
+                        : contact.email || client.display_name
+                    }
+                    checked={handleCheckedState(contact.id)}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      props.onContactCheckboxChange(
+                        event.target.value,
+                        event.target.checked
+                      )
+                    }
+                  />
 
-                <div className="relative">
-                  {contact.first_name && (
-                    <p className="text-sm" style={{ color: colors.$3 }}>
-                      {contact.email}
-                    </p>
-                  )}
+                  <div className="relative">
+                    {contact.first_name && (
+                      <p className="text-sm" style={{ color: colors.$3 }}>
+                        {contact.email}
+                      </p>
+                    )}
 
-                  {resource.invitations.length >= 1 && (
-                    <div className="flex space-x-2 mt-1">
-                      <Link
-                        to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
-                        external
-                      >
-                        {t('view_in_portal')}
-                      </Link>
+                    {Boolean(
+                      resource.invitations.length >= 1 &&
+                        resource.invitations[0].link
+                    ) && (
+                      <div className="flex space-x-2 mt-1">
+                        <Link
+                          to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
+                          external
+                        >
+                          {t('view_in_portal')}
+                        </Link>
 
-                      <Tooltip
-                        width="auto"
-                        placement="bottom"
-                        message={t('copy_link') as string}
-                        withoutArrow
-                      >
-                        <CopyToClipboardIconOnly
-                          text={resource.invitations[0].link}
-                        />
-                      </Tooltip>
-                    </div>
-                  )}
+                        <Tooltip
+                          width="auto"
+                          placement="bottom"
+                          message={t('copy_link') as string}
+                          withoutArrow
+                        >
+                          <CopyToClipboardIconOnly
+                            text={resource.invitations[0].link}
+                          />
+                        </Tooltip>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
-            </div>
-          ))}
+                {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </>
