@@ -135,9 +135,14 @@ export function ClientSelector(props: Props) {
             {client.contacts.map((contact, index) => (
               <div
                 key={index}
-                className="flex justify-between items-center first:pt-0 pt-3 pb-2"
+                className={classNames(
+                  'flex justify-between items-center first:pt-0 pt-2',
+                  {
+                    'pb-1.5': !resource.invitations[0].link,
+                  }
+                )}
               >
-                <div className="flex flex-col space-y-1.5">
+                <div className="flex flex-col">
                   <div className="flex space-x-2.5">
                     <Checkbox
                       id={contact.id}
@@ -161,14 +166,17 @@ export function ClientSelector(props: Props) {
                     </span>
                   </div>
 
-                  <div className="flex flex-col space-y-1.5 relative left-7">
+                  <div className="flex flex-col relative left-7">
                     {contact.first_name && (
                       <p className="text-sm" style={{ color: colors.$22 }}>
                         {contact.email}
                       </p>
                     )}
 
-                    {resource.invitations.length >= 1 && (
+                    {Boolean(
+                      resource.invitations.length >= 1 &&
+                        resource.invitations[0].link
+                    ) && (
                       <div className="flex space-x-0">
                         <Link
                           className="font-medium"

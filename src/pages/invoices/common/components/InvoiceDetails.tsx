@@ -36,8 +36,8 @@ export function InvoiceDetails(props: Props) {
   return (
     <>
       <Card
-        className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm"
-        style={{ borderColor: colors.$24, height: '100%' }}
+        className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm h-max"
+        style={{ borderColor: colors.$24 }}
       >
         <Element leftSide={t('invoice_date')}>
           <InputField
@@ -103,8 +103,8 @@ export function InvoiceDetails(props: Props) {
       </Card>
 
       <Card
-        className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm"
-        style={{ borderColor: colors.$24, height: '100%' }}
+        className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm h-max"
+        style={{ borderColor: colors.$24 }}
       >
         <Element leftSide={t('invoice_number_short')}>
           <InputField
