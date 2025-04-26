@@ -65,9 +65,10 @@ export default function EmailHistory() {
       withoutBodyPadding
     >
       <div
-        className={classNames('flex justify-center w-full px-2 pt-2', {
+        className={classNames('flex w-full px-2 pt-2', {
           'pb-10': emailRecords?.length,
           'pb-6': !emailRecords.length,
+          'justify-center': emailRecords.length,
         })}
       >
         {isLoading && (
