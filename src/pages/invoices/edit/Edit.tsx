@@ -104,7 +104,7 @@ export default function Edit() {
         >
           <div className="flex flex-col space-y-4">
             {invoice && (
-              <div className="flex flex-col space-y-1.5">
+              <div className="flex items-center space-x-10">
                 <span
                   className="text-sm font-medium"
                   style={{ color: colors.$22 }}

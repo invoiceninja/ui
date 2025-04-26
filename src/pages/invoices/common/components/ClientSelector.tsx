@@ -23,6 +23,7 @@ import { ClientActionButtons } from './ClientActionButtons';
 import { Tooltip } from '$app/components/Tooltip';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
+import { Element } from '$app/components/cards';
 
 interface Props {
   readonly?: boolean;
@@ -69,8 +70,8 @@ export function ClientSelector(props: Props) {
         style={{ color: colors.$3 }}
       >
         {props.textOnly ? (
-          <div className="flex flex-col space-y-1">
-            <span className="text-sm" style={{ color: colors.$22 }}>
+          <div className="flex space-x-10">
+            <span className="text-sm font-medium" style={{ color: colors.$22 }}>
               {t('client')}
             </span>
 
@@ -101,18 +102,23 @@ export function ClientSelector(props: Props) {
           <>
             {Boolean(client?.locations?.length) && props.onLocationChange && (
               <div className="pt-3">
-                <SelectField
-                  label={t('location')}
-                  value={resource?.location_id}
-                  onValueChange={(value) => props.onLocationChange?.(value)}
-                  customSelector
+                <Element
+                  leftSide={t('location')}
+                  noExternalPadding
+                  noVerticalPadding
                 >
-                  {client?.locations.map((location) => (
-                    <option key={location.id} value={location.id}>
-                      {location.name}
-                    </option>
-                  ))}
-                </SelectField>
+                  <SelectField
+                    value={resource?.location_id}
+                    onValueChange={(value) => props.onLocationChange?.(value)}
+                    customSelector
+                  >
+                    {client?.locations.map((location) => (
+                      <option key={location.id} value={location.id}>
+                        {location.name}
+                      </option>
+                    ))}
+                  </SelectField>
+                </Element>
               </div>
             )}
           </>
@@ -142,8 +148,8 @@ export function ClientSelector(props: Props) {
                   }
                 )}
               >
-                <div className="flex flex-col">
-                  <div className="flex space-x-2.5">
+                <div className="flex flex-col w-full">
+                  <div className="flex space-x-2.5 w-full">
                     <Checkbox
                       id={contact.id}
                       value={contact.id}
@@ -156,23 +162,30 @@ export function ClientSelector(props: Props) {
                       }
                     />
 
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: colors.$3 }}
+                    <div
+                      className={classNames('flex truncate', {
+                        'flex-col': !resource.invitations[0].link,
+                        'space-x-4': resource.invitations[0].link,
+                      })}
                     >
-                      {contact.first_name.length >= 1
-                        ? `${contact.first_name} ${contact.last_name}`
-                        : contact.email || client.display_name}
-                    </span>
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: colors.$3 }}
+                      >
+                        {contact.first_name.length >= 1
+                          ? `${contact.first_name} ${contact.last_name}`
+                          : contact.email || client.display_name}
+                      </span>
+
+                      {contact.first_name && (
+                        <span className="text-sm" style={{ color: colors.$22 }}>
+                          {contact.email}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-col relative left-7">
-                    {contact.first_name && (
-                      <p className="text-sm" style={{ color: colors.$22 }}>
-                        {contact.email}
-                      </p>
-                    )}
-
                     {Boolean(
                       resource.invitations.length >= 1 &&
                         resource.invitations[0].link
