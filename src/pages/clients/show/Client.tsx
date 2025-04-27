@@ -17,7 +17,6 @@ import { Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { Standing } from './components/Standing';
@@ -130,7 +129,6 @@ export default function Client() {
         <>
           <div className="grid grid-cols-12 lg:space-y-0 gap-4">
             <Details client={client} />
-            <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
             {client.gateway_tokens.length > 0 && <Gateways client={client} />}
