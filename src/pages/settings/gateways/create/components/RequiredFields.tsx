@@ -23,7 +23,7 @@ interface Props {
   >;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function RequiredFields(props: Props) {
   const [t] = useTranslation();
 

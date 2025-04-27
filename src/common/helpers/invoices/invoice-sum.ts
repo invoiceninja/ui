@@ -101,6 +101,8 @@ export class InvoiceSum {
 
   protected calculateInvoiceTaxes() {
 
+    let calculatedTax = 0;
+
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
 
@@ -109,8 +111,8 @@ export class InvoiceSum {
         this.invoice.tax_rate1
       );
 
-      this.totalTaxes += tax;
-
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
           this.invoice.tax_rate1.toFixed(this.currency?.precision || 2)
@@ -126,8 +128,8 @@ export class InvoiceSum {
         this.invoice.tax_rate2
       );
 
-      this.totalTaxes += tax;
-
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
           this.invoice.tax_rate2.toFixed(this.currency?.precision || 2)
@@ -143,7 +145,8 @@ export class InvoiceSum {
         this.invoice.tax_rate3
       );
 
-      this.totalTaxes += tax;
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
@@ -151,6 +154,8 @@ export class InvoiceSum {
         )} %`,
       });
     }
+
+    this.totalTaxes = parseFloat(calculatedTax.toFixed(this.currency?.precision || 2));
 
     return this;
   }
@@ -294,7 +299,7 @@ export class InvoiceSum {
   }
 
   protected taxer(amount: number, tax_rate: number) {
-    return Math.round((amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100;
+    return Number((Math.round(amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100);
   }
 
   protected valuer(customValue: number | undefined): number {

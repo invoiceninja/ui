@@ -158,6 +158,11 @@ export const recurringinvoiceMap: Record[] = [
     map: 'recurring_invoice',
   },
   {
+    trans: 'remaining_cycles',
+    value: 'recurring_invoice.remaining_cycles',
+    map: 'recurring_invoice',
+  },
+  {
     trans: 'next_send_date',
     value: 'recurring_invoice.next_send_date',
     map: 'recurring_invoice',

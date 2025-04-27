@@ -44,7 +44,7 @@ jobs:
 
     services:
       mariadb:
-        image: mariadb:10.6
+        image: mariadb:10.11
         ports:
           - 32768:3306
         env:
@@ -129,7 +129,7 @@ jobs:
             PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
             VITE_IS_TEST: true
             VITE_ROUTER: browser
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report

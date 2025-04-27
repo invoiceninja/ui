@@ -21,6 +21,7 @@ export const events = [
   'App\\Events\\Payment\\PaymentWasUpdated',
   'App\\Events\\Credit\\CreditWasCreated',
   'App\\Events\\Credit\\CreditWasUpdated',
+  'App\\Events\\Socket\\RefreshEntity',
 ] as const;
 
 export type Event = (typeof events)[number];
@@ -37,6 +38,7 @@ export function usePrivateSocketEvents() {
     'App\\Events\\Payment\\PaymentWasUpdated': () => {},
     'App\\Events\\Credit\\CreditWasCreated': () => {},
     'App\\Events\\Credit\\CreditWasUpdated': () => {},
+    'App\\Events\\Socket\\RefreshEntity': () => {},
   };
 
   useEffect(() => {

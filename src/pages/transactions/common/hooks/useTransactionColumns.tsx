@@ -15,7 +15,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useExpensesQuery } from '$app/common/queries/expenses';
-import { DataTableColumns } from '$app/components/DataTable';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { Tooltip } from '$app/components/Tooltip';
 import { Link } from '$app/components/forms';
@@ -30,15 +29,22 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-
-
+import {
+  defaultColumns,
+  useAllTransactionColumns,
+} from './useAllTransactionColumns';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import classNames from 'classnames';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
 
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const transactionColumns = useAllTransactionColumns();
+  type TransactionColumns = (typeof transactionColumns)[number];
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
@@ -57,9 +63,10 @@ export function useTransactionColumns() {
     return expenses?.find((expense) => expense.id === expenseId)?.number || '';
   };
 
-  const columns: DataTableColumns<Transaction> = [
+  const columns: DataTableColumnsExtended<Transaction, TransactionColumns> = [
     {
-      id: 'status',
+      column: 'status',
+      id: 'status_id',
       label: t('status'),
       format: (_, transaction) => (
         <DynamicLink
@@ -71,7 +78,8 @@ export function useTransactionColumns() {
       ),
     },
     {
-      id: 'deposit',
+      column: 'deposit',
+      id: 'deposit' as keyof Transaction,
       label: t('deposit'),
       format: (_, transaction) => {
         if (transaction.base_type === ApiTransactionType.Credit) {
@@ -84,7 +92,8 @@ export function useTransactionColumns() {
       },
     },
     {
-      id: 'withdrawal',
+      column: 'withdrawal',
+      id: 'withdrawal' as keyof Transaction,
       label: t('withdrawal'),
       format: (_, transaction) => {
         if (transaction.base_type === ApiTransactionType.Debit) {
@@ -97,11 +106,42 @@ export function useTransactionColumns() {
       },
     },
     {
+      column: 'date',
       id: 'date',
       label: t('date'),
       format: (value) => date(value, dateFormat),
     },
     {
+      column: 'created_at',
+      id: 'created_at',
+      label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'updated_at',
+      id: 'updated_at',
+      label: t('updated_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'archived_at',
+      id: 'archived_at',
+      label: t('archived_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'is_deleted',
+      id: 'is_deleted',
+      label: t('is_deleted'),
+      format: (_, transaction) => (transaction.is_deleted ? t('yes') : t('no')),
+    },
+    {
+      column: 'participant_name',
+      id: 'participant_name',
+      label: t('participant_name'),
+    },
+    {
+      column: 'description',
       id: 'description',
       label: t('description'),
       format: (value) => (
@@ -129,6 +169,7 @@ export function useTransactionColumns() {
       ),
     },
     {
+      column: 'invoices',
       id: 'invoice_ids',
       label: t('invoices'),
       format: (value) =>
@@ -146,6 +187,7 @@ export function useTransactionColumns() {
         ),
     },
     {
+      column: 'expense',
       id: 'expense_id',
       label: t('expense'),
       format: (value) =>
@@ -164,5 +206,10 @@ export function useTransactionColumns() {
     },
   ];
 
-  return columns;
+  const list: string[] =
+    reactSettings?.react_table_columns?.transaction || defaultColumns;
+
+  return columns
+    .filter((column) => list.includes(column.column))
+    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
 }

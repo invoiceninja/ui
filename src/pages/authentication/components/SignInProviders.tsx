@@ -24,15 +24,8 @@ import { ReactNode } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
-
-export const msal = new PublicClientApplication({
-  auth: {
-    clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
-    redirectUri: import.meta.env.VITE_MICROSOFT_REDIRECT_URI,
-  },
-});
-
-msal.initialize();
+import { v4 } from 'uuid';
+import AppleSignin from 'react-apple-signin-auth';
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -93,11 +86,19 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
+  const handleApple = (response: any) => {
+    request('POST', endpoint('/api/v1/oauth_login?provider=apple'), {
+      id_token: response.authorization.id_token,
+    }).then((response) => login(response));
+  };
+
   const handleMicrosoft = (token: string) => {
     request('POST', endpoint('/api/v1/oauth_login?provider=microsoft'), {
       accessToken: token,
     }).then((response) => login(response));
   };
+
+  const msal = createMsal();
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
@@ -111,6 +112,8 @@ export function SignInProviders() {
 
         <SignInProviderButton
           onClick={async () => {
+            if (!msal) return;
+
             await msal.handleRedirectPromise();
 
             msal
@@ -136,34 +139,37 @@ export function SignInProviders() {
           <p>Log in with Microsoft</p>
         </SignInProviderButton>
 
-        {/* 
-          eslint-disable-next-line 
-          @typescript-eslint/ban-ts-comment 
-        */}
-        {/* @ts-ignore */}
-        {/* <MicrosoftLogin
-          clientId={microsoftClientId}
-          authCallback={authHandler}
-          redirectUri={'https://app.invoicing.co/'}
-        >
-          <SignInProviderButton>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 23 23"
-            >
-              <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
-              <path fill="#f35325" d="M1 1h10v10H1z"></path>
-              <path fill="#81bc06" d="M12 1h10v10H12z"></path>
-              <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
-              <path fill="#ffba08" d="M12 12h10v10H12z"></path>
-            </svg>
-
-            <p>Log in with Microsoft</p>
-          </SignInProviderButton>
-        </MicrosoftLogin> */}
+        <AppleSignin
+          authOptions={{
+            clientId: 'com.invoiceninja.client',
+            scope: 'email name',
+            redirectURI: 'https://invoicing.co/auth/apple',
+            state: '',
+            nonce: v4(),
+            usePopup: true,
+          }}
+          uiType="dark"
+          onSuccess={handleApple}
+          onError={() => toast.error()}
+        />
       </div>
     </div>
   );
+}
+
+export function createMsal() {
+  const msal =
+    typeof window !== 'undefined'
+      ? new PublicClientApplication({
+          auth: {
+            clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
+          },
+        })
+      : null;
+
+  if (msal) {
+    msal.initialize();
+  }
+
+  return msal;
 }

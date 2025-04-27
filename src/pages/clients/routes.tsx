@@ -205,7 +205,7 @@ export const clientRoutes = (
         }
       />
       <Route
-        path="documents"
+        path="documents_overview"
         element={
           <Suspense fallback={<TabLoader />}>
             <Documents />

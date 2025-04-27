@@ -31,6 +31,7 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -134,6 +135,7 @@ export function Totals() {
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
+  const currentUser = useCurrentUser();
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -217,7 +219,7 @@ export function Totals() {
         .map((value) => parseInt(value as string))
         .toArray() as number[];
 
-      if (!$currencies.includes(currency)) {
+      if (!$currencies.includes(currency) && currency !== 999) {
         update('preferences.dashboard_charts.currency', $currencies[0]);
       }
 
@@ -238,8 +240,16 @@ export function Totals() {
 
   useEffect(() => {
     return () => {
-      update('preferences.dashboard_charts.default_view', 'month');
-      update('preferences.dashboard_charts.range', 'this_month');
+      if (settings?.preferences?.dashboard_charts?.range === 'custom') {
+        const currentRange =
+          currentUser?.company_user?.react_settings?.preferences
+            ?.dashboard_charts?.range;
+
+        update(
+          'preferences.dashboard_charts.range',
+          currentRange || 'this_month'
+        );
+      }
     };
   }, []);
 
@@ -359,6 +369,7 @@ export function Totals() {
                 onChange={(v) =>
                   update('preferences.dashboard_charts.currency', parseInt(v))
                 }
+                additionalCurrencies={[{ id: '999', label: t('all') }]}
               />
 
               <SelectField

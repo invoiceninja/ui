@@ -69,7 +69,7 @@ export function useTabs(params: Params) {
     },
     {
       name: t('documents'),
-      href: route('/clients/:id/documents', { id }),
+      href: route('/clients/:id/documents_overview', { id }),
       enabled:
         hasPermission('view_client') ||
         hasPermission('edit_client') ||

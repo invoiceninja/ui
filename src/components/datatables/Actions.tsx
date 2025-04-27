@@ -11,10 +11,16 @@
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
-import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
+import Select, {
+  GroupBase,
+  MultiValue,
+  SingleValue,
+  StylesConfig,
+} from 'react-select';
 import { ReactNode, Dispatch, SetStateAction } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import collect from 'collect.js';
+import { merge } from 'lodash';
 
 export interface SelectOption {
   value: string;
@@ -116,48 +122,55 @@ export function Actions(props: Props) {
 
   const colors = useColorScheme();
 
-  const customStyles: StylesConfig<SelectOption, true> = {
+  const customStyles: StylesConfig<
+    SelectOption,
+    true,
+    GroupBase<SelectOption>
+  > = {
     multiValue: (styles, { data }) => {
-      return {
-        ...styles,
+      return merge(styles, {
         backgroundColor: data.backgroundColor,
         color: data.color,
         borderRadius: '3px',
-      };
+      });
     },
-    multiValueLabel: (styles, { data }) => ({
-      ...styles,
-      color: data.color,
-    }),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    multiValueRemove: (styles) => ({
-      ...styles,
-      ':hover': {
-        color: 'white',
-      },
-      color: '#999999',
-    }),
-    menu: (base) => ({
-      ...base,
-      width: 'max-content',
-      minWidth: '100%',
-      backgroundColor: colors.$4,
-      borderColor: colors.$4,
-    }),
-    control: (base) => ({
-      ...base,
-      borderRadius: '3px',
-      backgroundColor: colors.$1,
-      color: colors.$3,
-      borderColor: colors.$5,
-    }),
-    option: (base) => ({
-      ...base,
-      backgroundColor: colors.$1,
-      ':hover': {
-        backgroundColor: colors.$7,
-      },
-    }),
+    multiValueLabel: (styles, { data }) => {
+      return merge(styles, {
+        color: data.color,
+      });
+    },
+    multiValueRemove: (styles) => {
+      return merge(styles, {
+        ':hover': {
+          color: 'white',
+        },
+        color: '#999999',
+      });
+    },
+    menu: (base) => {
+      return merge(base, {
+        width: 'max-content',
+        minWidth: '100%',
+        backgroundColor: colors.$4,
+        borderColor: colors.$4,
+      });
+    },
+    control: (base) => {
+      return merge(base, {
+        borderRadius: '3px',
+        backgroundColor: colors.$1,
+        color: colors.$3,
+        borderColor: colors.$5,
+      });
+    },
+    option: (base) => {
+      return merge(base, {
+        backgroundColor: colors.$1,
+        ':hover': {
+          backgroundColor: colors.$7,
+        },
+      });
+    },
   };
 
   return (

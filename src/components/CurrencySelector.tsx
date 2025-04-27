@@ -12,8 +12,19 @@ import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { GenericSelectorProps } from './CountrySelector';
 import { SearchableSelect } from './SearchableSelect';
 
-export function CurrencySelector(props: GenericSelectorProps) {
+interface AdditionalCurrency {
+  id: string;
+  label: string;
+}
+
+interface CurrencySelectorProps extends GenericSelectorProps {
+  additionalCurrencies?: AdditionalCurrency[];
+}
+
+export function CurrencySelector(props: CurrencySelectorProps) {
   const currencies = useCurrencies();
+
+  const { additionalCurrencies = [] } = props;
 
   return (
     <SearchableSelect
@@ -23,6 +34,12 @@ export function CurrencySelector(props: GenericSelectorProps) {
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
     >
+      {additionalCurrencies.map((currency, index) => (
+        <option key={index} value={currency.id}>
+          {currency.label}
+        </option>
+      ))}
+
       {currencies.map((currency, index) => (
         <option key={index} value={currency.id}>
           {currency.name} ({currency.code})
