@@ -139,7 +139,7 @@ export function SignInProviders() {
           <p>Log in with Microsoft</p>
         </SignInProviderButton>
 
-        {import.meta.env.VITE_ENABLE_APPLE_LOGIN ? (
+        {import.meta.env.VITE_ENABLE_APPLE_LOGIN === "true" ? (
           <AppleSignin
             authOptions={{
               clientId: 'com.invoiceninja.client',
