@@ -139,19 +139,21 @@ export function SignInProviders() {
           <p>Log in with Microsoft</p>
         </SignInProviderButton>
 
-        <AppleSignin
-          authOptions={{
-            clientId: 'com.invoiceninja.client',
-            scope: 'email name',
-            redirectURI: 'https://invoicing.co/auth/apple',
-            state: '',
-            nonce: v4(),
-            usePopup: true,
-          }}
-          uiType="dark"
-          onSuccess={handleApple}
-          onError={() => toast.error()}
-        />
+        {import.meta.env.VITE_ENABLE_APPLE_LOGIN === "true" ? (
+          <AppleSignin
+            authOptions={{
+              clientId: 'com.invoiceninja.client',
+              scope: 'email name',
+              redirectURI: 'https://invoicing.co/auth/apple',
+              state: '',
+              nonce: v4(),
+              usePopup: true,
+            }}
+            uiType="dark"
+            onSuccess={handleApple}
+            onError={() => toast.error()}
+          />
+        ) : null}
       </div>
     </div>
   );
