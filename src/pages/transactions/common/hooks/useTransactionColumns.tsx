@@ -49,7 +49,6 @@ export function useTransactionColumns() {
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
   const cleanDescriptionText = useCleanDescriptionText();
-  const reactSettings = useReactSettings();
 
   const { data: invoices } = useInvoicesQuery({ perPage: 1000 });
 
