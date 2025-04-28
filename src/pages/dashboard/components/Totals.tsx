@@ -280,7 +280,6 @@ export function Totals() {
                   )
                 }
                 customSelector
-                withoutSeparator
                 dismissable={false}
               >
                 <option value="999">{t('all')}</option>
