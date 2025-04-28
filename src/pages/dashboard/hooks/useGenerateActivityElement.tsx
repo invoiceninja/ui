@@ -27,6 +27,16 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import dayjs from 'dayjs';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
+import styled from 'styled-components';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+
+const Box = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
+
+  &:hover {
+    background-color: ${(props) => props.theme.hoverBackgroundColor};
+  }
+`;
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
@@ -231,22 +241,46 @@ export function useGenerateActivityElement() {
   };
 
   return (activity: ActivityRecord) => (
-    <div
-      className="flex flex-col py-2.5 border border-t-0 border-x-0 last:border-b-0 border-dashed"
-      style={{ borderColor: colors.$21 }}
+    <Box
+      key={activity.id}
+      className="flex space-x-3 p-4 rounded-md flex-1 min-w-0 w-full"
+      theme={{
+        backgroundColor: colors.$1,
+        hoverBackgroundColor: colors.$25,
+      }}
     >
-      <div className="flex flex-col space-y-1">
-        <span className="text-sm">{generate(activity)}</span>
+      <div className="flex items-center justify-center">
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$20 }}
+        >
+          <SquareActivityChart
+            size="1.3rem"
+            color={colors.$16}
+            filledColor={colors.$16}
+          />
+        </div>
+      </div>
 
-        <div className="flex space-x-3">
-          <span className="dark:text-white text-sm">
+      <div className="flex flex-col space-y-0.5 flex-1 min-w-0">
+        <div className="text-sm" style={{ color: colors.$3 }}>
+          {generate(activity)}
+        </div>
+
+        <div
+          className="flex w-full items-center space-x-1 text-xs truncate"
+          style={{ color: colors.$17 }}
+        >
+          <span className="whitespace-nowrap">
             {getDateTimeLabel(activity.created_at)}
           </span>
 
-          <span className="text-gray-500 text-sm">{activity.ip}</span>
+          <span>-</span>
+
+          <span>{activity.ip}</span>
         </div>
       </div>
-    </div>
+    </Box>
   );
 }
 
