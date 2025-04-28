@@ -45,6 +45,7 @@ import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
 import { InputLabel } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -60,6 +61,7 @@ export interface Context {
 export default function Edit() {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const [searchParams] = useSearchParams();
 
   const navigate = useNavigate();
@@ -96,56 +98,73 @@ export default function Edit() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {invoice && (
-            <div className="flex space-x-20">
-              <span className="text-sm">{t('status')}</span>
+        <Card
+          className="col-span-12 xl:col-span-4 h-max px-6 py-2 shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
+          <div className="flex flex-col space-y-4">
+            {invoice && (
+              <div className="flex items-center space-x-10">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('status')}
+                </span>
 
-              <InvoiceStatusBadge entity={invoice} />
-            </div>
-          )}
-
-          <Assigned
-            entityId={invoice?.project_id}
-            cacheEndpoint="/api/v1/projects"
-            apiEndpoint="/api/v1/projects/:id?include=client"
-            componentCallbackFn={(resource: Project) => (
-              <div className="flex space-x-20">
-                <span className="text-sm">{t('project')}</span>
-
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">{resource.name}</span>
-
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
-                      navigate(
-                        route('/projects/:id', { id: invoice?.project_id })
-                      )
-                    }
-                  >
-                    <Icon
-                      element={ExternalLink}
-                      style={{ width: '1.17rem', height: '1.17rem' }}
-                    />
-                  </div>
+                <div>
+                  <InvoiceStatusBadge entity={invoice} />
                 </div>
               </div>
             )}
-          />
 
-          <ClientSelector
-            resource={invoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onLocationChange={(locationId) =>
-              handleChange('location_id', locationId)
-            }
-            onContactCheckboxChange={handleInvitationChange}
-            errorMessage={errors?.errors.client_id}
-            textOnly
-            readonly
-          />
+            <Assigned
+              entityId={invoice?.project_id}
+              cacheEndpoint="/api/v1/projects"
+              apiEndpoint="/api/v1/projects/:id?include=client"
+              componentCallbackFn={(resource: Project) => (
+                <div className="flex space-x-4">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.$22 }}
+                  >
+                    {t('project')}:
+                  </span>
+
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">{resource.name}</span>
+
+                    <div
+                      className="cursor-pointer"
+                      onClick={() =>
+                        navigate(
+                          route('/projects/:id', { id: invoice?.project_id })
+                        )
+                      }
+                    >
+                      <Icon
+                        element={ExternalLink}
+                        style={{ width: '1.17rem', height: '1.17rem' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            />
+
+            <ClientSelector
+              resource={invoice}
+              onChange={(id) => handleChange('client_id', id)}
+              onClearButtonClick={() => handleChange('client_id', '')}
+              onLocationChange={(locationId) =>
+                handleChange('location_id', locationId)
+              }
+              onContactCheckboxChange={handleInvitationChange}
+              errorMessage={errors?.errors.client_id}
+              textOnly
+              readonly
+            />
+          </div>
         </Card>
 
         <InvoiceDetails
