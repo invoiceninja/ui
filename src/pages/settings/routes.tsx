@@ -9,7 +9,7 @@
  */
 
 import { Guard } from '$app/common/guards/Guard';
-import { admin } from '$app/common/guards/guards/admin';
+import { admin, owner } from '$app/common/guards/guards/admin';
 import { Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
@@ -63,7 +63,7 @@ export const settingsRoutes = (
           element={
             import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
             (import.meta.env.PROD ? isHosted() : true) ? (
-              <Settings.Plan2 />
+              <Guard guards={[owner()]} component={<Settings.Plan2 />} type="subPage" />
             ) : (
               <Settings.Plan />
             )
