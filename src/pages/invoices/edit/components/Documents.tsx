@@ -18,11 +18,13 @@ import { useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { Context } from '../Edit';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Documents() {
   const [t] = useTranslation();
 
   const location = useLocation();
+  const colors = useColorScheme();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -34,7 +36,12 @@ export default function Documents() {
   const { invoice } = context;
 
   return (
-    <Card title={t('documents')}>
+    <Card
+      title={t('documents')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <div className="flex flex-col items-center w-full px-4 sm:px-6 py-2">
         {location.pathname.includes('/create') ? (
           <div className="text-sm self-start">

@@ -17,6 +17,7 @@ import { CustomField } from '$app/components/CustomField';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useTranslation } from 'react-i18next';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   invoice?: Invoice;
@@ -25,14 +26,19 @@ interface Props {
 }
 
 export function InvoiceDetails(props: Props) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
   const { invoice, handleChange } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   return (
     <>
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm h-max"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('invoice_date')}>
           <InputField
             type="date"
@@ -96,7 +102,10 @@ export function InvoiceDetails(props: Props) {
         )}
       </Card>
 
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm h-max"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('invoice_number_short')}>
           <InputField
             id="number"
@@ -118,17 +127,8 @@ export function InvoiceDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <NumberInputField
-                onValueChange={(value) =>
-                  handleChange('discount', parseFloat(value) || 0)
-                }
-                value={invoice?.discount || ''}
-                errorMessage={props.errors?.errors.discount}
-              />
-            </div>
-
-            <div className="w-full lg:w-1/2">
               <SelectField
+                className="shadow-sm"
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
@@ -136,10 +136,21 @@ export function InvoiceDetails(props: Props) {
                 errorMessage={props.errors?.errors.is_amount_discount}
                 customSelector
                 dismissable={false}
+                withoutSeparator
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
               </SelectField>
+            </div>
+
+            <div className="w-full lg:w-1/2">
+              <NumberInputField
+                onValueChange={(value) =>
+                  handleChange('discount', parseFloat(value) || 0)
+                }
+                value={invoice?.discount || ''}
+                errorMessage={props.errors?.errors.discount}
+              />
             </div>
           </div>
         </Element>

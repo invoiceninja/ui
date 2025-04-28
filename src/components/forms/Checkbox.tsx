@@ -84,9 +84,12 @@ export function Checkbox(props: Props) {
           data-cy={props.cypressRef}
         />
       </div>
-      <div className="ml-3 text-sm">
-        <InputLabel>{props.label}</InputLabel>
-      </div>
+
+      {props.label && (
+        <div className="ml-3 text-sm">
+          <InputLabel>{props.label}</InputLabel>
+        </div>
+      )}
     </div>
   );
 }

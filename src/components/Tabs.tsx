@@ -133,7 +133,7 @@ export function Tabs(props: Props) {
       <div className="hidden sm:block">
         <div
           className="flex items-center justify-between space-x-4"
-          style={{ borderBottom: `2px solid ${colors.$20}` }}
+          style={{ borderBottom: `1px solid ${colors.$20}` }}
         >
           <nav
             ref={tabBar}
@@ -142,7 +142,7 @@ export function Tabs(props: Props) {
               tabBarClassName
             )}
             aria-label="Tabs"
-            style={{ marginBottom: '-2px' }}
+            style={{ marginBottom: '-1px' }}
           >
             {props.tabs.map(
               (tab) =>
@@ -166,7 +166,7 @@ export function Tabs(props: Props) {
                       <div
                         className="absolute left-1/2 transform -translate-x-1/2 w-full"
                         style={{
-                          height: '2px',
+                          height: '1px',
                           backgroundColor: colors.$3,
                           bottom: 0,
                         }}
