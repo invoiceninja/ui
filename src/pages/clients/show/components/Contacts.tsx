@@ -11,13 +11,15 @@
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
-import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
 import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
+import { useState } from 'react';
 
 interface Props {
   client: Client;
@@ -26,19 +28,32 @@ interface Props {
 export function Contacts(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
+
+  const [isShowMore, setIsShowMore] = useState<boolean>(false);
 
   const { client } = props;
 
   return (
     <>
       {client && (
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoCard
-            title={t('contacts')}
-            value={
-              <div className="space-y-2">
-                {client.contacts.map(
+        <Card
+          title={t('contacts')}
+          className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm h-full xl:h-max"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+          withoutBodyPadding
+          withScrollableBody
+        >
+          <div className="flex flex-col px-6 pb-6 w-full">
+            <div
+              className="flex flex-col w-full overflow-y-auto"
+              style={{ maxHeight: '30rem' }}
+            >
+              {client.contacts
+                .filter((_, index) => isShowMore || index < 3)
+                .map(
                   (contact: ClientContact, index: number) =>
                     Boolean(
                       contact.first_name ||
@@ -48,23 +63,45 @@ export function Contacts(props: Props) {
                     ) && (
                       <div
                         key={index}
-                        className="flex justify-between items-center"
+                        className="flex justify-between items-center py-4 border-b border-dashed"
+                        style={{ borderColor: colors.$21 }}
                       >
-                        <div className="flex flex-col space-y-1">
-                          <p
-                            className="font-semibold"
-                            style={{ color: accentColor }}
-                          >
-                            {contact.first_name} {contact.last_name}
-                          </p>
+                        <div className="flex flex-col space-y-2 text-sm">
+                          {Boolean(contact.first_name || contact.last_name) && (
+                            <span
+                              className="font-medium"
+                              style={{ color: colors.$3 }}
+                            >
+                              {contact.first_name} {contact.last_name}
+                            </span>
+                          )}
 
-                          <p>{contact.phone}</p>
+                          {Boolean(contact.phone) && (
+                            <span
+                              className="font-medium"
+                              style={{ color: colors.$22 }}
+                            >
+                              {contact.phone}
+                            </span>
+                          )}
 
                           {Boolean(contact.email) && (
-                            <div className="flex space-x-1">
-                              <span>{contact.email}</span>
+                            <div className="flex space-x-2">
+                              <span
+                                className="font-medium"
+                                style={{ color: colors.$22 }}
+                              >
+                                {contact.email}
+                              </span>
 
-                              <CopyToClipboardIconOnly text={contact.email} />
+                              <Tooltip
+                                message={t('copy') as string}
+                                placement="top"
+                                width="auto"
+                                centerVertically
+                              >
+                                <CopyToClipboardIconOnly text={contact.email} />
+                              </Tooltip>
                             </div>
                           )}
 
@@ -78,6 +115,7 @@ export function Contacts(props: Props) {
                                 }
                               )}
                               external
+                              withoutExternalIcon
                             >
                               {t('client_portal')}
                             </Link>
@@ -92,7 +130,6 @@ export function Contacts(props: Props) {
                                 text={route(
                                   `${client.contacts[index]?.link}?silent=true`
                                 )}
-                                iconColor={accentColor}
                               />
                             </Tooltip>
                           </div>
@@ -102,11 +139,20 @@ export function Contacts(props: Props) {
                       </div>
                     )
                 )}
-              </div>
-            }
-            className="h-full"
-          />
-        </div>
+            </div>
+
+            {client.contacts.length > 3 && (
+              <Button
+                className="w-full shadow-sm mt-4"
+                behavior="button"
+                type="secondary"
+                onClick={() => setIsShowMore(!isShowMore)}
+              >
+                {isShowMore ? t('view_less') : t('view_more')}
+              </Button>
+            )}
+          </div>
+        </Card>
       )}
     </>
   );

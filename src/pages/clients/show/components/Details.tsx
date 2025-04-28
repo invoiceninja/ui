@@ -40,16 +40,28 @@ export function Details(props: Props) {
   const resolveCountry = useResolveCountry();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
+  const isAnyCustomFieldPopulated = () => {
+    const fields = ['client1', 'client2', 'client3', 'client4'];
+
+    return fields.some((field) => {
+      const label = customField(field as CustomFields).label();
+      const value = client[`custom_value${field.slice(-1)}` as keyof Client];
+
+      return Boolean(label && value);
+    });
+  };
+
   return (
     <>
       {client && (
         <Card
           title={t('details')}
-          className="h-full col-span-12 md:col-span-6 lg:col-span-3 shadow-sm"
+          className="h-full xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm"
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
+          withoutBodyPadding
         >
-          <div className="flex flex-col px-6 space-y-4 pb-4">
+          <div className="flex flex-col px-6 space-y-4 pt-4 pb-6">
             <div className="flex flex-col space-y-1">
               <span
                 className="text-sm font-medium"
@@ -129,7 +141,7 @@ export function Details(props: Props) {
 
               {(client.address1 || client.address2) && (
                 <span
-                  className="break-all text-sm"
+                  className="break-all text-sm font-medium"
                   style={{ color: colors.$3 }}
                 >
                   {client.address1.length > 0 && client.address1}
@@ -140,7 +152,7 @@ export function Details(props: Props) {
 
               {(client.city || client.state || client.postal_code) && (
                 <span
-                  className="break-all text-sm"
+                  className="break-all text-sm font-medium"
                   style={{ color: colors.$3 }}
                 >
                   {client.city.length > 0 && client.city} &nbsp;
@@ -151,7 +163,7 @@ export function Details(props: Props) {
 
               {resolveCountry(client.country_id)?.name && (
                 <span
-                  className="break-all text-sm"
+                  className="break-all text-sm font-medium"
                   style={{ color: colors.$3 }}
                 >
                   {resolveCountry(client.country_id)?.name}
@@ -229,33 +241,35 @@ export function Details(props: Props) {
               </span>
             )}
 
-            <div className="flex flex-col space-y-1 mt-2">
-              {['client1', 'client2', 'client3', 'client4'].map((field) => {
-                const label = customField(field as CustomFields).label();
-                const value =
-                  client[`custom_value${field.slice(-1)}` as keyof Client];
+            {isAnyCustomFieldPopulated() && (
+              <div className="flex flex-col space-y-1">
+                {['client1', 'client2', 'client3', 'client4'].map((field) => {
+                  const label = customField(field as CustomFields).label();
+                  const value =
+                    client[`custom_value${field.slice(-1)}` as keyof Client];
 
-                return (
-                  Boolean(label && value) && (
-                    <div key={field} className="flex flex-col space-y-1">
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.$22 }}
-                      >
-                        {label}
-                      </span>
+                  return (
+                    Boolean(label && value) && (
+                      <div key={field} className="flex flex-col space-y-1">
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: colors.$22 }}
+                        >
+                          {label}
+                        </span>
 
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.$3 }}
-                      >
-                        {formatCustomFieldValue(field, value as string)}
-                      </span>
-                    </div>
-                  )
-                );
-              })}
-            </div>
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: colors.$3 }}
+                        >
+                          {formatCustomFieldValue(field, value as string)}
+                        </span>
+                      </div>
+                    )
+                  );
+                })}
+              </div>
+            )}
           </div>
         </Card>
       )}

@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Client } from '$app/common/interfaces/client';
-import { InfoCard } from '$app/components/InfoCard';
+import { Card } from '$app/components/cards';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 
@@ -24,29 +25,30 @@ export function ClientPublicNotes(props: Props) {
 
   const { client } = props;
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   return (
     <>
       {Boolean(client && client.public_notes) && (
-        <div className="col-span-12 md:col-span-6 lg:col-span-6 xl:col-span-3">
-          <InfoCard
-            title={t('public_notes')}
-            value={
-              <div className="whitespace-normal max-h-56 overflow-y-auto">
-                <article
-                  className={classNames('prose prose-sm', {
-                    'prose-invert': reactSettings?.dark_mode,
-                  })}
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHTML(client.public_notes),
-                  }}
-                />
-              </div>
-            }
-            className="h-full"
-          />
-        </div>
+        <Card
+          title={t('public_notes')}
+          className="col-span-12 shadow-sm h-max"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+          withoutBodyPadding
+        >
+          <div className="flex justify-center items-center whitespace-normal max-h-56 overflow-y-auto py-6">
+            <article
+              className={classNames('prose prose-sm', {
+                'prose-invert': reactSettings?.dark_mode,
+              })}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHTML(client.public_notes),
+              }}
+            />
+          </div>
+        </Card>
       )}
     </>
   );
