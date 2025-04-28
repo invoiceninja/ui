@@ -16,6 +16,7 @@ import { ShippingAddress } from './address/ShippingAddress';
 import { Client } from '$app/common/interfaces/client';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   client: Client | undefined;
@@ -27,17 +28,27 @@ interface Props {
 export function Address(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   return (
-    <Card title={t('address')}>
+    <Card
+      className="shadow-sm"
+      title={t('address')}
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutBodyPadding
+    >
       <TabGroup
-        className="px-5"
         tabs={[t('billing_address'), t('shipping_address')]}
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
+        fullRightPadding
       >
-        <div className="-mx-5">
+        <div>
           <BillingAddress {...props} />
         </div>
 
-        <div className="-mx-5">
+        <div>
           <ShippingAddress {...props} />
         </div>
       </TabGroup>

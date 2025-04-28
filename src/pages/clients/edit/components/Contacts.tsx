@@ -78,7 +78,13 @@ export function Contacts(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <Card className="mt-4 xl:mt-0" title={t('contacts')}>
+    <Card
+      className="shadow-sm"
+      title={t('contacts')}
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutBodyPadding
+    >
       {props.contacts.map((contact, index, row) => (
         <div
           key={index}
