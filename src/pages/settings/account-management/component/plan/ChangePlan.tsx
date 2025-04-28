@@ -17,7 +17,7 @@ import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Alert } from '$app/components/Alert';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Button, Radio } from '$app/components/forms';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import collect from 'collect.js';
 import { useFormik } from 'formik';
 import { useState } from 'react';
@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { Plan } from './Popup';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface ChangePlanProps {
   plan: Plan;
@@ -116,7 +117,15 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
 
             onSuccess();
           })
-          .catch(() => toast.error())
+          .catch((error: AxiosError<ValidationBag>) => {
+            console.log(error.response?.data);
+
+            error.response?.status === 400 || error.response?.status === 422
+              ? toast.error(error.response.data.message)
+              : toast.error();
+
+            return toast.error();
+          })
           .finally(() => setSubmitting(false));
 
         return;
