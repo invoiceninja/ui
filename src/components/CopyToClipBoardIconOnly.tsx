@@ -31,8 +31,6 @@ export function CopyToClipboardIconOnly({
   const value = text || '';
   const colors = useColorScheme();
 
-  const colors = useColorScheme();
-
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
 
