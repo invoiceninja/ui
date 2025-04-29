@@ -38,20 +38,22 @@ export function Address(props: Props) {
       headerStyle={{ borderColor: colors.$20 }}
       withoutBodyPadding
     >
-      <TabGroup
-        tabs={[t('billing_address'), t('shipping_address')]}
-        withHorizontalPadding
-        horizontalPaddingWidth="1.5rem"
-        fullRightPadding
-      >
-        <div>
-          <BillingAddress {...props} />
-        </div>
+      <div className="pt-2">
+        <TabGroup
+          tabs={[t('billing_address'), t('shipping_address')]}
+          withHorizontalPadding
+          horizontalPaddingWidth="1.5rem"
+          fullRightPadding
+        >
+          <div>
+            <BillingAddress {...props} />
+          </div>
 
-        <div>
-          <ShippingAddress {...props} />
-        </div>
-      </TabGroup>
+          <div>
+            <ShippingAddress {...props} />
+          </div>
+        </TabGroup>
+      </div>
     </Card>
   );
 }
