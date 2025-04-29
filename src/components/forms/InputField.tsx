@@ -101,6 +101,7 @@ export function InputField(props: Props) {
               border: props.border !== false,
               'border-[#09090B26] focus:border-black': !reactSettings.dark_mode,
               'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
+              block: props.element === 'textarea',
             }
           )}
           placeholder={props.placeholder || ''}

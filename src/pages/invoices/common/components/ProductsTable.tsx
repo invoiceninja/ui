@@ -9,7 +9,7 @@
  */
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { AlignJustify, Plus, Trash2 } from 'react-feather';
+import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   isLineItemEmpty,
@@ -27,6 +27,9 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import styled from 'styled-components';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -50,6 +53,37 @@ interface Props {
   onCreateItemClick: () => unknown;
   shouldCreateInitialLineItem?: boolean;
 }
+
+const AddLineItemButton = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
+// Add a container with horizontal scroll
+const TableContainer = styled.div`
+  overflow-x: auto;
+  width: 100%;
+`;
+
+// Create styled components for sticky columns
+const StickyTh = styled(Th)`
+  position: sticky !important;
+  right: ${({ theme }) => theme.right}px;
+  z-index: 10;
+  background-color: ${({ theme }) => theme.bgColor} !important;
+  box-shadow: -2px 0 5px -2px rgba(0, 0, 0, 0.1);
+`;
+
+const StickyTd = styled(Td)`
+  position: sticky !important;
+  right: ${({ theme }) => theme.right}px;
+  z-index: 5;
+  background-color: ${({ theme }) => theme.bgColor} !important;
+  box-shadow: -2px 0 5px -2px rgba(0, 0, 0, 0.1);
+`;
 
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
@@ -86,6 +120,13 @@ export function ProductsTable(props: Props) {
     return resource.line_items.indexOf(lineItem);
   };
 
+  // Calculate positions for the sticky columns
+  // We need the last two columns to be sticky
+  const deleteColumnWidth = 48; // Width of delete button column (in pixels)
+
+  // We'll make the last column and the second-to-last column sticky
+  const lastColumnIndex = columns.length - 1;
+
   // This portion of the code pertains to the automatic creation of line items.
   // Currently, we do not support this functionality, and we will comment it out until we begin providing support for it.
 
@@ -102,111 +143,225 @@ export function ProductsTable(props: Props) {
   }, [resource.client_id, resource.vendor_id]); */
 
   return (
-    <Table>
-      <Thead backgroundColor={themeColors.$5}>
-        {columns.map((column, index) => (
-          <Th key={index} textColor={themeColors.$6}>
-            {resolveTranslation(column)}
-          </Th>
-        ))}
-      </Thead>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="product-table">
-          {(provided) => (
-            <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
-              {items.map((lineItem, index) => (
-                <Draggable
-                  key={getLineItemIndex(lineItem)}
-                  draggableId={getLineItemIndex(lineItem).toString()}
-                  index={getLineItemIndex(lineItem)}
+    <TableContainer>
+      <Table>
+        <Thead backgroundColor={themeColors.$5}>
+          <Th></Th>
+
+          {columns.map((column, index) => {
+            if (index === lastColumnIndex) {
+              return (
+                <StickyTh
+                  key={index}
+                  textColor={themeColors.$6}
+                  theme={{ right: deleteColumnWidth, bgColor: colors.$1 }}
+                  {...(index === 0
+                    ? {
+                        withoutHorizontalPadding: true,
+                        className: 'pr-2 lg:pr-2.5 xl:pr-4',
+                      }
+                    : {
+                        withoutHorizontalPadding: true,
+                        className: 'px-2',
+                      })}
                 >
-                  {(provided) => (
-                    <Tr
-                      innerRef={provided.innerRef}
-                      key={getLineItemIndex(lineItem)}
-                      tabIndex={index + 1}
-                      {...provided.draggableProps}
-                    >
-                      {columns.map((column, columnIndex, { length }) => (
-                        <Td
-                          width={resolveColumnWidth(column)}
-                          key={columnIndex}
-                        >
-                          {length - 1 !== columnIndex && (
-                            <div
-                              className={classNames({
-                                'flex justify-between items-center space-x-3':
-                                  columnIndex === 0,
-                              })}
-                            >
-                              {columnIndex === 0 ? (
-                                <button
-                                  {...provided.dragHandleProps}
-                                  onMouseEnter={(e) => e.currentTarget.focus()}
-                                >
-                                  <AlignJustify size={18} />
-                                </button>
-                              ) : null}
+                  {resolveTranslation(column)}
+                </StickyTh>
+              );
+            } else {
+              return (
+                <Th
+                  key={index}
+                  textColor={themeColors.$6}
+                  {...(index === 0
+                    ? {
+                        withoutHorizontalPadding: true,
+                        className: 'pr-2 lg:pr-2.5 xl:pr-4',
+                      }
+                    : {
+                        withoutHorizontalPadding: true,
+                        className: 'px-2',
+                      })}
+                >
+                  {resolveTranslation(column)}
+                </Th>
+              );
+            }
+          })}
 
-                              {resolveInputField(
-                                column,
-                                getLineItemIndex(lineItem)
-                              )}
-                            </div>
-                          )}
-
-                          {length - 1 === columnIndex && (
-                            <div className="flex justify-between items-center">
-                              {resolveInputField(
-                                column,
-                                getLineItemIndex(lineItem)
-                              )}
-
-                              {resource && (
-                                <button
-                                  style={{ color: colors.$3 }}
-                                  className="ml-2 text-gray-600 hover:text-red-600"
-                                  onClick={() => {
-                                    setIsDeleteActionTriggered(true);
-
-                                    props.onDeleteRowClick(
-                                      getLineItemIndex(lineItem)
-                                    );
-                                  }}
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </Td>
-                      ))}
-                    </Tr>
-                  )}
-                </Draggable>
-              ))}
-
-              {provided.placeholder}
-
-              <Tr className="bg-slate-100 hover:bg-slate-200">
-                <Td colSpan={100}>
-                  <button
-                    onClick={() =>
-                      !isAnyLineItemEmpty() && props.onCreateItemClick()
-                    }
-                    className="w-full py-2 inline-flex justify-center items-center space-x-2"
+          <StickyTh theme={{ right: 0, bgColor: colors.$1 }}></StickyTh>
+        </Thead>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="product-table">
+            {(provided) => (
+              <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
+                {items.map((lineItem, index) => (
+                  <Draggable
+                    key={getLineItemIndex(lineItem)}
+                    draggableId={getLineItemIndex(lineItem).toString()}
+                    index={getLineItemIndex(lineItem)}
                   >
-                    <Plus size={18} />
-                    <span>
-                      {props.type === 'product' ? t('add_item') : t('add_line')}
-                    </span>
-                  </button>
-                </Td>
-              </Tr>
-            </Tbody>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </Table>
+                    {(provided) => (
+                      <Tr
+                        innerRef={provided.innerRef}
+                        key={getLineItemIndex(lineItem)}
+                        tabIndex={index + 1}
+                        {...provided.draggableProps}
+                      >
+                        <Td
+                          className="px-2 border-b"
+                          style={{
+                            borderColor: colors.$20,
+                          }}
+                          withoutPadding
+                        >
+                          <div
+                            className="flex justify-center items-center focus:outline-none focus:ring-0"
+                            {...provided.dragHandleProps}
+                            onMouseEnter={(e) => e.currentTarget.focus()}
+                          >
+                            <GridDotsVertical
+                              size="1.3rem"
+                              color={colors.$17}
+                            />
+                          </div>
+                        </Td>
+
+                        {columns.map((column, columnIndex, { length }) => {
+                          // For the last two columns, use sticky cells
+                          if (columnIndex === lastColumnIndex) {
+                            return (
+                              <StickyTd
+                                key={columnIndex}
+                                theme={{
+                                  right: deleteColumnWidth,
+                                  bgColor: colors.$1,
+                                }}
+                                {...(columnIndex === 0
+                                  ? {
+                                      className: 'pr-2 py-4 border-b',
+                                      withoutPadding: true,
+                                    }
+                                  : {
+                                      className: 'px-2 py-4 border-b',
+                                      withoutPadding: true,
+                                    })}
+                                style={{ borderColor: colors.$20 }}
+                              >
+                                <div
+                                  style={{ width: resolveColumnWidth(column) }}
+                                >
+                                  {resolveInputField(
+                                    column,
+                                    getLineItemIndex(lineItem)
+                                  )}
+                                </div>
+                              </StickyTd>
+                            );
+                          } else {
+                            return (
+                              <Td
+                                key={columnIndex}
+                                {...(columnIndex === 0
+                                  ? {
+                                      className: 'pr-2 py-4 border-b',
+                                      withoutPadding: true,
+                                    }
+                                  : {
+                                      className: 'px-2 py-4 border-b',
+                                      withoutPadding: true,
+                                    })}
+                                style={{ borderColor: colors.$20 }}
+                              >
+                                <div
+                                  style={{ width: resolveColumnWidth(column) }}
+                                >
+                                  {resolveInputField(
+                                    column,
+                                    getLineItemIndex(lineItem)
+                                  )}
+                                </div>
+                              </Td>
+                            );
+                          }
+                        })}
+
+                        <StickyTd
+                          className="px-2 py-4 border-b"
+                          withoutPadding
+                          theme={{ right: 0, bgColor: colors.$1 }}
+                          style={{ borderColor: colors.$20 }}
+                        >
+                          <div
+                            className="flex justify-end"
+                            style={{ width: '3rem' }}
+                          >
+                            {resource && (
+                              <button
+                                className="px-2"
+                                onClick={() => {
+                                  setIsDeleteActionTriggered(true);
+
+                                  props.onDeleteRowClick(
+                                    getLineItemIndex(lineItem)
+                                  );
+                                }}
+                              >
+                                <CircleXMark
+                                  color={colors.$16}
+                                  hoverColor={colors.$3}
+                                  borderColor={colors.$5}
+                                  hoverBorderColor={colors.$17}
+                                  size="1.6rem"
+                                />
+                              </button>
+                            )}
+                          </div>
+                        </StickyTd>
+                      </Tr>
+                    )}
+                  </Draggable>
+                ))}
+
+                {provided.placeholder}
+
+                <Tr>
+                  <Td colSpan={100} className="p-1" withoutPadding>
+                    <AddLineItemButton
+                      className={classNames(
+                        'w-full py-4 inline-flex justify-center items-center space-x-2 rounded-[0.1875rem]',
+                        {
+                          'cursor-not-allowed': isAnyLineItemEmpty(),
+                          'cursor-pointer': !isAnyLineItemEmpty(),
+                        }
+                      )}
+                      onClick={(event) => {
+                        event.stopPropagation();
+
+                        !isAnyLineItemEmpty() && props.onCreateItemClick();
+                      }}
+                      theme={{
+                        backgroundColor: colors.$1,
+                        hoverBackgroundColor: colors.$20,
+                      }}
+                    >
+                      <div>
+                        <Plus size="1.15rem" color={colors.$17} />
+                      </div>
+
+                      <span className="font-medium">
+                        {props.type === 'product'
+                          ? t('add_item')
+                          : t('add_line')}
+                      </span>
+                    </AddLineItemButton>
+                  </Td>
+                </Tr>
+              </Tbody>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </Table>
+    </TableContainer>
   );
 }

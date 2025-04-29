@@ -1,5 +1,3 @@
- 
-
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -112,7 +110,6 @@ export function useResolveInputField(props: Props) {
     return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
-   
   const cleanLineItemsList = useCallback(
     (lineItems: InvoiceItem[]) => {
       let typeId = InvoiceItemType.Product;
@@ -350,7 +347,6 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
-          style={{ marginTop: '4px' }}
           textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
       );
@@ -385,14 +381,18 @@ export function useResolveInputField(props: Props) {
     }
 
     if ('gross_line_total' === property) {
-      return formatMoney(
-        (resource?.line_items[index][property] ?? 0) as number
+      return (
+        <span className="font-mono">
+          {formatMoney((resource?.line_items[index][property] ?? 0) as number)}
+        </span>
       );
     }
 
     if ('tax_amount' === property) {
-      return formatMoney(
-        (resource?.line_items[index][property] ?? 0) as number
+      return (
+        <span className="font-mono">
+          {formatMoney((resource?.line_items[index][property] ?? 0) as number)}
+        </span>
       );
     }
 
@@ -401,7 +401,11 @@ export function useResolveInputField(props: Props) {
     }
 
     if (['line_total'].includes(property)) {
-      return formatMoney(resource?.line_items[index][property] as number);
+      return (
+        <span className="font-mono">
+          {formatMoney(resource?.line_items[index][property] as number)}
+        </span>
+      );
     }
 
     if (['product1', 'product2', 'product3', 'product4'].includes(property)) {
