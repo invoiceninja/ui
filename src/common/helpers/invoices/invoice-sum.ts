@@ -155,8 +155,10 @@ export class InvoiceSum {
       });
     }
 
+    console.log(this.totalTaxes);
     this.totalTaxes = parseFloat(calculatedTax.toFixed(this.currency?.precision || 2));
 
+    console.log(this.totalTaxes);
     return this;
   }
 
@@ -299,7 +301,10 @@ export class InvoiceSum {
   }
 
   protected taxer(amount: number, tax_rate: number) {
-    return Number((Math.round(amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100);
+
+    const taxAmount = amount * ((tax_rate ?? 0) / 100);
+    return Number((Math.ceil(taxAmount * 100)) / 100);    
+    // return Number((Math.round(amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100);
   }
 
   protected valuer(customValue: number | undefined): number {
