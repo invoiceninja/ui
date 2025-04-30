@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -21,6 +20,7 @@ import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useColorScheme } from '$app/common/colors';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { InfoCard } from '$app/components/InfoCard';
 
 interface Props {
   client: Client;
@@ -54,14 +54,12 @@ export function Details(props: Props) {
   return (
     <>
       {client && (
-        <Card
+        <InfoCard
           title={t('details')}
-          className="h-full xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm"
+          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm"
           style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-          withoutBodyPadding
         >
-          <div className="flex flex-col px-6 space-y-4 pt-4 pb-6">
+          <div className="flex flex-col pt-2 space-y-3">
             <div className="flex flex-col space-y-1">
               <span
                 className="text-sm font-medium"
@@ -75,7 +73,7 @@ export function Details(props: Props) {
               </div>
             </div>
 
-            <div className="flex flex-col space-y-1.5">
+            <div className="flex flex-col space-y-1">
               <span
                 className="text-sm font-medium"
                 style={{ color: colors.$22 }}
@@ -130,46 +128,6 @@ export function Details(props: Props) {
                 </Link>
               </div>
             )}
-
-            <div className="flex flex-col space-y-1">
-              <span
-                className="text-sm font-medium"
-                style={{ color: colors.$22 }}
-              >
-                {t('address')}
-              </span>
-
-              {(client.address1 || client.address2) && (
-                <span
-                  className="break-all text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {client.address1.length > 0 && client.address1}
-                  {client.address1.length > 0 && <br />}
-                  {client.address2}
-                </span>
-              )}
-
-              {(client.city || client.state || client.postal_code) && (
-                <span
-                  className="break-all text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {client.city.length > 0 && client.city} &nbsp;
-                  {client.state} &nbsp;
-                  {client.postal_code.length > 0 && client.postal_code}
-                </span>
-              )}
-
-              {resolveCountry(client.country_id)?.name && (
-                <span
-                  className="break-all text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {resolveCountry(client.country_id)?.name}
-                </span>
-              )}
-            </div>
 
             {client.vat_number.length > 1 && (
               <div className="flex flex-col space-y-1">
@@ -271,7 +229,7 @@ export function Details(props: Props) {
               </div>
             )}
           </div>
-        </Card>
+        </InfoCard>
       )}
     </>
   );

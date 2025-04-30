@@ -39,6 +39,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { InputLabel } from '$app/components/forms';
+import { Address } from './components/Address';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -129,6 +130,7 @@ export default function Client() {
         <>
           <div className="grid grid-cols-12 lg:space-y-0 gap-4">
             <Details client={client} />
+            <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
             {client.gateway_tokens.length > 0 && <Gateways client={client} />}

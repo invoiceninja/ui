@@ -11,7 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
-import { Card } from '$app/components/cards';
+import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -30,16 +30,14 @@ export function Standing(props: Props) {
   return (
     <>
       {client && (
-        <Card
+        <InfoCard
           title={t('standing')}
-          className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm h-full xl:h-max"
+          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max"
           style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-          withoutBodyPadding
         >
-          <div className="flex flex-col px-6 pb-6">
+          <div className="flex flex-col">
             <div
-              className="flex justify-between border-b border-dashed py-5"
+              className="flex justify-between border-b border-dashed pt-3 pb-4"
               style={{ borderColor: colors.$24 }}
             >
               <span
@@ -59,7 +57,7 @@ export function Standing(props: Props) {
             </div>
 
             <div
-              className="flex justify-between border-b border-dashed py-5"
+              className="flex justify-between border-b border-dashed py-4"
               style={{ borderColor: colors.$24 }}
             >
               <span
@@ -79,7 +77,7 @@ export function Standing(props: Props) {
             </div>
 
             <div
-              className="flex justify-between border-b border-dashed py-5"
+              className="flex justify-between border-b border-dashed py-4"
               style={{ borderColor: colors.$24 }}
             >
               <span
@@ -100,7 +98,7 @@ export function Standing(props: Props) {
 
             {client.payment_balance > 0 && (
               <div
-                className="flex justify-between border-b border-dashed py-5"
+                className="flex justify-between border-b border-dashed py-4"
                 style={{ borderColor: colors.$24 }}
               >
                 <span
@@ -120,7 +118,7 @@ export function Standing(props: Props) {
               </div>
             )}
           </div>
-        </Card>
+        </InfoCard>
       )}
     </>
   );

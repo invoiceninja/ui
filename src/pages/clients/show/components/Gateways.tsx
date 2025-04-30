@@ -33,8 +33,8 @@ import {
 import { useSetAtom } from 'jotai';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Card } from '$app/components/cards';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
+import { InfoCard } from '$app/components/InfoCard';
 
 interface Props {
   client: Client;
@@ -127,14 +127,12 @@ export function Gateways(props: Props) {
         disabledButton={isFormBusy}
       />
 
-      <Card
+      <InfoCard
         title={t('payment_methods')}
-        className="h-full xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm"
+        className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-5 2xl:col-span-4 shadow-sm"
         style={{ borderColor: colors.$24 }}
-        headerStyle={{ borderColor: colors.$20 }}
-        withoutBodyPadding
       >
-        <div className="flex flex-col px-6 pb-6 pt-2 max-h-96 overflow-y-auto text-sm">
+        <div className="flex flex-col pt-2 max-h-96 overflow-y-auto text-sm">
           {client.gateway_tokens.map((token) => (
             <div
               key={token.id}
@@ -314,7 +312,7 @@ export function Gateways(props: Props) {
             </div>
           ))}
         </div>
-      </Card>
+      </InfoCard>
     </>
   );
 }

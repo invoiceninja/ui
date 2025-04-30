@@ -17,9 +17,9 @@ import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { route } from '$app/common/helpers/route';
 import { Button, Link } from '$app/components/forms';
-import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { useState } from 'react';
+import { InfoCard } from '$app/components/InfoCard';
 
 interface Props {
   client: Client;
@@ -38,15 +38,12 @@ export function Contacts(props: Props) {
   return (
     <>
       {client && (
-        <Card
+        <InfoCard
           title={t('contacts')}
-          className="col-span-12 lg:col-span-6 xl:col-span-4 shadow-sm h-full xl:h-max"
+          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max"
           style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-          withoutBodyPadding
-          withScrollableBody
         >
-          <div className="flex flex-col px-6 pb-6 w-full">
+          <div className="flex flex-col w-full">
             <div
               className="flex flex-col w-full overflow-y-auto"
               style={{ maxHeight: '30rem' }}
@@ -63,10 +60,10 @@ export function Contacts(props: Props) {
                     ) && (
                       <div
                         key={index}
-                        className="flex justify-between items-center py-4 border-b border-dashed"
+                        className="flex justify-between items-center first:pt-2 py-4 border-b border-dashed"
                         style={{ borderColor: colors.$21 }}
                       >
-                        <div className="flex flex-col space-y-2 text-sm">
+                        <div className="flex flex-col space-y-1 text-sm">
                           {Boolean(contact.first_name || contact.last_name) && (
                             <span
                               className="font-medium"
@@ -152,7 +149,7 @@ export function Contacts(props: Props) {
               </Button>
             )}
           </div>
-        </Card>
+        </InfoCard>
       )}
     </>
   );

@@ -12,7 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Client } from '$app/common/interfaces/client';
-import { Card } from '$app/components/cards';
+import { InfoCard } from '$app/components/InfoCard';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 
@@ -31,14 +31,12 @@ export function ClientPrivateNotes(props: Props) {
   return (
     <>
       {Boolean(client && client.private_notes) && (
-        <Card
+        <InfoCard
           title={t('private_notes')}
-          className="col-span-12 shadow-sm h-max"
+          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm"
           style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-          withoutBodyPadding
         >
-          <div className="flex justify-center items-center whitespace-normal max-h-56 overflow-y-auto py-6">
+          <div className="whitespace-normal max-h-56 overflow-y-auto pt-2">
             <article
               className={classNames('prose prose-sm', {
                 'prose-invert': reactSettings?.dark_mode,
@@ -48,7 +46,7 @@ export function ClientPrivateNotes(props: Props) {
               }}
             />
           </div>
-        </Card>
+        </InfoCard>
       )}
     </>
   );
