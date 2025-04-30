@@ -119,7 +119,12 @@ export default function Locations() {
 
   if (!id) {
     return (
-      <Card className="w-full xl:w-2/3" title={t('locations')}>
+      <Card
+        title={t('locations')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <div className="px-6 text-sm">{t('save_to_add_locations')}.</div>
       </Card>
     );
@@ -127,15 +132,20 @@ export default function Locations() {
 
   return (
     <>
-      <Card className="w-full" title={t('locations')}>
+      <Card
+        title={t('locations')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <div className="px-4 sm:px-6 py-2">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <NewLocationCard
               className="flex flex-col space-y-2 items-center justify-center border-dashed border p-6 rounded-md cursor-pointer h-48"
               theme={{
                 backgroundColor: colors.$1,
-                hoverBackgroundColor: colors.$4,
-                borderColor: colors.$5,
+                hoverBackgroundColor: colors.$20,
+                borderColor: colors.$24,
               }}
               onClick={() => setIsModalOpen(true)}
             >
@@ -147,7 +157,7 @@ export default function Locations() {
               <LocationCard
                 key={index}
                 theme={{
-                  borderColor: colors.$5,
+                  borderColor: colors.$24,
                 }}
                 className="px-3 py-4 flex justify-between space-x-4 border rounded-md h-48"
               >
@@ -206,9 +216,9 @@ export default function Locations() {
                         'cursor-pointer': !isFormBusy,
                       }
                     )}
-                    style={{ borderColor: colors.$5 }}
+                    style={{ borderColor: colors.$24 }}
                     theme={{
-                      hoverBackgroundColor: colors.$4,
+                      hoverBackgroundColor: colors.$20,
                       backgroundColor: colors.$1,
                     }}
                     onClick={() =>
@@ -226,9 +236,9 @@ export default function Locations() {
                         'cursor-pointer': !isFormBusy,
                       }
                     )}
-                    style={{ borderColor: colors.$5 }}
+                    style={{ borderColor: colors.$24 }}
                     theme={{
-                      hoverBackgroundColor: colors.$4,
+                      hoverBackgroundColor: colors.$20,
                       backgroundColor: colors.$1,
                     }}
                     onClick={() => {

@@ -136,7 +136,6 @@ export function InvoiceDetails(props: Props) {
                 errorMessage={props.errors?.errors.is_amount_discount}
                 customSelector
                 dismissable={false}
-                withoutSeparator
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>

@@ -138,7 +138,6 @@ export function Pagination(props: Props) {
           onValueChange={(value) => props.onRowsChange(value as PerPage)}
           customSelector
           dismissable={false}
-          withoutSeparator
           searchable={false}
           dropdownIndicatorClassName="pl-0"
         >
