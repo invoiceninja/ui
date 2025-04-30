@@ -22,6 +22,7 @@ import { CustomField } from '$app/components/CustomField';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { useColorScheme } from '$app/common/colors';
 interface Props {
   client: Client | undefined;
   setClient: Dispatch<SetStateAction<Client | undefined>>;
@@ -32,6 +33,9 @@ interface Props {
 
 export function Details(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const { data: users } = useUsersQuery();
   const { data: groupSettings } = useGroupSettingsQuery();
 
@@ -51,7 +55,12 @@ export function Details(props: Props) {
   const company = useCurrentCompany();
 
   return (
-    <Card title={t('company_details')}>
+    <Card
+      className="shadow-sm"
+      title={t('company_details')}
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       {props.client && props.page === 'edit' && (
         <Element leftSide={t('status')}>
           <EntityStatus entity={props.client} />

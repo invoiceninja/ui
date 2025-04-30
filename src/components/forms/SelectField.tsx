@@ -31,7 +31,6 @@ export interface SelectProps extends CommonProps {
   dismissable?: boolean;
   clearAfterSelection?: boolean;
   menuPosition?: 'fixed';
-  withoutSeparator?: boolean;
   searchable?: boolean;
   controlIcon?: ReactNode;
   controlStyle?: CSSProperties;
@@ -122,13 +121,11 @@ export function SelectField(props: SelectProps) {
         minHeight: '1.875rem',
       });
     },
-    ...(props.withoutSeparator && {
-      indicatorSeparator: () => {
-        return {
-          display: 'none',
-        };
-      },
-    }),
+    indicatorSeparator: () => {
+      return {
+        display: 'none',
+      };
+    },
   };
 
   return (

@@ -43,19 +43,19 @@ export default function Edit() {
               errors={errors}
               page="edit"
             />
-          </div>
-
-          <div className="flex flex-col w-full xl:w-1/2 space-y-4">
-            <Contacts
-              contacts={contacts}
-              setContacts={setContacts}
-              setErrors={setErrors}
-              errors={errors}
-            />
 
             <Address
               client={client}
               setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
+          </div>
+
+          <div className="w-full xl:w-1/2">
+            <Contacts
+              contacts={contacts}
+              setContacts={setContacts}
               setErrors={setErrors}
               errors={errors}
             />
