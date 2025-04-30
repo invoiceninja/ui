@@ -50,23 +50,23 @@ const LinkStyled = styled(Link)`
 
 export function Settings(props: Props) {
   const [t] = useTranslation();
+
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
+
+  const location = useLocation();
+  const colors = useColorScheme();
+  const { basic, advanced } = useSettingsRoutes();
   const activeSettings = useActiveSettingsDetails();
-  const switchToCompanySettings = useSwitchToCompanySettings();
+  const settingPathNameKey = location.pathname.split('/')[2];
   const { isGroupSettingsActive, isClientSettingsActive } =
     useCurrentSettingsLevel();
 
-  const location = useLocation();
   const navigate = useNavigate();
-  const settingPathNameKey = location.pathname.split('/')[2];
-
-  const { basic, advanced } = useSettingsRoutes();
+  const switchToCompanySettings = useSwitchToCompanySettings();
 
   useEffect(() => {
     setErrors(undefined);
   }, [settingPathNameKey]);
-
-  const colors = useColorScheme();
 
   return (
     <Default
@@ -119,8 +119,10 @@ export function Settings(props: Props) {
             </div>
           )}
 
-          <a className="flex items-center py-4 px-3 text-xs uppercase font-medium">
-            <span className="truncate">{t('basic_settings')}</span>
+          <a className="flex items-center py-4 px-3 text-sm font-medium">
+            <span className="truncate" style={{ color: colors.$17 }}>
+              {t('basic_settings')}
+            </span>
           </a>
 
           <SelectField
@@ -163,9 +165,11 @@ export function Settings(props: Props) {
           </nav>
 
           {advanced.filter((route) => route.enabled).length > 0 && (
-            <div className="flex items-center py-4 px-3 text-xs uppercase font-medium mt-8 truncate space-x-1">
-              <span>{t('advanced_settings')}</span>
-              <sup>{t('pro')}</sup>
+            <div className="flex items-center py-4 px-3 text-sm font-medium mt-8 truncate space-x-1">
+              <span style={{ color: colors.$17 }}>
+                {t('advanced_settings')}
+              </span>
+              <div>{t('pro')}</div>
             </div>
           )}
 
