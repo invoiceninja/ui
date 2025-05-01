@@ -10,7 +10,6 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import classNames from 'classnames';
 import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
@@ -54,12 +53,11 @@ const StyledLink = styled(Link)`
 export function Tabs(props: Props) {
   const navigate = useNavigate();
 
-  const { visible = true, withoutDefaultTabSpace, tabBarClassName } = props;
+  const { visible = true, tabBarClassName } = props;
 
   const params = useParams();
   const location = useLocation();
   const colors = useColorScheme();
-  const accentColor = useAccentColor();
   const [searchParams] = useSearchParams();
   const tabBar = useRef<HTMLDivElement>(null);
 

@@ -27,6 +27,7 @@ import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompany
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
+import { Sparkle } from '../icons/Sparkle';
 
 interface Props {
   title: string;
@@ -79,8 +80,14 @@ export function Settings(props: Props) {
       breadcrumbs={[]}
       aboveMainContainer={props.aboveMainContainer}
     >
-      <div className="grid grid-cols-12 lg:gap-10">
-        <div className="col-span-12 lg:col-span-3">
+      {props.breadcrumbs && (
+        <div className="w-full pl-2 pt-3 pb-2">
+          <Breadcrumbs pages={props.breadcrumbs} />
+        </div>
+      )}
+
+      <div className="grid grid-cols-9 lg:gap-10">
+        <div className="col-span-12 lg:col-span-2">
           {(isGroupSettingsActive || isClientSettingsActive) && (
             <div
               className="flex items-center justify-between border py-3 rounded space-x-3 px-2"
@@ -149,13 +156,13 @@ export function Settings(props: Props) {
                     key={item.name}
                     to={item.href}
                     className={classNames(
-                      'flex items-center px-3 py-2 text-sm font-medium rounded'
+                      'flex items-center px-3 py-2 text-sm font-medium rounded-md'
                     )}
                     aria-current={item.current ? 'page' : undefined}
                     theme={{
-                      backgroundColor: item.current ? colors.$5 : '',
+                      backgroundColor: item.current ? colors.$20 : '',
                       color: item.current ? colors.$3 : '',
-                      hoverColor: colors.$5,
+                      hoverColor: colors.$20,
                     }}
                   >
                     <span className="truncate">{item.name}</span>
@@ -165,11 +172,20 @@ export function Settings(props: Props) {
           </nav>
 
           {advanced.filter((route) => route.enabled).length > 0 && (
-            <div className="flex items-center py-4 px-3 text-sm font-medium mt-8 truncate space-x-1">
+            <div className="flex items-center py-4 px-3 text-sm font-medium mt-8 truncate space-x-2">
               <span style={{ color: colors.$17 }}>
                 {t('advanced_settings')}
               </span>
-              <div>{t('pro')}</div>
+
+              <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
+                <div>
+                  <Sparkle size="1rem" color="#2176FF" />
+                </div>
+
+                <span className="font-medium" style={{ color: '#2176FF' }}>
+                  {t('pro')}
+                </span>
+              </div>
             </div>
           )}
 
@@ -197,13 +213,13 @@ export function Settings(props: Props) {
                     key={item.name}
                     to={item.href}
                     className={classNames(
-                      'flex items-center px-3 py-2 text-sm font-medium rounded'
+                      'flex items-center px-3 py-2 text-sm font-medium rounded-md'
                     )}
                     aria-current={item.current ? 'page' : undefined}
                     theme={{
-                      backgroundColor: item.current ? colors.$5 : '',
+                      backgroundColor: item.current ? colors.$20 : '',
                       color: item.current ? colors.$3 : '',
-                      hoverColor: colors.$5,
+                      hoverColor: colors.$20,
                     }}
                   >
                     <span className="truncate">{item.name}</span>
@@ -232,9 +248,7 @@ export function Settings(props: Props) {
           </nav>
         </div>
 
-        <div className="col-span-12 lg:col-start-4 space-y-6 mt-5">
-          {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
-
+        <div className="col-span-12 lg:col-start-3 space-y-6">
           {errors && <ValidationAlert errors={errors} />}
 
           {props.children}

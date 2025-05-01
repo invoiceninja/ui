@@ -17,6 +17,7 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Tabs } from '$app/components/Tabs';
 import { Outlet } from 'react-router-dom';
 import { useCompanyDetailsTabs } from './common/hooks/useCompanyDetailsTabs';
+import { Card } from '$app/components/cards';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
@@ -44,11 +45,13 @@ export function CompanyDetails() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#company_details"
     >
-      <Tabs tabs={tabs} className="mt-6" />
-      
-      <div className="my-4">
-        <Outlet />
-      </div>
+      <Card title={t('company')} withoutBodyPadding>
+        <Tabs tabs={tabs} />
+
+        <div className="my-4">
+          <Outlet />
+        </div>
+      </Card>
     </Settings>
   );
 }
