@@ -36,7 +36,7 @@ export function Address(props: Props) {
           className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3"
           style={{ borderColor: colors.$24 }}
         >
-          <div className="flex flex-col pt-2">
+          <div className="flex flex-col pt-2 h-44 overflow-y-auto">
             {(client.address1 || client.address2) && (
               <span
                 className="break-all text-sm font-medium"

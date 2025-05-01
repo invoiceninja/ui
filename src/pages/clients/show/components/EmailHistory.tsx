@@ -55,7 +55,7 @@ export function EmailHistory() {
           className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-5 2xl:col-span-4 shadow-sm"
           style={{ borderColor: colors.$24 }}
         >
-          <div className="flex flex-col pt-2 max-h-96 overflow-y-auto">
+          <div className="flex flex-col pt-2 h-44 overflow-y-auto">
             {emailRecords.map(
               (emailRecord, index) =>
                 emailRecord && (

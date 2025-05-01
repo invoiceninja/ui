@@ -36,7 +36,7 @@ export function ClientPublicNotes(props: Props) {
           className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm"
           style={{ borderColor: colors.$24 }}
         >
-          <div className="whitespace-normal max-h-56 overflow-y-auto pt-2">
+          <div className="whitespace-normal h-44 overflow-y-auto pt-2">
             <article
               className={classNames('prose prose-sm', {
                 'prose-invert': reactSettings?.dark_mode,

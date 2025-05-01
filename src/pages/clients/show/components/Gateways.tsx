@@ -132,7 +132,7 @@ export function Gateways(props: Props) {
         className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-5 2xl:col-span-4 shadow-sm"
         style={{ borderColor: colors.$24 }}
       >
-        <div className="flex flex-col max-h-96 overflow-y-auto text-sm">
+        <div className="flex flex-col h-44 overflow-y-auto text-sm">
           {client.gateway_tokens.map((token) => (
             <div
               key={token.id}

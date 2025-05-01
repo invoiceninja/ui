@@ -59,7 +59,7 @@ export function Details(props: Props) {
           className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm"
           style={{ borderColor: colors.$24 }}
         >
-          <div className="flex flex-col pt-2 space-y-3">
+          <div className="flex flex-col pt-2 space-y-3 h-44 overflow-y-auto">
             <div className="flex flex-col space-y-1">
               <span
                 className="text-sm font-medium"

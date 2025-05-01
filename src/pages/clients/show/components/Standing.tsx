@@ -35,7 +35,7 @@ export function Standing(props: Props) {
           className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max"
           style={{ borderColor: colors.$24 }}
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col h-44 overflow-y-auto">
             <div
               className="flex justify-between border-b border-dashed pt-3 pb-4"
               style={{ borderColor: colors.$24 }}
