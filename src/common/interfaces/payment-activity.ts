@@ -20,7 +20,8 @@ export interface PaymentActivity {
   notes: string;
   created_at: number;
   ip: string;
-  payment_amount: number;
+  payment_amount?: Client;
+  adjustment?: Client;
 }
 
 interface Client {

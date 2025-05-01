@@ -60,11 +60,8 @@ function useGenerateActivityElement() {
         </Link>
       ),
       user: activity.user?.label ?? t('system'),
-      payment_amount: formatMoney(
-        activity.payment_amount,
-        payment?.client?.country_id,
-        payment?.client?.settings.currency_id
-      ),
+      payment_amount: activity?.payment_amount?.label,
+      adjustment: activity?.adjustment?.label,
       invoice: (
         <Link
           to={route('/invoices/:id/edit', {
