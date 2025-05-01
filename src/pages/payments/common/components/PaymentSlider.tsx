@@ -16,18 +16,16 @@ import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint, trans } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { route } from '$app/common/helpers/route';
-import reactStringReplace from 'react-string-replace';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
@@ -39,69 +37,12 @@ import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
 import paymentType from '$app/common/constants/payment-type';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useGenerateActivityElement } from '$app/pages/payments/common/hooks/useGenerateActivityElement';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
-
-function useGenerateActivityElement() {
-  const [t] = useTranslation();
-
-  const formatMoney = useFormatMoney();
-
-  return (activity: PaymentActivity, payment: Payment | null) => {
-    let text = trans(`activity_${activity.activity_type_id}`, {});
-
-    const replacements = {
-      client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.label}
-        </Link>
-      ),
-      user: activity.user?.label ?? t('system'),
-      payment_amount: formatMoney(
-        activity.payment_amount,
-        payment?.client?.country_id,
-        payment?.client?.settings.currency_id
-      ),
-      invoice: (
-        <Link
-          to={route('/invoices/:id/edit', {
-            id: activity.invoice?.hashed_id,
-          })}
-        >
-          {activity?.invoice?.label}
-        </Link>
-      ),
-      payment: (
-        <Link
-          to={route('/payments/:id/edit', {
-            id: activity.payment?.hashed_id,
-          })}
-        >
-          {activity?.payment?.label}
-        </Link>
-      ),
-      contact: (
-        <Link
-          to={route('/clients/:id/edit', {
-            id: activity?.contact?.hashed_id,
-          })}
-        >
-          {activity?.contact?.label}
-        </Link>
-      ),
-    };
-    for (const [variable, value] of Object.entries(replacements)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      text = reactStringReplace(text, `:${variable}`, () => value);
-    }
-
-    return text;
-  };
-}
 
 export function PaymentSlider() {
   const [t] = useTranslation();

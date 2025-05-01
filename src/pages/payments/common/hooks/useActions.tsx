@@ -42,7 +42,7 @@ export function useActions(params?: Params) {
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'payment',
-    editPageTabs: ['documents', 'payment_fields', 'apply', 'refund'],
+    editPageTabs: ['documents', 'payment_fields', 'apply', 'refund', 'activity'],
   });
 
   const bulk = useBulk();
