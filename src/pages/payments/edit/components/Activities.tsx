@@ -11,7 +11,6 @@
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { AxiosResponse } from 'axios';
 import { useTranslation } from 'react-i18next';
