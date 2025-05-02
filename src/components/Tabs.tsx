@@ -30,6 +30,9 @@ interface Props {
   rightSide?: ReactNode;
   tabBarClassName?: string;
   withoutDefaultTabSpace?: boolean;
+  withHorizontalPadding?: boolean;
+  horizontalPaddingWidth?: string;
+  fullRightPadding?: boolean;
 }
 
 export type Tab = {
@@ -53,7 +56,13 @@ const StyledLink = styled(Link)`
 export function Tabs(props: Props) {
   const navigate = useNavigate();
 
-  const { visible = true, tabBarClassName } = props;
+  const {
+    visible = true,
+    tabBarClassName,
+    withHorizontalPadding,
+    horizontalPaddingWidth = '1.5rem',
+    fullRightPadding,
+  } = props;
 
   const params = useParams();
   const location = useLocation();
@@ -129,50 +138,61 @@ export function Tabs(props: Props) {
       </div>
 
       <div className="hidden sm:block">
-        <div
-          className="flex items-center justify-between space-x-4"
-          style={{ borderBottom: `1px solid ${colors.$20}` }}
-        >
+        <div className="flex items-center justify-between space-x-4">
           <nav
             ref={tabBar}
             className={classNames(
-              'flex relative scroll-smooth overflow-x-auto',
+              'flex flex-1 relative scroll-smooth overflow-x-auto',
               tabBarClassName
             )}
             aria-label="Tabs"
-            style={{ marginBottom: '-1px' }}
           >
+            {withHorizontalPadding && (
+              <div
+                style={{
+                  width: horizontalPaddingWidth,
+                  height: '3.5rem',
+                  borderBottom: `1px solid ${colors.$20}`,
+                }}
+              />
+            )}
+
             {props.tabs.map(
               (tab) =>
                 (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                  <div className="relative p-4">
-                    <StyledLink
-                      key={tab.name}
-                      to={tab.href}
-                      onClick={(event) => handleScroll(event)}
-                      theme={{
-                        textColor: isActive(tab) ? colors.$3 : colors.$17,
-                        hoverTextColor: colors.$3,
-                      }}
-                      className="whitespace-nowrap font-medium text-sm"
-                      aria-current={isActive(tab) ? 'page' : undefined}
-                    >
-                      <div>{tab.formatName?.() || tab.name}</div>
-                    </StyledLink>
-
-                    {isActive(tab) && (
-                      <div
-                        className="absolute left-1/2 transform -translate-x-1/2 w-full"
-                        style={{
-                          height: '1px',
-                          backgroundColor: colors.$3,
-                          bottom: 0,
-                        }}
-                      />
-                    )}
-                  </div>
+                  <StyledLink
+                    key={tab.name}
+                    to={tab.href}
+                    onClick={(event) => handleScroll(event)}
+                    theme={{
+                      textColor: isActive(tab) ? colors.$3 : colors.$17,
+                      hoverTextColor: colors.$3,
+                    }}
+                    className="whitespace-nowrap font-medium text-sm p-4"
+                    aria-current={isActive(tab) ? 'page' : undefined}
+                    style={{
+                      borderBottom: isActive(tab)
+                        ? `1px solid ${colors.$3}`
+                        : `1px solid ${colors.$20}`,
+                    }}
+                  >
+                    <div>{tab.formatName?.() || tab.name}</div>
+                  </StyledLink>
                 )
             )}
+
+            <div
+              className={classNames({
+                'flex-1': !withHorizontalPadding || fullRightPadding,
+              })}
+              style={{
+                ...(Boolean(withHorizontalPadding && !fullRightPadding) && {
+                  width: horizontalPaddingWidth,
+                }),
+                height: '3.5rem',
+                borderBottom: `1px solid ${colors.$20}`,
+              }}
+            />
           </nav>
 
           {props.rightSide}

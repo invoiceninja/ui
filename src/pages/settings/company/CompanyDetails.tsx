@@ -18,24 +18,25 @@ import { Tabs } from '$app/components/Tabs';
 import { Outlet } from 'react-router-dom';
 import { useCompanyDetailsTabs } from './common/hooks/useCompanyDetailsTabs';
 import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
 
+  useInjectCompanyChanges();
+
   useTitle('company_details');
+
+  const colors = useColorScheme();
+  const tabs = useCompanyDetailsTabs();
+
+  const onCancel = useDiscardChanges();
+  const onSave = useHandleCompanySave();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('company_details'), href: '/settings/company_details' },
   ];
-
-  const onSave = useHandleCompanySave();
-
-  const onCancel = useDiscardChanges();
-
-  const tabs = useCompanyDetailsTabs();
-
-  useInjectCompanyChanges();
 
   return (
     <Settings
@@ -45,8 +46,14 @@ export function CompanyDetails() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#company_details"
     >
-      <Card title={t('company')} withoutBodyPadding>
-        <Tabs tabs={tabs} />
+      <Card
+        className="shadow-sm"
+        title={t('company')}
+        withoutBodyPadding
+        withoutHeaderBorder
+        style={{ borderColor: colors.$24 }}
+      >
+        <Tabs tabs={tabs} withHorizontalPadding fullRightPadding />
 
         <div className="my-4">
           <Outlet />

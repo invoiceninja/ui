@@ -21,16 +21,17 @@ export function Documents() {
   const company = useCurrentCompany();
 
   return (
-    <>
+    <div className="px-6">
       {company && (
         <Upload
           endpoint={endpoint('/api/v1/companies/:id/upload', {
             id: company.id,
           })}
           onSuccess={onSuccess}
+          widgetOnly
         />
       )}
       <DocumentsTable />
-    </>
+    </div>
   );
 }

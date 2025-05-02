@@ -11,12 +11,12 @@
 import { Element } from '$app/components/cards';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ImportedFile } from './Import';
 import { toast } from '$app/common/helpers/toast/toast';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
 
 interface Props {
   group: string;
@@ -76,9 +76,10 @@ export function UploadImport(props: Props) {
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: group === 'backup' 
-      ? { 'application/zip': ['.zip'] }
-      : { 'text/*': ['.csv'] },
+    accept:
+      group === 'backup'
+        ? { 'application/zip': ['.zip'] }
+        : { 'text/*': ['.csv'] },
     onDrop: async (acceptedFiles) => {
       if (group === 'backup') {
         acceptedFiles.forEach((file) => {
@@ -115,10 +116,11 @@ export function UploadImport(props: Props) {
         >
           <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <input {...getInputProps()} />
-            <Image
-              className="mx-auto h-12 w-12"
-              style={{ color: colors.$3, colorScheme: colors.$0 }}
-            />
+
+            <div className="flex justify-center">
+              <CloudUpload size="2.3rem" color={colors.$3} />
+            </div>
+
             <span
               className="mt-2 block text-sm font-medium"
               style={{ color: colors.$3, colorScheme: colors.$0 }}

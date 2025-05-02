@@ -28,6 +28,7 @@ import { useConfigureGroupSettings } from '../../group-settings/common/hooks/use
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Trash } from '$app/components/icons/Trash';
 
 interface Props {
   isSettingsPage?: boolean;
@@ -110,14 +111,26 @@ export function DeleteLogo({ isSettingsPage = true }: Props) {
   };
 
   return isSettingsPage ? (
-    <Element>
-      <Button behavior="button" type="minimal" onClick={() => deleteLogo()}>
-        {t('remove_logo')}
+    <Element className="pb-3" pushContentToRight noVerticalPadding>
+      <Button behavior="button" type="secondary" onClick={() => deleteLogo()}>
+        <div className="flex items-center space-x-2">
+          <div>
+            <Trash size="1rem" color="#ef4444" />
+          </div>
+
+          <span className="text-sm text-red-500">{t('remove_logo')}</span>
+        </div>
       </Button>
     </Element>
   ) : (
-    <Button behavior="button" type="minimal" onClick={() => deleteLogo()}>
-      {t('remove_logo')}
+    <Button behavior="button" type="secondary" onClick={() => deleteLogo()}>
+      <div className="flex items-center space-x-2">
+        <div>
+          <Trash size="1rem" color="#ef4444" />
+        </div>
+
+        <span className="text-sm text-red-500">{t('remove_logo')}</span>
+      </div>
     </Button>
   );
 }

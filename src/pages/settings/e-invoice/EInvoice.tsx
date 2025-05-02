@@ -35,7 +35,6 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDropzone } from 'react-dropzone';
-import { Image } from 'react-feather';
 import { PaymentMeans } from '$app/components/e-invoice/PaymentMeans';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
@@ -44,6 +43,8 @@ import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
 import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
+import { useColorScheme } from '$app/common/colors';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -100,6 +101,8 @@ export function EInvoice() {
     { name: t('settings'), href: '/settings' },
     { name: t('e_invoicing'), href: '/settings/e_invoice' },
   ];
+
+  const colors = useColorScheme();
 
   const dispatch = useDispatch();
 
@@ -316,7 +319,11 @@ export function EInvoice() {
                       >
                         <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                           <input {...getInputProps()} />
-                          <Image className="mx-auto h-12 w-12 text-gray-400" />
+
+                          <div className="flex justify-center">
+                            <CloudUpload size="2.3rem" color={colors.$3} />
+                          </div>
+
                           <span className="mt-2 block text-sm font-medium text-gray-900">
                             {isDragActive
                               ? 'drop_your_logo_here'

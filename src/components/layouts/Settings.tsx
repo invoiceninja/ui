@@ -126,7 +126,7 @@ export function Settings(props: Props) {
             </div>
           )}
 
-          <a className="flex items-center py-4 px-3 text-sm font-medium">
+          <a className="flex items-center mb-3 mt-4 px-3 text-sm font-medium">
             <span className="truncate" style={{ color: colors.$17 }}>
               {t('basic_settings')}
             </span>
@@ -172,7 +172,7 @@ export function Settings(props: Props) {
           </nav>
 
           {advanced.filter((route) => route.enabled).length > 0 && (
-            <div className="flex items-center py-4 px-3 text-sm font-medium mt-8 truncate space-x-2">
+            <div className="flex items-center mb-3 mt-4 px-3 text-sm font-medium truncate space-x-2">
               <span style={{ color: colors.$17 }}>
                 {t('advanced_settings')}
               </span>
@@ -248,7 +248,7 @@ export function Settings(props: Props) {
           </nav>
         </div>
 
-        <div className="col-span-12 lg:col-start-3 space-y-6">
+        <div className="col-span-12 lg:col-start-3 space-y-6 mt-4">
           {errors && <ValidationAlert errors={errors} />}
 
           {props.children}
