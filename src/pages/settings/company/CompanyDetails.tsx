@@ -53,9 +53,14 @@ export function CompanyDetails() {
         withoutHeaderBorder
         style={{ borderColor: colors.$24 }}
       >
-        <Tabs tabs={tabs} withHorizontalPadding fullRightPadding />
+        <Tabs
+          tabs={tabs}
+          withHorizontalPadding
+          fullRightPadding
+          withHorizontalPaddingOnSmallScreen
+        />
 
-        <div className="my-4">
+        <div className="pt-4 pb-8">
           <Outlet />
         </div>
       </Card>

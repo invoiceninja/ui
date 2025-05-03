@@ -21,7 +21,7 @@ export function Documents() {
   const company = useCurrentCompany();
 
   return (
-    <div className="px-6">
+    <div className="px-6 pt-3">
       {company && (
         <Upload
           endpoint={endpoint('/api/v1/companies/:id/upload', {

@@ -17,12 +17,20 @@ import { useColorScheme } from '$app/common/colors';
 import { ImportedFile } from './Import';
 import { toast } from '$app/common/helpers/toast/toast';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
+import styled from 'styled-components';
 
 interface Props {
   group: string;
   files: ImportedFile[];
   setFiles: Dispatch<SetStateAction<ImportedFile[]>>;
 }
+
+const Box = styled.div`
+  border-color: ${(props) => props.theme.borderColor};
+  &:hover {
+    border-color: ${(props) => props.theme.hoverBorderColor};
+  }
+`;
 
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
@@ -114,7 +122,13 @@ export function UploadImport(props: Props) {
           {...getRootProps()}
           className="flex flex-col md:flex-row md:items-center"
         >
-          <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <Box
+            className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
+            theme={{
+              borderColor: colors.$21,
+              hoverBorderColor: colors.$17,
+            }}
+          >
             <input {...getInputProps()} />
 
             <div className="flex justify-center">
@@ -129,7 +143,7 @@ export function UploadImport(props: Props) {
                 ? t('drop_file_here')
                 : t('dropzone_default_message')}
             </span>
-          </div>
+          </Box>
         </div>
       ) : (
         <ul className="grid xs:grid-rows-6 lg:grid-cols-2">

@@ -36,12 +36,10 @@ interface Props {
 }
 
 const Box = styled.div`
-  background-color: ${(props) => props.theme.color};
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
-
   border-color: ${(props) => props.theme.borderColor};
+  &:hover {
+    border-color: ${(props) => props.theme.hoverBorderColor};
+  }
 `;
 
 export function Upload(props: Props) {
@@ -128,8 +126,7 @@ export function Upload(props: Props) {
             className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
             theme={{
               borderColor: colors.$21,
-              color: colors.$1,
-              hoverColor: colors.$19,
+              hoverBorderColor: colors.$17,
             }}
           >
             <input {...getInputProps()} />
@@ -190,8 +187,8 @@ export function Upload(props: Props) {
             <Box
               className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
               theme={{
-                color: colors.$24,
-                hoverColor: 'red',
+                borderColor: colors.$21,
+                hoverBorderColor: colors.$17,
               }}
             >
               <input {...getInputProps()} />

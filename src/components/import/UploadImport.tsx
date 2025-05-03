@@ -33,6 +33,7 @@ import { Icon } from '../icons/Icon';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { parse as papaParse, ParseResult } from 'papaparse';
 import { CloudUpload } from '../icons/CloudUpload';
+import styled from 'styled-components';
 
 interface Props {
   entity: string;
@@ -53,6 +54,13 @@ export interface ImportMap extends Record<string, any> {
 interface CSVRow {
   [key: string]: string | number | boolean | null;
 }
+
+const Box = styled.div`
+  border-color: ${(props) => props.theme.borderColor};
+  &:hover {
+    border-color: ${(props) => props.theme.hoverBorderColor};
+  }
+`;
 
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
@@ -448,7 +456,13 @@ export function UploadImport(props: Props) {
               {...getRootProps()}
               className="flex flex-col md:flex-row md:items-center"
             >
-              <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <Box
+                className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
+                theme={{
+                  borderColor: colors.$21,
+                  hoverBorderColor: colors.$17,
+                }}
+              >
                 <input {...getInputProps()} />
 
                 <div className="flex justify-center">
@@ -463,7 +477,7 @@ export function UploadImport(props: Props) {
                     ? t('drop_file_here')
                     : t('dropzone_default_message')}
                 </span>
-              </div>
+              </Box>
 
               {errors &&
                 Object.keys(errors.errors).map((key, index) => (

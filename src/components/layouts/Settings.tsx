@@ -81,13 +81,13 @@ export function Settings(props: Props) {
       aboveMainContainer={props.aboveMainContainer}
     >
       {props.breadcrumbs && (
-        <div className="w-full pl-2 pt-3 pb-2">
+        <div className="w-full pl-0 lg:pl-2 pt-3 pb-2">
           <Breadcrumbs pages={props.breadcrumbs} />
         </div>
       )}
 
-      <div className="grid grid-cols-9 lg:gap-10">
-        <div className="col-span-12 lg:col-span-2">
+      <div className="grid grid-cols-12 lg:gap-6">
+        <div className="col-span-12 lg:col-span-3">
           {(isGroupSettingsActive || isClientSettingsActive) && (
             <div
               className="flex items-center justify-between border py-3 rounded space-x-3 px-2"
@@ -126,17 +126,18 @@ export function Settings(props: Props) {
             </div>
           )}
 
-          <a className="flex items-center mb-3 mt-4 px-3 text-sm font-medium">
+          <a className="flex items-center mb-3 mt-4 px-0 lg:px-3 text-sm font-medium">
             <span className="truncate" style={{ color: colors.$17 }}>
               {t('basic_settings')}
             </span>
           </a>
 
           <SelectField
-            className="lg:hidden"
+            className="lg:hidden text-sm"
             value={location.pathname}
             onValueChange={(value) => navigate(value)}
             withBlank
+            customSelector
           >
             {basic.map(
               (item) =>
@@ -172,7 +173,7 @@ export function Settings(props: Props) {
           </nav>
 
           {advanced.filter((route) => route.enabled).length > 0 && (
-            <div className="flex items-center mb-3 mt-4 px-3 text-sm font-medium truncate space-x-2">
+            <div className="flex items-center mb-3 mt-8 px-0 lg:px-3 text-sm font-medium truncate space-x-2">
               <span style={{ color: colors.$17 }}>
                 {t('advanced_settings')}
               </span>
@@ -190,10 +191,11 @@ export function Settings(props: Props) {
           )}
 
           <SelectField
-            className="lg:hidden"
+            className="lg:hidden text-sm"
             value={location.pathname}
             onValueChange={(value) => navigate(value)}
             withBlank
+            customSelector
           >
             {advanced.map(
               (item) =>
@@ -248,7 +250,7 @@ export function Settings(props: Props) {
           </nav>
         </div>
 
-        <div className="col-span-12 lg:col-start-3 space-y-6 mt-4">
+        <div className="col-span-12 lg:col-start-4 space-y-6 mt-4">
           {errors && <ValidationAlert errors={errors} />}
 
           {props.children}

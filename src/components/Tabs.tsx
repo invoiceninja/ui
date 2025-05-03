@@ -21,6 +21,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import styled from 'styled-components';
+import { SelectField } from './forms';
 
 interface Props {
   className?: string;
@@ -33,6 +34,7 @@ interface Props {
   withHorizontalPadding?: boolean;
   horizontalPaddingWidth?: string;
   fullRightPadding?: boolean;
+  withHorizontalPaddingOnSmallScreen?: boolean;
 }
 
 export type Tab = {
@@ -111,18 +113,22 @@ export function Tabs(props: Props) {
 
   return visible ? (
     <div className={props.className} data-cy="tabs">
-      <div className="flex flex-col space-y-5 sm:hidden">
+      <div
+        className={classNames('flex flex-col space-y-5 sm:hidden', {
+          'px-4': props.withHorizontalPaddingOnSmallScreen,
+        })}
+      >
         <label htmlFor="tabs" className="sr-only">
           Select a tab
         </label>
 
         {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
-        <select
+        <SelectField
           id="tabs"
-          name="tabs"
-          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          className="text-sm sm:text-sm"
           defaultValue={props.tabs.find((tab) => tab)?.name}
-          onChange={(e) => navigate(e.currentTarget.value)}
+          onValueChange={(value) => navigate(value)}
+          customSelector
         >
           {props.tabs.map(
             (tab) =>
@@ -132,7 +138,7 @@ export function Tabs(props: Props) {
                 </option>
               )
           )}
-        </select>
+        </SelectField>
 
         {props.rightSide}
       </div>
@@ -151,7 +157,7 @@ export function Tabs(props: Props) {
               <div
                 style={{
                   width: horizontalPaddingWidth,
-                  height: '3.5rem',
+                  height: '2.8rem',
                   borderBottom: `1px solid ${colors.$20}`,
                 }}
               />
@@ -168,7 +174,7 @@ export function Tabs(props: Props) {
                       textColor: isActive(tab) ? colors.$3 : colors.$17,
                       hoverTextColor: colors.$3,
                     }}
-                    className="whitespace-nowrap font-medium text-sm p-4"
+                    className="whitespace-nowrap font-medium text-sm px-4 py-3"
                     aria-current={isActive(tab) ? 'page' : undefined}
                     style={{
                       borderBottom: isActive(tab)
@@ -189,7 +195,7 @@ export function Tabs(props: Props) {
                 ...(Boolean(withHorizontalPadding && !fullRightPadding) && {
                   width: horizontalPaddingWidth,
                 }),
-                height: '3.5rem',
+                height: '2.8rem',
                 borderBottom: `1px solid ${colors.$20}`,
               }}
             />

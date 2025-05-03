@@ -26,7 +26,7 @@ export function CustomFields() {
       <AdvancedSettingsPlanAlert />
 
       <>
-        <div className="px-6">
+        <div className="px-4 sm:px-6">
           {company &&
             ['company1', 'company2', 'company3', 'company4'].map((field) => (
               <Field
@@ -35,6 +35,8 @@ export function CustomFields() {
                 field={field}
                 placeholder={t('company_field')}
                 onChange={(value) => handleCustomFieldChange(field, value)}
+                noExternalPadding
+                withArrowAsSeparator
               />
             ))}
         </div>

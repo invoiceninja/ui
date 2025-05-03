@@ -189,8 +189,11 @@ export function XMLImport(props: Props) {
             className="flex flex-col md:flex-row md:items-center"
           >
             <Div
-              className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2"
-              theme={{ borderColor: colors.$5, hoverBorderColor: colors.$3 }}
+              className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
+              theme={{
+                borderColor: colors.$21,
+                hoverBorderColor: colors.$17,
+              }}
             >
               <input {...getInputProps()} />
 

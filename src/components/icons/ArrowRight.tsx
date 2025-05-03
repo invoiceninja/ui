@@ -11,9 +11,14 @@
 interface Props {
   color?: string;
   size?: string;
+  strokeWidth?: string;
 }
 
-export function ArrowRight({ color = '#000', size = '1.2rem' }: Props) {
+export function ArrowRight({
+  color = '#000',
+  size = '1.2rem',
+  strokeWidth = '2',
+}: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +37,7 @@ export function ArrowRight({ color = '#000', size = '1.2rem' }: Props) {
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth={strokeWidth}
         data-color="color-2"
       ></line>
       <polyline
@@ -41,7 +46,7 @@ export function ArrowRight({ color = '#000', size = '1.2rem' }: Props) {
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth={strokeWidth}
       ></polyline>
     </svg>
   );
