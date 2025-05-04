@@ -175,31 +175,37 @@ export function CardsCustomizationModal() {
             )}
           </SelectField>
 
-          <div className="flex flex-col space-y-3">
-            {currentCards.map((card) => (
-              <div key={card} className="flex items-center justify-between">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {t(card)}
-                </span>
+          {currentCards.length ? (
+            <div className="flex flex-col space-y-3">
+              {currentCards.map((card) => (
+                <div key={card} className="flex items-center justify-between">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.$3 }}
+                  >
+                    {t(card)}
+                  </span>
 
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleDelete(card)}
-                >
-                  <CircleXMark
-                    color={colors.$16}
-                    hoverColor={colors.$3}
-                    borderColor={colors.$5}
-                    hoverBorderColor={colors.$17}
-                    size="1.6rem"
-                  />
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleDelete(card)}
+                  >
+                    <CircleXMark
+                      color={colors.$16}
+                      hoverColor={colors.$3}
+                      borderColor={colors.$5}
+                      hoverBorderColor={colors.$17}
+                      size="1.6rem"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <span className="text-sm font-medium" style={{ color: colors.$3 }}>
+              {t('no_cards_selected')}.
+            </span>
+          )}
 
           <Button
             behavior="button"
