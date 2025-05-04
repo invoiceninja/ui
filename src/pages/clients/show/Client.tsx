@@ -40,6 +40,10 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { InputLabel } from '$app/components/forms';
 import { Address } from './components/Address';
+import CardsCustomizationModal, {
+  ClientShowCard,
+} from './components/CardsCustomizationModal';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -53,6 +57,8 @@ export default function Client() {
     id,
     enabled: Boolean(id) && !isPurgeOrMergeActionCalled,
   });
+
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -72,6 +78,17 @@ export default function Client() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+
+  const isCardVisible = (card: ClientShowCard) => {
+    const currentCards = reactSettings.client_show_cards || [
+      'details',
+      'address',
+      'contacts',
+      'standing',
+    ];
+
+    return currentCards.includes(card);
+  };
 
   useEffect(() => {
     setDocumentTitle(client?.display_name || 'view_client');
@@ -122,21 +139,31 @@ export default function Client() {
           />
         )
       }
-      afterBreadcrumbs={<PreviousNextNavigation entity="client" />}
+      afterBreadcrumbs={
+        <div className="flex flex-1 justify-end items-center gap-2">
+          <PreviousNextNavigation entity="client" />
+
+          <CardsCustomizationModal />
+        </div>
+      }
     >
       {isLoading && <Spinner />}
 
       {client && (
         <>
           <div className="grid grid-cols-12 lg:space-y-0 gap-4">
-            <Details client={client} />
-            <Address client={client} />
-            <Contacts client={client} />
-            <Standing client={client} />
-            {client.gateway_tokens.length > 0 && <Gateways client={client} />}
-            <EmailHistory />
-            <ClientPublicNotes client={client} />
-            <ClientPrivateNotes client={client} />
+            {isCardVisible('details') && <Details client={client} />}
+            {isCardVisible('address') && <Address client={client} />}
+            {isCardVisible('contacts') && <Contacts client={client} />}
+            {isCardVisible('standing') && <Standing client={client} />}
+            {isCardVisible('gateways') && <Gateways client={client} />}
+            {isCardVisible('email_history') && <EmailHistory />}
+            {isCardVisible('public_notes') && (
+              <ClientPublicNotes client={client} />
+            )}
+            {isCardVisible('private_notes') && (
+              <ClientPrivateNotes client={client} />
+            )}
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />
