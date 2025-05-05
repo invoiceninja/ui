@@ -190,7 +190,7 @@ export function ClientSelector(props: Props) {
                       resource.invitations.length >= 1 &&
                         resource.invitations[0].link
                     ) && (
-                      <div className="flex space-x-0">
+                      <div className="flex items-center space-x-2">
                         <Link
                           className="font-medium"
                           to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
@@ -205,7 +205,7 @@ export function ClientSelector(props: Props) {
                           message={t('copy_link') as string}
                           withoutArrow
                         >
-                          <div className="mt-0.5">
+                          <div className="mt-1.5">
                             <CopyToClipboardIconOnly
                               text={resource.invitations[0].link}
                             />

@@ -123,7 +123,7 @@ export function Option(props: OptionProps<SelectOption, true>) {
 
   return (
     <components.Option className="rounded-sm" {...props}>
-      <div className="flex items-center w-full truncate">
+      <div className="flex space-x-3 items-center w-full truncate">
         <Checkbox className="rounded-md" checked={isSelected} />
 
         <span className="text-sm">{label}</span>
