@@ -40,7 +40,7 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useNavigate } from 'react-router-dom';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
-import { useGenerateActivityElement } from '$app/pages/payments/common/hooks/useGenerateActivityElement';
+import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -54,64 +54,6 @@ const Box = styled.div`
     background-color: ${({ theme }) => theme.hoverBackgroundColor};
   }
 `;
-
-function useGenerateActivityElement() {
-  const [t] = useTranslation();
-
-  const formatMoney = useFormatMoney();
-
-  return (activity: PaymentActivity, payment: Payment | null) => {
-    let text = trans(`activity_${activity.activity_type_id}`, {});
-
-    const replacements = {
-      client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.label}
-        </Link>
-      ),
-      user: activity.user?.label ?? t('system'),
-      payment_amount: formatMoney(
-        activity.payment_amount,
-        payment?.client?.country_id,
-        payment?.client?.settings.currency_id
-      ),
-      invoice: (
-        <Link
-          to={route('/invoices/:id/edit', {
-            id: activity.invoice?.hashed_id,
-          })}
-        >
-          {activity?.invoice?.label}
-        </Link>
-      ),
-      payment: (
-        <Link
-          to={route('/payments/:id/edit', {
-            id: activity.payment?.hashed_id,
-          })}
-        >
-          {activity?.payment?.label}
-        </Link>
-      ),
-      contact: (
-        <Link
-          to={route('/clients/:id/edit', {
-            id: activity?.contact?.hashed_id,
-          })}
-        >
-          {activity?.contact?.label}
-        </Link>
-      ),
-    };
-    for (const [variable, value] of Object.entries(replacements)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      text = reactStringReplace(text, `:${variable}`, () => value);
-    }
-
-    return text;
-  };
-}
 
 export function PaymentSlider() {
   const [t] = useTranslation();
@@ -374,7 +316,7 @@ export function PaymentSlider() {
 
                 <div className="flex flex-col space-y-0.5 flex-1 min-w-0">
                   <div className="text-sm" style={{ color: colors.$3 }}>
-                    {activityElement(activity, payment)}
+                    {activityElement(activity)}
                   </div>
 
                   <div

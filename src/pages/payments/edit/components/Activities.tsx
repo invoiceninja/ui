@@ -25,57 +25,58 @@ import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { usePaymentQuery } from '$app/common/queries/payments';
 
 export default function Activities() {
-    const [t] = useTranslation();
+  const [t] = useTranslation();
 
-    const { id } = useParams();
-    const { data: payment } = usePaymentQuery({ id });
-    
-    const activityElement = useGenerateActivityElement();
+  const { id } = useParams();
+  const { data: payment } = usePaymentQuery({ id });
 
-    const { timeFormat } = useCompanyTimeFormat();
-    const { dateFormat } = useCurrentCompanyDateFormats();
+  const activityElement = useGenerateActivityElement();
 
-    const { data: activities, isLoading } = useQuery({
-        queryKey: ['/api/v1/activities/entity', id],
-        queryFn: () =>
-            request('POST', endpoint('/api/v1/activities/entity'), {
-                entity: 'payment',
-                entity_id: id,
-            }).then(
-                (response: AxiosResponse<GenericManyResponse<PaymentActivity>>) =>
-                    response.data.data
-            ),
-        enabled: Boolean(id),
-        staleTime: Infinity
-    });
+  const { timeFormat } = useCompanyTimeFormat();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
-    return (
-        <Card title={t('activity')} className="h-full relative">
-            {isLoading && (
-                <div className="flex justify-center">
-                    <Spinner />
-                </div>
-            )}
+  const { data: activities, isLoading } = useQuery({
+    queryKey: ['/api/v1/activities/entity', id],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/activities/entity'), {
+        entity: 'payment',
+        entity_id: id,
+      }).then(
+        (response: AxiosResponse<GenericManyResponse<PaymentActivity>>) =>
+          response.data.data
+      ),
+    enabled: Boolean(id),
+    staleTime: Infinity,
+  });
 
-            {!isLoading && activities && !activities.length && (
-                <NonClickableElement>{t('api_404')}</NonClickableElement>
-            )}
+  return (
+    <Card title={t('activity')} className="h-full relative">
+      {isLoading && (
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      )}
 
-            {!isLoading && payment && activities && activities.map((activity) => (
-                <NonClickableElement
-                    key={activity.id}
-                    className="flex flex-col space-y-2"
-                >
-                    <p>{activityElement(activity, payment)}</p>
-                    <div className="inline-flex items-center space-x-1">
-                        <p>
-                            {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
-                        </p>
-                        <p>&middot;</p>
-                        <p>{activity.ip}</p>
-                    </div>
-                </NonClickableElement>
-            ))}
-        </Card>
-    );
+      {!isLoading && activities && !activities.length && (
+        <NonClickableElement>{t('api_404')}</NonClickableElement>
+      )}
+
+      {!isLoading &&
+        payment &&
+        activities &&
+        activities.map((activity) => (
+          <NonClickableElement
+            key={activity.id}
+            className="flex flex-col space-y-2"
+          >
+            <p>{activityElement(activity)}</p>
+            <div className="inline-flex items-center space-x-1">
+              <p>{date(activity.created_at, `${dateFormat} ${timeFormat}`)}</p>
+              <p>&middot;</p>
+              <p>{activity.ip}</p>
+            </div>
+          </NonClickableElement>
+        ))}
+    </Card>
+  );
 }
