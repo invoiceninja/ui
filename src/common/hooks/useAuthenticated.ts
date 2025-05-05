@@ -58,6 +58,10 @@ export function useAuthenticated(): boolean {
             ) || 0;
         }
 
+        if (currentIndex === -1) {
+          currentIndex = 0;
+        }
+
         dispatch(
           authenticate({
             type: AuthenticationTypes.TOKEN,
@@ -70,7 +74,9 @@ export function useAuthenticated(): boolean {
         dispatch(resetChanges('company'));
         dispatch(changeCurrentIndex(currentIndex));
       })
-      .catch(() => {
+      .catch((e) => {
+        console.error(e)
+
         localStorage.removeItem('X-NINJA-TOKEN');
 
         navigate('/login');
