@@ -33,10 +33,11 @@ export function Address(props: Props) {
         <InfoCard
           title={t('address')}
           withoutTruncate
-          className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3"
+          className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 p-4"
           style={{ borderColor: colors.$24 }}
+          withoutPadding
         >
-          <div className="flex flex-col pt-2 h-44 overflow-y-auto">
+          <div className="flex flex-col pt-1 h-44 overflow-y-auto">
             {(client.address1 || client.address2) && (
               <span
                 className="break-all text-sm font-medium"

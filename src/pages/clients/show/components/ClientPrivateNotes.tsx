@@ -33,10 +33,11 @@ export function ClientPrivateNotes(props: Props) {
       {Boolean(client && client.private_notes) && (
         <InfoCard
           title={t('private_notes')}
-          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm"
+          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm p-4"
           style={{ borderColor: colors.$24 }}
+          withoutPadding
         >
-          <div className="whitespace-normal h-44 overflow-y-auto pt-2">
+          <div className="whitespace-normal h-44 overflow-y-auto pt-1">
             <article
               className={classNames('prose prose-sm', {
                 'prose-invert': reactSettings?.dark_mode,

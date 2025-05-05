@@ -32,12 +32,13 @@ export function Standing(props: Props) {
       {client && (
         <InfoCard
           title={t('standing')}
-          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max"
+          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max p-4"
           style={{ borderColor: colors.$24 }}
+          withoutPadding
         >
           <div className="flex flex-col h-44 overflow-y-auto">
             <div
-              className="flex justify-between border-b border-dashed pt-3 pb-4"
+              className="flex justify-between border-b border-dashed pt-1.5 pb-3"
               style={{ borderColor: colors.$24 }}
             >
               <span
@@ -57,7 +58,7 @@ export function Standing(props: Props) {
             </div>
 
             <div
-              className="flex justify-between border-b border-dashed py-4"
+              className="flex justify-between border-b border-dashed py-3"
               style={{ borderColor: colors.$24 }}
             >
               <span
@@ -77,7 +78,7 @@ export function Standing(props: Props) {
             </div>
 
             <div
-              className="flex justify-between border-b border-dashed py-4"
+              className="flex justify-between border-b border-dashed py-3"
               style={{ borderColor: colors.$24 }}
             >
               <span
@@ -96,27 +97,25 @@ export function Standing(props: Props) {
               </span>
             </div>
 
-            {client.payment_balance > 0 && (
-              <div
-                className="flex justify-between border-b border-dashed py-4"
-                style={{ borderColor: colors.$24 }}
+            <div
+              className="flex justify-between border-b border-dashed py-3"
+              style={{ borderColor: colors.$24 }}
+            >
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$17 }}
               >
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: colors.$17 }}
-                >
-                  {t('payment_balance')}
-                </span>
+                {t('payment_balance')}
+              </span>
 
-                <span className="text-sm font-mono">
-                  {formatMoney(
-                    client.payment_balance,
-                    client.country_id,
-                    client.settings.currency_id
-                  )}
-                </span>
-              </div>
-            )}
+              <span className="text-sm font-mono">
+                {formatMoney(
+                  client.payment_balance,
+                  client.country_id,
+                  client.settings.currency_id
+                )}
+              </span>
+            </div>
           </div>
         </InfoCard>
       )}

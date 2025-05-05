@@ -35,8 +35,9 @@ export function Contacts(props: Props) {
       {client && (
         <InfoCard
           title={t('contacts')}
-          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max"
+          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max p-4"
           style={{ borderColor: colors.$24 }}
+          withoutPadding
         >
           <div className="flex flex-col h-44 w-full overflow-y-auto">
             {client.contacts.map(
@@ -49,7 +50,7 @@ export function Contacts(props: Props) {
                 ) && (
                   <div
                     key={index}
-                    className="flex justify-between items-center first:pt-2 py-4 border-b border-dashed"
+                    className="flex justify-between items-center first:pt-1 py-4 border-b border-dashed"
                     style={{ borderColor: colors.$21 }}
                   >
                     <div className="flex flex-col space-y-1 text-sm">

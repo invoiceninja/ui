@@ -129,8 +129,9 @@ export function Gateways(props: Props) {
 
       <InfoCard
         title={t('payment_methods')}
-        className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-5 2xl:col-span-4 shadow-sm"
+        className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-5 2xl:col-span-4 shadow-sm p-4"
         style={{ borderColor: colors.$24 }}
+        withoutPadding
       >
         <div className="flex flex-col h-44 overflow-y-auto text-sm">
           {client.gateway_tokens.map((token) => (

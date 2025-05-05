@@ -56,10 +56,11 @@ export function Details(props: Props) {
       {client && (
         <InfoCard
           title={t('details')}
-          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm"
+          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm p-4"
           style={{ borderColor: colors.$24 }}
+          withoutPadding
         >
-          <div className="flex flex-col pt-2 space-y-3 h-44 overflow-y-auto">
+          <div className="flex flex-col pt-1 space-y-3 h-44 overflow-y-auto">
             <div className="flex flex-col space-y-1">
               <span
                 className="text-sm font-medium"
