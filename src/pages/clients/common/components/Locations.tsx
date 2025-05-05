@@ -194,11 +194,6 @@ export default function Locations() {
                     </div>
 
                     <div>
-                      <span style={{ color: colors.$16 }}>{t('phone')}: </span>
-                      {location.phone}
-                    </div>
-
-                    <div>
                       <span style={{ color: colors.$16 }}>
                         {t('shipping')}:{' '}
                       </span>

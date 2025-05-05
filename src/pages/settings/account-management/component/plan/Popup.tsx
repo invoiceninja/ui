@@ -190,7 +190,7 @@ export function Popup({ visible, onClose }: PopupProps) {
             </div>
           ) : null}
 
-          <div className="flex justify-center flex-col 2xl:flex-row gap-4 mt-6">
+          <div className="flex justify-center flex-col xl:flex-row gap-4 mt-6">
             {isPlanVisible('pro') ? (
               <div
                 className="w-full 2xl:w-[32rem] border py-8 px-7 rounded border-t-8"

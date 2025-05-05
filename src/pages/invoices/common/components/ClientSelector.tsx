@@ -205,11 +205,9 @@ export function ClientSelector(props: Props) {
                           message={t('copy_link') as string}
                           withoutArrow
                         >
-                          <div className="mt-0.5">
-                            <CopyToClipboardIconOnly
-                              text={resource.invitations[0].link}
-                            />
-                          </div>
+                          <CopyToClipboardIconOnly
+                            text={resource.invitations[0].link}
+                          />
                         </Tooltip>
                       </div>
                     )}
