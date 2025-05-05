@@ -223,7 +223,7 @@ export default function Show() {
             </p>
 
             <p>
-              {t('total_hours')}: {formatNumber(project.current_hours)}
+              {t('total_hours')}: {Math.floor(project.current_hours)}
             </p>
           </InfoCard>
         </div>

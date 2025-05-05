@@ -194,17 +194,10 @@ export function LocationModal({
           errorMessage={errors?.errors.country_id}
         />
 
-        <InputField
-          label={t('phone')}
-          value={currentLocation?.phone || ''}
-          onValueChange={(value) => handleChange(value, 'phone')}
-          errorMessage={errors?.errors.phone}
-        />
-
         <div className="pt-1">
           <Toggle
             label={t('shipping_address')}
-            value={Boolean(currentLocation?.is_shipping_location)}
+            checked={Boolean(currentLocation?.is_shipping_location)}
             onValueChange={(value) =>
               handleChange(value, 'is_shipping_location')
             }

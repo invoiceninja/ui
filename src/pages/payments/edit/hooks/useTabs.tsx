@@ -66,6 +66,10 @@ export function useTabs(params: Params) {
       ),
     },
     {
+      name: t('activity'),
+      href: route('/payments/:id/activity', { id }),
+    },
+    {
       name: t('custom_fields'),
       href: route('/payments/:id/payment_fields', { id }),
       enabled: isAdmin || isOwner,
