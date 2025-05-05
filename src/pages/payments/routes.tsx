@@ -16,6 +16,7 @@ import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 import { admin } from '$app/common/guards/guards/admin';
 
+const Activities = lazy(() => import('$app/pages/payments/edit/components/Activities'));
 const Payment = lazy(() => import('$app/pages/payments/Payment'));
 const Import = lazy(() => import('$app/pages/payments/import/Import'));
 const Payments = lazy(() => import('$app/pages/payments/index/Payments'));
@@ -82,6 +83,7 @@ export const paymentRoutes = (
     >
       <Route path="edit" element={<Edit />} />
       <Route path="documents" element={<Documents />} />
+      <Route path="activity" element={<Activities />} />
     </Route>
     <Route
       path=":id"

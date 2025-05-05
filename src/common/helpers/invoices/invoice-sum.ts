@@ -101,16 +101,18 @@ export class InvoiceSum {
 
   protected calculateInvoiceTaxes() {
 
+    let calculatedTax = 0;
+
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
-console.log(tax);
+
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name1,
         this.invoice.tax_rate1
       );
 
-      this.totalTaxes += tax;
-
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
           this.invoice.tax_rate1.toFixed(this.currency?.precision || 2)
@@ -120,14 +122,14 @@ console.log(tax);
 
     if (this.invoice.tax_name2.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate2);
-      console.log(tax);
+
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name2,
         this.invoice.tax_rate2
       );
 
-      this.totalTaxes += tax;
-
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
           this.invoice.tax_rate2.toFixed(this.currency?.precision || 2)
@@ -137,13 +139,14 @@ console.log(tax);
 
     if (this.invoice.tax_name3.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate3);
-      console.log(tax);
+
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name3,
         this.invoice.tax_rate3
       );
 
-      this.totalTaxes += tax;
+      // this.totalTaxes += tax;
+      calculatedTax += tax;
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
@@ -152,6 +155,10 @@ console.log(tax);
       });
     }
 
+    console.log(this.totalTaxes);
+    this.totalTaxes = parseFloat(calculatedTax.toFixed(this.currency?.precision || 2));
+
+    console.log(this.totalTaxes);
     return this;
   }
 
@@ -294,7 +301,10 @@ console.log(tax);
   }
 
   protected taxer(amount: number, tax_rate: number) {
-    return Number((Math.round(amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100);
+
+    const taxAmount = amount * ((tax_rate ?? 0) / 100);
+    return Number((Math.ceil(taxAmount * 100)) / 100);    
+    // return Number((Math.round(amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100);
   }
 
   protected valuer(customValue: number | undefined): number {

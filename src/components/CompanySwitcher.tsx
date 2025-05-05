@@ -246,23 +246,21 @@ export function CompanySwitcher() {
             </div>
 
             <div className="py-1">
-              {shouldShowAddCompany &&
-                canUserAddCompany &&
-                (isAdmin || isOwner) && (
-                  <Menu.Item>
-                    <div className="px-1">
-                      <SwitcherDiv
-                        className="flex items-center pl-3 space-x-3 py-2 rounded-md cursor-pointer"
-                        theme={{ hoverColor: colors.$5 }}
-                        onClick={() => setIsCompanyCreateModalOpened(true)}
-                      >
-                        <Plus />
+              {shouldShowAddCompany && canUserAddCompany && isOwner && (
+                <Menu.Item>
+                  <div className="px-1">
+                    <SwitcherDiv
+                      className="flex items-center pl-3 space-x-3 py-2 rounded-md cursor-pointer"
+                      theme={{ hoverColor: colors.$5 }}
+                      onClick={() => setIsCompanyCreateModalOpened(true)}
+                    >
+                      <Plus />
 
-                        <span className="text-sm">{t('add_company')}</span>
-                      </SwitcherDiv>
-                    </div>
-                  </Menu.Item>
-                )}
+                      <span className="text-sm">{t('add_company')}</span>
+                    </SwitcherDiv>
+                  </div>
+                </Menu.Item>
+              )}
 
               {(isAdmin || isOwner) && (
                 <Menu.Item>

@@ -12,7 +12,7 @@ import { FormEvent, ReactElement, ReactNode, useState } from 'react';
 import { Menu as MenuIcon, Info } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Link } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
@@ -20,7 +20,7 @@ import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
-import { isDemo, isSelfHosted, trans } from '$app/common/helpers';
+import { isDemo, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -408,6 +408,8 @@ export function Default(props: Props) {
     },
   });
 
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className="fixed bottom-4 right-4 z-50 flex items-end flex-col-reverse space-y-4 space-y-reverse">
@@ -465,6 +467,7 @@ export function Default(props: Props) {
 
               {shouldShowUnlockButton && (
                 <button
+                  type="button"
                   className="hidden sm:inline-flex items-center justify-center px-4 rounded-md text-sm font-medium text-white relative overflow-hidden"
                   style={{
                     height: '2.25rem',
@@ -473,17 +476,24 @@ export function Default(props: Props) {
                     boxShadow:
                       '0px 1px 1px 0px #1453B82E, 0px 2px 2px 0px #1453B829, 0px 5px 3px 0px #1453B817, 0px 9px 4px 0px #1453B808, 0px 15px 4px 0px #1453B800, 0px 1px 0px 0px #FFFFFF40 inset, 0px 0px 0px 1px #0062FF',
                   }}
-                  onClick={() =>
+                  onClick={() => {
+                    if (
+                      isHosted() &&
+                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT
+                    ) {
+                      return navigate('/settings/account_management');
+                    }
+
                     preventNavigation({
                       url: (isSelfHosted()
                         ? import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
                           'https://invoiceninja.invoicing.co/client/subscriptions/O5xe7Rwd7r/purchase'
                         : user?.company_user?.ninja_portal_url) as string,
                       externalLink: true,
-                    })
-                  }
+                    });
+                  }}
                 >
-                  <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
 
                   <span className="relative z-10 hidden xl:block">
                     {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
