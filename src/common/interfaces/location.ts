@@ -16,7 +16,6 @@ export interface Location {
   name: string;
   address1: string;
   address2: string;
-  phone: string;
   city: string;
   state: string;
   postal_code: string;
