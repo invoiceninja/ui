@@ -24,7 +24,7 @@ export function SettingsLabel(props: Props) {
 
   return (
     <div className="flex flex-col text-sm">
-      <span className="font-medium" style={{ color: colors.$3 }}>
+      <span className="font-medium" style={{ color: colors.$22 }}>
         {label}
         {required && <span className="ml-1 text-red-600">*</span>}
       </span>
@@ -35,10 +35,13 @@ export function SettingsLabel(props: Props) {
             <span
               className="text-xs"
               dangerouslySetInnerHTML={{ __html: helpLabel }}
-              style={{ color: colors.$3, opacity: 0.8 }}
+              style={{ color: colors.$22, opacity: 0.8 }}
             />
           ) : (
-            <div className="text-xs" style={{ color: colors.$3, opacity: 0.8 }}>
+            <div
+              className="text-xs"
+              style={{ color: colors.$22, opacity: 0.8 }}
+            >
               {helpLabel}
             </div>
           )}
