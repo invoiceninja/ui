@@ -72,7 +72,7 @@ export function EmailRecord(props: Props) {
   return (
     <div
       className={classNames('flex flex-col', {
-        'border-b': withBottomBorder,
+        'border-b border-dashed': withBottomBorder,
         'border rounded-md shadow-sm': withAllBorders,
       })}
       style={{

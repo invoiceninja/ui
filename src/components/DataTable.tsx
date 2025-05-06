@@ -727,7 +727,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               }}
             >
               <Td className={styleOptions?.tdClassName} colSpan={100}>
-                {t('no_records_found')}
+                <div className="flex items-center justify-center py-10">
+                  <span className="text-sm" style={{ color: colors.$17 }}>
+                    {t('no_records_found')}
+                  </span>
+                </div>
               </Td>
             </Tr>
           )}

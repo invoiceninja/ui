@@ -71,8 +71,8 @@ export default function Activities() {
       }
       withoutBodyPadding
     >
-      <div className="pl-6 pr-4">
-        <div className="flex flex-col overflow-y-auto pr-4">
+      <div className="px-6 pb-6 pt-2">
+        <div className="flex flex-col overflow-y-auto max-h-96">
           {activities
             ?.filter(
               (activity) =>

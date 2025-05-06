@@ -577,7 +577,7 @@ export function Default(props: Props) {
           {(props.breadcrumbs || props.topRight || props.afterBreadcrumbs) &&
             props.breadcrumbs.length > 0 && (
               <div className="pt-4 px-4 md:px-6 md:pt-6 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-                <div className="flex items-center">
+                <div className="flex items-center w-full">
                   {props.breadcrumbs && (
                     <Breadcrumbs pages={props.breadcrumbs} />
                   )}
