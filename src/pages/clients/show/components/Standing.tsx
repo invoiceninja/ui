@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
-import { Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -19,86 +19,105 @@ interface Props {
 }
 
 export function Standing(props: Props) {
+  const { client } = props;
+
   const [t] = useTranslation();
 
-  const { client } = props;
+  const colors = useColorScheme();
 
   const formatMoney = useFormatMoney();
 
   return (
     <>
       {client && (
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoCard
-            title={t('standing')}
-            value={
-              <div className="flex flex-col space-y-2">
-                <Element
-                  leftSide={
-                    <span className="font-bold">{t('paid_to_date')}</span>
-                  }
-                  pushContentToRight
-                  noExternalPadding
-                  noVerticalPadding
-                >
-                  {formatMoney(
-                    client.paid_to_date,
-                    client.country_id,
-                    client.settings.currency_id
-                  )}
-                </Element>
+        <InfoCard
+          title={t('standing')}
+          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max p-4"
+          style={{ borderColor: colors.$24 }}
+          withoutPadding
+        >
+          <div className="flex flex-col h-44 overflow-y-auto">
+            <div
+              className="flex justify-between border-b border-dashed pt-1.5 pb-3"
+              style={{ borderColor: colors.$24 }}
+            >
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$17 }}
+              >
+                {t('paid_to_date')}
+              </span>
 
-                <Element
-                  leftSide={
-                    <span className="font-bold">{t('outstanding')}</span>
-                  }
-                  pushContentToRight
-                  noExternalPadding
-                  noVerticalPadding
-                >
-                  {formatMoney(
-                    client.balance,
-                    client.country_id,
-                    client.settings.currency_id
-                  )}
-                </Element>
-
-                <Element
-                  leftSide={
-                    <span className="font-bold">{t('credit_balance')}</span>
-                  }
-                  pushContentToRight
-                  noExternalPadding
-                  noVerticalPadding
-                >
-                  {formatMoney(
-                    client.credit_balance,
-                    client.country_id,
-                    client.settings.currency_id
-                  )}
-                </Element>
-
-                {client.payment_balance > 0 && (
-                  <Element
-                    leftSide={
-                      <span className="font-bold">{t('payment_balance')}</span>
-                    }
-                    pushContentToRight
-                    noExternalPadding
-                    noVerticalPadding
-                  >
-                    {formatMoney(
-                      client.payment_balance,
-                      client.country_id,
-                      client.settings.currency_id
-                    )}
-                  </Element>
+              <span className="text-sm font-mono">
+                {formatMoney(
+                  client.paid_to_date,
+                  client.country_id,
+                  client.settings.currency_id
                 )}
-              </div>
-            }
-            className="h-full"
-          />
-        </div>
+              </span>
+            </div>
+
+            <div
+              className="flex justify-between border-b border-dashed py-3"
+              style={{ borderColor: colors.$24 }}
+            >
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$17 }}
+              >
+                {t('outstanding')}
+              </span>
+
+              <span className="text-sm font-mono">
+                {formatMoney(
+                  client.balance,
+                  client.country_id,
+                  client.settings.currency_id
+                )}
+              </span>
+            </div>
+
+            <div
+              className="flex justify-between border-b border-dashed py-3"
+              style={{ borderColor: colors.$24 }}
+            >
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$17 }}
+              >
+                {t('credit_balance')}
+              </span>
+
+              <span className="text-sm font-mono">
+                {formatMoney(
+                  client.credit_balance,
+                  client.country_id,
+                  client.settings.currency_id
+                )}
+              </span>
+            </div>
+
+            <div
+              className="flex justify-between border-b border-dashed py-3"
+              style={{ borderColor: colors.$24 }}
+            >
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$17 }}
+              >
+                {t('payment_balance')}
+              </span>
+
+              <span className="text-sm font-mono">
+                {formatMoney(
+                  client.payment_balance,
+                  client.country_id,
+                  client.settings.currency_id
+                )}
+              </span>
+            </div>
+          </div>
+        </InfoCard>
       )}
     </>
   );

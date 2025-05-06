@@ -16,6 +16,7 @@ import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
 import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
+import { ExternalLink } from '../icons/ExternalLink';
 
 interface Props extends CommonProps {
   to: string;
@@ -24,6 +25,7 @@ interface Props extends CommonProps {
   withoutDefaultStyling?: boolean;
   setBaseFont?: boolean;
   disableHoverUnderline?: boolean;
+  withoutExternalIcon?: boolean;
 }
 
 export function Link(props: Props) {
@@ -33,7 +35,12 @@ export function Link(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const { withoutDefaultStyling, setBaseFont, disableHoverUnderline } = props;
+  const {
+    withoutDefaultStyling,
+    setBaseFont,
+    disableHoverUnderline,
+    withoutExternalIcon = false,
+  } = props;
 
   const css: React.CSSProperties = {
     color: accentColor,
@@ -48,26 +55,34 @@ export function Link(props: Props) {
 
   if (props.external) {
     return (
-      <a
-        target="_blank"
-        href={getAdjustedHref()}
-        className={classNames(`text-center ${props.className}`, {
-          'text-sm': !setBaseFont,
-          'text-base': setBaseFont,
-          'hover:underline': !withoutDefaultStyling && !disableHoverUnderline,
-        })}
-        style={!withoutDefaultStyling ? css : undefined}
-        rel="noreferrer"
-        onClick={(event) => {
-          if (preventLeavingPage) {
-            event.preventDefault();
+      <div className="flex space-x-2 items-center">
+        {!withoutExternalIcon && (
+          <div>
+            <ExternalLink size="1rem" color="#0062FF" />
+          </div>
+        )}
 
-            preventNavigation({ url: props.to, externalLink: true });
-          }
-        }}
-      >
-        {props.children}
-      </a>
+        <a
+          target="_blank"
+          href={getAdjustedHref()}
+          className={classNames(`text-center ${props.className}`, {
+            'text-sm': !setBaseFont,
+            'text-base': setBaseFont,
+            'hover:underline': !withoutDefaultStyling && !disableHoverUnderline,
+          })}
+          style={!withoutDefaultStyling ? css : undefined}
+          rel="noreferrer"
+          onClick={(event) => {
+            if (preventLeavingPage) {
+              event.preventDefault();
+
+              preventNavigation({ url: props.to, externalLink: true });
+            }
+          }}
+        >
+          {props.children}
+        </a>
+      </div>
     );
   }
 

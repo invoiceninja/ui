@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Client } from '$app/common/interfaces/client';
@@ -24,29 +25,29 @@ export function ClientPublicNotes(props: Props) {
 
   const { client } = props;
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   return (
     <>
       {Boolean(client && client.public_notes) && (
-        <div className="col-span-12 md:col-span-6 lg:col-span-6 xl:col-span-3">
-          <InfoCard
-            title={t('public_notes')}
-            value={
-              <div className="whitespace-normal max-h-56 overflow-y-auto">
-                <article
-                  className={classNames('prose prose-sm', {
-                    'prose-invert': reactSettings?.dark_mode,
-                  })}
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHTML(client.public_notes),
-                  }}
-                />
-              </div>
-            }
-            className="h-full"
-          />
-        </div>
+        <InfoCard
+          title={t('public_notes')}
+          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm p-4"
+          style={{ borderColor: colors.$24 }}
+          withoutPadding
+        >
+          <div className="whitespace-normal h-44 overflow-y-auto pt-1">
+            <article
+              className={classNames('prose prose-sm', {
+                'prose-invert': reactSettings?.dark_mode,
+              })}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHTML(client.public_notes),
+              }}
+            />
+          </div>
+        </InfoCard>
       )}
     </>
   );
