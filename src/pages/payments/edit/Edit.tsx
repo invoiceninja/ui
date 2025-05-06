@@ -62,11 +62,16 @@ export default function Edit() {
   };
 
   return (
-    <Card title={documentTitle}>
+    <Card
+      title={documentTitle}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       {payment?.client && <ClientCard client={payment.client} />}
       {payment && <PaymentOverview payment={payment} />}
 
-      <Divider />
+      <Divider borderColor={colors.$20} />
 
       <Element leftSide={t('payment_number')}>
         <InputField
