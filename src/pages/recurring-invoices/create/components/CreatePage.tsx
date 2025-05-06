@@ -24,9 +24,12 @@ import { RecurringInvoiceContext } from '../Create';
 import { useRecurringInvoiceUtilities } from '../../common/hooks';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { useColorScheme } from '$app/common/colors';
 
 export default function CreatePage() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const [searchParams] = useSearchParams();
 
@@ -51,7 +54,11 @@ export default function CreatePage() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+        <Card
+          className="col-span-12 xl:col-span-4 h-max shadow-sm"
+          withContainer
+          style={{ borderColor: colors.$24 }}
+        >
           <ClientSelector
             resource={recurringInvoice}
             onChange={(id) => handleChange('client_id', id)}
