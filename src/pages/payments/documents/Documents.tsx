@@ -47,33 +47,26 @@ export default function Documents() {
           'flex-col items-center': id,
         })}
       >
-        {id ? (
-          <>
-            <div className="w-full">
-              <Upload
-                endpoint={endpoint('/api/v1/payments/:id/upload', { id })}
-                onSuccess={invalidateQuery}
-                disableUpload={
-                  !hasPermission('edit_payment') && !entityAssigned(payment)
-                }
-                widgetOnly
-              />
-            </div>
+        <div className="w-full">
+          <Upload
+            endpoint={endpoint('/api/v1/payments/:id/upload', { id })}
+            onSuccess={invalidateQuery}
+            disableUpload={
+              !hasPermission('edit_payment') && !entityAssigned(payment)
+            }
+            widgetOnly
+          />
+        </div>
 
-            <div className="w-full">
-              <DocumentsTable
-                documents={payment?.documents ?? []}
-                onDocumentDelete={invalidateQuery}
-                disableEditableOptions={
-                  !entityAssigned(payment, true) &&
-                  !hasPermission('edit_payment')
-                }
-              />
-            </div>
-          </>
-        ) : (
-          <div className="text-sm">{t('save_to_upload_documents')}.</div>
-        )}
+        <div className="w-full">
+          <DocumentsTable
+            documents={payment?.documents ?? []}
+            onDocumentDelete={invalidateQuery}
+            disableEditableOptions={
+              !entityAssigned(payment, true) && !hasPermission('edit_payment')
+            }
+          />
+        </div>
       </div>
     </Card>
   );
