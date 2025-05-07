@@ -15,9 +15,12 @@ import { RecurringInvoiceContext } from '../../create/Create';
 import { useOutletContext } from 'react-router-dom';
 import { cloneDeep, get, set } from 'lodash';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { useColorScheme } from '$app/common/colors';
 
 export default function EInvoice() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const context: RecurringInvoiceContext = useOutletContext();
   const { recurringInvoice, errors, setRecurringInvoice } = context;
@@ -42,7 +45,12 @@ export default function EInvoice() {
   };
 
   return (
-    <Card title={t('date_range')}>
+    <Card
+      title={t('date_range')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Element leftSide={t('start_date')}>
         <InputField
           element="textarea"
