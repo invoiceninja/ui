@@ -13,7 +13,6 @@ import { InputField, SelectField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Payment } from '$app/common/interfaces/payment';
-import { Divider } from '$app/components/cards/Divider';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
 import Toggle from '$app/components/forms/Toggle';
@@ -68,10 +67,12 @@ export default function Edit() {
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
     >
-      {payment?.client && <ClientCard client={payment.client} />}
+      {payment?.client && (
+        <div className="pt-2">
+          <ClientCard client={payment.client} />
+        </div>
+      )}
       {payment && <PaymentOverview payment={payment} />}
-
-      <Divider borderColor={colors.$20} />
 
       <Element leftSide={t('payment_number')}>
         <InputField
