@@ -64,7 +64,7 @@ export default function Edit() {
         >
           <div className="flex flex-col space-y-4">
             {recurringInvoice && (
-              <div className="flex items-center space-x-10">
+              <div className="flex items-center space-x-9">
                 <span
                   className="text-sm font-medium"
                   style={{ color: colors.$22 }}
