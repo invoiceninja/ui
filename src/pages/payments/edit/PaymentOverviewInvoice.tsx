@@ -81,7 +81,7 @@ export function PaymentOverviewInvoice(props: Props) {
           </div>
 
           <div className="flex items-center justify-center space-x-5">
-            <span className="font-mono" style={{ color: colors.$3 }}>
+            <span style={{ color: colors.$3 }}>
               {formatMoney(
                 props?.paymentable?.amount || 0,
                 props.payment.client?.country_id,
@@ -98,7 +98,7 @@ export function PaymentOverviewInvoice(props: Props) {
 
             {props.paymentable.refunded > 0 && (
               <div className="flex items-center space-x-1">
-                <span className="font-mono" style={{ color: 'red' }}>
+                <span style={{ color: 'red' }}>
                   {formatMoney(
                     props?.paymentable?.refunded || 0,
                     props.payment.client?.country_id,
@@ -141,7 +141,7 @@ export function PaymentOverviewInvoice(props: Props) {
           </div>
 
           <div className="flex items-center justify-center space-x-5">
-            <span className="font-mono" style={{ color: colors.$3 }}>
+            <span style={{ color: colors.$3 }}>
               {formatMoney(
                 props?.paymentable?.amount || 0,
                 props.payment.client?.country_id,
@@ -158,7 +158,7 @@ export function PaymentOverviewInvoice(props: Props) {
 
             {props.paymentable.refunded > 0 && (
               <div className="flex items-center space-x-1">
-                <span className="font-mono" style={{ color: 'red' }}>
+                <span style={{ color: 'red' }}>
                   {formatMoney(
                     props?.paymentable?.refunded || 0,
                     props.payment.client?.country_id,

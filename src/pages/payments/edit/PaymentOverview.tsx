@@ -42,7 +42,7 @@ export function PaymentOverview(props: Props) {
             {t('amount')}:
           </span>
 
-          <span className="font-medium font-mono" style={{ color: colors.$3 }}>
+          <span className="font-medium" style={{ color: colors.$3 }}>
             {formatMoney(
               props?.payment?.amount || 0,
               props.payment.client?.country_id,
@@ -56,7 +56,7 @@ export function PaymentOverview(props: Props) {
             {t('applied')}:
           </span>
 
-          <span className="font-medium font-mono" style={{ color: colors.$3 }}>
+          <span className="font-medium" style={{ color: colors.$3 }}>
             {formatMoney(
               props?.payment?.applied || 0,
               props.payment.client?.country_id,
@@ -74,7 +74,7 @@ export function PaymentOverview(props: Props) {
             {t('refunded')}:
           </span>
 
-          <span className="font-medium font-mono" style={{ color: colors.$3 }}>
+          <span className="font-medium" style={{ color: colors.$3 }}>
             {formatMoney(
               props?.payment?.refunded || 0,
               props.payment.client?.country_id,
@@ -89,10 +89,7 @@ export function PaymentOverview(props: Props) {
               {t('unapplied')}:
             </span>
 
-            <span
-              className="font-medium font-mono"
-              style={{ color: colors.$3 }}
-            >
+            <span className="font-medium" style={{ color: colors.$3 }}>
               {formatMoney(
                 props?.payment?.amount - props?.payment?.applied || 0,
                 props.payment.client?.country_id,
