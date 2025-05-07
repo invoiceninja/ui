@@ -539,11 +539,12 @@ export function Default(props: Props) {
                       </Button>
 
                       <Dropdown
-                        className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                        className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
                         cardActions
                         disabled={
                           saveBtn?.disableSaveButton || props.disableSaveButton
                         }
+                        labelButtonBorderColor={colors.$1}
                       >
                         {props.additionalSaveOptions.map((option, index) => (
                           <DropdownElement

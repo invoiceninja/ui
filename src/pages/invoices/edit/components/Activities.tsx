@@ -27,12 +27,6 @@ import styled from 'styled-components';
 import classNames from 'classnames';
 
 const ActivityBox = styled.div`
-  display: flex;
-  space-x: 0.75rem;
-  padding: 1rem;
-  border-radius: 0.375rem;
-  flex: 1;
-  min-width: 0;
   background-color: ${(props) => props.theme.backgroundColor};
 
   &:hover {

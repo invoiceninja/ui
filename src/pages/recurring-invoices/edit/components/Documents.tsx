@@ -18,51 +18,63 @@ import { useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { RecurringInvoiceContext } from '../../create/Create';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Documents() {
   const [t] = useTranslation();
 
+  const { id } = useParams();
+
   const location = useLocation();
+  const colors = useColorScheme();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const { id } = useParams();
-
   const context: RecurringInvoiceContext = useOutletContext();
-
   const { recurringInvoice } = context;
 
   return (
-    <Card title={t('documents')} className="w-full xl:w-2/3">
-      {location.pathname.includes('/create') ? (
-        <div className="text-sm mt-4 px-6">
-          {t('save_to_upload_documents')}.
-        </div>
-      ) : (
-        <div className="px-6">
-          <Upload
-            widgetOnly
-            endpoint={endpoint('/api/v1/recurring_invoices/:id/upload', {
-              id,
-            })}
-            onSuccess={() => $refetch(['recurring_invoices'])}
-            disableUpload={
-              !hasPermission('edit_recurring_invoice') &&
-              !entityAssigned(recurringInvoice)
-            }
-          />
+    <Card
+      title={t('documents')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
+      <div className="flex flex-col items-center w-full px-4 sm:px-6 py-2">
+        {location.pathname.includes('/create') ? (
+          <div className="text-sm self-start">
+            {t('save_to_upload_documents')}.
+          </div>
+        ) : (
+          <>
+            <div className="w-full lg:w-2/3">
+              <Upload
+                widgetOnly
+                endpoint={endpoint('/api/v1/recurring_invoices/:id/upload', {
+                  id,
+                })}
+                onSuccess={() => $refetch(['recurring_invoices'])}
+                disableUpload={
+                  !hasPermission('edit_recurring_invoice') &&
+                  !entityAssigned(recurringInvoice)
+                }
+              />
+            </div>
 
-          <DocumentsTable
-            documents={recurringInvoice?.documents || []}
-            onDocumentDelete={() => $refetch(['recurring_invoices'])}
-            disableEditableOptions={
-              !entityAssigned(recurringInvoice, true) &&
-              !hasPermission('edit_recurring_invoice')
-            }
-          />
-        </div>
-      )}
+            <div className="w-full lg:w-2/3">
+              <DocumentsTable
+                documents={recurringInvoice?.documents || []}
+                onDocumentDelete={() => $refetch(['recurring_invoices'])}
+                disableEditableOptions={
+                  !entityAssigned(recurringInvoice, true) &&
+                  !hasPermission('edit_recurring_invoice')
+                }
+              />
+            </div>
+          </>
+        )}
+      </div>
     </Card>
   );
 }
