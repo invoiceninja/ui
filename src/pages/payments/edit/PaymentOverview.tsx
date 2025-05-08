@@ -23,81 +23,111 @@ interface Props {
 
 export function PaymentOverview(props: Props) {
   const [t] = useTranslation();
-  const formatMoney = useFormatMoney();
+
   const colors = useColorScheme();
+
+  const formatMoney = useFormatMoney();
 
   return (
     <div>
       <div
-        className={classNames(
-          'grid grid-cols-2 gap-4 pt-6 px-4 md:px-6 text-sm md:text-base border-t mt-6',
-          {
-            'pb-4': props.payment.paymentables.length,
-          }
-        )}
+        className={classNames('border-t mt-6 pt-6 px-4 md:px-6', {
+          'pb-4': props.payment.paymentables.length,
+        })}
         style={{ borderColor: colors.$20 }}
       >
-        <div className="flex space-x-2 items-center justify-center">
-          <span className="font-medium" style={{ color: colors.$3 }}>
-            {t('amount')}:
-          </span>
-
-          <span className="font-medium" style={{ color: colors.$3 }}>
-            {formatMoney(
-              props?.payment?.amount || 0,
-              props.payment.client?.country_id,
-              props.payment?.currency_id
-            )}
-          </span>
-        </div>
-
-        <div className="flex space-x-2 items-center justify-center">
-          <span className="font-medium" style={{ color: colors.$3 }}>
-            {t('applied')}:
-          </span>
-
-          <span className="font-medium" style={{ color: colors.$3 }}>
-            {formatMoney(
-              props?.payment?.applied || 0,
-              props.payment.client?.country_id,
-              props.payment?.currency_id
-            )}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-center">
+        <div className="flex justify-center mb-5">
           <PaymentStatus entity={props.payment} />
         </div>
 
-        <div className="flex space-x-2 items-center justify-center">
-          <span className="font-medium" style={{ color: colors.$3 }}>
-            {t('refunded')}:
-          </span>
-
-          <span className="font-medium" style={{ color: colors.$3 }}>
-            {formatMoney(
-              props?.payment?.refunded || 0,
-              props.payment.client?.country_id,
-              props.payment?.currency_id
-            )}
-          </span>
-        </div>
-
-        {props?.payment?.applied < props?.payment?.amount && (
-          <div className="flex space-x-2 items-center justify-center">
-            <span className="font-medium" style={{ color: colors.$3 }}>
-              {t('unapplied')}:
+        <div
+          className={classNames('grid grid-cols-2 gap-3 text-sm md:text-base', {
+            'sm:grid-cols-4': props?.payment?.applied < props?.payment?.amount,
+            'sm:grid-cols-3': props?.payment?.applied >= props?.payment?.amount,
+          })}
+        >
+          <div
+            className="rounded-md p-3 flex items-center flex-col"
+            style={{ backgroundColor: colors.$21 }}
+          >
+            <span className="text-xs mb-1" style={{ color: colors.$22 }}>
+              {t('amount')}
             </span>
 
-            <span className="font-medium" style={{ color: colors.$3 }}>
+            <span
+              className="font-medium text-base md:text-lg"
+              style={{ color: colors.$3 }}
+            >
               {formatMoney(
-                props?.payment?.amount - props?.payment?.applied || 0,
+                props?.payment?.amount || 0,
                 props.payment.client?.country_id,
                 props.payment?.currency_id
               )}
             </span>
           </div>
-        )}
+
+          <div
+            className="rounded-md p-3 flex items-center flex-col"
+            style={{ backgroundColor: colors.$21 }}
+          >
+            <span className="text-xs mb-1" style={{ color: colors.$22 }}>
+              {t('applied')}
+            </span>
+
+            <span
+              className="font-medium text-base md:text-lg"
+              style={{ color: colors.$3 }}
+            >
+              {formatMoney(
+                props?.payment?.applied || 0,
+                props.payment.client?.country_id,
+                props.payment?.currency_id
+              )}
+            </span>
+          </div>
+
+          <div
+            className="rounded-md p-3 flex items-center flex-col"
+            style={{ backgroundColor: colors.$21 }}
+          >
+            <span className="text-xs mb-1" style={{ color: colors.$22 }}>
+              {t('refunded')}
+            </span>
+
+            <span
+              className="font-medium text-base md:text-lg"
+              style={{ color: colors.$3 }}
+            >
+              {formatMoney(
+                props?.payment?.refunded || 0,
+                props.payment.client?.country_id,
+                props.payment?.currency_id
+              )}
+            </span>
+          </div>
+
+          {props?.payment?.applied < props?.payment?.amount && (
+            <div
+              className="rounded-md p-3 flex items-center flex-col"
+              style={{ backgroundColor: colors.$21 }}
+            >
+              <span className="text-xs mb-1" style={{ color: colors.$22 }}>
+                {t('unapplied')}
+              </span>
+
+              <span
+                className="font-medium text-base md:text-lg"
+                style={{ color: colors.$3 }}
+              >
+                {formatMoney(
+                  props?.payment?.amount - props?.payment?.applied || 0,
+                  props.payment.client?.country_id,
+                  props.payment?.currency_id
+                )}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {props.payment.paymentables.length ? (
