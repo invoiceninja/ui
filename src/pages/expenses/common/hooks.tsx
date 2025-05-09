@@ -93,6 +93,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      invoice_id: '',
       date: dayjs().format('YYYY-MM-DD'),
     });
 
