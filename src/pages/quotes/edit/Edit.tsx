@@ -64,39 +64,38 @@ export default function Edit() {
     <>
       <div className="grid grid-cols-12 gap-4">
         <Card
-          className="col-span-12 xl:col-span-4 h-max shadow-sm"
-          withContainer
-          style={{
-            borderColor: colors.$24,
-          }}
+          className="col-span-12 xl:col-span-4 h-max px-6 py-2 shadow-sm"
+          style={{ borderColor: colors.$24 }}
         >
-          {quote && (
-            <div className="flex items-center space-x-9">
-              <span
-                className="text-sm font-medium"
-                style={{ color: colors.$22 }}
-              >
-                {t('status')}
-              </span>
+          <div className="flex flex-col space-y-4">
+            {quote && (
+              <div className="flex items-center space-x-9">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('status')}
+                </span>
 
-              <div>
-                <QuoteStatusBadge entity={quote} />
+                <div>
+                  <QuoteStatusBadge entity={quote} />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <ClientSelector
-            resource={quote}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onLocationChange={(locationId) =>
-              handleChange('location_id', locationId)
-            }
-            onContactCheckboxChange={handleInvitationChange}
-            errorMessage={errors?.errors.client_id}
-            textOnly
-            readonly
-          />
+            <ClientSelector
+              resource={quote}
+              onChange={(id) => handleChange('client_id', id)}
+              onClearButtonClick={() => handleChange('client_id', '')}
+              onLocationChange={(locationId) =>
+                handleChange('location_id', locationId)
+              }
+              onContactCheckboxChange={handleInvitationChange}
+              errorMessage={errors?.errors.client_id}
+              textOnly
+              readonly
+            />
+          </div>
         </Card>
 
         <QuoteDetails handleChange={handleChange} errors={errors} />
