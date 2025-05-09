@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { creditAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -25,16 +26,21 @@ interface Props {
 }
 
 export function CreditDetails(props: Props) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
   const { handleChange, errors } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const [credit] = useAtom(creditAtom);
 
   return (
     <>
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('credit_date')}>
           <InputField
             type="date"
@@ -98,7 +104,10 @@ export function CreditDetails(props: Props) {
         )}
       </Card>
 
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('credit_number')}>
           <InputField
             id="number"
@@ -120,16 +129,6 @@ export function CreditDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <NumberInputField
-                value={credit?.discount || ''}
-                onValueChange={(value) =>
-                  handleChange('discount', parseFloat(value))
-                }
-                errorMessage={errors?.errors.discount}
-              />
-            </div>
-
-            <div className="w-full lg:w-1/2">
               <SelectField
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
@@ -142,6 +141,16 @@ export function CreditDetails(props: Props) {
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
               </SelectField>
+            </div>
+
+            <div className="w-full lg:w-1/2">
+              <NumberInputField
+                value={credit?.discount || ''}
+                onValueChange={(value) =>
+                  handleChange('discount', parseFloat(value))
+                }
+                errorMessage={errors?.errors.discount}
+              />
             </div>
           </div>
         </Element>
