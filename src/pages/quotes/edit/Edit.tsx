@@ -63,20 +63,25 @@ export default function Edit() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+        <Card
+          className="col-span-12 xl:col-span-4 h-max shadow-sm"
+          withContainer
+          style={{
+            borderColor: colors.$24,
+          }}
+        >
           {quote && (
-            <div className="flex space-x-20">
+            <div className="flex items-center space-x-9">
               <span
-                className="text-sm"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
+                className="text-sm font-medium"
+                style={{ color: colors.$22 }}
               >
                 {t('status')}
               </span>
-              <QuoteStatusBadge entity={quote} />
+
+              <div>
+                <QuoteStatusBadge entity={quote} />
+              </div>
             </div>
           )}
 
