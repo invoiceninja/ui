@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
@@ -29,7 +29,6 @@ import { CustomField } from '$app/components/CustomField';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
-import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
@@ -46,6 +45,7 @@ import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Banner } from '$app/components/Banner';
 import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -219,7 +219,12 @@ export default function Create() {
       }
     >
       <Container breadcrumbs={[]}>
-        <Card title={t('enter_payment')}>
+        <Card
+          title={t('enter_payment')}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <Element leftSide={t('client')}>
             <ClientSelector
               onChange={(client) => {
@@ -328,14 +333,18 @@ export default function Create() {
                       withoutLabelWrapping
                     />
 
-                    <Button
-                      behavior="button"
-                      type="minimal"
-                      className="self-center mt-6"
+                    <div
+                      className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
                       onClick={() => handleDeletingInvoice(invoice._id)}
                     >
-                      <X />
-                    </Button>
+                      <CircleXMark
+                        color={colors.$16}
+                        hoverColor={colors.$3}
+                        borderColor={colors.$5}
+                        hoverBorderColor={colors.$17}
+                        size="1.6rem"
+                      />
+                    </div>
                   </div>
 
                   {errors?.errors[`invoices.${index}.amount`] && (
@@ -452,14 +461,18 @@ export default function Create() {
                       withoutLabelWrapping
                     />
 
-                    <Button
-                      behavior="button"
-                      type="minimal"
-                      className="self-center mt-6"
+                    <div
+                      className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
                       onClick={() => handleDeletingCredit(credit._id)}
                     >
-                      <X />
-                    </Button>
+                      <CircleXMark
+                        color={colors.$16}
+                        hoverColor={colors.$3}
+                        borderColor={colors.$5}
+                        hoverBorderColor={colors.$17}
+                        size="1.6rem"
+                      />
+                    </div>
                   </div>
 
                   {errors?.errors[`credits.${index}.amount`] && (

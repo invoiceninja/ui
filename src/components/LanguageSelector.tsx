@@ -10,24 +10,25 @@
 
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { GenericSelectorProps } from './CountrySelector';
-import { SearchableSelect } from './SearchableSelect';
+import { SelectField } from './forms';
 
 export function LanguageSelector(props: GenericSelectorProps) {
   const languages = useLanguages();
 
   return (
-    <SearchableSelect
+    <SelectField
       value={props.value}
       onValueChange={props.onChange}
       label={props.label}
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
+      customSelector
     >
       {languages.map((language, index) => (
         <option key={index} value={language.id}>
           {language.name}
         </option>
       ))}
-    </SearchableSelect>
+    </SelectField>
   );
 }
