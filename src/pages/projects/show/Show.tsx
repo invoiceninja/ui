@@ -140,16 +140,19 @@ export default function Show() {
       afterBreadcrumbs={<PreviousNextNavigation entity="project" />}
     >
       <div className="grid grid-cols-12 lg:space-y-0 gap-4">
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoCard title={project.name}>
+        <InfoCard
+          title={project.name}
+          className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 p-4"
+          style={{ borderColor: colors.$24 }}
+          withoutPadding
+        >
+          <div className="flex flex-col space-y-3 pt-1">
             {project && (
-              <div className="flex space-x-20 my-3">
+              <div className="flex space-x-20">
                 <span
-                  className="text-sm"
+                  className="text-sm font-medium"
                   style={{
-                    backgroundColor: colors.$2,
                     color: colors.$3,
-                    colorScheme: colors.$0,
                   }}
                 >
                   {t('status')}
@@ -163,54 +166,70 @@ export default function Show() {
               <ClientActionButtons displayClientName client={project.client} />
             )}
 
-            <div className="mt-2">
+            <div>
               {project.due_date.length > 0 && (
-                <p>
-                  {t('due_date')}: {date(project.due_date, dateFormat)}
-                </p>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium">{t('due_date')}:</span>
+
+                  <span className="text-sm">
+                    {date(project.due_date, dateFormat)}
+                  </span>
+                </div>
               )}
 
-              <p>
-                {t('budgeted_hours')}: {formatNumber(project.budgeted_hours)}
-              </p>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">
+                  {t('budgeted_hours')}:
+                </span>
 
-              <p>
-                {t('task_rate')}:{' '}
-                {formatMoney(
-                  project.task_rate,
-                  project.client?.country_id,
-                  project.client?.settings.currency_id
-                )}
-              </p>
+                <span className="text-sm">
+                  {formatNumber(project.budgeted_hours)}
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">{t('task_rate')}:</span>
+
+                <span className="text-sm">
+                  {formatMoney(
+                    project.task_rate,
+                    project.client?.country_id,
+                    project.client?.settings.currency_id
+                  )}
+                </span>
+              </div>
             </div>
 
-            <div className="mt-2">
+            <div>
               {project?.invoices?.map((invoice: Invoice, index: number) => (
-                <div key={index}>
-                  <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
-                    {t('invoice')} #{invoice.number}
-                  </Link>
-                </div>
+                <Link
+                  key={index}
+                  to={route('/invoices/:id/edit', { id: invoice.id })}
+                >
+                  {t('invoice')} #{invoice.number}
+                </Link>
               ))}
 
               {project?.quotes?.map((quote: Quote, index: number) => (
-                <div key={index}>
-                  <Link to={route('/quotes/:id/edit', { id: quote.id })}>
-                    {t('quote')} #{quote.number}
-                  </Link>
-                </div>
+                <Link
+                  key={index}
+                  to={route('/quotes/:id/edit', { id: quote.id })}
+                >
+                  {t('quote')} #{quote.number}
+                </Link>
               ))}
 
               {project?.expenses?.map((expense: Expense, index: number) => (
-                <div key={index}>
-                  <Link to={route('/expenses/:id/edit', { id: expense.id })}>
-                    {t('expense')} #{expense.number}
-                  </Link>
-                </div>
+                <Link
+                  key={index}
+                  to={route('/expenses/:id/edit', { id: expense.id })}
+                >
+                  {t('expense')} #{expense.number}
+                </Link>
               ))}
             </div>
-          </InfoCard>
-        </div>
+          </div>
+        </InfoCard>
 
         <ProjectPrivateNotes project={project} />
 

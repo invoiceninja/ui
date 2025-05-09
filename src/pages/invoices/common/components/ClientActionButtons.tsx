@@ -30,9 +30,9 @@ export function ClientActionButtons(props: Props) {
   const { client, displayClientName, clientId } = props;
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col space-y-1">
       {displayClientName && (
-        <span className="text-sm">{client?.display_name}</span>
+        <span className="text-sm font-medium">{client?.display_name}</span>
       )}
 
       <div className="space-x-2">
