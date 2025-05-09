@@ -47,8 +47,8 @@ export function PaymentOverview(props: Props) {
           })}
         >
           <div
-            className="rounded-md p-3 flex items-center flex-col"
-            style={{ backgroundColor: colors.$21 }}
+            className="rounded-md p-3 flex items-center flex-col shadow-sm border"
+            style={{ borderColor: colors.$20 }}
           >
             <span className="text-xs mb-1" style={{ color: colors.$22 }}>
               {t('amount')}
@@ -67,8 +67,8 @@ export function PaymentOverview(props: Props) {
           </div>
 
           <div
-            className="rounded-md p-3 flex items-center flex-col"
-            style={{ backgroundColor: colors.$21 }}
+            className="rounded-md p-3 flex items-center flex-col shadow-sm border"
+            style={{ borderColor: colors.$20 }}
           >
             <span className="text-xs mb-1" style={{ color: colors.$22 }}>
               {t('applied')}
@@ -87,8 +87,8 @@ export function PaymentOverview(props: Props) {
           </div>
 
           <div
-            className="rounded-md p-3 flex items-center flex-col"
-            style={{ backgroundColor: colors.$21 }}
+            className="rounded-md p-3 flex items-center flex-col shadow-sm border"
+            style={{ borderColor: colors.$20 }}
           >
             <span className="text-xs mb-1" style={{ color: colors.$22 }}>
               {t('refunded')}
@@ -108,8 +108,8 @@ export function PaymentOverview(props: Props) {
 
           {props?.payment?.applied < props?.payment?.amount && (
             <div
-              className="rounded-md p-3 flex items-center flex-col"
-              style={{ backgroundColor: colors.$21 }}
+              className="rounded-md p-3 flex items-center flex-col shadow-sm border"
+              style={{ borderColor: colors.$20 }}
             >
               <span className="text-xs mb-1" style={{ color: colors.$22 }}>
                 {t('unapplied')}
