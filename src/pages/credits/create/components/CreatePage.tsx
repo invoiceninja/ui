@@ -22,6 +22,7 @@ import { CreditDetails } from '../../common/components/CreditDetails';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { CreditFooter } from '../../common/components/CreditFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useColorScheme } from '$app/common/colors';
 
 export default function CreatePage() {
   const context: CreditsContext = useOutletContext();
@@ -39,6 +40,7 @@ export default function CreatePage() {
 
   const [searchParams] = useSearchParams();
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
 
@@ -56,7 +58,11 @@ export default function CreatePage() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+        <Card
+          className="col-span-12 xl:col-span-4 h-max shadow-sm"
+          withContainer
+          style={{ borderColor: colors.$24 }}
+        >
           <ClientSelector
             resource={credit}
             onChange={(id) => handleChange('client_id', id)}

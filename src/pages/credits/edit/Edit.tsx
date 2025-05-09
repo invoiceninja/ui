@@ -24,6 +24,7 @@ import { useCreditUtilities } from '../common/hooks';
 import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
 import { CreditsContext } from '../create/Create';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -40,6 +41,7 @@ export default function Edit() {
     setIsDefaultFooter,
   } = context;
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
 
@@ -55,26 +57,39 @@ export default function Edit() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {credit && (
-            <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
-              <CreditStatusBadge entity={credit} />
-            </div>
-          )}
+        <Card
+          className="col-span-12 xl:col-span-4 h-max px-6 py-2 shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
+          <div className="flex flex-col space-y-4">
+            {credit && (
+              <div className="flex items-center space-x-9">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('status')}
+                </span>
 
-          <ClientSelector
-            resource={credit}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onLocationChange={(locationId) =>
-              handleChange('location_id', locationId)
-            }
-            onContactCheckboxChange={handleInvitationChange}
-            errorMessage={errors?.errors.client_id}
-            readonly
-            textOnly
-          />
+                <div>
+                  <CreditStatusBadge entity={credit} />
+                </div>
+              </div>
+            )}
+
+            <ClientSelector
+              resource={credit}
+              onChange={(id) => handleChange('client_id', id)}
+              onClearButtonClick={() => handleChange('client_id', '')}
+              onLocationChange={(locationId) =>
+                handleChange('location_id', locationId)
+              }
+              onContactCheckboxChange={handleInvitationChange}
+              errorMessage={errors?.errors.client_id}
+              readonly
+              textOnly
+            />
+          </div>
         </Card>
 
         <CreditDetails handleChange={handleChange} errors={errors} />

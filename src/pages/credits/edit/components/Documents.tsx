@@ -18,11 +18,13 @@ import { useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { CreditsContext } from '../../create/Create';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Documents() {
   const [t] = useTranslation();
 
   const location = useLocation();
+  const colors = useColorScheme();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -34,33 +36,44 @@ export default function Documents() {
   const { credit } = context;
 
   return (
-    <Card title={t('documents')} className="w-full xl:w-2/3">
-      {location.pathname.includes('/create') ? (
-        <div className="text-sm mt-4 px-6">
-          {t('save_to_upload_documents')}.
-        </div>
-      ) : (
-        <div className="px-6">
-          <Upload
-            widgetOnly
-            endpoint={endpoint('/api/v1/credits/:id/upload', {
-              id,
-            })}
-            onSuccess={() => $refetch(['credits'])}
-            disableUpload={
-              !hasPermission('edit_credit') && !entityAssigned(credit)
-            }
-          />
+    <Card
+      title={t('documents')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
+      <div className="flex flex-col items-center w-full px-4 sm:px-6 py-2">
+        {location.pathname.includes('/create') ? (
+          <div className="text-sm self-start">
+            {t('save_to_upload_documents')}.
+          </div>
+        ) : (
+          <>
+            <div className="w-full lg:w-2/3">
+              <Upload
+                widgetOnly
+                endpoint={endpoint('/api/v1/credits/:id/upload', {
+                  id,
+                })}
+                onSuccess={() => $refetch(['credits'])}
+                disableUpload={
+                  !hasPermission('edit_credit') && !entityAssigned(credit)
+                }
+              />
+            </div>
 
-          <DocumentsTable
-            documents={credit?.documents || []}
-            onDocumentDelete={() => $refetch(['credits'])}
-            disableEditableOptions={
-              !entityAssigned(credit, true) && !hasPermission('edit_credit')
-            }
-          />
-        </div>
-      )}
+            <div className="w-full lg:w-2/3">
+              <DocumentsTable
+                documents={credit?.documents || []}
+                onDocumentDelete={() => $refetch(['credits'])}
+                disableEditableOptions={
+                  !entityAssigned(credit, true) && !hasPermission('edit_credit')
+                }
+              />
+            </div>
+          </>
+        )}
+      </div>
     </Card>
   );
 }
