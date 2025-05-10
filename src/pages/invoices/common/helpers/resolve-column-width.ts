@@ -21,6 +21,18 @@ export function resolveColumnWidth(column: string) {
     line_total: '5%',
     discount: '10%',
     tax_rate1: '12%',
+    tax_rate2: '12%',
+    tax_rate3: '12%',
+    tax_amount: '5%',
+    gross_line_total: '10%',
+    product1: '10%',
+    product2: '10%',
+    product3: '10%',
+    product4: '10%',
+    task1: '10%',
+    task2: '10%',
+    task3: '10%',
+    task4: '10%',
   };
 
   return mappings[property] || '';
