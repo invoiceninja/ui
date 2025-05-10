@@ -203,7 +203,7 @@ export function Tabs(props: Props) {
 
           {props.rightSide && (
             <div
-              className="border-b pl-4"
+              className="flex items-center border-b pl-4"
               style={{ borderColor: colors.$20, height: '2.8rem' }}
             >
               {props.rightSide}
