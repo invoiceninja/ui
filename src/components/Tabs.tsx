@@ -144,7 +144,7 @@ export function Tabs(props: Props) {
       </div>
 
       <div className="hidden sm:block">
-        <div className="flex items-center justify-between space-x-4">
+        <div className="flex items-center justify-between">
           <nav
             ref={tabBar}
             className={classNames(
@@ -201,7 +201,14 @@ export function Tabs(props: Props) {
             />
           </nav>
 
-          {props.rightSide}
+          {props.rightSide && (
+            <div
+              className="border-b pl-4"
+              style={{ borderColor: colors.$20, height: '2.8rem' }}
+            >
+              {props.rightSide}
+            </div>
+          )}
         </div>
       </div>
     </div>
