@@ -8,18 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import Toggle from '$app/components/forms/Toggle';
+import { useTranslation } from 'react-i18next';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Card, Element } from '$app/components/cards';
 import { Link } from '$app/components/forms';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import Toggle from '$app/components/forms/Toggle';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtomValue } from 'jotai';
-import { useTranslation } from 'react-i18next';
-import { quoteAtom } from '../atoms';
-import { ChangeHandler } from '../hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { Dispatch, SetStateAction } from 'react';
+import { useAtomValue } from 'jotai';
+import { quoteAtom } from '../atoms';
+import { ChangeHandler } from '../hooks';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -33,6 +34,10 @@ interface Props {
 export function QuoteFooter(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
+  const { isAdmin, isOwner } = useAdmin();
+
   const {
     handleChange,
     isDefaultTerms,
@@ -41,22 +46,43 @@ export function QuoteFooter(props: Props) {
     setIsDefaultTerms,
   } = props;
 
-  const { isAdmin, isOwner } = useAdmin();
-
   const quote = useAtomValue(quoteAtom);
 
   const tabs = [
-    t('terms'),
-    t('footer'),
     t('public_notes'),
     t('private_notes'),
+    t('terms'),
+    t('footer'),
     ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
   return (
-    <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs} withoutVerticalMargin>
-        <div>
+    <Card
+      className="col-span-12 xl:col-span-8 shadow-sm h-max"
+      style={{ borderColor: colors.$24 }}
+    >
+      <TabGroup
+        tabs={tabs}
+        withoutVerticalMargin
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
+        fullRightPadding
+      >
+        <div className="mb-4 px-6">
+          <MarkdownEditor
+            value={quote?.public_notes || ''}
+            onChange={(value) => handleChange('public_notes', value)}
+          />
+        </div>
+
+        <div className="mb-4 px-6">
+          <MarkdownEditor
+            value={quote?.private_notes || ''}
+            onChange={(value) => handleChange('private_notes', value)}
+          />
+        </div>
+
+        <div className="px-6">
           <MarkdownEditor
             value={quote?.terms || ''}
             onChange={(value) => handleChange('terms', value)}
@@ -77,7 +103,7 @@ export function QuoteFooter(props: Props) {
           </Element>
         </div>
 
-        <div>
+        <div className="px-6">
           <MarkdownEditor
             value={quote?.footer || ''}
             onChange={(value) => handleChange('footer', value)}
@@ -98,24 +124,10 @@ export function QuoteFooter(props: Props) {
           </Element>
         </div>
 
-        <div className="mb-4">
-          <MarkdownEditor
-            value={quote?.public_notes || ''}
-            onChange={(value) => handleChange('public_notes', value)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <MarkdownEditor
-            value={quote?.private_notes || ''}
-            onChange={(value) => handleChange('private_notes', value)}
-          />
-        </div>
-
-        <div className="my-4">
+        <div className="my-4 px-6">
           <span className="text-sm">{t('custom_fields')} &nbsp;</span>
           <Link to="/settings/custom_fields/invoices" className="capitalize">
-            {t('click_here')}
+            {t('click_here')}.
           </Link>
         </div>
       </TabGroup>
