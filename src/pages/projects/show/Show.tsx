@@ -148,7 +148,7 @@ export default function Show() {
         >
           <div className="flex flex-col space-y-3 pt-1">
             {project && (
-              <div className="flex space-x-20">
+              <div className="flex space-x-10">
                 <span
                   className="text-sm font-medium"
                   style={{
@@ -235,17 +235,24 @@ export default function Show() {
 
         <ProjectPublicNotes project={project} />
 
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoCard title={t('summary')}>
-            <p>
-              {t('active_tasks')}: {project.tasks?.length}
-            </p>
+        <InfoCard
+          title={t('summary')}
+          className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 p-4"
+          style={{ borderColor: colors.$24 }}
+          withoutPadding
+        >
+          <div className="flex space-x-2">
+            <span className="font-medium">{t('active_tasks')}:</span>
 
-            <p>
-              {t('total_hours')}: {Math.floor(project.current_hours)}
-            </p>
-          </InfoCard>
-        </div>
+            <span>{project.tasks?.length}</span>
+          </div>
+
+          <div className="flex space-x-2">
+            <span className="font-medium">{t('total_hours')}:</span>
+
+            <span>{Math.floor(project.current_hours)}</span>
+          </div>
+        </InfoCard>
       </div>
 
       {enabled(ModuleBitmask.Tasks) && (
