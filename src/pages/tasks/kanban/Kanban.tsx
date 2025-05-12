@@ -331,7 +331,6 @@ export default function Kanban() {
           </Inline>
         </Link>
       }
-      
     >
       <Slider
         title={
@@ -341,6 +340,7 @@ export default function Kanban() {
         }
         visible={isKanbanViewSliderVisible}
         onClose={handleKanbanClose}
+        withoutHeaderBorder
         actionChildren={
           <div
             className="flex w-full divide-x-2"

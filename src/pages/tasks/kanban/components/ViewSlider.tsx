@@ -8,12 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClickableElement, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { endpoint } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
@@ -34,19 +33,30 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { useColorScheme } from '$app/common/colors';
+import styled from 'styled-components';
+import { Divider } from '$app/components/cards/Divider';
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function ViewSlider() {
   const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
-
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const accentColor = useAccentColor();
-  const formatMoney = useFormatMoney();
-  const formatTimeLog = useFormatTimeLog();
-
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const formatMoney = useFormatMoney();
+  const hasPermission = useHasPermission();
+  const formatTimeLog = useFormatTimeLog();
+  const entityAssigned = useEntityAssigned();
 
   const [currentTask] = useAtom(currentTaskAtom);
 
@@ -66,10 +76,13 @@ export function ViewSlider() {
           return (
             <DocumentsTabLabel
               numberOfDocuments={currentTask?.documents.length}
+              textCenter
             />
           );
         }
       }}
+      withHorizontalPadding
+      horizontalPaddingWidth="1.5rem"
     >
       <div>
         {currentTask && (
@@ -87,42 +100,71 @@ export function ViewSlider() {
             </Element>
 
             <Element leftSide={t('status')}>
-              <TaskStatus entity={currentTask} />
+              <TaskStatus entity={currentTask} withoutDropdown />
             </Element>
 
-            <NonClickableElement
-              style={{ backgroundColor: accentColor, color: 'white' }}
-            >
-              <div className="inline-flex items-center">
-                <span>{currentTask.description}</span>
+            {currentTask.description && (
+              <div className="flex flex-col items-center px-6">
+                <span
+                  className="text-sm font-medium self-start"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('description')}
+                </span>
+
+                <span className="text-sm mt-1" style={{ color: colors.$17 }}>
+                  {currentTask.description}
+                </span>
               </div>
-            </NonClickableElement>
+            )}
 
-            <div className="divide-y">
+            {Boolean(currentTaskTimeLogs?.length) && (
+              <Divider
+                className="pt-2"
+                withoutPadding
+                borderColor={colors.$20}
+              />
+            )}
+
+            <div className="flex flex-col space-y-4 px-6 py-5">
               {currentTaskTimeLogs?.map(([date, start, end], i) => (
-                <ClickableElement key={i}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <p>{formatDate(date, dateFormat)}</p>
+                <Box
+                  key={i}
+                  className="flex items-center justify-between p-4 w-full shadow-sm border rounded-md"
+                  style={{ borderColor: colors.$20 }}
+                  theme={{
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
+                >
+                  <div className="flex flex-col">
+                    <p
+                      className="text-sm font-medium"
+                      style={{ color: colors.$3 }}
+                    >
+                      {formatDate(date, dateFormat)}
+                    </p>
 
-                      <small>
-                        {start} - {end}
-                      </small>
-                    </div>
-
-                    <div>
-                      {isTaskRunning(currentTask) &&
-                      i === currentTaskTimeLogs.length - 1 ? (
-                        <TaskClock
-                          task={currentTask}
-                          calculateLastTimeLog={true}
-                        />
-                      ) : (
-                        calculateDifferenceBetweenLogs(currentTask.time_log, i)
-                      )}
-                    </div>
+                    <span className="text-xs" style={{ color: colors.$17 }}>
+                      {start} - {end}
+                    </span>
                   </div>
-                </ClickableElement>
+
+                  <div
+                    className="text-sm font-medium"
+                    style={{ color: colors.$3 }}
+                  >
+                    {isTaskRunning(currentTask) &&
+                    i === currentTaskTimeLogs.length - 1 ? (
+                      <TaskClock
+                        task={currentTask}
+                        calculateLastTimeLog={true}
+                      />
+                    ) : (
+                      calculateDifferenceBetweenLogs(currentTask.time_log, i)
+                    )}
+                  </div>
+                </Box>
               ))}
             </div>
           </>
