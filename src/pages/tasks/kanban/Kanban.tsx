@@ -42,17 +42,16 @@ import {
   currentTaskIdAtom,
   isKanbanViewSliderVisibleAtom,
 } from './common/atoms';
-import { useHandleCurrentTask } from './common/hooks';
+import { useFormatTimeLog, useHandleCurrentTask } from './common/hooks';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { Slider } from '$app/components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
 import { useNavigate } from 'react-router-dom';
-import { Card, Element } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { Inline } from '$app/components/Inline';
 import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
-import { MdAdd } from 'react-icons/md';
 import {
   CreateTaskModal,
   TaskDetails,
@@ -119,6 +118,8 @@ export default function Kanban() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+
+  const formatTimeLog = useFormatTimeLog();
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
@@ -353,6 +354,11 @@ export default function Kanban() {
         visible={isKanbanViewSliderVisible}
         onClose={handleKanbanClose}
         withoutHeaderBorder
+        withoutDivider={
+          currentTask &&
+          sliderType === 'edit' &&
+          !formatTimeLog(currentTask.time_log).length
+        }
         actionChildren={
           <div
             className="flex w-full divide-x-2"
@@ -454,30 +460,29 @@ export default function Kanban() {
         {sliderType === 'edit' && <EditSlider />}
       </Slider>
 
-      <div
-        className="grid grid-cols-12 gap-4"
+      <Card
+        className="w-full xl:w-2/5 rounded-sm shadow-sm"
         style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
-          borderColor: colors.$4,
+          borderColor: colors.$21,
         }}
       >
-        <Card className="col-span-12 xl:col-span-4">
-          <Element leftSide={t('project')}>
-            <ProjectSelector
-              value={projectId}
-              onChange={(project) => setProjectId(project.id)}
-              onClearButtonClick={() => setProjectId(undefined)}
-              clearButton
-            />
-          </Element>
-        </Card>
-      </div>
+        <div className="flex flex-col items-start md:flex-row md:items-center px-4 md:px-6 py-4 md:space-x-10 md:justify-between">
+          <span className="text-sm font-medium mb-1 md:mb-0">
+            {t('project')}
+          </span>
+
+          <ProjectSelector
+            value={projectId}
+            onChange={(project) => setProjectId(project.id)}
+            onClearButtonClick={() => setProjectId(undefined)}
+            clearButton
+          />
+        </div>
+      </Card>
 
       {board && (
         <div
-          className="flex pb-6 border space-x-4 overflow-x-auto mt-4 p-6 shadow-sm rounded-sm"
+          className="flex border space-x-4 overflow-x-auto mt-4 p-6 shadow-sm rounded-sm"
           style={{
             color: colors.$3,
             backgroundColor: colors.$1,
@@ -525,7 +530,8 @@ export default function Kanban() {
                             }}
                           >
                             <h3 className="leading-6 font-medium">
-                              {column.title}
+                              {column.title.slice(0, 25)}
+                              {column.title.length > 25 && '...'}
                             </h3>
 
                             {hasPermission('create_task') && (
@@ -574,7 +580,6 @@ export default function Kanban() {
                                     className="px-4 sm:px-6 py-4"
                                     style={{
                                       color: colors.$3,
-                                      colorScheme: colors.$0,
                                       backgroundColor: colors.$4,
                                       borderColor: colors.$4,
                                     }}
@@ -582,7 +587,10 @@ export default function Kanban() {
                                     <p>{card.title}</p>
                                     <small>
                                       {isTaskRunning(card.task) ? (
-                                        <TaskClock task={card.task} />
+                                        <TaskClock
+                                          task={card.task}
+                                          extraSmallText
+                                        />
                                       ) : (
                                         card.description
                                       )}
@@ -693,7 +701,7 @@ export default function Kanban() {
                                     >
                                       {(dragProvided) => (
                                         <Container
-                                          className="w-full text-leftblock rounded text-sm group"
+                                          className="w-full text-leftblock text-sm group"
                                           ref={dragProvided.innerRef}
                                           {...dragProvided.draggableProps}
                                           {...dragProvided.dragHandleProps}
@@ -702,24 +710,30 @@ export default function Kanban() {
                                             color: colors.$3,
                                           }}
                                         >
-                                          <div className="px-4 sm:px-6 py-4">
-                                            <p>{card.title}</p>
-                                            <small>
+                                          <div className="flex flex-col justify-center px-4 sm:px-6 py-4 border rounded-t-sm h-14">
+                                            <p>
+                                              {card.title.slice(0, 35)}
+                                              {card.title.length > 35 && '...'}
+                                            </p>
+
+                                            <div className="font-mono font-medium text-xs">
                                               {isTaskRunning(card.task) ? (
-                                                <TaskClock task={card.task} />
+                                                <TaskClock
+                                                  task={card.task}
+                                                  extraSmallText
+                                                />
                                               ) : (
-                                                card.description
+                                                card.description.slice(0, 20)
                                               )}
-                                            </small>
+                                            </div>
                                           </div>
 
                                           <div
-                                            className="hidden group-hover:flex border-t justify-center items-center"
+                                            className="hidden group-hover:flex border-b border-l border-r justify-center rounded-br rounded-bl items-center divide-x-2"
                                             style={{
                                               color: colors.$3,
-                                              colorScheme: colors.$0,
                                               backgroundColor: colors.$1,
-                                              borderColor: colors.$4,
+                                              borderColor: colors.$21,
                                             }}
                                           >
                                             {(hasPermission('view_task') ||
@@ -728,7 +742,6 @@ export default function Kanban() {
                                               <button
                                                 style={{
                                                   color: colors.$3,
-                                                  colorScheme: colors.$0,
                                                   backgroundColor: colors.$1,
                                                   borderColor: colors.$4,
                                                 }}
@@ -829,28 +842,21 @@ export default function Kanban() {
           </DragDropContext>
 
           {(isAdmin || isOwner) && (
-            <div>
-              <div
-                className="bg-white shadow rounded p-1"
+            <div className="pr-6">
+              <Box
+                className="shadow-sm rounded border p-2 cursor-pointer"
                 style={{
                   color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
+                  borderColor: colors.$21,
                 }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
+                onClick={() => setIsTaskStatusModalOpened(true)}
               >
-                <MdAdd
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  className="cursor-pointer"
-                  fontSize={28}
-                  onClick={() => setIsTaskStatusModalOpened(true)}
-                />
-              </div>
+                <Plus size="1.3rem" color={colors.$3} />
+              </Box>
             </div>
           )}
         </div>

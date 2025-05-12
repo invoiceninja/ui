@@ -122,7 +122,7 @@ export function ViewSlider() {
               />
             )}
 
-            <div className="flex flex-col space-y-4 px-6 py-5">
+            <div className="flex flex-col space-y-4 px-6 py-5 overflow-y-auto max-h-[30rem]">
               {currentTaskTimeLogs?.map(([date, start, end], i) => (
                 <Box
                   key={i}

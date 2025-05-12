@@ -272,7 +272,7 @@ export function EditSlider() {
           </div>
         </div>
 
-        <div className="flex flex-col space-y-4 px-6 py-1">
+        <div className="flex flex-col space-y-4 px-6 py-1 overflow-y-auto max-h-[42.5rem]">
           {task &&
             formatTimeLog(task.time_log).map(([date, start, end], i) => (
               <Box
@@ -313,12 +313,18 @@ export function EditSlider() {
                 </div>
               </Box>
             ))}
+
+          {task && formatTimeLog(task.time_log).length === 0 && (
+            <div className="text-sm font-medium">{t('no_records_found')}.</div>
+          )}
         </div>
       </TabGroup>
 
-      <div className="flex justify-end px-6 py-4">
-        <Button onClick={() => task && save(task)}>{t('save')}</Button>
-      </div>
+      {task && formatTimeLog(task.time_log).length > 0 && (
+        <div className="flex justify-end px-6 py-4">
+          <Button onClick={() => save(task)}>{t('save')}</Button>
+        </div>
+      )}
     </>
   );
 }
