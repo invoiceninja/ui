@@ -52,7 +52,7 @@ import { Card, Element } from '$app/components/cards';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { Inline } from '$app/components/Inline';
 import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
-import { MdAdd, MdAddCircle } from 'react-icons/md';
+import { MdAdd } from 'react-icons/md';
 import {
   CreateTaskModal,
   TaskDetails,
@@ -69,6 +69,7 @@ import styled from 'styled-components';
 import { Pencil } from '$app/components/icons/Pencil';
 import { MediaPlay } from '$app/components/icons/MediaPlay';
 import { MediaPause } from '$app/components/icons/MediaPause';
+import { Plus } from '$app/components/icons/Plus';
 
 const Container = styled.div`
   min-width: ${(props) => props.theme.minWidth}px;
@@ -476,14 +477,13 @@ export default function Kanban() {
 
       {board && (
         <div
+          className="flex pb-6 border space-x-4 overflow-x-auto mt-4 p-6 shadow-sm rounded-sm"
           style={{
             color: colors.$3,
-            colorScheme: colors.$0,
             backgroundColor: colors.$1,
-            borderColor: colors.$4,
+            borderColor: colors.$21,
             paddingRight: isKanbanViewSliderVisible ? 512 : 0,
           }}
-          className="flex pb-6 space-x-4 overflow-x-auto mt-4"
         >
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable
@@ -505,25 +505,23 @@ export default function Kanban() {
                     >
                       {(columnDraggableProvided: DraggableProvided) => (
                         <Container
-                          className="bg-white rounded border shadow select-none h-max"
+                          className="rounded border shadow select-none h-max"
                           ref={columnDraggableProvided.innerRef}
                           {...columnDraggableProvided.draggableProps}
                           theme={{
                             minWidth: 360,
                             color: colors.$3,
-                            colorScheme: colors.$0,
                             backgroundColor: colors.$1,
-                            borderColor: colors.$4,
+                            borderColor: colors.$21,
                           }}
                         >
                           <div
                             {...columnDraggableProvided.dragHandleProps}
-                            className="flex items-center justify-between border-b px-4 py-5"
+                            className="flex items-center justify-between border-b rounded-tl rounded-tr px-4 py-5"
                             style={{
                               color: colors.$3,
-                              colorScheme: colors.$0,
                               backgroundColor: colors.$1,
-                              borderColor: colors.$4,
+                              borderColor: colors.$20,
                             }}
                           >
                             <h3 className="leading-6 font-medium">
@@ -531,9 +529,8 @@ export default function Kanban() {
                             </h3>
 
                             {hasPermission('create_task') && (
-                              <MdAddCircle
-                                className="cursor-pointer"
-                                fontSize={22}
+                              <Box
+                                className="cursor-pointer focus:outline-none focus:ring-0 p-1 border rounded-sm"
                                 onClick={() => {
                                   setTaskDetails({
                                     taskStatusId: column.id,
@@ -541,7 +538,16 @@ export default function Kanban() {
                                   });
                                   setIsTaskModalOpened(true);
                                 }}
-                              />
+                                style={{
+                                  borderColor: colors.$21,
+                                }}
+                                theme={{
+                                  backgroundColor: colors.$1,
+                                  hoverBackgroundColor: colors.$4,
+                                }}
+                              >
+                                <Plus size="1.1rem" color={colors.$3} />
+                              </Box>
                             )}
                           </div>
 
@@ -671,7 +677,7 @@ export default function Kanban() {
                               <div {...dropProvided.droppableProps}>
                                 <div
                                   ref={dropProvided.innerRef}
-                                  className="p-4 space-y-4"
+                                  className="p-4 space-y-4 rounded-bl rounded-br"
                                   style={{
                                     color: colors.$3,
                                     colorScheme: colors.$0,
