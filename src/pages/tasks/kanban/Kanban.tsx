@@ -47,8 +47,7 @@ import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { Slider } from '$app/components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
-import { Edit, Pause, Play } from 'react-feather';
-import { Link as ReactRouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, Element } from '$app/components/cards';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { Inline } from '$app/components/Inline';
@@ -67,6 +66,9 @@ import {
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { TaskClock } from './components/TaskClock';
 import styled from 'styled-components';
+import { Pencil } from '$app/components/icons/Pencil';
+import { MediaPlay } from '$app/components/icons/MediaPlay';
+import { MediaPause } from '$app/components/icons/MediaPause';
 
 const Container = styled.div`
   min-width: ${(props) => props.theme.minWidth}px;
@@ -96,6 +98,14 @@ interface Board {
 
 type SliderType = 'view' | 'edit';
 
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
 export default function Kanban() {
   const { documentTitle } = useTitle('kanban');
   const [t] = useTranslation();
@@ -105,6 +115,7 @@ export default function Kanban() {
 
   const stopTask = useStop();
   const startTask = useStart();
+  const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
@@ -353,13 +364,26 @@ export default function Kanban() {
           >
             {sliderType === 'view' &&
               (hasPermission('edit_task') || entityAssigned(currentTask)) && (
-                <ReactRouterLink
-                  to={route('/tasks/:id/edit', { id: currentTask?.id })}
-                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                <Box
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full cursor-pointer focus:outline-none focus:ring-0"
+                  onClick={() =>
+                    navigate(route('/tasks/:id/edit', { id: currentTask?.id }))
+                  }
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                  theme={{
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
                 >
-                  <Edit size={18} />
+                  <div>
+                    <Pencil color={colors.$3} size="1.2rem" />
+                  </div>
+
                   <span>{t('edit_task')}</span>
-                </ReactRouterLink>
+                </Box>
               )}
 
             {/* <button className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50">
@@ -370,37 +394,55 @@ export default function Kanban() {
             {currentTask &&
               !isTaskRunning(currentTask) &&
               (hasPermission('edit_task') || entityAssigned(currentTask)) && (
-                <button
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                <Box
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full cursor-pointer focus:outline-none focus:ring-0"
                   onClick={() => startTask(currentTask)}
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                  theme={{
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
                 >
-                  <Play size={18} />
+                  <div>
+                    <MediaPlay
+                      color={colors.$3}
+                      filledColor="transparent"
+                      size="1.2rem"
+                    />
+                  </div>
+
                   <span>{t('start')}</span>
-                </button>
+                </Box>
               )}
 
             {currentTask &&
               isTaskRunning(currentTask) &&
               (hasPermission('edit_task') || entityAssigned(currentTask)) && (
-                <button
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                <Box
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full cursor-pointer focus:outline-none focus:ring-0"
                   onClick={() => stopTask(currentTask)}
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                  theme={{
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
                 >
-                  <Pause size={18} />
+                  <div>
+                    <MediaPause
+                      color={colors.$3}
+                      filledColor="transparent"
+                      size="1.2rem"
+                    />
+                  </div>
+
                   <span>{t('stop')}</span>
-                </button>
+                </Box>
               )}
           </div>
         }

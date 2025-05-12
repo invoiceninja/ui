@@ -36,6 +36,7 @@ import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
 import { Divider } from '$app/components/cards/Divider';
+import { InputLabel } from '$app/components/forms';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -104,15 +105,10 @@ export function ViewSlider() {
             </Element>
 
             {currentTask.description && (
-              <div className="flex flex-col items-center px-6">
-                <span
-                  className="text-sm font-medium self-start"
-                  style={{ color: colors.$22 }}
-                >
-                  {t('description')}
-                </span>
+              <div className="flex flex-col justify-start px-6 py-3">
+                <InputLabel className="mb-1">{t('description')}</InputLabel>
 
-                <span className="text-sm mt-1" style={{ color: colors.$17 }}>
+                <span className="text-sm mt-1" style={{ color: colors.$3 }}>
                   {currentTask.description}
                 </span>
               </div>
@@ -120,7 +116,7 @@ export function ViewSlider() {
 
             {Boolean(currentTaskTimeLogs?.length) && (
               <Divider
-                className="pt-2"
+                className="pt-1"
                 withoutPadding
                 borderColor={colors.$20}
               />
