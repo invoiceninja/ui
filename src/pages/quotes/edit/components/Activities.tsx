@@ -11,7 +11,6 @@
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { AxiosResponse } from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -22,16 +21,28 @@ import { Spinner } from '$app/components/Spinner';
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useGenerateActivityElement } from '../../common/components/QuoteSlider';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useColorScheme } from '$app/common/colors';
+import styled from 'styled-components';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import classNames from 'classnames';
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export default function Activities() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-
-  const activityElement = useGenerateActivityElement();
-
+  const colors = useColorScheme();
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const activityElement = useGenerateActivityElement();
 
   const { data: activities, isLoading } = useQuery({
     queryKey: ['/api/v1/activities/entity', id],
@@ -48,27 +59,72 @@ export default function Activities() {
   });
 
   return (
-    <Card title={t('activity')} className="w-full xl:w-2/3">
-      {isLoading && (
-        <div className="flex justify-center">
-          <Spinner />
-        </div>
-      )}
+    <Card
+      title={t('activity')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutBodyPadding
+    >
+      <div
+        className={classNames('w-full px-2 pt-2', {
+          'pb-10': activities && activities.length,
+          'pb-6': !activities || !activities.length,
+        })}
+      >
+        {isLoading && (
+          <div className="flex justify-center">
+            <Spinner />
+          </div>
+        )}
 
-      {activities && !activities.length && (
-        <NonClickableElement>{t('api_404')}</NonClickableElement>
-      )}
+        {activities && !activities.length && (
+          <div className="px-3 pt-3 text-sm">{t('api_404')}</div>
+        )}
 
-      {activities?.map((activity) => (
-        <NonClickableElement key={activity.id} className="flex flex-col">
-          <p>{activityElement(activity)}</p>
-          <p className="inline-flex items-center space-x-1">
-            <p>{date(activity.created_at, `${dateFormat} ${timeFormat}`)}</p>
-            <p>&middot;</p>
-            <p>{activity.ip}</p>
-          </p>
-        </NonClickableElement>
-      ))}
+        {activities?.map((activity) => (
+          <Box
+            key={activity.id}
+            className="flex space-x-3 p-4 rounded-md flex-1 min-w-0"
+            theme={{
+              backgroundColor: colors.$1,
+              hoverBackgroundColor: colors.$25,
+            }}
+          >
+            <div className="flex items-center justify-center">
+              <div
+                className="p-2 rounded-full"
+                style={{ backgroundColor: colors.$20 }}
+              >
+                <SquareActivityChart
+                  size="1.3rem"
+                  color={colors.$16}
+                  filledColor={colors.$16}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col space-y-0.5 flex-1 min-w-0">
+              <div className="text-sm" style={{ color: colors.$3 }}>
+                {activityElement(activity)}
+              </div>
+
+              <div
+                className="flex w-full items-center space-x-1 text-xs truncate"
+                style={{ color: colors.$17 }}
+              >
+                <span className="whitespace-nowrap">
+                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                </span>
+
+                <span>-</span>
+
+                <span>{activity.ip}</span>
+              </div>
+            </div>
+          </Box>
+        ))}
+      </div>
     </Card>
   );
 }
