@@ -25,9 +25,12 @@ import { QuoteContext } from '../Create';
 import { useQuoteUtilities } from '../../common/hooks';
 import { QuoteDetails } from '../../common/components/QuoteDetails';
 import { QuoteFooter } from '../../common/components/QuoteFooter';
+import { useColorScheme } from '$app/common/colors';
 
 export default function CreatePage() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const context: QuoteContext = useOutletContext();
   const {
@@ -60,7 +63,11 @@ export default function CreatePage() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+        <Card
+          className="col-span-12 xl:col-span-4 h-max shadow-sm"
+          withContainer
+          style={{ borderColor: colors.$24 }}
+        >
           <ClientSelector
             resource={quote}
             onChange={(id) => handleChange('client_id', id)}

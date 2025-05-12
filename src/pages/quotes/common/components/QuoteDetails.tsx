@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -25,15 +26,21 @@ interface Props {
 }
 
 export function QuoteDetails(props: Props) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+
   const { handleChange, errors } = props;
 
   const [quote] = useAtom(quoteAtom);
-  const company = useCurrentCompany();
 
   return (
     <>
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('quote_date')}>
           <InputField
             type="date"
@@ -97,7 +104,10 @@ export function QuoteDetails(props: Props) {
         )}
       </Card>
 
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('quote_number_short')}>
           <InputField
             id="number"
@@ -119,16 +129,6 @@ export function QuoteDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <NumberInputField
-                value={quote?.discount || ''}
-                onValueChange={(value) =>
-                  handleChange('discount', parseFloat(value))
-                }
-                errorMessage={errors?.errors.discount}
-              />
-            </div>
-
-            <div className="w-full lg:w-1/2">
               <SelectField
                 value={quote?.is_amount_discount.toString()}
                 onValueChange={(value) =>
@@ -141,6 +141,16 @@ export function QuoteDetails(props: Props) {
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
               </SelectField>
+            </div>
+
+            <div className="w-full lg:w-1/2">
+              <NumberInputField
+                value={quote?.discount || ''}
+                onValueChange={(value) =>
+                  handleChange('discount', parseFloat(value))
+                }
+                errorMessage={errors?.errors.discount}
+              />
             </div>
           </div>
         </Element>
