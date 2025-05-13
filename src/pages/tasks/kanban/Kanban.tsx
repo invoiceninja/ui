@@ -577,14 +577,18 @@ export default function Kanban() {
                                   ref={provided.innerRef}
                                 >
                                   <div
-                                    className="px-4 sm:px-6 py-4"
+                                    className="px-4 sm:px-6 py-4 border"
                                     style={{
                                       color: colors.$3,
                                       backgroundColor: colors.$4,
-                                      borderColor: colors.$4,
+                                      borderColor: colors.$21,
                                     }}
                                   >
-                                    <p>{card.title}</p>
+                                    <p>
+                                      {card.title.slice(0, 35)}
+                                      {card.title.length > 35 && '...'}
+                                    </p>
+
                                     <small>
                                       {isTaskRunning(card.task) ? (
                                         <TaskClock
@@ -598,12 +602,11 @@ export default function Kanban() {
                                   </div>
 
                                   <div
-                                    className="flex border-t justify-center items-center"
+                                    className="flex border-b border-l border-r justify-center items-center divide-x-2"
                                     style={{
                                       color: colors.$3,
-                                      colorScheme: colors.$0,
                                       backgroundColor: colors.$1,
-                                      borderColor: colors.$4,
+                                      borderColor: colors.$21,
                                     }}
                                   >
                                     {(hasPermission('view_task') ||
@@ -612,9 +615,7 @@ export default function Kanban() {
                                       <button
                                         style={{
                                           color: colors.$3,
-                                          colorScheme: colors.$0,
                                           backgroundColor: colors.$1,
-                                          borderColor: colors.$4,
                                         }}
                                         className="w-full py-2 rounded-bl"
                                         onClick={() =>
@@ -630,9 +631,7 @@ export default function Kanban() {
                                       <button
                                         style={{
                                           color: colors.$3,
-                                          colorScheme: colors.$0,
                                           backgroundColor: colors.$1,
-                                          borderColor: colors.$4,
                                         }}
                                         className="w-full text-center py-2"
                                         onClick={() =>
@@ -647,14 +646,12 @@ export default function Kanban() {
                                       (hasPermission('edit_task') ||
                                         entityAssigned(currentTask)) && (
                                         <button
-                                          style={{
-                                            color: colors.$3,
-                                            colorScheme: colors.$0,
-                                            backgroundColor: colors.$1,
-                                            borderColor: colors.$4,
-                                          }}
                                           className="w-full py-2 rounded-br"
                                           onClick={() => stopTask(card.task)}
+                                          style={{
+                                            color: colors.$3,
+                                            backgroundColor: colors.$1,
+                                          }}
                                         >
                                           {t('stop')}
                                         </button>
@@ -666,9 +663,7 @@ export default function Kanban() {
                                         <button
                                           style={{
                                             color: colors.$3,
-                                            colorScheme: colors.$0,
                                             backgroundColor: colors.$1,
-                                            borderColor: colors.$4,
                                           }}
                                           className="w-full py-2 rounded-br"
                                           onClick={() => startTask(card.task)}
@@ -743,7 +738,6 @@ export default function Kanban() {
                                                 style={{
                                                   color: colors.$3,
                                                   backgroundColor: colors.$1,
-                                                  borderColor: colors.$4,
                                                 }}
                                                 className="w-full py-2 rounded-bl"
                                                 onClick={() =>
@@ -762,9 +756,7 @@ export default function Kanban() {
                                               <button
                                                 style={{
                                                   color: colors.$3,
-                                                  colorScheme: colors.$0,
                                                   backgroundColor: colors.$1,
-                                                  borderColor: colors.$4,
                                                 }}
                                                 className="w-full text-center py-2"
                                                 onClick={() =>
@@ -786,9 +778,7 @@ export default function Kanban() {
                                                 <button
                                                   style={{
                                                     color: colors.$3,
-                                                    colorScheme: colors.$0,
                                                     backgroundColor: colors.$1,
-                                                    borderColor: colors.$4,
                                                   }}
                                                   className="w-full py-2 rounded-br"
                                                   onClick={() =>
@@ -807,9 +797,7 @@ export default function Kanban() {
                                                 <button
                                                   style={{
                                                     color: colors.$3,
-                                                    colorScheme: colors.$0,
                                                     backgroundColor: colors.$1,
-                                                    borderColor: colors.$4,
                                                   }}
                                                   className="w-full py-2 rounded-br"
                                                   onClick={() =>
