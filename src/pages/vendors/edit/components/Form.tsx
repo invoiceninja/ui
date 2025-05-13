@@ -29,6 +29,7 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { Dispatch, SetStateAction } from 'react';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   vendor: Vendor;
@@ -43,6 +44,7 @@ interface Props {
 
 export function Form(props: Props) {
   const [t] = useTranslation();
+
   const {
     vendor,
     setVendor,
@@ -53,8 +55,9 @@ export function Form(props: Props) {
     fundamentalConceptVisible,
   } = props;
 
+  const colors = useColorScheme();
+  const languages = useLanguages();
   const company = useCurrentCompany();
-
   const { isAdmin, isOwner } = useAdmin();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
@@ -105,8 +108,6 @@ export function Form(props: Props) {
 
     setContacts(currentContacts);
   };
-
-  const languages = useLanguages();
 
   return (
     <>
@@ -162,7 +163,12 @@ export function Form(props: Props) {
       ) : (
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-12 xl:col-span-6 space-y-4">
-            <Card title={t('details')}>
+            <Card
+              className="shadow-sm"
+              title={t('details')}
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+            >
               {page === 'edit' && (
                 <Element leftSide={t('status')}>
                   <EntityStatus entity={vendor} />
@@ -313,7 +319,12 @@ export function Form(props: Props) {
               )}
             </Card>
 
-            <Card title={t('address')}>
+            <Card
+              className="shadow-sm"
+              title={t('address')}
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+            >
               <Element leftSide={t('address1')}>
                 <InputField
                   value={vendor.address1}
@@ -501,15 +512,22 @@ export function Form(props: Props) {
               ))}
             </Card>
 
-            <Card title={t('additional_info')}>
+            <Card
+              className="shadow-sm"
+              title={t('additional_info')}
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+            >
               <TabGroup
-                className="px-5"
                 tabs={[
                   t('settings'),
                   ...(isAdmin || isOwner ? [t('custom_fields')] : []),
                 ]}
+                withHorizontalPadding
+                horizontalPaddingWidth="1.5rem"
+                fullRightPadding
               >
-                <div className="flex flex-col space-y-4">
+                <div className="flex flex-col space-y-4 px-6">
                   <Element leftSide={t('currency')} noExternalPadding>
                     <CurrencySelector
                       value={vendor.currency_id}
@@ -544,13 +562,14 @@ export function Form(props: Props) {
                   />
                 </div>
 
-                <div>
+                <div className="px-6">
                   <span className="text-sm">{t('custom_fields')} &nbsp;</span>
+
                   <Link
                     to="/settings/custom_fields/vendors"
                     className="capitalize"
                   >
-                    {t('click_here')}
+                    {t('click_here')}.
                   </Link>
                 </div>
               </TabGroup>
