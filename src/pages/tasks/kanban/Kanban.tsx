@@ -589,7 +589,7 @@ export default function Kanban() {
                                       {card.title.length > 35 && '...'}
                                     </p>
 
-                                    <small>
+                                    <div className="font-mono font-medium text-xs">
                                       {isTaskRunning(card.task) ? (
                                         <TaskClock
                                           task={card.task}
@@ -598,7 +598,7 @@ export default function Kanban() {
                                       ) : (
                                         card.description
                                       )}
-                                    </small>
+                                    </div>
                                   </div>
 
                                   <div
@@ -718,7 +718,7 @@ export default function Kanban() {
                                                   extraSmallText
                                                 />
                                               ) : (
-                                                card.description.slice(0, 20)
+                                                card.description
                                               )}
                                             </div>
                                           </div>
