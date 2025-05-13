@@ -14,7 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
-import { Divider } from '$app/components/cards/Divider';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { CustomField } from '$app/components/CustomField';
 import Toggle from '$app/components/forms/Toggle';
@@ -30,6 +29,9 @@ import { Dispatch, SetStateAction } from 'react';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useColorScheme } from '$app/common/colors';
+import { Trash } from '$app/components/icons/Trash';
+import { Plus } from '$app/components/icons/Plus';
+import classNames from 'classnames';
 
 interface Props {
   vendor: Vendor;
@@ -107,6 +109,22 @@ export function Form(props: Props) {
     });
 
     setContacts(currentContacts);
+  };
+
+  const handleAddContact = () => {
+    handleCreate();
+
+    setTimeout(() => {
+      const contactElements = document.querySelectorAll('[id^="first_name_"]');
+
+      if (contactElements.length > 2) {
+        const lastContactElement = contactElements[contactElements.length - 1];
+        lastContactElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }, 50);
   };
 
   return (
@@ -376,138 +394,170 @@ export function Form(props: Props) {
           </div>
 
           <div className="col-span-12 xl:col-span-6 space-y-4">
-            <Card title={t('contacts')}>
-              {contacts.map((contact, index, { length }) => (
-                <div key={index}>
-                  <Element leftSide={t('first_name')}>
-                    <InputField
-                      id={`first_name_${index}`}
-                      value={contact.first_name}
-                      onValueChange={(value) =>
-                        handleContactChange('first_name', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.first_name`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('last_name')}>
-                    <InputField
-                      id={`last_name_${index}`}
-                      value={contact.last_name}
-                      onValueChange={(value) =>
-                        handleContactChange('last_name', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.last_name`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('email')}>
-                    <InputField
-                      id={`email_${index}`}
-                      value={contact.email}
-                      onValueChange={(value) =>
-                        handleContactChange('email', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.email`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('phone')}>
-                    <InputField
-                      value={contact.phone}
-                      onValueChange={(value) =>
-                        handleContactChange('phone', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.phone`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('send_email')}>
-                    <Toggle
-                      checked={contact.send_email}
-                      onChange={(value) =>
-                        handleContactChange('send_email', value, index)
-                      }
-                    />
-                  </Element>
-
-                  {company?.custom_fields?.vendor_contact1 && (
-                    <CustomField
-                      field="vendor_contact1"
-                      defaultValue={contact.custom_value1 || ''}
-                      value={company.custom_fields.vendor_contact1}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value1', value, index)
-                      }
-                    />
-                  )}
-
-                  {company?.custom_fields?.vendor_contact2 && (
-                    <CustomField
-                      field="vendor_contact2"
-                      defaultValue={contact.custom_value2 || ''}
-                      value={company.custom_fields.vendor_contact2}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value2', value, index)
-                      }
-                    />
-                  )}
-
-                  {company?.custom_fields?.vendor_contact3 && (
-                    <CustomField
-                      field="vendor_contact3"
-                      defaultValue={contact.custom_value3 || ''}
-                      value={company.custom_fields.vendor_contact3}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value3', value, index)
-                      }
-                    />
-                  )}
-
-                  {company?.custom_fields?.vendor_contact4 && (
-                    <CustomField
-                      field="vendor_contact4"
-                      defaultValue={contact.custom_value4 || ''}
-                      value={company.custom_fields.vendor_contact4}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value4', value, index)
-                      }
-                    />
-                  )}
-
-                  <Element>
-                    <div className="flex justify-between items-center">
-                      {vendor.contacts.length >= 2 && (
-                        <button
-                          type="button"
-                          className="text-red-600"
-                          onClick={() => handleDelete(index)}
-                        >
-                          {t('remove_contact')}
-                        </button>
-                      )}
-
-                      {index + 1 == length && (
-                        <Button
-                          type="minimal"
-                          behavior="button"
-                          onClick={handleCreate}
-                        >
-                          {t('add_contact')}
-                        </Button>
-                      )}
+            <Card
+              className="shadow-sm"
+              title={t('contacts')}
+              headerClassName="px-4 sm:px-6 py-[0.825rem]"
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+              withoutBodyPadding
+              withoutHeaderPadding
+              topRight={
+                <Button
+                  className="shadow-sm"
+                  type="secondary"
+                  behavior="button"
+                  onClick={handleAddContact}
+                >
+                  <div className="flex items-center">
+                    <div>
+                      <Plus size="0.7rem" color={colors.$3} />
                     </div>
-                  </Element>
 
-                  <Divider />
+                    <span className="font-medium">{t('add_contact')}</span>
+                  </div>
+                </Button>
+              }
+            >
+              {contacts.map((contact, index) => (
+                <div key={index} className="px-6">
+                  <div
+                    className={classNames('pb-2 pt-4 border-b border-dashed', {
+                      'border-b-0': index === contacts.length - 1,
+                    })}
+                    style={{ borderColor: colors.$24 }}
+                  >
+                    <Element leftSide={t('first_name')} noExternalPadding>
+                      <InputField
+                        id={`first_name_${index}`}
+                        value={contact.first_name}
+                        onValueChange={(value) =>
+                          handleContactChange('first_name', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.first_name`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('last_name')} noExternalPadding>
+                      <InputField
+                        id={`last_name_${index}`}
+                        value={contact.last_name}
+                        onValueChange={(value) =>
+                          handleContactChange('last_name', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.last_name`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('email')} noExternalPadding>
+                      <InputField
+                        id={`email_${index}`}
+                        value={contact.email}
+                        onValueChange={(value) =>
+                          handleContactChange('email', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.email`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('phone')} noExternalPadding>
+                      <InputField
+                        value={contact.phone}
+                        onValueChange={(value) =>
+                          handleContactChange('phone', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.phone`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('send_email')} noExternalPadding>
+                      <Toggle
+                        checked={contact.send_email}
+                        onChange={(value) =>
+                          handleContactChange('send_email', value, index)
+                        }
+                      />
+                    </Element>
+
+                    {company?.custom_fields?.vendor_contact1 && (
+                      <CustomField
+                        field="vendor_contact1"
+                        defaultValue={contact.custom_value1 || ''}
+                        value={company.custom_fields.vendor_contact1}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value1', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    {company?.custom_fields?.vendor_contact2 && (
+                      <CustomField
+                        field="vendor_contact2"
+                        defaultValue={contact.custom_value2 || ''}
+                        value={company.custom_fields.vendor_contact2}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value2', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    {company?.custom_fields?.vendor_contact3 && (
+                      <CustomField
+                        field="vendor_contact3"
+                        defaultValue={contact.custom_value3 || ''}
+                        value={company.custom_fields.vendor_contact3}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value3', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    {company?.custom_fields?.vendor_contact4 && (
+                      <CustomField
+                        field="vendor_contact4"
+                        defaultValue={contact.custom_value4 || ''}
+                        value={company.custom_fields.vendor_contact4}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value4', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    <Element noExternalPadding pushContentToRight>
+                      <div className="flex items-center">
+                        {contacts.length >= 2 && (
+                          <Button
+                            className="shadow-sm"
+                            type="secondary"
+                            behavior="button"
+                            onClick={() => handleDelete(index)}
+                          >
+                            <div className="flex space-x-2 items-center">
+                              <div>
+                                <Trash size="1rem" color="#ef4444" />
+                              </div>
+
+                              <span className="font-medium text-red-500">
+                                {t('remove_contact')}
+                              </span>
+                            </div>
+                          </Button>
+                        )}
+                      </div>
+                    </Element>
+                  </div>
                 </div>
               ))}
             </Card>
@@ -555,14 +605,16 @@ export function Form(props: Props) {
                     value={vendor.public_notes}
                   />
 
-                  <MarkdownEditor
-                    label={t('private_notes').toString()}
-                    onChange={(value) => handleChange('private_notes', value)}
-                    value={vendor.private_notes}
-                  />
+                  <div className="pt-3">
+                    <MarkdownEditor
+                      label={t('private_notes').toString()}
+                      onChange={(value) => handleChange('private_notes', value)}
+                      value={vendor.private_notes}
+                    />
+                  </div>
                 </div>
 
-                <div className="px-6">
+                <div className="px-6 pt-1">
                   <span className="text-sm">{t('custom_fields')} &nbsp;</span>
 
                   <Link
