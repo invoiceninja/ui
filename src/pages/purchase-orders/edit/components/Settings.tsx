@@ -18,9 +18,12 @@ import { useOutletContext } from 'react-router-dom';
 import { PurchaseOrderContext } from '../../create/Create';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Settings() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const context: PurchaseOrderContext = useOutletContext();
   const { purchaseOrder, setPurchaseOrder, errors } = context;
@@ -33,56 +36,67 @@ export default function Settings() {
   };
 
   return (
-    <Card title={t('settings')} className="w-full xl:w-2/3">
-      <div className="grid grid-cols-12 gap-4 px-6">
-        <div className="col-span-12 lg:col-span-6 space-y-6">
-          <UserSelector
-            inputLabel={t('User')}
-            value={purchaseOrder?.assigned_user_id}
-            onChange={(user) => handleChange('assigned_user_id', user.id)}
-            errorMessage={errors?.errors.assigned_user_id}
-          />
-        </div>
+    <Card
+      title={t('settings')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
+      <div className="flex justify-center w-full pb-10 pt-2">
+        <div className="grid grid-cols-12 gap-4 px-6 w-full xl:w-2/3">
+          <div className="col-span-12 lg:col-span-6 space-y-6">
+            <div className="space-y-2">
+              <UserSelector
+                inputLabel={t('User')}
+                value={purchaseOrder?.assigned_user_id}
+                onChange={(user) => handleChange('assigned_user_id', user.id)}
+                errorMessage={errors?.errors.assigned_user_id}
+              />
+            </div>
 
-        <div className="col-span-12 lg:col-span-6 space-y-6">
-          <ProjectSelector
-            inputLabel={t('project')}
-            value={purchaseOrder?.project_id}
-            onChange={(project) => handleChange('project_id', project.id)}
-            errorMessage={errors?.errors.project_id}
-          />
-        </div>
+            <div className="space-y-2">
+              <ProjectSelector
+                inputLabel={t('project')}
+                value={purchaseOrder?.project_id}
+                onChange={(project) => handleChange('project_id', project.id)}
+                errorMessage={errors?.errors.project_id}
+              />
+            </div>
 
-        <div className="col-span-12 lg:col-span-6 space-y-6 lg:pt-1">
-          <ClientSelector
-            inputLabel={t('client')}
-            value={purchaseOrder?.client_id}
-            onChange={(client) => handleChange('client_id', client.id)}
-            errorMessage={errors?.errors.client_id}
-          />
-        </div>
+            <div className="space-y-2">
+              <ClientSelector
+                inputLabel={t('client')}
+                value={purchaseOrder?.client_id}
+                onChange={(client) => handleChange('client_id', client.id)}
+                errorMessage={errors?.errors.client_id}
+              />
+            </div>
+          </div>
 
-        <div className="col-span-12 lg:col-span-6 space-y-6">
-          <NumberInputField
-            label={t('exchange_rate')}
-            value={purchaseOrder?.exchange_rate || 1.0}
-            onValueChange={(value) =>
-              handleChange('exchange_rate', parseFloat(value) || 1.0)
-            }
-            errorMessage={errors?.errors.exchange_rate}
-            disablePrecision
-          />
-        </div>
+          <div className="col-span-12 lg:col-span-6 space-y-6">
+            <div className="space-y-2">
+              <NumberInputField
+                label={t('exchange_rate')}
+                value={purchaseOrder?.exchange_rate || 1.0}
+                onValueChange={(value) =>
+                  handleChange('exchange_rate', parseFloat(value) || 1.0)
+                }
+                errorMessage={errors?.errors.exchange_rate}
+                disablePrecision
+              />
+            </div>
 
-        <div className="col-span-12 lg:col-span-6 space-y-6">
-          <DesignSelector
-            inputLabel={t('design')}
-            value={purchaseOrder?.design_id}
-            onChange={(design) => handleChange('design_id', design.id)}
-            onClearButtonClick={() => handleChange('design_id', '')}
-            disableWithQueryParameter
-            errorMessage={errors?.errors.design_id}
-          />
+            <div className="space-y-2">
+              <DesignSelector
+                inputLabel={t('design')}
+                value={purchaseOrder?.design_id}
+                onChange={(design) => handleChange('design_id', design.id)}
+                onClearButtonClick={() => handleChange('design_id', '')}
+                disableWithQueryParameter
+                errorMessage={errors?.errors.design_id}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Card>
