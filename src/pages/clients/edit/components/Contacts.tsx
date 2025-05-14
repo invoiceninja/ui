@@ -35,8 +35,10 @@ interface Props {
 
 export function Contacts(props: Props) {
   const [t] = useTranslation();
-  const accentColor = useAccentColor();
+
+  const colors = useColorScheme();
   const company = useCurrentCompany();
+  const accentColor = useAccentColor();
 
   const handleChange = (
     value: string | number | boolean,
@@ -78,7 +80,21 @@ export function Contacts(props: Props) {
     props.setContacts(contacts);
   };
 
-  const colors = useColorScheme();
+  const handleAddContact = () => {
+    create();
+
+    setTimeout(() => {
+      const contactElements = document.querySelectorAll('[id^="first_name_"]');
+
+      if (contactElements.length > 2) {
+        const lastContactElement = contactElements[contactElements.length - 1];
+        lastContactElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }, 50);
+  };
 
   return (
     <Card
@@ -92,8 +108,7 @@ export function Contacts(props: Props) {
           className="shadow-sm"
           type="secondary"
           behavior="button"
-          onClick={create}
-          style={{ color: accentColor }}
+          onClick={handleAddContact}
         >
           <div className="flex items-center">
             <div>
