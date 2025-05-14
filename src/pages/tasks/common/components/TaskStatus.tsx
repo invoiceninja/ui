@@ -96,7 +96,7 @@ export function TaskStatus(props: Props) {
             className={classNames(
               'text-xs rounded-l px-2 py-1 border-r border-white font-medium',
               {
-                'rounded-r': props.withoutDropdown,
+                'rounded-r border-r-0': props.withoutDropdown,
               }
             )}
             style={{
@@ -145,7 +145,7 @@ export function TaskStatus(props: Props) {
           className={classNames(
             'text-xs rounded-l px-2 py-1 border-r border-white font-medium bg-gray-100 text-gray-800',
             {
-              'rounded-r': props.withoutDropdown,
+              'rounded-r border-r-0': props.withoutDropdown,
             }
           )}
         >

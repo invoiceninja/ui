@@ -42,18 +42,16 @@ import {
   currentTaskIdAtom,
   isKanbanViewSliderVisibleAtom,
 } from './common/atoms';
-import { useHandleCurrentTask } from './common/hooks';
+import { useFormatTimeLog, useHandleCurrentTask } from './common/hooks';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { Slider } from '$app/components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
-import { Edit, Pause, Play } from 'react-feather';
-import { Link as ReactRouterLink } from 'react-router-dom';
-import { Card, Element } from '$app/components/cards';
+import { useNavigate } from 'react-router-dom';
+import { Card } from '$app/components/cards';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { Inline } from '$app/components/Inline';
 import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
-import { MdAdd, MdAddCircle } from 'react-icons/md';
 import {
   CreateTaskModal,
   TaskDetails,
@@ -67,6 +65,10 @@ import {
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { TaskClock } from './components/TaskClock';
 import styled from 'styled-components';
+import { Pencil } from '$app/components/icons/Pencil';
+import { MediaPlay } from '$app/components/icons/MediaPlay';
+import { MediaPause } from '$app/components/icons/MediaPause';
+import { Plus } from '$app/components/icons/Plus';
 
 const Container = styled.div`
   min-width: ${(props) => props.theme.minWidth}px;
@@ -96,6 +98,14 @@ interface Board {
 
 type SliderType = 'view' | 'edit';
 
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
 export default function Kanban() {
   const { documentTitle } = useTitle('kanban');
   const [t] = useTranslation();
@@ -105,8 +115,11 @@ export default function Kanban() {
 
   const stopTask = useStop();
   const startTask = useStart();
+  const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+
+  const formatTimeLog = useFormatTimeLog();
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
@@ -331,7 +344,6 @@ export default function Kanban() {
           </Inline>
         </Link>
       }
-      
     >
       <Slider
         title={
@@ -341,6 +353,12 @@ export default function Kanban() {
         }
         visible={isKanbanViewSliderVisible}
         onClose={handleKanbanClose}
+        withoutHeaderBorder
+        withoutDivider={
+          currentTask &&
+          sliderType === 'edit' &&
+          !formatTimeLog(currentTask.time_log).length
+        }
         actionChildren={
           <div
             className="flex w-full divide-x-2"
@@ -353,13 +371,26 @@ export default function Kanban() {
           >
             {sliderType === 'view' &&
               (hasPermission('edit_task') || entityAssigned(currentTask)) && (
-                <ReactRouterLink
-                  to={route('/tasks/:id/edit', { id: currentTask?.id })}
-                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                <Box
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full cursor-pointer focus:outline-none focus:ring-0"
+                  onClick={() =>
+                    navigate(route('/tasks/:id/edit', { id: currentTask?.id }))
+                  }
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                  theme={{
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
                 >
-                  <Edit size={18} />
+                  <div>
+                    <Pencil color={colors.$3} size="1.2rem" />
+                  </div>
+
                   <span>{t('edit_task')}</span>
-                </ReactRouterLink>
+                </Box>
               )}
 
             {/* <button className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50">
@@ -370,37 +401,55 @@ export default function Kanban() {
             {currentTask &&
               !isTaskRunning(currentTask) &&
               (hasPermission('edit_task') || entityAssigned(currentTask)) && (
-                <button
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                <Box
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full cursor-pointer focus:outline-none focus:ring-0"
                   onClick={() => startTask(currentTask)}
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                  theme={{
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
                 >
-                  <Play size={18} />
+                  <div>
+                    <MediaPlay
+                      color={colors.$3}
+                      filledColor="transparent"
+                      size="1.2rem"
+                    />
+                  </div>
+
                   <span>{t('start')}</span>
-                </button>
+                </Box>
               )}
 
             {currentTask &&
               isTaskRunning(currentTask) &&
               (hasPermission('edit_task') || entityAssigned(currentTask)) && (
-                <button
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                <Box
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full cursor-pointer focus:outline-none focus:ring-0"
                   onClick={() => stopTask(currentTask)}
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                  theme={{
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
                 >
-                  <Pause size={18} />
+                  <div>
+                    <MediaPause
+                      color={colors.$3}
+                      filledColor="transparent"
+                      size="1.2rem"
+                    />
+                  </div>
+
                   <span>{t('stop')}</span>
-                </button>
+                </Box>
               )}
           </div>
         }
@@ -411,37 +460,35 @@ export default function Kanban() {
         {sliderType === 'edit' && <EditSlider />}
       </Slider>
 
-      <div
-        className="grid grid-cols-12 gap-4"
+      <Card
+        className="w-full xl:w-2/5 rounded-sm shadow-sm"
         style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
-          borderColor: colors.$4,
+          borderColor: colors.$21,
         }}
       >
-        <Card className="col-span-12 xl:col-span-4">
-          <Element leftSide={t('project')}>
-            <ProjectSelector
-              value={projectId}
-              onChange={(project) => setProjectId(project.id)}
-              onClearButtonClick={() => setProjectId(undefined)}
-              clearButton
-            />
-          </Element>
-        </Card>
-      </div>
+        <div className="flex flex-col items-start md:flex-row md:items-center px-4 md:px-6 py-4 md:space-x-10 md:justify-between">
+          <span className="text-sm font-medium mb-1 md:mb-0">
+            {t('project')}
+          </span>
+
+          <ProjectSelector
+            value={projectId}
+            onChange={(project) => setProjectId(project.id)}
+            onClearButtonClick={() => setProjectId(undefined)}
+            clearButton
+          />
+        </div>
+      </Card>
 
       {board && (
         <div
+          className="flex border space-x-4 overflow-x-auto mt-4 p-6 shadow-sm rounded-sm"
           style={{
             color: colors.$3,
-            colorScheme: colors.$0,
             backgroundColor: colors.$1,
-            borderColor: colors.$4,
+            borderColor: colors.$21,
             paddingRight: isKanbanViewSliderVisible ? 512 : 0,
           }}
-          className="flex pb-6 space-x-4 overflow-x-auto mt-4"
         >
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable
@@ -463,35 +510,33 @@ export default function Kanban() {
                     >
                       {(columnDraggableProvided: DraggableProvided) => (
                         <Container
-                          className="bg-white rounded border shadow select-none h-max"
+                          className="rounded border shadow select-none h-max"
                           ref={columnDraggableProvided.innerRef}
                           {...columnDraggableProvided.draggableProps}
                           theme={{
                             minWidth: 360,
                             color: colors.$3,
-                            colorScheme: colors.$0,
                             backgroundColor: colors.$1,
-                            borderColor: colors.$4,
+                            borderColor: colors.$21,
                           }}
                         >
                           <div
                             {...columnDraggableProvided.dragHandleProps}
-                            className="flex items-center justify-between border-b px-4 py-5"
+                            className="flex items-center justify-between border-b rounded-tl rounded-tr px-4 py-5"
                             style={{
                               color: colors.$3,
-                              colorScheme: colors.$0,
                               backgroundColor: colors.$1,
-                              borderColor: colors.$4,
+                              borderColor: colors.$20,
                             }}
                           >
                             <h3 className="leading-6 font-medium">
-                              {column.title}
+                              {column.title.slice(0, 25)}
+                              {column.title.length > 25 && '...'}
                             </h3>
 
                             {hasPermission('create_task') && (
-                              <MdAddCircle
-                                className="cursor-pointer"
-                                fontSize={22}
+                              <Box
+                                className="cursor-pointer focus:outline-none focus:ring-0 p-1 border rounded-sm"
                                 onClick={() => {
                                   setTaskDetails({
                                     taskStatusId: column.id,
@@ -499,7 +544,16 @@ export default function Kanban() {
                                   });
                                   setIsTaskModalOpened(true);
                                 }}
-                              />
+                                style={{
+                                  borderColor: colors.$21,
+                                }}
+                                theme={{
+                                  backgroundColor: colors.$1,
+                                  hoverBackgroundColor: colors.$4,
+                                }}
+                              >
+                                <Plus size="1.1rem" color={colors.$3} />
+                              </Box>
                             )}
                           </div>
 
@@ -523,31 +577,36 @@ export default function Kanban() {
                                   ref={provided.innerRef}
                                 >
                                   <div
-                                    className="px-4 sm:px-6 py-4"
+                                    className="px-4 sm:px-6 py-4 border"
                                     style={{
                                       color: colors.$3,
-                                      colorScheme: colors.$0,
                                       backgroundColor: colors.$4,
-                                      borderColor: colors.$4,
+                                      borderColor: colors.$21,
                                     }}
                                   >
-                                    <p>{card.title}</p>
-                                    <small>
+                                    <p>
+                                      {card.title.slice(0, 35)}
+                                      {card.title.length > 35 && '...'}
+                                    </p>
+
+                                    <div className="font-mono font-medium text-xs">
                                       {isTaskRunning(card.task) ? (
-                                        <TaskClock task={card.task} />
+                                        <TaskClock
+                                          task={card.task}
+                                          extraSmallText
+                                        />
                                       ) : (
                                         card.description
                                       )}
-                                    </small>
+                                    </div>
                                   </div>
 
                                   <div
-                                    className="flex border-t justify-center items-center"
+                                    className="flex border-b border-l border-r justify-center items-center divide-x-2"
                                     style={{
                                       color: colors.$3,
-                                      colorScheme: colors.$0,
                                       backgroundColor: colors.$1,
-                                      borderColor: colors.$4,
+                                      borderColor: colors.$21,
                                     }}
                                   >
                                     {(hasPermission('view_task') ||
@@ -556,9 +615,7 @@ export default function Kanban() {
                                       <button
                                         style={{
                                           color: colors.$3,
-                                          colorScheme: colors.$0,
                                           backgroundColor: colors.$1,
-                                          borderColor: colors.$4,
                                         }}
                                         className="w-full py-2 rounded-bl"
                                         onClick={() =>
@@ -574,9 +631,7 @@ export default function Kanban() {
                                       <button
                                         style={{
                                           color: colors.$3,
-                                          colorScheme: colors.$0,
                                           backgroundColor: colors.$1,
-                                          borderColor: colors.$4,
                                         }}
                                         className="w-full text-center py-2"
                                         onClick={() =>
@@ -591,14 +646,12 @@ export default function Kanban() {
                                       (hasPermission('edit_task') ||
                                         entityAssigned(currentTask)) && (
                                         <button
-                                          style={{
-                                            color: colors.$3,
-                                            colorScheme: colors.$0,
-                                            backgroundColor: colors.$1,
-                                            borderColor: colors.$4,
-                                          }}
                                           className="w-full py-2 rounded-br"
                                           onClick={() => stopTask(card.task)}
+                                          style={{
+                                            color: colors.$3,
+                                            backgroundColor: colors.$1,
+                                          }}
                                         >
                                           {t('stop')}
                                         </button>
@@ -610,9 +663,7 @@ export default function Kanban() {
                                         <button
                                           style={{
                                             color: colors.$3,
-                                            colorScheme: colors.$0,
                                             backgroundColor: colors.$1,
-                                            borderColor: colors.$4,
                                           }}
                                           className="w-full py-2 rounded-br"
                                           onClick={() => startTask(card.task)}
@@ -629,7 +680,7 @@ export default function Kanban() {
                               <div {...dropProvided.droppableProps}>
                                 <div
                                   ref={dropProvided.innerRef}
-                                  className="p-4 space-y-4"
+                                  className="p-4 space-y-4 rounded-bl rounded-br"
                                   style={{
                                     color: colors.$3,
                                     colorScheme: colors.$0,
@@ -645,7 +696,7 @@ export default function Kanban() {
                                     >
                                       {(dragProvided) => (
                                         <Container
-                                          className="w-full text-leftblock rounded text-sm group"
+                                          className="w-full text-leftblock text-sm group"
                                           ref={dragProvided.innerRef}
                                           {...dragProvided.draggableProps}
                                           {...dragProvided.dragHandleProps}
@@ -654,24 +705,30 @@ export default function Kanban() {
                                             color: colors.$3,
                                           }}
                                         >
-                                          <div className="px-4 sm:px-6 py-4">
-                                            <p>{card.title}</p>
-                                            <small>
+                                          <div className="flex flex-col justify-center px-4 sm:px-6 py-4 border rounded-t-sm h-14">
+                                            <p>
+                                              {card.title.slice(0, 35)}
+                                              {card.title.length > 35 && '...'}
+                                            </p>
+
+                                            <div className="font-mono font-medium text-xs">
                                               {isTaskRunning(card.task) ? (
-                                                <TaskClock task={card.task} />
+                                                <TaskClock
+                                                  task={card.task}
+                                                  extraSmallText
+                                                />
                                               ) : (
                                                 card.description
                                               )}
-                                            </small>
+                                            </div>
                                           </div>
 
                                           <div
-                                            className="hidden group-hover:flex border-t justify-center items-center"
+                                            className="hidden group-hover:flex border-b border-l border-r justify-center rounded-br rounded-bl items-center divide-x-2"
                                             style={{
                                               color: colors.$3,
-                                              colorScheme: colors.$0,
                                               backgroundColor: colors.$1,
-                                              borderColor: colors.$4,
+                                              borderColor: colors.$21,
                                             }}
                                           >
                                             {(hasPermission('view_task') ||
@@ -680,9 +737,7 @@ export default function Kanban() {
                                               <button
                                                 style={{
                                                   color: colors.$3,
-                                                  colorScheme: colors.$0,
                                                   backgroundColor: colors.$1,
-                                                  borderColor: colors.$4,
                                                 }}
                                                 className="w-full py-2 rounded-bl"
                                                 onClick={() =>
@@ -701,9 +756,7 @@ export default function Kanban() {
                                               <button
                                                 style={{
                                                   color: colors.$3,
-                                                  colorScheme: colors.$0,
                                                   backgroundColor: colors.$1,
-                                                  borderColor: colors.$4,
                                                 }}
                                                 className="w-full text-center py-2"
                                                 onClick={() =>
@@ -725,9 +778,7 @@ export default function Kanban() {
                                                 <button
                                                   style={{
                                                     color: colors.$3,
-                                                    colorScheme: colors.$0,
                                                     backgroundColor: colors.$1,
-                                                    borderColor: colors.$4,
                                                   }}
                                                   className="w-full py-2 rounded-br"
                                                   onClick={() =>
@@ -746,9 +797,7 @@ export default function Kanban() {
                                                 <button
                                                   style={{
                                                     color: colors.$3,
-                                                    colorScheme: colors.$0,
                                                     backgroundColor: colors.$1,
-                                                    borderColor: colors.$4,
                                                   }}
                                                   className="w-full py-2 rounded-br"
                                                   onClick={() =>
@@ -781,28 +830,21 @@ export default function Kanban() {
           </DragDropContext>
 
           {(isAdmin || isOwner) && (
-            <div>
-              <div
-                className="bg-white shadow rounded p-1"
+            <div className="pr-6">
+              <Box
+                className="shadow-sm rounded border p-2 cursor-pointer"
                 style={{
                   color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
+                  borderColor: colors.$21,
                 }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
+                onClick={() => setIsTaskStatusModalOpened(true)}
               >
-                <MdAdd
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  className="cursor-pointer"
-                  fontSize={28}
-                  onClick={() => setIsTaskStatusModalOpened(true)}
-                />
-              </div>
+                <Plus size="1.3rem" color={colors.$3} />
+              </Box>
             </div>
           )}
         </div>
