@@ -23,11 +23,13 @@ import { useTranslation } from 'react-i18next';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { RecurringExpenseCardProps } from './Details';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function AdditionalInfo(props: RecurringExpenseCardProps) {
   const [t] = useTranslation();
   const { recurringExpense, handleChange, errors } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -156,7 +158,13 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
   }, [recurringExpense]);
 
   return (
-    <Card title={t('additional_info')} isLoading={!recurringExpense}>
+    <Card
+      title={t('additional_info')}
+      isLoading={!recurringExpense}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       {recurringExpense && (
         <Element
           leftSide={t('should_be_invoiced')}
