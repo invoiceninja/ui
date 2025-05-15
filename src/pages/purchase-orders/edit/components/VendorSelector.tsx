@@ -73,7 +73,7 @@ export function VendorSelector(props: Props) {
         className="flex flex-col justify-between space-y-0.5"
         style={{ color: colors.$3 }}
       >
-        {props.textOnly ? (
+        {props.readonly ? (
           <div className="flex space-x-10">
             <span className="text-sm font-medium" style={{ color: colors.$22 }}>
               {t('vendor')}
