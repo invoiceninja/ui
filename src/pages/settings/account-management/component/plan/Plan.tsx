@@ -43,7 +43,7 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
 
     request('POST', endpoint('/api/client/account_management/cancel_trial'))
       .then(() => {
-        toast.success(t('cancelled_trial') || 'Trial cancelled successfully');
+        toast.success(t('cancelled')!);
         refresh();
         setShowCancelModal(false);
       })
@@ -78,7 +78,7 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
           <p>
             {trial ? t('free_trial_then') : null} <b> ${price} /</b>{' '}
             <span className="lowercase mr-4">{t(term)}</span>
-            {account.is_trial && (
+            {account.trial_days_left > 0 && (
             <Button className="bg-red-500 text-white" behavior="button" type="minimal" onClick={handleTrialCancellation}>
               {t('cancel')}
             </Button>
@@ -126,7 +126,7 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
           <div className="flex justify-end space-x-2">
             <Button
               behavior="button"
-              type="minimal"
+              type="primary"
               className="bg-red-500 text-white"
               onClick={confirmCancellation}
             >
