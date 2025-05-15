@@ -128,7 +128,6 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
         }
 
         if (result.setupIntent && result.setupIntent.status === 'succeeded') {
-          console.log(result.setupIntent);
           request(
             'POST',
             endpoint('/api/client/account_management/methods/confirm'),
