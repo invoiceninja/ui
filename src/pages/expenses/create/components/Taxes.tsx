@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends ExpenseCardProps {
   taxInputType: 'by_rate' | 'by_amount';
@@ -29,6 +30,7 @@ export function TaxSettings(props: Props) {
 
   const { expense, handleChange, taxInputType, setTaxInputType } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const handleResetTaxValues = (value: 'by_rate' | 'by_amount') => {
@@ -54,7 +56,13 @@ export function TaxSettings(props: Props) {
   };
 
   return (
-    <Card title={t('taxes')} isLoading={!expense}>
+    <Card
+      title={t('taxes')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      isLoading={!expense}
+    >
       {company?.enabled_expense_tax_rates === 0 && (
         <Element leftSide={t('expense_tax_help')}>
           <DynamicLink
