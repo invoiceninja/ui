@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { MdInfoOutline } from 'react-icons/md';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { route } from '$app/common/helpers/route';
 
 export function PEPPOLPlanBanner() {
   const [t] = useTranslation();
@@ -46,8 +47,8 @@ export function PEPPOLPlanBanner() {
         {currentUser?.company_user && (
           <Link
             className="ml-10"
-            external
-            to={currentUser.company_user.ninja_portal_url}
+            
+            to={route('/settings/account_management')}
           >
             {t('plan_change')}
           </Link>

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from '$app/common/helpers/route';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
@@ -31,7 +32,7 @@ export function BankAccountsPlanAlert() {
           </div>
 
           {user?.company_user && (
-            <Link external to={user.company_user.ninja_portal_url}>
+            <Link to={route('/settings/account_management')}>
               {t('plan_change')}
             </Link>
           )}

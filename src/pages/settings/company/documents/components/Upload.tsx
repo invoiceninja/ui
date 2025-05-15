@@ -25,6 +25,7 @@ import { MdInfoOutline } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
+import { route } from '$app/common/helpers/route';
 
 interface Props {
   endpoint: string;
@@ -100,8 +101,8 @@ export function Upload(props: Props) {
               {user?.company_user && (
                 <Link
                   className="ml-10"
-                  external
-                  to={user.company_user.ninja_portal_url}
+                  
+                  to={route('/settings/account_management')}
                 >
                   {t('plan_change')}
                 </Link>
@@ -150,8 +151,8 @@ export function Upload(props: Props) {
             {user?.company_user && (
               <Link
                 className="ml-10"
-                external
-                to={user.company_user.ninja_portal_url}
+                
+                to={route('/settings/account_management')}
               >
                 {t('plan_change')}
               </Link>
