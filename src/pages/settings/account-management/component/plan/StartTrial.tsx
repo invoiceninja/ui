@@ -14,7 +14,7 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Modal } from '$app/components/Modal';
 import { useTranslation } from 'react-i18next';
 import { PopupProps } from './NewCreditCard';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
