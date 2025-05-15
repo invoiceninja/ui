@@ -9,12 +9,16 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { date, trans } from '$app/common/helpers';
+import { date, endpoint, trans } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { Button } from '$app/components/forms';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { Modal } from '$app/components/Modal';
 export interface PlanProps {
   title: ReactNode;
   color: string;
@@ -27,6 +31,28 @@ export interface PlanProps {
 export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
   const scheme = useColorScheme();
   const account = useCurrentAccount();
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const refresh = useRefreshCompanyUsers();
+
+  const handleTrialCancellation = () => {
+    setShowCancelModal(true);
+  };
+
+  const confirmCancellation = () => {
+    toast.processing();
+
+    request('POST', endpoint('/api/client/account_management/cancel_trial'))
+      .then(() => {
+        toast.success(t('cancelled_trial') || 'Trial cancelled successfully');
+        refresh();
+        setShowCancelModal(false);
+      })
+      .catch(() => {
+        toast.error();
+      });
+  };
+
+  
 
   const width = () => {
     const percentage = (account.trial_days_left / 14) * 100;
@@ -38,6 +64,7 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
   const { t } = useTranslation();
 
   return (
+    <>
     <div
       className="border border-l-8 rounded p-4 flex flex-col space-y-4"
       style={{ borderColor: color }}
@@ -50,7 +77,12 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
         ) : (
           <p>
             {trial ? t('free_trial_then') : null} <b> ${price} /</b>{' '}
-            <span className="lowercase">{t(term)}</span>
+            <span className="lowercase mr-4">{t(term)}</span>
+            {account.is_trial && (
+            <Button className="bg-red-500 text-white" behavior="button" type="minimal" onClick={handleTrialCancellation}>
+              {t('cancel')}
+            </Button>
+            )}
           </p>
         )}
       </div>
@@ -79,15 +111,40 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
           ></div>
         </div>
       ) : null}
+
+
     </div>
+
+      <Modal
+        title={t('cancel_trial')}
+        visible={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+      >
+        <div className="space-y-4">
+          <p>{t('cancel_trial_description')}</p>
+
+          <div className="flex justify-end space-x-2">
+            <Button
+              behavior="button"
+              type="minimal"
+              className="bg-red-500 text-white"
+              onClick={confirmCancellation}
+            >
+              {t('continue')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      </>
   );
 }
 
 export function Free() {
+  const { t } = useTranslation();
+
   return (
     <div className="border rounded p-4 flex justify-between items-center">
-      <p className="font-semibold">Free</p>
-
+      <p className="font-semibold">{t('free')}</p>
       <p>
         <b>$0</b>
       </p>
