@@ -139,9 +139,8 @@ export function Details(props: Props) {
       className="flex flex-col flex-1 border-b"
       style={{
         color: colors.$3,
-        colorScheme: colors.$0,
         backgroundColor: colors.$1,
-        borderColor: colors.$4,
+        borderColor: colors.$24,
       }}
     >
       <div>
