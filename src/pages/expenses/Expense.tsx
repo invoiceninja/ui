@@ -141,7 +141,7 @@ export default function Expense() {
               <Divider
                 className="pt-4"
                 withoutPadding
-                borderColor={colors.$5}
+                borderColor={colors.$21}
               />
             )}
 

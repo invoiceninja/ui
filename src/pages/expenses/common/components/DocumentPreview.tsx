@@ -8,32 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Document } from '$app/common/interfaces/document.interface';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { FileIcon } from '$app/components/FileIcon';
 import { Spinner } from '$app/components/Spinner';
-import { Icon } from '$app/components/icons/Icon';
+import { ChevronLeft } from '$app/components/icons/ChevronLeft';
+import { ChevronRight } from '$app/components/icons/ChevronRight';
+import { DoubleChevronLeft } from '$app/components/icons/DoubleChevronLeft';
+import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
 import { android } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  MdFirstPage,
-  MdLastPage,
-  MdNavigateBefore,
-  MdNavigateNext,
-} from 'react-icons/md';
 import { useQueryClient } from 'react-query';
+import styled from 'styled-components';
+
+const Button = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
+  border-color: ${(props) => props.theme.borderColor};
+
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 interface Props {
   documents: Document[];
 }
 export function DocumentPreview(props: Props) {
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const { documents } = props;
+
+  const colors = useColorScheme();
+  const queryClient = useQueryClient();
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -115,38 +125,60 @@ export function DocumentPreview(props: Props) {
       {documents.length ? (
         <div className="flex flex-col">
           {!isFormBusy && (
-            <div className="flex self-end pb-1">
-              <Icon
-                className="cursor-pointer"
-                element={MdFirstPage}
-                size={25}
+            <div className="flex self-end pb-2">
+              <Button
+                className="p-2 border rounded-l-md shadow-sm cursor-pointer"
+                theme={{
+                  hoverColor: colors.$4,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$24,
+                }}
                 onClick={() => setDocumentIndex(0)}
-              />
-              <Icon
-                className="cursor-pointer"
-                element={MdNavigateBefore}
-                size={25}
+              >
+                <DoubleChevronLeft size="0.85rem" color={colors.$3} />
+              </Button>
+
+              <Button
+                className="p-2 border-b border-t border-r rounded-r-md shadow-sm cursor-pointer"
+                theme={{
+                  hoverColor: colors.$4,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$24,
+                }}
                 onClick={() =>
                   documentIndex !== 0 &&
                   setDocumentIndex((current) => current - 1)
                 }
-              />
+              >
+                <ChevronLeft size="0.85rem" color={colors.$3} />
+              </Button>
 
-              <Icon
-                className="cursor-pointer"
-                element={MdNavigateNext}
-                size={25}
+              <Button
+                className="p-2 border-t border-b border-l rounded-l-md shadow-sm cursor-pointer ml-2"
+                theme={{
+                  hoverColor: colors.$4,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$24,
+                }}
                 onClick={() =>
                   documentIndex !== documents.length - 1 &&
                   setDocumentIndex((current) => current + 1)
                 }
-              />
-              <Icon
-                className="cursor-pointer"
-                element={MdLastPage}
-                size={25}
+              >
+                <ChevronRight size="0.85rem" color={colors.$3} />
+              </Button>
+
+              <Button
+                className="p-2 border rounded-r-md shadow-sm cursor-pointer"
+                theme={{
+                  hoverColor: colors.$4,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$24,
+                }}
                 onClick={() => setDocumentIndex(documents.length - 1)}
-              />
+              >
+                <DoubleChevronRight size="0.85rem" color={colors.$3} />
+              </Button>
             </div>
           )}
 
