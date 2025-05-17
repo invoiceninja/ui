@@ -8,14 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CardContainer } from '$app/components/cards';
 import { InputField, InputLabel } from '$app/components/forms';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Dispatch, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
+import { CardContainer } from '$app/components/cards';
 
 interface Props {
   nameFieldRef?: RefObject<HTMLInputElement | undefined>;
@@ -23,6 +22,7 @@ interface Props {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   setExpenseCategory: Dispatch<SetStateAction<ExpenseCategory | undefined>>;
   expenseCategory: ExpenseCategory | undefined;
+  withCardContainer?: boolean;
 }
 
 export function CreateExpenseCategoryForm(props: Props) {
@@ -34,9 +34,8 @@ export function CreateExpenseCategoryForm(props: Props) {
     setExpenseCategory,
     expenseCategory,
     nameFieldRef,
+    withCardContainer = false,
   } = props;
-
-  const colors = useColorScheme();
 
   const handleChange = (
     property: keyof ExpenseCategory,
@@ -53,16 +52,35 @@ export function CreateExpenseCategoryForm(props: Props) {
     );
   };
 
+  if (withCardContainer) {
+    return (
+      <CardContainer>
+        <InputField
+          innerRef={nameFieldRef}
+          required
+          label={t('name')}
+          value={expenseCategory?.name}
+          onValueChange={(value) => handleChange('name', value)}
+          errorMessage={errors?.errors.name}
+          cypressRef="expenseCategoryNameField"
+        />
+
+        <div>
+          <InputLabel className="mb-1">{t('color')}</InputLabel>
+
+          <ColorPicker
+            value={expenseCategory?.color}
+            onValueChange={(value) => handleChange('color', value)}
+          />
+        </div>
+      </CardContainer>
+    );
+  }
+
   return (
-    <CardContainer>
+    <>
       <InputField
         innerRef={nameFieldRef}
-        style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
-          borderColor: colors.$4,
-        }}
         required
         label={t('name')}
         value={expenseCategory?.name}
@@ -71,12 +89,14 @@ export function CreateExpenseCategoryForm(props: Props) {
         cypressRef="expenseCategoryNameField"
       />
 
-      <InputLabel>{t('color')}</InputLabel>
+      <div>
+        <InputLabel className="mb-1">{t('color')}</InputLabel>
 
-      <ColorPicker
-        value={expenseCategory?.color}
-        onValueChange={(value) => handleChange('color', value)}
-      />
-    </CardContainer>
+        <ColorPicker
+          value={expenseCategory?.color}
+          onValueChange={(value) => handleChange('color', value)}
+        />
+      </div>
+    </>
   );
 }

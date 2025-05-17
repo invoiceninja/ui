@@ -139,9 +139,8 @@ export function Details(props: Props) {
       className="flex flex-col flex-1 border-b"
       style={{
         color: colors.$3,
-        colorScheme: colors.$0,
         backgroundColor: colors.$1,
-        borderColor: colors.$4,
+        borderColor: colors.$24,
       }}
     >
       <div>
@@ -165,12 +164,6 @@ export function Details(props: Props) {
 
         <Element leftSide={t('bank_account')} className="cursor-pointer">
           <Link
-            style={{
-              color: colors.$3,
-              colorScheme: colors.$0,
-              backgroundColor: colors.$1,
-              borderColor: colors.$4,
-            }}
             to={route('/settings/bank_accounts/:id/details', {
               id: bankAccountResponse?.id,
             })}
@@ -201,12 +194,6 @@ export function Details(props: Props) {
               className="cursor-pointer"
             >
               <Link
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 to={route('/invoices/:id/edit', {
                   id,
                 })}
@@ -219,7 +206,6 @@ export function Details(props: Props) {
           {transaction?.payment_id && (
             <Element leftSide={t('payment')} className="cursor-pointer">
               <Link
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
                 to={route('/payments/:id/edit', {
                   id: matchedPayment?.id,
                 })}
@@ -232,12 +218,6 @@ export function Details(props: Props) {
           {transaction?.vendor_id && (
             <Element leftSide={t('vendor')} className="cursor-pointer">
               <Link
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 to={route('/vendors/:id', {
                   id: vendorResponse?.id,
                 })}
@@ -250,7 +230,6 @@ export function Details(props: Props) {
           {transaction?.ninja_category_id && (
             <Element leftSide={t('category')} className="cursor-pointer">
               <Link
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
                 to={route('/settings/expense_categories/:id/edit', {
                   id: matchedExpenseCategory?.id,
                 })}
@@ -267,7 +246,6 @@ export function Details(props: Props) {
               className="cursor-pointer"
             >
               <Link
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
                 to={route('/expenses/:id/edit', {
                   id,
                 })}
