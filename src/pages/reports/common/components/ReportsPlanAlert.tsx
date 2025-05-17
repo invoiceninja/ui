@@ -37,7 +37,7 @@ export function ReportsPlanAlert(props?: CommonProps) {
               {user?.company_user && (
                 <Link
                   to={
-                    user.company_user.ninja_portal_url ||
+                    
                     route('/settings/account_management')
                   }
                   className="ml-10"
