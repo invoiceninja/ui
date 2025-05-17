@@ -287,7 +287,7 @@ export function ListBox(props: Props) {
         className="flex flex-col grow justify-start overflow-y-auto"
       >
         {resourceItems?.map(
-          (resourceItem: ResourceItem, index: number) =>
+          (resourceItem: ResourceItem) =>
             (isItemChecked(resourceItem.id) ||
               !props.selectedIds?.length ||
               isInvoicesDataKey ||

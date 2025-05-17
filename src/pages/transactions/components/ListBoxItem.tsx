@@ -36,7 +36,7 @@ export function ListBoxItem(props: Props) {
     <li
       style={{
         color: colors.$3,
-        backgroundColor: colors.$1,
+        backgroundColor: props.isItemChecked ? colors.$7 : colors.$1,
         borderColor: colors.$24,
       }}
       key={props.resourceItem.id}
@@ -47,12 +47,6 @@ export function ListBoxItem(props: Props) {
     >
       <div className="flex space-x-2 items-center">
         <Checkbox
-          style={{
-            color: colors.$3,
-            colorScheme: colors.$0,
-            backgroundColor: colors.$1,
-            borderColor: colors.$4,
-          }}
           checked={props.isItemChecked}
           onClick={() => props.selectItem(props.resourceItem.id)}
         />
@@ -60,66 +54,24 @@ export function ListBoxItem(props: Props) {
           className="flex flex-col items-start"
           style={{
             color: colors.$3,
-            colorScheme: colors.$0,
-            backgroundColor: colors.$1,
-            borderColor: colors.$4,
           }}
         >
           <span className="text-sm">{props.resourceItem.name}</span>
           <span className="text-sm">{props.resourceItem.number}</span>
         </div>
       </div>
-      <div
-        className="flex items-center flex-grow pr-3"
-        style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
-          borderColor: colors.$4,
-        }}
-      >
-        <div
-          className="flex flex-col flex-grow pl-8 pr-3"
-          style={{
-            color: colors.$3,
-            colorScheme: colors.$0,
-            backgroundColor: colors.$1,
-            borderColor: colors.$4,
-          }}
-        >
-          <span
-            className="text-sm"
-            style={{
-              color: colors.$3,
-              colorScheme: colors.$0,
-              backgroundColor: colors.$1,
-              borderColor: colors.$4,
-            }}
-          >
+      <div className="flex items-center flex-grow pr-3">
+        <div className="flex flex-col flex-grow pl-8 pr-3">
+          <span className="text-sm" style={{ color: colors.$3 }}>
             {props.resourceItem.clientName}
           </span>
-          <span
-            className="text-sm"
-            style={{
-              color: colors.$3,
-              colorScheme: colors.$0,
-              backgroundColor: colors.$1,
-              borderColor: colors.$4,
-            }}
-          >
+          <span className="text-sm" style={{ color: colors.$3 }}>
+            {formatDate(props.resourceItem.date || '', dateFormat)}
             {formatDate(props.resourceItem.date || '', dateFormat)}
           </span>
         </div>
         {typeof props.resourceItem.amount === 'number' && (
-          <span
-            className="text-sm"
-            style={{
-              color: colors.$3,
-              colorScheme: colors.$0,
-              backgroundColor: colors.$1,
-              borderColor: colors.$4,
-            }}
-          >
+          <span className="text-sm" style={{ color: colors.$3 }}>
             {formatMoney(
               props.resourceItem.amount || 0,
               props.resourceItem.country_id,
@@ -128,15 +80,7 @@ export function ListBoxItem(props: Props) {
           </span>
         )}
       </div>
-      <div
-        className="flex items-center"
-        style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
-          borderColor: colors.$4,
-        }}
-      >
+      <div className="flex items-center" style={{ color: colors.$3 }}>
         {props.resourceItem.statusId ? (
           <>
             {props.dataKey === 'invoices' && (
