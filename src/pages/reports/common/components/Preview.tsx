@@ -17,7 +17,6 @@ import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BiSortAlt2 } from 'react-icons/bi';
 
 export const previewAtom = atom<Preview | null>(null);
 
@@ -198,6 +197,8 @@ export function Preview() {
     link.click();
   };
 
+  console.log(Boolean(sorts?.['client.currency_id']), sorts, preview.columns);
+
   if (preview) {
     return (
       <div id="preview-table my-4">
@@ -215,19 +216,22 @@ export function Preview() {
                 ascIcon={<ArrowUp size="1.1rem" color="#6b7280" />}
                 descIcon={<ArrowDown size="1.1rem" color="#6b7280" />}
                 style={{ borderBottom: `1px solid ${colors.$20}` }}
+                isCurrentlyUsed={Boolean(sorts?.[column.identifier])}
+                useOnlyCurrentSortDirectionIcon
+                onColumnClick={() => sort(column.identifier)}
               >
-                <div
-                  onClick={() => sort(column.identifier)}
-                  className="cursor-pointer inline-flex items-center space-x-2"
-                >
-                  <p>{column.display_value}</p> <BiSortAlt2 />
-                </div>
+                {column.display_value}
               </Th>
             ))}
           </Thead>
 
           <Tbody>
-            <Tr>
+            <Tr
+              className="border-b"
+              style={{
+                borderColor: colors.$20,
+              }}
+            >
               {preview.columns.map((column, i) => (
                 <Td key={i}>
                   <InputField
