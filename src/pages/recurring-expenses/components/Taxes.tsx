@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { RecurringExpenseCardProps } from './Details';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends RecurringExpenseCardProps {
   taxInputType: 'by_rate' | 'by_amount';
@@ -25,8 +26,8 @@ interface Props extends RecurringExpenseCardProps {
 export function TaxSettings(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
-
   const { isAdmin, isOwner } = useAdmin();
 
   const { recurringExpense, handleChange, taxInputType, setTaxInputType } =
@@ -55,7 +56,13 @@ export function TaxSettings(props: Props) {
   };
 
   return (
-    <Card title={t('taxes')} isLoading={!recurringExpense}>
+    <Card
+      title={t('taxes')}
+      isLoading={!recurringExpense}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       {!company?.enabled_expense_tax_rates && (
         <Element leftSide={t('expense_tax_help')}>
           <DynamicLink

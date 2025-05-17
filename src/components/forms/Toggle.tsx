@@ -52,7 +52,7 @@ export default function Toggle(props: Props) {
         theme={{
           ringColor: colors.$5,
           borderColor: colors.$5,
-          backgroundColor: checked ? accentColor : colors.$5,
+          backgroundColor: checked ? colors.$3 : colors.$5,
         }}
         className={classNames(
           'relative inline-flex items-center flex-shrink-0 h-6 w-11 rounded-full transition-colors ease-in-out duration-200',

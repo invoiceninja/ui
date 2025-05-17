@@ -21,6 +21,7 @@ export function PaymentTypeSelector(props: GenericSelectorProps) {
       onValueChange={props.onChange}
       withBlank
       errorMessage={props.errorMessage}
+      customSelector
     >
       {statics.data?.payment_types
         .sort((a, b) => a.name.localeCompare(b.name))

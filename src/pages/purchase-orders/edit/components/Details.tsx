@@ -18,6 +18,7 @@ import { date as formatDate } from '$app/common/helpers';
 import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export interface PurchaseOrderCardProps {
   purchaseOrder: PurchaseOrder;
@@ -32,11 +33,16 @@ export function Details(props: PurchaseOrderCardProps) {
   const [t] = useTranslation();
 
   const { purchaseOrder, handleChange, errors } = props;
+
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   return (
     <>
-      <Card className="col-span-12 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('purchase_order_date')}>
           <InputField
             type="date"
@@ -102,7 +108,10 @@ export function Details(props: PurchaseOrderCardProps) {
         )}
       </Card>
 
-      <Card className="col-span-12 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('po_number')}>
           <InputField
             value={purchaseOrder.number}
@@ -114,6 +123,21 @@ export function Details(props: PurchaseOrderCardProps) {
         <Element leftSide={t('discount')}>
           <Inline>
             <div className="w-full lg:w-1/2">
+              <SelectField
+                value={purchaseOrder.is_amount_discount.toString()}
+                onValueChange={(value) =>
+                  handleChange('is_amount_discount', JSON.parse(value))
+                }
+                errorMessage={errors?.errors.is_amount_discount}
+                customSelector
+                dismissable={false}
+              >
+                <option value="false">{t('percent')}</option>
+                <option value="true">{t('amount')}</option>
+              </SelectField>
+            </div>
+
+            <div className="w-full lg:w-1/2">
               <NumberInputField
                 value={purchaseOrder.discount || ''}
                 onValueChange={(value) =>
@@ -121,19 +145,6 @@ export function Details(props: PurchaseOrderCardProps) {
                 }
                 errorMessage={errors?.errors.discount}
               />
-            </div>
-
-            <div className="w-full lg:w-1/2">
-              <SelectField
-                value={purchaseOrder.is_amount_discount.toString()}
-                onValueChange={(value) =>
-                  handleChange('is_amount_discount', JSON.parse(value))
-                }
-                errorMessage={errors?.errors.is_amount_discount}
-              >
-                <option value="false">{t('percent')}</option>
-                <option value="true">{t('amount')}</option>
-              </SelectField>
             </div>
           </Inline>
         </Element>
