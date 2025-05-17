@@ -215,18 +215,20 @@ export function TransactionMatchDetails(props: Props) {
 
   return (
     <div className="flex flex-col flex-1">
-      <div className="flex flex-col flex-1">
+      <div
+        className="flex flex-col flex-1 border-t"
+        style={{
+          borderColor: colors.$24,
+        }}
+      >
         {!isTransactionConverted && (
           <TabGroup
-            className="flex flex-col flex-1 border-t"
+            className="flex flex-col flex-1 mt-2"
             tabs={tabs}
             height="full"
             width="full"
             withHorizontalPadding
             horizontalPaddingWidth="1rem"
-            style={{
-              borderColor: colors.$24,
-            }}
           >
             <div>
               {props.isCreditTransactionType ? (
@@ -272,13 +274,17 @@ export function TransactionMatchDetails(props: Props) {
                 </>
               )}
 
-              <div className="px-3 py-3 w-full border-t border-gray-200">
+              <div
+                className="px-3 py-3 w-full border-t"
+                style={{
+                  borderColor: colors.$24,
+                }}
+              >
                 <Button
                   style={{
                     color: colors.$3,
-                    colorScheme: colors.$0,
                     backgroundColor: colors.$1,
-                    borderColor: colors.$4,
+                    borderColor: colors.$24,
                   }}
                   className="w-full"
                   onClick={
@@ -341,13 +347,17 @@ export function TransactionMatchDetails(props: Props) {
                 />
               )}
 
-              <div className="px-3 py-3 w-full border-t border-gray-200">
+              <div
+                className="px-3 py-3 w-full border-t"
+                style={{
+                  borderColor: colors.$24,
+                }}
+              >
                 <Button
                   style={{
                     color: colors.$3,
-                    colorScheme: colors.$0,
                     backgroundColor: colors.$1,
-                    borderColor: colors.$4,
+                    borderColor: colors.$24,
                   }}
                   className="w-full"
                   onClick={

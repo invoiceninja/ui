@@ -100,7 +100,10 @@ export function CreateExpenseCategoryModal(props: Props) {
       onClose={() => props.setVisible(false)}
       stopPropagationInHeader
     >
-      <div onClick={(event) => event.stopPropagation()}>
+      <div
+        className="flex flex-col space-y-4"
+        onClick={(event) => event.stopPropagation()}
+      >
         <CreateExpenseCategoryForm
           expenseCategory={expenseCategory}
           setExpenseCategory={setExpenseCategory}

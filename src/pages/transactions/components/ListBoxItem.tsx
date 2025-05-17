@@ -36,9 +36,8 @@ export function ListBoxItem(props: Props) {
     <li
       style={{
         color: colors.$3,
-        colorScheme: colors.$0,
         backgroundColor: colors.$1,
-        borderColor: colors.$4,
+        borderColor: colors.$24,
       }}
       key={props.resourceItem.id}
       className="flex justify-between w-full cursor-pointer p-4 border-b last:border-b-0"
