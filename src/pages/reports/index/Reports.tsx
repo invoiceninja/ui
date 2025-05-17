@@ -115,11 +115,12 @@ const download = (data: BlobPart, identifier: string) => {
   // Check if data is ArrayBuffer or Uint8Array
   if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
     const view = new Uint8Array(data instanceof ArrayBuffer ? data : data);
-    isPDF = view.length > 4 &&
+    isPDF =
+      view.length > 4 &&
       view[0] === 0x25 && // %
       view[1] === 0x50 && // P
       view[2] === 0x44 && // D
-      view[3] === 0x46;   // F
+      view[3] === 0x46; // F
   } else if (typeof data === 'string') {
     isPDF = data.startsWith('%PDF');
   }
@@ -134,7 +135,7 @@ const download = (data: BlobPart, identifier: string) => {
   link.download = `${identifier}.${fileType}`;
   link.href = url;
   link.click();
-  
+
   URL.revokeObjectURL(url);
 };
 
@@ -244,11 +245,14 @@ export default function Reports() {
           .fetchQuery({
             queryKey: ['exports', hash],
             queryFn: () =>
-              request('POST', endpoint(`/api/v1/exports/preview/${hash}`), null, {
-                responseType: 'arraybuffer'
-              }).then(
-                (response) => response.data
-              ),
+              request(
+                'POST',
+                endpoint(`/api/v1/exports/preview/${hash}`),
+                null,
+                {
+                  responseType: 'arraybuffer',
+                }
+              ).then((response) => response.data),
             retry: 50,
             retryDelay: import.meta.env.DEV ? 1000 : 2000,
           })
@@ -396,7 +400,7 @@ export default function Reports() {
       disableSaveButton={isPendingExport || (!proPlan() && !enterprisePlan())}
       navigationTopRight={
         <Dropdown
-          label={t('more_actions')}
+          label={t('actions')}
           disabled={!proPlan() && !enterprisePlan()}
         >
           {report.supports_previews && (
@@ -421,14 +425,12 @@ export default function Reports() {
 
       <div
         className="grid grid-cols-12 gap-4"
-        style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
-          borderColor: colors.$4,
-        }}
+        style={{ borderColor: colors.$4 }}
       >
-        <Card className="col-span-6 h-max">
+        <Card
+          className="col-span-6 h-max shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
           <Element leftSide={t('report')}>
             <SelectField
               onValueChange={(value) => {
@@ -437,6 +439,8 @@ export default function Reports() {
               }}
               value={report.identifier}
               cypressRef="reportNameSelector"
+              customSelector
+              dismissable={false}
             >
               {reports.map((report, i) => (
                 <option value={report.identifier} key={i}>
@@ -448,12 +452,6 @@ export default function Reports() {
 
           <Element leftSide={t('send_email')}>
             <Toggle
-              style={{
-                color: colors.$3,
-                colorScheme: colors.$0,
-                backgroundColor: colors.$1,
-                borderColor: colors.$4,
-              }}
               checked={report.payload.send_email}
               onValueChange={handleSendEmailChange}
             />
@@ -462,12 +460,6 @@ export default function Reports() {
           {showReportField('document_email_attachment') && (
             <Element leftSide={t('document_email_attachment')}>
               <Toggle
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 checked={report.payload.document_email_attachment}
                 onValueChange={(value) =>
                   handlePayloadChange('document_email_attachment', value)
@@ -480,12 +472,6 @@ export default function Reports() {
           {showReportField('pdf_email_attachment') && (
             <Element leftSide={t('attach_pdf')}>
               <Toggle
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 checked={report.payload.pdf_email_attachment}
                 onValueChange={(value) =>
                   handlePayloadChange('pdf_email_attachment', value)
@@ -497,12 +483,6 @@ export default function Reports() {
           {showReportField('is_expense_billed') && (
             <Element leftSide={t('expense_paid_report')}>
               <Toggle
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 checked={report.payload.is_expense_billed}
                 onValueChange={(value) =>
                   handlePayloadChange('is_expense_billed', value)
@@ -515,12 +495,6 @@ export default function Reports() {
           {showReportField('is_income_billed') && (
             <Element leftSide={t('cash_vs_accrual')}>
               <Toggle
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 checked={report.payload.is_income_billed}
                 onValueChange={(value) =>
                   handlePayloadChange('is_income_billed', value)
@@ -533,12 +507,6 @@ export default function Reports() {
           {showReportField('include_tax') && (
             <Element leftSide={t('include_tax')}>
               <Toggle
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 checked={report.payload.include_tax}
                 onValueChange={(value) =>
                   handlePayloadChange('include_tax', value)
@@ -554,12 +522,6 @@ export default function Reports() {
               leftSideHelp={t('include_deleted_help')}
             >
               <Toggle
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 checked={report.payload.include_deleted}
                 onValueChange={(value) =>
                   handlePayloadChange('include_deleted', value)
@@ -625,17 +587,17 @@ export default function Reports() {
           )}
         </Card>
 
-        <Card className="col-span-6 h-max">
+        <Card
+          className="col-span-6 h-max shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
           <Element leftSide={t('range')}>
             <SelectField
-              style={{
-                color: colors.$3,
-                colorScheme: colors.$0,
-                backgroundColor: colors.$1,
-              }}
-              onValueChange={(value) => handleRangeChange(value)}
               value={report.payload.date_range}
+              onValueChange={(value) => handleRangeChange(value)}
               cypressRef="reportDateRange"
+              customSelector
+              dismissable={false}
             >
               {ranges.map((range, i) => (
                 <option value={range.identifier} key={i}>
@@ -662,12 +624,6 @@ export default function Reports() {
           {report.payload.date_range === 'custom' && (
             <Element leftSide={t('end_date')}>
               <InputField
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 type="date"
                 value={report.payload.end_date}
                 onValueChange={(value) =>
@@ -696,12 +652,6 @@ export default function Reports() {
           {report.allow_custom_column && (
             <Element leftSide={`${t('customize')} ${t('columns')}`}>
               <Toggle
-                style={{
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                  backgroundColor: colors.$1,
-                  borderColor: colors.$4,
-                }}
                 checked={showCustomColumns}
                 onValueChange={(value) => setShowCustomColumns(Boolean(value))}
               />
