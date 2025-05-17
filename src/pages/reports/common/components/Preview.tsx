@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Button, InputField, Link } from '$app/components/forms';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -86,10 +89,13 @@ export function usePreview() {
 }
 
 export function Preview() {
-  const preview = usePreview();
-  const [filtered, setFiltered] = useState<Preview | null>(null);
-  const [sorts, setSorts] = useState<Record<string, string>>();
   const [t] = useTranslation();
+
+  const preview = usePreview();
+  const colors = useColorScheme();
+
+  const [sorts, setSorts] = useState<Record<string, string>>();
+  const [filtered, setFiltered] = useState<Preview | null>(null);
 
   if (!preview) {
     return null;
@@ -204,7 +210,12 @@ export function Preview() {
         <Table>
           <Thead>
             {preview.columns.map((column, i) => (
-              <Th key={i}>
+              <Th
+                key={i}
+                ascIcon={<ArrowUp size="1.1rem" color="#6b7280" />}
+                descIcon={<ArrowDown size="1.1rem" color="#6b7280" />}
+                style={{ borderBottom: `1px solid ${colors.$20}` }}
+              >
                 <div
                   onClick={() => sort(column.identifier)}
                   className="cursor-pointer inline-flex items-center space-x-2"
@@ -214,6 +225,7 @@ export function Preview() {
               </Th>
             ))}
           </Thead>
+
           <Tbody>
             <Tr>
               {preview.columns.map((column, i) => (
@@ -226,7 +238,13 @@ export function Preview() {
             </Tr>
 
             {data.map((row, i) => (
-              <Tr key={i}>
+              <Tr
+                key={i}
+                className="border-b"
+                style={{
+                  borderColor: colors.$20,
+                }}
+              >
                 {row.map((cell, i) => (
                   <Td key={i}>{cell.display_value}</Td>
                 ))}
