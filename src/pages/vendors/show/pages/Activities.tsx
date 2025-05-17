@@ -23,6 +23,8 @@ import {
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import Toggle from '$app/components/forms/Toggle';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 interface Context {
   displayName: string;
@@ -32,6 +34,9 @@ export default function Activities() {
   const { id } = useParams();
 
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const activityElement = useGenerateActivityElement();
 
   const context: Context = useOutletContext();
@@ -56,7 +61,7 @@ export default function Activities() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-full relative"
+      className="shadow-sm"
       topRight={
         <div className="flex items-center space-x-10">
           <Toggle
@@ -73,8 +78,27 @@ export default function Activities() {
         </div>
       }
       withoutBodyPadding
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
     >
-      <div className="pl-6 pr-4">
+      <div
+        className={classNames('px-6 pt-2', {
+          'pb-6': Boolean(
+            activities?.filter(
+              (activity) =>
+                (commentsOnly && activity.activity_type_id === 141) ||
+                !commentsOnly
+            )?.length
+          ),
+          'pb-4': Boolean(
+            !activities?.filter(
+              (activity) =>
+                (commentsOnly && activity.activity_type_id === 141) ||
+                !commentsOnly
+            )?.length
+          ),
+        })}
+      >
         {Boolean(
           !activities?.filter(
             (activity) =>
@@ -82,7 +106,7 @@ export default function Activities() {
               !commentsOnly
           )?.length
         ) && (
-          <div className="py-4">
+          <div className="pt-2">
             <span className="text-sm font-medium">
               {t('no_records_found')}.
             </span>
@@ -90,7 +114,7 @@ export default function Activities() {
         )}
 
         {Boolean(activities?.length) && (
-          <div className="flex flex-col overflow-y-auto pr-4">
+          <div className="flex flex-col overflow-y-auto max-h-96">
             {activities
               ?.filter(
                 (activity) =>
