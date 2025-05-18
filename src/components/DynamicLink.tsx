@@ -29,7 +29,7 @@ export function DynamicLink(props: Props) {
   }
 
   return (
-    <div onClick={(event) => event.stopPropagation()}>
+    <div className="w-max" onClick={(event) => event.stopPropagation()}>
       <RouterLink
         className={`text-sm hover:underline ${props.className}`}
         style={{ color: accentColor }}
