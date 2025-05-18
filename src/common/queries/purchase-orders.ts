@@ -46,7 +46,9 @@ export function usePurchaseOrderQuery(params: { id: string | undefined }) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/purchase_orders/:id', { id: params.id })
+        endpoint('/api/v1/purchase_orders/:id?include=vendor', {
+          id: params.id,
+        })
       ).then(
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
           response.data.data

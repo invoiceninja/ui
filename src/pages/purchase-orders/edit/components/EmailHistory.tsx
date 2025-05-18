@@ -18,12 +18,14 @@ import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export default function EmailHistory() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -54,27 +56,41 @@ export default function EmailHistory() {
   }, [id]);
 
   return (
-    <Card title={t('email_history')} className="w-full xl:w-2/3">
-      {isLoading && (
-        <div className="flex justify-center">
-          <Spinner />
+    <Card
+      title={t('email_history')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutBodyPadding
+    >
+      <div
+        className={classNames('flex w-full px-2 pt-2', {
+          'pb-10': emailRecords?.length,
+          'pb-6': !emailRecords.length,
+          'justify-center': emailRecords.length,
+        })}
+      >
+        {isLoading && (
+          <div className="flex justify-center p-6">
+            <Spinner />
+          </div>
+        )}
+
+        {!isLoading && !emailRecords.length && (
+          <div className="text-sm px-4 pt-3">{t('email_history_empty')}</div>
+        )}
+
+        <div className="flex flex-col w-full lg:w-2/4 space-y-2">
+          {emailRecords.map((emailRecord, index) => (
+            <EmailRecord
+              key={index}
+              className="py-4"
+              emailRecord={emailRecord}
+              index={index}
+              withAllBorders
+            />
+          ))}
         </div>
-      )}
-
-      {!isLoading && !emailRecords.length && (
-        <span className="px-6">{t('email_history_empty')}</span>
-      )}
-
-      <div className="flex flex-col space-y-2 px-6">
-        {emailRecords.map((emailRecord, index) => (
-          <EmailRecord
-            key={index}
-            className="py-4"
-            emailRecord={emailRecord}
-            index={index}
-            withAllBorders
-          />
-        ))}
       </div>
     </Card>
   );

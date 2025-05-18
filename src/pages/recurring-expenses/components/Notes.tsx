@@ -12,14 +12,24 @@ import { Card } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { RecurringExpenseCardProps } from './Details';
+import { useColorScheme } from '$app/common/colors';
 
 export function Notes(props: RecurringExpenseCardProps) {
   const [t] = useTranslation();
 
   const { recurringExpense, handleChange, errors } = props;
 
+  const colors = useColorScheme();
+
   return (
-    <Card title={t('notes')} isLoading={!recurringExpense} withContainer>
+    <Card
+      title={t('notes')}
+      isLoading={!recurringExpense}
+      withContainer
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       {recurringExpense && (
         <InputField
           element="textarea"

@@ -26,8 +26,10 @@ import { useHandleLineItemPropertyChange } from '../../edit/hooks/useHandleLineI
 import { useHandleProductChange } from '../../edit/hooks/useHandleProductChange';
 import { Card } from '$app/components/cards';
 import { PurchaseOrderContext } from '../Create';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Create() {
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const context: PurchaseOrderContext = useOutletContext();
@@ -63,7 +65,11 @@ export default function Create() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+        <Card
+          className="col-span-12 xl:col-span-4 h-max shadow-sm"
+          withContainer
+          style={{ borderColor: colors.$24 }}
+        >
           <VendorSelector
             resource={purchaseOrder}
             onChange={(id) => handleChange('vendor_id', id)}
