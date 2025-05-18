@@ -132,6 +132,7 @@ export function Preview() {
   };
 
   const sort = (column: string) => {
+    console.log('ok');
     const value = sorts?.[column] === 'asc' ? 'desc' : 'asc';
 
     setSorts((current) => ({ ...current, [column]: value }));
