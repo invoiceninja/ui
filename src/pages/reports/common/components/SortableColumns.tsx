@@ -333,42 +333,33 @@ export function SortableColumns({ report, columns }: Props) {
 
   return (
     <div
-      className="min-w-min"
+      className="overflow-x-auto w-full my-6"
       style={{
         color: colors.$3,
-        colorScheme: colors.$0,
-        backgroundColor: colors.$1,
         borderColor: colors.$4,
       }}
     >
-      <Card className="my-6">
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div
-            className="flex w-full py-2 px-6 space-x-4"
-            style={{
-              color: colors.$3,
-              colorScheme: colors.$0,
-              backgroundColor: colors.$1,
-              borderColor: colors.$4,
-            }}
-          >
-            {columns.includes('client') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('client')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(0)}
+      <div
+        style={{
+          minWidth: 'min-content',
+        }}
+      >
+        <Card>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div
+              className="flex w-full py-2 px-6 space-x-4"
+              style={{
+                color: colors.$3,
+                colorScheme: colors.$0,
+                backgroundColor: colors.$1,
+                borderColor: colors.$4,
+              }}
+            >
+              {columns.includes('client') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
                       style={{
                         color: colors.$3,
                         colorScheme: colors.$0,
@@ -376,359 +367,372 @@ export function SortableColumns({ report, columns }: Props) {
                         borderColor: colors.$4,
                       }}
                     >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[0]}
-                droppableId="0"
-                isDropDisabled={true}
-              />
-            )}
+                      <p>{t('client')}</p>
 
-            {columns.includes('invoice') && (
-              <Column
-                title={() => (
-                  <div className="flex justify-between items-center">
-                    <p>{t('invoice')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(1)}
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[1]}
-                droppableId="1"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('credit') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('credit')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(2)}
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[2]}
-                droppableId="2"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('quote') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('quote')}</p>
-
-                    <button type="button" onClick={() => onAddAll(3)}>
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[3]}
-                droppableId="3"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('payment') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('payment')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(4)}
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[4]}
-                droppableId="4"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('vendor') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('vendor')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(5)}
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[5]}
-                droppableId="5"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('purchase_order') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('purchase_order')}</p>
-
-                    <button type="button" onClick={() => onAddAll(6)}>
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[6]}
-                droppableId="6"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('task') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('task')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(7)}
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[7]}
-                droppableId="7"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('expense') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('expense')}</p>
-
-                    <button type="button" onClick={() => onAddAll(8)}>
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[8]}
-                droppableId="8"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('recurring_invoice') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('recurring_invoice')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(9)}
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[9]}
-                droppableId="9"
-                isDropDisabled={true}
-              />
-            )}
-
-            {columns.includes('contact') && (
-              <Column
-                title={() => (
-                  <div
-                    className="flex justify-between items-center"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>{t('contact')}</p>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddAll(10)}
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <ChevronsRight size={16} />
-                    </button>
-                  </div>
-                )}
-                data={data[10]}
-                droppableId="10"
-                isDropDisabled={true}
-              />
-            )}
-
-            <Column
-              title={() => (
-                <div
-                  className="flex items-center justify-between"
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                >
-                  <p>
-                    {t('report')} {t('columns')}
-                  </p>
-
-                  <div
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                    className="flex items-end space-x-1 cursor-pointer"
-                    onClick={onRemoveAll}
-                  >
-                    <X size={19} />
-                    <span className="text-xs">({t('reset')})</span>
-                  </div>
-                </div>
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(0)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[0]}
+                  droppableId="0"
+                  isDropDisabled={true}
+                />
               )}
-              data={data[reportColumn]}
-              droppableId={reportColumn.toString()}
-              isDropDisabled={false}
-              onRemove={onRemove}
-            />
-          </div>
-        </DragDropContext>
-      </Card>
+
+              {columns.includes('invoice') && (
+                <Column
+                  title={() => (
+                    <div className="flex justify-between items-center">
+                      <p>{t('invoice')}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(1)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[1]}
+                  droppableId="1"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('credit') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('credit')}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(2)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[2]}
+                  droppableId="2"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('quote') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('quote')}</p>
+
+                      <button type="button" onClick={() => onAddAll(3)}>
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[3]}
+                  droppableId="3"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('payment') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('payment')}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(4)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[4]}
+                  droppableId="4"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('vendor') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('vendor')}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(5)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[5]}
+                  droppableId="5"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('purchase_order') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('purchase_order')}</p>
+
+                      <button type="button" onClick={() => onAddAll(6)}>
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[6]}
+                  droppableId="6"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('task') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('task')}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(7)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[7]}
+                  droppableId="7"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('expense') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('expense')}</p>
+
+                      <button type="button" onClick={() => onAddAll(8)}>
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[8]}
+                  droppableId="8"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('recurring_invoice') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('recurring_invoice')}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(9)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[9]}
+                  droppableId="9"
+                  isDropDisabled={true}
+                />
+              )}
+
+              {columns.includes('contact') && (
+                <Column
+                  title={() => (
+                    <div
+                      className="flex justify-between items-center"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <p>{t('contact')}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => onAddAll(10)}
+                        style={{
+                          color: colors.$3,
+                          colorScheme: colors.$0,
+                          backgroundColor: colors.$1,
+                          borderColor: colors.$4,
+                        }}
+                      >
+                        <ChevronsRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                  data={data[10]}
+                  droppableId="10"
+                  isDropDisabled={true}
+                />
+              )}
+
+              <Column
+                title={() => (
+                  <div
+                    className="flex items-center justify-between"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
+                    <p>
+                      {t('report')} {t('columns')}
+                    </p>
+
+                    <div
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                      className="flex items-end space-x-1 cursor-pointer"
+                      onClick={onRemoveAll}
+                    >
+                      <X size={19} />
+                      <span className="text-xs">({t('reset')})</span>
+                    </div>
+                  </div>
+                )}
+                data={data[reportColumn]}
+                droppableId={reportColumn.toString()}
+                isDropDisabled={false}
+                onRemove={onRemove}
+              />
+            </div>
+          </DragDropContext>
+        </Card>
+      </div>
     </div>
   );
 }
