@@ -143,10 +143,14 @@ export default function Reports() {
   const { documentTitle } = useTitle('reports');
   const { t } = useTranslation();
 
+  const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
+
   const reports = useReports();
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const scheduleReport = useScheduleReport();
+  const { save, preferences } = usePreferences();
   const numericFormatter = useNumericFormatter();
 
   const [report, setReport] = useState<Report>(reports[0]);
@@ -154,10 +158,9 @@ export default function Reports() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
 
-  const showReportField = useShowReportField({ report: report.identifier });
-  const { save, preferences } = usePreferences();
+  const [preview, setPreview] = useAtom(previewAtom);
 
-  const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
+  const showReportField = useShowReportField({ report: report.identifier });
 
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
@@ -284,8 +287,6 @@ export default function Reports() {
       });
   };
 
-  const [preview, setPreview] = useAtom(previewAtom);
-
   const adjustCellValue = (currentCell: Cell) => {
     if (
       currentCell.identifier.endsWith('_notes') ||
@@ -389,7 +390,6 @@ export default function Reports() {
       setPreview(null);
     };
   }, []);
-  const colors = useColorScheme();
 
   return (
     <Default

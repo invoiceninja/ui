@@ -10,8 +10,6 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { Button, InputField, Link } from '$app/components/forms';
-import { ArrowDown } from '$app/components/icons/ArrowDown';
-import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -197,8 +195,6 @@ export function Preview() {
     link.click();
   };
 
-  console.log(Boolean(sorts?.['client.currency_id']), sorts, preview.columns);
-
   if (preview) {
     return (
       <div id="preview-table my-4">
@@ -213,11 +209,8 @@ export function Preview() {
             {preview.columns.map((column, i) => (
               <Th
                 key={i}
-                ascIcon={<ArrowUp size="1.1rem" color="#6b7280" />}
-                descIcon={<ArrowDown size="1.1rem" color="#6b7280" />}
                 style={{ borderBottom: `1px solid ${colors.$20}` }}
                 isCurrentlyUsed={Boolean(sorts?.[column.identifier])}
-                useOnlyCurrentSortDirectionIcon
                 onColumnClick={() => sort(column.identifier)}
               >
                 {column.display_value}
