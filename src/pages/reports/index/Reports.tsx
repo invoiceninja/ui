@@ -115,11 +115,12 @@ const download = (data: BlobPart, identifier: string) => {
   // Check if data is ArrayBuffer or Uint8Array
   if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
     const view = new Uint8Array(data instanceof ArrayBuffer ? data : data);
-    isPDF = view.length > 4 &&
+    isPDF =
+      view.length > 4 &&
       view[0] === 0x25 && // %
       view[1] === 0x50 && // P
       view[2] === 0x44 && // D
-      view[3] === 0x46;   // F
+      view[3] === 0x46; // F
   } else if (typeof data === 'string') {
     isPDF = data.startsWith('%PDF');
   }
@@ -134,7 +135,7 @@ const download = (data: BlobPart, identifier: string) => {
   link.download = `${identifier}.${fileType}`;
   link.href = url;
   link.click();
-  
+
   URL.revokeObjectURL(url);
 };
 
@@ -244,11 +245,14 @@ export default function Reports() {
           .fetchQuery({
             queryKey: ['exports', hash],
             queryFn: () =>
-              request('POST', endpoint(`/api/v1/exports/preview/${hash}`), null, {
-                responseType: 'arraybuffer'
-              }).then(
-                (response) => response.data
-              ),
+              request(
+                'POST',
+                endpoint(`/api/v1/exports/preview/${hash}`),
+                null,
+                {
+                  responseType: 'arraybuffer',
+                }
+              ).then((response) => response.data),
             retry: 50,
             retryDelay: import.meta.env.DEV ? 1000 : 2000,
           })
@@ -422,9 +426,6 @@ export default function Reports() {
       <div
         className="grid grid-cols-12 gap-4"
         style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
           borderColor: colors.$4,
         }}
       >

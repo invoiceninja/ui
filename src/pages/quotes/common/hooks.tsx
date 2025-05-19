@@ -733,6 +733,7 @@ export const defaultColumns: string[] = [
   'number',
   'client',
   'amount',
+  'net_amount',
   'date',
   'valid_until',
 ];
@@ -748,6 +749,7 @@ export function useAllQuoteColumns() {
     'number',
     'client',
     'amount',
+    'net_amount',
     'date',
     'valid_until',
     'archived_at',
@@ -892,6 +894,17 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
+        ),
+    },
+    {
+      column: 'net_amount',
+      id: 'amount',
+      label: t('net_amount'),
+      format: (value, quote) =>
+        formatMoney(
+          Number(value) - Number(quote.total_taxes || 0),
           quote.client?.country_id,
           quote.client?.settings.currency_id
         ),
