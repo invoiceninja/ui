@@ -14,7 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
-import { Divider } from '$app/components/cards/Divider';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { CustomField } from '$app/components/CustomField';
 import Toggle from '$app/components/forms/Toggle';
@@ -29,6 +28,10 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { Dispatch, SetStateAction } from 'react';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useColorScheme } from '$app/common/colors';
+import { Trash } from '$app/components/icons/Trash';
+import { Plus } from '$app/components/icons/Plus';
+import classNames from 'classnames';
 
 interface Props {
   vendor: Vendor;
@@ -43,6 +46,7 @@ interface Props {
 
 export function Form(props: Props) {
   const [t] = useTranslation();
+
   const {
     vendor,
     setVendor,
@@ -53,8 +57,9 @@ export function Form(props: Props) {
     fundamentalConceptVisible,
   } = props;
 
+  const colors = useColorScheme();
+  const languages = useLanguages();
   const company = useCurrentCompany();
-
   const { isAdmin, isOwner } = useAdmin();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
@@ -106,7 +111,21 @@ export function Form(props: Props) {
     setContacts(currentContacts);
   };
 
-  const languages = useLanguages();
+  const handleAddContact = () => {
+    handleCreate();
+
+    setTimeout(() => {
+      const contactElements = document.querySelectorAll('[id^="first_name_"]');
+
+      if (contactElements.length > 2) {
+        const lastContactElement = contactElements[contactElements.length - 1];
+        lastContactElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }, 50);
+  };
 
   return (
     <>
@@ -162,7 +181,12 @@ export function Form(props: Props) {
       ) : (
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-12 xl:col-span-6 space-y-4">
-            <Card title={t('details')}>
+            <Card
+              className="shadow-sm"
+              title={t('details')}
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+            >
               {page === 'edit' && (
                 <Element leftSide={t('status')}>
                   <EntityStatus entity={vendor} />
@@ -313,7 +337,12 @@ export function Form(props: Props) {
               )}
             </Card>
 
-            <Card title={t('address')}>
+            <Card
+              className="shadow-sm"
+              title={t('address')}
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+            >
               <Element leftSide={t('address1')}>
                 <InputField
                   value={vendor.address1}
@@ -365,151 +394,190 @@ export function Form(props: Props) {
           </div>
 
           <div className="col-span-12 xl:col-span-6 space-y-4">
-            <Card title={t('contacts')}>
-              {contacts.map((contact, index, { length }) => (
-                <div key={index}>
-                  <Element leftSide={t('first_name')}>
-                    <InputField
-                      id={`first_name_${index}`}
-                      value={contact.first_name}
-                      onValueChange={(value) =>
-                        handleContactChange('first_name', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.first_name`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('last_name')}>
-                    <InputField
-                      id={`last_name_${index}`}
-                      value={contact.last_name}
-                      onValueChange={(value) =>
-                        handleContactChange('last_name', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.last_name`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('email')}>
-                    <InputField
-                      id={`email_${index}`}
-                      value={contact.email}
-                      onValueChange={(value) =>
-                        handleContactChange('email', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.email`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('phone')}>
-                    <InputField
-                      value={contact.phone}
-                      onValueChange={(value) =>
-                        handleContactChange('phone', value, index)
-                      }
-                      errorMessage={
-                        props.errors?.errors[`contacts.${index}.phone`]
-                      }
-                    />
-                  </Element>
-
-                  <Element leftSide={t('send_email')}>
-                    <Toggle
-                      checked={contact.send_email}
-                      onChange={(value) =>
-                        handleContactChange('send_email', value, index)
-                      }
-                    />
-                  </Element>
-
-                  {company?.custom_fields?.vendor_contact1 && (
-                    <CustomField
-                      field="vendor_contact1"
-                      defaultValue={contact.custom_value1 || ''}
-                      value={company.custom_fields.vendor_contact1}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value1', value, index)
-                      }
-                    />
-                  )}
-
-                  {company?.custom_fields?.vendor_contact2 && (
-                    <CustomField
-                      field="vendor_contact2"
-                      defaultValue={contact.custom_value2 || ''}
-                      value={company.custom_fields.vendor_contact2}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value2', value, index)
-                      }
-                    />
-                  )}
-
-                  {company?.custom_fields?.vendor_contact3 && (
-                    <CustomField
-                      field="vendor_contact3"
-                      defaultValue={contact.custom_value3 || ''}
-                      value={company.custom_fields.vendor_contact3}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value3', value, index)
-                      }
-                    />
-                  )}
-
-                  {company?.custom_fields?.vendor_contact4 && (
-                    <CustomField
-                      field="vendor_contact4"
-                      defaultValue={contact.custom_value4 || ''}
-                      value={company.custom_fields.vendor_contact4}
-                      onValueChange={(value) =>
-                        handleContactChange('custom_value4', value, index)
-                      }
-                    />
-                  )}
-
-                  <Element>
-                    <div className="flex justify-between items-center">
-                      {vendor.contacts.length >= 2 && (
-                        <button
-                          type="button"
-                          className="text-red-600"
-                          onClick={() => handleDelete(index)}
-                        >
-                          {t('remove_contact')}
-                        </button>
-                      )}
-
-                      {index + 1 == length && (
-                        <Button
-                          type="minimal"
-                          behavior="button"
-                          onClick={handleCreate}
-                        >
-                          {t('add_contact')}
-                        </Button>
-                      )}
+            <Card
+              className="shadow-sm"
+              title={t('contacts')}
+              headerClassName="px-4 sm:px-6 py-[0.825rem]"
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+              withoutBodyPadding
+              withoutHeaderPadding
+              topRight={
+                <Button
+                  className="shadow-sm"
+                  type="secondary"
+                  behavior="button"
+                  onClick={handleAddContact}
+                >
+                  <div className="flex items-center">
+                    <div>
+                      <Plus size="0.7rem" color={colors.$3} />
                     </div>
-                  </Element>
 
-                  <Divider />
+                    <span className="font-medium">{t('add_contact')}</span>
+                  </div>
+                </Button>
+              }
+            >
+              {contacts.map((contact, index) => (
+                <div key={index} className="px-6">
+                  <div
+                    className={classNames('pb-2 pt-4 border-b border-dashed', {
+                      'border-b-0': index === contacts.length - 1,
+                    })}
+                    style={{ borderColor: colors.$24 }}
+                  >
+                    <Element leftSide={t('first_name')} noExternalPadding>
+                      <InputField
+                        id={`first_name_${index}`}
+                        value={contact.first_name}
+                        onValueChange={(value) =>
+                          handleContactChange('first_name', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.first_name`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('last_name')} noExternalPadding>
+                      <InputField
+                        id={`last_name_${index}`}
+                        value={contact.last_name}
+                        onValueChange={(value) =>
+                          handleContactChange('last_name', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.last_name`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('email')} noExternalPadding>
+                      <InputField
+                        id={`email_${index}`}
+                        value={contact.email}
+                        onValueChange={(value) =>
+                          handleContactChange('email', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.email`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('phone')} noExternalPadding>
+                      <InputField
+                        value={contact.phone}
+                        onValueChange={(value) =>
+                          handleContactChange('phone', value, index)
+                        }
+                        errorMessage={
+                          props.errors?.errors[`contacts.${index}.phone`]
+                        }
+                      />
+                    </Element>
+
+                    <Element leftSide={t('send_email')} noExternalPadding>
+                      <Toggle
+                        checked={contact.send_email}
+                        onChange={(value) =>
+                          handleContactChange('send_email', value, index)
+                        }
+                      />
+                    </Element>
+
+                    {company?.custom_fields?.vendor_contact1 && (
+                      <CustomField
+                        field="vendor_contact1"
+                        defaultValue={contact.custom_value1 || ''}
+                        value={company.custom_fields.vendor_contact1}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value1', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    {company?.custom_fields?.vendor_contact2 && (
+                      <CustomField
+                        field="vendor_contact2"
+                        defaultValue={contact.custom_value2 || ''}
+                        value={company.custom_fields.vendor_contact2}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value2', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    {company?.custom_fields?.vendor_contact3 && (
+                      <CustomField
+                        field="vendor_contact3"
+                        defaultValue={contact.custom_value3 || ''}
+                        value={company.custom_fields.vendor_contact3}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value3', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    {company?.custom_fields?.vendor_contact4 && (
+                      <CustomField
+                        field="vendor_contact4"
+                        defaultValue={contact.custom_value4 || ''}
+                        value={company.custom_fields.vendor_contact4}
+                        onValueChange={(value) =>
+                          handleContactChange('custom_value4', value, index)
+                        }
+                        noExternalPadding
+                      />
+                    )}
+
+                    <Element noExternalPadding pushContentToRight>
+                      <div className="flex items-center">
+                        {contacts.length >= 2 && (
+                          <Button
+                            className="shadow-sm"
+                            type="secondary"
+                            behavior="button"
+                            onClick={() => handleDelete(index)}
+                          >
+                            <div className="flex space-x-2 items-center">
+                              <div>
+                                <Trash size="1rem" color="#ef4444" />
+                              </div>
+
+                              <span className="font-medium text-red-500">
+                                {t('remove_contact')}
+                              </span>
+                            </div>
+                          </Button>
+                        )}
+                      </div>
+                    </Element>
+                  </div>
                 </div>
               ))}
             </Card>
 
-            <Card title={t('additional_info')}>
+            <Card
+              className="shadow-sm"
+              title={t('additional_info')}
+              style={{ borderColor: colors.$24 }}
+              headerStyle={{ borderColor: colors.$20 }}
+            >
               <TabGroup
-                className="px-5"
                 tabs={[
                   t('settings'),
                   ...(isAdmin || isOwner ? [t('custom_fields')] : []),
                 ]}
+                withHorizontalPadding
+                horizontalPaddingWidth="1.5rem"
+                fullRightPadding
               >
-                <div className="flex flex-col space-y-4">
+                <div className="flex flex-col space-y-4 px-6">
                   <Element leftSide={t('currency')} noExternalPadding>
                     <CurrencySelector
                       value={vendor.currency_id}
@@ -537,20 +605,23 @@ export function Form(props: Props) {
                     value={vendor.public_notes}
                   />
 
-                  <MarkdownEditor
-                    label={t('private_notes').toString()}
-                    onChange={(value) => handleChange('private_notes', value)}
-                    value={vendor.private_notes}
-                  />
+                  <div className="pt-3">
+                    <MarkdownEditor
+                      label={t('private_notes').toString()}
+                      onChange={(value) => handleChange('private_notes', value)}
+                      value={vendor.private_notes}
+                    />
+                  </div>
                 </div>
 
-                <div>
+                <div className="px-6 pt-1">
                   <span className="text-sm">{t('custom_fields')} &nbsp;</span>
+
                   <Link
                     to="/settings/custom_fields/vendors"
                     className="capitalize"
                   >
-                    {t('click_here')}
+                    {t('click_here')}.
                   </Link>
                 </div>
               </TabGroup>
