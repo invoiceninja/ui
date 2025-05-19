@@ -16,6 +16,7 @@ import CommonProps from '../common/interfaces/common-props.interface';
 import { MdInfoOutline } from 'react-icons/md';
 import { Icon } from './icons/Icon';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import { route } from '$app/common/helpers/route';
 
 interface Props extends CommonProps {
   message?: string;
@@ -45,7 +46,7 @@ export function AdvancedSettingsPlanAlert(props: Props) {
           </div>
 
           {user?.company_user && (
-            <Link external to={user.company_user.ninja_portal_url}>
+            <Link to={route('/settings/account_management')}>
               {t('plan_change')}
             </Link>
           )}

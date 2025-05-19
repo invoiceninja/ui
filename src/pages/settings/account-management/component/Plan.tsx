@@ -17,6 +17,7 @@ import { License } from '.';
 import { Card, Element } from '../../../../components/cards';
 import { Link } from '../../../../components/forms';
 import dayjs from 'dayjs';
+import { route } from '$app/common/helpers/route';
 
 export function Plan() {
   const [t] = useTranslation();
@@ -62,8 +63,8 @@ export function Plan() {
         <Element>
           <Link
             className="mt-4"
-            external
-            to={user?.company_user?.ninja_portal_url}
+            
+          to={route('/settings/account_management')}
           >
             {t('plan_change')}
           </Link>
