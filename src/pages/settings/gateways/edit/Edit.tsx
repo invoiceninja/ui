@@ -140,7 +140,7 @@ export function Edit() {
                   .flatten()
                   .unique()
                   .whereNotNull()
-                  .count() > 1 && (
+                  .count() >= 1 && (
                   <WebhookConfiguration
                     companyGateway={companyGateway}
                     gateway={gateway}

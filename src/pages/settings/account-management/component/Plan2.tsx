@@ -22,7 +22,6 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { get } from 'lodash';
 import { Free, Plan } from './plan/Plan';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { NewCreditCard } from './plan/NewCreditCard';
 import { DeleteCreditCard } from './plan/DeleteCreditCard';
 import { Popup } from './plan/Popup';
 import { CreditCard } from './plan/CreditCard';
@@ -31,6 +30,8 @@ import { usePlansQuery } from '$app/common/queries/plans';
 import { useTranslation } from 'react-i18next';
 import { useEnterpriseUtils } from '../common/hooks/useEnterpriseUtils';
 import { Downgrade } from './plan/Downgrade';
+import { StartTrial } from './plan/StartTrial';
+import { NewCreditCard } from './plan/NewCreditCard';
 
 export function Plan2() {
   const accentColor = useAccentColor();
@@ -40,7 +41,7 @@ export function Plan2() {
   const [popupVisible, setPopupVisible] = useState(false);
   const [deletePopupVisible, setDeletePopupVisible] = useState(false);
   const [createPopupVisible, setCreatePopupVisible] = useState(false);
-
+  const [startTrialFlag, setStartTrialFlag] = useState(false);
   const { data: methods } = useQuery({
     queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
@@ -145,7 +146,7 @@ export function Plan2() {
 
                 <div className="space-y-2">
                   <h3 className="font-semibold mb-3">Enterprise</h3>
-                
+
                   <p className="flex items-center space-x-1">
                     <Check size={18} style={{ color: accentColor }} />
                     <span className="block">Additional Account Users</span>
@@ -168,9 +169,20 @@ export function Plan2() {
               </div>
             </div>
 
-            <Button behavior="button" onClick={() => setPopupVisible(true)}>
-              Upgrade Plan
-            </Button>
+            <div className="flex flex-col space-y-2">
+              <Button behavior="button" onClick={() => setPopupVisible(true)}>
+                {t('upgrade_plan')}
+              </Button>
+              {account.can_trial && (
+                <div className="flex flex-col items-center space-y-2">
+                  <p>or</p>
+                  <Button behavior="button" type="secondary" onClick={() => setStartTrialFlag(true)}>
+                    {t('trial_call_to_action')}
+                  </Button>
+                </div>
+              )
+              }
+            </div>
           </div>
         </div>
       </Card>
@@ -227,6 +239,11 @@ export function Plan2() {
       {account.plan !== '' ? <Downgrade /> : null}
 
       <Popup visible={popupVisible} onClose={() => setPopupVisible(false)} />
+
+      <StartTrial
+        visible={startTrialFlag}
+        onClose={() => setStartTrialFlag(false)}
+      />
 
       <DeleteCreditCard
         gateway={selectedGateway}
