@@ -8,13 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { SelectOption } from '$app/components/datatables/Actions';
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Select, {
   components,
   ControlProps,
   MenuProps,
   MultiValue,
-  OptionProps,
   StylesConfig,
   ValueContainerProps,
 } from 'react-select';
@@ -70,32 +69,46 @@ function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
 
   const menuIsOpen = currentSelectedProps.menuIsOpen;
   const isSearchable = currentSelectedProps.isSearchable;
-  const searchTerm = (currentSelectedProps[
-    'searchTerm' as keyof typeof currentSelectedProps
-  ] || '') as string;
-  const setSearchTerm = currentSelectedProps[
-    'setSearchTerm' as keyof typeof currentSelectedProps
-  ] as Dispatch<SetStateAction<string>>;
+  const withoutLabel =
+    currentSelectedProps['withoutLabel' as keyof typeof currentSelectedProps];
+
+  const searchTerm = currentSelectedProps.inputValue || '';
+  const onSearchTermChange = currentSelectedProps[
+    'onSearchTermChange' as keyof typeof currentSelectedProps
+  ] as ((value: string) => void) | undefined;
 
   return (
     <components.ValueContainer {...props}>
       <div className="flex xl:space-x-1 cursor-pointer w-full">
-        <span
-          className="hidden xl:inline-block font-medium text-sm"
-          style={{ color: colors.$17 }}
-        >
-          {label && `${label}:`}
-        </span>
+        {label && (
+          <span
+            className="hidden xl:inline-block font-medium text-sm"
+            style={{ color: colors.$17 }}
+          >
+            {withoutLabel ? `${t('select')}:` : `${label}:`}
+          </span>
+        )}
 
         {menuIsOpen && isSearchable ? (
           <div className="flex-1 flex items-center">
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) =>
+                onSearchTermChange && onSearchTermChange(e.target.value)
+              }
               placeholder={t('search') as string}
               className="w-full text-sm border-0 focus:outline-none focus:ring-0 p-0"
               onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (
+                  ['Escape', 'Tab', 'Enter', 'ArrowUp', 'ArrowDown'].includes(
+                    e.key
+                  )
+                ) {
+                  e.stopPropagation();
+                }
+              }}
               autoFocus
               style={{ backgroundColor: 'transparent' }}
             />
@@ -110,6 +123,7 @@ function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
 
 function DropdownIndicator() {
   const colors = useColorScheme();
+
   return (
     <div
       className={classNames(
@@ -122,22 +136,11 @@ function DropdownIndicator() {
   );
 }
 
-function Option(props: OptionProps<SelectOption, true>) {
-  const { isSelected, label } = props;
-  return (
-    <components.Option className="rounded-sm" {...props}>
-      <div className="flex space-x-3 items-center w-full truncate">
-        <Checkbox className="rounded-md" checked={isSelected} />
-        <span className="text-sm">{label}</span>
-      </div>
-    </components.Option>
-  );
-}
-
 function Control(props: ControlProps<SelectOption, true>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const colors = useColorScheme();
   const label = props.selectProps.placeholder;
+
   const handleOpenCloseMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (props.selectProps.menuIsOpen) {
@@ -155,23 +158,25 @@ function Control(props: ControlProps<SelectOption, true>) {
     <div className="relative">
       {label && (
         <span
-          className="xl:hidden absolute left-3 px-1 text-xs font-medium z-10 rounded-sm"
+          className="xl:hidden absolute left-3 px-1 text-xs font-medium z-10 rounded-sm truncate"
           style={{
             color: colors.$17,
-            backgroundColor: colors.$2,
-            top: '-0.35rem',
+            backgroundColor: colors.$1,
+            top: '-0.475rem',
+            maxWidth: '50%',
           }}
         >
           {label}
         </span>
       )}
+
       <components.Control
         className={classNames('shadow-sm', { 'pt-1': label })}
         {...props}
       >
         <div
           ref={containerRef}
-          className="flex items-center w-full"
+          className="flex items-center w-full h-[2.2rem] cursor-pointer"
           onClick={handleOpenCloseMenu}
         >
           {props.children}
@@ -191,7 +196,7 @@ function CustomSelect(props: any) {
     ...restProps
   } = props;
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const colors = useColorScheme();
 
   const clearValues = () => {
@@ -200,8 +205,8 @@ function CustomSelect(props: any) {
 
   const CustomMenu = (menuProps: MenuProps<SelectOption, true>) => {
     const filteredOptions = options.filter((option: SelectOption) => {
-      if (!searchTerm || !isSearchable) return true;
-      return option.label.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!inputValue || !isSearchable) return true;
+      return option.label.toLowerCase().includes(inputValue.toLowerCase());
     });
 
     const handleOptionClick = (option: SelectOption) => {
@@ -210,6 +215,7 @@ function CustomSelect(props: any) {
       );
 
       let newValue;
+
       if (isSelected) {
         newValue = restProps.value.filter(
           (val: SelectOption) => val.value !== option.value
@@ -222,29 +228,38 @@ function CustomSelect(props: any) {
     };
 
     return (
-      <components.Menu className="px-1" {...menuProps}>
+      <components.Menu className="p-1" {...menuProps}>
         <div>
-          {filteredOptions.map((option: SelectOption) => {
-            const isSelected = restProps.value?.some(
-              (val: SelectOption) => val.value === option.value
-            );
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option: SelectOption) => {
+              const isSelected = restProps.value?.some(
+                (val: SelectOption) => val.value === option.value
+              );
 
-            return (
-              <Box
-                key={option.value}
-                className="flex space-x-3 items-center w-full truncate p-3 cursor-pointer rounded-sm"
-                onClick={() => handleOptionClick(option)}
-                theme={{
-                  backgroundColor: colors.$1,
-                  hoverBackgroundColor: colors.$20,
-                }}
-              >
-                <Checkbox checked={isSelected} />
+              return (
+                <Box
+                  key={option.value}
+                  className="flex space-x-3 items-center w-full truncate px-[0.75rem] py-2 cursor-pointer rounded-[0.1875rem]"
+                  onClick={() => handleOptionClick(option)}
+                  theme={{
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$4,
+                  }}
+                >
+                  <Checkbox className="rounded-md" checked={isSelected} />
 
-                <span className="text-sm">{option.label}</span>
-              </Box>
-            );
-          })}
+                  <span className="text-sm">{option.label}</span>
+                </Box>
+              );
+            })
+          ) : (
+            <div
+              className="p-3 text-sm text-center"
+              style={{ color: colors.$3 }}
+            >
+              {t('no_records_found')}.
+            </div>
+          )}
         </div>
       </components.Menu>
     );
@@ -255,10 +270,15 @@ function CustomSelect(props: any) {
   };
 
   const onMenuClose = () => {
-    setSearchTerm('');
+    setInputValue('');
+
     if (restProps.onMenuClose) {
       restProps.onMenuClose();
     }
+  };
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
   };
 
   return (
@@ -274,10 +294,11 @@ function CustomSelect(props: any) {
       }}
       className="sm:w-auto w-full"
       onMenuClose={onMenuClose}
-      searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
+      inputValue={inputValue}
+      onSearchTermChange={handleInputChange}
       isSearchable={isSearchable}
       clearValues={clearValues}
+      withoutLabel={Boolean(!restProps.placeholder)}
     />
   );
 }
@@ -310,10 +331,9 @@ export function CustomMultiSelect(props: Props) {
     MultiValueContainer,
     ValueContainer,
     DropdownIndicator,
-    Option,
     Control,
-    // Dodajemo ClearIndicator u komponente, ali ga prikazujemo samo kad imamo odabrane vrijednosti
     ClearIndicator: value && value.length > 0 ? ClearIndicator : null,
+    Input: () => null,
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {

@@ -69,7 +69,7 @@ export function MultiVendorSelector(props: Props) {
             })}
             onValueChange={(options) => onValueChange(handleChange(options))}
             options={vendors}
-            isSearchable={true}
+            isSearchable
           />
         </Element>
       ) : (

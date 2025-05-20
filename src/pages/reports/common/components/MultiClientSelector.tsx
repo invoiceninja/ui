@@ -61,7 +61,6 @@ export function MultiClientSelector(props: Props) {
         <Element leftSide={t('clients')}>
           <CustomMultiSelect
             id="clientItemSelector"
-            placeholder={t('clients')}
             {...(value && {
               value: clients?.filter((option) =>
                 value.split(',').find((clientId) => clientId === option.value)

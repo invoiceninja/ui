@@ -72,7 +72,7 @@ export function MultiProjectSelector(props: Props) {
             })}
             onValueChange={(options) => onValueChange(handleChange(options))}
             options={projects}
-            isSearchable={true}
+            isSearchable
           />
         </Element>
       ) : (

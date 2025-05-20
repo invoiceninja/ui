@@ -66,7 +66,6 @@ export function MultiExpenseCategorySelector(props: Props) {
         <Element leftSide={t('expense_categories')}>
           <CustomMultiSelect
             id="expenseCategoryItemSelector"
-            placeholder={t('expense_categories')}
             {...(value && {
               value: expenseCategories?.filter((option) =>
                 value
@@ -78,7 +77,7 @@ export function MultiExpenseCategorySelector(props: Props) {
             })}
             onValueChange={(options) => onValueChange(handleChange(options))}
             options={expenseCategories}
-            isSearchable={true}
+            isSearchable
           />
         </Element>
       ) : (
