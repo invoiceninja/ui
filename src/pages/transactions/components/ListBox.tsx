@@ -231,25 +231,24 @@ export function ListBox(props: Props) {
       })}
       style={{
         color: colors.$3,
-        colorScheme: colors.$0,
         backgroundColor: colors.$1,
-        borderColor: colors.$4,
+        borderColor: colors.$24,
       }}
     >
       <div
-        style={{
-          color: colors.$3,
-          colorScheme: colors.$0,
-          backgroundColor: colors.$1,
-          borderColor: colors.$4,
-        }}
         className={classNames(
-          `flex justify-center px-5 py-3 relative border-b border-t`,
+          `flex justify-center px-5 py-3 relative border-b`,
           props.className,
           {
             relative: props.addSelectAllButton,
+            'border-t': !isVendorsDataKey && !isExpensesDataKey,
           }
         )}
+        style={{
+          color: colors.$3,
+          backgroundColor: colors.$1,
+          borderColor: colors.$24,
+        }}
       >
         {props.addSelectAllButton && (
           <div className="absolute top-5 left-4">
@@ -282,9 +281,8 @@ export function ListBox(props: Props) {
         style={{
           height: isInvoicesDataKey ? 400 : 200,
           color: colors.$3,
-          colorScheme: colors.$0,
           backgroundColor: colors.$1,
-          borderColor: colors.$4,
+          borderColor: colors.$24,
         }}
         className="flex flex-col grow justify-start overflow-y-auto"
       >

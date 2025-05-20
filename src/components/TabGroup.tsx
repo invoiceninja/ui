@@ -9,7 +9,13 @@
  */
 
 import classNames from 'classnames';
-import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
+import React, {
+  CSSProperties,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from 'react';
 import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
 
@@ -28,6 +34,7 @@ interface Props {
   withHorizontalPadding?: boolean;
   horizontalPaddingWidth?: string;
   fullRightPadding?: boolean;
+  style?: CSSProperties;
 }
 
 const StyledButton = styled.button`
@@ -47,6 +54,7 @@ export function TabGroup(props: Props) {
     withHorizontalPadding = false,
     horizontalPaddingWidth = '7rem',
     fullRightPadding = false,
+    style,
   } = props;
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
@@ -67,6 +75,7 @@ export function TabGroup(props: Props) {
         'w-full': props.width === 'full',
       })}
       data-cy="tabs"
+      style={style}
     >
       <div className="flex justify-between relative">
         <div className="flex flex-1 overflow-x-auto relative">

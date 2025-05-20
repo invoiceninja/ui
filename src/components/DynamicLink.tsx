@@ -29,14 +29,13 @@ export function DynamicLink(props: Props) {
   }
 
   return (
-    <div onClick={(event) => event.stopPropagation()}>
-      <RouterLink
-        className={`text-sm hover:underline ${props.className}`}
-        style={{ color: accentColor }}
-        to={props.to}
-      >
-        {props.children}
-      </RouterLink>
-    </div>
+    <RouterLink
+      className={`text-sm hover:underline ${props.className}`}
+      style={{ color: accentColor }}
+      to={props.to}
+      onClick={(event) => event.stopPropagation()}
+    >
+      {props.children}
+    </RouterLink>
   );
 }
