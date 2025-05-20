@@ -7,9 +7,8 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-
 import { SelectOption } from '$app/components/datatables/Actions';
-import { useRef } from 'react';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
 import Select, {
   components,
   ControlProps,
@@ -24,20 +23,59 @@ import classNames from 'classnames';
 import { Checkbox } from '$app/components/forms';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
 import { useClickAway } from 'react-use';
+import { t } from 'i18next';
+import { XMark } from '../icons/XMark';
+import styled from 'styled-components';
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 function MultiValueContainer() {
   return null;
 }
 
+function ClearIndicator(props: any) {
+  const colors = useColorScheme();
+  const { clearValues } = props.selectProps;
+
+  return (
+    <div
+      className="opacity-70 hover:opacity-100 transition-opacity duration-150 cursor-pointer pr-2.5 pl-1.5"
+      onClick={(e) => {
+        e.stopPropagation();
+        clearValues();
+      }}
+    >
+      <XMark size="0.9rem" color={colors.$3} />
+    </div>
+  );
+}
+
 function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
   const colors = useColorScheme();
   const values = props.getValue();
-  const label = props.selectProps.placeholder;
+  const currentSelectedProps = props.selectProps;
+
+  const label = currentSelectedProps.placeholder;
 
   const valueDisplay =
     values.length > 0
       ? values.map((value: SelectOption) => value.label).join(', ')
       : '';
+
+  const menuIsOpen = currentSelectedProps.menuIsOpen;
+  const isSearchable = currentSelectedProps.isSearchable;
+  const searchTerm = (currentSelectedProps[
+    'searchTerm' as keyof typeof currentSelectedProps
+  ] || '') as string;
+  const setSearchTerm = currentSelectedProps[
+    'setSearchTerm' as keyof typeof currentSelectedProps
+  ] as Dispatch<SetStateAction<string>>;
 
   return (
     <components.ValueContainer {...props}>
@@ -49,7 +87,22 @@ function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
           {label && `${label}:`}
         </span>
 
-        <div className="truncate text-sm flex-1">{valueDisplay}</div>
+        {menuIsOpen && isSearchable ? (
+          <div className="flex-1 flex items-center">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('search') as string}
+              className="w-full text-sm border-0 focus:outline-none focus:ring-0 p-0"
+              onClick={(e) => e.stopPropagation()}
+              autoFocus
+              style={{ backgroundColor: 'transparent' }}
+            />
+          </div>
+        ) : (
+          <div className="truncate text-sm flex-1">{valueDisplay}</div>
+        )}
       </div>
     </components.ValueContainer>
   );
@@ -57,7 +110,6 @@ function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
 
 function DropdownIndicator() {
   const colors = useColorScheme();
-
   return (
     <div
       className={classNames(
@@ -72,12 +124,10 @@ function DropdownIndicator() {
 
 function Option(props: OptionProps<SelectOption, true>) {
   const { isSelected, label } = props;
-
   return (
     <components.Option className="rounded-sm" {...props}>
       <div className="flex space-x-3 items-center w-full truncate">
         <Checkbox className="rounded-md" checked={isSelected} />
-
         <span className="text-sm">{label}</span>
       </div>
     </components.Option>
@@ -88,10 +138,8 @@ function Control(props: ControlProps<SelectOption, true>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const colors = useColorScheme();
   const label = props.selectProps.placeholder;
-
   const handleOpenCloseMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-
     if (props.selectProps.menuIsOpen) {
       props.selectProps.onMenuClose();
     } else {
@@ -117,7 +165,6 @@ function Control(props: ControlProps<SelectOption, true>) {
           {label}
         </span>
       )}
-
       <components.Control
         className={classNames('shadow-sm', { 'pt-1': label })}
         {...props}
@@ -140,19 +187,78 @@ function CustomSelect(props: any) {
     defaultValue,
     onChange,
     components: customComponents,
+    isSearchable,
     ...restProps
   } = props;
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const colors = useColorScheme();
+
+  const clearValues = () => {
+    onChange([]);
+  };
+
   const CustomMenu = (menuProps: MenuProps<SelectOption, true>) => {
+    const filteredOptions = options.filter((option: SelectOption) => {
+      if (!searchTerm || !isSearchable) return true;
+      return option.label.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    const handleOptionClick = (option: SelectOption) => {
+      const isSelected = restProps.value?.some(
+        (val: SelectOption) => val.value === option.value
+      );
+
+      let newValue;
+      if (isSelected) {
+        newValue = restProps.value.filter(
+          (val: SelectOption) => val.value !== option.value
+        );
+      } else {
+        newValue = [...(restProps.value || []), option];
+      }
+
+      onChange(newValue);
+    };
+
     return (
       <components.Menu className="px-1" {...menuProps}>
-        <div>{menuProps.children}</div>
+        <div>
+          {filteredOptions.map((option: SelectOption) => {
+            const isSelected = restProps.value?.some(
+              (val: SelectOption) => val.value === option.value
+            );
+
+            return (
+              <Box
+                key={option.value}
+                className="flex space-x-3 items-center w-full truncate p-3 cursor-pointer rounded-sm"
+                onClick={() => handleOptionClick(option)}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$20,
+                }}
+              >
+                <Checkbox checked={isSelected} />
+
+                <span className="text-sm">{option.label}</span>
+              </Box>
+            );
+          })}
+        </div>
       </components.Menu>
     );
   };
 
   const handleChange = (newValue: any) => {
     onChange(newValue);
+  };
+
+  const onMenuClose = () => {
+    setSearchTerm('');
+    if (restProps.onMenuClose) {
+      restProps.onMenuClose();
+    }
   };
 
   return (
@@ -167,22 +273,38 @@ function CustomSelect(props: any) {
         Menu: CustomMenu,
       }}
       className="sm:w-auto w-full"
+      onMenuClose={onMenuClose}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      isSearchable={isSearchable}
+      clearValues={clearValues}
     />
   );
 }
 
 interface Props {
   id?: string;
+  defaultValue?: SelectOption[];
   value?: SelectOption[];
   options: SelectOption[];
   onValueChange: (value: MultiValue<SelectOption>) => void;
   placeholder?: string | null;
+  onInputChange?: (inputValue: string) => void;
+  isSearchable?: boolean;
 }
 
 export function CustomMultiSelect(props: Props) {
   const colors = useColorScheme();
-
-  const { id, value, options, onValueChange, placeholder } = props;
+  const {
+    id,
+    defaultValue,
+    options,
+    onValueChange,
+    placeholder,
+    onInputChange,
+    isSearchable,
+    value,
+  } = props;
 
   const commonComponents = {
     MultiValueContainer,
@@ -190,6 +312,8 @@ export function CustomMultiSelect(props: Props) {
     DropdownIndicator,
     Option,
     Control,
+    // Dodajemo ClearIndicator u komponente, ali ga prikazujemo samo kad imamo odabrane vrijednosti
+    ClearIndicator: value && value.length > 0 ? ClearIndicator : null,
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
@@ -235,18 +359,27 @@ export function CustomMultiSelect(props: Props) {
         backgroundColor: colors.$4,
       },
     }),
+    clearIndicator: (base) => ({
+      ...base,
+      padding: '0px',
+      cursor: 'pointer',
+    }),
   };
 
   return (
     <CustomSelect
       id={id}
       value={value}
+      defaultValue={defaultValue}
       onChange={(options: MultiValue<SelectOption>) => onValueChange(options)}
       components={commonComponents}
       placeholder={placeholder}
       options={options}
       isMulti={true}
       styles={customStyles}
+      onInputChange={onInputChange}
+      hideSelectedOptions={false}
+      isSearchable={isSearchable}
     />
   );
 }

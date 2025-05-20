@@ -13,7 +13,7 @@ import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue } from 'react-select';
+import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
 import { request } from '$app/common/helpers/request';
@@ -21,7 +21,7 @@ import { endpoint } from '$app/common/helpers';
 import { Product } from '$app/common/interfaces/product';
 import { useQuery, useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
 
 interface Props {
   value?: string;
@@ -32,8 +32,6 @@ export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const queryClient = useQueryClient();
-
-  const { customStyles } = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
 
@@ -142,7 +140,7 @@ export function ProductItemsSelector(props: Props) {
         <Element leftSide={t('products')}>
           <div className="flex space-x-3">
             <div className="flex-1">
-              <Select
+              <CustomMultiSelect
                 id="productItemSelector"
                 placeholder={t('products')}
                 {...(value && {
@@ -152,7 +150,9 @@ export function ProductItemsSelector(props: Props) {
                       .find((productKey) => productKey === option.value)
                   ),
                 })}
-                onChange={(options) => onValueChange(handleChange(options))}
+                onValueChange={(options) =>
+                  onValueChange(handleChange(options))
+                }
                 options={productItems}
                 onInputChange={(filterValue) => {
                   clearTimeout(filterTimeOut.current);
@@ -164,8 +164,6 @@ export function ProductItemsSelector(props: Props) {
 
                   filterTimeOut.current = currentTimeout;
                 }}
-                isMulti={true}
-                styles={customStyles}
                 isSearchable
               />
             </div>

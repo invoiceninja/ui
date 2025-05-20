@@ -13,11 +13,11 @@ import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue } from 'react-select';
+import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
 import { useVendorsQuery } from '$app/common/queries/vendor';
-import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
 
 interface Props {
   value?: string;
@@ -27,8 +27,6 @@ interface Props {
 export function MultiVendorSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
-
-  const { customStyles } = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
 
@@ -61,7 +59,7 @@ export function MultiVendorSelector(props: Props) {
     <>
       {vendors ? (
         <Element leftSide={t('vendors')}>
-          <Select
+          <CustomMultiSelect
             id="vendorItemSelector"
             placeholder={t('vendors')}
             {...(value && {
@@ -69,10 +67,9 @@ export function MultiVendorSelector(props: Props) {
                 value.split(',').find((vendorId) => vendorId === option.value)
               ),
             })}
-            onChange={(options) => onValueChange(handleChange(options))}
+            onValueChange={(options) => onValueChange(handleChange(options))}
             options={vendors}
-            isMulti={true}
-            styles={customStyles}
+            isSearchable={true}
           />
         </Element>
       ) : (
