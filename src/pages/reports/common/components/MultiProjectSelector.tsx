@@ -64,7 +64,6 @@ export function MultiProjectSelector(props: Props) {
         <Element leftSide={t('projects')}>
           <CustomMultiSelect
             id="projectItemSelector"
-            placeholder={t('projects')}
             {...(value && {
               value: projects?.filter((option) =>
                 value.split(',').find((projectId) => projectId === option.value)

@@ -240,7 +240,6 @@ export function SelectWithApplyButton(props: any) {
     );
   };
 
-  // Handle internal value changes without propagating to parent
   const handleChange = (newValue: any) => {
     setTempValue(newValue);
   };
@@ -256,7 +255,7 @@ export function SelectWithApplyButton(props: any) {
         ...customComponents,
         Menu: CustomMenu,
       }}
-      className="sm:w-auto w-full" // Full width on mobile, auto on desktop
+      className="sm:w-auto w-full"
     />
   );
 }

@@ -137,9 +137,14 @@ function DropdownIndicator() {
 }
 
 function Control(props: ControlProps<SelectOption, true>) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const colors = useColorScheme();
-  const label = props.selectProps.placeholder;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const currentSelectedProps = props.selectProps;
+
+  const label = currentSelectedProps.placeholder;
+  const withoutLabel =
+    currentSelectedProps['withoutLabel' as keyof typeof currentSelectedProps];
 
   const handleOpenCloseMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -166,7 +171,7 @@ function Control(props: ControlProps<SelectOption, true>) {
             maxWidth: '50%',
           }}
         >
-          {label}
+          {withoutLabel ? `${t('select')}:` : `${label}:`}
         </span>
       )}
 
