@@ -57,6 +57,7 @@ import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { numberFormattableColumns } from '../common/constants/columns';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { ACTIVITY_TYPES, ActivitySelector } from '$app/components/layouts/ActivitySelector';
 
 interface Range {
   identifier: string;
@@ -623,6 +624,17 @@ export default function Reports() {
                 handlePayloadChange('categories', expenseCategoryIds)
               }
             />
+          )}
+
+          {showReportField('activity_type_id') && (
+            <Element leftSide={t('activity')} className={'mb-50 py-50'}>
+              <ActivitySelector
+                value={report.payload.activity_type_id || ''}
+                onChange={(activity_type_id) =>
+                  handlePayloadChange('activity_type_id', activity_type_id)
+                }
+              />
+            </Element>
           )}
         </Card>
 

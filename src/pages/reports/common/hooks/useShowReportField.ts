@@ -23,7 +23,8 @@ type Field =
   | 'categories'
   | 'include_deleted'
   | 'client'
-  | 'pdf_email_attachment';
+  | 'pdf_email_attachment'
+  | 'activity_type_id';
 
 const ReportFields: Record<Identifier, Field[]> = {
   client: ['document_email_attachment', 'include_deleted'],
@@ -86,8 +87,8 @@ const ReportFields: Record<Identifier, Field[]> = {
     'include_deleted',
     'status',
   ],
-  project: ['clients','projects'],
-  activity: [],
+  project: ['clients', 'projects'],
+  activity: ['activity_type_id'],
   contact: [],
   recurring_invoice: ['include_deleted', 'status', 'client'],
   product_sales: ['product_key', 'client'],
