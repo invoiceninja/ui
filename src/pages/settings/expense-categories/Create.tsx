@@ -132,6 +132,7 @@ export function Create() {
           setExpenseCategory={setExpenseCategory}
           errors={errors}
           setErrors={setErrors}
+          withCardContainer
         />
       </Card>
     </Settings>
