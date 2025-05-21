@@ -57,7 +57,7 @@ import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { numberFormattableColumns } from '../common/constants/columns';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { ACTIVITY_TYPES, ActivitySelector } from '$app/components/layouts/ActivitySelector';
+import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
 
 interface Range {
   identifier: string;
