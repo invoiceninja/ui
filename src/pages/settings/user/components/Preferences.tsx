@@ -41,140 +41,135 @@ export function Preferences() {
 
   return (
     <div className="space-y-4">
-      <Card title={t('preferences')}>
-        <Element leftSide={t('show_pdf_preview')}>
-          <Toggle
-            checked={
-              typeof reactSettings.show_pdf_preview === 'boolean'
-                ? reactSettings.show_pdf_preview
-                : true
-            }
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.show_pdf_preview',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element leftSide={t('show_pdf_preview')}>
+        <Toggle
+          checked={
+            typeof reactSettings.show_pdf_preview === 'boolean'
+              ? reactSettings.show_pdf_preview
+              : true
+          }
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.show_pdf_preview', value)
+          }
+        />
+      </Element>
 
-        <Element leftSide={t('show_document_preview')}>
-          <Toggle
-            checked={Boolean(reactSettings.show_document_preview)}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.show_document_preview',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element leftSide={t('show_document_preview')}>
+        <Toggle
+          checked={Boolean(reactSettings.show_document_preview)}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.show_document_preview',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('react_notification_link')}
-          leftSideHelp={t('react_notification_link_help')}
-        >
-          <Toggle
-            checked={reactSettings.react_notification_link}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.react_notification_link',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('react_notification_link')}
+        leftSideHelp={t('react_notification_link_help')}
+      >
+        <Toggle
+          checked={reactSettings.react_notification_link}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.react_notification_link',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('number_precision')}
-          leftSideHelp={t('number_precision_help')}
-        >
-          <NumberInputField
-            precision={0}
-            value={reactSettings?.number_precision || ''}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.number_precision',
-                Number(value)
-              )
-            }
-            placeholder={t('number_precision')}
-            disablePrecision
-          />
-        </Element>
+      <Element
+        leftSide={t('number_precision')}
+        leftSideHelp={t('number_precision_help')}
+      >
+        <NumberInputField
+          precision={0}
+          value={reactSettings?.number_precision || ''}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.number_precision',
+              Number(value)
+            )
+          }
+          placeholder={t('number_precision')}
+          disablePrecision
+        />
+      </Element>
 
-        <Element leftSide={t('dark_mode')}>
-          <Toggle
-            checked={Boolean(reactSettings?.dark_mode)}
-            onChange={(value) =>
-              handleChange('company_user.react_settings.dark_mode', value)
-            }
-          />
-        </Element>
+      <Element leftSide={t('dark_mode')}>
+        <Toggle
+          checked={Boolean(reactSettings?.dark_mode)}
+          onChange={(value) =>
+            handleChange('company_user.react_settings.dark_mode', value)
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('show_table_footer')}
-          leftSideHelp={t('show_table_footer_help')}
-        >
-          <Toggle
-            checked={Boolean(reactSettings?.show_table_footer)}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.show_table_footer',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('show_table_footer')}
+        leftSideHelp={t('show_table_footer_help')}
+      >
+        <Toggle
+          checked={Boolean(reactSettings?.show_table_footer)}
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.show_table_footer', value)
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('auto_expand_product_table_notes')}
-          leftSideHelp={t('auto_expand_product_table_notes_help')}
-        >
-          <Toggle
-            checked={Boolean(
-              reactSettings.preferences.auto_expand_product_table_notes
-            )}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.preferences.auto_expand_product_table_notes',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('auto_expand_product_table_notes')}
+        leftSideHelp={t('auto_expand_product_table_notes_help')}
+      >
+        <Toggle
+          checked={Boolean(
+            reactSettings.preferences.auto_expand_product_table_notes
+          )}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.auto_expand_product_table_notes',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element leftSide={t('enable_public_notifications')} leftSideHelp={t('enable_public_notifications_help')}>
-          <Toggle
-            checked={Boolean(
-              reactSettings.preferences.enable_public_notifications
-            )}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.preferences.enable_public_notifications',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('enable_public_notifications')}
+        leftSideHelp={t('enable_public_notifications_help')}
+      >
+        <Toggle
+          checked={Boolean(
+            reactSettings.preferences.enable_public_notifications
+          )}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.enable_public_notifications',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('use_system_fonts')}
-          leftSideHelp={t('use_system_fonts_help')}
-        >
-          <Toggle
-            checked={Boolean(reactSettings.preferences.use_system_fonts)}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.preferences.use_system_fonts',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('use_system_fonts')}
+        leftSideHelp={t('use_system_fonts_help')}
+      >
+        <Toggle
+          checked={Boolean(reactSettings.preferences.use_system_fonts)}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.use_system_fonts',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <StatusColorTheme />
-      </Card>
+      <StatusColorTheme />
 
       <PreferenceCard
         title={`${t('dashboard')} ${t('charts')}`}

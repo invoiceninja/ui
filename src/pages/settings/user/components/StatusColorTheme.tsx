@@ -16,12 +16,14 @@ import { Button, InputField, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdClose, MdDone } from 'react-icons/md';
+import { MdDone } from 'react-icons/md';
 import hexColorRegex from 'hex-color-regex';
 import { toast } from '$app/common/helpers/toast/toast';
 import { cloneDeep } from 'lodash';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/user';
+import { XMark } from '$app/components/icons/XMark';
+import { useColorScheme } from '$app/common/colors';
 
 type ThemeKey =
   | 'light'
@@ -361,6 +363,7 @@ export function DefaultColorPickerModal(props: ModalProps) {
 
   const { fieldKey } = props;
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const isColorValid = useIsColorValid();
@@ -391,17 +394,17 @@ export function DefaultColorPickerModal(props: ModalProps) {
           }}
         />
 
-        <Icon
-          className="cursor-pointer"
-          element={MdClose}
-          size={26}
+        <div
+          className="cursor-pointer hover:opacity-75"
           onClick={() =>
             handleUserChange(
               `company_user.react_settings.color_theme.${fieldKey}`,
               ''
             )
           }
-        />
+        >
+          <XMark size="1.2rem" color={colors.$3} />
+        </div>
       </div>
 
       <Modal
