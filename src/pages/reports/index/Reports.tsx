@@ -57,6 +57,7 @@ import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { numberFormattableColumns } from '../common/constants/columns';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { cloneDeep } from 'lodash';
 
 interface Range {
   identifier: string;
@@ -168,7 +169,7 @@ export default function Reports() {
     setShowCustomColumns(false);
 
     if (report) {
-      setReport(report);
+      setReport(cloneDeep(report));
     }
   };
 
@@ -428,7 +429,7 @@ export default function Reports() {
         style={{ borderColor: colors.$4 }}
       >
         <Card
-          className="col-span-6 h-max shadow-sm"
+          className="col-span-12 lg:col-span-6 h-max shadow-sm"
           style={{ borderColor: colors.$24 }}
         >
           <Element leftSide={t('report')}>
@@ -544,6 +545,7 @@ export default function Reports() {
 
           {showReportField('product_key') && (
             <ProductItemsSelector
+              value={report.payload.product_key}
               onValueChange={(productsKeys) =>
                 handlePayloadChange('product_key', productsKeys)
               }
@@ -588,7 +590,7 @@ export default function Reports() {
         </Card>
 
         <Card
-          className="col-span-6 h-max shadow-sm"
+          className="col-span-12 lg:col-span-6 h-max shadow-sm"
           style={{ borderColor: colors.$24 }}
         >
           <Element leftSide={t('range')}>

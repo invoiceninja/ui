@@ -229,6 +229,7 @@ export function Preview() {
                 <Td key={i}>
                   <InputField
                     onValueChange={(value) => filter(column.identifier, value)}
+                    changeOverride
                   />
                 </Td>
               ))}

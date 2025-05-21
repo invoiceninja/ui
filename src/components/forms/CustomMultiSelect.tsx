@@ -10,10 +10,10 @@
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useRef, useState } from 'react';
 import Select, {
+  ClearIndicatorProps,
   components,
   ControlProps,
-  MenuProps,
-  MultiValue,
+  OptionProps,
   StylesConfig,
   ValueContainerProps,
 } from 'react-select';
@@ -38,20 +38,18 @@ function MultiValueContainer() {
   return null;
 }
 
-function ClearIndicator(props: any) {
+function ClearIndicator(props: ClearIndicatorProps) {
   const colors = useColorScheme();
-  const { clearValues } = props.selectProps;
 
   return (
-    <div
-      className="opacity-70 hover:opacity-100 transition-opacity duration-150 cursor-pointer pr-2.5 pl-1.5"
-      onClick={(e) => {
-        e.stopPropagation();
-        clearValues();
-      }}
+    <components.ClearIndicator
+      {...props}
+      className="opacity-70 hover:opacity-100 transition-opacity duration-150 cursor-pointer"
     >
-      <XMark size="0.9rem" color={colors.$3} />
-    </div>
+      <div className="pr-2 pl-1.5">
+        <XMark size="0.9rem" color={colors.$3} />
+      </div>
+    </components.ClearIndicator>
   );
 }
 
@@ -171,7 +169,7 @@ function Control(props: ControlProps<SelectOption, true>) {
             maxWidth: '50%',
           }}
         >
-          {withoutLabel ? `${t('select')}:` : `${label}:`}
+          {withoutLabel ? `${t('select')}` : `${label}`}
         </span>
       )}
 
@@ -188,6 +186,45 @@ function Control(props: ControlProps<SelectOption, true>) {
         </div>
       </components.Control>
     </div>
+  );
+}
+
+function Option(props: OptionProps<SelectOption, true>) {
+  const { isSelected, label, data, innerProps } = props;
+  const colors = useColorScheme();
+
+  return (
+    <Box
+      {...innerProps}
+      className="flex space-x-3 items-center w-full truncate px-[0.75rem] py-2 cursor-pointer rounded-[0.1875rem]"
+      theme={{
+        backgroundColor: colors.$1,
+        hoverBackgroundColor: colors.$4,
+      }}
+    >
+      <Checkbox className="rounded-md" checked={isSelected} />
+      <span className="text-sm">{label}</span>
+    </Box>
+  );
+}
+
+function Menu(props: any) {
+  return (
+    <components.Menu className="p-1" {...props}>
+      {props.children}
+    </components.Menu>
+  );
+}
+
+function NoOptionsMessage(props: any) {
+  const colors = useColorScheme();
+
+  return (
+    <components.NoOptionsMessage {...props}>
+      <div className="p-3 text-sm text-center" style={{ color: colors.$3 }}>
+        {t('no_records_found')}.
+      </div>
+    </components.NoOptionsMessage>
   );
 }
 
@@ -208,68 +245,6 @@ function CustomSelect(props: any) {
     onChange([]);
   };
 
-  const CustomMenu = (menuProps: MenuProps<SelectOption, true>) => {
-    const filteredOptions = options.filter((option: SelectOption) => {
-      if (!inputValue || !isSearchable) return true;
-      return option.label.toLowerCase().includes(inputValue.toLowerCase());
-    });
-
-    const handleOptionClick = (option: SelectOption) => {
-      const isSelected = restProps.value?.some(
-        (val: SelectOption) => val.value === option.value
-      );
-
-      let newValue;
-
-      if (isSelected) {
-        newValue = restProps.value.filter(
-          (val: SelectOption) => val.value !== option.value
-        );
-      } else {
-        newValue = [...(restProps.value || []), option];
-      }
-
-      onChange(newValue);
-    };
-
-    return (
-      <components.Menu className="p-1" {...menuProps}>
-        <div>
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option: SelectOption) => {
-              const isSelected = restProps.value?.some(
-                (val: SelectOption) => val.value === option.value
-              );
-
-              return (
-                <Box
-                  key={option.value}
-                  className="flex space-x-3 items-center w-full truncate px-[0.75rem] py-2 cursor-pointer rounded-[0.1875rem]"
-                  onClick={() => handleOptionClick(option)}
-                  theme={{
-                    backgroundColor: colors.$1,
-                    hoverBackgroundColor: colors.$4,
-                  }}
-                >
-                  <Checkbox className="rounded-md" checked={isSelected} />
-
-                  <span className="text-sm">{option.label}</span>
-                </Box>
-              );
-            })
-          ) : (
-            <div
-              className="p-3 text-sm text-center"
-              style={{ color: colors.$3 }}
-            >
-              {t('no_records_found')}.
-            </div>
-          )}
-        </div>
-      </components.Menu>
-    );
-  };
-
   const handleChange = (newValue: any) => {
     onChange(newValue);
   };
@@ -286,6 +261,11 @@ function CustomSelect(props: any) {
     setInputValue(value);
   };
 
+  const filterOption = (option: any, inputValue: string) => {
+    if (!inputValue || !isSearchable) return true;
+    return option.label.toLowerCase().includes(inputValue.toLowerCase());
+  };
+
   return (
     <Select
       {...restProps}
@@ -295,7 +275,6 @@ function CustomSelect(props: any) {
       onChange={handleChange}
       components={{
         ...customComponents,
-        Menu: CustomMenu,
       }}
       className="sm:w-auto w-full"
       onMenuClose={onMenuClose}
@@ -304,6 +283,7 @@ function CustomSelect(props: any) {
       isSearchable={isSearchable}
       clearValues={clearValues}
       withoutLabel={Boolean(!restProps.placeholder)}
+      filterOption={filterOption}
     />
   );
 }
@@ -313,7 +293,7 @@ interface Props {
   defaultValue?: SelectOption[];
   value?: SelectOption[];
   options: SelectOption[];
-  onValueChange: (value: MultiValue<SelectOption>) => void;
+  onValueChange: (value: any) => void;
   placeholder?: string | null;
   onInputChange?: (inputValue: string) => void;
   isSearchable?: boolean;
@@ -328,7 +308,7 @@ export function CustomMultiSelect(props: Props) {
     onValueChange,
     placeholder,
     onInputChange,
-    isSearchable,
+    isSearchable = false,
     value,
   } = props;
 
@@ -337,7 +317,10 @@ export function CustomMultiSelect(props: Props) {
     ValueContainer,
     DropdownIndicator,
     Control,
-    ClearIndicator: value && value.length > 0 ? ClearIndicator : null,
+    ClearIndicator,
+    Option,
+    Menu,
+    NoOptionsMessage,
     Input: () => null,
   };
 
@@ -372,16 +355,19 @@ export function CustomMultiSelect(props: Props) {
       zIndex: 10,
       width: '16rem',
       boxShadow: 'none',
+      padding: '0.25rem',
     }),
     option: (base) => ({
       ...base,
-      color: colors.$3,
-      backgroundColor: colors.$1,
-      padding: '8px 12px',
+      backgroundColor: 'transparent',
       cursor: 'pointer',
-      borderRadius: '0.1875rem',
+      padding: '0',
+      margin: '0',
       '&:hover': {
-        backgroundColor: colors.$4,
+        backgroundColor: 'transparent',
+      },
+      '&:active': {
+        backgroundColor: 'transparent',
       },
     }),
     clearIndicator: (base) => ({
@@ -396,7 +382,7 @@ export function CustomMultiSelect(props: Props) {
       id={id}
       value={value}
       defaultValue={defaultValue}
-      onChange={(options: MultiValue<SelectOption>) => onValueChange(options)}
+      onChange={(options: any) => onValueChange(options)}
       components={commonComponents}
       placeholder={placeholder}
       options={options}

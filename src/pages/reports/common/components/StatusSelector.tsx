@@ -99,7 +99,6 @@ export function StatusSelector(props: Props) {
         onValueChange={(options: MultiValue<SelectOption>) =>
           onValueChange(handleStatusChange(options))
         }
-        placeholder={t('status')}
         options={options}
       />
 

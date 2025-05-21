@@ -142,7 +142,6 @@ export function ProductItemsSelector(props: Props) {
             <div className="flex-1">
               <CustomMultiSelect
                 id="productItemSelector"
-                placeholder={t('products')}
                 {...(value && {
                   defaultValue: productItems?.filter((option) =>
                     value
@@ -164,7 +163,7 @@ export function ProductItemsSelector(props: Props) {
 
                   filterTimeOut.current = currentTimeout;
                 }}
-                isSearchable
+                isSearchable={true}
               />
             </div>
 

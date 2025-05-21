@@ -61,7 +61,6 @@ export function MultiVendorSelector(props: Props) {
         <Element leftSide={t('vendors')}>
           <CustomMultiSelect
             id="vendorItemSelector"
-            placeholder={t('vendors')}
             {...(value && {
               value: vendors?.filter((option) =>
                 value.split(',').find((vendorId) => vendorId === option.value)
@@ -69,7 +68,7 @@ export function MultiVendorSelector(props: Props) {
             })}
             onValueChange={(options) => onValueChange(handleChange(options))}
             options={vendors}
-            isSearchable
+            isSearchable={true}
           />
         </Element>
       ) : (

@@ -77,7 +77,7 @@ export function MultiExpenseCategorySelector(props: Props) {
             })}
             onValueChange={(options) => onValueChange(handleChange(options))}
             options={expenseCategories}
-            isSearchable
+            isSearchable={true}
           />
         </Element>
       ) : (
