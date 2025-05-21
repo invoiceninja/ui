@@ -28,6 +28,7 @@ export interface Payload {
   vendors?: string;
   include_deleted?: boolean;
   pdf_email_attachment?: boolean;
+  activity_type_id?: string;
 }
 
 export interface Report {
@@ -85,6 +86,7 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        activity_type_id: '',
       },
       preview: '/api/v1/reports/activities?output=json',
       supports_previews: false,
