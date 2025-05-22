@@ -11,23 +11,26 @@
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, ClickableElement, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { updateChanges } from '$app/common/stores/slices/user';
 import {
   preferencesDefaults,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Inline } from '$app/components/Inline';
-import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { StatusColorTheme } from './StatusColorTheme';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
+import { Divider } from '$app/components/cards/Divider';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export function Preferences() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const handleChange = (property: string, value: string | number | boolean) => {
@@ -198,6 +201,7 @@ interface PreferenceCardProps {
 }
 
 function PreferenceCard({ title, children, path }: PreferenceCardProps) {
+  const colors = useColorScheme();
   const { preferences } = usePreferences();
 
   if (
@@ -207,7 +211,23 @@ function PreferenceCard({ title, children, path }: PreferenceCardProps) {
     return null;
   }
 
-  return <Card title={title}>{children}</Card>;
+  return (
+    <>
+      <div className="px-4 sm:px-6 pt-4">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
+
+      <div className="px-4 sm:px-6">
+        <div className="text-lg pt-4 pb-2 font-medium">{title}</div>
+
+        <div>{children}</div>
+      </div>
+    </>
+  );
 }
 
 interface PreferenceProps {
@@ -215,6 +235,7 @@ interface PreferenceProps {
 }
 
 function Preference({ path }: PreferenceProps) {
+  const colors = useColorScheme();
   const { preferences, update } = usePreferences();
   const { t } = useTranslation();
 
@@ -231,18 +252,27 @@ function Preference({ path }: PreferenceProps) {
   }
 
   return (
-    <ClickableElement
-      onClick={() =>
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        update(`preferences.${path}`, get(preferencesDefaults, path))
-      }
-    >
-      <Inline className="space-x-2">
-        <div>{translations[path as keyof typeof translations]}</div>
+    <div className="flex items-center justify-between w-60 py-3 px-4 sm:px-6">
+      <div className="text-sm font-medium">
+        {translations[path as keyof typeof translations]}
+      </div>
 
-        <X size={18} />
-      </Inline>
-    </ClickableElement>
+      <div
+        className="hover:opacity-75 cursor-pointer"
+        onClick={() =>
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          update(`preferences.${path}`, get(preferencesDefaults, path))
+        }
+      >
+        <CircleXMark
+          color={colors.$16}
+          hoverColor={colors.$3}
+          borderColor={colors.$5}
+          hoverBorderColor={colors.$17}
+          size="1.6rem"
+        />
+      </div>
+    </div>
   );
 }

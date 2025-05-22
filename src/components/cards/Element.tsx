@@ -42,7 +42,7 @@ export function Element(props: Props) {
         {
           'px-5 sm:px-6': !props.noExternalPadding,
           'py-4 sm:py-3': !props.noVerticalPadding,
-          'lg:items-center': !props.withoutItemsCenter,
+          'sm:items-center': !props.withoutItemsCenter,
           'sm:grid-cols-2': props.twoGridColumns,
           'sm:grid-cols-3': !props.twoGridColumns,
         }

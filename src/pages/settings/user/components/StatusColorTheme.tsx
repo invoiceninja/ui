@@ -22,8 +22,8 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { cloneDeep } from 'lodash';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/user';
-import { XMark } from '$app/components/icons/XMark';
 import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 type ThemeKey =
   | 'light'
@@ -395,7 +395,7 @@ export function DefaultColorPickerModal(props: ModalProps) {
         />
 
         <div
-          className="cursor-pointer hover:opacity-75"
+          className="cursor-pointer"
           onClick={() =>
             handleUserChange(
               `company_user.react_settings.color_theme.${fieldKey}`,
@@ -403,7 +403,13 @@ export function DefaultColorPickerModal(props: ModalProps) {
             )
           }
         >
-          <XMark size="1.2rem" color={colors.$3} />
+          <CircleXMark
+            color={colors.$16}
+            hoverColor={colors.$3}
+            borderColor={colors.$5}
+            hoverBorderColor={colors.$17}
+            size="1.6rem"
+          />
         </div>
       </div>
 
