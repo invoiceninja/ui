@@ -7,68 +7,137 @@ import { toast } from "$app/common/helpers/toast/toast";
 import { AxiosError } from "axios";
 import { endpoint } from "$app/common/helpers";
 import { request } from "$app/common/helpers/request";
+import { useState } from "react";
+import { Alert } from "$app/components/Alert";
+import { User, Account } from "$app/common/interfaces/docuninja/api";
+
 export default function Documents() {
     const { documentTitle } = useTitle('documents');
     const [t] = useTranslation();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [account, setAccount] = useState<Account | null>(null);
 
     const pages = [{ name: t('documents'), href: '/documents' }];
 
+    const isPaidUser = account?.plan !== 'free' && new Date(account?.plan_expires ?? '') > new Date();
     function login() {
-        console.log('login');
+        setIsLoading(true);
+        setError(null);
 
-
-    request('POST', endpoint('/api/docuninja/login'), {})
-        .then((response) => {
-            console.log(response);
-            toast.success('logged in!');
-            
-        })
-        .catch((e: AxiosError<ValidationBag>) => {
-            // if (e.response?.status === 422) {
-                // setErrors(e.response.data);
-                // toast.dismiss();
-            // }
-        });
-
+        request('POST', endpoint('/api/docuninja/login'), {})
+            .then((response) => {
+                console.log('Login response:', response.data);
+                
+                if (response.data.data) {
+                    setUser(response.data.data);
+                    setAccount(response.data.data.account);
+                    toast.success(t('successfully_logged_in') as string);
+                } else {
+                    setUser(null);
+                    setAccount(null);
+                }
+            })
+            .catch((e: AxiosError<ValidationBag>) => {
+                console.error('Login error:', e);
+                setError(e.response?.data?.message || t('error_logging_in') as string);
+                toast.error(t('error_logging_in') as string);
+            })
+            .finally(() => {
+                console.log('Current state:', { user, account, isLoading });
+                setIsLoading(false);
+            });
     }
 
     function create() {
-        console.log('create');
-
+        setIsLoading(true);
+        setError(null);
 
         request('POST', endpoint('/api/docuninja/create'), {})
             .then((response) => {
-                console.log(response);
-                toast.success('logged in!');
+                
+                setUser(response.data);
+                setAccount(response.data?.account);
 
+                toast.success(t('account_created_successfully') as string);
             })
             .catch((e: AxiosError<ValidationBag>) => {
-                // if (e.response?.status === 422) {
-                // setErrors(e.response.data);
-                // toast.dismiss();
-                // }
-            });
+                setError(e.response?.data?.message || t('error_creating_account') as string);
+                toast.error(t('error_creating_account') as string);
+            })
+            .finally(() => setIsLoading(false));
+    }
 
-    
+    function renderContent() {
+        console.log('Rendering with state:', { user, account, isLoading });
+        
+        if (isLoading) {
+            return (
+                <div className="flex justify-center items-center p-6">
+                    <span className="text-gray-600">{t('loading')}...</span>
+                </div>
+            );
+        }
 
+        // If we have an account, show the documents view
+        if (account && user) {
+            return (
+                <div className="space-y-6">
+                    {!isPaidUser && (
+                        <Alert type="warning" className="mb-4">
+                            <div className="flex justify-between items-center">
+                                <span>{t('upgrade_account_message')}</span>
+                                <Button onClick={() => window.open('/settings/account/plans', '_blank')}>
+                                    {t('upgrade_now')}
+                                </Button>
+                            </div>
+                        </Alert>
+                    )}
+
+                    {/* Add your table component here */}
+                    <div className="bg-white rounded shadow overflow-hidden">
+                        <div className="p-4">
+                            <h2 className="text-lg font-medium">{t('your_documents')}</h2>
+                            {/* Table implementation goes here */}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // If we have a user but no account, show create account
+        if (user && !account) {
+            return (
+                <div className="flex flex-col items-center gap-4 p-6">
+                    <p className="text-gray-600 mb-4">{t('no_account_found')}</p>
+                    <Button onClick={create} disabled={isLoading}>
+                        {t('create_account')}
+                    </Button>
+                </div>
+            );
+        }
+
+        // Default state - show login
+        return (
+            <div className="flex flex-col items-center gap-4 p-6">
+                <p className="text-gray-600 mb-4">{t('check_existing_account')}</p>
+                <Button onClick={login} disabled={isLoading}>
+                    {t('login')}
+                </Button>
+            </div>
+        );
     }
 
     return (
         <Default title={documentTitle} breadcrumbs={pages} docsLink="en/documents">
-
-        <div className="flex grid-cols-3 gap-4">
-        
-            <div>
-                <Button onClick={login}>{t('login')}</Button>
-            </div>
-
-            <div>
-                <Button onClick={create}>{t('create')}</Button>
-            </div>
-
-
-
-        </div>
+            {error && (
+                <Alert type="danger" className="mb-4">
+                    {error}
+                </Alert>
+            )}
+            
+            {renderContent()}
         </Default>
     );
 }
