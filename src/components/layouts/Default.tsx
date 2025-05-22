@@ -64,7 +64,6 @@ import { CurrencyExchange } from '../icons/CurrencyExchange';
 import { ChartLine } from '../icons/ChartLine';
 import { ArrowsTransaction } from '../icons/ArrowsTransaction';
 import { Gear } from '../icons/Gear';
-
 export interface SaveOption {
   label: string;
   onClick: (event: FormEvent<HTMLFormElement>) => unknown;
@@ -357,6 +356,19 @@ export function Default(props: Props) {
       icon: ChartLine,
       current: location.pathname.startsWith('/reports'),
       visible: hasPermission('view_reports'),
+    },
+    {
+      name: t('documents'),
+      href: '/documents',
+      icon: ArrowsTransaction,
+      current: location.pathname.startsWith('/documents'),
+      visible: true, //isHosted(), //@TODO: switch back @ release @docuninja
+      rightButton: {
+        icon: Plus,
+        to: '/documents/create',
+        label: t('new_document'),
+        visible: hasPermission('create_bank_transaction'),
+      },
     },
     {
       name: t('settings'),
