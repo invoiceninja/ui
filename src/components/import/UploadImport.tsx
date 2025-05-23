@@ -58,7 +58,11 @@ export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const isImportFileTypeZip = props.type === 'zip';
   const acceptableFileExtensions = {
-    ...(!isImportFileTypeZip && { 'text/*': ['.csv'] }),
+    ...(!isImportFileTypeZip && {
+      'text/*': ['.csv'],
+      'application/vnd.ms-excel': ['.csv'],
+      'application/csv': ['.csv'],
+    }),
     ...(isImportFileTypeZip && { 'application/zip': ['.zip'] }),
   };
 

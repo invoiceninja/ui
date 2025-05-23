@@ -76,9 +76,14 @@ export function UploadImport(props: Props) {
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: group === 'backup' 
-      ? { 'application/zip': ['.zip'] }
-      : { 'text/*': ['.csv'] },
+    accept:
+      group === 'backup'
+        ? { 'application/zip': ['.zip'] }
+        : {
+            'text/*': ['.csv'],
+            'application/vnd.ms-excel': ['.csv'],
+            'application/csv': ['.csv'],
+          },
     onDrop: async (acceptedFiles) => {
       if (group === 'backup') {
         acceptedFiles.forEach((file) => {
