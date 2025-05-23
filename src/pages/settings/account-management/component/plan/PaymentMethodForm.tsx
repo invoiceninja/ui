@@ -9,6 +9,7 @@ import { Spinner } from "$app/components/Spinner";
 import { Button } from "$app/components/forms";
 import { Icon } from "$app/components/icons/Icon";
 import { MdCreditCard } from "react-icons/md";
+import { useLogin } from "$app/pages/authentication/common/hooks";
 
 import type {
     Stripe,
@@ -54,6 +55,7 @@ export interface PaymentProps {
     amount_string?: string;
     amount_raw?: number;
     onPaymentSuccess?: (result: PaymentSuccessResult) => void;
+    onPaymentComplete?: () => void;
     onCancel?: () => void;
 }
 
@@ -65,11 +67,13 @@ export function PaymentMethodForm({
     amount_string,
     amount_raw,
     onPaymentSuccess,
+    onPaymentComplete,
     onCancel,
 }: PaymentProps) {
     const account = useCurrentAccount();
     const { t } = useTranslation();
     const isDestroyed = useRef(false);
+    const handleLogin = useLogin();
 
     const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("new_card");
     const [errors, setErrors] = useState<string | null>(null);
@@ -218,6 +222,9 @@ export function PaymentMethodForm({
                                 if (onPaymentSuccess) {
                                     onPaymentSuccess(result.paymentIntent);
                                 }
+                                if (onPaymentComplete) {
+                                    onPaymentComplete();
+                                }
                                 setIsSubmitting(false);
                             })
                             .catch((error: AxiosError<ApiError>) => {
@@ -245,6 +252,9 @@ export function PaymentMethodForm({
                     toast.success(t("payment_successful") as string);
                     if (onPaymentSuccess) {
                         onPaymentSuccess({ status: "succeeded" });
+                    }
+                    if (onPaymentComplete) {
+                        onPaymentComplete();
                     }
                     setIsSubmitting(false);
                 })
@@ -287,7 +297,7 @@ export function PaymentMethodForm({
             )}
 
             <div className="space-y-4">
-                <RadioGroup value={selectedMethod} onChange={setSelectedMethod}>
+                <RadioGroup value={selectedMethod} onChange={handleMethodChange}>
                     <RadioGroup.Label className="sr-only">Payment Method</RadioGroup.Label>
                     <div className="space-y-2">
                         {tokens?.map((token: GatewayToken) => (
@@ -375,13 +385,13 @@ export function PaymentMethodForm({
             )}
 
             <div className="flex justify-end gap-2">
-                <Button
-                    type="secondary"
+                <button
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={onCancel}
                     disabled={isSubmitting}
                 >
                     {t("cancel")}
-                </Button>
+                </button>
                 <Button
                     type="primary"
                     onClick={handleSubmit}

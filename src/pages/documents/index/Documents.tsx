@@ -2,90 +2,69 @@ import { useTitle } from "$app/common/hooks/useTitle";
 import { Default } from "$app/components/layouts/Default";
 import { useTranslation } from "react-i18next";
 import { Button } from '$app/components/forms';
-import { ValidationBag } from "$app/common/interfaces/validation-bag";
-import { toast } from "$app/common/helpers/toast/toast";
-import { AxiosError } from "axios";
 import { endpoint } from "$app/common/helpers";
 import { request } from "$app/common/helpers/request";
 import { useState } from "react";
 import { Alert } from "$app/components/Alert";
-import { User, Account } from "$app/common/interfaces/docuninja/api";
+import { User, Account, Company } from "$app/common/interfaces/docuninja/api";
 import { usePaidOrSelfHost } from "$app/common/hooks/usePaidOrSelfhost";
 import { useNavigate } from "react-router-dom";
 import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
 import { UpgradeModal } from "../components/UpgradeModal";
+import { useCurrentCompany } from "$app/common/hooks/useCurrentCompany";
+import { useQuery, useQueryClient } from "react-query";
 
 export default function Documents() {
     const { documentTitle } = useTitle('documents');
     const [t] = useTranslation();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [user, setUser] = useState<User | null>(null);
-    const [docuAccount, setDocuAccount] = useState<Account | null>(null);
-    const [testLogin, setTestLogin] = useState(false);
-    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-    const account = useCurrentAccount();
+    const queryClient = useQueryClient();
 
+    const [error, setError] = useState<string | null>(null);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+    const account = useCurrentAccount();
+    const company = useCurrentCompany();
     const pages = [{ name: t('documents'), href: '/documents' }];
 
-    const isPaidUser = account?.plan !== 'free' && new Date(account?.plan_expires ?? '') > new Date();
+    const { data: docuData, isLoading } = useQuery(
+        ['/api/docuninja/login'],
+        async () => {
+            const response = await request('POST', endpoint('/api/docuninja/login'), {}, { skipIntercept: true });
+            return response.data?.data;
+        },
+        {
+            onError: (err) => {
+                console.error('Error fetching Docuninja data:', err);
+                setError('Failed to fetch Docuninja data');
+            },
+            enabled: !!company?.company_key,
+        }
+    );
 
-    /**Tests if the user can login to Docuninja */
-    function login() {
-        setIsLoading(true);
-        setError(null);
-
-        request('POST', endpoint('/api/docuninja/login'), {})
-            .then((response) => {
-                console.log('Login response:', response.data);
-                
-                if (response.data.data) {
-                    setUser(response.data.data);
-                    setDocuAccount(response.data.data.account);
-                    toast.success(t('successfully_logged_in') as string);
-                } else {
-                    setUser(null);
-                    setDocuAccount(null);
-                }
-            })
-            .catch((e: AxiosError<ValidationBag>) => {
-                console.error('Login error:', e);
-                setError(e.response?.data?.message || t('error_logging_in') as string);
-                toast.error(t('error_logging_in') as string);
-            })
-            .finally(() => {
-                console.log('Current state:', { user, account, isLoading });
-                setIsLoading(false);
-                setTestLogin(true);
-            });
-    }
+    const user = docuData;
+    const docuAccount = docuData?.account;
+    const docuCompany = docuData?.companies?.find((c: Company) => c.ninja_company_key === company?.company_key);
+    const isPaidUser = docuAccount?.plan !== 'free' && new Date(docuAccount?.plan_expires ?? '') > new Date();
+    const testLogin = !!docuData;
 
     /**Creates a new account in Docuninja */
     function create() {
-        setIsLoading(true);
         setError(null);
 
-        request('POST', endpoint('/api/docuninja/create'), {})
+        request('POST', endpoint('/api/docuninja/create'), {}, { skipIntercept: true })
             .then((response) => {
-                
-                setUser(response.data);
-                setDocuAccount(response.data?.account);
-
-                toast.success(t('account_created_successfully') as string);
+                // After creating, invalidate the query to trigger a refresh
+                queryClient.invalidateQueries(['/api/docuninja/login']);
             })
-            .catch((e: AxiosError<ValidationBag>) => {
-                setError(e.response?.data?.message || t('error_creating_account') as string);
-                toast.error(t('error_creating_account') as string);
-            })
-            .finally(() => setIsLoading(false));
+            .catch(() => {
+                setError('Failed to create Docuninja account');
+            });
     }
 
     const hasPaidNinjaPlan = usePaidOrSelfHost();
-    
     const navigate = useNavigate();
 
     function renderContent() {
-        
         if (isLoading) {
             return (
                 <div className="flex justify-center items-center p-6">
@@ -94,9 +73,6 @@ export default function Documents() {
             );
         }
 
-
-        /** First gate check if the user has a paid Invoice Ninjaplan */
-        // if (!hasPaidNinjaPlan) { //@docuninja stubs
         if (account.plan !== 'pro') {
             return (
                 <div className="flex flex-col items-center gap-4 p-6">
@@ -108,20 +84,19 @@ export default function Documents() {
             );
         }
 
-        // If we have a user but no account, show create account
-        if (testLogin &&!docuAccount) {
+        if (testLogin && !docuCompany) {
             return (
                 <div className="flex flex-col items-center gap-4 p-6">
-                    <p className="text-gray-600 mb-4">{t('no_account_found')}</p>
+                    <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
+                    <p className="text-gray-600 mb-4">To create your DocuNinja account for this company, please click the button below.</p>
                     <Button onClick={create} disabled={isLoading}>
-                        {t('create_account')}
+                        {t('create')}
                     </Button>
                 </div>
             );
         }
 
-        // If we have an account, show the documents view
-        if (docuAccount) {
+        if (docuCompany) {
             return (
                 <div className="space-y-6">
                     {!isPaidUser && (
@@ -139,28 +114,21 @@ export default function Documents() {
                         visible={showUpgradeModal}
                         onClose={() => setShowUpgradeModal(false)}
                         upgradeableUsers={account?.num_users ?? 1}
+                        currentSeats={docuAccount?.seats ?? 1}
+                        onPaymentComplete={() => {
+                            queryClient.invalidateQueries(['/api/docuninja/login']);
+                            setShowUpgradeModal(false);
+                        }}
                     />
 
-                    {/* Add your table component here */}
                     <div className="bg-white rounded shadow overflow-hidden">
                         <div className="p-4">
                             <h2 className="text-lg font-medium">{t('your_documents')}</h2>
-                            {/* Table implementation goes here */}
                         </div>
                     </div>
                 </div>
             );
         }
-
-        // Default state - show login
-        return (
-            <div className="flex flex-col items-center gap-4 p-6">
-                <p className="text-gray-600 mb-4">{t('check_existing_account')}</p>
-                <Button onClick={login} disabled={isLoading}>
-                    {t('login')}
-                </Button>
-            </div>
-        );
     }
 
     return (

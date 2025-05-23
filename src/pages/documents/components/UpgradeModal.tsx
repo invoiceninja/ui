@@ -17,6 +17,8 @@ interface Props {
     visible: boolean;
     onClose: () => void;
     upgradeableUsers: number;
+    onPaymentComplete: () => void;
+    currentSeats?: number;
 }
 
 interface PricingResponse {
@@ -26,7 +28,7 @@ interface PricingResponse {
     pro_rata_raw: number;
 }
 
-export function UpgradeModal({ visible, onClose, upgradeableUsers }: Props) {
+export function UpgradeModal({ visible, onClose, upgradeableUsers, onPaymentComplete, currentSeats = 1 }: Props) {
     const [t] = useTranslation();
     const account = useCurrentAccount();
     const [isLoading, setIsLoading] = useState(false);
@@ -46,21 +48,26 @@ export function UpgradeModal({ visible, onClose, upgradeableUsers }: Props) {
         enabled: Boolean(account),
     });
 
-    
-    const userOptions = Array.from({ length: upgradeableUsers }, (_, i) => ({
-        value: (i + 1).toString(),
-        label: `${i + 1} ${t('users')}`,
-    }));
+    // Generate options from current seats + 1 up to max seats
+    const userOptions = Array.from(
+        { length: upgradeableUsers - currentSeats }, 
+        (_, i) => ({
+            value: (currentSeats + i + 1).toString(),
+            label: `${currentSeats + i + 1} ${t('users')}`,
+        })
+    );
 
     useEffect(() => {
         if (visible) {
             // Reset to first screen when modal opens
             setShowPayment(false);
+            // Set initial selection to minimum available upgrade
+            setSelectedUsers(currentSeats + 1);
             if (selectedUsers) {
                 fetchPricing(selectedUsers);
             }
         }
-    }, [visible, selectedUsers]);
+    }, [visible, currentSeats]);
 
     const fetchPricing = (numUsers: number) => {
         setIsLoading(true);
@@ -193,6 +200,7 @@ export function UpgradeModal({ visible, onClose, upgradeableUsers }: Props) {
                             num_users={selectedUsers}
                             onPaymentSuccess={handlePaymentSuccess}
                             onCancel={handleCancel}
+                            onPaymentComplete={onPaymentComplete}
                         />
                     </div>
                 )}

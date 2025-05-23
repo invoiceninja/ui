@@ -47,6 +47,7 @@ export interface Company {
     onboarding_completed_at: string; // ISO date string
     created_at: string; // ISO date string
     updated_at: string; // ISO date string
+    ninja_company_key: string;
 
     // Relations
     users?: User[];
