@@ -10,6 +10,10 @@ import { request } from "$app/common/helpers/request";
 import { useState } from "react";
 import { Alert } from "$app/components/Alert";
 import { User, Account } from "$app/common/interfaces/docuninja/api";
+import { usePaidOrSelfHost } from "$app/common/hooks/usePaidOrSelfhost";
+import { useNavigate } from "react-router-dom";
+import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
+import { UpgradeModal } from "../components/UpgradeModal";
 
 export default function Documents() {
     const { documentTitle } = useTitle('documents');
@@ -18,10 +22,14 @@ export default function Documents() {
     const [error, setError] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [account, setAccount] = useState<Account | null>(null);
+    const [testLogin, setTestLogin] = useState(false);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
     const pages = [{ name: t('documents'), href: '/documents' }];
 
     const isPaidUser = account?.plan !== 'free' && new Date(account?.plan_expires ?? '') > new Date();
+
+    /**Tests if the user can login to Docuninja */
     function login() {
         setIsLoading(true);
         setError(null);
@@ -47,9 +55,11 @@ export default function Documents() {
             .finally(() => {
                 console.log('Current state:', { user, account, isLoading });
                 setIsLoading(false);
+                setTestLogin(true);
             });
     }
 
+    /**Creates a new account in Docuninja */
     function create() {
         setIsLoading(true);
         setError(null);
@@ -69,8 +79,12 @@ export default function Documents() {
             .finally(() => setIsLoading(false));
     }
 
+    const hasPaidNinjaPlan = usePaidOrSelfHost();
+    const ninjaAccount = useCurrentAccount();
+    
+    const navigate = useNavigate();
+
     function renderContent() {
-        console.log('Rendering with state:', { user, account, isLoading });
         
         if (isLoading) {
             return (
@@ -80,20 +94,52 @@ export default function Documents() {
             );
         }
 
+
+        /** First gate check if the user has a paid Invoice Ninjaplan */
+        // if (!hasPaidNinjaPlan) { //@docuninja stubs
+        if (ninjaAccount.plan !== 'pro') {
+            return (
+                <div className="flex flex-col items-center gap-4 p-6">
+                    <p className="text-gray-600 mb-4">Upgrade to a paid plan to access Docuninja</p>
+                    <Button onClick={() => navigate('/settings/account_management')}>
+                        {t('upgrade_plan')}
+                    </Button>
+                </div>
+            );
+        }
+
+        // If we have a user but no account, show create account
+        if (testLogin &&!account) {
+            return (
+                <div className="flex flex-col items-center gap-4 p-6">
+                    <p className="text-gray-600 mb-4">{t('no_account_found')}</p>
+                    <Button onClick={create} disabled={isLoading}>
+                        {t('create_account')}
+                    </Button>
+                </div>
+            );
+        }
+
         // If we have an account, show the documents view
-        if (account && user) {
+        if (account) {
             return (
                 <div className="space-y-6">
                     {!isPaidUser && (
                         <Alert type="warning" className="mb-4">
                             <div className="flex justify-between items-center">
                                 <span>{t('upgrade_account_message')}</span>
-                                <Button onClick={() => window.open('/settings/account/plans', '_blank')}>
+                                <Button onClick={() => setShowUpgradeModal(true)}>
                                     {t('upgrade_now')}
                                 </Button>
                             </div>
                         </Alert>
                     )}
+
+                    <UpgradeModal 
+                        visible={showUpgradeModal}
+                        onClose={() => setShowUpgradeModal(false)}
+                        upgradeableUsers={account?.num_users ?? 1}
+                    />
 
                     {/* Add your table component here */}
                     <div className="bg-white rounded shadow overflow-hidden">
@@ -102,18 +148,6 @@ export default function Documents() {
                             {/* Table implementation goes here */}
                         </div>
                     </div>
-                </div>
-            );
-        }
-
-        // If we have a user but no account, show create account
-        if (user && !account) {
-            return (
-                <div className="flex flex-col items-center gap-4 p-6">
-                    <p className="text-gray-600 mb-4">{t('no_account_found')}</p>
-                    <Button onClick={create} disabled={isLoading}>
-                        {t('create_account')}
-                    </Button>
                 </div>
             );
         }
