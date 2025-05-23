@@ -41,6 +41,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { Spinner } from '$app/components/Spinner';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
+import { route } from '$app/common/helpers/route';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -427,9 +428,7 @@ export function TemplatesAndReminders() {
               <Button
                 behavior="button"
                 className="mt-2"
-                onClick={() =>
-                  window.open(user?.company_user?.ninja_portal_url || '')
-                }
+                onClick={() => route('/settings/account_management')}
               >
                 {t('plan_change')}
               </Button>
