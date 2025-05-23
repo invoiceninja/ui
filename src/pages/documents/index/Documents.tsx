@@ -21,9 +21,10 @@ export default function Documents() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
-    const [account, setAccount] = useState<Account | null>(null);
+    const [docuAccount, setDocuAccount] = useState<Account | null>(null);
     const [testLogin, setTestLogin] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+    const account = useCurrentAccount();
 
     const pages = [{ name: t('documents'), href: '/documents' }];
 
@@ -40,11 +41,11 @@ export default function Documents() {
                 
                 if (response.data.data) {
                     setUser(response.data.data);
-                    setAccount(response.data.data.account);
+                    setDocuAccount(response.data.data.account);
                     toast.success(t('successfully_logged_in') as string);
                 } else {
                     setUser(null);
-                    setAccount(null);
+                    setDocuAccount(null);
                 }
             })
             .catch((e: AxiosError<ValidationBag>) => {
@@ -68,7 +69,7 @@ export default function Documents() {
             .then((response) => {
                 
                 setUser(response.data);
-                setAccount(response.data?.account);
+                setDocuAccount(response.data?.account);
 
                 toast.success(t('account_created_successfully') as string);
             })
@@ -80,7 +81,6 @@ export default function Documents() {
     }
 
     const hasPaidNinjaPlan = usePaidOrSelfHost();
-    const ninjaAccount = useCurrentAccount();
     
     const navigate = useNavigate();
 
@@ -97,7 +97,7 @@ export default function Documents() {
 
         /** First gate check if the user has a paid Invoice Ninjaplan */
         // if (!hasPaidNinjaPlan) { //@docuninja stubs
-        if (ninjaAccount.plan !== 'pro') {
+        if (account.plan !== 'pro') {
             return (
                 <div className="flex flex-col items-center gap-4 p-6">
                     <p className="text-gray-600 mb-4">Upgrade to a paid plan to access Docuninja</p>
@@ -109,7 +109,7 @@ export default function Documents() {
         }
 
         // If we have a user but no account, show create account
-        if (testLogin &&!account) {
+        if (testLogin &&!docuAccount) {
             return (
                 <div className="flex flex-col items-center gap-4 p-6">
                     <p className="text-gray-600 mb-4">{t('no_account_found')}</p>
@@ -121,7 +121,7 @@ export default function Documents() {
         }
 
         // If we have an account, show the documents view
-        if (account) {
+        if (docuAccount) {
             return (
                 <div className="space-y-6">
                     {!isPaidUser && (
