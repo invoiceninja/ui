@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Button, InputField, Link } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BiSortAlt2 } from 'react-icons/bi';
 
 export const previewAtom = atom<Preview | null>(null);
 
@@ -86,10 +86,13 @@ export function usePreview() {
 }
 
 export function Preview() {
-  const preview = usePreview();
-  const [filtered, setFiltered] = useState<Preview | null>(null);
-  const [sorts, setSorts] = useState<Record<string, string>>();
   const [t] = useTranslation();
+
+  const preview = usePreview();
+  const colors = useColorScheme();
+
+  const [sorts, setSorts] = useState<Record<string, string>>();
+  const [filtered, setFiltered] = useState<Preview | null>(null);
 
   if (!preview) {
     return null;
@@ -204,29 +207,42 @@ export function Preview() {
         <Table>
           <Thead>
             {preview.columns.map((column, i) => (
-              <Th key={i}>
-                <div
-                  onClick={() => sort(column.identifier)}
-                  className="cursor-pointer inline-flex items-center space-x-2"
-                >
-                  <p>{column.display_value}</p> <BiSortAlt2 />
-                </div>
+              <Th
+                key={i}
+                style={{ borderBottom: `1px solid ${colors.$20}` }}
+                isCurrentlyUsed={Boolean(sorts?.[column.identifier])}
+                onColumnClick={() => sort(column.identifier)}
+              >
+                {column.display_value}
               </Th>
             ))}
           </Thead>
+
           <Tbody>
-            <Tr>
+            <Tr
+              className="border-b"
+              style={{
+                borderColor: colors.$20,
+              }}
+            >
               {preview.columns.map((column, i) => (
                 <Td key={i}>
                   <InputField
                     onValueChange={(value) => filter(column.identifier, value)}
+                    changeOverride
                   />
                 </Td>
               ))}
             </Tr>
 
             {data.map((row, i) => (
-              <Tr key={i}>
+              <Tr
+                key={i}
+                className="border-b"
+                style={{
+                  borderColor: colors.$20,
+                }}
+              >
                 {row.map((cell, i) => (
                   <Td key={i}>{cell.display_value}</Td>
                 ))}

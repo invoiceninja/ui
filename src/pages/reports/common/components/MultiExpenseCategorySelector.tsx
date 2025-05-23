@@ -13,11 +13,12 @@ import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue } from 'react-select';
+import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
 import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
 
 interface Props {
   value?: string;
@@ -63,9 +64,8 @@ export function MultiExpenseCategorySelector(props: Props) {
     <>
       {expenseCategories ? (
         <Element leftSide={t('expense_categories')}>
-          <Select
+          <CustomMultiSelect
             id="expenseCategoryItemSelector"
-            placeholder={t('expense_categories')}
             {...(value && {
               value: expenseCategories?.filter((option) =>
                 value
@@ -75,10 +75,9 @@ export function MultiExpenseCategorySelector(props: Props) {
                   )
               ),
             })}
-            onChange={(options) => onValueChange(handleChange(options))}
+            onValueChange={(options) => onValueChange(handleChange(options))}
             options={expenseCategories}
-            isMulti={true}
-            styles={customStyles}
+            isSearchable={true}
           />
         </Element>
       ) : (

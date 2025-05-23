@@ -13,7 +13,7 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue } from 'react-select';
+import { MultiValue } from 'react-select';
 import { Identifier } from '../useReports';
 import { useCreditsFilters } from '$app/pages/credits/common/hooks/useCreditsFilters';
 import { useExpenseFilters } from '$app/pages/expenses/common/hooks';
@@ -22,7 +22,7 @@ import { useQuoteFilters } from '$app/pages/quotes/common/hooks';
 import { useRecurringInvoiceFilters } from '$app/pages/recurring-invoices/common/hooks';
 import { usePaymentFilters } from '$app/pages/payments/common/hooks/usePaymentFilters';
 import { useTaskFilters } from '$app/pages/tasks/common/hooks';
-import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
 
 interface Props {
   report: Identifier;
@@ -34,8 +34,6 @@ export function StatusSelector(props: Props) {
   const [t] = useTranslation();
 
   const { value, onValueChange, errorMessage, report } = props;
-
-  const { customStyles } = useSelectorCustomStyles();
 
   const taskFilters = useTaskFilters();
   const quoteFilters = useQuoteFilters();
@@ -91,18 +89,17 @@ export function StatusSelector(props: Props) {
 
   return (
     <>
-      <Select
+      <CustomMultiSelect
         id="statusSelector"
-        styles={customStyles}
         {...(value && {
           value: options.filter((option) =>
             value.split(',').find((optionValue) => option.value === optionValue)
           ),
         })}
-        onChange={(options) => onValueChange(handleStatusChange(options))}
-        placeholder={t('status')}
+        onValueChange={(options: MultiValue<SelectOption>) =>
+          onValueChange(handleStatusChange(options))
+        }
         options={options}
-        isMulti={true}
       />
 
       {errorMessage && (
