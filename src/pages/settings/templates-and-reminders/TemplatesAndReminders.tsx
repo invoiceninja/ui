@@ -14,7 +14,6 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { request } from '$app/common/helpers/request';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -60,14 +59,12 @@ export function TemplatesAndReminders() {
   ];
 
   const company = useInjectCompanyChanges();
-  const handleChange = useHandleCurrentCompanyChangeProperty();
-  const handleSave = useHandleCompanySave();
-  const onCancel = useDiscardChanges();
-  const user = useCurrentUser();
-
-  const disableSettingsField = useDisableSettingsField();
-
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
+  const onCancel = useDiscardChanges();
+  const handleSave = useHandleCompanySave();
+  const disableSettingsField = useDisableSettingsField();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { data: statics } = useStaticsQuery();
   const [templateId, setTemplateId] = useState(
@@ -79,23 +76,29 @@ export function TemplatesAndReminders() {
   const [preview, setPreview] = useState<EmailTemplate>();
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
-  const [reminderIndex, setReminderIndex] = useState<number>(-1);
-
   const [isInitial, setIsInitial] = useState<boolean>(true);
-
+  const [reminderIndex, setReminderIndex] = useState<number>(-1);
   const [isLoadingPdf, setIsLoadingPdf] = useState<boolean>(false);
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
+  const getTemplateKey = (templateId: string) => {
+    if (templateId === 'partial_payment') {
+      return 'payment_partial';
+    }
+
+    return templateId as keyof CompanySettings;
+  };
+
   const emailSubjectKey = (
     templateId === 'quote_reminder1'
       ? 'email_quote_subject_reminder1'
-      : `email_subject_${templateId || 'invoice'}`
+      : `email_subject_${getTemplateKey(templateId) || 'invoice'}`
   ) as keyof CompanySettings;
   const emailTemplateKey = (
     templateId === 'quote_reminder1'
       ? 'email_quote_template_reminder1'
-      : `email_template_${templateId || 'invoice'}`
+      : `email_template_${getTemplateKey(templateId) || 'invoice'}`
   ) as keyof CompanySettings;
 
   const getNumDaysReminderKey = (index: number) => {
@@ -241,9 +244,9 @@ export function TemplatesAndReminders() {
         delete updatedCompanySettingsChanges[
           (templateId === 'quote_reminder1'
             ? 'email_quote_subject_reminder1'
-            : `email_subject_${
+            : `email_subject_${getTemplateKey(
                 currentReminder || templateId
-              }`) as keyof typeof updatedCompanySettingsChanges
+              )}`) as keyof typeof updatedCompanySettingsChanges
         ];
 
         if (
@@ -376,8 +379,6 @@ export function TemplatesAndReminders() {
 
             <option value="credit">{t('credit')}</option>
             <option value="purchase_order">{t('purchase_order')}</option>
-
-            {/* <option value="partial_payment">{t('partial_payment')}</option> */}
 
             <option value="custom1">{t('first_custom')}</option>
             <option value="custom2">{t('second_custom')}</option>
