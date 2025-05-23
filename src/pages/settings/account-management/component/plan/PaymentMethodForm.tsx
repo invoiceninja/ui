@@ -213,9 +213,11 @@ export function PaymentMethodForm({
                         result.paymentIntent &&
                         result.paymentIntent.status === "succeeded"
                     ) {
-                        request('POST', endpoint('/api/client/account_management/payment/intent'), {
+                        request('POST', endpoint('/api/client/account_management/docuninja/upgrade'), {
                                 payment_intent: result.paymentIntent.id,
                                 num_users: num_users,
+                                amount: amount_raw ?? 0,
+                                product: "docuninja_users",
                             })
                             .then(() => {
                                 toast.success(t("payment_successful") as string);

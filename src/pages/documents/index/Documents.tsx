@@ -114,7 +114,7 @@ export default function Documents() {
                         visible={showUpgradeModal}
                         onClose={() => setShowUpgradeModal(false)}
                         upgradeableUsers={account?.num_users ?? 1}
-                        currentSeats={docuAccount?.seats ?? 1}
+                        currentSeats={docuAccount.plan === 'free' ? 0 : docuAccount?.seats ?? 1}
                         onPaymentComplete={() => {
                             queryClient.invalidateQueries(['/api/docuninja/login']);
                             setShowUpgradeModal(false);

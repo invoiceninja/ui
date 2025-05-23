@@ -32,7 +32,7 @@ export function UpgradeModal({ visible, onClose, upgradeableUsers, onPaymentComp
     const [t] = useTranslation();
     const account = useCurrentAccount();
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedUsers, setSelectedUsers] = useState(upgradeableUsers);
+    const [selectedUsers, setSelectedUsers] = useState(currentSeats + 1);
     const [pricing, setPricing] = useState<PricingResponse | null>(null);
     const [showPayment, setShowPayment] = useState(false);
 
@@ -62,12 +62,23 @@ export function UpgradeModal({ visible, onClose, upgradeableUsers, onPaymentComp
             // Reset to first screen when modal opens
             setShowPayment(false);
             // Set initial selection to minimum available upgrade
-            setSelectedUsers(currentSeats + 1);
-            if (selectedUsers) {
-                fetchPricing(selectedUsers);
-            }
+            const initialSelection = currentSeats + 1;
+            setSelectedUsers(initialSelection);
+            fetchPricing(initialSelection);
         }
     }, [visible, currentSeats]);
+
+    // Fetch pricing whenever selected users changes
+    useEffect(() => {
+        if (selectedUsers) {
+            fetchPricing(selectedUsers);
+        }
+    }, [selectedUsers]);
+
+    const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const newValue = parseInt(event.target.value);
+        setSelectedUsers(newValue);
+    };
 
     const fetchPricing = (numUsers: number) => {
         setIsLoading(true);
@@ -76,6 +87,7 @@ export function UpgradeModal({ visible, onClose, upgradeableUsers, onPaymentComp
             num_users: numUsers,
         })
             .then((response) => {
+
                 setPricing(response.data);
             })
             .catch((error) => {
@@ -117,7 +129,7 @@ export function UpgradeModal({ visible, onClose, upgradeableUsers, onPaymentComp
                             <div>
                                 <SelectField
                                     value={selectedUsers.toString()}
-                                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setSelectedUsers(parseInt(event.target.value))}
+                                    onChange={handleUserChange}
                                     label={t('select_number_of_users')}
                                 >
                                     {userOptions.map((option) => (
