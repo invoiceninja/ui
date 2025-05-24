@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Link, SelectField } from '$app/components/forms';
 import {
   CompanyGateway,
@@ -28,13 +28,11 @@ import { Entry } from '$app/components/forms/Combobox';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { $help } from '$app/components/HelpWidget';
-import { HelpCircle } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   gateway: Gateway;
@@ -50,6 +48,7 @@ const currentGatewayTypeAtom = atom<string | undefined>(undefined);
 export function LimitsAndFees(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const [currentGatewayTypeId, setCurrentGatewayTypeId] = useAtom(
@@ -104,27 +103,8 @@ export function LimitsAndFees(props: Props) {
     return false;
   };
 
-  const accentColor = useAccentColor();
-
   return (
-    <Card
-      title={t('limits_and_fees')}
-      topRight={
-        <button
-          style={{ color: accentColor }}
-          type="button"
-          onClick={() =>
-            $help('gateways', {
-              moveToHeading: 'Limits/Fees',
-            })
-          }
-          className="inline-flex items-center space-x-1 text-sm"
-        >
-          <HelpCircle size={18} />
-          <span>{t('documentation')}</span>
-        </button>
-      }
-    >
+    <>
       <Element leftSide={t('payment_type')}>
         <SelectField
           value={currentGatewayTypeId}
@@ -145,7 +125,13 @@ export function LimitsAndFees(props: Props) {
 
       {currentGatewayTypeId && (
         <>
-          <Divider />
+          <div className="px-4 sm:px-6 py-4">
+            <Divider
+              className="border-dashed"
+              withoutPadding
+              borderColor={colors.$20}
+            />
+          </div>
 
           <Element leftSide={`${t('min')} ${t('limit')}`}>
             <div className="space-y-4">
@@ -207,7 +193,13 @@ export function LimitsAndFees(props: Props) {
             </div>
           </Element>
 
-          <Divider />
+          <div className="px-4 sm:px-6 py-4">
+            <Divider
+              className="border-dashed"
+              withoutPadding
+              borderColor={colors.$20}
+            />
+          </div>
 
           <Element leftSide={t('fee_percent')}>
             <NumberInputField
@@ -358,6 +350,6 @@ export function LimitsAndFees(props: Props) {
           </Element>
         </>
       )}
-    </Card>
+    </>
   );
 }

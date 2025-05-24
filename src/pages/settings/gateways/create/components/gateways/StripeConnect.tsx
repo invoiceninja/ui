@@ -35,7 +35,7 @@ export function StripeConnect() {
 
   return (
     <Element>
-      <Button onClick={handleSetup} type="minimal" behavior="button">
+      <Button onClick={handleSetup} type="secondary" behavior="button">
         {t('gateway_setup')}
       </Button>
     </Element>

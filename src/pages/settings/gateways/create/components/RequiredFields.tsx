@@ -8,12 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   gateway: Gateway;
@@ -23,9 +24,10 @@ interface Props {
   >;
 }
 
- 
 export function RequiredFields(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const handleChange = (property: keyof CompanyGateway, value: boolean) => {
     props.setCompanyGateway(
@@ -34,7 +36,7 @@ export function RequiredFields(props: Props) {
   };
 
   return (
-    <Card title={t('required_fields')}>
+    <>
       <Element leftSide={t('client_name')}>
         <Toggle
           checked={props.companyGateway.require_client_name}
@@ -91,7 +93,13 @@ export function RequiredFields(props: Props) {
         />
       </Element>
 
-      <Divider />
+      <div className="px-4 sm:px-6 pt-4 pb-4">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
 
       <Element leftSide={t('update_address')}>
         <Toggle
@@ -110,6 +118,6 @@ export function RequiredFields(props: Props) {
           }
         />
       </Element>
-    </Card>
+    </>
   );
 }
