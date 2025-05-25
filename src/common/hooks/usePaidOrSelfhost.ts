@@ -18,7 +18,7 @@ export function usePaidOrSelfHost() {
   const account = useCurrentAccount();
 
   const isPaidPlan =
-    new Date(account?.plan_expires) > new Date() &&
+    dayjs(account?.plan_expires).endOf('day').isAfter(dayjs()) &&
     (enterprisePlan() || proPlan());
 
   return (isHosted() && isPaidPlan) || isSelfHosted();
@@ -28,7 +28,7 @@ export function useIsPaid() {
   const account = useCurrentAccount();
 
   const isPaidPlan =
-    new Date(account?.plan_expires) > new Date() &&
+    dayjs(account?.plan_expires).endOf('day').isAfter(dayjs()) &&
     (enterprisePlan() || proPlan());
 
   return isPaidPlan;
