@@ -32,6 +32,7 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { trans } from '$app/common/helpers';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function TaskSettings() {
   useTitle('task_settings');
@@ -44,6 +45,7 @@ export function TaskSettings() {
   const disableSettingsField = useDisableSettingsField();
   const handleSettingsChange = useHandleCurrentCompanyChangeProperty();
 
+  const colors = useColorScheme();
   const companyChanges = useCompanyChanges();
   const errors = useAtomValue(companySettingsErrorsAtom);
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
@@ -88,7 +90,14 @@ export function TaskSettings() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#task_settings"
     >
-      <Card title={t('settings')}>
+      <Card
+        title={t('settings')}
+        className="shadow-sm pb-6"
+        childrenClassName="pt-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+      >
         <Element
           leftSide={
             <PropertyCheckbox
@@ -170,7 +179,15 @@ export function TaskSettings() {
           </Element>
         )}
 
-        {isCompanySettingsActive && <Divider />}
+        {isCompanySettingsActive && (
+          <div className="px-4 sm:px-6 py-4">
+            <Divider
+              className="border-dashed"
+              style={{ borderColor: colors.$20 }}
+              withoutPadding
+            />
+          </div>
+        )}
 
         {isCompanySettingsActive && (
           <Element
@@ -284,7 +301,13 @@ export function TaskSettings() {
           </Element>
         )}
 
-        <Divider />
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            style={{ borderColor: colors.$20 }}
+            withoutPadding
+          />
+        </div>
 
         <Element
           leftSide={

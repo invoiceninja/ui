@@ -24,6 +24,7 @@ import { ExpenseCategories } from '../expense-categories';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { isSelfHosted } from '$app/common/helpers';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { useColorScheme } from '$app/common/colors';
 
 export function ExpenseSettings() {
   useTitle('expense_settings');
@@ -34,6 +35,7 @@ export function ExpenseSettings() {
     { name: t('expense_settings'), href: '/settings/expense_settings' },
   ];
 
+  const colors = useColorScheme();
   const companyChanges = useInjectCompanyChanges();
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -51,7 +53,14 @@ export function ExpenseSettings() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#expense_settings"
     >
-      <Card title={t('settings')}>
+      <Card
+        title={t('settings')}
+        className="shadow-sm pb-6"
+        childrenClassName="pt-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+      >
         <Element
           leftSide={t('should_be_invoiced')}
           leftSideHelp={t('should_be_invoiced_help')}
@@ -127,7 +136,13 @@ export function ExpenseSettings() {
 
         {isCompanySettingsActive && isSelfHosted() && (
           <>
-            <Divider withoutPadding />
+            <div className="px-4 sm:px-6 pt-4">
+              <Divider
+                className="border-dashed"
+                style={{ borderColor: colors.$20 }}
+                withoutPadding
+              />
+            </div>
 
             <Element className="mt-3.5" leftSide={t('expense_mailbox_active')}>
               <Toggle
@@ -245,7 +260,13 @@ export function ExpenseSettings() {
           </>
         )}
 
-        <Divider className="pb-3.5" withoutPadding />
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            style={{ borderColor: colors.$20 }}
+            withoutPadding
+          />
+        </div>
 
         <Element leftSide={t('enter_taxes')}>
           <Radio
