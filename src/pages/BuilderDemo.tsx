@@ -1,7 +1,28 @@
+import { Alert } from '$app/components/Alert';
 import { Button } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
-import { BuilderContext, Builder } from '~/public/docuninja/builder2.0';
+import {
+  Builder,
+  BuilderContext,
+  ConfirmationDialogButtonProps,
+  ConfirmationDialogProps,
+  CreateClientTabProps,
+  CreateDialogProps,
+  CreateDialogTabButtonProps,
+  DeleteDialogButtonProps,
+  DeleteDialogProps,
+  SaveButtonProps,
+  SendButtonProps,
+  SendDialogButtonProps,
+  SendDialogProps,
+  SignatorySelectorProps,
+  UninviteDialogButtonProps,
+  UninviteDialogProps,
+  UploadDialogProps,
+  UploadProps,
+  ValidationErrorsProps,
+} from '@docuninja/builder2.0';
 
 export function BuilderDemo() {
   return (
@@ -28,6 +49,27 @@ export function BuilderDemo() {
                 trigger: Upload,
                 dialog: UploadDialog,
               },
+              confirmation: {
+                dialog: ConfirmationDialog,
+                button: ConfirmationDialogButton,
+              },
+              createSignatory: {
+                dialog: CreateDialog,
+                client: {
+                  form: CreateClientForm,
+                  button: CreateDialogTabButton,
+                },
+                user: {
+                  form: CreateUserForm,
+                  button: CreateDialogTabButton,
+                },
+              },
+              signatorySelector: SignatorySelector,
+              uninvite: {
+                dialog: UninviteDialog,
+                button: UninviteButton
+              }
+              validationErrors: ValidationErrors,
             },
           }}
         >
@@ -62,10 +104,8 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   return (
     <Modal visible={open} onClose={onOpenChange}>
       {content}
-      
-      <div className="flex justify-end">
-        {action}
-      </div>
+
+      <div className="flex justify-end">{action}</div>
     </Modal>
   );
 }
@@ -88,4 +128,102 @@ function Upload({ ...props }: UploadProps) {
 
 function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
   return null;
+}
+
+function ValidationErrors({ content }: ValidationErrorsProps) {
+  return <Alert>{content}</Alert>;
+}
+
+function ConfirmationDialog({
+  isOpen,
+  onOpenChange,
+  content,
+  action,
+}: ConfirmationDialogProps) {
+  return null;
+}
+
+function ConfirmationDialogButton({ ...props }: ConfirmationDialogButtonProps) {
+  return (
+    <Button behavior="button" {...props}>
+      Confirm
+    </Button>
+  );
+}
+
+export function CreateDialog({
+  open,
+  onOpenChange,
+  client,
+  user,
+}: CreateDialogProps) {
+  return null;
+}
+
+function CreateClientForm({ fields }: CreateClientTabProps) {
+  return (
+    <>
+      {fields.map((field) => (
+        <div key={field.name} className="mb-4">
+          <label htmlFor={field.name} className="block text-sm font-medium">
+            {field.name}
+          </label>
+
+          <input type="text" id={field.name} {...field.register(field.name)} />
+        </div>
+      ))}
+    </>
+  );
+}
+
+function CreateUserForm({ fields }: CreateClientTabProps) {
+  return (
+    <>
+      {fields.map((field) => (
+        <div key={field.name} className="mb-4">
+          <label htmlFor={field.name} className="block text-sm font-medium">
+            {field.name}
+          </label>
+
+          <input type="text" id={field.name} {...field.register(field.name)} />
+        </div>
+      ))}
+    </>
+  );
+}
+
+function CreateDialogTabButton({
+  form,
+  isSubmitting,
+}: CreateDialogTabButtonProps) {
+  return (
+    <Button form={form} behavior="submit" disabled={isSubmitting}>
+      Create
+    </Button>
+  );
+}
+
+function SignatorySelector({
+  results,
+  onSelect,
+  value,
+}: SignatorySelectorProps) {
+  return null
+}
+
+function UniviteDialog({
+  open,
+  onOpenChange,
+  content,
+  action,
+}: UninviteDialogProps) {
+  return null
+}
+
+function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
+  return (
+    <Button form={form} behavior="submit" disabled={isSubmitting}>
+      Continue
+    </Button>
+  );
 }
