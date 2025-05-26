@@ -361,14 +361,13 @@ export function Create() {
         title={t('add_gateway')}
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
-        headerStyle={{ borderColor: colors.$20 }}
         withoutBodyPadding
         withoutHeaderBorder
         topRight={
           <>
             {tabIndex === 1 && (
               <button
-                style={{ color: accentColor }}
+                style={{ color: '#0062FF' }}
                 type="button"
                 onClick={() =>
                   $help('gateways', {
@@ -385,7 +384,7 @@ export function Create() {
 
             {tabIndex === 3 && (
               <button
-                style={{ color: accentColor }}
+                style={{ color: '#0062FF' }}
                 type="button"
                 onClick={() =>
                   $help('gateways', {

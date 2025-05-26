@@ -12,7 +12,6 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { updateChanges } from '$app/common/stores/slices/company-users';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaxRates } from '..';
@@ -32,6 +31,8 @@ import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { HelpWidget } from '$app/components/HelpWidget';
 import { CalculateTaxesNotificationModal } from './components/calculate-taxes/components/CalculateTaxesNotificationModal';
+import { useColorScheme } from '$app/common/colors';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -44,6 +45,7 @@ export function TaxSettings() {
   useInjectCompanyChanges();
   useTitle('tax_settings');
 
+  const colors = useColorScheme();
   const isPaidOrSelfHost = usePaidOrSelfHost();
 
   const calculateTaxesRegion = useCalculateTaxesRegion();
@@ -59,15 +61,7 @@ export function TaxSettings() {
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
-  };
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const handleToggleChange = (id: string, value: boolean) => {
     dispatch(
@@ -92,14 +86,24 @@ export function TaxSettings() {
     >
       {isCompanySettingsActive && (
         <>
-          <Card title={t('tax_settings')}>
-            {companyChanges.calculate_taxes ? null : (
+          <Card
+            title={t('tax_settings')}
+            className="shadow-sm pb-6"
+            childrenClassName="pt-4"
+            style={{ borderColor: colors.$24 }}
+            headerStyle={{ borderColor: colors.$20 }}
+            withoutBodyPadding
+          >
+            {!companyChanges.calculate_taxes && (
               <Element leftSide={t('invoice_tax_rates')}>
                 <SelectField
-                  id="enabled_tax_rates"
-                  onChange={handleChange}
-                  value={companyChanges?.enabled_tax_rates || 0}
+                  value={companyChanges?.enabled_tax_rates?.toString() || '0'}
+                  onValueChange={(value) =>
+                    handleChange('enabled_tax_rates', value)
+                  }
                   errorMessage={errors?.errors.enabled_tax_rates}
+                  customSelector
+                  dismissable={false}
                 >
                   <option value="0">{t('disabled')}</option>
                   <option value="1">{t('one_tax_rate')}</option>
@@ -111,10 +115,15 @@ export function TaxSettings() {
 
             <Element leftSide={t('line_item_tax_rates')}>
               <SelectField
-                id="enabled_item_tax_rates"
-                onChange={handleChange}
-                value={companyChanges?.enabled_item_tax_rates || 0}
+                value={
+                  companyChanges?.enabled_item_tax_rates?.toString() || '0'
+                }
+                onValueChange={(value) =>
+                  handleChange('enabled_item_tax_rates', value)
+                }
                 errorMessage={errors?.errors.enabled_item_tax_rates}
+                customSelector
+                dismissable={false}
               >
                 <option value="0">{t('disabled')}</option>
                 <option value="1">{t('one_tax_rate')}</option>
@@ -125,10 +134,15 @@ export function TaxSettings() {
 
             <Element leftSide={t('expense_tax_rates')}>
               <SelectField
-                id="enabled_expense_tax_rates"
-                onChange={handleChange}
-                value={companyChanges?.enabled_expense_tax_rates || 0}
+                value={
+                  companyChanges?.enabled_expense_tax_rates?.toString() || '0'
+                }
+                onValueChange={(value) =>
+                  handleChange('enabled_expense_tax_rates', value)
+                }
                 errorMessage={errors?.errors.enabled_expense_tax_rates}
+                customSelector
+                dismissable={false}
               >
                 <option value="0">{t('disabled')}</option>
                 <option value="1">{t('one_tax_rate')}</option>
@@ -160,7 +174,13 @@ export function TaxSettings() {
             {isPaidOrSelfHost &&
               calculateTaxesRegion(companyChanges?.settings?.country_id) && (
                 <>
-                  <Divider />
+                  <div className="px-4 sm:px-6 pt-4 pb-2">
+                    <Divider
+                      className="border-dashed"
+                      style={{ borderColor: colors.$20 }}
+                      withoutPadding
+                    />
+                  </div>
 
                   <CalculateTaxesNotificationModal />
 
