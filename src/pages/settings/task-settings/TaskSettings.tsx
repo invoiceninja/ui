@@ -343,19 +343,25 @@ export function TaskSettings() {
           }
         >
           <SelectField
-            id="settings.show_all_tasks_client_portal"
-            onChange={handleChange}
-            disabled={
-              Boolean(!companyChanges?.settings?.enable_client_portal_tasks) ||
-              disableSettingsField('show_all_tasks_client_portal')
-            }
             value={
               companyChanges?.settings?.show_all_tasks_client_portal?.toString() ||
               'invoiced'
             }
+            onValueChange={(value) =>
+              handleSettingsChange(
+                'settings.show_all_tasks_client_portal',
+                value
+              )
+            }
+            disabled={
+              Boolean(!companyChanges?.settings?.enable_client_portal_tasks) ||
+              disableSettingsField('show_all_tasks_client_portal')
+            }
             errorMessage={
               errors?.errors['settings.show_all_tasks_client_portal']
             }
+            customSelector
+            dismissable={false}
           >
             <option value="invoiced">{t('invoiced')}</option>
             <option value="uninvoiced">{t('uninvoiced')}</option>
@@ -421,6 +427,8 @@ export function TaskSettings() {
               )
             }
             disabled={disableSettingsField('task_round_to_nearest')}
+            customSelector
+            dismissable={false}
           >
             <option value="1">
               {t('1_second')} ({t('disabled')})
