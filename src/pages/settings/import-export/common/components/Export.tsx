@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -110,7 +111,7 @@ const DATE_RANGES: Range[] = [
   {
     identifier: 'last_year',
     label: 'last_year',
-  }, 
+  },
   { identifier: 'custom', label: 'custom' },
 ];
 
@@ -124,6 +125,8 @@ const DEFAULT_EXPORT: Export = {
 };
 export function Export() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -179,6 +182,7 @@ export function Export() {
   return (
     <Card
       title={t('export')}
+      className="shadow-sm"
       saveButtonLabel={t('export')}
       withSaveButton
       onSaveClick={(event) => {
@@ -187,6 +191,8 @@ export function Export() {
       }}
       disableSubmitButton={isFormBusy}
       disableWithoutIcon
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
     >
       <Element leftSide={t('export')}>{t('csv')}</Element>
 
@@ -194,6 +200,8 @@ export function Export() {
         <SelectField
           value={exportType}
           onValueChange={(value) => setExportType(value as ExportType)}
+          customSelector
+          dismissable={false}
         >
           {Object.keys(EXPORTS_DATES).map((key, index) => (
             <option key={index} value={key}>
@@ -208,6 +216,7 @@ export function Export() {
           <SelectField
             value={selectedExport.date_key}
             onValueChange={(value) => handleChange(value, 'date_key')}
+            customSelector
             withBlank
             errorMessage={errors?.errors.date_key}
           >
@@ -226,6 +235,8 @@ export function Export() {
             value={selectedExport.date_range}
             onValueChange={(value) => handleChange(value, 'date_range')}
             errorMessage={errors?.errors.date_range}
+            customSelector
+            dismissable={false}
           >
             {DATE_RANGES.map(({ identifier, label }, index) => (
               <option key={index} value={identifier}>
