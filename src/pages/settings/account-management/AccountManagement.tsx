@@ -17,9 +17,13 @@ import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useAccountManagementTabs } from './common/hooks/useAccountManagementTabs';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function AccountManagement() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -42,11 +46,26 @@ export function AccountManagement() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#account_management"
     >
-      <Tabs tabs={tabs} className="mt-6" />
+      <Card
+        title={t('account_management')}
+        className="shadow-sm pb-6"
+        withoutBodyPadding
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutHeaderBorder
+      >
+        <Tabs
+          tabs={tabs}
+          withHorizontalPadding
+          horizontalPaddingWidth="1.5rem"
+          fullRightPadding
+          withHorizontalPaddingOnSmallScreen
+        />
 
-      <div className="my-4">
-        <Outlet />
-      </div>
+        <div className="pt-4 pb-6">
+          <Outlet />
+        </div>
+      </Card>
     </Settings>
   );
 }
