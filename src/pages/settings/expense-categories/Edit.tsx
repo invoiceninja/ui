@@ -27,6 +27,7 @@ import { useActions } from '$app/pages/settings/expense-categories/common/hooks/
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 interface ExpenseCategoryInput {
   name: string;
@@ -40,6 +41,7 @@ export function Edit() {
   const { id } = useParams();
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   const { data } = useExpenseCategoryQuery({ id });
 
@@ -53,13 +55,13 @@ export function Edit() {
   ];
 
   const [errors, setErrors] = useState<ValidationBag>();
-
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
   const [expenseCategory, setExpenseCategory] = useState<ExpenseCategoryInput>({
     name: '',
     color: '',
   });
+
+  console.log(expenseCategory?.name);
 
   const handleChange = (
     property: keyof ExpenseCategoryInput,
@@ -112,7 +114,7 @@ export function Edit() {
       navigationTopRight={
         expenseCategory && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={expenseCategory}
             actions={actions}
           />
@@ -126,43 +128,50 @@ export function Edit() {
       )}
 
       {data && (
-          <Card
-            withSaveButton
-            disableSubmitButton={isFormBusy}
-            onFormSubmit={handleSubmit}
-            title={expenseCategory?.name}
-          >
-            <Element leftSide={t('status')}>
-              {!data.data.data.is_deleted && !data.data.data.archived_at && (
-                <Badge variant="primary">{t('active')}</Badge>
-              )}
+        <Card
+          className="shadow-sm"
+          childrenClassName="pt-4 pb-4"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+          withoutBodyPadding
+          withSaveButton
+          disableSubmitButton={isFormBusy}
+          title={expenseCategory?.name}
+          disableWithoutIcon
+        >
+          <Element leftSide={t('status')}>
+            {!data.data.data.is_deleted && !data.data.data.archived_at && (
+              <Badge variant="primary">{t('active')}</Badge>
+            )}
 
-              {data.data.data.archived_at && !data.data.data.is_deleted ? (
-                <Badge variant="yellow">{t('archived')}</Badge>
-              ) : null}
+            {data.data.data.archived_at && !data.data.data.is_deleted ? (
+              <Badge variant="yellow">{t('archived')}</Badge>
+            ) : null}
 
-              {data.data.data.is_deleted && (
-                <Badge variant="red">{t('deleted')}</Badge>
-              )}
-            </Element>
+            {data.data.data.is_deleted && (
+              <Badge variant="red">{t('deleted')}</Badge>
+            )}
+          </Element>
 
-            <CardContainer>
-              <InputField
-                label={t('name')}
-                onValueChange={(value) => handleChange('name', value)}
-                value={expenseCategory?.name}
-                errorMessage={errors?.errors.name}
-                required
-              />
+          <CardContainer>
+            <InputField
+              label={t('name')}
+              onValueChange={(value) => handleChange('name', value)}
+              value={expenseCategory?.name}
+              errorMessage={errors?.errors.name}
+              required
+            />
 
-              <InputLabel>{t('color')}</InputLabel>
+            <div>
+              <InputLabel className="mb-1">{t('color')}</InputLabel>
 
               <ColorPicker
                 value={expenseCategory?.color}
                 onValueChange={(value) => handleChange('color', value)}
               />
-            </CardContainer>
-          </Card>
+            </div>
+          </CardContainer>
+        </Card>
       )}
     </Settings>
   );
