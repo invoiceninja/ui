@@ -12,7 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { ReactNode } from 'react';
 
 interface Props {
-  label: string;
+  label: string | ReactNode;
   helpLabel?: string | ReactNode | null;
   required?: boolean;
 }
