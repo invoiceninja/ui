@@ -43,7 +43,7 @@ export function Link(props: Props) {
   } = props;
 
   const css: React.CSSProperties = {
-    color: accentColor,
+    color: '#0062FF',
     ...props.style,
   };
 

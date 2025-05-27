@@ -24,8 +24,10 @@ import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function ProductSettings() {
+  useTitle('product_settings');
   const [t] = useTranslation();
 
   const pages = [
@@ -34,13 +36,16 @@ export function ProductSettings() {
   ];
 
   useInjectCompanyChanges();
-  useTitle('product_settings');
 
-  const errors = useAtomValue(companySettingsErrorsAtom);
+  const colors = useColorScheme();
+  const companyChanges = useCompanyChanges();
 
   const dispatch = useDispatch();
+  const onCancel = useDiscardChanges();
+  const onSave = useHandleCompanySave();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const companyChanges = useCompanyChanges();
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleToggleChange = (id: string, value: boolean) => {
     dispatch(
@@ -52,11 +57,6 @@ export function ProductSettings() {
     );
   };
 
-  const handleChange = useHandleCurrentCompanyChangeProperty();
-
-  const onSave = useHandleCompanySave();
-  const onCancel = useDiscardChanges();
-
   return (
     <Settings
       onSaveClick={onSave}
@@ -65,7 +65,12 @@ export function ProductSettings() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#product_settings"
     >
-      <Card title={t('Settings')}>
+      <Card
+        title={t('settings')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element
           leftSide={t('track_inventory')}
           leftSideHelp={t('track_inventory_help')}
@@ -77,6 +82,7 @@ export function ProductSettings() {
             }
           />
         </Element>
+
         <Element
           leftSide={t('stock_notifications')}
           leftSideHelp={t('stock_notifications_help')}
@@ -88,6 +94,7 @@ export function ProductSettings() {
             }
           />
         </Element>
+
         {companyChanges?.stock_notification === true ? (
           <>
             <Element leftSide={t('notification_threshold')}>
@@ -109,7 +116,13 @@ export function ProductSettings() {
           ''
         )}
 
-        <Divider />
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            style={{ borderColor: colors.$20 }}
+            withoutPadding
+          />
+        </div>
 
         <Element
           leftSide={t('show_product_discount')}
@@ -122,6 +135,7 @@ export function ProductSettings() {
             }
           />
         </Element>
+
         <Element
           leftSide={t('show_product_cost')}
           leftSideHelp={t('show_cost_help')}
@@ -133,6 +147,7 @@ export function ProductSettings() {
             }
           />
         </Element>
+
         <Element
           leftSide={t('show_product_quantity')}
           leftSideHelp={t('show_product_quantity_help')}
@@ -144,6 +159,7 @@ export function ProductSettings() {
             }
           />
         </Element>
+
         <Element
           leftSide={t('default_quantity')}
           leftSideHelp={t('default_quantity_help')}
@@ -156,7 +172,13 @@ export function ProductSettings() {
           />
         </Element>
 
-        <Divider />
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            style={{ borderColor: colors.$20 }}
+            withoutPadding
+          />
+        </div>
 
         <Element
           leftSide={t('fill_products')}
@@ -169,6 +191,7 @@ export function ProductSettings() {
             }
           />
         </Element>
+
         <Element
           leftSide={t('update_products')}
           leftSideHelp={t('update_products_help')}
@@ -180,6 +203,7 @@ export function ProductSettings() {
             }
           />
         </Element>
+
         <Element
           leftSide={t('convert_products')}
           leftSideHelp={t('convert_products_help')}

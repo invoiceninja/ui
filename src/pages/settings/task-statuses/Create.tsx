@@ -29,6 +29,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const { documentTitle } = useTitle('new_task_status');
@@ -37,6 +38,7 @@ export function Create() {
 
   const navigate = useNavigate();
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const pages = [
@@ -114,31 +116,37 @@ export function Create() {
 
   return (
     <Settings title={t('task_statuses')} breadcrumbs={pages}>
-      <div className="max-w-3xl">
-        <Card
-          title={documentTitle}
-          withSaveButton
-          disableSubmitButton={isFormBusy}
-          onSaveClick={(event) => handleSave(event, 'save')}
-          additionalSaveOptions={saveOptions}
-        >
-          <CardContainer>
-            <InputField
-              required
-              label={t('name')}
-              value={taskStatus?.name}
-              onValueChange={(value) => handleChange('name', value)}
-              errorMessage={errors?.errors.name}
-            />
+      <Card
+        title={documentTitle}
+        className="shadow-sm"
+        childrenClassName="pt-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+        withSaveButton
+        disableSubmitButton={isFormBusy}
+        onSaveClick={(event) => handleSave(event, 'save')}
+        additionalSaveOptions={saveOptions}
+      >
+        <CardContainer>
+          <InputField
+            required
+            label={t('name')}
+            value={taskStatus?.name}
+            onValueChange={(value) => handleChange('name', value)}
+            errorMessage={errors?.errors.name}
+          />
 
-            <InputLabel>{t('color')}</InputLabel>
+          <div>
+            <InputLabel className="mb-1">{t('color')}</InputLabel>
+
             <ColorPicker
               value={taskStatus?.color || accentColor}
               onValueChange={(color) => handleChange('color', color)}
             />
-          </CardContainer>
-        </Card>
-      </div>
+          </div>
+        </CardContainer>
+      </Card>
     </Settings>
   );
 }

@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const { documentTitle } = useTitle('create_tax_rate');
@@ -35,6 +36,7 @@ export function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
+  const colors = useColorScheme();
   const { data: blankTaxRate } = useBlankTaxRateQuery();
 
   const pages = [
@@ -107,11 +109,14 @@ export function Create() {
       <div className="max-w-3xl">
         <Card
           title={documentTitle}
-          withSaveButton
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
           disableSubmitButton={isFormBusy}
           onFormSubmit={(event) => handleSave(event, 'save')}
           onSaveClick={(event) => handleSave(event, 'save')}
           additionalSaveOptions={saveOptions}
+          withSaveButton
         >
           <CardContainer>
             <InputField
