@@ -20,6 +20,8 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { CreditCard } from '$app/components/icons/CreditCard';
+import { LockCircle } from '$app/components/icons/LockCircle';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -101,9 +103,13 @@ export function License() {
           }}
           style={{ borderColor: colors.$24 }}
         >
-          <span className="text-sm" style={{ color: colors.$3 }}>
-            {t('purchase_license')}
-          </span>
+          <div className="flex items-center space-x-2">
+            <CreditCard color={colors.$3} size="1.4rem" />
+
+            <span className="text-sm" style={{ color: colors.$3 }}>
+              {t('purchase_license')}
+            </span>
+          </div>
 
           <div>
             <ArrowRight color={colors.$3} size="1.4rem" strokeWidth="1.5" />
@@ -111,7 +117,7 @@ export function License() {
         </Box>
 
         <Box
-          className="flex justify-between items-center p-4 border shadow-sm w-full rounded-md cursor-pointer"
+          className="flex space-x-2 items-center p-4 border shadow-sm w-full rounded-md cursor-pointer"
           onClick={() => setIsModalVisible(true)}
           theme={{
             backgroundColor: colors.$1,
@@ -119,13 +125,13 @@ export function License() {
           }}
           style={{ borderColor: colors.$24 }}
         >
+          <div>
+            <LockCircle color={colors.$3} size="1.4rem" />
+          </div>
+
           <span className="text-sm" style={{ color: colors.$3 }}>
             {t('apply_license')}
           </span>
-
-          <div>
-            <ArrowRight color={colors.$3} size="1.4rem" strokeWidth="1.5" />
-          </div>
         </Box>
       </div>
     </>

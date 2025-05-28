@@ -26,7 +26,7 @@ export function Plan() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
-    <>
+    <div className="flex flex-col pb-4">
       <Element className="mb-3" leftSide={t('plan')}>
         {isHosted() ? (
           <>
@@ -68,6 +68,6 @@ export function Plan() {
       )}
 
       {isSelfHosted() && !isDemo() && <License />}
-    </>
+    </div>
   );
 }

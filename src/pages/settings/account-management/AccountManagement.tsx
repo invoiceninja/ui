@@ -62,7 +62,7 @@ export function AccountManagement() {
           withHorizontalPaddingOnSmallScreen
         />
 
-        <div className="pt-4 pb-6">
+        <div className="pt-4">
           <Outlet />
         </div>
       </Card>
