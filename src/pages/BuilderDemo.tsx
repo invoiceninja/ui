@@ -28,11 +28,12 @@ export function BuilderDemo() {
   return (
     <Default breadcrumbs={[]}>
       <div className="max-w-7xl mx-auto">
+        {/* @ts-ignore */}
         <BuilderContext.Provider
           value={{
             token:
-              'tpLV7Zd9bRHNxnksPwtDnrEceOhvLTkUeZUY1ENZALRj3DZmX2dWLTpbrYUNCXus',
-            document: '01JVA4Y86JKC0Q39VBVATYEKB7',
+              import.meta.env.VITE_DOCUNINJA_TOKEN as string,
+            document: import.meta.env.VITE_DOCUNINJA_DOCUMENT as string,
             components: {
               skeleton: Loading,
               save: Save,
@@ -68,7 +69,7 @@ export function BuilderDemo() {
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton
-              }
+              },
               validationErrors: ValidationErrors,
             },
           }}
@@ -211,7 +212,7 @@ function SignatorySelector({
   return null
 }
 
-function UniviteDialog({
+function UninviteDialog({
   open,
   onOpenChange,
   content,
