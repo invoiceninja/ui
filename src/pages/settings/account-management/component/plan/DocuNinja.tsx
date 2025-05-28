@@ -4,7 +4,7 @@ import { useCurrentCompany } from "$app/common/hooks/useCurrentCompany";
 import { Company } from "$app/common/interfaces/docuninja/api";
 import { Card } from "$app/components/cards";
 import { useTranslation } from "react-i18next";
-import { useQuery, useQueryClient } from "react-query";
+import { useQueryClient } from "react-query";
 import { request } from "$app/common/helpers/request";
 import { Plan } from "./Plan";
 import { UpgradeModal } from "$app/pages/documents/components/UpgradeModal";
@@ -13,6 +13,8 @@ import { useState } from "react";
 import { Check } from "react-feather";
 import { useAccentColor } from "$app/common/hooks/useAccentColor";
 import { useColorScheme } from "$app/common/colors";
+import { useLogin } from "$app/common/queries/docuninja";
+import { Alert } from "$app/components/Alert";
 
 export function DocuNinja() {
 
@@ -23,26 +25,28 @@ export function DocuNinja() {
     const { t } = useTranslation();
     const company = useCurrentCompany();
     const queryClient = useQueryClient();
-    const { data: docuData, isLoading } = useQuery(
-        ['/api/docuninja/login'],
-        async () => {
-            const response = await request('POST', endpoint('/api/docuninja/login'), {}, { skipIntercept: true });
-            return response.data?.data;
-        },
-        {
-            onError: (err) => {
-                console.error('Error fetching Docuninja data:', err);
-            },
-        }
-    );
+    const [error, setError] = useState<string | null>(null);
+    const [isCreating, setIsCreating] = useState(false);
+
+    // Only check login status if company exists
+    const shouldCheckLogin = !!company?.company_key;
+    const { data: loginResponse, isLoading } = useLogin(shouldCheckLogin);
+    const docuData = loginResponse?.data?.data;
 
     function createDocuNinjaAccount() {
+        setError(null);
+        setIsCreating(true);
+        
         request('POST', endpoint('/api/docuninja/create'), {}, { skipIntercept: true })
             .then((response) => {
                 // After creating, invalidate the query to trigger a refresh
                 queryClient.invalidateQueries(['/api/docuninja/login']);
             })
-            .catch(() => {
+            .catch((error) => {
+                setError(error.response.data.error ?? 'Failed to create Docuninja account');
+            })
+            .finally(() => {
+                setIsCreating(false);
             });
     }
 
@@ -53,7 +57,8 @@ export function DocuNinja() {
     const docuCompany = docuData?.companies?.find((c: Company) => c.ninja_company_key === company?.company_key);
     const isPaidUser = docuAccount?.plan !== 'free' && new Date(docuAccount?.plan_expires ?? '') > new Date();
     const testLogin = !!docuData;
-    
+
+    console.log(docuAccount?.num_users, account.num_users);
     return (
         
         <Card>
@@ -61,7 +66,12 @@ export function DocuNinja() {
                 <div className="flex justify-between items-center">
                     <h4 className="text-lg font-semibold">{t('docuninja')}</h4>
                 </div>
-            
+                
+                {error && (
+                    <Alert type="danger" className="mb-4">
+                        {error}
+                    </Alert>
+                )}
 
 
                 {docuAccount?.plan === 'pro' ? (
@@ -143,7 +153,11 @@ export function DocuNinja() {
                                 
                                 <p>Get started with DocuNinja!</p>
 
-                                <Button onClick={() => createDocuNinjaAccount()}>
+                                <Button 
+                                    onClick={() => createDocuNinjaAccount()} 
+                                    behavior="button"
+                                    disabled={isCreating || isLoading}
+                                >
                                     {t('create')}
                                 </Button>
 
@@ -152,15 +166,13 @@ export function DocuNinja() {
 
                         {docuAccount?.num_users < account.num_users && (
                             <div className="flex flex-col space-y-2">
-                                <Button onClick={() => setShowUpgradeModal(true)}>
+                                <Button onClick={() => setShowUpgradeModal(true)} behavior="button">
                                     {t('upgrade_now')}
                                 </Button>
 
                                 <UpgradeModal
                                     visible={showUpgradeModal}
                                     onClose={() => setShowUpgradeModal(false)}
-                                    upgradeableUsers={account?.num_users ?? 1}
-                                    currentSeats={docuAccount.plan === 'free' ? 0 : docuAccount?.num_users ?? 1}
                                     onPaymentComplete={() => {
                                         queryClient.invalidateQueries(['/api/docuninja/login']);
                                         setShowUpgradeModal(false);

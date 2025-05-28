@@ -63,7 +63,7 @@ export const settingsRoutes = (
           element={
             import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
             (import.meta.env.PROD ? isHosted() : true) ? (
-              <Guard guards={[owner()]} component={<Settings.Plan2 />} type="subPage" />
+              <Guard guards={[owner()]} component={<Settings.Plan3 />} type="subPage" />
             ) : (
               <Settings.Plan />
             )
