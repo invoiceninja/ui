@@ -28,7 +28,7 @@ export function BuilderDemo() {
   return (
     <Default breadcrumbs={[]}>
       <div className="max-w-7xl mx-auto">
-        {/* @ts-ignore */}
+        {/* @ts-expect-error */}
         <BuilderContext.Provider
           value={{
             token:
