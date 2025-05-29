@@ -7,7 +7,6 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Card, ClickableElement } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -19,10 +18,23 @@ import { route } from '$app/common/helpers/route';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
 import { toast } from '$app/common/helpers/toast/toast';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { Trash } from '$app/components/icons/Trash';
+import { TrashXMark } from '$app/components/icons/TrashXMark';
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function DangerZone() {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const companyUsers = useSelector((state: RootState) => state.companyUsers);
@@ -103,9 +115,14 @@ export function DangerZone() {
           required
         />
 
-        {purgeInputField === 'purge' && (
-          <Button onClick={purge}>{t('continue')}</Button>
-        )}
+        <Button
+          behavior="button"
+          onClick={purge}
+          disabled={purgeInputField !== 'purge' || !password}
+          disableWithoutIcon
+        >
+          {t('continue')}
+        </Button>
       </Modal>
 
       <Modal
@@ -152,28 +169,53 @@ export function DangerZone() {
           required
         />
 
-        {purgeInputField === 'delete' && (
-          <Button onClick={destroy}>{t('continue')}</Button>
-        )}
+        <Button
+          behavior="button"
+          onClick={destroy}
+          disabled={purgeInputField !== 'delete' || !password}
+          disableWithoutIcon
+        >
+          {t('continue')}
+        </Button>
       </Modal>
 
-      <Card title={t('danger_zone')}>
-        <ClickableElement
+      <div className="flex flex-col space-y-4 px-4 sm:px-6 pt-2 pb-4">
+        <Box
+          className="flex space-x-2 items-center p-4 border shadow-sm w-full rounded-md cursor-pointer text-red-500 hover:text-red-600"
+          theme={{
+            backgroundColor: colors.$1,
+            hoverBackgroundColor: colors.$4,
+          }}
           onClick={() => setIsPurgeModalOpen(true)}
-          className="text-red-500 hover:text-red-600"
+          style={{ borderColor: colors.$24 }}
         >
-          {t('purge_data')}
-        </ClickableElement>
+          <div>
+            <TrashXMark color="#ef4444" size="1.4rem" />
+          </div>
 
-        <ClickableElement
+          <span className="text-sm">{t('purge_data')}</span>
+        </Box>
+
+        <Box
+          className="flex space-x-2 items-center p-4 border shadow-sm w-full rounded-md cursor-pointer text-red-500 hover:text-red-600"
+          theme={{
+            backgroundColor: colors.$1,
+            hoverBackgroundColor: colors.$4,
+          }}
           onClick={() => setIsDeleteModalOpen(true)}
-          className="text-red-500 hover:text-red-600"
+          style={{ borderColor: colors.$24 }}
         >
-          {companyUsers?.api.length > 1
-            ? t('delete_company')
-            : t('cancel_account')}
-        </ClickableElement>
-      </Card>
+          <div>
+            <Trash color="#ef4444" size="1.4rem" />
+          </div>
+
+          <span className="text-sm">
+            {companyUsers?.api.length > 1
+              ? t('delete_company')
+              : t('cancel_account')}
+          </span>
+        </Box>
+      </div>
     </>
   );
 }

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -33,10 +33,10 @@ export function Backup() {
   };
 
   return (
-    <Card>
-      <Element leftSide={t('export_company')} leftSideHelp={t('exported_data')}>
-        <Button onClick={handleExportCompany}>{t('export')}</Button>
-      </Element>
-    </Card>
+    <Element leftSide={t('export_company')} leftSideHelp={t('exported_data')}>
+      <Button behavior="button" onClick={handleExportCompany}>
+        {t('export')}
+      </Button>
+    </Element>
   );
 }

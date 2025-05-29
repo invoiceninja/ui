@@ -65,6 +65,18 @@ const Box = styled.div`
   }
 `;
 
+function CardWrapper(props: {
+  title?: string | null;
+  children: ReactNode;
+  fragmentWrapper?: boolean;
+}) {
+  if (props.fragmentWrapper) {
+    return <>{props.children}</>;
+  }
+
+  return <Card title={props.title}>{props.children}</Card>;
+}
+
 export function UploadCompanyImport(props: Props) {
   const [t] = useTranslation();
   const isImportFileTypeZip = props.type === 'zip';
@@ -505,7 +517,10 @@ export function UploadCompanyImport(props: Props) {
 
   return (
     <>
-      <Card title={t(props.entity)}>
+      <CardWrapper
+        title={t(props.entity)}
+        fragmentWrapper={isImportFileTypeZip}
+      >
         <Element
           leftSide={t(isImportFileTypeZip ? 'company_backup_file' : 'csv_file')}
           leftSideHelp={isImportFileTypeZip && t('company_backup_file_help')}
@@ -607,7 +622,7 @@ export function UploadCompanyImport(props: Props) {
             </div>
           </>
         )}
-      </Card>
+      </CardWrapper>
 
       {mapData && !isImportFileTypeZip && Boolean(numberOfTemplates) && (
         <Card className="mt-4">

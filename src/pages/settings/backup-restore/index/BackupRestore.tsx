@@ -13,10 +13,13 @@ import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import { useCompanyBackupRestoreTabs } from '../common/hooks/useCompanyBackupRestoreTabs';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function BackupRestore() {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const tabs = useCompanyBackupRestoreTabs();
 
   const pages = [
@@ -29,11 +32,25 @@ export function BackupRestore() {
 
   return (
     <Settings title={t('backup_restore')} breadcrumbs={pages}>
-      <Tabs tabs={tabs} className="mt-6" />
+      <Card
+        className="shadow-sm"
+        title={t('backup_restore')}
+        withoutBodyPadding
+        withoutHeaderBorder
+        style={{ borderColor: colors.$24 }}
+      >
+        <Tabs
+          tabs={tabs}
+          horizontalPaddingWidth="1.5rem"
+          withHorizontalPadding
+          fullRightPadding
+          withHorizontalPaddingOnSmallScreen
+        />
 
-      <div className="my-4">
-        <Outlet />
-      </div>
+        <div className="pt-4 pb-6">
+          <Outlet />
+        </div>
+      </Card>
     </Settings>
   );
 }
