@@ -6,7 +6,6 @@ import { Card } from "$app/components/cards";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "react-query";
 import { request } from "$app/common/helpers/request";
-import { UpgradeModal } from "$app/pages/documents/components/UpgradeModal";
 import { Button } from "$app/components/forms";
 import { useState } from "react";
 import { Check } from "react-feather";

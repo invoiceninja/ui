@@ -54,6 +54,10 @@ export interface PaymentProps {
     num_users?: number;
     amount_string?: string;
     amount_raw?: number;
+    plan?: string,
+    docuninja_users?: number,
+    term?: string,
+    hash?: string,
     onPaymentSuccess?: (result: PaymentSuccessResult) => void;
     onPaymentComplete?: () => void;
     onCancel?: () => void;
@@ -64,6 +68,10 @@ type PaymentMethod = "new_card" | string; // string will be gateway token id
 export function PaymentMethodForm({
     tokens,
     num_users,
+    plan,
+    docuninja_users,
+    term,
+    hash,
     amount_string,
     amount_raw,
     onPaymentSuccess,
@@ -121,9 +129,8 @@ export function PaymentMethodForm({
 
                         // Only create payment intent for new cards
                         request('POST', endpoint('/api/client/account_management/payment/intent'), {
-                            num_users: num_users ?? 1,
                             amount: amount_raw ?? 0,
-                            product: "docuninja_users",
+                            hash: hash
                         })
                         .then((response: AxiosResponse<ResponsePaymentIntent>) => {
                             if (!mounted) return;
@@ -213,11 +220,10 @@ export function PaymentMethodForm({
                         result.paymentIntent &&
                         result.paymentIntent.status === "succeeded"
                     ) {
-                        request('POST', endpoint('/api/client/account_management/docuninja/upgrade'), {
+                        request('POST', endpoint('/api/client/account_management/v2/payment'), {
                                 payment_intent: result.paymentIntent.id,
-                                num_users: num_users,
                                 amount: amount_raw ?? 0,
-                                product: "docuninja_users",
+                                hash:hash
                             })
                             .then(() => {
                                 toast.success(t("payment_successful") as string);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import React from 'react';
 import { Modal } from '$app/components/Modal';
 import { SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,7 @@ interface PricingResponse {
     price: string;
     pro_rata: string;
     pro_rata_raw: number;
+    hash: string;
 }
 
 enum ModalStep {
@@ -35,35 +37,36 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const account = useCurrentAccount();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState<PlanType>('enterprise');
-    const [enterpriseUsers, setEnterpriseUsers] = useState(1);
-    const [docuNinjaUsers, setDocuNinjaUsers] = useState(1);
+    const [enterpriseUsers, setEnterpriseUsers] = useState(2);
+    const [docuNinjaUsers, setDocuNinjaUsers] = useState(0);
+    const [docuNinjaEnabled, setDocuNinjaEnabled] = useState(false);
     const [isYearly, setIsYearly] = useState(true);
     const [pricing, setPricing] = useState<PricingResponse | null>(null);
     const [currentStep, setCurrentStep] = useState<ModalStep>(ModalStep.PLAN_SELECTION);
 
     // Generate enterprise user options from 1 to account.num_users
     const enterpriseUserOptions = [{
-            value: '',
+            value: 2,
             label: `1-2 ${t('users')}`,
         },
         {
-            value: '5',
+            value: 5,
             label: `3-5 ${t('users')}`,
         },
         {
-            value: '10',
+            value: 10,
             label: `6-10 ${t('users')}`,
         },
         {
-            value: '20',
+            value: 20,
             label: `11-20 ${t('users')}`,
         },
         {
-            value: '30',
+            value: 30,
             label: `21-30 ${t('users')}`,
         },
         {
-            value: '50',
+            value: 50,
             label: `31-50 ${t('users')}`,
         }
     ];
@@ -115,36 +118,43 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             setCurrentStep(ModalStep.PLAN_SELECTION);
             // Set initial selections
             setSelectedPlan('enterprise');
-            setEnterpriseUsers(1);
-            setDocuNinjaUsers(1);
+            setEnterpriseUsers(2);
+            setDocuNinjaUsers(0);
+            setDocuNinjaEnabled(false);
             setIsYearly(true);
-            fetchPricing('enterprise', 1, 1, true);
+            // Don't fetch pricing here, let the main effect handle it
         }
     }, [visible]);
 
-    // Fetch pricing whenever selections change
+    // Single effect to handle all pricing updates with debouncing
     useEffect(() => {
-        if (selectedPlan && enterpriseUsers && docuNinjaUsers) {
-            fetchPricing(selectedPlan, enterpriseUsers, docuNinjaUsers, isYearly);
-        }
-    }, [selectedPlan, enterpriseUsers, docuNinjaUsers, isYearly]);
+        if (!visible || !selectedPlan || !enterpriseUsers) return;
 
-    // Reset DocuNinja users when plan changes
-    useEffect(() => {
-        if (selectedPlan === 'pro') {
-            setDocuNinjaUsers(1);
-        } else if (docuNinjaUsers > enterpriseUsers) {
-            setDocuNinjaUsers(enterpriseUsers);
-        }
-    }, [selectedPlan, enterpriseUsers]);
+        // Debounce the API call to prevent multiple rapid calls
+        const timeoutId = setTimeout(() => {
+            const effectiveDocuNinjaUsers = docuNinjaEnabled ? docuNinjaUsers : 0;
+            fetchPricing(selectedPlan, enterpriseUsers, effectiveDocuNinjaUsers, isYearly);
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [visible, selectedPlan, enterpriseUsers, docuNinjaUsers, docuNinjaEnabled, isYearly]);
 
     const handlePlanChange = (plan: PlanType) => {
         setSelectedPlan(plan);
+        // Immediately reset DocuNinja settings when changing to Pro
+        if (plan === 'pro') {
+            setDocuNinjaUsers(0);
+            setDocuNinjaEnabled(false);
+        }
     };
 
     const handleEnterpriseUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newValue = parseInt(event.target.value);
         setEnterpriseUsers(newValue);
+        // If DocuNinja users exceed new enterprise users, reset it
+        if (docuNinjaUsers > newValue) {
+            setDocuNinjaUsers(newValue);
+        }
     };
 
     const handleDocuNinjaUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -156,16 +166,30 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         setIsYearly(!isYearly);
     };
 
+    const handleDocuNinjaToggle = () => {
+        const newEnabled = !docuNinjaEnabled;
+        setDocuNinjaEnabled(newEnabled);
+        // Reset to 1 user when disabling DocuNinja
+        if (!newEnabled) {
+            setDocuNinjaUsers(0);
+        }
+
+        if (newEnabled && selectedPlan === 'pro') {
+            setDocuNinjaUsers(1);
+        }
+    };
+
     const fetchPricing = (plan: PlanType, enterpriseUsers: number, docuNinjaUsers: number, yearly: boolean) => {
         setIsLoading(true);
 
-        request('POST', endpoint('/api/client/account_management/docuninja/description'), {
+        request('POST', endpoint('/api/client/account_management/v2/description'), {
             plan: plan,
-            enterprise_users: enterpriseUsers,
+            users: enterpriseUsers,
             docuninja_users: docuNinjaUsers,
             term: yearly ? 'year' : 'month'
         })
             .then((response) => {
+                console.log(response.data);
                 setPricing(response.data);
             })
             .catch((error) => {
@@ -300,80 +324,96 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                 <p className="text-sm text-gray-600 mt-2">{t('pay_annually_discount')}</p>
                             </div>
 
-                           
-                                                        
                             {/* DocuNinja Users Selection */}
-                            <div>
-                                <div className="max-w-xs">
-                                    <SelectField
-                                        value={docuNinjaUsers.toString()}
-                                        onChange={handleDocuNinjaUserChange}
-                                        label={t('number_of_docuninja_users')}
-                                        disabled={selectedPlan === 'pro'}
-                                    >
-                                        {getDocuNinjaUserOptions().map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </SelectField>
+                            <div className="flex flex-rowspace-y-4">
+                                <div className="flex items-center space-x-3">
+                                    <input
+                                        type="checkbox"
+                                        id="docuninja-enabled"
+                                        checked={docuNinjaEnabled}
+                                        onChange={handleDocuNinjaToggle}
+                                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                    />
+                                    <label htmlFor="docuninja-enabled" className="flex-1">
+                                        <div>
+                                            <p className="font-medium">Want DocuNinja with that?</p>
+                                            <p className="text-sm text-gray-600">Add in E Signatures with DocuNinja!</p>
+                                        </div>
+                                    </label>
                                 </div>
-                                <div className="text-sm text-gray-600 mt-1 space-y-1">
-                                    <p>
-                                        {selectedPlan === 'pro' 
-                                            ? t('pro_docuninja_users_description')
-                                            : t('enterprise_docuninja_users_description')
-                                        }
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                        {t('docuninja_users_explanation')}
-                                    </p>
-                                </div>
+
+                                {docuNinjaEnabled && (
+                                    <div className="ml-7 space-y-2">
+                                        <div className="max-w-xs">
+                                            <SelectField
+                                                value={docuNinjaUsers.toString()}
+                                                onChange={handleDocuNinjaUserChange}
+                                                label=''
+                                                disabled={selectedPlan === 'pro'}
+                                            >
+                                                {getDocuNinjaUserOptions().map((option) => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </SelectField>
+                                        </div>
+                                        
+                                    </div>
+                                )}
                             </div>
 
-                           
-
                             {/* Pricing Display */}
-                            {pricing && !isLoading && (
-                                <div className="space-y-4">
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <h3 className="font-medium">{pricing.description}</h3>
-                                        <div className="mt-2 space-y-2">
-                                            <div className="flex justify-between">
-                                                <span>{isYearly ? t('yearly_price') : t('monthly_price')}:</span>
-                                                <span className="font-medium">{pricing.price}</span>
+                            <div className="space-y-4">
+                                <div className="bg-gray-50 p-4 rounded">
+                                    {pricing ? (
+                                        <>
+                                            <h3 className="font-medium">{pricing.description}</h3>
+                                            <div className="mt-2 space-y-2">
+                                                <div className="flex justify-between">
+                                                    <span>{isYearly ? t('yearly_price') : t('monthly_price')}:</span>
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="font-medium">{pricing.price}</span>
+                                                        {isLoading && (
+                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('total_amount')}:</span>
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="font-medium">{pricing.pro_rata}</span>
+                                                        {isLoading && (
+                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span>{t('total_amount')}:</span>
-                                                <span className="font-medium">{pricing.pro_rata}</span>
-                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="flex justify-center py-4">
+                                            <span className="text-gray-600">{t('loading')}...</span>
                                         </div>
-                                    </div>
-
-                                    <div className="flex justify-end space-x-2">
-                                        <button
-                                            onClick={handleCancel}
-                                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                                        >
-                                            {t('cancel')}
-                                        </button>
-                                        <Button 
-                                            type="primary"
-                                            behavior="button"
-                                            onClick={handleContinueToPayment}
-                                            disabled={!pricing}
-                                        >
-                                            {t('continue_to_payment')}
-                                        </Button>
-                                    </div>
+                                    )}
                                 </div>
-                            )}
 
-                            {isLoading && (
-                                <div className="flex justify-center py-4">
-                                    <span className="text-gray-600">{t('loading')}...</span>
+                                <div className="flex justify-end space-x-2">
+                                    <button
+                                        onClick={handleCancel}
+                                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                    >
+                                        {t('cancel')}
+                                    </button>
+                                    <Button 
+                                        type="primary"
+                                        behavior="button"
+                                        onClick={handleContinueToPayment}
+                                        disabled={!pricing || isLoading}
+                                    >
+                                        {t('continue_to_payment')}
+                                    </Button>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </>
                 )}
@@ -406,7 +446,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     )}
                                     <div className="flex justify-between text-sm">
                                         <span>{t('docuninja_users')}:</span>
-                                        <span>{docuNinjaUsers}</span>
+                                        <span>{docuNinjaEnabled ? docuNinjaUsers : 0}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span>{t('billing_term')}:</span>
@@ -424,9 +464,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             {/* Payment Form */}
                             <PaymentMethodForm
                                 tokens={[]}
-                                num_users={docuNinjaUsers}
+                                num_users={enterpriseUsers}
+                                plan={selectedPlan}
+                                docuninja_users={docuNinjaUsers}
+                                term={isYearly ? 'year' : 'month'}
                                 amount_string={pricing?.price}
                                 amount_raw={pricing?.pro_rata_raw}
+                                hash={pricing?.hash}
                                 onPaymentSuccess={handlePaymentSuccess}
                                 onPaymentComplete={onPaymentComplete}
                                 onCancel={handleBackToPlanSelection}

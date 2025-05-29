@@ -278,9 +278,7 @@ export function HostedPlan() {
     <UpgradeModal
         visible={upgradeVisible}
         onClose={() => setUpgradeVisible(false)}
-        upgradeableUsers={account.num_users}
         onPaymentComplete={() => {}}
-        currentSeats={account.num_users}
     />
 
     <StartTrial
