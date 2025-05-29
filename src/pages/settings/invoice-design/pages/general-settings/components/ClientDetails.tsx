@@ -15,9 +15,13 @@ import { useCustomField } from '$app/components/CustomField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { useColorScheme } from '$app/common/colors';
 
 export default function ClientDetails() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const customField = useCustomField();
 
   const defaultVariables = [
@@ -73,7 +77,13 @@ export default function ClientDetails() {
     <>
       <AdvancedSettingsPlanAlert />
 
-      <Card title={t('client_details')} padding="small">
+      <Card
+        title={t('client_details')}
+        className="shadow-sm"
+        padding="small"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <SortableVariableList
           for="client_details"
           defaultVariables={defaultVariables}
