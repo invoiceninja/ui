@@ -28,6 +28,7 @@ import { Settings } from '$app/components/layouts/Settings';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
 
 export function Analytics() {
   const [t] = useTranslation();
@@ -44,6 +45,8 @@ export function Analytics() {
   useTitle('analytics');
 
   const dispatch = useDispatch();
+
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
 
@@ -102,18 +105,28 @@ export function Analytics() {
       onSaveClick={onSave}
       disableSaveButton={isFormBusy}
     >
-      <Card title={t('analytics')}>
+      <Card
+        title={t('analytics')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element
           leftSide={
-            <div className="flex flex-col items-start">
-              {t('google_analytics_tracking_id')}
+            <div className="flex space-x-1">
+              <span>{t('google_analytics_tracking_id')}</span>
 
-              <Link
-                to="https://support.google.com/analytics/answer/1037249?hl=en"
-                external
-              >
-                {t('learn_more')}
-              </Link>
+              <div className="flex">
+                <span>(</span>
+                <Link
+                  to="https://support.google.com/analytics/answer/1037249?hl=en"
+                  external
+                  withoutExternalIcon
+                >
+                  {t('learn_more')}
+                </Link>
+                <span>)</span>
+              </div>
             </div>
           }
         >

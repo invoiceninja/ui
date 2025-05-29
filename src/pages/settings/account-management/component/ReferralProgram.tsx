@@ -10,7 +10,7 @@
 
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 
 export function ReferralProgram() {
@@ -19,7 +19,7 @@ export function ReferralProgram() {
   const user = useCurrentUser();
 
   return (
-    <Card title={t('referral_program')}>
+    <>
       <Element leftSide={t('referral_code')}>
         <CopyToClipboard
           text={`https://app.invoicing.co/#/register?rc=${user?.referral_code}`}
@@ -31,6 +31,6 @@ export function ReferralProgram() {
       <Element leftSide={t('enterprise')}>
         {user?.referral_meta?.enterprise || 0}
       </Element>
-    </Card>
+    </>
   );
 }

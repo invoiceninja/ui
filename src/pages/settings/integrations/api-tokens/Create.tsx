@@ -28,11 +28,14 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const [t] = useTranslation();
   const { documentTitle } = useTitle('new_token');
   const navigate = useNavigate();
+
+  const colors = useColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -112,7 +115,12 @@ export function Create() {
         onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
         disableSaveButton={!apiToken}
       >
-        <Card title={t('new_token')}>
+        <Card
+          title={t('new_token')}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <Element leftSide={t('name')} required>
             <InputField
               required

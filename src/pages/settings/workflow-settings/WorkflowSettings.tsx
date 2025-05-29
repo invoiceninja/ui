@@ -17,9 +17,13 @@ import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Invoices, Quotes } from './components';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function WorkflowSettings() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -41,17 +45,31 @@ export function WorkflowSettings() {
       title={t('workflow_settings')}
       breadcrumbs={pages}
       docsLink="en/advanced-settings/#workflow_settings"
-      
     >
-      <TabGroup tabs={tabs}>
-        <div>
-          <Invoices />
-        </div>
+      <Card
+        title={t('workflow_settings')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+      >
+        <TabGroup
+          tabs={tabs}
+          horizontalPaddingWidth="1.5rem"
+          withHorizontalPadding
+          fullRightPadding
+          withoutVerticalMargin
+        >
+          <div className="pt-4 pb-6">
+            <Invoices />
+          </div>
 
-        <div>
-          <Quotes />
-        </div>
-      </TabGroup>
+          <div className="pt-4 pb-6">
+            <Quotes />
+          </div>
+        </TabGroup>
+      </Card>
     </Settings>
   );
 }
