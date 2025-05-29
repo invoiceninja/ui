@@ -12,9 +12,14 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
+import { useColorScheme } from '$app/common/colors';
+import { FileClock } from '$app/components/icons/FileClock';
 
 export default function PurchaseOrderDetails() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const customField = useCustomField();
 
   const defaultVariables = [
@@ -43,7 +48,21 @@ export default function PurchaseOrderDetails() {
   ];
 
   return (
-    <Card title={t('purchase_order_details')} padding="small">
+    <Card
+      title={
+        <div className="flex items-center space-x-2">
+          <div>
+            <FileClock color="#2176FF" size="1.3rem" />
+          </div>
+
+          <span>{t('purchase_order_details')}</span>
+        </div>
+      }
+      padding="small"
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <SortableVariableList
         for="purchase_order_details"
         defaultVariables={defaultVariables}

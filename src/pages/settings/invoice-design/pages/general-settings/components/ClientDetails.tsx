@@ -16,6 +16,7 @@ import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useColorScheme } from '$app/common/colors';
+import { MsgBubbleUser } from '$app/components/icons/MsgBubbleUser';
 
 export default function ClientDetails() {
   const [t] = useTranslation();
@@ -78,7 +79,15 @@ export default function ClientDetails() {
       <AdvancedSettingsPlanAlert />
 
       <Card
-        title={t('client_details')}
+        title={
+          <div className="flex items-center space-x-2">
+            <div>
+              <MsgBubbleUser color="#2176FF" size="1.3rem" fill="#2176FF" />
+            </div>
+
+            <span>{t('client_details')}</span>
+          </div>
+        }
         className="shadow-sm"
         padding="small"
         style={{ borderColor: colors.$24 }}

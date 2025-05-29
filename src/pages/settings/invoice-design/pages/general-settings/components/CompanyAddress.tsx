@@ -12,9 +12,14 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
+import { useColorScheme } from '$app/common/colors';
+import { Office } from '$app/components/icons/Office';
 
 export default function CompanyAddress() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const customField = useCustomField();
 
   const defaultVariables = [
@@ -48,7 +53,21 @@ export default function CompanyAddress() {
   ];
 
   return (
-    <Card title={t('company_address')} padding="small">
+    <Card
+      title={
+        <div className="flex items-center space-x-2">
+          <div>
+            <Office color="#2176FF" size="1.3rem" />
+          </div>
+
+          <span>{t('company_address')}</span>
+        </div>
+      }
+      padding="small"
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <SortableVariableList
         for="company_address"
         defaultVariables={defaultVariables}
