@@ -28,6 +28,7 @@ interface Props {
   disabledLabels?: boolean;
   noVerticalPadding?: boolean;
   twoGridColumns?: boolean;
+  textVerticalAlign?: 'top' | 'middle' | 'bottom';
 }
 
 export function Element(props: Props) {
@@ -53,6 +54,7 @@ export function Element(props: Props) {
       <dt
         className={classNames('text-sm flex flex-col', {
           'opacity-75': props.disabledLabels,
+          'h-full justify-start': props.textVerticalAlign === 'top',
         })}
         style={{ color: colors.$3, colorScheme: colors.$0 }}
       >

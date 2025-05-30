@@ -15,9 +15,13 @@ import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 import { useCustomField } from '$app/components/CustomField';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useColorScheme } from '$app/common/colors';
+import { Cube } from '$app/components/icons/Cube';
 
 export default function ProductColumns() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const company = useCompanyChanges();
 
   const customField = useCustomField();
@@ -70,18 +74,35 @@ export default function ProductColumns() {
   return (
     <Card
       title={
-        company?.settings.sync_invoice_quote_columns
-          ? t('product_columns')
-          : t('invoice_product_columns')
+        <div className="flex items-center space-x-2">
+          <div>
+            <Cube color="#2176FF" size="1.3rem" />
+          </div>
+
+          <span>
+            {company?.settings.sync_invoice_quote_columns
+              ? t('product_columns')
+              : t('invoice_product_columns')}
+          </span>
+        </div>
       }
       padding="small"
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
     >
       <SortableVariableList
         for="product_columns"
         defaultVariables={defaultVariables}
       />
 
-      <Divider />
+      <div className="px-4 sm:px-6 py-4">
+        <Divider
+          className="border-dashed"
+          borderColor={colors.$20}
+          withoutPadding
+        />
+      </div>
 
       <Element leftSide={t('share_invoice_quote_columns')}>
         <Toggle
