@@ -25,6 +25,7 @@ import { Check } from 'react-feather';
 import { StartTrial } from './StartTrial';
 import { Upgrade } from '../upgrade/Upgrade';
 import { UpgradeModal } from '$app/pages/documents/components/UpgradeModal';
+import { usePlansQuery } from '$app/common/queries/plans';
 
 
 export function HostedPlan() {
@@ -65,8 +66,11 @@ export function HostedPlan() {
     const term = account.plan_term === 'month' ? 'month' : 'year';
 
     const refresh = useRefreshCompanyUsers();
-
+    const {data: plans} = usePlansQuery();
         
+    console.log("plans = ");
+    console.log(plans);
+
     function EnterpriseLabel() {
         const { t } = useTranslation();
         const account = useCurrentAccount();

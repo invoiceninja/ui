@@ -110,7 +110,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 t('custom_integrations')
             ]
         }
-    ];
+    ].filter(plan => {
+        // If user is on enterprise, hide pro plan option
+        if (account?.plan === 'enterprise' && plan.value === 'pro') {
+            return false;
+        }
+        return true;
+    });
 
     useEffect(() => {
         if (visible) {
@@ -118,10 +124,27 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             setCurrentStep(ModalStep.PLAN_SELECTION);
             // Set initial selections
             setSelectedPlan('enterprise');
-            setEnterpriseUsers(2);
+
+            if(account.plan == 'enterprise'){
+                if(account.num_users == 2){
+                    setEnterpriseUsers(5);
+                }
+                if(account.num_users == 5){
+                    setEnterpriseUsers(10);
+                }
+                if(account.num_users == 10){
+                    setEnterpriseUsers(20);
+                }
+                if(account.num_users == 20){
+                    setEnterpriseUsers(30);
+                }
+                if(account.num_users == 30){
+                    setEnterpriseUsers(50);
+                }
+            }
             setDocuNinjaUsers(0);
             setDocuNinjaEnabled(false);
-            setIsYearly(true);
+            setIsYearly(account.plan_term == 'yearly');
             // Don't fetch pricing here, let the main effect handle it
         }
     }, [visible]);
@@ -310,6 +333,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                 </div>
                             </div>
 
+                            {account.plan_term !== 'yearly' && (
                             <div className="flex flex-col items-center mt-6">
                                 <div className="flex items-center space-x-2">
                                     <span>{t('plan_term_monthly')}</span>
@@ -323,7 +347,8 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                 </div>
                                 <p className="text-sm text-gray-600 mt-2">{t('pay_annually_discount')}</p>
                             </div>
-
+                            )}
+                            
                             {/* DocuNinja Users Selection */}
                             <div className="flex flex-rowspace-y-4">
                                 <div className="flex items-center space-x-3">
