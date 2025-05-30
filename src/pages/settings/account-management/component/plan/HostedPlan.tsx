@@ -64,7 +64,8 @@ export function HostedPlan() {
 
     const term = account.plan_term === 'month' ? 'month' : 'year';
 
-    
+    const refresh = useRefreshCompanyUsers();
+
         
     function EnterpriseLabel() {
         const { t } = useTranslation();
@@ -278,7 +279,7 @@ export function HostedPlan() {
     <UpgradeModal
         visible={upgradeVisible}
         onClose={() => setUpgradeVisible(false)}
-        onPaymentComplete={() => {}}
+        onPaymentComplete={() => { refresh(); }}
     />
 
     <StartTrial
