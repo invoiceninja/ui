@@ -9,10 +9,12 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import { ReactNode } from 'react';
 import { Link } from './forms';
 import { House } from './icons/House';
+import classNames from 'classnames';
 
-export type Page = { name: string; href: string };
+export type Page = { name: string; href: string; afterName?: ReactNode };
 
 export function Breadcrumbs(props: { pages: Page[] }) {
   const colors = useColorScheme();
@@ -35,14 +37,22 @@ export function Breadcrumbs(props: { pages: Page[] }) {
             <div className="flex items-center">
               <span style={{ color: colors.$22 }}>/</span>
 
-              <Link
-                to={page.href}
-                className="ml-4 text-sm font-medium"
-                style={{ color: colors.$22 }}
-                disableHoverUnderline
+              <div
+                className={classNames('flex items-center', {
+                  'space-x-2': page.afterName,
+                })}
               >
-                {page.name}
-              </Link>
+                <Link
+                  to={page.href}
+                  className="ml-4 text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                  disableHoverUnderline
+                >
+                  {page.name}
+                </Link>
+
+                {page.afterName && <div>{page.afterName}</div>}
+              </div>
             </div>
           </li>
         ))}

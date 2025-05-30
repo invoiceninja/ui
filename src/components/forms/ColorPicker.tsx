@@ -11,7 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import classNames from 'classnames';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
@@ -25,6 +25,7 @@ interface Props {
   onValueChange?: (color: string) => unknown;
   disabled?: boolean;
   includeDefaultPalette?: boolean;
+  renderLabelBox?: (color: string) => ReactNode;
 }
 
 const DEFAULT_COLORS = [
@@ -57,7 +58,7 @@ const DEFAULT_COLORS = [
 export function ColorPicker(props: Props) {
   const { t } = useTranslation();
 
-  const { includeDefaultPalette } = props;
+  const { includeDefaultPalette, renderLabelBox } = props;
 
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
@@ -168,18 +169,22 @@ export function ColorPicker(props: Props) {
         </div>
       </Modal>
 
-      <div
-        style={{ backgroundColor: color }}
-        className={classNames('w-16 h-6 shadow rounded-md', {
-          'opacity-75 cursor-not-allowed': props.disabled,
-          'cursor-pointer':
-            typeof props.disabled === 'undefined' || !props.disabled,
-        })}
-        onClick={() =>
-          (!props.disabled || typeof props.disabled === 'undefined') &&
-          setIsModalOpen(true)
-        }
-      ></div>
+      {renderLabelBox ? (
+        <div onClick={() => setIsModalOpen(true)}>{renderLabelBox(color)}</div>
+      ) : (
+        <div
+          style={{ backgroundColor: color }}
+          className={classNames('w-16 h-6 shadow rounded-md', {
+            'opacity-75 cursor-not-allowed': props.disabled,
+            'cursor-pointer':
+              typeof props.disabled === 'undefined' || !props.disabled,
+          })}
+          onClick={() =>
+            (!props.disabled || typeof props.disabled === 'undefined') &&
+            setIsModalOpen(true)
+          }
+        />
+      )}
     </div>
   );
 }

@@ -35,6 +35,7 @@ interface Props {
   horizontalPaddingWidth?: string;
   fullRightPadding?: boolean;
   withHorizontalPaddingOnSmallScreen?: boolean;
+  paddingTabsHeight?: string;
 }
 
 export type Tab = {
@@ -64,6 +65,7 @@ export function Tabs(props: Props) {
     withHorizontalPadding,
     horizontalPaddingWidth = '1.5rem',
     fullRightPadding,
+    paddingTabsHeight = '2.8rem',
   } = props;
 
   const params = useParams();
@@ -157,7 +159,7 @@ export function Tabs(props: Props) {
               <div
                 style={{
                   width: horizontalPaddingWidth,
-                  height: '2.8rem',
+                  height: paddingTabsHeight,
                   borderBottom: `1px solid ${colors.$20}`,
                 }}
               />
@@ -195,7 +197,7 @@ export function Tabs(props: Props) {
                 ...(Boolean(withHorizontalPadding && !fullRightPadding) && {
                   width: horizontalPaddingWidth,
                 }),
-                height: '2.8rem',
+                height: paddingTabsHeight,
                 borderBottom: `1px solid ${colors.$20}`,
               }}
             />

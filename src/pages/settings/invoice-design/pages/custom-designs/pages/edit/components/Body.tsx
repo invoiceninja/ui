@@ -32,7 +32,15 @@ export default function Body() {
   useDebounce(() => handleBlockChange('body', value || ''), 500, [value]);
 
   return (
-    <Card title={t('body')} padding="small" height="full">
+    <Card
+      title={t('body')}
+      className="shadow-sm"
+      childrenClassName="pt-6"
+      padding="small"
+      height="full"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         defaultLanguage="twig"

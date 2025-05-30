@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Editor } from '@monaco-editor/react';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { useColorScheme } from '$app/common/colors';
 
 export const templateEntites = [
   'invoice',
@@ -44,6 +45,9 @@ export const templateEntites = [
 
 export default function Create() {
   const { t } = useTranslation();
+
+  const colors = useColorScheme();
+
   const { data } = useBlankDesignQuery();
 
   const [design, setDesign] = useState<Design | null>(null);
@@ -168,7 +172,12 @@ export default function Create() {
     <Container breadcrumbs={[]}>
       <AdvancedSettingsPlanAlert />
 
-      <Card title={t('new_design')}>
+      <Card
+        title={t('new_design')}
+        className="shadow-sm pb-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('name')}>
           <InputField
             value={design?.name}

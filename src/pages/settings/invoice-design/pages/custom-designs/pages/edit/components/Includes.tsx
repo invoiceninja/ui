@@ -42,7 +42,15 @@ export default function Includes() {
   useDebounce(() => handleBlockChange('includes', value || ''), 500, [value]);
 
   return (
-    <Card title={t('includes')} padding="small" height="full">
+    <Card
+      title={t('includes')}
+      className="shadow-sm"
+      childrenClassName="pt-6"
+      padding="small"
+      height="full"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Editor
         defaultLanguage="twig"
         language="twig"
