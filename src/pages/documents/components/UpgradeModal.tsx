@@ -115,7 +115,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         
         if (currentUserPlan === 'enterprise') {
             // Enterprise users can only upgrade to higher tiers
-            filteredTiers = allTiers.filter(tier => tier.value > currentUserCount);
+            filteredTiers = allTiers.filter(tier => tier.value >= currentUserCount);
         }
         // Pro users and others can see all enterprise tiers
         
@@ -175,8 +175,20 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     };
 
     const planOptions = [
-        // Show regular upgrade options first
-        ...(!hasExistingPlan || account?.plan !== 'enterprise' ? [{
+        // Show current plan first if user has one
+        ...(hasExistingPlan && account?.plan === 'pro' ? [{
+            value: 'pro',
+            label: t('pro'),
+            description: `Your current ${t('pro_plan')}`,
+            features: [
+                t('unlimited_documents'),
+                t('esignatures_at_checkout'),
+                t('basic_customization')
+            ]
+        }] : []),
+        
+        // Show Pro as upgrade option for new users or enterprise users who want to downgrade
+        ...(!hasExistingPlan ? [{
             value: 'pro',
             label: t('pro'),
             description: t('pro_plan'),
@@ -186,10 +198,14 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 t('basic_customization')
             ]
         }] : []),
+        
+        // Always show Enterprise (current plan or upgrade option)
         {
             value: 'enterprise',
             label: t('enterprise'),
-            description: t('enterprise_plan'),
+            description: hasExistingPlan && account?.plan === 'enterprise' 
+                ? `Your current ${t('enterprise_plan')}` 
+                : `Upgrade to ${t('enterprise_plan')}`,
             features: [
                 t('unlimited_documents'),
                 t('esignatures_at_checkout'),
@@ -198,29 +214,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 t('custom_integrations')
             ]
         },
-        // Show DocuNinja-only option last (to the right) if user has existing plan
+        
+        // Show DocuNinja add-on option
         ...(hasExistingPlan ? [{
             value: 'docuninja',
             label: 'DocuNinja',
-            description: 'Add E-Signatures to your existing plan',
+            description: 'Add E-Signatures to your plan',
             features: [
                 'Keep your current plan unchanged',
-                'Add DocuNinja E-Signatures',
+                'Add DocuNinja E-Signatures', 
                 'Works with your existing features',
                 'Separate billing for DocuNinja'
             ]
-        }] : [])
-    ].filter(plan => {
-        // If user is on enterprise, hide pro plan option (but keep DocuNinja and enterprise upgrade options)
-        if (account?.plan === 'enterprise' && plan.value === 'pro') {
-            return false;
-        }
-        return true;
-    });
-
-    // Add DocuNinja option for new users (always at the end)
-    if (!hasExistingPlan) {
-        planOptions.push({
+        }] : [{
             value: 'docuninja',
             label: 'DocuNinja',
             description: 'Add E-Signatures to your plan',
@@ -230,50 +236,40 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 'Additional per-user billing',
                 'Optional add-on service'
             ]
-        });
-    }
+        }])
+    ];
 
     useEffect(() => {
         if (visible) {
             // Reset to first step when modal opens
             setCurrentStep(ModalStep.PLAN_SELECTION);
             
-            // Set initial selections based on user's current plan
+            // Pre-configure with user's current plan to provide pricing context
             if (hasExistingPlan) {
-                setSelectedMainPlan(null); // No main plan selection for existing users
+                // Set current plan as selected
+                if (account?.plan === 'pro' || account?.plan === 'enterprise') {
+                    setSelectedMainPlan(account.plan);
+                }
+                
+                // Set current user count for enterprise users
+                if (account?.plan === 'enterprise' && account?.num_users) {
+                    setEnterpriseUsers(account.num_users);
+                }
+                
+                // Don't pre-select DocuNinja - let user choose to add it
                 setDocuNinjaSelected(false);
                 setDocuNinjaUsers(0);
             } else {
+                // New users start with no selection
                 setSelectedMainPlan(null);
                 setDocuNinjaSelected(false);
                 setDocuNinjaUsers(0);
             }
 
-            if(account.plan == 'enterprise'){
-                if(account.num_users == 2){
-                    setEnterpriseUsers(5);
-                }
-                if(account.num_users == 5){
-                    setEnterpriseUsers(10);
-                }
-                if(account.num_users == 10){
-                    setEnterpriseUsers(20);
-                }
-                if(account.num_users == 20){
-                    setEnterpriseUsers(30);
-                }
-                if(account.num_users == 30){
-                    setEnterpriseUsers(50);
-                }
-            }
-
-            if(account.plan === 'pro' && account.plan_term === 'month'){
-                setIsYearly(true);
-            }
-            else
-                setIsYearly(account.plan_term == 'year');
+            // Set billing term to match user's current term (or default to yearly)
+            setIsYearly(account?.plan_term === 'year' || !account?.plan_term);
         }
-    }, [visible, hasExistingPlan]);
+    }, [visible, hasExistingPlan, account?.plan, account?.num_users, account?.plan_term]);
 
     // Single effect to handle all pricing updates with debouncing
     useEffect(() => {
@@ -362,11 +358,8 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     };
 
     const handleBillingToggleDisabledState = () => {
-        if (selectedMainPlan === 'pro' && account?.plan === 'pro' && account?.plan_term === 'month'){
-            return true;
-        }
-
-        if (selectedMainPlan === 'enterprise' && account?.plan === 'pro' && account?.plan_term === 'year'){
+        
+        if (account?.plan_term === 'year'){
             return true;
         }
 
@@ -442,7 +435,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             title={getModalTitle()}
             visible={visible}
             onClose={onClose}
-            size="large"
+            size={account?.plan == 'enterprise' ? 'regular' : 'large'}
             disableClosing={currentStep === ModalStep.PAYMENT}
         >
             <div className="space-y-6">
@@ -453,7 +446,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             {/* Plan Type Selection */}
                             <div>
                                 <h3 className="text-lg font-medium mb-4">{t('choose_your_plan')}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 {account?.plan == 'enterprise' ? md:grid-cols-2 : md:grid-cols-3} gap-4">
                                     {planOptions.map((plan) => (
                                         <div
                                             key={plan.value}
@@ -506,9 +499,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                                 ))}
                                                             </SelectField>
                                                         </div>
-                                                        <p className="text-sm text-gray-600 mt-1">
-                                                            {t('enterprise_users_description')}
-                                                        </p>
+                                                       
                                                     </li>
                                                 )}
 
@@ -533,11 +524,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                                     ))}
                                                                 </SelectField>
                                                             </div>
-                                                            {hasExistingPlan && (
-                                                                <p className="text-sm text-gray-600 mt-1">
-                                                                    Add DocuNinja E-Signatures to your existing {account?.plan?.toUpperCase()} plan
-                                                                </p>
-                                                            )}
+                                                           
                                                         </li>
                                                     ) : null;
                                                 })()}
@@ -547,7 +534,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                 </div>
                             </div>
 
-                            {account.plan_term !== 'year' && !docuNinjaSelected && (
+                            {account.plan_term !== 'year' && (
                             <div className="flex flex-col items-center mt-6">
                                 <div className="flex items-center space-x-2">
                                     <span>{t('plan_term_monthly')}</span>
@@ -609,7 +596,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         type="primary"
                                         behavior="button"
                                         onClick={handleContinueToPayment}
-                                        disabled={!pricing || isLoading}
+                                        disabled={!pricing || isLoading || pricing.pro_rata_raw <= 0}
                                     >
                                         {t('continue_to_payment')}
                                     </Button>
@@ -640,6 +627,8 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         <span className="capitalize">
                                             {hasExistingPlan && docuNinjaSelected && !selectedMainPlan
                                                 ? `DocuNinja (${account?.plan} add-on)` 
+                                                : selectedMainPlan === account?.plan
+                                                ? `Current ${selectedMainPlan?.toUpperCase()} plan`
                                                 : selectedMainPlan || 'None selected'
                                             }
                                         </span>
