@@ -44,32 +44,99 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const [pricing, setPricing] = useState<PricingResponse | null>(null);
     const [currentStep, setCurrentStep] = useState<ModalStep>(ModalStep.PLAN_SELECTION);
 
-    // Generate enterprise user options from 1 to account.num_users
-    const enterpriseUserOptions = [{
+    // Static map of all available enterprise tiers
+    const ENTERPRISE_TIERS_MAP = {
+        2: {
             value: 2,
             label: `1-2 ${t('users')}`,
+            monthlyKey: 'enterprise_plan',
+            yearlyKey: 'enterprise_plan_annual',
+            minUsers: 1,
+            maxUsers: 2
         },
-        {
+        5: {
             value: 5,
             label: `3-5 ${t('users')}`,
+            monthlyKey: 'enterprise_plan_5',
+            yearlyKey: 'enterprise_plan_annual_5',
+            minUsers: 3,
+            maxUsers: 5
         },
-        {
+        10: {
             value: 10,
             label: `6-10 ${t('users')}`,
+            monthlyKey: 'enterprise_plan_10',
+            yearlyKey: 'enterprise_plan_annual_10',
+            minUsers: 6,
+            maxUsers: 10
         },
-        {
+        20: {
             value: 20,
             label: `11-20 ${t('users')}`,
+            monthlyKey: 'enterprise_plan_20',
+            yearlyKey: 'enterprise_plan_annual_20',
+            minUsers: 11,
+            maxUsers: 20
         },
-        {
+        30: {
             value: 30,
             label: `21-30 ${t('users')}`,
+            monthlyKey: 'enterprise_plan_30',
+            yearlyKey: 'enterprise_plan_annual_30',
+            minUsers: 21,
+            maxUsers: 30
         },
-        {
+        50: {
             value: 50,
             label: `31-50 ${t('users')}`,
+            monthlyKey: 'enterprise_plan_50',
+            yearlyKey: 'enterprise_plan_annual_50',
+            minUsers: 31,
+            maxUsers: 50
         }
-    ];
+    };
+
+    // Function to get filtered enterprise user options based on current user and criteria
+    const getFilteredEnterpriseOptions = () => {
+        const currentUserPlan = account?.plan;
+        const currentUserCount = account?.num_users || 2;
+        
+        // Convert map to array
+        const allTiers = Object.values(ENTERPRISE_TIERS_MAP);
+        
+        // Apply filters based on current user's plan
+        let filteredTiers = allTiers;
+        
+        if (currentUserPlan === 'enterprise') {
+            // Enterprise users can only upgrade to higher tiers
+            filteredTiers = allTiers.filter(tier => tier.value > currentUserCount);
+        }
+        // Pro users and others can see all enterprise tiers
+        
+        // TODO: Add more filtering logic here as needed
+        // Example filters you could add:
+        // - Filter by region/country
+        // - Filter by account type
+        // - Filter by feature availability
+        // - Filter by special promotions
+        
+        return filteredTiers;
+    };
+
+    // Generate enterprise user options from filtered tiers
+    const enterpriseUserOptions = getFilteredEnterpriseOptions();
+
+    // Helper function to get product key for a tier based on billing term
+    const getProductKeyForTier = (tierValue: number, isYearly: boolean) => {
+        const tier = ENTERPRISE_TIERS_MAP[tierValue as keyof typeof ENTERPRISE_TIERS_MAP];
+        if (!tier) return null;
+        return isYearly ? tier.yearlyKey : tier.monthlyKey;
+    };
+
+    // Helper function to get tier details by value
+    const getTierDetails = (tierValue: number) => {
+        return ENTERPRISE_TIERS_MAP[tierValue as keyof typeof ENTERPRISE_TIERS_MAP] || null;
+    };
 
     // Generate DocuNinja user options based on selected plan
     const getDocuNinjaUserOptions = () => {
@@ -264,7 +331,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             title={getModalTitle()}
             visible={visible}
             onClose={onClose}
-            size="large"
+            size="regular"
             disableClosing={currentStep === ModalStep.PAYMENT}
         >
             <div className="space-y-6">
