@@ -30,19 +30,25 @@ enum ModalStep {
     PAYMENT = 'payment'
 }
 
-type PlanType = 'pro' | 'enterprise';
+type PlanType = 'pro' | 'enterprise' | 'docuninja';
 
 export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const [t] = useTranslation();
     const account = useCurrentAccount();
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<PlanType>('enterprise');
+    const [selectedMainPlan, setSelectedMainPlan] = useState<'pro' | 'enterprise' | null>(null);
+    const [docuNinjaSelected, setDocuNinjaSelected] = useState(false);
     const [enterpriseUsers, setEnterpriseUsers] = useState(2);
     const [docuNinjaUsers, setDocuNinjaUsers] = useState(0);
-    const [docuNinjaEnabled, setDocuNinjaEnabled] = useState(false);
     const [isYearly, setIsYearly] = useState(true);
     const [pricing, setPricing] = useState<PricingResponse | null>(null);
     const [currentStep, setCurrentStep] = useState<ModalStep>(ModalStep.PLAN_SELECTION);
+
+    // Check if user already has a plan (pro or enterprise)
+    const hasExistingPlan = account?.plan === 'pro' || account?.plan === 'enterprise';
+    
+    // DocuNinja is available if user has existing plan OR has selected a main plan
+    const isDocuNinjaAvailable = hasExistingPlan || selectedMainPlan !== null;
 
     // Static map of all available enterprise tiers
     const ENTERPRISE_TIERS_MAP = {
@@ -138,37 +144,52 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         return ENTERPRISE_TIERS_MAP[tierValue as keyof typeof ENTERPRISE_TIERS_MAP] || null;
     };
 
-    // Generate DocuNinja user options based on selected plan
+    // Generate DocuNinja user options based on selected plan and user's current plan
     const getDocuNinjaUserOptions = () => {
-        if (selectedPlan === 'pro') {
-            return [{ value: '1', label: `1 ${t('user')}` }];
-        } else {
-            // For enterprise, 1 to selected enterprise users
-            return Array.from(
-                { length: enterpriseUsers }, 
+        if (docuNinjaSelected) {
+            let maxUsers = 1; // Default for Pro plans
+            
+            if (selectedMainPlan === 'enterprise') {
+                // New user or existing user upgrading to enterprise - use selected enterprise user count
+                maxUsers = enterpriseUsers;
+            } else if (selectedMainPlan === 'pro') {
+                // Pro plan selected - only 1 user allowed
+                maxUsers = 1;
+            } else if (hasExistingPlan) {
+                // Existing user with no main plan selected (adding DocuNinja only)
+                maxUsers = account?.plan === 'enterprise' ? (account?.num_users || 2) : 1;
+            }
+            
+            const options = Array.from(
+                { length: maxUsers }, 
                 (_, i) => ({
                     value: (i + 1).toString(),
-                    label: `${i + 1} ${t('users')}`,
+                    label: `${i + 1} ${i === 0 ? t('user') : t('users')}`,
                 })
             );
+            
+            return options;
         }
+        
+        return [];
     };
 
     const planOptions = [
-        { 
-            value: 'pro', 
-            label: t('pro'), 
-            description: t('pro_plan_description'),
+        // Show regular upgrade options first
+        ...(!hasExistingPlan || account?.plan !== 'enterprise' ? [{
+            value: 'pro',
+            label: t('pro'),
+            description: t('pro_plan'),
             features: [
                 t('unlimited_documents'),
                 t('esignatures_at_checkout'),
                 t('basic_customization')
             ]
-        },
-        { 
-            value: 'enterprise', 
-            label: t('enterprise'), 
-            description: t('enterprise_plan_description'),
+        }] : []),
+        {
+            value: 'enterprise',
+            label: t('enterprise'),
+            description: t('enterprise_plan'),
             features: [
                 t('unlimited_documents'),
                 t('esignatures_at_checkout'),
@@ -176,21 +197,57 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 t('priority_support'),
                 t('custom_integrations')
             ]
-        }
+        },
+        // Show DocuNinja-only option last (to the right) if user has existing plan
+        ...(hasExistingPlan ? [{
+            value: 'docuninja',
+            label: 'DocuNinja',
+            description: 'Add E-Signatures to your existing plan',
+            features: [
+                'Keep your current plan unchanged',
+                'Add DocuNinja E-Signatures',
+                'Works with your existing features',
+                'Separate billing for DocuNinja'
+            ]
+        }] : [])
     ].filter(plan => {
-        // If user is on enterprise, hide pro plan option
+        // If user is on enterprise, hide pro plan option (but keep DocuNinja and enterprise upgrade options)
         if (account?.plan === 'enterprise' && plan.value === 'pro') {
             return false;
         }
         return true;
     });
 
+    // Add DocuNinja option for new users (always at the end)
+    if (!hasExistingPlan) {
+        planOptions.push({
+            value: 'docuninja',
+            label: 'DocuNinja',
+            description: 'Add E-Signatures to your plan',
+            features: [
+                'E-Signature functionality',
+                'Works with Pro or Enterprise',
+                'Additional per-user billing',
+                'Optional add-on service'
+            ]
+        });
+    }
+
     useEffect(() => {
         if (visible) {
             // Reset to first step when modal opens
             setCurrentStep(ModalStep.PLAN_SELECTION);
-            // Set initial selections
-            setSelectedPlan('enterprise');
+            
+            // Set initial selections based on user's current plan
+            if (hasExistingPlan) {
+                setSelectedMainPlan(null); // No main plan selection for existing users
+                setDocuNinjaSelected(false);
+                setDocuNinjaUsers(0);
+            } else {
+                setSelectedMainPlan(null);
+                setDocuNinjaSelected(false);
+                setDocuNinjaUsers(0);
+            }
 
             if(account.plan == 'enterprise'){
                 if(account.num_users == 2){
@@ -209,33 +266,86 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                     setEnterpriseUsers(50);
                 }
             }
-            setDocuNinjaUsers(0);
-            setDocuNinjaEnabled(false);
-            setIsYearly(account.plan_term == 'yearly');
-            // Don't fetch pricing here, let the main effect handle it
+
+            if(account.plan === 'pro' && account.plan_term === 'month'){
+                setIsYearly(true);
+            }
+            else
+                setIsYearly(account.plan_term == 'year');
         }
-    }, [visible]);
+    }, [visible, hasExistingPlan]);
 
     // Single effect to handle all pricing updates with debouncing
     useEffect(() => {
-        if (!visible || !selectedPlan || !enterpriseUsers) return;
-
-        // Debounce the API call to prevent multiple rapid calls
-        const timeoutId = setTimeout(() => {
-            const effectiveDocuNinjaUsers = docuNinjaEnabled ? docuNinjaUsers : 0;
-            fetchPricing(selectedPlan, enterpriseUsers, effectiveDocuNinjaUsers, isYearly);
-        }, 300); // 300ms debounce
-
-        return () => clearTimeout(timeoutId);
-    }, [visible, selectedPlan, enterpriseUsers, docuNinjaUsers, docuNinjaEnabled, isYearly]);
-
-    const handlePlanChange = (plan: PlanType) => {
-        setSelectedPlan(plan);
-        // Immediately reset DocuNinja settings when changing to Pro
-        if (plan === 'pro') {
-            setDocuNinjaUsers(0);
-            setDocuNinjaEnabled(false);
+        if (!visible) return;
+        
+        // More strict condition - only fetch pricing when we actually have selections
+        const hasMainPlanSelected = selectedMainPlan !== null;
+        const hasDocuNinjaSelected = docuNinjaSelected && docuNinjaUsers > 0;
+        const hasValidSelection = hasMainPlanSelected || hasDocuNinjaSelected;
+        
+        if (!hasValidSelection) {
+            setPricing(null);
+            return;
         }
+        
+        const timeoutId = setTimeout(() => {
+            if (hasExistingPlan && docuNinjaSelected && !selectedMainPlan && docuNinjaUsers > 0) {
+                // Existing user adding DocuNinja only - use their current plan
+                fetchPricing(account?.plan as 'pro' | 'enterprise', account?.num_users || 1, docuNinjaUsers, isYearly);
+            } else if (selectedMainPlan) {
+                // User selecting main plan (with optional DocuNinja) - works for both new and existing users
+                const effectiveDocuNinjaUsers = docuNinjaSelected ? docuNinjaUsers : 0;
+                const effectiveUsers = selectedMainPlan === 'enterprise' ? enterpriseUsers : 1;
+                fetchPricing(selectedMainPlan, effectiveUsers, effectiveDocuNinjaUsers, isYearly);
+            }
+        }, 300);
+        
+        return () => clearTimeout(timeoutId);
+    }, [visible, selectedMainPlan, docuNinjaSelected, enterpriseUsers, docuNinjaUsers, isYearly, hasExistingPlan]);
+
+    const handlePlanToggle = (planValue: string) => {
+        if (planValue === 'docuninja') {
+            if (isDocuNinjaAvailable) {
+                const newSelected = !docuNinjaSelected;
+                setDocuNinjaSelected(newSelected);
+                if (newSelected) {
+                    setDocuNinjaUsers(1);
+                } else {
+                    setDocuNinjaUsers(0);
+                }
+            }
+        } else {
+            const planType = planValue as 'pro' | 'enterprise';
+            if (selectedMainPlan === planType) {
+                // Deselecting current plan
+                setSelectedMainPlan(null);
+                // Always deselect DocuNinja when main plan is deselected
+                setDocuNinjaSelected(false);
+                setDocuNinjaUsers(0);
+            } else {
+                // Selecting new plan
+                setSelectedMainPlan(planType);
+                // Reset DocuNinja users when changing main plan
+                if (docuNinjaSelected && planType === 'pro') {
+                    setDocuNinjaUsers(1); // Pro only allows 1 DocuNinja user
+                }
+            }
+        }
+    };
+
+    const isPlanSelected = (planValue: string) => {
+        if (planValue === 'docuninja') {
+            return docuNinjaSelected;
+        }
+        return selectedMainPlan === planValue;
+    };
+
+    const isPlanDisabled = (planValue: string) => {
+        if (planValue === 'docuninja') {
+            return !isDocuNinjaAvailable;
+        }
+        return false;
     };
 
     const handleEnterpriseUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -247,43 +357,39 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         }
     };
 
-    const handleDocuNinjaUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const newValue = parseInt(event.target.value);
-        setDocuNinjaUsers(newValue);
-    };
-
     const handleBillingToggle = () => {
         setIsYearly(!isYearly);
     };
 
-    const handleDocuNinjaToggle = () => {
-        const newEnabled = !docuNinjaEnabled;
-        setDocuNinjaEnabled(newEnabled);
-        // Reset to 1 user when disabling DocuNinja
-        if (!newEnabled) {
-            setDocuNinjaUsers(0);
+    const handleBillingToggleDisabledState = () => {
+        if (selectedMainPlan === 'pro' && account?.plan === 'pro' && account?.plan_term === 'month'){
+            return true;
         }
 
-        if (newEnabled && selectedPlan === 'pro') {
-            setDocuNinjaUsers(1);
+        if (selectedMainPlan === 'enterprise' && account?.plan === 'pro' && account?.plan_term === 'year'){
+            return true;
         }
+
+        if (selectedMainPlan === 'enterprise' && account?.plan === 'pro' && account?.plan_term === 'month') {
+            return false;
+        }
+        
+        return false;
     };
 
-    const fetchPricing = (plan: PlanType, enterpriseUsers: number, docuNinjaUsers: number, yearly: boolean) => {
+    const fetchPricing = (plan: 'pro' | 'enterprise', users: number, docuNinjaUsers: number, yearly: boolean) => {
         setIsLoading(true);
 
         request('POST', endpoint('/api/client/account_management/v2/description'), {
             plan: plan,
-            users: enterpriseUsers,
+            users: users,
             docuninja_users: docuNinjaUsers,
             term: yearly ? 'year' : 'month'
         })
             .then((response) => {
-                console.log(response.data);
                 setPricing(response.data);
             })
             .catch((error) => {
-                console.error('Error fetching pricing:', error);
                 toast.error(t('error_fetching_pricing') as string);
             })
             .finally(() => setIsLoading(false));
@@ -322,6 +428,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         }
     };
 
+    const handleDocuNinjaUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const newValue = parseInt(event.target.value);
+        setDocuNinjaUsers(newValue);
+    };
+
     if (!visible) {
         return null;
     }
@@ -331,7 +442,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             title={getModalTitle()}
             visible={visible}
             onClose={onClose}
-            size="regular"
+            size="large"
             disableClosing={currentStep === ModalStep.PAYMENT}
         >
             <div className="space-y-6">
@@ -342,27 +453,33 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             {/* Plan Type Selection */}
                             <div>
                                 <h3 className="text-lg font-medium mb-4">{t('choose_your_plan')}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {planOptions.map((plan) => (
                                         <div
                                             key={plan.value}
-                                            className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-                                                selectedPlan === plan.value
-                                                    ? 'border-primary bg-primary/5'
-                                                    : 'border-gray-200 hover:border-gray-300'
+                                            className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                                                isPlanSelected(plan.value)
+                                                    ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200'
+                                                    : isPlanDisabled(plan.value)
+                                                    ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
+                                                    : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm'
                                             }`}
-                                            onClick={() => handlePlanChange(plan.value as PlanType)}
+                                            onClick={() => !isPlanDisabled(plan.value) && handlePlanToggle(plan.value)}
                                         >
-                                            <div className="flex items-center mb-2">
-                                                <input
-                                                    type="radio"
-                                                    name="plan"
-                                                    value={plan.value}
-                                                    checked={selectedPlan === plan.value}
-                                                    onChange={() => handlePlanChange(plan.value as PlanType)}
-                                                    className="mr-3"
-                                                />
+                                            <div className="flex items-center justify-between mb-2">
                                                 <h4 className="text-lg font-semibold">{plan.label}</h4>
+                                                {isPlanSelected(plan.value) && (
+                                                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                )}
+                                                {isPlanDisabled(plan.value) && !hasExistingPlan && (
+                                                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
+                                                        Select a main plan first
+                                                    </span>
+                                                )}
                                             </div>
                                             <p className="text-sm text-gray-600 mb-3">{plan.description}</p>
                                             <ul className="text-sm space-y-1">
@@ -374,9 +491,9 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                 ))}
                                             
                                                 {/* Enterprise Users Selection (only for Enterprise plan) */}
-                                                {selectedPlan === 'enterprise' && plan.value === 'enterprise' && (
+                                                {plan.value === 'enterprise' && (
                                                     <li className="mt-3 pt-3 border-t border-gray-200">
-                                                        <div className="max-w-xs">
+                                                        <div className="max-w-xs" onClick={(e) => e.stopPropagation()}>
                                                             <SelectField
                                                                 value={enterpriseUsers.toString()}
                                                                 onChange={handleEnterpriseUserChange}
@@ -394,13 +511,43 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                         </p>
                                                     </li>
                                                 )}
+
+                                                {/* DocuNinja Users Selection (only for DocuNinja plan when selected) */}
+                                                {(() => {
+                                                    const isDocuNinjaPlan = plan.value === 'docuninja';
+                                                    const shouldShowSelector = isDocuNinjaPlan && docuNinjaSelected;
+                                                    
+                                                    return shouldShowSelector ? (
+                                                        <li className="mt-3 pt-3 border-t border-gray-200">
+                                                            <div className="max-w-xs" onClick={(e) => e.stopPropagation()}>
+                                                                <SelectField
+                                                                    value={docuNinjaUsers.toString()}
+                                                                    onChange={handleDocuNinjaUserChange}
+                                                                    label="DocuNinja Users"
+                                                                    disabled={selectedMainPlan === 'pro'}
+                                                                >
+                                                                    {getDocuNinjaUserOptions().map((option) => (
+                                                                        <option key={option.value} value={option.value}>
+                                                                            {option.label}
+                                                                        </option>
+                                                                    ))}
+                                                                </SelectField>
+                                                            </div>
+                                                            {hasExistingPlan && (
+                                                                <p className="text-sm text-gray-600 mt-1">
+                                                                    Add DocuNinja E-Signatures to your existing {account?.plan?.toUpperCase()} plan
+                                                                </p>
+                                                            )}
+                                                        </li>
+                                                    ) : null;
+                                                })()}
                                             </ul>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            {account.plan_term !== 'yearly' && (
+                            {account.plan_term !== 'year' && !docuNinjaSelected && (
                             <div className="flex flex-col items-center mt-6">
                                 <div className="flex items-center space-x-2">
                                     <span>{t('plan_term_monthly')}</span>
@@ -408,6 +555,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     <Toggle
                                         checked={isYearly}
                                         onValueChange={handleBillingToggle}
+                                        disabled={handleBillingToggleDisabledState()}
                                     />
                                     <span>{t('plan_term_yearly')} </span>
                                     
@@ -416,45 +564,6 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             </div>
                             )}
                             
-                            {/* DocuNinja Users Selection */}
-                            <div className="flex flex-rowspace-y-4">
-                                <div className="flex items-center space-x-3">
-                                    <input
-                                        type="checkbox"
-                                        id="docuninja-enabled"
-                                        checked={docuNinjaEnabled}
-                                        onChange={handleDocuNinjaToggle}
-                                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                                    />
-                                    <label htmlFor="docuninja-enabled" className="flex-1">
-                                        <div>
-                                            <p className="font-medium">Want DocuNinja with that?</p>
-                                            <p className="text-sm text-gray-600">Add in E Signatures with DocuNinja!</p>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                {docuNinjaEnabled && (
-                                    <div className="ml-7 space-y-2">
-                                        <div className="max-w-xs">
-                                            <SelectField
-                                                value={docuNinjaUsers.toString()}
-                                                onChange={handleDocuNinjaUserChange}
-                                                label=''
-                                                disabled={selectedPlan === 'pro'}
-                                            >
-                                                {getDocuNinjaUserOptions().map((option) => (
-                                                    <option key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </option>
-                                                ))}
-                                            </SelectField>
-                                        </div>
-                                        
-                                    </div>
-                                )}
-                            </div>
-
                             {/* Pricing Display */}
                             <div className="space-y-4">
                                 <div className="bg-gray-50 p-4 rounded">
@@ -528,9 +637,14 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                 <div className="mt-2 space-y-1">
                                     <div className="flex justify-between text-sm">
                                         <span>{t('plan')}:</span>
-                                        <span className="capitalize">{selectedPlan}</span>
+                                        <span className="capitalize">
+                                            {hasExistingPlan && docuNinjaSelected && !selectedMainPlan
+                                                ? `DocuNinja (${account?.plan} add-on)` 
+                                                : selectedMainPlan || 'None selected'
+                                            }
+                                        </span>
                                     </div>
-                                    {selectedPlan === 'enterprise' && (
+                                    {selectedMainPlan === 'enterprise' && (
                                         <div className="flex justify-between text-sm">
                                             <span>{t('enterprise_users')}:</span>
                                             <span>{enterpriseUsers}</span>
@@ -538,7 +652,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     )}
                                     <div className="flex justify-between text-sm">
                                         <span>{t('docuninja_users')}:</span>
-                                        <span>{docuNinjaEnabled ? docuNinjaUsers : 0}</span>
+                                        <span>{docuNinjaSelected ? docuNinjaUsers : 0}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span>{t('billing_term')}:</span>
@@ -556,11 +670,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             {/* Payment Form */}
                             <PaymentMethodForm
                                 tokens={[]}
-                                num_users={enterpriseUsers}
-                                plan={selectedPlan}
-                                docuninja_users={docuNinjaUsers}
+                                num_users={hasExistingPlan && !selectedMainPlan ? (account?.num_users || 1) : enterpriseUsers}
+                                plan={hasExistingPlan && docuNinjaSelected && !selectedMainPlan ? 'docuninja' : (selectedMainPlan || 'pro')}
+                                docuninja_users={docuNinjaSelected ? docuNinjaUsers : 0}
                                 term={isYearly ? 'year' : 'month'}
-                                amount_string={pricing?.price}
+                                amount_string={pricing?.pro_rata}
                                 amount_raw={pricing?.pro_rata_raw}
                                 hash={pricing?.hash}
                                 onPaymentSuccess={handlePaymentSuccess}
