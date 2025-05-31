@@ -21,11 +21,14 @@ import { Settings } from '../../../../components/layouts/Settings';
 import { useBlankBankAccountQuery } from '../common/queries';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { BankAccountsPlanAlert } from '../common/components/BankAccountsPlanAlert';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const [t] = useTranslation();
 
   useTitle('new_bank_account');
+
+  const colors = useColorScheme();
 
   const { data } = useBlankBankAccountQuery();
 
@@ -73,7 +76,13 @@ export function Create() {
     >
       {!enterprisePlan() && isHosted() && <BankAccountsPlanAlert />}
 
-      <Card onFormSubmit={handleSave} title={t('new_bank_account')}>
+      <Card
+        onFormSubmit={handleSave}
+        title={t('new_bank_account')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('account_name')}>
           <InputField
             value={bankAccount?.bank_account_name}

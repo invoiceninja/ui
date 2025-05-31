@@ -60,10 +60,12 @@ export function TransactionRuleForm(props: Props) {
             ? t('new_transaction_rule')
             : t('edit_transaction_rule')
         }
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
       >
         <Element leftSide={t('name')} required>
           <InputField
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             required
             value={transactionRule.name}
             onValueChange={(value) => handleChange('name', value)}
@@ -76,7 +78,6 @@ export function TransactionRuleForm(props: Props) {
           leftSideHelp={t('match_all_rules_help')}
         >
           <Toggle
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             checked={transactionRule.matches_on_all || false}
             onValueChange={(value) => handleChange('matches_on_all', value)}
           />
@@ -87,8 +88,6 @@ export function TransactionRuleForm(props: Props) {
           leftSideHelp={t('auto_convert_help')}
         >
           <Toggle
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-
             checked={transactionRule.auto_convert || false}
             onValueChange={(value) => handleChange('auto_convert', value)}
           />
@@ -125,15 +124,23 @@ export function TransactionRuleForm(props: Props) {
         <Tbody>
           {transactionRule.rules?.map((rule, index) => (
             <Tr key={index} className="py-2">
-              <Td width="30%" style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}>{t(rule.search_key)}</Td>
+              <Td width="30%">{t(rule.search_key)}</Td>
 
-              <Td width="30%" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>{t(rule.operator)}</Td>
+              <Td width="30%">{t(rule.operator)}</Td>
 
-              <Td width="40%" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+              <Td width="40%">
                 <div className="flex justify-between">
                   <span>{rule.value}</span>
 
-                  <div className="flex space-x-8" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+                  <div
+                    className="flex space-x-8"
+                    style={{
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
+                  >
                     <MdEdit
                       className="cursor-pointer"
                       color={accentColor}
@@ -156,10 +163,9 @@ export function TransactionRuleForm(props: Props) {
             </Tr>
           ))}
 
-          <Tr style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-            <Td colSpan={100} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+          <Tr>
+            <Td colSpan={100}>
               <button
-                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                 onClick={() => {
                   setRuleIndex(-1);
                   setIsRuleModalOpen(true);
