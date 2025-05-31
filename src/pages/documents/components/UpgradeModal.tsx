@@ -601,7 +601,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         onClick={handleContinueToPayment}
                                         disabled={!pricing || isLoading || pricing.pro_rata_raw <= 0}
                                     >
-                                        {t('continue_to_payment')}
+                                        {t('next')}
                                     </Button>
                                 </div>
                             </div>
