@@ -72,6 +72,7 @@ export function SMTPMailDriver() {
           onValueChange={(value) => handleChange('smtp_encryption', value)}
           withBlank
           disabled={isFormBusy}
+          customSelector
         >
           <option value="tls">STARTTLS</option>
           <option value="ssl">SSL/TLS</option>
@@ -94,7 +95,10 @@ export function SMTPMailDriver() {
         />
       </Element>
 
-      <Element leftSide={t('local_domain')} leftSideHelp={t('local_domain_help')}>
+      <Element
+        leftSide={t('local_domain')}
+        leftSideHelp={t('local_domain_help')}
+      >
         <InputField
           value={company?.smtp_local_domain || ''}
           onValueChange={(value) => handleChange('smtp_local_domain', value)}
@@ -114,7 +118,7 @@ export function SMTPMailDriver() {
 
       <Element leftSide={t('send_time')}>
         <SelectField
-          value={company?.settings.entity_send_time || ''}
+          value={company?.settings.entity_send_time?.toString() || ''}
           onValueChange={(value) =>
             handleChange(
               'settings.entity_send_time',
@@ -122,9 +126,10 @@ export function SMTPMailDriver() {
             )
           }
           withBlank
+          customSelector
         >
           {[...Array(24).keys()].map((number, index) => (
-            <option key={index} value={number + 1}>
+            <option key={index} value={(number + 1).toString()}>
               {dayjs()
                 .startOf('day')
                 .add(number + 1, 'hour')

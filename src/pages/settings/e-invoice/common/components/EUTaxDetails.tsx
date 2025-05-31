@@ -27,11 +27,14 @@ import { AxiosError } from 'axios';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Country } from '$app/common/interfaces/country';
 import { X } from 'react-feather';
+import { useColorScheme } from '$app/common/colors';
 
 export function EUTaxDetails() {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
+
   const resolveCountry = useResolveCountry();
 
   const displayCountryOption = (countryId: string) => {
@@ -52,6 +55,9 @@ export function EUTaxDetails() {
     <Card
       title={t('additional_tax_identifiers')}
       description={t('additional_tax_identifiers_help').toString()}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
     >
       <Element leftSide={t('new_identifier')}>
         <Configure />

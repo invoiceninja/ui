@@ -31,6 +31,7 @@ import { useFormik } from 'formik';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { get } from 'lodash';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useColorScheme } from '$app/common/colors';
 
 type Entity = 'company' | 'invoice' | 'client';
 
@@ -316,6 +317,7 @@ const PAYMENT_MEANS_FORM_ELEMENTS = {
 
 export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
   (props, ref) => {
+    const colors = useColorScheme();
     const company = useCurrentCompany();
 
     const [t] = useTranslation();
@@ -454,7 +456,12 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     }, [company.e_invoice]);
 
     return (
-      <Card title={t('payment_means')}>
+      <Card
+        title={t('payment_means')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide="Code">
           <SelectField
             value={form.values.payment_means[0].code}

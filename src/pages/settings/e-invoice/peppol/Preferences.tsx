@@ -28,14 +28,17 @@ import { useQuery, useQueryClient } from 'react-query';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { get } from 'lodash';
+import { useColorScheme } from '$app/common/colors';
 
 export function Preferences() {
   const { t } = useTranslation();
-  const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
+
+  const colors = useColorScheme();
+  const statics = useStaticsQuery();
+  const company = useCurrentCompany();
   const account = useCurrentAccount();
   const accentColor = useAccentColor();
-  const statics = useStaticsQuery();
 
   const form = useFormik({
     initialValues: {
@@ -128,7 +131,12 @@ export function Preferences() {
         </div>
       </Modal>
 
-      <Card title={`PEPPOL: ${t('preferences')}`}>
+      <Card
+        title={`PEPPOL: ${t('preferences')}`}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('status')}>
           <div className="flex flex-col">
             <p>
