@@ -10,7 +10,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, ClickableElement, Element } from '../../../../components/cards';
+import { ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
@@ -23,11 +23,14 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function Clients() {
   const [t] = useTranslation();
+
   const [pattern, setPattern] = useState<string>('');
 
+  const colors = useColorScheme();
   const companyChanges = useCompanyChanges();
 
   const disableSettingsField = useDisableSettingsField();
@@ -48,7 +51,7 @@ export function Clients() {
   ];
 
   return (
-    <Card title={t('clients')}>
+    <>
       <Element
         leftSide={
           <PropertyCheckbox
@@ -88,7 +91,13 @@ export function Clients() {
         />
       </Element>
 
-      <Divider />
+      <div className="px-4 sm:px-6 py-4">
+        <Divider
+          className="border-dashed"
+          borderColor={colors.$20}
+          withoutPadding
+        />
+      </div>
 
       {variables.map((item, index) => (
         <ClickableElement
@@ -99,9 +108,15 @@ export function Clients() {
         </ClickableElement>
       ))}
 
-      <Divider />
+      <div className="px-4 sm:px-6 pt-4 pb-6">
+        <Divider
+          className="border-dashed"
+          borderColor={colors.$20}
+          withoutPadding
+        />
+      </div>
 
       <LinkToVariables />
-    </Card>
+    </>
   );
 }

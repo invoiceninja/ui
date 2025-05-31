@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
@@ -19,20 +19,22 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useColorScheme } from '$app/common/colors';
 
 export function Messages() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const company = useCompanyChanges();
-  const handleChange = useHandleCurrentCompanyChangeProperty();
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const disableSettingsField = useDisableSettingsField();
-
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
-    <Card title={t('messages')}>
+    <>
       {isCompanySettingsActive && (
         <Element leftSide={t('dashboard')}>
           <InputField
@@ -106,6 +108,6 @@ export function Messages() {
           }
         />
       </Element>
-    </Card>
+    </>
   );
 }

@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
@@ -52,15 +52,15 @@ export const RESECT_COUNTER_FREQUENCIES = [
 export function Settings() {
   const [t] = useTranslation();
 
-  const disableSettingsField = useDisableSettingsField();
-
   const companyChanges = useInjectCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
-    <Card title={t('settings')}>
+    <>
       <Element
         leftSide={
           <PropertyCheckbox
@@ -71,16 +71,17 @@ export function Settings() {
         }
       >
         <SelectField
-          id="settings.counter_padding"
-          value={companyChanges?.settings?.counter_padding || '1'}
+          value={companyChanges?.settings?.counter_padding?.toString() || '1'}
           onValueChange={(value) =>
-            handleChange('settings.counter_padding', value)
+            handleChange('settings.counter_padding', parseInt(value))
           }
           disabled={disableSettingsField('counter_padding')}
           errorMessage={errors?.errors['settings.counter_padding']}
+          customSelector
+          dismissable={false}
         >
           {COUNTER_PADDINGS.map((value, index) => (
-            <option key={index} value={index + 1}>
+            <option key={index} value={(index + 1).toString()}>
               {value}
             </option>
           ))}
@@ -97,7 +98,6 @@ export function Settings() {
         }
       >
         <SelectField
-          id="settings.counter_number_applied"
           value={
             companyChanges?.settings?.counter_number_applied || 'when_saved'
           }
@@ -106,6 +106,8 @@ export function Settings() {
           }
           disabled={disableSettingsField('counter_number_applied')}
           errorMessage={errors?.errors['settings.counter_number_applied']}
+          customSelector
+          dismissable={false}
         >
           <option value="when_saved">{t('when_saved')}</option>
           <option value="when_sent">{t('when_sent')}</option>
@@ -184,7 +186,10 @@ export function Settings() {
         }
       >
         <SelectField
-          value={companyChanges?.settings?.reset_counter_frequency_id || '0'}
+          value={
+            companyChanges?.settings?.reset_counter_frequency_id?.toString() ||
+            '0'
+          }
           onValueChange={(value) => {
             handleChange(
               'settings.reset_counter_frequency_id',
@@ -197,9 +202,11 @@ export function Settings() {
           }}
           disabled={disableSettingsField('reset_counter_frequency_id')}
           errorMessage={errors?.errors['settings.reset_counter_frequency_id']}
+          customSelector
+          dismissable={false}
         >
           {RESECT_COUNTER_FREQUENCIES.map((value, index) => (
-            <option key={index} value={index}>
+            <option key={index} value={index.toString()}>
               {t(value)}
             </option>
           ))}
@@ -227,6 +234,6 @@ export function Settings() {
             />
           </Element>
         )}
-    </Card>
+    </>
   );
 }

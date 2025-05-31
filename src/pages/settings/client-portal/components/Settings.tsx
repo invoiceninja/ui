@@ -14,7 +14,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { InputField, Link, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useAtom } from 'jotai';
@@ -29,6 +29,7 @@ import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsFie
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
+import { useColorScheme } from '$app/common/colors';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -37,6 +38,7 @@ export function Settings() {
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
+  const colors = useColorScheme();
   const company = useCompanyChanges();
 
   const disableSettingsField = useDisableSettingsField();
@@ -62,7 +64,7 @@ export function Settings() {
   };
 
   return (
-    <Card title={t('settings')}>
+    <>
       {isHosted() && isCompanySettingsActive && (
         <>
           <Element
@@ -132,47 +134,63 @@ export function Settings() {
       {isCompanySettingsActive && (
         <Element
           leftSide={
-            <span>
-              {t('login')} {t('url')}
-            </span>
+            <div className="flex items-center space-x-1">
+              <span>
+                {t('login')} {t('url')}
+              </span>
+
+              {Boolean(isHosted() && company.portal_mode === 'domain') && (
+                <div className="flex items-center space-x-0.5">
+                  <span>(</span>
+
+                  <Link
+                    to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
+                    external
+                    withoutExternalIcon
+                  >
+                    {t('app_help_link')}
+                  </Link>
+
+                  <span>)</span>
+                </div>
+              )}
+            </div>
           }
         >
           <div className="flex flex-col space-y-1">
             {isSelfHosted() && (
               <CopyToClipboard
+                className="break-all"
                 text={`${company?.portal_domain}/client/login/${company?.company_key}`}
               />
             )}
 
             {Boolean(isHosted() && company.portal_mode === 'domain') && (
               <CopyToClipboard
+                className="break-all"
                 text={`${company?.portal_domain}/client/login`}
               />
             )}
 
             {Boolean(isHosted() && company.portal_mode === 'subdomain') && (
               <CopyToClipboard
+                className="break-all"
                 text={`${company?.subdomain}.invoicing.co/client/login`}
               />
-            )}
-
-            {Boolean(isHosted() && company.portal_mode === 'domain') && (
-              <div>
-                <span>{t('app_help_link')}</span>
-                <Link
-                  external
-                  to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
-                >
-                  {t('here')}
-                </Link>
-                .
-              </div>
             )}
           </div>
         </Element>
       )}
 
-      {isCompanySettingsActive && <Divider />}
+      {isCompanySettingsActive && (
+        <div className="px-4 sm:px-6 pt-5">
+          <Divider
+            className="border-dashed"
+            borderColor={colors.$20}
+            withoutPadding
+          />
+        </div>
+      )}
 
       <Element
         className={classNames({ 'mt-4': isCompanySettingsActive })}
@@ -277,15 +295,20 @@ export function Settings() {
         />
       </Element>
 
-      { company?.settings?.show_pdfhtml_on_mobile && (
+      {company?.settings?.show_pdfhtml_on_mobile && (
         <Element
           leftSide={t('preference_product_notes_for_html_view')}
           leftSideHelp={t('preference_product_notes_for_html_view_help')}
         >
           <Toggle
-            checked={Boolean(company?.settings?.preference_product_notes_for_html_view)}
+            checked={Boolean(
+              company?.settings?.preference_product_notes_for_html_view
+            )}
             onValueChange={(value) =>
-              handleChange('settings.preference_product_notes_for_html_view', value)
+              handleChange(
+                'settings.preference_product_notes_for_html_view',
+                value
+              )
             }
           />
         </Element>
@@ -319,7 +342,13 @@ export function Settings() {
         <Toggle />
       </Element> */}
 
-      <Divider />
+      <div className="px-4 sm:px-6 pt-4 pb-2">
+        <Divider
+          className="border-dashed"
+          borderColor={colors.$20}
+          withoutPadding
+        />
+      </div>
 
       <Element
         className="mt-4"
@@ -359,6 +388,6 @@ export function Settings() {
           errorMessage={errors?.errors['settings.client_portal_privacy_policy']}
         />
       </Element>
-    </Card>
+    </>
   );
 }

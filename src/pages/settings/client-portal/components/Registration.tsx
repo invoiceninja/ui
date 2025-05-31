@@ -12,10 +12,12 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { cloneDeep } from 'lodash';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 import { SelectField } from '$app/components/forms';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { useColorScheme } from '$app/common/colors';
+import { Divider } from '$app/components/cards/Divider';
 
 interface Field {
   key: string;
@@ -26,7 +28,9 @@ interface Field {
 export function Registration() {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCompanyChanges();
+
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const fields = [
@@ -117,7 +121,7 @@ export function Registration() {
   };
 
   return (
-    <Card title={t('registration')}>
+    <>
       <Element
         leftSide={t('client_registration')}
         leftSideHelp={t('client_registration_help')}
@@ -129,16 +133,20 @@ export function Registration() {
       </Element>
 
       {company?.client_can_register && (
-      <Element
-        leftSide={t('registration_url')}
-      >
-        
-        <CopyToClipboard text={`${company?.portal_domain}/client/register?company_key=${company?.company_key}`} />
-
-      </Element>
+        <Element leftSide={t('registration_url')}>
+          <CopyToClipboard
+            text={`${company?.portal_domain}/client/register?company_key=${company?.company_key}`}
+          />
+        </Element>
       )}
 
-      <div className="pt-4 border-b"></div>
+      <div className="px-4 sm:px-6 pt-3 pb-4">
+        <Divider
+          className="border-dashed"
+          borderColor={colors.$20}
+          withoutPadding
+        />
+      </div>
 
       {fields.map((field) => (
         <Element key={field.field} leftSide={field.label}>
@@ -147,6 +155,8 @@ export function Registration() {
             onValueChange={(value) =>
               handleChangeFieldValue(field.field, value)
             }
+            customSelector
+            dismissable={false}
           >
             <option value="hidden" defaultChecked>
               {t('hidden')}
@@ -156,6 +166,6 @@ export function Registration() {
           </SelectField>
         </Element>
       ))}
-    </Card>
+    </>
   );
 }

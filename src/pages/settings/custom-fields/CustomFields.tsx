@@ -16,11 +16,15 @@ import { Tabs } from '$app/components/Tabs';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function CustomFields() {
   useTitle('custom_fields');
 
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -58,11 +62,27 @@ export function CustomFields() {
         <Navigate to="/settings/custom_fields/company" />
       )}
 
-      <Tabs tabs={modules} />
-
       <AdvancedSettingsPlanAlert />
 
-      <Outlet />
+      <Card
+        title={t('custom_fields')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+      >
+        <Tabs
+          tabs={modules}
+          withHorizontalPadding
+          horizontalPaddingWidth="1.5rem"
+          fullRightPadding
+          withHorizontalPaddingOnSmallScreen
+        />
+
+        <div className="pt-4 pb-6">
+          <Outlet />
+        </div>
+      </Card>
     </Settings>
   );
 }
