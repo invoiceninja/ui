@@ -91,7 +91,7 @@ export function EmailSettings() {
         <AdvancedSettingsPlanAlert />
 
         <Card
-          title={t('settings')}
+          title={t('email_settings')}
           className="shadow-sm"
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
