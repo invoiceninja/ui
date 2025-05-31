@@ -44,7 +44,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const [selectedMainPlan, setSelectedMainPlan] = useState<'pro' | 'enterprise' | null>(null);
     const [docuNinjaSelected, setDocuNinjaSelected] = useState(false);
     const [enterpriseUsers, setEnterpriseUsers] = useState(2);
-    const [docuNinjaUsers, setDocuNinjaUsers] = useState(0);
+    const [docuNinjaUsers, setDocuNinjaUsers] = useState(account?.docuninja_num_users);
     const [isYearly, setIsYearly] = useState(true);
     const [pricing, setPricing] = useState<PricingResponse | null>(null);
     const [currentStep, setCurrentStep] = useState<ModalStep>(ModalStep.PLAN_SELECTION);
@@ -53,7 +53,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const hasExistingPlan = account?.plan === 'pro' || account?.plan === 'enterprise';
     
     // DocuNinja is available if user has existing plan OR has selected a main plan
-    const isDocuNinjaAvailable = hasExistingPlan || selectedMainPlan !== null && !(account?.plan === 'pro' && account?.docuninja_num_users === 1);
+    const isDocuNinjaAvailable = hasExistingPlan || selectedMainPlan !== null;
 
     // Static map of all available enterprise tiers
     const ENTERPRISE_TIERS_MAP = {
@@ -252,6 +252,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             // Reset to first step when modal opens
             setCurrentStep(ModalStep.PLAN_SELECTION);
             
+            // Auto-select DocuNinja if user already has DocuNinja users
+            const hasDocuNinjaUsers = (account?.docuninja_num_users || 0) > 0;
+            setDocuNinjaSelected(hasDocuNinjaUsers);
+            setDocuNinjaUsers(account?.docuninja_num_users);
+            
             // Pre-configure with user's current plan to provide pricing context
             if (hasExistingPlan) {
                 // Set current plan as selected
@@ -263,21 +268,15 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 if (account?.plan === 'enterprise' && account?.num_users) {
                     setEnterpriseUsers(account.num_users);
                 }
-                
-                // Don't pre-select DocuNinja - let user choose to add it
-                setDocuNinjaSelected(false);
-                setDocuNinjaUsers(0);
             } else {
-                // New users start with no selection
+                // New users start with no main plan selection
                 setSelectedMainPlan(null);
-                setDocuNinjaSelected(false);
-                setDocuNinjaUsers(0);
             }
 
             // Set billing term to match user's current term (or default to yearly)
             setIsYearly(account?.plan_term === 'year' || !account?.plan_term);
         }
-    }, [visible, hasExistingPlan, account?.plan, account?.num_users, account?.plan_term]);
+    }, [visible, hasExistingPlan, account?.plan, account?.num_users, account?.plan_term, account?.docuninja_num_users]);
 
     // Single effect to handle all pricing updates with debouncing
     useEffect(() => {
@@ -311,12 +310,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const handlePlanToggle = (planValue: string) => {
         if (planValue === 'docuninja') {
             if (isDocuNinjaAvailable) {
+                // If user already has DocuNinja users, prevent deselection
+                const hasExistingDocuNinjaUsers = (account?.docuninja_num_users || 0) > 0;
+                if (hasExistingDocuNinjaUsers && docuNinjaSelected) {
+                    // Don't allow deselection if user already has DocuNinja users
+                    return;
+                }
+                
                 const newSelected = !docuNinjaSelected;
                 setDocuNinjaSelected(newSelected);
                 if (newSelected) {
                     setDocuNinjaUsers(1);
                 } else {
-                    setDocuNinjaUsers(0);
+                    setDocuNinjaUsers(account?.docuninja_num_users);
                 }
             }
         } else {
@@ -324,9 +330,12 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             if (selectedMainPlan === planType) {
                 // Deselecting current plan
                 setSelectedMainPlan(null);
-                // Always deselect DocuNinja when main plan is deselected
-                setDocuNinjaSelected(false);
-                setDocuNinjaUsers(0);
+                // Only deselect DocuNinja if user doesn't have existing DocuNinja users
+                const hasExistingDocuNinjaUsers = (account?.docuninja_num_users || 0) > 0;
+                if (!hasExistingDocuNinjaUsers) {
+                    setDocuNinjaSelected(false);
+                    setDocuNinjaUsers(account?.docuninja_num_users);
+                }
             } else {
                 // Selecting new plan
                 setSelectedMainPlan(planType);
@@ -348,6 +357,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const isPlanDisabled = (planValue: string) => {
         if (planValue === 'docuninja') {
             return !isDocuNinjaAvailable;
+        }
+        return false;
+    };
+
+    const isPlanPermanentlySelected = (planValue: string) => {
+        if (planValue === 'docuninja') {
+            return (account?.docuninja_num_users || 0) > 0 && docuNinjaSelected;
         }
         return false;
     };
@@ -469,19 +485,25 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     {planOptions.map((plan) => (
                                         <div
                                             key={plan.value}
-                                            className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                                            className={`border-2 rounded-lg p-4 transition-all duration-200 ${
                                                 isPlanSelected(plan.value)
-                                                    ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200'
+                                                    ? isPlanPermanentlySelected(plan.value)
+                                                        ? 'border-green-500 bg-green-50 shadow-md ring-2 ring-green-200 cursor-default'
+                                                        : 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-pointer'
                                                     : isPlanDisabled(plan.value)
                                                     ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
-                                                    : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm'
+                                                    : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm cursor-pointer'
                                             }`}
-                                            onClick={() => !isPlanDisabled(plan.value) && handlePlanToggle(plan.value)}
+                                            onClick={() => !isPlanDisabled(plan.value) && !isPlanPermanentlySelected(plan.value) && handlePlanToggle(plan.value)}
                                         >
                                             <div className="flex items-center justify-between mb-2">
                                                 <h4 className="text-lg font-semibold">{plan.label}</h4>
                                                 {isPlanSelected(plan.value) && (
-                                                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                                        isPlanPermanentlySelected(plan.value)
+                                                            ? 'bg-green-500'
+                                                            : 'bg-blue-500'
+                                                    }`}>
                                                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                                         </svg>
@@ -490,6 +512,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                 {isPlanDisabled(plan.value) && !hasExistingPlan && (
                                                     <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
                                                         Select a main plan first
+                                                    </span>
+                                                )}
+                                                {isPlanPermanentlySelected(plan.value) && (
+                                                    <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded ml-2">
+                                                        Currently Active
                                                     </span>
                                                 )}
                                             </div>
@@ -576,9 +603,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     {pricing ? (
                                         <>
                                             <h3 className="font-medium">{pricing.description}</h3>
+
                                             <div className="mt-2 space-y-2">
                                                 <div className="flex justify-between">
-                                                    <span>{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}:</span>
+                                                    <span>Docu Ninja users: </span>
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="font-medium">{docuNinjaUsers}</span>
+                                                        {isLoading && (
+                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('total')}</span>
                                                     <div className="flex items-center space-x-2">
                                                         <span className="font-medium">{pricing.price}</span>
                                                         {isLoading && (
