@@ -14,7 +14,6 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { request } from '$app/common/helpers/request';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -43,6 +42,7 @@ import { Spinner } from '$app/components/Spinner';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
 import { route } from '$app/common/helpers/route';
+import { useColorScheme } from '$app/common/colors';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -59,11 +59,11 @@ export function TemplatesAndReminders() {
     },
   ];
 
+  const colors = useColorScheme();
   const company = useInjectCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
   const handleSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
-  const user = useCurrentUser();
 
   const disableSettingsField = useDisableSettingsField();
 
@@ -343,7 +343,12 @@ export function TemplatesAndReminders() {
     >
       <AdvancedSettingsPlanAlert />
 
-      <Card title={t('edit')}>
+      <Card
+        title={t('edit')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element
           leftSide={
             <PropertyCheckbox
@@ -440,7 +445,7 @@ export function TemplatesAndReminders() {
         templateId === 'reminder_endless' ||
         templateId === 'quote_reminder1') &&
         !disableSettingsField(emailTemplateKey) && (
-          <Card>
+          <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
             {REMINDERS.includes(templateId) ||
             templateId === 'quote_reminder1' ? (
               <>
@@ -474,6 +479,8 @@ export function TemplatesAndReminders() {
                         value
                       )
                     }
+                    customSelector
+                    dismissable={false}
                   >
                     <option value="disabled" defaultChecked>
                       {t('disabled')}
@@ -582,6 +589,7 @@ export function TemplatesAndReminders() {
                       )
                     }
                     withBlank
+                    customSelector
                   >
                     {Object.keys(frequencies).map((frequency, index) => (
                       <option key={index} value={frequency}>
@@ -596,7 +604,12 @@ export function TemplatesAndReminders() {
         )}
 
       {preview && (
-        <Card className="scale-y-100" title={preview.subject}>
+        <Card
+          className="scale-y-100 shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+          title={preview.subject}
+        >
           {!isLoadingPdf ? (
             <iframe
               srcDoc={generateEmailPreview(preview.body, preview.wrapper)}
@@ -615,7 +628,12 @@ export function TemplatesAndReminders() {
         </Card>
       )}
 
-      <Card title={t('variables')}>
+      <Card
+        title={t('variables')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('invoice')} className="flex-wrap">
           <div className="flex flex-wrap">
             {variables.invoice.map((variable, index) => (

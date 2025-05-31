@@ -39,6 +39,7 @@ import reactStringReplace from 'react-string-replace';
 import { useState } from 'react';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { SendTimeModal } from './common/components/SendTimeModal';
+import { useColorScheme } from '$app/common/colors';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -50,6 +51,7 @@ export function EmailSettings() {
     { name: t('email_settings'), href: '/settings/email_settings' },
   ];
 
+  const colors = useColorScheme();
   const company = useInjectCompanyChanges();
   const currentCompany = useCurrentCompany();
   const emailProviders = useEmailProviders();
@@ -88,7 +90,12 @@ export function EmailSettings() {
       >
         <AdvancedSettingsPlanAlert />
 
-        <Card title={t('settings')}>
+        <Card
+          title={t('settings')}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <Element
             leftSide={
               <PropertyCheckbox
@@ -170,7 +177,13 @@ export function EmailSettings() {
             />
           </Element>
 
-          <Divider />
+          <div className="px-4 sm:px-6 py-4">
+            <Divider
+              className="border-dashed"
+              withoutPadding
+              style={{ borderColor: colors.$20 }}
+            />
+          </div>
 
           <Element
             leftSide={
@@ -191,6 +204,8 @@ export function EmailSettings() {
                 (!proPlan() && !enterprisePlan())
               }
               errorMessage={errors?.errors['settings.email_sending_method']}
+              customSelector
+              dismissable={false}
             >
               {emailProviders.map(
                 ({ value, label, enabled }) =>
@@ -311,6 +326,8 @@ export function EmailSettings() {
                   }
                   disabled={disableSettingsField('mailgun_endpoint')}
                   errorMessage={errors?.errors['settings.mailgun_endpoint']}
+                  customSelector
+                  dismissable={false}
                 >
                   <option value="api.mailgun.net" defaultChecked>
                     api.mailgun.net
@@ -453,7 +470,7 @@ export function EmailSettings() {
               }
             >
               <SelectField
-                value={company?.settings.entity_send_time || ''}
+                value={company?.settings.entity_send_time?.toString() || ''}
                 onValueChange={(value) =>
                   handleChange(
                     'settings.entity_send_time',
@@ -463,9 +480,10 @@ export function EmailSettings() {
                 withBlank
                 disabled={disableSettingsField('entity_send_time')}
                 errorMessage={errors?.errors['settings.entity_send_time']}
+                customSelector
               >
                 {[...Array(24).keys()].map((number, index) => (
-                  <option key={index} value={number + 1}>
+                  <option key={index} value={(number + 1).toString()}>
                     {dayjs()
                       .startOf('day')
                       .add(number + 1, 'hour')
@@ -480,7 +498,13 @@ export function EmailSettings() {
             <SMTPMailDriver />
           )}
 
-          <Divider />
+          <div className="px-4 sm:px-6 py-4">
+            <Divider
+              className="border-dashed"
+              withoutPadding
+              style={{ borderColor: colors.$20 }}
+            />
+          </div>
 
           <Element
             leftSide={
@@ -498,6 +522,8 @@ export function EmailSettings() {
               }
               disabled={disableSettingsField('email_style')}
               errorMessage={errors?.errors['settings.email_style']}
+              customSelector
+              dismissable={false}
             >
               <option value="plain">{t('plain')}</option>
               <option value="light">{t('light')}</option>
