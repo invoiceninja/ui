@@ -161,6 +161,7 @@ export function Tabs(props: Props) {
                   width: horizontalPaddingWidth,
                   height: paddingTabsHeight,
                   borderBottom: `1px solid ${colors.$20}`,
+                  flexShrink: 0,
                 }}
               />
             )}
@@ -194,9 +195,14 @@ export function Tabs(props: Props) {
                 'flex-1': !withHorizontalPadding || fullRightPadding,
               })}
               style={{
-                ...(Boolean(withHorizontalPadding && !fullRightPadding) && {
-                  width: horizontalPaddingWidth,
-                }),
+                ...(withHorizontalPadding && !fullRightPadding
+                  ? {
+                      width: horizontalPaddingWidth,
+                      flexShrink: 0,
+                    }
+                  : {
+                      minWidth: horizontalPaddingWidth,
+                    }),
                 height: paddingTabsHeight,
                 borderBottom: `1px solid ${colors.$20}`,
               }}

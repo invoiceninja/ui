@@ -55,7 +55,9 @@ export function Link(props: Props) {
 
   if (props.external) {
     return (
-      <div className="flex space-x-2 items-center">
+      <div
+        className={classNames('flex space-x-2 items-center', props.className)}
+      >
         {!withoutExternalIcon && (
           <div>
             <ExternalLink size="1rem" color="#0062FF" />
@@ -65,7 +67,7 @@ export function Link(props: Props) {
         <a
           target="_blank"
           href={getAdjustedHref()}
-          className={classNames(`text-center ${props.className}`, {
+          className={classNames('text-center', {
             'text-sm': !setBaseFont,
             'text-base': setBaseFont,
             'hover:underline': !withoutDefaultStyling && !disableHoverUnderline,
