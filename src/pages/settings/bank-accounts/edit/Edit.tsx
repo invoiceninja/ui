@@ -25,11 +25,14 @@ import Toggle from '$app/components/forms/Toggle';
 import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { Settings } from '$app/components/layouts/Settings';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export function Edit() {
   useTitle('edit_bank_account');
 
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const navigate = useNavigate();
 
@@ -104,7 +107,13 @@ export function Edit() {
       docsLink="en/basic-settings/#edit_bank_account"
       onSaveClick={handleSave}
     >
-      <Card onFormSubmit={handleSave} title={t('edit_bank_account')}>
+      <Card
+        onFormSubmit={handleSave}
+        title={t('edit_bank_account')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('account_name')}>
           <InputField
             value={accountDetails?.bank_account_name}

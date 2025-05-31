@@ -113,12 +113,15 @@ export function RuleModal(props: Props) {
       title={ruleIndex > -1 ? t('edit_rule') : t('add_rule')}
       visible={visible}
       onClose={() => setVisible(false)}
+      overflowVisible
     >
       <SelectField
         required
         label={t('field')}
         value={rule?.search_key}
         onValueChange={(value) => handleChangeRuleField(value)}
+        customSelector
+        dismissable={false}
       >
         <option defaultChecked value="description">
           {t('description')}
@@ -131,6 +134,8 @@ export function RuleModal(props: Props) {
         label={t('operator')}
         value={rule?.operator}
         onValueChange={(value) => handleChangeRule('operator', value)}
+        customSelector
+        dismissable={false}
       >
         {rule?.search_key &&
           OPERATORS[rule.search_key as keyof typeof OPERATORS].map(
