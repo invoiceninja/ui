@@ -118,14 +118,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             filteredTiers = allTiers.filter(tier => tier.value >= currentUserCount);
         }
         // Pro users and others can see all enterprise tiers
-        
-        // TODO: Add more filtering logic here as needed
-        // Example filters you could add:
-        // - Filter by region/country
-        // - Filter by account type
-        // - Filter by feature availability
-        // - Filter by special promotions
-        
+                
         return filteredTiers;
     };
 
@@ -174,16 +167,22 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         return [];
     };
 
+
+
     const planOptions = [
         // Show current plan first if user has one
         ...(hasExistingPlan && account?.plan === 'pro' ? [{
             value: 'pro',
             label: t('pro'),
-            description: `Your current ${t('pro_plan')}`,
+            description: `${t('pro_plan')}`,
             features: [
-                t('unlimited_documents'),
-                t('esignatures_at_checkout'),
-                t('basic_customization')
+                t('pro_plan_feature_1'),
+                t('pro_plan_feature4'),
+                t('pro_plan_feature_3'),
+                t('pro_plan_feature_7'),
+                t('pro_plan_feature_8'),
+                t('pro_plan_feature_5'),
+                t('pro_plan_feature_6'),
             ]
         }] : []),
         
@@ -193,9 +192,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             label: t('pro'),
             description: t('pro_plan'),
             features: [
-                t('unlimited_documents'),
-                t('esignatures_at_checkout'),
-                t('basic_customization')
+                t('pro_plan_feature_1'),
+                t('pro_plan_feature4'),
+                t('pro_plan_feature_3'),
+                t('pro_plan_feature_7'),
+                t('pro_plan_feature_8'),
+                t('pro_plan_feature_5'),
+                t('pro_plan_feature_6'),
             ]
         }] : []),
         
@@ -207,11 +210,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 ? `Your current ${t('enterprise_plan')}` 
                 : `Upgrade to ${t('enterprise_plan')}`,
             features: [
-                t('unlimited_documents'),
-                t('esignatures_at_checkout'),
-                t('advanced_customization'),
-                t('priority_support'),
-                t('custom_integrations')
+                t('all_pro_features_plus'),
+                t('enterprise_plan_feature_1'),
+                t('enterprise_plan_feature_2'),
+                t('enterprise_plan_feature_3'),
+                t('enterprise_plan_feature_4')
             ]
         },
         
@@ -219,22 +222,22 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         ...(hasExistingPlan ? [{
             value: 'docuninja',
             label: 'DocuNinja',
-            description: 'Add E-Signatures to your plan',
+            description: 'Add E-Signatures',
             features: [
-                'Keep your current plan unchanged',
-                'Add DocuNinja E-Signatures', 
-                'Works with your existing features',
-                'Separate billing for DocuNinja'
-            ]
+                'Capture E-Signatures', 
+                'Integrates Deeply With Invoice Ninja',
+                'Unlimited Signature requests',
+                'API Access',
+                ]
         }] : [{
             value: 'docuninja',
             label: 'DocuNinja',
             description: 'Add E-Signatures to your plan',
             features: [
-                'E-Signature functionality',
-                'Works with Pro or Enterprise',
-                'Additional per-user billing',
-                'Optional add-on service'
+                'Capture E-Signatures',
+                'Intgrates with existing workflows',
+                'Unlimited Signature requests',
+                'API Access',
             ]
         }])
     ];
@@ -413,11 +416,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const getModalTitle = () => {
         switch (currentStep) {
             case ModalStep.PLAN_SELECTION:
-                return t('select_docuninja_plan');
+                return t('upgrade_plan');
             case ModalStep.PAYMENT:
-                return t('complete_payment');
+                return t('complete_your_payment');
             default:
-                return t('select_docuninja_plan');
+                return t('upgrade_plan');
         }
     };
 
@@ -435,7 +438,8 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             title={getModalTitle()}
             visible={visible}
             onClose={onClose}
-            size={account?.plan == 'enterprise' ? 'regular' : 'large'}
+            // size="large"
+            size={account?.plan == 'enterprise' || currentStep === ModalStep.PAYMENT ? 'regular' : 'large'}
             disableClosing={currentStep === ModalStep.PAYMENT}
         >
             <div className="space-y-6">
@@ -445,8 +449,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                         <div className="space-y-6">
                             {/* Plan Type Selection */}
                             <div>
-                                <h3 className="text-lg font-medium mb-4">{t('choose_your_plan')}</h3>
-                                <div className="grid grid-cols-1 {account?.plan == 'enterprise' ? md:grid-cols-2 : md:grid-cols-3} gap-4">
+                                <div className={`grid grid-cols-1 ${account?.plan == 'enterprise' ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}>
                                     {planOptions.map((plan) => (
                                         <div
                                             key={plan.value}
@@ -474,7 +477,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-sm text-gray-600 mb-3">{plan.description}</p>
+                                            {/* <p className="text-sm text-gray-600 mb-3">{plan.description}</p> */}
                                             <ul className="text-sm space-y-1">
                                                 {plan.features.map((feature, index) => (
                                                     <li key={index} className="flex items-center">
@@ -486,11 +489,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                 {/* Enterprise Users Selection (only for Enterprise plan) */}
                                                 {plan.value === 'enterprise' && (
                                                     <li className="mt-3 pt-3 border-t border-gray-200">
-                                                        <div className="max-w-xs" onClick={(e) => e.stopPropagation()}>
+                                                        <div className="w-full" onClick={(e) => e.stopPropagation()}>
                                                             <SelectField
                                                                 value={enterpriseUsers.toString()}
                                                                 onChange={handleEnterpriseUserChange}
-                                                                label={t('number_of_enterprise_users')}
+                                                                label={t('users')}
                                                             >
                                                                 {enterpriseUserOptions.map((option) => (
                                                                     <option key={option.value} value={option.value}>
@@ -559,7 +562,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                             <h3 className="font-medium">{pricing.description}</h3>
                                             <div className="mt-2 space-y-2">
                                                 <div className="flex justify-between">
-                                                    <span>{isYearly ? t('yearly_price') : t('monthly_price')}:</span>
+                                                    <span>{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}:</span>
                                                     <div className="flex items-center space-x-2">
                                                         <span className="font-medium">{pricing.price}</span>
                                                         {isLoading && (
@@ -613,13 +616,15 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             {/* Order Summary */}
                             <div className="bg-gray-50 p-4 rounded mb-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="font-medium">{t('order_summary')}</h3>
-                                    <button
+                                    <h3 className="font-medium">{t('order_overview')}</h3>
+                                    <Button
+                                        behavior="button"
+                                        type="minimal"
                                         onClick={handleBackToPlanSelection}
                                         className="text-sm text-primary hover:text-primary-dark"
                                     >
                                         {t('change')}
-                                    </button>
+                                    </Button>
                                 </div>
                                 <div className="mt-2 space-y-1">
                                     <div className="flex justify-between text-sm">
@@ -629,23 +634,24 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                 ? `DocuNinja (${account?.plan} add-on)` 
                                                 : selectedMainPlan === account?.plan
                                                 ? `Current ${selectedMainPlan?.toUpperCase()} plan`
-                                                : selectedMainPlan || 'None selected'
+                                                : pricing?.description || 'None selected'
                                             }
                                         </span>
                                     </div>
                                     {selectedMainPlan === 'enterprise' && (
                                         <div className="flex justify-between text-sm">
-                                            <span>{t('enterprise_users')}:</span>
+                                            <span>{t('users')}:</span>
                                             <span>{enterpriseUsers}</span>
                                         </div>
                                     )}
+                                    
                                     <div className="flex justify-between text-sm">
-                                        <span>{t('docuninja_users')}:</span>
-                                        <span>{docuNinjaSelected ? docuNinjaUsers : 0}</span>
+                                        <span>{t('plan_term')}:</span>
+                                        <span>{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span>{t('billing_term')}:</span>
-                                        <span>{isYearly ? t('yearly') : t('monthly')}</span>
+                                        <span>DocuNinja {t('users')}:</span>
+                                        <span>{docuNinjaSelected ? docuNinjaUsers : 0}</span>
                                     </div>
                                     {pricing && (
                                         <div className="flex justify-between text-sm font-medium pt-2 border-t">
