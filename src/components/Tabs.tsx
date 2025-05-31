@@ -131,6 +131,7 @@ export function Tabs(props: Props) {
           defaultValue={props.tabs.find((tab) => tab)?.name}
           onValueChange={(value) => navigate(value)}
           customSelector
+          dismissable={false}
         >
           {props.tabs.map(
             (tab) =>
