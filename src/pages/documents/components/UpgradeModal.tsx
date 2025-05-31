@@ -10,6 +10,11 @@ import { PaymentMethodForm } from '$app/pages/settings/account-management/compon
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { AxiosResponse } from 'axios';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { useQuery } from 'react-query';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { GatewayToken } from '$app/common/interfaces/client';
 
 interface Props {
     visible: boolean;
@@ -48,7 +53,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const hasExistingPlan = account?.plan === 'pro' || account?.plan === 'enterprise';
     
     // DocuNinja is available if user has existing plan OR has selected a main plan
-    const isDocuNinjaAvailable = hasExistingPlan || selectedMainPlan !== null;
+    const isDocuNinjaAvailable = hasExistingPlan || selectedMainPlan !== null && !(account?.plan === 'pro' && account?.docuninja_num_users === 1);
 
     // Static map of all available enterprise tiers
     const ENTERPRISE_TIERS_MAP = {
@@ -424,6 +429,18 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         }
     };
 
+    const { data: methods } = useQuery({
+        queryKey: ['/api/client/account_management/methods', account?.id],
+        queryFn: () =>
+            request('POST', endpoint('/api/client/account_management/methods'), {
+                account_key: account?.key,
+            }).then(
+                (response: AxiosResponse<GenericManyResponse<GatewayToken>>) =>
+                    response.data.data
+            ),
+        enabled: Boolean(account),
+    });
+  
     const handleDocuNinjaUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newValue = parseInt(event.target.value);
         setDocuNinjaUsers(newValue);
@@ -438,7 +455,6 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             title={getModalTitle()}
             visible={visible}
             onClose={onClose}
-            // size="large"
             size={account?.plan == 'enterprise' || currentStep === ModalStep.PAYMENT ? 'regular' : 'large'}
             disableClosing={currentStep === ModalStep.PAYMENT}
         >
@@ -571,7 +587,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                    <span>{t('total_amount')}:</span>
+                                                    <span>{t('pro_rata')} - {t('total_amount')}:</span>
                                                     <div className="flex items-center space-x-2">
                                                         <span className="font-medium">{pricing.pro_rata}</span>
                                                         {isLoading && (
@@ -664,7 +680,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
 
                             {/* Payment Form */}
                             <PaymentMethodForm
-                                tokens={[]}
+                                tokens={methods ?? []}
                                 num_users={hasExistingPlan && !selectedMainPlan ? (account?.num_users || 1) : enterpriseUsers}
                                 plan={hasExistingPlan && docuNinjaSelected && !selectedMainPlan ? 'docuninja' : (selectedMainPlan || 'pro')}
                                 docuninja_users={docuNinjaSelected ? docuNinjaUsers : 0}

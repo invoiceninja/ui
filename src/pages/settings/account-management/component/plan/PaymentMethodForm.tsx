@@ -250,11 +250,10 @@ export function PaymentMethodForm({
         } else {
             // Using existing payment method
             setIsSubmitting(true);
-            request('POST', endpoint('/api/client/account_management/payment/token'), {
+            request('POST', endpoint('/api/client/account_management/v2/payment/token'), {
                     gateway_token_id: selectedMethod,
-                    num_users: num_users,
                     amount: amount_raw ?? 0,
-                    product: "docuninja_users",
+                    hash: hash
                 })
                 .then(() => {
                     toast.success(t("payment_successful") as string);
