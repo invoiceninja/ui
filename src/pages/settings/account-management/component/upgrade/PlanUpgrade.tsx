@@ -30,7 +30,8 @@ export function PlanUpgrade() {
                 <Button behavior="button" type="secondary" onClick={() => removeDocuNinja()}>
                     {t('remove_docu_ninja')}
                 </Button>
-            <p>Need help? Please use the in app message feature to raise a support request.</p>
+
+                <p>Need help? Please use the in app message feature to raise a support request.</p>
             </div>
 
         </div>
