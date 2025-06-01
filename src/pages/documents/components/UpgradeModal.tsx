@@ -433,7 +433,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     };
 
     const handlePaymentSuccess = () => {
-        toast.success(t('upgrade_successful') as string);
+        toast.success(t('success') as string);
         onPaymentComplete();
         onClose();
     };
@@ -454,7 +454,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     };
 
     const { data: methods } = useQuery({
-        queryKey: ['/api/client/account_management/methods', account?.id],
+        queryKey: ['/api/client/account_management/methods'],
         queryFn: () =>
             request('POST', endpoint('/api/client/account_management/methods'), {
                 account_key: account?.key,

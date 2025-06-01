@@ -22,6 +22,7 @@ import type { AxiosError, AxiosResponse } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "$app/common/helpers/toast/toast";
+import { useQueryClient } from "react-query";
 
 export interface ResponsePaymentIntent {
     id: string;
@@ -81,6 +82,8 @@ export function PaymentMethodForm({
     const { t } = useTranslation();
     const isDestroyed = useRef(false);
     const handleLogin = useLogin();
+
+    const queryClient = useQueryClient();
 
     const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("new_card");
     const [errors, setErrors] = useState<string | null>(null);
@@ -233,6 +236,7 @@ export function PaymentMethodForm({
                                     onPaymentComplete();
                                 }
                                 setIsSubmitting(false);
+                                queryClient.invalidateQueries('/api/client/account_management/methods');
                             })
                             .catch((error: AxiosError<ApiError>) => {
                                 setErrors(
