@@ -19,7 +19,6 @@ import type {
 } from "@stripe/stripe-js";
 import { loadStripe } from "@stripe/stripe-js/pure";
 import type { AxiosError, AxiosResponse } from "axios";
-import { useAtomValue } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "$app/common/helpers/toast/toast";

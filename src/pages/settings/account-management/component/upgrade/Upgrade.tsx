@@ -1,18 +1,12 @@
 import { endpoint } from "$app/common/helpers";
 import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
 import { useCurrentCompany } from "$app/common/hooks/useCurrentCompany";
-import { Company } from "$app/common/interfaces/docuninja/api";
-import { Card } from "$app/components/cards";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "react-query";
 import { request } from "$app/common/helpers/request";
-import { UpgradeModal } from "$app/pages/documents/components/UpgradeModal";
 import { Button } from "$app/components/forms";
 import { useEffect, useState } from "react";
-import { Check } from "react-feather";
-import { useAccentColor } from "$app/common/hooks/useAccentColor";
 import { useColorScheme } from "$app/common/colors";
-import { useLogin } from "$app/common/queries/docuninja";
 import { Alert } from "$app/components/Alert";
 import { PopupProps } from "../plan/NewCreditCard";
 import { Modal } from "$app/components/Modal";
