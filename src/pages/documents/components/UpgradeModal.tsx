@@ -51,7 +51,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
 
     // Check if user already has a plan (pro or enterprise)
     const hasExistingPlan = account?.plan === 'pro' || account?.plan === 'enterprise';
-    
+
     // DocuNinja is available if user has existing plan OR has selected a main plan
     const isDocuNinjaAvailable = hasExistingPlan || selectedMainPlan !== null;
 
@@ -111,19 +111,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const getFilteredEnterpriseOptions = () => {
         const currentUserPlan = account?.plan;
         const currentUserCount = account?.num_users || 2;
-        
+
         // Convert map to array
         const allTiers = Object.values(ENTERPRISE_TIERS_MAP);
-        
+
         // Apply filters based on current user's plan
         let filteredTiers = allTiers;
-        
+
         if (currentUserPlan === 'enterprise') {
             // Enterprise users can only upgrade to higher tiers
             filteredTiers = allTiers.filter(tier => tier.value >= currentUserCount);
         }
         // Pro users and others can see all enterprise tiers
-                
+
         return filteredTiers;
     };
 
@@ -158,21 +158,28 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 maxUsers = account?.plan === 'enterprise' ? (account?.num_users || 2) : 1;
             }
             
+            // Ensure minimum users is never less than current DocuNinja users
+            const currentDocuNinjaUsers = account?.docuninja_num_users || 0;
+            const minUsers = Math.max(1, currentDocuNinjaUsers);
+            const effectiveMaxUsers = Math.max(maxUsers, minUsers);
+            
             const options = Array.from(
-                { length: maxUsers }, 
-                (_, i) => ({
-                    value: (i + 1).toString(),
-                    label: `${i + 1} ${i === 0 ? t('user') : t('users')}`,
-                })
-            );
+                { length: effectiveMaxUsers },
+                (_, i) => {
+                    const userCount = i + 1;
+                    return {
+                        value: userCount.toString(),
+                        label: `${userCount} ${userCount === 1 ? t('user') : t('users')}`,
+                        disabled: userCount < minUsers
+                    };
+                }
+            ).filter(option => !option.disabled); // Only show selectable options
             
             return options;
         }
         
         return [];
     };
-
-
 
     const planOptions = [
         // Show current plan first if user has one
@@ -190,7 +197,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 t('pro_plan_feature_6'),
             ]
         }] : []),
-        
+
         // Show Pro as upgrade option for new users or enterprise users who want to downgrade
         ...(!hasExistingPlan ? [{
             value: 'pro',
@@ -206,13 +213,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 t('pro_plan_feature_6'),
             ]
         }] : []),
-        
+
         // Always show Enterprise (current plan or upgrade option)
         {
             value: 'enterprise',
             label: t('enterprise'),
-            description: hasExistingPlan && account?.plan === 'enterprise' 
-                ? `Your current ${t('enterprise_plan')}` 
+            description: hasExistingPlan && account?.plan === 'enterprise'
+                ? `Your current ${t('enterprise_plan')}`
                 : `Upgrade to ${t('enterprise_plan')}`,
             features: [
                 t('all_pro_features_plus'),
@@ -222,18 +229,18 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 t('enterprise_plan_feature_4')
             ]
         },
-        
+
         // Show DocuNinja add-on option
         ...(hasExistingPlan ? [{
             value: 'docuninja',
             label: 'DocuNinja',
             description: 'Add E-Signatures',
             features: [
-                'Capture E-Signatures', 
+                'Capture E-Signatures',
                 'Integrates Deeply With Invoice Ninja',
                 'Unlimited Signature requests',
                 'API Access',
-                ]
+            ]
         }] : [{
             value: 'docuninja',
             label: 'DocuNinja',
@@ -251,19 +258,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         if (visible) {
             // Reset to first step when modal opens
             setCurrentStep(ModalStep.PLAN_SELECTION);
-            
+
             // Auto-select DocuNinja if user already has DocuNinja users
             const hasDocuNinjaUsers = (account?.docuninja_num_users || 0) > 0;
             setDocuNinjaSelected(hasDocuNinjaUsers);
             setDocuNinjaUsers(account?.docuninja_num_users);
-            
+
             // Pre-configure with user's current plan to provide pricing context
             if (hasExistingPlan) {
                 // Set current plan as selected
                 if (account?.plan === 'pro' || account?.plan === 'enterprise') {
                     setSelectedMainPlan(account.plan);
                 }
-                
+
                 // Set current user count for enterprise users
                 if (account?.plan === 'enterprise' && account?.num_users) {
                     setEnterpriseUsers(account.num_users);
@@ -281,17 +288,17 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     // Single effect to handle all pricing updates with debouncing
     useEffect(() => {
         if (!visible) return;
-        
+
         // More strict condition - only fetch pricing when we actually have selections
         const hasMainPlanSelected = selectedMainPlan !== null;
         const hasDocuNinjaSelected = docuNinjaSelected && docuNinjaUsers > 0;
         const hasValidSelection = hasMainPlanSelected || hasDocuNinjaSelected;
-        
+
         if (!hasValidSelection) {
             setPricing(null);
             return;
         }
-        
+
         const timeoutId = setTimeout(() => {
             if (hasExistingPlan && docuNinjaSelected && !selectedMainPlan && docuNinjaUsers > 0) {
                 // Existing user adding DocuNinja only - use their current plan
@@ -303,7 +310,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 fetchPricing(selectedMainPlan, effectiveUsers, effectiveDocuNinjaUsers, isYearly);
             }
         }, 300);
-        
+
         return () => clearTimeout(timeoutId);
     }, [visible, selectedMainPlan, docuNinjaSelected, enterpriseUsers, docuNinjaUsers, isYearly, hasExistingPlan]);
 
@@ -316,7 +323,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                     // Don't allow deselection if user already has DocuNinja users
                     return;
                 }
-                
+
                 const newSelected = !docuNinjaSelected;
                 setDocuNinjaSelected(newSelected);
                 if (newSelected) {
@@ -382,15 +389,15 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     };
 
     const handleBillingToggleDisabledState = () => {
-        
-        if (account?.plan_term === 'year'){
+
+        if (account?.plan_term === 'year') {
             return true;
         }
 
         if (selectedMainPlan === 'enterprise' && account?.plan === 'pro' && account?.plan_term === 'month') {
             return false;
         }
-        
+
         return false;
     };
 
@@ -456,7 +463,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             ),
         enabled: Boolean(account),
     });
-  
+
     const handleDocuNinjaUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newValue = parseInt(event.target.value);
         setDocuNinjaUsers(newValue);
@@ -485,25 +492,23 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     {planOptions.map((plan) => (
                                         <div
                                             key={plan.value}
-                                            className={`border-2 rounded-lg p-4 transition-all duration-200 ${
-                                                isPlanSelected(plan.value)
+                                            className={`border-2 rounded-lg p-4 transition-all duration-200 ${isPlanSelected(plan.value)
                                                     ? isPlanPermanentlySelected(plan.value)
                                                         ? 'border-green-500 bg-green-50 shadow-md ring-2 ring-green-200 cursor-default'
                                                         : 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-pointer'
                                                     : isPlanDisabled(plan.value)
-                                                    ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
-                                                    : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm cursor-pointer'
-                                            }`}
+                                                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
+                                                        : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm cursor-pointer'
+                                                }`}
                                             onClick={() => !isPlanDisabled(plan.value) && !isPlanPermanentlySelected(plan.value) && handlePlanToggle(plan.value)}
                                         >
                                             <div className="flex items-center justify-between mb-2">
                                                 <h4 className="text-lg font-semibold">{plan.label}</h4>
                                                 {isPlanSelected(plan.value) && (
-                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                        isPlanPermanentlySelected(plan.value)
+                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isPlanPermanentlySelected(plan.value)
                                                             ? 'bg-green-500'
                                                             : 'bg-blue-500'
-                                                    }`}>
+                                                        }`}>
                                                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                                         </svg>
@@ -528,7 +533,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                         {feature}
                                                     </li>
                                                 ))}
-                                            
+
                                                 {/* Enterprise Users Selection (only for Enterprise plan) */}
                                                 {plan.value === 'enterprise' && (
                                                     <li className="mt-3 pt-3 border-t border-gray-200">
@@ -545,7 +550,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                                 ))}
                                                             </SelectField>
                                                         </div>
-                                                       
+
                                                     </li>
                                                 )}
 
@@ -553,7 +558,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                 {(() => {
                                                     const isDocuNinjaPlan = plan.value === 'docuninja';
                                                     const shouldShowSelector = isDocuNinjaPlan && docuNinjaSelected;
-                                                    
+
                                                     return shouldShowSelector ? (
                                                         <li className="mt-3 pt-3 border-t border-gray-200">
                                                             <div className="max-w-xs" onClick={(e) => e.stopPropagation()}>
@@ -570,7 +575,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                                     ))}
                                                                 </SelectField>
                                                             </div>
-                                                           
+
                                                         </li>
                                                     ) : null;
                                                 })()}
@@ -581,22 +586,22 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             </div>
 
                             {account.plan_term !== 'year' && (
-                            <div className="flex flex-col items-center mt-6">
-                                <div className="flex items-center space-x-2">
-                                    <span>{t('plan_term_monthly')}</span>
+                                <div className="flex flex-col items-center mt-6">
+                                    <div className="flex items-center space-x-2">
+                                        <span>{t('plan_term_monthly')}</span>
 
-                                    <Toggle
-                                        checked={isYearly}
-                                        onValueChange={handleBillingToggle}
-                                        disabled={handleBillingToggleDisabledState()}
-                                    />
-                                    <span>{t('plan_term_yearly')} </span>
-                                    
+                                        <Toggle
+                                            checked={isYearly}
+                                            onValueChange={handleBillingToggle}
+                                            disabled={handleBillingToggleDisabledState()}
+                                        />
+                                        <span>{t('plan_term_yearly')} </span>
+
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-2">{t('pay_annually_discount')}</p>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-2">{t('pay_annually_discount')}</p>
-                            </div>
                             )}
-                            
+
                             {/* Pricing Display */}
                             <div className="space-y-4">
                                 <div className="bg-gray-50 p-4 rounded">
@@ -648,7 +653,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     >
                                         {t('cancel')}
                                     </button>
-                                    <Button 
+                                    <Button
                                         type="primary"
                                         behavior="button"
                                         onClick={handleContinueToPayment}
@@ -684,10 +689,10 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         <span>{t('plan')}:</span>
                                         <span className="capitalize">
                                             {hasExistingPlan && docuNinjaSelected && !selectedMainPlan
-                                                ? `DocuNinja (${account?.plan} add-on)` 
+                                                ? `DocuNinja (${account?.plan} add-on)`
                                                 : selectedMainPlan === account?.plan
-                                                ? `Current ${selectedMainPlan?.toUpperCase()} plan`
-                                                : pricing?.description || 'None selected'
+                                                    ? `Current ${selectedMainPlan?.toUpperCase()} plan`
+                                                    : pricing?.description || 'None selected'
                                             }
                                         </span>
                                     </div>
@@ -697,7 +702,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                             <span>{enterpriseUsers}</span>
                                         </div>
                                     )}
-                                    
+
                                     <div className="flex justify-between text-sm">
                                         <span>{t('plan_term')}:</span>
                                         <span>{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}</span>
