@@ -6,7 +6,7 @@ import { endpoint } from "$app/common/helpers";
 import { request } from "$app/common/helpers/request";
 import { useState } from "react";
 import { Alert } from "$app/components/Alert";
-import { User, Account, Company } from "$app/common/interfaces/docuninja/api";
+import { Company } from "$app/common/interfaces/docuninja/api";
 import { usePaidOrSelfHost } from "$app/common/hooks/usePaidOrSelfhost";
 import { useNavigate } from "react-router-dom";
 import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";

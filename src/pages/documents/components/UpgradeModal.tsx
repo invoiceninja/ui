@@ -13,7 +13,6 @@ import Toggle from '$app/components/forms/Toggle';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { useQuery } from 'react-query';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { GatewayToken } from '$app/common/interfaces/client';
 
 interface Props {
