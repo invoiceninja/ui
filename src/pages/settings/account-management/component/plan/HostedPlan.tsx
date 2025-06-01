@@ -9,21 +9,17 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { date, endpoint, trans } from '$app/common/helpers';
+import { date, trans } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '$app/components/forms';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { Modal } from '$app/components/Modal';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useEnterpriseUtils } from '../../common/hooks/useEnterpriseUtils';
 import { Check } from 'react-feather';
 import { StartTrial } from './StartTrial';
-import { Upgrade } from '../upgrade/Upgrade';
 import { UpgradeModal } from '$app/pages/documents/components/UpgradeModal';
 import { usePlansQuery } from '$app/common/queries/plans';
 
