@@ -24,18 +24,22 @@ export function PlanUpgrade() {
     return (
     <div className="space-y-2">
         
-        <div className="">
-            <div className="flex justify-between items-center">
-                <h4 className="text-lg font-semibold">{t('upgrade_for_features')}</h4>
+        <div className="mt-4">
+            <div className="flex flex-col items-center  ">
+                <h4 className="text-lg font-semibold">{t('downgrade')}</h4>
             </div>
-            {account.can_trial && (
-                <div className="flex flex-col items-center space-y-2">
-                    <h2>{t('upgrade_for_features')}</h2>
-                    <Button behavior="button" type="secondary" onClick={() => setStartTrialFlag(true)}>
-                        {t('trial_call_to_action')}
-                    </Button>
-                </div>
-            )}
+
+            <div className="flex flex-col items-center space-y-4 mt-4">
+                <Button behavior="button" type="secondary" onClick={() => setStartTrialFlag(true)}>
+                    {t('free_plan')}
+                </Button>
+
+                <Button behavior="button" type="secondary" onClick={() => setStartTrialFlag(true)}>
+                    {t('remove_docu_ninja')}
+                </Button>
+            <p>Need help? Please use the in app message feature to raise a support request.</p>
+            </div>
+
         </div>
         
     </div>

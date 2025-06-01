@@ -137,6 +137,9 @@ export function HostedPlan() {
                         {t('expires_on')} <b>{date(account.plan_expires, dateFormat)}</b>
                     </p>
                     )}
+                    <div>
+                        <span className="mr-4">Docu Ninja users: (<b>{account.docuninja_num_users}</b>)</span>
+                    </div>
                 </div>
             )}
 

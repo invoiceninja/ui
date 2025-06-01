@@ -25,6 +25,8 @@ interface Props {
 interface PricingResponse {
     description: string;
     price: string;
+    ninja_price: string;
+    docuninja_price: string;
     pro_rata: string;
     pro_rata_raw: number;
     hash: string;
@@ -409,7 +411,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             users: users,
             docuninja_users: docuNinjaUsers,
             term: yearly ? 'year' : 'month'
-        })
+        },{skipIntercept: true})
             .then((response) => {
                 setPricing(response.data);
             })
@@ -457,7 +459,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         queryFn: () =>
             request('POST', endpoint('/api/client/account_management/methods'), {
                 account_key: account?.key,
-            }).then(
+            },{skipIntercept: true}).then(
                 (response: AxiosResponse<GenericManyResponse<GatewayToken>>) =>
                     response.data.data
             ),
@@ -607,13 +609,22 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                 <div className="bg-gray-50 p-4 rounded">
                                     {pricing ? (
                                         <>
-                                            <h3 className="font-medium">{pricing.description}</h3>
+                                            
 
                                             <div className="mt-2 space-y-2">
                                                 <div className="flex justify-between">
-                                                    <span>Docu Ninja users: </span>
+                                                    <span><h3 className="font-medium">{pricing.description}</h3></span>
                                                     <div className="flex items-center space-x-2">
-                                                        <span className="font-medium">{docuNinjaUsers}</span>
+                                                        <span className="font-medium">{pricing.ninja_price}</span>
+                                                        {isLoading && (
+                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>Docu Ninja users: ({docuNinjaUsers})</span>
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="font-medium">{pricing.docuninja_price}</span>
                                                         {isLoading && (
                                                             <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
                                                         )}
@@ -723,7 +734,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             {/* Payment Form */}
                             <PaymentMethodForm
                                 tokens={methods ?? []}
-                                num_users={hasExistingPlan && !selectedMainPlan ? (account?.num_users || 1) : enterpriseUsers}
+                                num_users={selectedMainPlan === 'enterprise' ? enterpriseUsers : (hasExistingPlan && !selectedMainPlan ? (account?.num_users || 1) : 1)}
                                 plan={hasExistingPlan && docuNinjaSelected && !selectedMainPlan ? 'docuninja' : (selectedMainPlan || 'pro')}
                                 docuninja_users={docuNinjaSelected ? docuNinjaUsers : 0}
                                 term={isYearly ? 'year' : 'month'}
