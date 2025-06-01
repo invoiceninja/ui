@@ -9,14 +9,8 @@
  */
 
 import { Guard } from '$app/common/guards/Guard';
-import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { enabled } from '$app/common/guards/guards/enabled';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
-import { or } from '$app/common/guards/guards/or';
-import { assigned } from '$app/common/guards/guards/assigned';
 import { lazy } from 'react';
-import { isHosted } from '$app/common/helpers';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 
@@ -27,14 +21,6 @@ export const documentsRoutes = (
             element={
                 <Guard
                     guards={[]}
-                    // guards={[
-                    //     true, //isHosted(),
-                    //     or(
-                    //         permission('view_invoice'),
-                    //         permission('create_invoice'),
-                    //         permission('edit_invoice')
-                    //     ),
-                    // ]}
                     component={<Documents />}
                 />
             }
