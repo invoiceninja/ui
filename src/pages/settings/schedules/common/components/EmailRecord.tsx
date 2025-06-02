@@ -53,6 +53,8 @@ export function EmailRecord(props: Props) {
             handleChange('parameters.entity' as keyof Schedule, value)
           }
           errorMessage={errors?.errors['parameters.entity']}
+          customSelector
+          dismissable={false}
         >
           <option value="invoice" defaultChecked>
             {t('invoice')}

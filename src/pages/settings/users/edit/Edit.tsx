@@ -31,6 +31,8 @@ import { Permissions } from './components/Permissions';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function Edit() {
   const [passwordValidated, setPasswordValidated] = useState(false);
@@ -56,8 +58,10 @@ export function Edit() {
     },
   ];
 
-  const currentUser = useCurrentUser();
   const navigate = useNavigate();
+
+  const colors = useColorScheme();
+  const currentUser = useCurrentUser();
   const queryClient = useQueryClient();
 
   const [errors, setErrors] = useState<ValidationBag>();
@@ -140,13 +144,32 @@ export function Edit() {
         <Alert type="warning">{t('email_sent_to_confirm_email')}.</Alert>
       )}
 
-      <TabGroup tabs={tabs}>
-        <div>
-          {user && <Details user={user} setUser={setUser} errors={errors} />}
-        </div>
-        <div>{user && <Notifications user={user} setUser={setUser} />}</div>
-        <div>{user && <Permissions user={user} setUser={setUser} />}</div>
-      </TabGroup>
+      <Card
+        title={t('edit_user')}
+        className="shadow-sm pb-6"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+      >
+        <TabGroup
+          tabs={tabs}
+          horizontalPaddingWidth="1.5rem"
+          withHorizontalPadding
+          fullRightPadding
+          withoutVerticalMargin
+        >
+          <div className="pt-4">
+            {user && <Details user={user} setUser={setUser} errors={errors} />}
+          </div>
+          <div className="pt-4">
+            {user && <Notifications user={user} setUser={setUser} />}
+          </div>
+          <div className="pt-4">
+            {user && <Permissions user={user} setUser={setUser} />}
+          </div>
+        </TabGroup>
+      </Card>
     </Settings>
   );
 }

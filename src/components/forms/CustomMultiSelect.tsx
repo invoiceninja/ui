@@ -46,7 +46,7 @@ function ClearIndicator(props: ClearIndicatorProps) {
       {...props}
       className="opacity-70 hover:opacity-100 transition-opacity duration-150 cursor-pointer"
     >
-      <div className="pr-2 pl-1.5">
+      <div className="pr-5 pl-1.5">
         <XMark size="0.9rem" color={colors.$3} />
       </div>
     </components.ClearIndicator>
@@ -239,7 +239,6 @@ function CustomSelect(props: any) {
   } = props;
 
   const [inputValue, setInputValue] = useState('');
-  const colors = useColorScheme();
 
   const clearValues = () => {
     onChange([]);

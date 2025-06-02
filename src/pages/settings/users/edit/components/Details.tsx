@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { User } from '$app/common/interfaces/user';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,7 @@ export function Details(props: Props) {
   const company = useCurrentCompany();
 
   return (
-    <Card title={t('details')}>
+    <>
       <Element leftSide={t('first_name')} required>
         <InputField
           value={user?.first_name}
@@ -113,6 +113,6 @@ export function Details(props: Props) {
           onValueChange={(value) => onChange('custom_value4', String(value))}
         />
       )}
-    </Card>
+    </>
   );
 }
