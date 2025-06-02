@@ -12,13 +12,12 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { useDocumentsQuery } from '$app/common/queries/docuninja/documents';
 import { useState } from 'react';
-import { MoreHorizontal, FileText, Download, Eye, Trash2 } from 'react-feather';
+import { FileText } from 'react-feather';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button } from '$app/components/forms';
 import { Td } from '$app/components/tables/Td';
 import { Icon } from '$app/components/icons/Icon';
-import { MdEdit, MdViewCozy } from 'react-icons/md';
+import { MdViewCozy } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 
 interface DocumentFile {
