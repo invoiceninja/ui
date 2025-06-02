@@ -11,13 +11,14 @@
 import { Product } from '$app/common/interfaces/product';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { Link, SelectField } from '$app/components/forms';
-import { MdClose } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { route } from '$app/common/helpers/route';
 import { BsBox } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   type:
@@ -34,6 +35,7 @@ interface Props {
 }
 
 export function MultipleProductSelector(props: Props) {
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ export function MultipleProductSelector(props: Props) {
 
     if (productIndex > -1) {
       const updatedSelectedProducts = selectedProducts.filter(
-        (product, index) => index !== productIndex
+        (_, index) => index !== productIndex
       );
 
       setSelectedProducts(updatedSelectedProducts);
@@ -153,14 +155,14 @@ export function MultipleProductSelector(props: Props) {
                   </span>
 
                   <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                    <div className="flex flex-1 justify-between space-x-5">
+                    <div className="flex items-center flex-1 justify-between space-x-5">
                       <Link
                         to={route(`/products/:id/edit`, { id: product.id })}
                       >
                         {product.product_key}
                       </Link>
 
-                      <span>
+                      <span className="font-mono">
                         {formatMoney(
                           product.price,
                           product.company?.settings.country_id,
@@ -169,12 +171,16 @@ export function MultipleProductSelector(props: Props) {
                       </span>
                     </div>
 
-                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                      <MdClose
-                        className="cursor-pointer ml-10 xl:ml-20"
-                        color={accentColor}
-                        fontSize={19}
-                        onClick={() => handleRemoveProduct(product.id)}
+                    <div
+                      className="whitespace-nowrap text-right cursor-pointer"
+                      onClick={() => handleRemoveProduct(product.id)}
+                    >
+                      <CircleXMark
+                        color={colors.$16}
+                        hoverColor={colors.$3}
+                        borderColor={colors.$5}
+                        hoverBorderColor={colors.$17}
+                        size="1.4rem"
                       />
                     </div>
                   </div>

@@ -109,7 +109,7 @@ export function Edit() {
         headerStyle={{ borderColor: colors.$20 }}
         headerClassName={classNames('px-4 sm:px-6', {
           'pt-4': currentTabIndex === 0,
-          'pt-[1.4rem] pb-[0.425rem]': currentTabIndex !== 0,
+          'pt-[1.45rem] pb-[0.46rem]': currentTabIndex !== 0,
         })}
         topRight={
           <>
