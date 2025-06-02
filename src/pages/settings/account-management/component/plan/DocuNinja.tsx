@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Check } from "react-feather";
 import { useAccentColor } from "$app/common/hooks/useAccentColor";
 import { useColorScheme } from "$app/common/colors";
-import { useLogin } from "$app/common/queries/docuninja";
+import { useLogin } from "$app/common/queries/docuninja/docuninja";
 import { Alert } from "$app/components/Alert";
 
 export function DocuNinja() {

@@ -15,6 +15,8 @@ import { docuNinjaEndpoint } from "$app/common/helpers";
 import { GenericQueryOptions } from "../invoices";
 import { GenericSingleResourceResponse } from "$app/common/interfaces/generic-api-response";
 import { Client, Document, User } from "$app/common/interfaces/docuninja/api";
+import { TimelineItemType } from "$app/pages/documents/show/components/timeline-layout";
+import { AxiosResponse } from "axios";
 
 export function useDocumentsQuery(params: Params){
 
@@ -84,12 +86,12 @@ export function useDocumentTimelineQuery({ id, enabled }: GenericQueryOptions) {
                     }
                 }
             ).then(
-                (response: GenericSingleResourceResponse<DocumentTimeline>) => response.data.data
+                (response: AxiosResponse<TimelineItemType[] >) => response.data
             ),
-        {
-            enabled: enabled ?? true,
-            staleTime: Infinity,
-        }
+            {
+                enabled: enabled ?? true,
+                staleTime: Infinity
+            }
     );
 }
 

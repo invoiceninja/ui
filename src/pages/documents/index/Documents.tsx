@@ -236,16 +236,14 @@ export default function Documents() {
                                 </td>
                                 <Td>
                                     <Dropdown label={t('actions')}>
-                                                <DropdownElement
-                                                    to={route('/documents/:id', {
-                                                        id: document.id,
-                                                    })}
-                                                    icon={<Icon element={MdViewCozy} />}
-                                                >
-                                                    {t('view')}
-                                                </DropdownElement>
-                                        
-                                       
+                                        <DropdownElement
+                                            to={route('/documents/:id', {
+                                                id: document.id,
+                                            })}
+                                            icon={<Icon element={MdViewCozy} />}
+                                        >
+                                            {t('view')}
+                                        </DropdownElement>
                                     </Dropdown>
                                 </Td>
                             </tr>
@@ -253,7 +251,6 @@ export default function Documents() {
                     </tbody>
                 </table>
             </div>
-
 
             {/* Pagination */}
             {documents.length > 0 && (
@@ -276,7 +273,7 @@ export default function Documents() {
                             Next
                         </button>
                     </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div className="hidden sm:flex-1 sm:flex sm:items-center justify-between">
                         <div className="flex items-center space-x-6">
                             <p className="text-sm text-gray-700">
                                 Showing{' '}

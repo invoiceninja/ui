@@ -13,7 +13,7 @@ import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
 import { UpgradeModal } from "./components/UpgradeModal";
 import { useCurrentCompany } from "$app/common/hooks/useCurrentCompany";
 import { useQueryClient } from "react-query";
-import { useLogin } from "$app/common/queries/docuninja";
+import { useLogin } from "$app/common/queries/docuninja/docuninja";
 import Documents from "./index/Documents";
 
 export default function Document() {

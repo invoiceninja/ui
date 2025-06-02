@@ -78,10 +78,8 @@ export function PaymentMethodForm({
     onPaymentComplete,
     onCancel,
 }: PaymentProps) {
-    const account = useCurrentAccount();
     const { t } = useTranslation();
     const isDestroyed = useRef(false);
-    const handleLogin = useLogin();
 
     const queryClient = useQueryClient();
 
