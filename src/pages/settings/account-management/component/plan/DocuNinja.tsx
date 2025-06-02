@@ -30,7 +30,7 @@ export function DocuNinja() {
 
     // Only check login status if company exists
     const shouldCheckLogin = !!company?.company_key;
-    const { data: loginResponse, isLoading } = useLogin(shouldCheckLogin);
+    const { data: loginResponse, isLoading } = useLogin();
     const docuData = loginResponse?.data?.data;
 
     function createDocuNinjaAccount() {
