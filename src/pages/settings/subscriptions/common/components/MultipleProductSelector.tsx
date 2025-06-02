@@ -112,9 +112,10 @@ export function MultipleProductSelector(props: Props) {
     <>
       {props.products && (
         <SelectField
-          onValueChange={(value) => setSelectedProductId(value)}
           value={selectedProductId}
+          onValueChange={(value) => setSelectedProductId(value)}
           withBlank
+          customSelector
         >
           {props.products.map((product, index) => (
             <option key={index} value={product.id}>

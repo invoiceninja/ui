@@ -34,6 +34,8 @@ import { Settings as SettingsIcon } from 'react-feather';
 import { useConfigureGroupSettings } from '../common/hooks/useConfigureGroupSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -44,6 +46,7 @@ export function Edit() {
   const { data: groupSettingsResponse } = useGroupQuery({ id });
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   const configureGroupSettings = useConfigureGroupSettings();
 
@@ -56,9 +59,10 @@ export function Edit() {
     },
   ];
 
-  const [groupSettings, setGroupSettings] = useState<GroupSettings>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
+  const [groupSettings, setGroupSettings] = useState<GroupSettings>();
 
   const handleChange = useHandleChange({
     setGroupSettings,
@@ -86,79 +90,94 @@ export function Edit() {
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={handleSave}
-      disableSaveButton={isFormBusy || !groupSettings}
       navigationTopRight={
         groupSettings && (
           <ResourceActions
-            label={t('more_actions')}
+            onSaveClick={handleSave}
+            label={t('actions')}
             resource={groupSettings}
             actions={actions}
+            disableSaveButton={isFormBusy || !groupSettings}
           />
         )
       }
     >
-      <TabGroup
-        tabs={[t('overview'), t('clients'), t('documents')]}
-        formatTabLabel={(tabIndex) => {
-          if (tabIndex === 2) {
-            return (
-              <DocumentsTabLabel
-                numberOfDocuments={groupSettings?.documents.length}
-              />
-            );
-          }
-        }}
-      >
-        <div>
-          {groupSettings && groupSettingsResponse && (
-            <Card
-              title={t('edit_group')}
-              topRight={
-                <Button
-                  behavior="button"
-                  onClick={() => configureGroupSettings(groupSettingsResponse)}
-                >
-                  <Icon
-                    className="h-4 w-4"
-                    element={SettingsIcon}
-                    color="white"
-                  />
-
-                  <span>{t('configure_settings')}</span>
-                </Button>
-              }
-            >
-              <div>
-                <GroupSettingsForm
-                  groupSettings={groupSettings}
-                  handleChange={handleChange}
-                  errors={errors}
+      <Card
+        title={t('edit_group')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        headerClassName={classNames('px-4 sm:px-6', {
+          'pt-4': currentTabIndex === 0,
+          'pt-[1.4rem] pb-[0.425rem]': currentTabIndex !== 0,
+        })}
+        topRight={
+          <>
+            {groupSettingsResponse && currentTabIndex === 0 && (
+              <Button
+                behavior="button"
+                onClick={() => configureGroupSettings(groupSettingsResponse)}
+              >
+                <Icon
+                  className="h-4 w-4"
+                  element={SettingsIcon}
+                  color="white"
                 />
-              </div>
-            </Card>
-          )}
-        </div>
 
-        <div>
-          <Clients />
-        </div>
+                <span>{t('configure_settings')}</span>
+              </Button>
+            )}
+          </>
+        }
+        withoutHeaderBorder
+        withoutHeaderPadding
+      >
+        <TabGroup
+          tabs={[t('overview'), t('clients'), t('documents')]}
+          formatTabLabel={(tabIndex) => {
+            if (tabIndex === 2) {
+              return (
+                <DocumentsTabLabel
+                  numberOfDocuments={groupSettings?.documents.length}
+                />
+              );
+            }
+          }}
+          onTabChange={(tabIndex) => setCurrentTabIndex(tabIndex)}
+          withHorizontalPadding
+          fullRightPadding
+          horizontalPaddingWidth="1.5rem"
+        >
+          <div>
+            {groupSettings && groupSettingsResponse && (
+              <GroupSettingsForm
+                groupSettings={groupSettings}
+                handleChange={handleChange}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          <Upload
-            endpoint={endpoint('/api/v1/group_settings/:id/upload', {
-              id,
-            })}
-            onSuccess={onSuccess}
-            widgetOnly
-          />
+          <div>
+            <Clients />
+          </div>
 
-          <DocumentsTable
-            documents={groupSettings?.documents || []}
-            onDocumentDelete={onSuccess}
-          />
-        </div>
-      </TabGroup>
+          <div className="px-4 sm:px-6 pt-3">
+            <Upload
+              endpoint={endpoint('/api/v1/group_settings/:id/upload', {
+                id,
+              })}
+              onSuccess={onSuccess}
+              widgetOnly
+            />
+
+            <DocumentsTable
+              documents={groupSettings?.documents || []}
+              onDocumentDelete={onSuccess}
+            />
+          </div>
+        </TabGroup>
+      </Card>
     </Settings>
   );
 }

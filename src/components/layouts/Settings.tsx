@@ -20,7 +20,7 @@ import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useSettingsRoutes } from './common/hooks';
 import { Icon } from '../icons/Icon';
-import { MdClose, MdGroup } from 'react-icons/md';
+import { MdGroup } from 'react-icons/md';
 import { FaObjectGroup } from 'react-icons/fa';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
@@ -28,6 +28,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import { Sparkle } from '../icons/Sparkle';
+import { XMark } from '../icons/XMark';
 
 interface Props {
   title: string;
@@ -90,10 +91,10 @@ export function Settings(props: Props) {
         <div className="col-span-12 lg:col-span-3">
           {(isGroupSettingsActive || isClientSettingsActive) && (
             <div
-              className="flex items-center justify-between border py-3 rounded space-x-3 px-2"
+              className="flex items-center justify-between border py-3 space-x-3 px-3 rounded-md shadow-sm"
               style={{
                 backgroundColor: colors.$1,
-                borderColor: colors.$5,
+                borderColor: colors.$24,
               }}
             >
               <div className="flex items-center space-x-2 flex-1 min-w-0">
@@ -113,7 +114,7 @@ export function Settings(props: Props) {
               </div>
 
               <div
-                className="cursor-pointer"
+                className="cursor-pointer hover:opacity-75"
                 onClick={() => {
                   switchToCompanySettings();
 
@@ -121,7 +122,7 @@ export function Settings(props: Props) {
                   isClientSettingsActive && navigate('/clients');
                 }}
               >
-                <Icon element={MdClose} size={20} />
+                <XMark color={colors.$3} size="1rem" />
               </div>
             </div>
           )}
