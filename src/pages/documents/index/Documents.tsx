@@ -18,7 +18,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { Td } from '$app/components/tables/Td';
 import { Icon } from '$app/components/icons/Icon';
-import { MdEdit } from 'react-icons/md';
+import { MdEdit, MdViewCozy } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 
 interface DocumentFile {
@@ -237,12 +237,12 @@ export default function Documents() {
                                 <Td>
                                     <Dropdown label={t('actions')}>
                                                 <DropdownElement
-                                                    to={route('/documents/:id/edit', {
+                                                    to={route('/documents/:id', {
                                                         id: document.id,
                                                     })}
-                                                    icon={<Icon element={MdEdit} />}
+                                                    icon={<Icon element={MdViewCozy} />}
                                                 >
-                                                    {t('edit')}
+                                                    {t('view')}
                                                 </DropdownElement>
                                         
                                        

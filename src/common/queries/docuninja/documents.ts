@@ -12,6 +12,9 @@ import { useQuery } from "react-query"
 import { Params } from '../common/params.interface';
 import { request } from '$app/common/helpers/request';
 import { docuNinjaEndpoint } from "$app/common/helpers";
+import { GenericQueryOptions } from "../invoices";
+import { GenericSingleResourceResponse } from "$app/common/interfaces/generic-api-response";
+import { Client, Document, User } from "$app/common/interfaces/docuninja/api";
 
 export function useDocumentsQuery(params: Params){
 
@@ -35,4 +38,109 @@ return useQuery(
         { staleTime: Infinity, enabled: true }
     );
 
+}
+
+
+export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
+    return useQuery(
+        ['/api/documents', id],
+        () =>
+            request(
+                'GET',
+                docuNinjaEndpoint(
+                    '/api/documents/:id',
+                    { id }
+                ),
+                {},
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`
+                    }
+                }
+            ).then(
+                (response: GenericSingleResourceResponse<Document>) => response.data.data
+            ),
+        {
+            enabled: enabled ?? true,
+            staleTime: Infinity,
+        }
+    );
+}
+
+export function useDocumentTimelineQuery({ id, enabled }: GenericQueryOptions) {
+    return useQuery(
+        ['/api/documents/:id/timeline', id],
+        () =>
+            request(
+                'POST',
+                docuNinjaEndpoint(
+                    '/api/documents/:id/timeline',
+                    { id }
+                ),
+                {},
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`
+                    }
+                }
+            ).then(
+                (response: GenericSingleResourceResponse<DocumentTimeline>) => response.data.data
+            ),
+        {
+            enabled: enabled ?? true,
+            staleTime: Infinity,
+        }
+    );
+}
+
+export function useUserQuery({ id, enabled }: GenericQueryOptions) {
+    return useQuery(
+        ['/api/users', id],
+        () =>
+            request(
+                'GET',
+                docuNinjaEndpoint(
+                    '/api/users/:id',
+                    { id }
+                ),
+                {},
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`
+                    }
+                }
+            ).then(
+                (response: GenericSingleResourceResponse<User>) => response.data.data
+            ),  
+        {
+            enabled: enabled ?? true,
+            staleTime: Infinity,
+        }
+    );
+}
+
+export function useClientQuery({ id, enabled }: GenericQueryOptions) {
+    return useQuery(
+        ['/api/clients', id],
+        () =>
+            request(
+                'GET',
+                docuNinjaEndpoint(
+                    '/api/clients/:id',
+                    { id }
+                ),
+                {},
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`
+                    }
+                }
+            ).then(
+                (response: GenericSingleResourceResponse<Client>) => response.data.data 
+            ),
+        {
+            enabled: enabled ?? true,
+            staleTime: Infinity,
+        }
+    );
 }

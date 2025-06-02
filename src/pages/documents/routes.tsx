@@ -13,9 +13,10 @@ import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
+const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
 
 export const documentsRoutes = (
-    <Route path="/documents">
+    <Route path="documents">
         <Route
             path=""
             element={
@@ -26,5 +27,15 @@ export const documentsRoutes = (
             }
         />
         
+    
+     <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[]}
+          component={<DocumentShow />}
+        />
+      }
+    />
     </Route>
 );
