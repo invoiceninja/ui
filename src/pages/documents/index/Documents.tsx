@@ -93,28 +93,6 @@ export default function Documents() {
     const documents = documentsResponse?.data?.data || [];
     const pagination: PaginationMeta = documentsResponse?.data?.meta || {} as PaginationMeta;
 
-    // Debug logging
-    console.log('Documents Response:', documentsResponse);
-    console.log('Documents Array:', documents);
-    console.log('Pagination Meta:', pagination);
-    console.log('Documents Length:', documents.length);
-
-    const handleMenuAction = (action: string, document: Document) => {
-        switch (action) {
-            case 'view':
-                console.log('View document:', document.id);
-                break;
-            case 'download':
-                console.log('Download document:', document.id);
-                break;
-            case 'delete':
-                console.log('Delete document:', document.id);
-                break;
-            default:
-                break;
-        }
-    };
-
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString();
     };

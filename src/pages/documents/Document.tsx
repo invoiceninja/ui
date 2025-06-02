@@ -7,7 +7,6 @@ import { request } from "$app/common/helpers/request";
 import { useState } from "react";
 import { Alert } from "$app/components/Alert";
 import { Company } from "$app/common/interfaces/docuninja/api";
-import { usePaidOrSelfHost } from "$app/common/hooks/usePaidOrSelfhost";
 import { useNavigate } from "react-router-dom";
 import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
 import { UpgradeModal } from "./components/UpgradeModal";
@@ -30,8 +29,8 @@ export default function Document() {
     const pages = [{ name: t('documents'), href: '/documents' }];
 
     // Only check login status if user has a pro plan and company exists
-    const shouldCheckLogin = (account?.plan === 'pro' || account?.plan === 'enterprise') && !!company?.company_key;
-    const { data: loginResponse, isLoading, error: loginError } = useLogin(shouldCheckLogin);
+    // const shouldCheckLogin = (account?.plan === 'pro' || account?.plan === 'enterprise') && !!company?.company_key;
+    const { data: loginResponse, isLoading, error: loginError } = useLogin();
     const docuData = loginResponse?.data?.data;
 
     // Check if the error is a 401 (no account exists)
@@ -53,13 +52,11 @@ export default function Document() {
 
     /**Creates a new account in Docuninja */
     function create() {
-        console.log('Create function called - making request to /api/docuninja/create');
         setError(null);
         setIsCreating(true);
 
         request('POST', endpoint('/api/docuninja/create'), {}, { skipIntercept: true })
             .then((response) => {
-                console.log('Create request successful:', response);
                 queryClient.invalidateQueries(['/api/docuninja/login']);
             })
             .catch((error) => {
@@ -70,7 +67,6 @@ export default function Document() {
             });
     }
 
-    const hasPaidNinjaPlan = usePaidOrSelfHost();
     const navigate = useNavigate();
 
     function renderContent() {

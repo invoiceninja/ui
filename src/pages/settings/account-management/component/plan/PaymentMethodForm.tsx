@@ -1,6 +1,5 @@
 import { endpoint } from "$app/common/helpers";
 import { wait } from "$app/common/helpers/wait";
-import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
 import { GatewayToken } from "$app/common/interfaces/client";
 import { request } from '$app/common/helpers/request';
 import { RadioGroup } from "@headlessui/react";
@@ -9,7 +8,6 @@ import { Spinner } from "$app/components/Spinner";
 import { Button } from "$app/components/forms";
 import { Icon } from "$app/components/icons/Icon";
 import { MdCreditCard } from "react-icons/md";
-import { useLogin } from "$app/pages/authentication/common/hooks";
 
 import type {
     Stripe,

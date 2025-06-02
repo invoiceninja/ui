@@ -16,19 +16,13 @@ import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Default } from '$app/components/layouts/Default';
 import { Alert } from '$app/components/Alert';
-import { useEffect, useState } from 'react';
-import { Card, Element } from '$app/components/cards';
+import { useState } from 'react';
 import { Badge } from '$app/components/Badge';
 import { Spinner } from '$app/components/Spinner';
-import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Icon } from '$app/components/icons/Icon';
-import { MdFileDownload, MdOpenInNew, MdPictureAsPdf } from 'react-icons/md';
 import { Button } from '$app/components/forms';
-import { FileIcon } from '$app/components/FileIcon';
-import { InputField } from '$app/components/forms';
 import type { Document as DocumentType, DocumentFile } from '$app/common/interfaces/docuninja/api';
-import { TimelineLayout, TimelineItemType } from './components/timeline-layout';
+import { TimelineLayout } from './components/timeline-layout';
 import { Invitations } from './components/invitations';
 
 const STATUS_LABELS = {
@@ -141,6 +135,16 @@ export default function Document() {
                 </Alert>
             )}
 
+            <div className="flex flex-row justify-between items-center mb-4">
+
+                <div className="flex flex-row items-center gap-2">
+                    <h1 className="text-2xl font-bold">{document.description}</h1>
+                    <span className="text-sm text-gray-500">{getStatusBadge(document.status_id)}</span>
+                </div>
+                <Button type="primary" onClick={() => {}}>
+                    {t('edit')}
+                </Button>
+            </div>
             <div className="grid grid-cols-3 gap-4">
                 <Invitations document={document} />
                 
@@ -153,73 +157,6 @@ export default function Document() {
                         <TimelineLayout items={timelineData || []} />
                     )}
                 </div>
-            </div>
-
-            <div className="grid grid-cols-12 gap-4">
-                {/* Document Details */}
-                <div className="col-span-12 lg:col-span-8">
-                    <Card title={t('document_details')} className="mb-4">
-                        <Element leftSide={t('description')}>
-                            <InputField 
-                                value={document.description || 'Untitled Document'}
-                                readOnly
-                            />
-                        </Element>
-
-                        <Element leftSide={t('status')}>
-                            {getStatusBadge(document.status_id)}
-                        </Element>
-
-                        <Element leftSide={t('document_id')}>
-                            <InputField 
-                                value={document.id}
-                                readOnly
-                            />
-                        </Element>
-
-                        <Element leftSide={t('created_at')}>
-                            <InputField 
-                                value={document.created_at ? date(document.created_at, dateFormat) : '-'}
-                                readOnly
-                            />
-                        </Element>
-
-                        <Element leftSide={t('updated_at')}>
-                            <InputField 
-                                value={document.updated_at ? date(document.updated_at, dateFormat) : '-'}
-                                readOnly
-                            />
-                        </Element>
-                    </Card>
-                </div>
-
-                {/* Document Actions */}
-                <div className="col-span-12 lg:col-span-4">
-                    <Card title={t('actions')} className="mb-4">
-                        <div className="space-y-3">
-                            <Button 
-                                type="primary" 
-                                className="w-full"
-                                onClick={() => document.files?.[0] && handlePreview(document.files[0])}
-                                disabled={!document.files?.length}
-                            >
-                                <Icon element={MdOpenInNew} className="mr-2" />
-                                {t('preview')}
-                            </Button>
-                            
-                            <Button 
-                                type="secondary" 
-                                className="w-full"
-                                onClick={() => document.files?.[0] && handleDownload(document.files[0])}
-                                disabled={!document.files?.length}
-                            >
-                                <Icon element={MdFileDownload} className="mr-2" />
-                                {t('download')}
-                            </Button>
-                        </div>
-                    </Card>
-                </div>
-
             </div>
 
         </Default>

@@ -8,14 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Calendar, MoreHorizontal, UserPlus } from 'react-feather';
+import { Calendar, UserPlus } from 'react-feather';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Badge } from '$app/components/Badge';
 import { Button } from '$app/components/forms';
-import { Card, Element } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
@@ -24,6 +22,9 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date } from '$app/common/helpers';
 import type { Document as DocumentType, DocumentInvitation } from '$app/common/interfaces/docuninja/api';
 import { route } from '$app/common/helpers/route';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Tooltip } from '$app/components/Tooltip';
 
 type InvitationsProps = {
     document: DocumentType;
@@ -31,6 +32,7 @@ type InvitationsProps = {
 
 export function Invitations({ document }: InvitationsProps) {
     const [t] = useTranslation();
+    const accentColor = useAccentColor();
 
     if (!document.invitations?.length) {
         return (
@@ -76,6 +78,7 @@ function Invitation({ invitation, document }: InvitationProps) {
     const { dateFormat } = useCurrentCompanyDateFormats();
     const [t] = useTranslation();
 
+    const accentColor = useAccentColor();
     const [sendingInvitations, setSendingInvitations] = useState<DocumentInvitation[]>([]);
 
     const getInvitationStatus = (invitation: DocumentInvitation) => {
@@ -157,19 +160,12 @@ function Invitation({ invitation, document }: InvitationProps) {
         <div className="border rounded-lg p-4 transition-colors bg-white">
             <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                        {getEntityLink() ? (
-                            <Link
-                                to={getEntityLink()!}
-                                className="text-sm font-medium text-gray-900 hover:text-primary"
-                            >
-                                {getName(invitation)}
-                            </Link>
-                        ) : (
-                            <span className="text-sm font-medium text-gray-900">
-                                {getName(invitation)}
-                            </span>
-                        )}
+                    <div className="flex items-center justify-between space-x-3 mb-2">
+                        
+                        <span className="text-sm font-medium text-gray-900">
+                            {getName(invitation)}
+                        </span>
+                        
                         {getInvitationStatus(invitation)}
                     </div>
                     
@@ -180,23 +176,42 @@ function Invitation({ invitation, document }: InvitationProps) {
                         ) : null}
                     </div>
                     
-                    {getInvitationDate(invitation)}
+                    <div className="flex items-center justify-between ">
+                        {getInvitationDate(invitation)}
+                        
+                        <div className="flex space-x-4">
+                            {getEntityLink() && (
+                                <Tooltip
+                                width="auto"
+                                placement="bottom"
+                                message={t('copy_link') || 'Copy Link'}
+                                withoutArrow
+                            >
+                                    <CopyToClipboardIconOnly
+                                        text={getEntityLink()!}
+                                    />
+                            </Tooltip>
+                               
+                            )}
+                                
+                            <Tooltip
+                                width="auto"
+                                placement="bottom"
+                                message={t('send_email') || 'Send Email'}
+                                withoutArrow
+                            >
+                                <div
+                                    onClick={() => handleSendInvitation()
+                                    }
+                                >
+                                    <Icon element={MdSend} />
+                                </div>
+                            </Tooltip>
+                        </div>
+                    </div>
                 </div>
 
-                <Dropdown label={t('actions')}>
-                    <DropdownElement
-                        onClick={handleCopyLink}
-                        icon={<Icon element={MdContentCopy} />}
-                    >
-                        {t('copy_link') || 'Copy Link'}
-                    </DropdownElement>
-                    <DropdownElement
-                        onClick={handleSendInvitation}
-                        icon={<Icon element={MdSend} />}
-                    >
-                        {t('send_invitation') || 'Send Invitation'}
-                    </DropdownElement>
-                </Dropdown>
+                
             </div>
         </div>
     );
