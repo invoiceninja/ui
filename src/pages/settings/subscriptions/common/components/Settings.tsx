@@ -77,7 +77,7 @@ export function Settings(props: SubscriptionProps) {
           errorMessage={errors?.errors.auto_bill}
           customSelector
         >
-          <option defaultChecked></option>
+          <option defaultChecked value=""></option>
           <option value="always">{t('enabled')}</option>
           <option value="optout">{t('optout')}</option>
           <option value="optin">{t('optin')}</option>
