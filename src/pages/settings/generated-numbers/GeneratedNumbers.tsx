@@ -19,6 +19,8 @@ import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useGeneratedNumbersTabs } from './common/hooks/useGeneratedNumbersTabs';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function GeneratedNumbers() {
   useTitle('generated_numbers');
@@ -32,13 +34,12 @@ export function GeneratedNumbers() {
 
   useInjectCompanyChanges();
 
+  const colors = useColorScheme();
   const tabs = useGeneratedNumbersTabs();
-
-  const onSave = useHandleCompanySave();
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const onCancel = useDiscardChanges();
-
-  const showPlanAlert = useShouldDisableAdvanceSettings();
+  const onSave = useHandleCompanySave();
 
   return (
     <Settings
@@ -49,13 +50,27 @@ export function GeneratedNumbers() {
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
     >
-      <Tabs tabs={tabs} className="mt-6" />
-
       <AdvancedSettingsPlanAlert />
 
-      <div className="my-4">
-        <Outlet />
-      </div>
+      <Card
+        title={t('generated_numbers')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+      >
+        <Tabs
+          tabs={tabs}
+          withHorizontalPadding
+          horizontalPaddingWidth="1.5rem"
+          withHorizontalPaddingOnSmallScreen
+          fullRightPadding
+        />
+
+        <div className="pt-4 pb-6">
+          <Outlet />
+        </div>
+      </Card>
     </Settings>
   );
 }
