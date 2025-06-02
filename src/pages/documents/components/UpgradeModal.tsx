@@ -462,7 +462,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                 (response: AxiosResponse<GenericManyResponse<GatewayToken>>) =>
                     response.data.data
             ),
-        enabled: Boolean(account),
+        enabled: Boolean(account) && visible && currentStep === ModalStep.PAYMENT,
     });
 
     const handleDocuNinjaUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

@@ -57,7 +57,7 @@ export function DocuNinja() {
     const docuCompany = docuData?.companies?.find((c: Company) => c.ninja_company_key === company?.company_key);
     const isPaidUser = docuAccount?.plan !== 'free' && new Date(docuAccount?.plan_expires ?? '') > new Date();
     const testLogin = !!docuData;
-
+    
     console.log(docuAccount?.num_users, account.num_users);
     return (
         
@@ -66,7 +66,7 @@ export function DocuNinja() {
                 <div className="flex justify-between items-center">
                     <h4 className="text-lg font-semibold">{t('docuninja')}</h4>
                 </div>
-                
+            
                 {error && (
                     <Alert type="danger" className="mb-4">
                         {error}

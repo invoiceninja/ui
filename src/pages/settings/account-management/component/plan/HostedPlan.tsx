@@ -64,9 +64,6 @@ export function HostedPlan() {
     const refresh = useRefreshCompanyUsers();
     const {data: plans} = usePlansQuery();
         
-    console.log("plans = ");
-    console.log(plans);
-
     function EnterpriseLabel() {
         const { t } = useTranslation();
         const account = useCurrentAccount();
