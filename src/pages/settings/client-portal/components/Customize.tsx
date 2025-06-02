@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { isSelfHosted } from '$app/common/helpers';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
@@ -19,18 +19,21 @@ import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useColorScheme } from '$app/common/colors';
 
 export function Customize() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const company = useCompanyChanges();
-  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const disableSettingsField = useDisableSettingsField();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
-    <Card title={t('customize')}>
+    <>
       <Element
         leftSide={
           <PropertyCheckbox
@@ -110,6 +113,6 @@ export function Customize() {
           </Element>
         </>
       )}
-    </Card>
+    </>
   );
 }
