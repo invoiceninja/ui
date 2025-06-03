@@ -14,6 +14,7 @@ import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   accountDetails?: BankAccount;
@@ -30,19 +31,27 @@ export function Details(props: Props) {
 
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
   const resolveCurrency = useResolveCurrency({ resolveBy: 'code' });
 
   return (
-    <Card title={t('details')}>
+    <Card
+      title={t('details')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Element leftSide={t('balance')}>
-        {formatMoney(
-          balance || 0,
-          company.settings.country_id,
-          resolveCurrency(currency)?.id
-        )}
+        <span className="font-mono">
+          {formatMoney(
+            balance || 0,
+            company.settings.country_id,
+            resolveCurrency(currency)?.id
+          )}
+        </span>
       </Element>
       <Element leftSide={t('type')}>{bankAccountType}</Element>
       <Element leftSide={t('provider')}>{providerName}</Element>

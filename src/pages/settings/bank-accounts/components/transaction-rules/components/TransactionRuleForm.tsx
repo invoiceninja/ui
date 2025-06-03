@@ -19,10 +19,13 @@ import Toggle from '$app/components/forms/Toggle';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd, MdDelete, MdEdit } from 'react-icons/md';
 import { useHandleChange } from '../hooks/useHandleChange';
 import { RuleModal } from './RuleModal';
 import { useColorScheme } from '$app/common/colors';
+import styled from 'styled-components';
+import { Plus } from '$app/components/icons/Plus';
+import { Pencil } from '$app/components/icons/Pencil';
+import { Trash } from '$app/components/icons/Trash';
 
 interface Props {
   transactionRule: TransactionRule;
@@ -31,6 +34,14 @@ interface Props {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   page?: 'create' | 'edit';
 }
+
+const AddRuleButton = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function TransactionRuleForm(props: Props) {
   const [t] = useTranslation();
@@ -60,10 +71,12 @@ export function TransactionRuleForm(props: Props) {
             ? t('new_transaction_rule')
             : t('edit_transaction_rule')
         }
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
       >
         <Element leftSide={t('name')} required>
           <InputField
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             required
             value={transactionRule.name}
             onValueChange={(value) => handleChange('name', value)}
@@ -76,7 +89,6 @@ export function TransactionRuleForm(props: Props) {
           leftSideHelp={t('match_all_rules_help')}
         >
           <Toggle
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             checked={transactionRule.matches_on_all || false}
             onValueChange={(value) => handleChange('matches_on_all', value)}
           />
@@ -87,8 +99,6 @@ export function TransactionRuleForm(props: Props) {
           leftSideHelp={t('auto_convert_help')}
         >
           <Toggle
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-
             checked={transactionRule.auto_convert || false}
             onValueChange={(value) => handleChange('auto_convert', value)}
           />
@@ -124,56 +134,61 @@ export function TransactionRuleForm(props: Props) {
 
         <Tbody>
           {transactionRule.rules?.map((rule, index) => (
-            <Tr key={index} className="py-2">
-              <Td width="30%" style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}>{t(rule.search_key)}</Td>
+            <Tr
+              key={index}
+              className="py-2 border-b"
+              style={{
+                borderColor: colors.$20,
+              }}
+            >
+              <Td width="30%">{t(rule.search_key)}</Td>
 
-              <Td width="30%" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>{t(rule.operator)}</Td>
+              <Td width="30%">{t(rule.operator)}</Td>
 
-              <Td width="40%" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+              <Td width="40%">
                 <div className="flex justify-between">
                   <span>{rule.value}</span>
 
-                  <div className="flex space-x-8" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-                    <MdEdit
-                      className="cursor-pointer"
-                      color={accentColor}
-                      fontSize={22}
+                  <div className="flex space-x-6">
+                    <div
+                      className="cursor-pointer hover:opacity-75"
                       onClick={() => {
                         setRuleIndex(index);
                         setIsRuleModalOpen(true);
                       }}
-                    />
+                    >
+                      <Pencil color="#2176FF" size="1.2rem" />
+                    </div>
 
-                    <MdDelete
-                      className="cursor-pointer"
-                      color={accentColor}
-                      fontSize={22}
+                    <div
+                      className="cursor-pointer hover:opacity-75"
                       onClick={() => handleRemoveRule(index)}
-                    />
+                    >
+                      <Trash color="#ef4444" size="1.2rem" />
+                    </div>
                   </div>
                 </div>
               </Td>
             </Tr>
           ))}
 
-          <Tr style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-            <Td colSpan={100} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-              <button
-                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+          <Tr>
+            <Td colSpan={100} className="p-1" withoutPadding>
+              <AddRuleButton
+                className="w-full py-2 inline-flex justify-center items-center space-x-2 rounded-[0.1875rem] cursor-pointer"
                 onClick={() => {
                   setRuleIndex(-1);
                   setIsRuleModalOpen(true);
                 }}
-                className="w-full py-1 inline-flex justify-center items-center space-x-2"
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$20,
+                }}
               >
-                <MdAdd
-                  className="cursor-pointer"
-                  color={accentColor}
-                  fontSize={18}
-                />
+                <Plus color={colors.$3} size="1rem" />
 
                 <span>{t('add_rule')}</span>
-              </button>
+              </AddRuleButton>
             </Td>
           </Tr>
         </Tbody>
