@@ -119,169 +119,205 @@ export function InvoiceTotals(props: Props) {
         </div>
       )}
 
-      {variables.map((variable, index) => (
-        <Fragment key={index}>
-          {isTaxField(variable) && (
-            <>
-              {Boolean(
-                company && company.enabled_tax_rates > 0 && variable === '$tax1'
-              ) && (
-                <Element leftSide={t('tax')}>
-                  <TaxRateSelector
-                    defaultValue={getTaxRateComboValue(resource, 'tax_name1')}
-                    onChange={(value: Entry<TaxRate>) => {
-                      handleChange('tax_name1', value.resource?.name);
-                      handleChange('tax_rate1', value.resource?.rate);
-                    }}
-                    onClearButtonClick={() => {
-                      handleChange('tax_name1', '');
-                      handleChange('tax_rate1', 0);
-                    }}
-                    onTaxCreated={(taxRate) => {
-                      handleChange('tax_name1', taxRate.name);
-                      handleChange('tax_rate1', taxRate.rate);
-                    }}
-                    resourceTaxName={resource.tax_name1}
-                    resourceTaxRate={resource.tax_rate1}
-                  />
-                </Element>
+      <div className="px-6">
+        <div
+          className={classNames('divide-y divide-dashed', {
+            'divide-[#09090B1A]': !reactSettings.dark_mode,
+            'divide-[#1f2e41]': reactSettings.dark_mode,
+          })}
+        >
+          {variables.map((variable, index) => (
+            <Fragment key={index}>
+              {isTaxField(variable) && (
+                <>
+                  {Boolean(
+                    company &&
+                      company.enabled_tax_rates > 0 &&
+                      variable === '$tax1'
+                  ) && (
+                    <Element leftSide={t('tax')} noExternalPadding>
+                      <TaxRateSelector
+                        defaultValue={getTaxRateComboValue(
+                          resource,
+                          'tax_name1'
+                        )}
+                        onChange={(value: Entry<TaxRate>) => {
+                          handleChange('tax_name1', value.resource?.name);
+                          handleChange('tax_rate1', value.resource?.rate);
+                        }}
+                        onClearButtonClick={() => {
+                          handleChange('tax_name1', '');
+                          handleChange('tax_rate1', 0);
+                        }}
+                        onTaxCreated={(taxRate) => {
+                          handleChange('tax_name1', taxRate.name);
+                          handleChange('tax_rate1', taxRate.rate);
+                        }}
+                        resourceTaxName={resource.tax_name1}
+                        resourceTaxRate={resource.tax_rate1}
+                      />
+                    </Element>
+                  )}
+
+                  {Boolean(
+                    company &&
+                      company.enabled_tax_rates > 1 &&
+                      variable === '$tax2'
+                  ) && (
+                    <Element leftSide={t('tax')} noExternalPadding>
+                      <TaxRateSelector
+                        defaultValue={getTaxRateComboValue(
+                          resource,
+                          'tax_name2'
+                        )}
+                        onChange={(value: Entry<TaxRate>) => {
+                          handleChange('tax_name2', value.resource?.name);
+                          handleChange('tax_rate2', value.resource?.rate);
+                        }}
+                        onClearButtonClick={() => {
+                          handleChange('tax_name2', '');
+                          handleChange('tax_rate2', 0);
+                        }}
+                        onTaxCreated={(taxRate) => {
+                          handleChange('tax_name2', taxRate.name);
+                          handleChange('tax_rate2', taxRate.rate);
+                        }}
+                        resourceTaxName={resource.tax_name2}
+                        resourceTaxRate={resource.tax_rate2}
+                      />
+                    </Element>
+                  )}
+
+                  {Boolean(
+                    company &&
+                      company.enabled_tax_rates > 2 &&
+                      variable === '$tax3'
+                  ) && (
+                    <Element leftSide={t('tax')} noExternalPadding>
+                      <TaxRateSelector
+                        defaultValue={getTaxRateComboValue(
+                          resource,
+                          'tax_name3'
+                        )}
+                        onChange={(value: Entry<TaxRate>) => {
+                          handleChange('tax_name3', value.resource?.name);
+                          handleChange('tax_rate3', value.resource?.rate);
+                        }}
+                        onClearButtonClick={() => {
+                          handleChange('tax_name3', '');
+                          handleChange('tax_rate3', 0);
+                        }}
+                        onTaxCreated={(taxRate) => {
+                          handleChange('tax_name3', taxRate.name);
+                          handleChange('tax_rate3', taxRate.rate);
+                        }}
+                        resourceTaxName={resource.tax_name3}
+                        resourceTaxRate={resource.tax_rate3}
+                      />
+                    </Element>
+                  )}
+                </>
               )}
 
-              {Boolean(
-                company && company.enabled_tax_rates > 1 && variable === '$tax2'
-              ) && (
-                <Element leftSide={t('tax')}>
-                  <TaxRateSelector
-                    defaultValue={getTaxRateComboValue(resource, 'tax_name2')}
-                    onChange={(value: Entry<TaxRate>) => {
-                      handleChange('tax_name2', value.resource?.name);
-                      handleChange('tax_rate2', value.resource?.rate);
-                    }}
-                    onClearButtonClick={() => {
-                      handleChange('tax_name2', '');
-                      handleChange('tax_rate2', 0);
-                    }}
-                    onTaxCreated={(taxRate) => {
-                      handleChange('tax_name2', taxRate.name);
-                      handleChange('tax_rate2', taxRate.rate);
-                    }}
-                    resourceTaxName={resource.tax_name2}
-                    resourceTaxRate={resource.tax_rate2}
-                  />
-                </Element>
+              {isSurchargeField(variable) && (
+                <>
+                  {Boolean(
+                    company &&
+                      company?.custom_fields?.surcharge1 &&
+                      variable === '$custom_surcharge1'
+                  ) && (
+                    <CustomSurchargeField
+                      field="surcharge1"
+                      type="number"
+                      defaultValue={resource?.custom_surcharge1}
+                      value={resource?.custom_surcharge1}
+                      onValueChange={(value) =>
+                        handleChange(
+                          'custom_surcharge1',
+                          parseFloat(value as string)
+                        )
+                      }
+                      elementNoExternalPadding
+                      elementClassName="py-5"
+                      elementWithoutWrappingLeftSide
+                    />
+                  )}
+
+                  {Boolean(
+                    company &&
+                      company?.custom_fields?.surcharge2 &&
+                      variable === '$custom_surcharge2'
+                  ) && (
+                    <CustomSurchargeField
+                      field="surcharge2"
+                      type="number"
+                      defaultValue={resource?.custom_surcharge2}
+                      value={resource?.custom_surcharge2}
+                      onValueChange={(value) =>
+                        handleChange(
+                          'custom_surcharge2',
+                          parseFloat(value as string)
+                        )
+                      }
+                      elementNoExternalPadding
+                      elementClassName="py-5"
+                      elementWithoutWrappingLeftSide
+                    />
+                  )}
+
+                  {Boolean(
+                    company &&
+                      company?.custom_fields?.surcharge3 &&
+                      variable === '$custom_surcharge3'
+                  ) && (
+                    <CustomSurchargeField
+                      field="surcharge3"
+                      type="number"
+                      defaultValue={resource?.custom_surcharge3}
+                      value={resource?.custom_surcharge3}
+                      onValueChange={(value) =>
+                        handleChange(
+                          'custom_surcharge3',
+                          parseFloat(value as string)
+                        )
+                      }
+                      elementNoExternalPadding
+                      elementClassName="py-5"
+                      elementWithoutWrappingLeftSide
+                    />
+                  )}
+
+                  {Boolean(
+                    company &&
+                      company?.custom_fields?.surcharge4 &&
+                      variable === '$custom_surcharge4'
+                  ) && (
+                    <CustomSurchargeField
+                      field="surcharge4"
+                      type="number"
+                      defaultValue={resource?.custom_surcharge4}
+                      value={resource?.custom_surcharge4}
+                      onValueChange={(value) =>
+                        handleChange(
+                          'custom_surcharge4',
+                          parseFloat(value as string)
+                        )
+                      }
+                      elementNoExternalPadding
+                      elementClassName="py-5"
+                      elementWithoutWrappingLeftSide
+                    />
+                  )}
+                </>
               )}
 
-              {Boolean(
-                company && company.enabled_tax_rates > 2 && variable === '$tax3'
-              ) && (
-                <Element leftSide={t('tax')}>
-                  <TaxRateSelector
-                    defaultValue={getTaxRateComboValue(resource, 'tax_name3')}
-                    onChange={(value: Entry<TaxRate>) => {
-                      handleChange('tax_name3', value.resource?.name);
-                      handleChange('tax_rate3', value.resource?.rate);
-                    }}
-                    onClearButtonClick={() => {
-                      handleChange('tax_name3', '');
-                      handleChange('tax_rate3', 0);
-                    }}
-                    onTaxCreated={(taxRate) => {
-                      handleChange('tax_name3', taxRate.name);
-                      handleChange('tax_rate3', taxRate.rate);
-                    }}
-                    resourceTaxName={resource.tax_name3}
-                    resourceTaxRate={resource.tax_rate3}
-                  />
-                </Element>
+              {!isTaxField(variable) && !isSurchargeField(variable) && (
+                <>{resolveVariable(variable)}</>
               )}
-            </>
-          )}
-
-          {isSurchargeField(variable) && (
-            <>
-              {Boolean(
-                company &&
-                  company?.custom_fields?.surcharge1 &&
-                  variable === '$custom_surcharge1'
-              ) && (
-                <CustomSurchargeField
-                  field="surcharge1"
-                  type="number"
-                  defaultValue={resource?.custom_surcharge1}
-                  value={resource?.custom_surcharge1}
-                  onValueChange={(value) =>
-                    handleChange(
-                      'custom_surcharge1',
-                      parseFloat(value as string)
-                    )
-                  }
-                />
-              )}
-
-              {Boolean(
-                company &&
-                  company?.custom_fields?.surcharge2 &&
-                  variable === '$custom_surcharge2'
-              ) && (
-                <CustomSurchargeField
-                  field="surcharge2"
-                  type="number"
-                  defaultValue={resource?.custom_surcharge2}
-                  value={resource?.custom_surcharge2}
-                  onValueChange={(value) =>
-                    handleChange(
-                      'custom_surcharge2',
-                      parseFloat(value as string)
-                    )
-                  }
-                />
-              )}
-
-              {Boolean(
-                company &&
-                  company?.custom_fields?.surcharge3 &&
-                  variable === '$custom_surcharge3'
-              ) && (
-                <CustomSurchargeField
-                  field="surcharge3"
-                  type="number"
-                  defaultValue={resource?.custom_surcharge3}
-                  value={resource?.custom_surcharge3}
-                  onValueChange={(value) =>
-                    handleChange(
-                      'custom_surcharge3',
-                      parseFloat(value as string)
-                    )
-                  }
-                />
-              )}
-
-              {Boolean(
-                company &&
-                  company?.custom_fields?.surcharge4 &&
-                  variable === '$custom_surcharge4'
-              ) && (
-                <CustomSurchargeField
-                  field="surcharge4"
-                  type="number"
-                  defaultValue={resource?.custom_surcharge4}
-                  value={resource?.custom_surcharge4}
-                  onValueChange={(value) =>
-                    handleChange(
-                      'custom_surcharge4',
-                      parseFloat(value as string)
-                    )
-                  }
-                />
-              )}
-            </>
-          )}
-
-          {!isTaxField(variable) && !isSurchargeField(variable) && (
-            <>{resolveVariable(variable)}</>
-          )}
-        </Fragment>
-      ))}
+            </Fragment>
+          ))}
+        </div>
+      </div>
     </Card>
   );
 }
