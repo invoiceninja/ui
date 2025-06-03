@@ -108,6 +108,7 @@ interface StyleOptions {
   disableThUppercase?: boolean;
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
+  withoutTdPadding?: boolean;
 }
 
 interface Props<T> extends CommonProps {
@@ -789,6 +790,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                               : document.getElementById(resource.id)?.click();
                           }
                         }}
+                        withoutPadding={styleOptions?.withoutTdPadding}
                         resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
                         {column.format
