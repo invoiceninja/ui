@@ -1,7 +1,14 @@
 import { Alert } from '$app/components/Alert';
-import { Button } from '$app/components/forms';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button, InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
+import { SearchableSelect } from '$app/components/SearchableSelect';
+import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 import {
   Builder,
   BuilderContext,
@@ -17,12 +24,15 @@ import {
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
+  ToolboxContextProps,
   UninviteDialogButtonProps,
   UninviteDialogProps,
   UploadDialogProps,
   UploadProps,
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
+import { Check } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 
 export function BuilderDemo() {
   return (
@@ -31,8 +41,7 @@ export function BuilderDemo() {
         {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
           value={{
-            token:
-              import.meta.env.VITE_DOCUNINJA_TOKEN as string,
+            token: import.meta.env.VITE_DOCUNINJA_TOKEN as string,
             document: import.meta.env.VITE_DOCUNINJA_DOCUMENT as string,
             components: {
               skeleton: Loading,
@@ -68,9 +77,11 @@ export function BuilderDemo() {
               signatorySelector: SignatorySelector,
               uninvite: {
                 dialog: UninviteDialog,
-                button: UninviteButton
+                button: UninviteButton,
               },
               validationErrors: ValidationErrors,
+              sign: () => null,
+              toolboxContext: ToolboxContext,
             },
           }}
         >
@@ -84,13 +95,17 @@ export function BuilderDemo() {
 function Loading() {
   return (
     <div className="max-w-4xl mx-auto flex flex-col space-y-3 my-5">
-      <div className="space-y-2">Load load load..</div>
+      <Spinner />
     </div>
   );
 }
 
 function Save({ isSubmitting, ...props }: SaveButtonProps) {
-  return <Button {...props}>Save</Button>;
+  return (
+    <Button {...props} disabled={isSubmitting}>
+      Save
+    </Button>
+  );
 }
 
 function Send({ ...props }: SendButtonProps) {
@@ -116,19 +131,45 @@ function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
 }
 
 function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
-  return null;
+  return (
+    <Modal title="Delete document" visible={open} onClose={onOpenChange}>
+      <p>
+        Are you sure you want to delete this document? This action cannot be
+        undone.
+      </p>
+
+      {action}
+    </Modal>
+  );
 }
 
 function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
-  return null;
+  return (
+    <Button behavior="button" disabled={isSubmitting} className="w-full">
+      Delete
+    </Button>
+  );
 }
 
 function Upload({ ...props }: UploadProps) {
-  return null;
+  return (
+    <Button type="secondary" {...props} className="w-full">
+      Upload
+    </Button>
+  );
 }
 
 function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
-  return null;
+  return (
+    <Modal
+      title="Upload document"
+      visible={open}
+      onClose={onOpenChange}
+      size="small"
+    >
+      {content}
+    </Modal>
+  );
 }
 
 function ValidationErrors({ content }: ValidationErrorsProps) {
@@ -141,7 +182,12 @@ function ConfirmationDialog({
   content,
   action,
 }: ConfirmationDialogProps) {
-  return null;
+  return (
+    <Modal title="Confirmation" visible={isOpen} onClose={onOpenChange}>
+      {content}
+      {action}
+    </Modal>
+  );
 }
 
 function ConfirmationDialogButton({ ...props }: ConfirmationDialogButtonProps) {
@@ -158,35 +204,44 @@ export function CreateDialog({
   client,
   user,
 }: CreateDialogProps) {
-  return null;
+  return (
+    <Modal title="Create client or user" visible={open} onClose={onOpenChange}>
+      <TabGroup tabs={['Client', 'User']}>
+        <div>{client}</div>
+        <div>{user}</div>
+      </TabGroup>
+    </Modal>
+  );
 }
 
-function CreateClientForm({ fields }: CreateClientTabProps) {
+function CreateClientForm({ fields, errors }: CreateClientTabProps) {
+  const [t] = useTranslation();
+
   return (
     <>
       {fields.map((field) => (
         <div key={field.name} className="mb-4">
-          <label htmlFor={field.name} className="block text-sm font-medium">
-            {field.name}
-          </label>
-
-          <input type="text" id={field.name} {...field.register(field.name)} />
+          <InputField
+            label={t(field.name)}
+            errorMessage={errors?.errors[field.name]}
+          />
         </div>
       ))}
     </>
   );
 }
 
-function CreateUserForm({ fields }: CreateClientTabProps) {
+function CreateUserForm({ fields, errors }: CreateClientTabProps) {
+  const [t] = useTranslation();
+
   return (
     <>
       {fields.map((field) => (
         <div key={field.name} className="mb-4">
-          <label htmlFor={field.name} className="block text-sm font-medium">
-            {field.name}
-          </label>
-
-          <input type="text" id={field.name} {...field.register(field.name)} />
+          <InputField
+            label={t(field.name)}
+            errorMessage={errors?.errors[field.name]}
+          />
         </div>
       ))}
     </>
@@ -198,7 +253,12 @@ function CreateDialogTabButton({
   isSubmitting,
 }: CreateDialogTabButtonProps) {
   return (
-    <Button form={form} behavior="submit" disabled={isSubmitting}>
+    <Button
+      form={form}
+      behavior="submit"
+      disabled={isSubmitting}
+      className="w-full"
+    >
       Create
     </Button>
   );
@@ -208,8 +268,41 @@ function SignatorySelector({
   results,
   onSelect,
   value,
+  setCreateDialogOpen,
 }: SignatorySelectorProps) {
-  return null
+  function handleSelect(v: string | undefined) {
+    if (!v) {
+      return;
+    }
+
+    if (v === 'create') {
+      setCreateDialogOpen(true);
+
+      return;
+    }
+
+    const [type, value] = v.split('|');
+    const entity = results.find((r) => r.value === value);
+
+    if (!entity) {
+      return;
+    }
+
+    onSelect(value, type as 'user', entity as any); // @ts-ignore - type assertion for simplicity
+  }
+
+  return (
+    <SearchableSelect value={value} onValueChange={handleSelect}>
+      <option disabled>Select user or client...</option>
+      <option value="create">Create client or user</option>
+
+      {results.map((result) => (
+        <option value={`${result.type}|${result.value}`} key={result.value}>
+          {result.label}
+        </option>
+      ))}
+    </SearchableSelect>
+  );
 }
 
 function UninviteDialog({
@@ -218,7 +311,12 @@ function UninviteDialog({
   content,
   action,
 }: UninviteDialogProps) {
-  return null
+  return (
+    <Modal title="Remove invitation(s)" visible={open} onClose={onOpenChange}>
+      {content}
+      {action}
+    </Modal>
+  );
 }
 
 function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
@@ -226,5 +324,58 @@ function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
     <Button form={form} behavior="submit" disabled={isSubmitting}>
       Continue
     </Button>
+  );
+}
+
+function ToolboxContext({ options }: ToolboxContextProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Dropdown
+      customLabel={
+        <span>
+          <Settings />
+        </span>
+      }
+    >
+      {options.map((option, i) =>
+        option.children.length > 0 ? (
+          <>
+            {option.children.map((child, j) => (
+              <DropdownElement
+                key={`${i}-${j}`}
+                value={child.value}
+                onClick={child.onSelect}
+              >
+                <div className="flex items-center gap-2">
+                  {t(child.label) || child.label}
+
+                  {option.value === child.value ? <Check size={18} /> : null}
+                </div>
+              </DropdownElement>
+            ))}
+          </>
+        ) : (
+          <DropdownElement
+            key={i}
+            value={option.value}
+            onClick={() =>
+              option.type !== 'toggle' ? option.onSelect(option.value) : null
+            }
+          >
+            <div className="flex items-center gap-2">
+              {option.type === 'toggle' ? (
+                <Toggle
+                  checked={option.value as boolean}
+                  onValueChange={option.onSelect}
+                />
+              ) : null}
+
+              {t(option.label) || option.label}
+            </div>
+          </DropdownElement>
+        )
+      )}
+    </Dropdown>
   );
 }
