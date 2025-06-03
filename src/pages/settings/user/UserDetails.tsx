@@ -39,6 +39,8 @@ import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/setting
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 import { resetChanges as resetCompanyChanges } from '$app/common/stores/slices/company-users';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -48,6 +50,7 @@ export function UserDetails() {
 
   const user = useCurrentUser();
   const { isAdmin } = useAdmin();
+  const colors = useColorScheme();
   const tabs = useUserDetailsTabs();
   const company = useInjectCompanyChanges();
 
@@ -162,11 +165,24 @@ export function UserDetails() {
           onSave={onSave}
         />
 
-        <Tabs tabs={tabs} className="mt-6" />
+        <Card
+          className="shadow-sm"
+          title={t('user_details')}
+          withoutBodyPadding
+          withoutHeaderBorder
+          style={{ borderColor: colors.$24 }}
+        >
+          <Tabs
+            tabs={tabs}
+            withHorizontalPadding
+            fullRightPadding
+            withHorizontalPaddingOnSmallScreen
+          />
 
-        <div className="my-4">
-          <Outlet context={errors} />
-        </div>
+          <div className="pt-4 pb-8">
+            <Outlet context={errors} />
+          </div>
+        </Card>
       </Settings>
 
       <TwoFactorAuthenticationModals

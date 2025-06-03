@@ -13,11 +13,15 @@ import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useColorScheme } from '$app/common/colors';
+import { ClipboardCheck } from '$app/components/icons/ClipboardCheck';
 
 export default function TaskColumns() {
   const [t] = useTranslation();
+
   const customField = useCustomField();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   let defaultVariables = [
@@ -56,7 +60,21 @@ export default function TaskColumns() {
   }
 
   return (
-    <Card title={t('task_columns')} padding="small">
+    <Card
+      title={
+        <div className="flex items-center space-x-2">
+          <div>
+            <ClipboardCheck color="#2176FF" size="1.3rem" strokeWidth="1" />
+          </div>
+
+          <span>{t('task_columns')}</span>
+        </div>
+      }
+      padding="small"
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <SortableVariableList
         for="task_columns"
         defaultVariables={defaultVariables}

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Client } from '$app/common/interfaces/client';
@@ -24,26 +25,38 @@ export function ClientActionButtons(props: Props) {
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
 
+  const colors = useColorScheme();
+
   const { client, displayClientName, clientId } = props;
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col space-y-1">
       {displayClientName && (
-        <span className="text-sm">{client?.display_name}</span>
+        <span className="text-sm font-medium">{client?.display_name}</span>
       )}
 
       <div className="space-x-2">
         {hasPermission('edit_client') && (
-          <Link to={route('/clients/:id/edit', { id: client?.id || clientId })}>
-            {t('edit_client')}
+          <Link
+            className="font-medium"
+            to={route('/clients/:id/edit', { id: client?.id || clientId })}
+          >
+            {t('edit')}
           </Link>
         )}
 
-        {hasPermission('edit_client') && <span className="text-sm">/</span>}
+        {hasPermission('edit_client') && (
+          <span className="text-sm" style={{ color: colors.$21 }}>
+            |
+          </span>
+        )}
 
         {(hasPermission('view_client') || hasPermission('edit_client')) && (
-          <Link to={route('/clients/:id', { id: client?.id || clientId })}>
-            {t('view_client')}
+          <Link
+            className="font-medium"
+            to={route('/clients/:id', { id: client?.id || clientId })}
+          >
+            {t('view')}
           </Link>
         )}
       </div>

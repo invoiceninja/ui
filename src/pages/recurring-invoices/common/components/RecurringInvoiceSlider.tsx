@@ -10,7 +10,7 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { TabGroup } from '$app/components/TabGroup';
-import { ClickableElement, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -28,9 +28,6 @@ import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Inline } from '$app/components/Inline';
-import { Icon } from '$app/components/icons/Icon';
-import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { useActions } from '../hooks';
@@ -54,11 +51,26 @@ import { useColorScheme } from '$app/common/colors';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { CloudPlay } from '$app/components/icons/CloudPlay';
+import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
+import { History } from '$app/components/icons/History';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export const useGenerateActivityElement = () => {
   const [t] = useTranslation();
@@ -91,9 +103,7 @@ export const useGenerateActivityElement = () => {
       ),
       notes: activity?.notes && (
         <>
-          <br />
-
-          {activity?.notes}
+          <br />'{activity?.notes}'
         </>
       ),
     };
@@ -118,6 +128,7 @@ export const RecurringInvoiceSlider = () => {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const navigate = useNavigate();
 
   const getSetting = useGetSetting();
   const getTimezone = useGetTimezone();
@@ -191,14 +202,24 @@ export const RecurringInvoiceSlider = () => {
         ) : null
       }
       withoutActionContainer
+      withoutHeaderBorder
     >
       <TabGroup
         tabs={[t('overview'), t('history'), t('schedule'), t('activity')]}
         width="full"
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
       >
         <div className="space-y-2">
-          <div>
-            <Element leftSide={t('invoice_amount')}>
+          <div className="px-6">
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('invoice_amount')}
+              pushContentToRight
+              withoutWrappingLeftSide
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {recurringInvoice
                 ? formatMoney(
                     recurringInvoice?.amount || 0,
@@ -208,7 +229,14 @@ export const RecurringInvoiceSlider = () => {
                 : null}
             </Element>
 
-            <Element leftSide={t('balance_due')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('balance_due')}
+              pushContentToRight
+              withoutWrappingLeftSide
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {recurringInvoice
                 ? formatMoney(
                     recurringInvoice.balance || 0,
@@ -219,7 +247,13 @@ export const RecurringInvoiceSlider = () => {
             </Element>
 
             {recurringInvoice && recurringInvoice.next_send_date ? (
-              <Element leftSide={t('next_send_date')}>
+              <Element
+                className="border-b border-dashed"
+                leftSide={t('next_send_date')}
+                pushContentToRight
+                noExternalPadding
+                style={{ borderColor: colors.$20 }}
+              >
                 {recurringInvoice
                   ? dateTime(
                       recurringInvoice.next_send_datetime,
@@ -233,7 +267,13 @@ export const RecurringInvoiceSlider = () => {
               </Element>
             ) : null}
 
-            <Element leftSide={t('frequency')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('frequency')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {t(
                 frequencies[
                   recurringInvoice?.frequency_id as keyof typeof frequencies
@@ -241,41 +281,73 @@ export const RecurringInvoiceSlider = () => {
               )}
             </Element>
 
-            <Element leftSide={t('remaining_cycles')} withoutWrappingLeftSide>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('remaining_cycles')}
+              pushContentToRight
+              withoutWrappingLeftSide
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {recurringInvoice?.remaining_cycles === -1
                 ? t('endless')
                 : recurringInvoice?.remaining_cycles}
             </Element>
 
-            <Element leftSide={t('auto_bill')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('auto_bill')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {t(recurringInvoice?.auto_bill || '')}
             </Element>
 
-            <Element leftSide={t('status')}>
+            <Element
+              leftSide={t('status')}
+              pushContentToRight
+              noExternalPadding
+            >
               {recurringInvoice ? (
                 <RecurringInvoiceStatus entity={recurringInvoice} />
               ) : null}
             </Element>
           </div>
 
-          <Divider withoutPadding />
+          <Divider withoutPadding borderColor={colors.$20} />
 
-          <Inline className="w-full">
-            <ClickableElement
-              className="text-center"
+          <div className="flex space-x-4 items-center justify-center px-6 py-5">
+            <Box
+              className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
               onClick={() =>
                 recurringInvoice ? openClientPortal(recurringInvoice) : null
               }
+              style={{
+                borderColor: colors.$20,
+              }}
+              theme={{
+                backgroundColor: colors.$1,
+                hoverBackgroundColor: colors.$4,
+              }}
             >
-              <div className="inline-flex items-center space-x-1">
-                <Icon element={MdCloudCircle} />
-                <p>{t('view_portal')}</p>
-              </div>
-            </ClickableElement>
+              <CloudPlay
+                color={colors.$17}
+                filledColor={colors.$17}
+                size="1.3rem"
+              />
+
+              <span
+                className="font-medium whitespace-nowrap"
+                style={{ color: colors.$3 }}
+              >
+                {t('view_portal')}
+              </span>
+            </Box>
 
             {recurringInvoice ? (
-              <ClickableElement
-                className="text-center"
+              <Box
+                className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
                 onClick={() => {
                   navigator.clipboard.writeText(
                     generateClientPortalUrl(recurringInvoice) ?? ''
@@ -283,84 +355,150 @@ export const RecurringInvoiceSlider = () => {
 
                   toast.success('copied_to_clipboard', { value: '' });
                 }}
+                style={{
+                  borderColor: colors.$20,
+                }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
               >
-                <div className="inline-flex items-center space-x-1">
-                  <Icon element={MdOutlineContentCopy} />
-                  <p>{t('copy_link')}</p>
-                </div>
-              </ClickableElement>
+                <CopyToClipboard
+                  color={colors.$17}
+                  filledColor={colors.$17}
+                  size="1.3rem"
+                />
+
+                <span
+                  className="font-medium whitespace-nowrap"
+                  style={{ color: colors.$3 }}
+                >
+                  {t('copy_link')}
+                </span>
+              </Box>
             ) : null}
-          </Inline>
+          </div>
         </div>
 
-        <div className="divide-y">
+        <div>
           {resource?.activities && resource.activities.length === 0 && (
             <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
 
-          {resource?.activities &&
-            resource.activities.map((activity) => (
-              <ClickableElement
-                key={activity.id}
-                to={route('/activities/:id', { id: activity.id })}
-                disableNavigation={Boolean(!activity.history.id)}
-              >
-                <div className="flex flex-col">
-                  <div className="flex space-x-1">
-                    <span>
-                      {recurringInvoice?.client
-                        ? formatMoney(
-                            activity.history.amount || 0,
-                            recurringInvoice?.client?.country_id,
-                            recurringInvoice?.client?.settings.currency_id
-                          )
-                        : null}
-                    </span>
-                    <span>&middot;</span>
-                    <DynamicLink
-                      to={`/clients/${activity.client_id}`}
-                      renderSpan={disableNavigation(
-                        'client',
-                        recurringInvoice?.client
-                      )}
+          {Boolean(resource?.activities?.length) && (
+            <div className="flex flex-col px-3">
+              {resource?.activities &&
+                resource.activities.map((activity) => (
+                  <Box
+                    className="flex items-center justify-start p-4 space-x-3 rounded-md cursor-pointer"
+                    key={activity.id}
+                    onClick={() =>
+                      navigate(
+                        route('/activities/:id', {
+                          id: activity.id,
+                        })
+                      )
+                    }
+                    theme={{
+                      backgroundColor: colors.$1,
+                      hoverBackgroundColor: colors.$25,
+                    }}
+                  >
+                    <div
+                      className="p-2 rounded-full"
+                      style={{ backgroundColor: colors.$20 }}
                     >
-                      {recurringInvoice?.client?.display_name}
-                    </DynamicLink>
-                  </div>
+                      <History
+                        size="1.3rem"
+                        color={colors.$16}
+                        filledColor={colors.$16}
+                      />
+                    </div>
 
-                  <div className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
-                    </p>
-                    <p>{dayjs.unix(activity.created_at).fromNow()}</p>
-                  </div>
-                </div>
-              </ClickableElement>
-            ))}
+                    <div className="flex flex-col items-start space-y-0.5 justify-center">
+                      <div className="flex space-x-1 text-sm">
+                        <span style={{ color: colors.$3 }}>
+                          {recurringInvoice?.client
+                            ? formatMoney(
+                                activity.history.amount || 0,
+                                recurringInvoice?.client?.country_id,
+                                recurringInvoice?.client?.settings.currency_id
+                              )
+                            : null}
+                        </span>
+
+                        <div>
+                          <ArrowRight color={colors.$17} size="1.1rem" />
+                        </div>
+
+                        <DynamicLink
+                          to={`/clients/${activity.client_id}`}
+                          renderSpan={disableNavigation(
+                            'client',
+                            recurringInvoice?.client
+                          )}
+                        >
+                          {recurringInvoice?.client?.display_name}
+                        </DynamicLink>
+                      </div>
+
+                      <div
+                        className="flex items-center space-x-1 text-xs"
+                        style={{ color: colors.$17 }}
+                      >
+                        <span>
+                          {date(
+                            activity.created_at,
+                            `${dateFormat} ${timeFormat}`
+                          )}
+                        </span>
+
+                        <span>{dayjs.unix(activity.created_at).fromNow()}</span>
+                      </div>
+                    </div>
+                  </Box>
+                ))}
+            </div>
+          )}
         </div>
 
         <div>
-          <div className="flex px-6 pt-2 pb-3 font-medium text-sm">
+          <div
+            className="flex px-6 pt-2 pb-3 font-medium text-sm"
+            style={{ color: colors.$22 }}
+          >
             <span className="w-1/2">{t('send_date')}</span>
             <span className="w-1/2">{t('due_date')}</span>
           </div>
 
-          {resource?.recurring_dates.map((recurringDate, index) => (
-            <div key={index} className="flex px-6 py-2 text-sm">
-              <span className="w-1/2">
-                {date(recurringDate.send_date, dateFormat)}
-              </span>
-              <span className="w-1/2">
-                {date(recurringDate.due_date, dateFormat)}
-              </span>
-            </div>
-          ))}
+          <div className="px-6">
+            {resource?.recurring_dates.map((recurringDate, index) => (
+              <div
+                key={index}
+                className="flex py-2 text-sm border-b border-dashed"
+                style={{
+                  borderColor:
+                    index === resource.recurring_dates.length - 1
+                      ? 'transparent'
+                      : colors.$20,
+                }}
+              >
+                <span className="w-1/2" style={{ color: colors.$3 }}>
+                  {date(recurringDate.send_date, dateFormat)}
+                </span>
+
+                <span className="w-1/2" style={{ color: colors.$3 }}>
+                  {date(recurringDate.due_date, dateFormat)}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div>
           <div
             className="flex items-center border-b px-6 pb-4 justify-between"
-            style={{ borderColor: colors.$4 }}
+            style={{ borderColor: colors.$20 }}
           >
             <Toggle
               label={t('comments_only')}
@@ -371,11 +509,11 @@ export const RecurringInvoiceSlider = () => {
             <AddActivityComment
               entity="recurring_invoice"
               entityId={resource?.id}
-              label={`#${resource?.number}`}
+              label={resource?.number || ''}
             />
           </div>
 
-          <div className="flex flex-col divide-y">
+          <div className="flex flex-col pt-3 px-3">
             {activities
               ?.filter(
                 (activity) =>
@@ -383,20 +521,49 @@ export const RecurringInvoiceSlider = () => {
                   !commentsOnly
               )
               .map((activity) => (
-                <NonClickableElement
+                <Box
                   key={activity.id}
-                  className="flex flex-col space-y-2"
+                  className="flex space-x-3 p-4 rounded-md flex-1 min-w-0"
+                  theme={{
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$25,
+                  }}
                 >
-                  <p>{activityElement(activity)}</p>
-
-                  <div className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{activity.ip}</p>
+                  <div className="flex items-center justify-center">
+                    <div
+                      className="p-2 rounded-full"
+                      style={{ backgroundColor: colors.$20 }}
+                    >
+                      <SquareActivityChart
+                        size="1.3rem"
+                        color={colors.$16}
+                        filledColor={colors.$16}
+                      />
+                    </div>
                   </div>
-                </NonClickableElement>
+
+                  <div className="flex flex-col space-y-0.5 flex-1 min-w-0">
+                    <div className="text-sm" style={{ color: colors.$3 }}>
+                      {activityElement(activity)}
+                    </div>
+
+                    <div
+                      className="flex w-full items-center space-x-1 text-xs truncate"
+                      style={{ color: colors.$17 }}
+                    >
+                      <span className="whitespace-nowrap">
+                        {date(
+                          activity.created_at,
+                          `${dateFormat} ${timeFormat}`
+                        )}
+                      </span>
+
+                      <span>-</span>
+
+                      <span>{activity.ip}</span>
+                    </div>
+                  </div>
+                </Box>
               ))}
           </div>
         </div>

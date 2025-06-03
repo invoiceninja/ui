@@ -45,8 +45,8 @@ import { Quote } from '$app/common/interfaces/quote';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import classNames from 'classnames';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import { InputLabel } from '$app/components/forms';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -106,33 +106,26 @@ export default function Quotes() {
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={
-          <Guard
-            type="component"
-            guards={[or(permission('create_quote'), permission('edit_quote'))]}
-            component={<ImportButton route="/quotes/import" />}
-          />
-        }
-        leftSideChevrons={
-          <div
-            className={classNames('flex items-center space-x-1', {
-              'pr-4': Boolean(reactSettings.show_table_footer),
-            })}
-          >
+          <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (
-              <>
-                <DataTableFooterColumnsPicker
-                  table="quote"
-                  columns={allFooterColumns}
-                />
-
-                <span>|</span>
-              </>
+              <DataTableFooterColumnsPicker
+                table="quote"
+                columns={allFooterColumns}
+              />
             )}
 
             <DataTableColumnsPicker
               columns={quoteColumns as unknown as string[]}
               defaultColumns={defaultColumns}
               table="quote"
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(permission('create_quote'), permission('edit_quote')),
+              ]}
+              component={<ImportButton route="/quotes/import" />}
             />
           </div>
         }
@@ -153,7 +146,20 @@ export default function Quotes() {
         entities={changeTemplateResources as Quote[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        labelFn={(quote) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{quote.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(quote) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{quote.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/quotes/bulk"
       />
     </Default>

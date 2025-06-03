@@ -117,7 +117,7 @@ export function Actions(props: Props) {
         onSave={bulk}
       />
 
-      <Dropdown label={t('more_actions')} className="divide-y">
+      <Dropdown label={t('actions')}>
         <div>
           <DropdownElement
             onClick={() => invite()}

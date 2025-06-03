@@ -28,6 +28,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { CreateExpenseCategoryForm } from './components/CreateExpenseCategoryForm';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   useTitle('new_expense_category');
@@ -35,7 +36,9 @@ export function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const accentColor: string = useAccentColor();
+
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
 
   const nameFieldRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +124,11 @@ export function Create() {
     <Settings title={t('expense_categories')} breadcrumbs={pages}>
       <Card
         title={t('create_expense_category')}
+        className="shadow-sm"
+        childrenClassName="pt-4 pb-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
         withSaveButton
         disableSubmitButton={isFormBusy}
         onSaveClick={() => handleSave('save')}
@@ -132,6 +140,7 @@ export function Create() {
           setExpenseCategory={setExpenseCategory}
           errors={errors}
           setErrors={setErrors}
+          withCardContainer
         />
       </Card>
     </Settings>

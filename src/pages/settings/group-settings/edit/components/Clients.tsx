@@ -23,7 +23,7 @@ export function Clients() {
   const customBulkActions = useCustomBulkActions();
 
   return (
-    <div className="mt-8">
+    <div className="px-4 sm:px-6 pt-3">
       <DataTable
         resource="client"
         endpoint={route(

@@ -14,12 +14,15 @@ import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import duration from 'dayjs/plugin/duration';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 dayjs.extend(duration);
 
 interface Props {
   task: Task;
   calculateLastTimeLog?: boolean;
+  extraSmallText?: boolean;
 }
 
 export const formatTime = (seconds: number) => {
@@ -33,6 +36,8 @@ export const formatTime = (seconds: number) => {
 };
 
 export function TaskClock(props: Props) {
+  const colors = useColorScheme();
+
   const [seconds, setSeconds] = useState<number>(0);
 
   const isTaskActive = props.task && isTaskRunning(props.task);
@@ -91,5 +96,15 @@ export function TaskClock(props: Props) {
     };
   }, [props.task.updated_at]);
 
-  return <p>{isTaskActive && formatTime(seconds)}</p>;
+  return (
+    <p
+      className={classNames('font-mono', {
+        'text-xs': props.extraSmallText,
+        'text-sm': !props.extraSmallText,
+      })}
+      style={{ color: colors.$17 }}
+    >
+      {isTaskActive && formatTime(seconds)}
+    </p>
+  );
 }

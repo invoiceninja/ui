@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -25,18 +25,31 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankApiWebhookQuery } from '$app/common/queries/api-webhooks';
 import { Settings } from '$app/components/layouts/Settings';
 import { useEffect, useState } from 'react';
-import { PlusCircle, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useEvents } from './common/hooks/useEvents';
-import { SearchableSelect } from '$app/components/SearchableSelect';
+import { useColorScheme } from '$app/common/colors';
+import styled from 'styled-components';
+import { Plus } from '$app/components/icons/Plus';
+import classNames from 'classnames';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function Create() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('new_webhook');
+
+  const colors = useColorScheme();
 
   const { data: blankApiWebHook } = useBlankApiWebhookQuery();
 
@@ -118,7 +131,12 @@ export function Create() {
       disableSaveButton={!apiWebHook}
       onSaveClick={handleSave}
     >
-      <Card title={documentTitle}>
+      <Card
+        title={documentTitle}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('target_url')} required>
           <InputField
             required
@@ -129,17 +147,19 @@ export function Create() {
         </Element>
 
         <Element leftSide={t('event_type')}>
-          <SearchableSelect
+          <SelectField
             value={apiWebHook?.event_id}
             onValueChange={(value) => handleChange('event_id', value)}
             errorMessage={errors?.errors.event_id}
+            customSelector
+            dismissable={false}
           >
             {events.map((event) => (
               <option key={event.event} value={event.event}>
                 {event.label}
               </option>
             ))}
-          </SearchableSelect>
+          </SelectField>
         </Element>
 
         <Element leftSide={t('method')}>
@@ -147,6 +167,8 @@ export function Create() {
             value={apiWebHook?.rest_method}
             onValueChange={(value) => handleChange('rest_method', value)}
             errorMessage={errors?.errors.method}
+            customSelector
+            dismissable={false}
           >
             <option value="post">POST</option>
             <option value="put">PUT</option>
@@ -179,12 +201,21 @@ export function Create() {
                 />
               </div>
 
-              <Button
-                behavior="button"
-                type="minimal"
-                disableWithoutIcon
-                disabled={Boolean(!header.key) || Boolean(!header.value)}
+              <Box
+                className={classNames(
+                  'focus:outline-none focus:ring-0 p-1.5 border rounded-md',
+                  {
+                    'cursor-pointer':
+                      Boolean(header.key) && Boolean(header.value),
+                    'cursor-not-allowed opacity-75':
+                      Boolean(!header.key) || Boolean(!header.value),
+                  }
+                )}
                 onClick={() => {
+                  if (Boolean(!header.key) || Boolean(!header.value)) {
+                    return;
+                  }
+
                   setHeaders((headers) => ({
                     ...headers,
                     [header.key]: header.value,
@@ -192,9 +223,16 @@ export function Create() {
 
                   setHeader({});
                 }}
+                style={{
+                  borderColor: colors.$21,
+                }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
               >
-                <PlusCircle />
-              </Button>
+                <Plus size="1.1rem" color={colors.$3} />
+              </Box>
             </div>
 
             <div className="flex flex-col space-y-5 pt-5">
@@ -207,13 +245,18 @@ export function Create() {
 
                   <span className="flex-1 text-start">{value}</span>
 
-                  <Button
-                    behavior="button"
-                    type="minimal"
+                  <div
+                    className="cursor-pointer"
                     onClick={() => handleRemoveHeader(key)}
                   >
-                    <X size={18} />
-                  </Button>
+                    <CircleXMark
+                      color={colors.$16}
+                      hoverColor={colors.$3}
+                      borderColor={colors.$5}
+                      hoverBorderColor={colors.$17}
+                      size="1.6rem"
+                    />
+                  </div>
                 </div>
               ))}
 

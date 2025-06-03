@@ -42,6 +42,7 @@ import { Spinner } from '$app/components/Spinner';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
 import { route } from '$app/common/helpers/route';
+import { useColorScheme } from '$app/common/colors';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -58,6 +59,7 @@ export function TemplatesAndReminders() {
     },
   ];
 
+  const colors = useColorScheme();
   const company = useInjectCompanyChanges();
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -346,7 +348,12 @@ export function TemplatesAndReminders() {
     >
       <AdvancedSettingsPlanAlert />
 
-      <Card title={t('edit')}>
+      <Card
+        title={t('templates_and_reminders')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element
           leftSide={
             <PropertyCheckbox
@@ -441,7 +448,7 @@ export function TemplatesAndReminders() {
         templateId === 'reminder_endless' ||
         templateId === 'quote_reminder1') &&
         !disableSettingsField(emailTemplateKey) && (
-          <Card>
+          <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
             {REMINDERS.includes(templateId) ||
             templateId === 'quote_reminder1' ? (
               <>
@@ -475,6 +482,8 @@ export function TemplatesAndReminders() {
                         value
                       )
                     }
+                    customSelector
+                    dismissable={false}
                   >
                     <option value="disabled" defaultChecked>
                       {t('disabled')}
@@ -583,6 +592,7 @@ export function TemplatesAndReminders() {
                       )
                     }
                     withBlank
+                    customSelector
                   >
                     {Object.keys(frequencies).map((frequency, index) => (
                       <option key={index} value={frequency}>
@@ -597,7 +607,12 @@ export function TemplatesAndReminders() {
         )}
 
       {preview && (
-        <Card className="scale-y-100" title={preview.subject}>
+        <Card
+          className="scale-y-100 shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+          title={preview.subject}
+        >
           {!isLoadingPdf ? (
             <iframe
               srcDoc={generateEmailPreview(preview.body, preview.wrapper)}
@@ -616,7 +631,12 @@ export function TemplatesAndReminders() {
         </Card>
       )}
 
-      <Card title={t('variables')}>
+      <Card
+        title={t('variables')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('invoice')} className="flex-wrap">
           <div className="flex flex-wrap">
             {variables.invoice.map((variable, index) => (

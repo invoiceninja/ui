@@ -30,6 +30,7 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import { InputLabel } from '$app/components/forms';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -69,7 +70,7 @@ export default function PurchaseOrders() {
         customFilters={filters}
         customFilterPlaceholder="status"
         withResourcefulActions
-        leftSideChevrons={
+        rightSide={
           <DataTableColumnsPicker
             columns={purchaseOrderColumns as unknown as string[]}
             defaultColumns={defaultColumns}
@@ -87,7 +88,20 @@ export default function PurchaseOrders() {
         entities={changeTemplateResources as PurchaseOrder[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
+        labelFn={(purchase_order) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{purchase_order.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(purchase_order) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{purchase_order.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/purchase_orders/bulk"
       />
     </Default>

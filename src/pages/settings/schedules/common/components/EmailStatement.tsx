@@ -20,7 +20,8 @@ import Toggle from '$app/components/forms/Toggle';
 import { atom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdClose } from 'react-icons/md';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   schedule: Schedule;
@@ -36,6 +37,8 @@ export const scheduleParametersAtom = atom<Parameters | undefined>(undefined);
 
 export function EmailStatement(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const parametersAtom = useAtomValue(scheduleParametersAtom);
@@ -84,6 +87,8 @@ export function EmailStatement(props: Props) {
             handleChange('parameters.date_range' as keyof Schedule, value)
           }
           errorMessage={errors?.errors['parameters.date_range']}
+          customSelector
+          dismissable={false}
         >
           <option value="last7_days">{t('last7_days')}</option>
           <option value="last30_days">{t('last30_days')}</option>
@@ -105,6 +110,8 @@ export function EmailStatement(props: Props) {
             handleChange('parameters.status' as keyof Schedule, value)
           }
           errorMessage={errors?.errors['parameters.status']}
+          customSelector
+          dismissable={false}
         >
           <option value="all">{t('all')}</option>
           <option value="paid">{t('paid')}</option>
@@ -181,18 +188,27 @@ export function EmailStatement(props: Props) {
               >
                 <span>{client.display_name}</span>
 
-                <MdClose
+                <div
                   className="cursor-pointer ml-16"
-                  fontSize={20}
-                  color={accentColor}
                   onClick={() => handleRemoveClient(index)}
-                />
+                >
+                  <CircleXMark
+                    color={colors.$16}
+                    hoverColor={colors.$3}
+                    borderColor={colors.$5}
+                    hoverBorderColor={colors.$17}
+                    size="1.6rem"
+                  />
+                </div>
               </div>
             ))}
           </div>
 
           {!selectedClients?.length && (
-            <span className="text-gray-500 self-center text-xl mt-4">
+            <span
+              className="self-center text-xl mt-4"
+              style={{ color: colors.$17 }}
+            >
               {t('all_clients')}
             </span>
           )}

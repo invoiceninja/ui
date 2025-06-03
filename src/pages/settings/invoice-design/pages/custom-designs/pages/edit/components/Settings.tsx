@@ -9,14 +9,14 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card, ClickableElement, Element } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { Checkbox, InputField, SelectField } from '$app/components/forms';
 import { Divider } from '$app/components/cards/Divider';
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { trans } from '$app/common/helpers';
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -28,6 +28,12 @@ import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 import { QuoteSelector } from '$app/components/quotes/QuoteSelector';
 import { CreditSelector } from '$app/components/credit/CreditSelector';
 import { PurchaseOrderSelector } from '$app/components/purchase-order/PurchaseOrderSelector';
+import { useColorScheme } from '$app/common/colors';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
+import styled from 'styled-components';
+import { BookOpen } from '$app/components/icons/BookOpen';
+import { Import as ImportIcon } from '$app/components/icons/Import';
+import { Export } from '$app/components/icons/Export';
 
 export interface Context {
   errors: ValidationBag | undefined;
@@ -37,6 +43,13 @@ export interface Context {
   payload: PreviewPayload;
   setPayload: Dispatch<SetStateAction<PreviewPayload>>;
 }
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -52,7 +65,9 @@ export default function Settings() {
     setPayload,
   } = context;
 
-  const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
+  const colors = useColorScheme();
+
+  const setIsImportModalVisible = useSetAtom(importModalVisiblityAtom);
 
   const handleExportToTxtFile = () => {
     if (payload.design) {
@@ -103,7 +118,13 @@ export default function Settings() {
     <>
       <Import onImport={(parts) => handlePropertyChange('design', parts)} />
 
-      <Card title={t('settings')} padding="small">
+      <Card
+        title={t('settings')}
+        padding="small"
+        className="shadow-sm pb-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('name')}>
           <InputField
             value={payload.design?.name}
@@ -114,17 +135,19 @@ export default function Settings() {
 
         {payload.design?.is_template ? (
           <Element leftSide={t('resource')}>
-            {templateEntites.map((entity) => (
-              <Checkbox
-                key={entity}
-                label={t(entity)}
-                value={entity}
-                onValueChange={(value, checked) =>
-                  handleResourceChange(value, Boolean(checked))
-                }
-                checked={payload.design?.entities.includes(entity)}
-              />
-            ))}
+            <div className="flex flex-col space-y-2">
+              {templateEntites.map((entity) => (
+                <Checkbox
+                  key={entity}
+                  label={t(entity)}
+                  value={entity}
+                  onValueChange={(value, checked) =>
+                    handleResourceChange(value, Boolean(checked))
+                  }
+                  checked={payload.design?.entities.includes(entity)}
+                />
+              ))}
+            </div>
           </Element>
         ) : null}
 
@@ -153,6 +176,8 @@ export default function Settings() {
                     entity_id: '-1',
                   }))
                 }
+                customSelector
+                dismissable={false}
                 errorMessage={errors?.errors.entity}
               >
                 <option value="invoice">{t('invoice')}</option>
@@ -248,19 +273,86 @@ export default function Settings() {
           </>
         )}
 
-        <Divider />
+        <div className="px-4 sm:px-6 pb-6 pt-3">
+          <Divider
+            className="border-dashed"
+            borderColor={colors.$20}
+            withoutPadding
+          />
+        </div>
 
-        <ClickableElement href="https://invoiceninja.github.io/en/custom-fields/">
-          {t('view_docs')}
-        </ClickableElement>
+        <div className="flex flex-col space-y-4 px-4 sm:px-6">
+          <Box
+            className="flex justify-between items-center p-4 border shadow-sm w-full rounded-md cursor-pointer"
+            theme={{
+              backgroundColor: colors.$1,
+              hoverBackgroundColor: colors.$4,
+            }}
+            onClick={() =>
+              window.open(
+                'https://invoiceninja.github.io/en/custom-fields/',
+                '_blank'
+              )
+            }
+            style={{ borderColor: colors.$24 }}
+          >
+            <div className="flex items-center space-x-2">
+              <BookOpen color={colors.$3} size="1.4rem" />
 
-        <ClickableElement onClick={() => setIsImportModalVisible(true)}>
-          {t('import')}
-        </ClickableElement>
+              <span className="text-sm" style={{ color: colors.$3 }}>
+                {t('api_docs')}
+              </span>
+            </div>
 
-        <ClickableElement onClick={handleExport}>
-          {t('export')}
-        </ClickableElement>
+            <div>
+              <ArrowRight color={colors.$3} size="1.4rem" strokeWidth="1.5" />
+            </div>
+          </Box>
+
+          <Box
+            className="flex items-center p-4 border shadow-sm w-full rounded-md cursor-pointer space-x-2"
+            theme={{
+              backgroundColor: colors.$1,
+              hoverBackgroundColor: colors.$4,
+            }}
+            onClick={() => setIsImportModalVisible(true)}
+            style={{ borderColor: colors.$24 }}
+          >
+            <div>
+              <ImportIcon color={colors.$3} size="1.4rem" />
+            </div>
+
+            <span className="text-sm" style={{ color: colors.$3 }}>
+              {t('import')}
+            </span>
+          </Box>
+
+          <Box
+            className="flex items-center p-4 border shadow-sm w-full rounded-md cursor-pointer space-x-2"
+            theme={{
+              backgroundColor: colors.$1,
+              hoverBackgroundColor: colors.$4,
+            }}
+            onClick={handleExport}
+            style={{ borderColor: colors.$24 }}
+          >
+            <div>
+              <Export color={colors.$3} size="1.4rem" strokeWidth="1" />
+            </div>
+
+            <span className="text-sm" style={{ color: colors.$3 }}>
+              {t('export')}
+            </span>
+          </Box>
+        </div>
+
+        <div className="px-4 sm:px-6 pb-2 pt-6">
+          <Divider
+            className="border-dashed"
+            borderColor={colors.$20}
+            withoutPadding
+          />
+        </div>
 
         <Element leftSide={t('html_mode')}>
           <Toggle

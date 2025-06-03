@@ -12,7 +12,7 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
@@ -38,7 +38,7 @@ export function Quotes() {
     );
 
   return (
-    <Card title={t('quotes')}>
+    <>
       <Element
         leftSide={
           <PropertyCheckbox
@@ -97,6 +97,6 @@ export function Quotes() {
           />
         </Element>
       )}
-    </Card>
+    </>
   );
 }

@@ -22,6 +22,7 @@ import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -33,15 +34,19 @@ interface Context {
 export default function Edit() {
   const [t] = useTranslation();
 
-  const company = useCurrentCompany();
-
   const { id } = useParams();
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
 
   const { data } = useProjectQuery({ id });
 
   const context: Context = useOutletContext();
-
   const { errors, setErrors, project, setProject } = context;
+
+  const handleChange = (property: keyof Project, value: unknown) => {
+    setErrors(undefined);
+    setProject((project) => project && { ...project, [property]: value });
+  };
 
   useEffect(() => {
     if (data) {
@@ -49,13 +54,13 @@ export default function Edit() {
     }
   }, [data]);
 
-  const handleChange = (property: keyof Project, value: unknown) => {
-    setErrors(undefined);
-    setProject((project) => project && { ...project, [property]: value });
-  };
-
   return (
-    <Card title={t('edit_project')}>
+    <Card
+      title={t('edit_project')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       {project && (
         <Element leftSide={t('status')}>
           <EntityStatus entity={project} />

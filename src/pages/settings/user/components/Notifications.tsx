@@ -14,17 +14,19 @@ import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { SelectField } from '$app/components/forms';
 import { useNotificationOptions } from '../common/hooks/useNotificationOptions';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
+import { useColorScheme } from '$app/common/colors';
 
 export function Notifications() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
+  const colors = useColorScheme();
   const options = useNotificationOptions();
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
@@ -142,7 +144,7 @@ export function Notifications() {
   }, [userChanges]);
 
   return (
-    <Card title={t('notifications')}>
+    <>
       <Element
         leftSide={t('login_notification')}
         leftSideHelp={t('login_notification_help')}
@@ -170,7 +172,13 @@ export function Notifications() {
         />
       </Element>
 
-      <Divider withoutPadding />
+      <div className="px-4 sm:px-6">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
 
       <Element className="my-4" leftSide={t('all_events')}>
         <SelectField
@@ -185,7 +193,13 @@ export function Notifications() {
         </SelectField>
       </Element>
 
-      <Divider withoutPadding />
+      <div className="px-4 sm:px-6">
+        <Divider
+          className="mb-4 border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
 
       <div className="flex flex-col">
         {options.map((notification, index) => (
@@ -210,6 +224,6 @@ export function Notifications() {
           </Element>
         ))}
       </div>
-    </Card>
+    </>
   );
 }

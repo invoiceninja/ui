@@ -34,24 +34,27 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { CustomField } from '$app/components/CustomField';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_project');
 
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const [searchParams] = useSearchParams();
+  const clientResolver = useClientResolver();
+
+  const navigate = useNavigate();
+
   const pages = [
     { name: t('projects'), href: '/projects' },
     { name: t('new_project'), href: '/projects/create' },
   ];
 
-  const [searchParams] = useSearchParams();
   const [project, setProject] = useAtom(projectAtom);
   const [errors, setErrors] = useState<ValidationBag>();
-
-  const company = useCurrentCompany();
-  const clientResolver = useClientResolver();
-  const navigate = useNavigate();
 
   const handleChange = (property: keyof Project, value: unknown) => {
     setProject((project) => project && { ...project, [property]: value });
@@ -60,6 +63,27 @@ export default function Create() {
   const { data } = useBlankProjectQuery({
     enabled: typeof project === 'undefined',
   });
+
+  const onSave = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    toast.processing();
+    setErrors(undefined);
+
+    request('POST', endpoint('/api/v1/projects'), project)
+      .then((response) => {
+        toast.success('created_project');
+
+        $refetch(['projects']);
+
+        navigate(route('/projects/:id/edit', { id: response.data.data.id }));
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        }
+      });
+  };
 
   useEffect(() => {
     setProject((current) => {
@@ -99,27 +123,6 @@ export default function Create() {
     }
   }, [project?.client_id]);
 
-  const onSave = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    toast.processing();
-    setErrors(undefined);
-
-    request('POST', endpoint('/api/v1/projects'), project)
-      .then((response) => {
-        toast.success('created_project');
-
-        $refetch(['projects']);
-
-        navigate(route('/projects/:id/edit', { id: response.data.data.id }));
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
-        }
-      });
-  };
-
   return (
     <Default
       title={documentTitle}
@@ -128,7 +131,12 @@ export default function Create() {
       onSaveClick={onSave}
     >
       <Container breadcrumbs={[]}>
-        <Card title={documentTitle}>
+        <Card
+          title={documentTitle}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <Element leftSide={t('project_name')} required>
             <InputField
               value={project?.name}

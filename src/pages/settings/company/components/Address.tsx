@@ -12,7 +12,7 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
@@ -45,7 +45,7 @@ export function Address() {
   return (
     <>
       {companyChanges?.settings && (
-        <Card title={t('address')}>
+        <>
           <Element
             leftSide={
               <PropertyCheckbox
@@ -149,7 +149,7 @@ export function Address() {
               errorMessage={errors?.errors['settings.country_id']}
             />
           </Element>
-        </Card>
+        </>
       )}
     </>
   );

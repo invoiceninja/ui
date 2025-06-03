@@ -11,10 +11,11 @@
 interface Props {
   size?: string;
   color?: string;
+  strokeWidth?: string;
 }
 
 export function ClipboardCheck(props: Props) {
-  const { size = '1rem', color = '#000' } = props;
+  const { size = '1rem', color = '#000', strokeWidth = '1.5' } = props;
 
   return (
     <svg
@@ -31,7 +32,7 @@ export function ClipboardCheck(props: Props) {
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
       ></path>
       <rect
         x="4.25"
@@ -44,7 +45,7 @@ export function ClipboardCheck(props: Props) {
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
         data-color="color-2"
       ></rect>
       <polyline
@@ -53,7 +54,7 @@ export function ClipboardCheck(props: Props) {
         stroke={color}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
         data-color="color-2"
       ></polyline>
     </svg>

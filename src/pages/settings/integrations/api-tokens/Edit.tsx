@@ -32,11 +32,14 @@ import { useActions } from './common/hooks/useActions';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { useColorScheme } from '$app/common/colors';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: fetchedApiToken } = useApiTokenQuery({ id });
+
+  const colors = useColorScheme();
 
   const navigate = useNavigate();
 
@@ -128,7 +131,12 @@ export function Edit() {
         }
       >
         {fetchedApiToken && apiToken && (
-          <Card title={fetchedApiToken.name}>
+          <Card
+            title={fetchedApiToken.name}
+            className="shadow-sm"
+            style={{ borderColor: colors.$24 }}
+            headerStyle={{ borderColor: colors.$20 }}
+          >
             <Element leftSide="Status">
               {!apiToken.is_deleted && !apiToken.archived_at && (
                 <Badge variant="primary">{t('active')}</Badge>

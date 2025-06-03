@@ -32,6 +32,7 @@ import {
 } from '$app/pages/settings/task-statuses/common/hooks';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -39,6 +40,7 @@ export function Edit() {
   const { id } = useParams();
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -51,15 +53,11 @@ export function Edit() {
 
   const { data: taskStatusData } = useTaskStatusQuery({ id });
 
-  const [taskStatus, setTaskStatus] = useState<TaskStatus>();
-
-  const [isTitleApplied, setIsTitleApplied] = useState<boolean>(false);
-
-  const { documentTitle, setDocumentTitle } = useTitle('');
-
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
   const [errors, setErrors] = useState<ValidationBag>();
+  const { documentTitle, setDocumentTitle } = useTitle('');
+  const [taskStatus, setTaskStatus] = useState<TaskStatus>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [isTitleApplied, setIsTitleApplied] = useState<boolean>(false);
 
   const handleChange = useHandleChange({ setErrors, setTaskStatus });
 
@@ -110,7 +108,7 @@ export function Edit() {
       navigationTopRight={
         taskStatus && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={taskStatus}
             actions={actions}
           />
@@ -125,45 +123,51 @@ export function Edit() {
       )}
 
       {taskStatus && (
-        <div className="max-w-3xl">
-          <Card
-            title={documentTitle}
-            withSaveButton
-            disableSubmitButton={isFormBusy}
-            onFormSubmit={handleSave}
-          >
-            <Element leftSide={t('status')}>
-              {!taskStatus.is_deleted && !taskStatus.archived_at && (
-                <Badge variant="primary">{t('active')}</Badge>
-              )}
+        <Card
+          title={documentTitle}
+          className="shadow-sm"
+          childrenClassName="pt-4"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+          withoutBodyPadding
+          withSaveButton
+          disableSubmitButton={isFormBusy}
+          onSaveClick={(event) => handleSave(event)}
+          onFormSubmit={(event) => handleSave(event)}
+        >
+          <Element leftSide={t('status')}>
+            {!taskStatus.is_deleted && !taskStatus.archived_at && (
+              <Badge variant="primary">{t('active')}</Badge>
+            )}
 
-              {taskStatus.archived_at && !taskStatus.is_deleted ? (
-                <Badge variant="yellow">{t('archived')}</Badge>
-              ) : null}
+            {taskStatus.archived_at && !taskStatus.is_deleted ? (
+              <Badge variant="yellow">{t('archived')}</Badge>
+            ) : null}
 
-              {taskStatus.is_deleted && (
-                <Badge variant="red">{t('deleted')}</Badge>
-              )}
-            </Element>
+            {taskStatus.is_deleted && (
+              <Badge variant="red">{t('deleted')}</Badge>
+            )}
+          </Element>
 
-            <CardContainer>
-              <InputField
-                required
-                label={t('name')}
-                value={taskStatus.name}
-                onValueChange={(value) => handleChange('name', value)}
-                errorMessage={errors?.errors?.name}
-              />
+          <CardContainer>
+            <InputField
+              required
+              label={t('name')}
+              value={taskStatus.name}
+              onValueChange={(value) => handleChange('name', value)}
+              errorMessage={errors?.errors?.name}
+            />
 
-              <InputLabel>{t('color')}</InputLabel>
+            <div>
+              <InputLabel className="mb-1">{t('color')}</InputLabel>
 
               <ColorPicker
                 value={taskStatus.color}
                 onValueChange={(value) => handleChange('color', value)}
               />
-            </CardContainer>
-          </Card>
-        </div>
+            </div>
+          </CardContainer>
+        </Card>
       )}
     </Settings>
   );

@@ -35,6 +35,7 @@ import {
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { InputLabel } from '$app/components/forms';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
@@ -147,7 +148,13 @@ export default function Project() {
         entities={changeTemplateResources as ProjectEntity[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(project) => `${t('number')}: ${project.number}`}
+        labelFn={(project) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{project.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/projects/bulk"
       />
     </Default>

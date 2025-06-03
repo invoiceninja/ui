@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/user';
 import { RootState } from '../../../../common/stores/store';
@@ -23,22 +23,20 @@ export function AccentColor() {
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
   return (
-    <Card title={t('accent_color')}>
-      <Element leftSide={t('accent_color')}>
-        <ColorPicker
-          value={
-            userChanges?.company_user?.settings?.accent_color || colors.primary
-          }
-          onValueChange={(color) =>
-            dispatch(
-              updateChanges({
-                property: 'company_user.settings.accent_color',
-                value: color,
-              })
-            )
-          }
-        />
-      </Element>
-    </Card>
+    <Element leftSide={t('accent_color')}>
+      <ColorPicker
+        value={
+          userChanges?.company_user?.settings?.accent_color || colors.primary
+        }
+        onValueChange={(color) =>
+          dispatch(
+            updateChanges({
+              property: 'company_user.settings.accent_color',
+              value: color,
+            })
+          )
+        }
+      />
+    </Element>
   );
 }

@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClickableElement } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
@@ -29,6 +28,7 @@ import {
   useHandleTaskTimeChange,
 } from '$app/pages/tasks/common/helpers';
 import {
+  calculateDifferenceBetweenLogs,
   parseTimeLog,
   TimeLogsType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
@@ -40,13 +40,28 @@ import { useFormatTimeLog } from '../common/hooks';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
+import { TaskClock } from './TaskClock';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { isTaskRunning } from '../../common/helpers/calculate-entity-state';
+
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
 
 export function EditSlider() {
   const [t] = useTranslation();
   const [task, setTask] = useAtom(currentTaskAtom);
 
+  const colors = useColorScheme();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const company = useCurrentCompany();
+  const formatTimeLog = useFormatTimeLog();
   const handleTaskTimeChange = useHandleTaskTimeChange();
   const handleTaskDateChange = useHandleTaskDateChange();
 
@@ -59,15 +74,7 @@ export function EditSlider() {
     setTask((current) => current && { ...current, [property]: value });
   };
 
-  const company = useCurrentCompany();
   const save = useSave();
-  const formatTimeLog = useFormatTimeLog();
-
-  useEffect(() => {
-    if (task?.time_log) {
-      setTimeLog(parseTimeLog(task.time_log));
-    }
-  }, [timeLogIndex, task?.time_log]);
 
   const handleDateChange = (
     unix: number,
@@ -103,6 +110,12 @@ export function EditSlider() {
       handleTaskDurationChange(task!.time_log, value, start, index)
     );
   };
+
+  useEffect(() => {
+    if (task?.time_log) {
+      setTimeLog(parseTimeLog(task.time_log));
+    }
+  }, [timeLogIndex, task?.time_log]);
 
   return (
     <>
@@ -203,9 +216,14 @@ export function EditSlider() {
         </div>
       </Modal>
 
-      <TabGroup tabs={[t('details'), t('times')]} width="full">
+      <TabGroup
+        tabs={[t('details'), t('times')]}
+        width="full"
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
+      >
         <div>
-          <div className="px-4 space-y-4">
+          <div className="px-6 space-y-4">
             <ClientSelector
               inputLabel={t('client')}
               value={task?.client_id}
@@ -246,6 +264,7 @@ export function EditSlider() {
             />
 
             <InputField
+              label={t('description')}
               element="textarea"
               value={task?.description}
               onValueChange={(value) => handleChange('description', value)}
@@ -253,31 +272,59 @@ export function EditSlider() {
           </div>
         </div>
 
-        <div>
+        <div className="flex flex-col space-y-4 px-6 py-1 overflow-y-auto max-h-[42.5rem]">
           {task &&
             formatTimeLog(task.time_log).map(([date, start, end], i) => (
-              <ClickableElement
+              <Box
                 key={i}
+                className="flex items-center justify-between p-4 w-full shadow-sm border rounded-md cursor-pointer focus:outline-none focus:ring-0"
+                style={{ borderColor: colors.$20 }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
                 onClick={() => {
                   setIsTimeModalVisible(true);
                   setTimeLogIndex(i);
                 }}
               >
-                <div>
-                  <p>{formatDate(date, dateFormat)}</p>
+                <div className="flex flex-col">
+                  <p
+                    className="text-sm font-medium"
+                    style={{ color: colors.$3 }}
+                  >
+                    {formatDate(date, dateFormat)}
+                  </p>
 
-                  <small>
+                  <span className="text-xs" style={{ color: colors.$17 }}>
                     {start} - {end}
-                  </small>
+                  </span>
                 </div>
-              </ClickableElement>
+
+                <div
+                  className="text-sm font-medium"
+                  style={{ color: colors.$3 }}
+                >
+                  {isTaskRunning(task) && i === task.time_log.length - 1 ? (
+                    <TaskClock task={task} calculateLastTimeLog={true} />
+                  ) : (
+                    calculateDifferenceBetweenLogs(task.time_log, i)
+                  )}
+                </div>
+              </Box>
             ))}
+
+          {task && formatTimeLog(task.time_log).length === 0 && (
+            <div className="text-sm font-medium">{t('no_records_found')}.</div>
+          )}
         </div>
       </TabGroup>
 
-      <div className="flex justify-end p-4">
-        <Button onClick={() => task && save(task)}>{t('save')}</Button>
-      </div>
+      {task && formatTimeLog(task.time_log).length > 0 && (
+        <div className="flex justify-end px-6 py-4">
+          <Button onClick={() => save(task)}>{t('save')}</Button>
+        </div>
+      )}
     </>
   );
 }

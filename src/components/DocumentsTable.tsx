@@ -36,6 +36,9 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AxiosResponse } from 'axios';
 import { useSetDocumentVisibility } from '$app/common/queries/documents';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { useColorScheme } from '$app/common/colors';
+import { LockOpen } from './icons/LockOpen';
+import { Lock } from './icons/Lock';
 
 interface Props {
   documents: Document[];
@@ -50,6 +53,8 @@ export interface DocumentUrl {
 
 export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const { disableEditableOptions = false } = props;
@@ -171,7 +176,12 @@ export function DocumentsTable(props: Props) {
 
   return (
     <>
-      <Table>
+      <Table
+        withoutTopBorder
+        withoutLeftBorder
+        withoutRightBorder
+        withoutBottomBorder
+      >
         <Thead>
           <Th>{t('name')}</Th>
           <Th>{t('date')}</Th>
@@ -182,13 +192,24 @@ export function DocumentsTable(props: Props) {
 
         <Tbody>
           {!props.documents.length && (
-            <Tr>
+            <Tr
+              className="border-b"
+              style={{
+                borderColor: colors.$20,
+              }}
+            >
               <Td colSpan={5}>{t('no_records_found')}</Td>
             </Tr>
           )}
 
           {props.documents.map((document, index) => (
-            <Tr key={index}>
+            <Tr
+              key={index}
+              className="border-b"
+              style={{
+                borderColor: colors.$20,
+              }}
+            >
               <Td>
                 <div
                   className="flex items-center space-x-10"
@@ -199,9 +220,9 @@ export function DocumentsTable(props: Props) {
                     <span>{document.name}</span>
 
                     {document.is_public ? (
-                      <Icon element={MdOutlineLockOpen} size={27} />
+                      <LockOpen color={colors.$3} size="1.4rem" />
                     ) : (
-                      <Icon element={MdLockOutline} size={27} />
+                      <Lock color={colors.$3} size="1.4rem" />
                     )}
                   </div>
 

@@ -36,6 +36,7 @@ import { ClientActionButtons } from '$app/pages/invoices/common/components/Clien
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useColorScheme } from '$app/common/colors';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -53,12 +54,13 @@ interface Props extends RecurringExpenseCardProps {
 
 export function Details(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
   const [searchParams] = useSearchParams();
 
   const { recurringExpense, handleChange, taxInputType, pageType, errors } =
     props;
-
-  const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
@@ -79,7 +81,7 @@ export function Details(props: Props) {
   return (
     <div className="flex flex-col space-y-4">
       {recurringExpense && (
-        <Card>
+        <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
           <Element leftSide={t('expense_total')} withoutWrappingLeftSide>
             {formatMoney(
               calculateExpenseAmount(recurringExpense),
@@ -91,7 +93,13 @@ export function Details(props: Props) {
         </Card>
       )}
 
-      <Card title={t('details')} isLoading={!recurringExpense}>
+      <Card
+        title={t('details')}
+        isLoading={!recurringExpense}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         {recurringExpense && pageType === 'edit' && (
           <>
             <Element leftSide={t('status')}>

@@ -11,7 +11,6 @@
 import { Card, Element } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useTotalVariables } from '../hooks/useTotalVariables';
@@ -26,6 +25,10 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useColorScheme } from '$app/common/colors';
+import { Fragment, useRef } from 'react';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   resource: ProductTableResource;
@@ -35,9 +38,16 @@ interface Props {
 }
 
 export function InvoiceTotals(props: Props) {
-  const variables = useTotalVariables();
-  const company = useCurrentCompany();
   const resource = props.resource;
+
+  const [t] = useTranslation();
+
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const variables = useTotalVariables();
+  const reactSettings = useReactSettings();
 
   const resolveVariable = useResolveTotalVariable({
     resource,
@@ -48,8 +58,6 @@ export function InvoiceTotals(props: Props) {
 
   const handleChange = (property: keyof ProductTableResource, value: unknown) =>
     props.onChange(property, value);
-
-  const [t] = useTranslation();
 
   const isAnyTaxHidden = () => {
     if (
@@ -86,7 +94,13 @@ export function InvoiceTotals(props: Props) {
   };
 
   return (
-    <Card className="col-span-12 xl:col-span-4 h-max">
+    <Card
+      className="col-span-12 xl:col-span-4 shadow-sm pb-6"
+      withoutBodyPadding
+      height="full"
+      style={{ borderColor: colors.$24, height: '100%' }}
+      innerRef={cardRef}
+    >
       {isAnyTaxHidden() && (
         <div className="flex items-center space-x-3 px-6">
           <div>

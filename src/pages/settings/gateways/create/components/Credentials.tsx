@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Button, Link } from '$app/components/forms';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
@@ -29,9 +29,8 @@ import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 import { useLocation } from 'react-router-dom';
-import { $help } from '$app/components/HelpWidget';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { HelpCircle } from 'react-feather';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   gateway: Gateway;
@@ -47,7 +46,10 @@ export function Credentials(props: Props) {
   const [t] = useTranslation();
 
   const location = useLocation();
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
 
+  const handleGoCardless = useHandleGoCardless();
   const resolveInputField = useResolveInputField(
     props.companyGateway,
     props.setCompanyGateway
@@ -96,102 +98,81 @@ export function Credentials(props: Props) {
     }
   };
 
-  const handleGoCardless = useHandleGoCardless();
-  const accentColor = useAccentColor();
-
   return (
     <>
-      <Card
-        title={t('credentials')}
-        topRight={
-          <button
-            style={{ color: accentColor }}
-            type="button"
-            onClick={() =>
-              $help('gateways', {
-                moveToHeading: 'Credentials',
-              })
-            }
-            className="inline-flex items-center space-x-1 text-sm"
-          >
-            <HelpCircle size={18} />
-            <span>{t('documentation')}</span>
-          </button>
-        }
-      >
-        {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
-          <Element leftSide={t('help')}>
-            <Link external to={props.gateway.site_url}>
-              {t('learn_more')}
-            </Link>
+      {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
+        <Element leftSide={t('help')}>
+          <Link external to={props.gateway.site_url}>
+            {t('learn_more')}
+          </Link>
+        </Element>
+      )}
+
+      {props.gateway && props.gateway.key === STRIPE_CONNECT && (
+        <StripeConnect />
+      )}
+
+      {props.gateway && props.gateway.key === WEPAY && <WePay />}
+
+      {props.gateway && props.gateway.key === PAYPAL_PPCP && (
+        <PayPalPPCP
+          gateway={props.gateway}
+          companyGateway={props.companyGateway}
+          setCompanyGateway={props.setCompanyGateway}
+          errors={props.errors}
+        />
+      )}
+
+      {props.gateway &&
+        props.gateway.key === GOCARDLESS &&
+        isHosted() &&
+        config('oauth2') === true && <GoCardlessOAuth2 />}
+
+      {props.gateway &&
+        !hostedGateways.includes(props.gateway.key) &&
+        Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
+          <Element leftSide={formatLabel(field)} key={index}>
+            {resolveInputField(
+              field,
+              JSON.parse(props.gateway.fields)[field],
+              props.errors
+            )}
+          </Element>
+        ))}
+
+      {props.gateway &&
+        props.gateway.key === GOCARDLESS &&
+        isHosted() &&
+        config('oauth2') !== true && (
+          <Element leftSide={t('OAuth 2.0')}>
+            <Button behavior="button" type="minimal" onClick={handleGoCardless}>
+              {t('connect')}
+            </Button>
           </Element>
         )}
 
-        {props.gateway && props.gateway.key === STRIPE_CONNECT && (
-          <StripeConnect />
-        )}
+      {!location.pathname.includes('/create') && (
+        <>
+          <div className="px-4 sm:px-6 pt-2 pb-4">
+            <Divider
+              className="border-dashed"
+              withoutPadding
+              borderColor={colors.$20}
+            />
+          </div>
 
-        {props.gateway && props.gateway.key === WEPAY && <WePay />}
-
-        {props.gateway && props.gateway.key === PAYPAL_PPCP && (
-          <PayPalPPCP
-            gateway={props.gateway}
-            companyGateway={props.companyGateway}
-            setCompanyGateway={props.setCompanyGateway}
-            errors={props.errors}
-          />
-        )}
-
-        {props.gateway &&
-          props.gateway.key === GOCARDLESS &&
-          isHosted() &&
-          config('oauth2') === true && <GoCardlessOAuth2 />}
-
-        {props.gateway &&
-          !hostedGateways.includes(props.gateway.key) &&
-          Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
-            <Element leftSide={formatLabel(field)} key={index}>
-              {resolveInputField(
-                field,
-                JSON.parse(props.gateway.fields)[field],
-                props.errors
-              )}
-            </Element>
-          ))}
-
-        {props.gateway &&
-          props.gateway.key === GOCARDLESS &&
-          isHosted() &&
-          config('oauth2') !== true && (
-            <Element leftSide={t('OAuth 2.0')}>
-              <Button
-                behavior="button"
-                type="minimal"
-                onClick={handleGoCardless}
-              >
-                {t('connect')}
-              </Button>
-            </Element>
-          )}
-
-        <Divider />
-        {!location.pathname.includes('/create') && (
-          <>
-            <Divider />
-
-            <div className="flex justify-end pr-6">
-              <Button
-                behavior="button"
-                onClick={handleTestCredentials}
-                disableWithoutIcon
-                disabled={isTestingBusy || !props.isGatewaySaved}
-              >
-                {t('health_check')}
-              </Button>
-            </div>
-          </>
-        )}
-      </Card>
+          <div className="flex justify-end pr-6">
+            <Button
+              behavior="button"
+              onClick={handleTestCredentials}
+              disableWithoutIcon
+              disabled={isTestingBusy || !props.isGatewaySaved}
+            >
+              {t('health_check')}
+            </Button>
+          </div>
+        </>
+      )}
 
       <Modal
         title={t('status')}

@@ -12,10 +12,9 @@ import { SelectField } from '$app/components/forms';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
@@ -23,10 +22,13 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { useColorScheme } from '$app/common/colors';
 
 export function Invoices() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+
+  const colors = useColorScheme();
   const companyChanges = useCompanyChanges();
 
   const disableSettingsField = useDisableSettingsField();
@@ -45,7 +47,7 @@ export function Invoices() {
     );
 
   return (
-    <Card title={t('invoices')}>
+    <>
       <Element
         leftSide={
           <PropertyCheckbox
@@ -83,7 +85,13 @@ export function Invoices() {
         </Element>
       )}
 
-      <Divider />
+      <div className="px-4 sm:px-6 py-4">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          style={{ borderColor: colors.$20 }}
+        />
+      </div>
 
       <Element
         leftSide={
@@ -133,7 +141,13 @@ export function Invoices() {
         />
       </Element>
 
-      <Divider />
+      <div className="px-4 sm:px-6 py-4">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          style={{ borderColor: colors.$20 }}
+        />
+      </div>
 
       <Element
         leftSide={
@@ -145,12 +159,14 @@ export function Invoices() {
         }
       >
         <SelectField
-          onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-            handleToggleChange('settings.lock_invoices', event.target.value)
+          value={companyChanges?.settings?.lock_invoices?.toString() || 'off'}
+          onValueChange={(value) =>
+            handleToggleChange('settings.lock_invoices', value)
           }
-          value={companyChanges?.settings?.lock_invoices || 'off'}
           disabled={disableSettingsField('lock_invoices')}
           errorMessage={errors?.errors['settings.lock_invoices']}
+          customSelector
+          dismissable={false}
         >
           <option value="off">{t('off')}</option>
           <option value="when_sent">{t('when_sent')}</option>
@@ -158,6 +174,6 @@ export function Invoices() {
           <option value="end_of_month">{t('end_of_month')}</option>
         </SelectField>
       </Element>
-    </Card>
+    </>
   );
 }

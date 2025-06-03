@@ -28,6 +28,8 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { toast } from '$app/common/helpers/toast/toast';
 import { User } from '$app/common/interfaces/user';
+import { TableColumns } from './icons/TableColumns';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   table: ReactTableColumns;
@@ -42,6 +44,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
   const dispatch = useDispatch();
   const handleCurrentUserChangeProperty = useHandleCurrentUserChangeProperty();
 
+  const colors = useColorScheme();
   const userChanges = useInjectUserChanges();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -103,11 +106,17 @@ export function DataTableFooterColumnsPicker(props: Props) {
   return (
     <>
       <Button
-        className="mr-1"
+        className="shadow-sm"
         type="secondary"
         onClick={() => setIsModalOpen(true)}
       >
-        {t('footer')} {t('columns')}
+        <div className="flex items-center space-x-2">
+          <TableColumns size="1.3rem" color={colors.$3} />
+
+          <span className="hidden 2xl:flex">
+            {t('footer')} {t('columns')}
+          </span>
+        </div>
       </Button>
 
       <Modal

@@ -12,9 +12,14 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
+import { useColorScheme } from '$app/common/colors';
+import { Invoice } from '$app/components/icons/Invoice';
 
 export default function InvoiceDetails() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const customField = useCustomField();
 
   const defaultVariables = [
@@ -47,7 +52,21 @@ export default function InvoiceDetails() {
   ];
 
   return (
-    <Card title={t('invoice_details')} padding="small">
+    <Card
+      title={
+        <div className="flex items-center space-x-2">
+          <div>
+            <Invoice color="#2176FF" size="1.3rem" />
+          </div>
+
+          <span>{t('invoice_details')}</span>
+        </div>
+      }
+      padding="small"
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <SortableVariableList
         for="invoice_details"
         defaultVariables={defaultVariables}

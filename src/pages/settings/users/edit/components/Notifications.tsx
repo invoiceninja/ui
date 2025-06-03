@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
 import { User } from '$app/common/interfaces/user';
 import { cloneDeep } from 'lodash';
@@ -135,16 +135,17 @@ export function Notifications(props: Props) {
   };
 
   return (
-    <Card title={t('notifications')}>
+    <>
       <Element>{t('email')}</Element>
 
       <Element leftSide={t('all_events')}>
         <SelectField
-          withBlank
           value={defaultNotificationValue()}
           onValueChange={(value) =>
             handleNotificationChange('all_events', value)
           }
+          customSelector
+          withBlank
         >
           <option value="all_notifications">{t('all_records')}</option>
           <option value="all_user_notifications">{t('owned_by_user')}</option>
@@ -160,6 +161,8 @@ export function Notifications(props: Props) {
             onValueChange={(value) =>
               handleNotificationChange(notification.id, value)
             }
+            customSelector
+            dismissable={false}
           >
             <option value={`${notification.id}_all`}>{t('all_records')}</option>
             <option value={`${notification.id}_user`}>
@@ -169,6 +172,6 @@ export function Notifications(props: Props) {
           </SelectField>
         </Element>
       ))}
-    </Card>
+    </>
   );
 }
