@@ -215,7 +215,12 @@ export function EInvoice() {
       <PEPPOLPlanBanner />
 
       {Boolean(!company?.legal_entity_id) && (
-        <Card title={t('e_invoicing')}>
+        <Card
+          title={t('e_invoicing')}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <Element
             leftSide={
               <PropertyCheckbox
@@ -377,6 +382,8 @@ export function EInvoice() {
                         handleChange('settings.e_quote_type', value)
                       }
                       disabled={disableSettingsField('e_quote_type')}
+                      dismissable={false}
+                      customSelector
                     >
                       <option value="OrderX_Comfort">OrderX_Comfort</option>
                       <option value="OrderX_Basic">OrderX_Basic</option>
