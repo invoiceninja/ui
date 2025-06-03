@@ -1,7 +1,7 @@
 import { Alert } from '$app/components/Alert';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
@@ -288,7 +288,7 @@ function SignatorySelector({
       return;
     }
 
-    onSelect(value, type as 'user', entity as any); // @ts-ignore - type assertion for simplicity
+    onSelect(value, type as 'user', entity as any); // @ts-expect-error It's safe
   }
 
   return (
