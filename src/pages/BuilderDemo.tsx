@@ -224,6 +224,7 @@ function CreateClientForm({ fields, errors }: CreateClientTabProps) {
           <InputField
             label={t(field.name)}
             errorMessage={errors?.errors[field.name]}
+            onValueChange={field.onValueChange}
           />
         </div>
       ))}
@@ -241,6 +242,7 @@ function CreateUserForm({ fields, errors }: CreateClientTabProps) {
           <InputField
             label={t(field.name)}
             errorMessage={errors?.errors[field.name]}
+            onValueChange={field.onValueChange}
           />
         </div>
       ))}
