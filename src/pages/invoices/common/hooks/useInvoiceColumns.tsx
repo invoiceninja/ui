@@ -60,6 +60,7 @@ export const defaultColumns: string[] = [
   'number',
   'client',
   'amount',
+  'net_amount',
   'balance',
   'date',
   'due_date',
@@ -75,6 +76,7 @@ export function useAllInvoiceColumns() {
     'status',
     'number',
     'amount',
+    'net_amount',
     'client',
     'balance',
     'date',
@@ -169,6 +171,17 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
+        ),
+    },
+    {
+      column: 'net_amount',
+      id: 'amount',
+      label: t('net_amount'),
+      format: (value, invoice) =>
+        formatMoney(
+          Number(value) - Number(invoice.total_taxes || 0),
           invoice.client?.country_id,
           invoice.client?.settings.currency_id
         ),

@@ -596,6 +596,7 @@ export const defaultColumns: string[] = [
   'number',
   'client',
   'amount',
+  'net_amount',
   'remaining_cycles',
   'next_send_date',
   'frequency',
@@ -614,6 +615,7 @@ export function useAllRecurringInvoiceColumns() {
     'number',
     'client',
     'amount',
+    'net_amount',
     'remaining_cycles',
     'next_send_date',
     'frequency',
@@ -711,6 +713,17 @@ export function useRecurringInvoiceColumns() {
       format: (value, recurringInvoice) =>
         formatMoney(
           value,
+          recurringInvoice.client?.country_id,
+          recurringInvoice.client?.settings.currency_id
+        ),
+    },
+    {
+      column: 'net_amount',
+      id: 'amount',
+      label: t('net_amount'),
+      format: (value, recurringInvoice) =>
+        formatMoney(
+          Number(value) - Number(recurringInvoice.total_taxes || 0),
           recurringInvoice.client?.country_id,
           recurringInvoice.client?.settings.currency_id
         ),
