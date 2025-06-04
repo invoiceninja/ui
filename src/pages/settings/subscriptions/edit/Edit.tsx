@@ -33,12 +33,15 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useActions } from '../common/hooks/useActions';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Steps } from '../common/components/Steps';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment_link');
   const [t] = useTranslation();
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   const { id } = useParams();
   const { data } = useSubscriptionQuery({ id });
@@ -142,48 +145,63 @@ export function Edit() {
         )
       }
     >
-      <TabGroup tabs={tabs}>
-        <div>
-          {subscription && (
-            <Overview
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-              products={products}
-            />
-          )}
-        </div>
+      <Card
+        title={t('edit_payment_link')}
+        className="shadow-sm"
+        childrenClassName="pb-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutHeaderBorder
+        withoutBodyPadding
+      >
+        <TabGroup
+          tabs={tabs}
+          withHorizontalPadding
+          fullRightPadding
+          horizontalPaddingWidth="1.5rem"
+        >
+          <div>
+            {subscription && (
+              <Overview
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+                products={products}
+              />
+            )}
+          </div>
 
-        <div>
-          {subscription && (
-            <SubscriptionSettings
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-            />
-          )}
-        </div>
+          <div>
+            {subscription && (
+              <SubscriptionSettings
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          {subscription && (
-            <Webhook
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-            />
-          )}
-        </div>
+          <div>
+            {subscription && (
+              <Webhook
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          {subscription && (
-            <Steps
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-            />
-          )}
-        </div>
-      </TabGroup>
+          <div>
+            {subscription && (
+              <Steps
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+              />
+            )}
+          </div>
+        </TabGroup>
+      </Card>
     </Settings>
   );
 }

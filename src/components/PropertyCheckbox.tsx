@@ -77,7 +77,7 @@ export function PropertyCheckbox(props: Props) {
   }, [props.checked]);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center space-x-2">
       {!isCompanySettingsActive && (
         <Checkbox
           checked={checked}

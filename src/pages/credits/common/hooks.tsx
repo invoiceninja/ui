@@ -480,7 +480,7 @@ export function useActions(params?: Params) {
         })}
         entity="credit"
         entityId={credit.id}
-        label={`#${credit.number}`}
+        label={credit.number}
         labelElement={
           <EntityActionElement
             entity="credit"

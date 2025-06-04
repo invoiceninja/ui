@@ -68,34 +68,38 @@ export default function Edit() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {purchaseOrder && (
-            <div className="flex space-x-20">
-              <span
-                className="text-sm"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
-              >
-                {t('status')}
-              </span>
-              <PurchaseOrderStatus entity={purchaseOrder} />
-            </div>
-          )}
+        <Card
+          className="col-span-12 xl:col-span-4 h-max px-6 py-2 shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
+          <div className="flex flex-col space-y-4">
+            {purchaseOrder && (
+              <div className="flex items-center space-x-11">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('status')}
+                </span>
 
-          <VendorSelector
-            readonly
-            resource={purchaseOrder}
-            onChange={(id) => handleChange('vendor_id', id)}
-            onClearButtonClick={() => handleChange('vendor_id', '')}
-            onContactCheckboxChange={(id, checked) =>
-              purchaseOrder &&
-              handleInvitationChange(purchaseOrder, id, checked)
-            }
-            errorMessage={errors?.errors.vendor_id}
-          />
+                <div>
+                  <PurchaseOrderStatus entity={purchaseOrder} />
+                </div>
+              </div>
+            )}
+
+            <VendorSelector
+              resource={purchaseOrder}
+              onChange={(id) => handleChange('vendor_id', id)}
+              onClearButtonClick={() => handleChange('vendor_id', '')}
+              onContactCheckboxChange={(id, checked) =>
+                purchaseOrder &&
+                handleInvitationChange(purchaseOrder, id, checked)
+              }
+              errorMessage={errors?.errors.vendor_id}
+              readonly
+            />
+          </div>
         </Card>
 
         {purchaseOrder && (

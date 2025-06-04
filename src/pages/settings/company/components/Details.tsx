@@ -11,7 +11,6 @@
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { RootState } from '$app/common/stores/store';
-import { Card } from '$app/components/cards/Card';
 import { Element } from '$app/components/cards/Element';
 import { CustomField } from '$app/components/CustomField';
 import { InputField } from '$app/components/forms/InputField';
@@ -54,7 +53,7 @@ export function Details() {
   return (
     <>
       {companyChanges?.settings && (
-        <Card title={t('details')}>
+        <>
           <Element
             leftSide={
               <PropertyCheckbox
@@ -330,7 +329,7 @@ export function Details() {
               }
             />
           )}
-        </Card>
+        </>
       )}
     </>
   );

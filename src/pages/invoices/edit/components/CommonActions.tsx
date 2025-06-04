@@ -13,9 +13,7 @@ import {
   CommonActionsPreferenceModal,
   Entity as EntityType,
 } from '$app/components/CommonActionsPreferenceModal';
-import { Icon } from '$app/components/icons/Icon';
 import { useEffect, useState } from 'react';
-import { MdSettings } from 'react-icons/md';
 import { useActions as useInvoiceActions } from './Actions';
 import { ResourceAction } from '$app/components/DataTable';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
@@ -29,6 +27,8 @@ import { useActions as useRecurringInvoiceActions } from '$app/pages/recurring-i
 import { useActions as usePurchaseOrderActions } from '$app/pages/purchase-orders/common/hooks';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Gear } from '$app/components/icons/Gear';
+import { useColorScheme } from '$app/common/colors';
 
 type Resource = Invoice | Credit | Quote | RecurringInvoice | PurchaseOrder;
 
@@ -39,21 +39,21 @@ interface Props {
 export function CommonActions(props: Props) {
   const [t] = useTranslation();
 
-  const user = useCurrentUser();
+  const { resource, entity } = props;
 
-  const invoiceActions = useInvoiceActions({ dropdown: false });
-  const creditActions = useCreditActions({ dropdown: false });
+  const user = useCurrentUser();
+  const colors = useColorScheme();
+
   const quoteActions = useQuoteActions({ dropdown: false });
+  const creditActions = useCreditActions({ dropdown: false });
+  const invoiceActions = useInvoiceActions({ dropdown: false });
+  const purchaseOrderActions = usePurchaseOrderActions({ dropdown: false });
   const recurringInvoiceActions = useRecurringInvoiceActions({
     dropdown: false,
   });
-  const purchaseOrderActions = usePurchaseOrderActions({ dropdown: false });
-
-  const { resource, entity } = props;
 
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
     useState<boolean>(false);
-
   const [selectedActions, setSelectedActions] =
     useState<ResourceAction<Resource>[]>();
 
@@ -128,13 +128,11 @@ export function CommonActions(props: Props) {
           placement="bottom"
           withoutArrow
         >
-          <div>
-            <Icon
-              className="cursor-pointer"
-              element={MdSettings}
-              size={25}
-              onClick={() => setIsPreferenceModalOpen(true)}
-            />
+          <div
+            className="cursor-pointer"
+            onClick={() => setIsPreferenceModalOpen(true)}
+          >
+            <Gear size="1.4rem" color={colors.$3} />
           </div>
         </Tooltip>
       </div>

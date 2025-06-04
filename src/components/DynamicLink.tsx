@@ -33,6 +33,7 @@ export function DynamicLink(props: Props) {
       className={`text-sm hover:underline ${props.className}`}
       style={{ color: accentColor }}
       to={props.to}
+      onClick={(event) => event.stopPropagation()}
     >
       {props.children}
     </RouterLink>

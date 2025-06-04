@@ -22,7 +22,7 @@ export function Divider(props: Props) {
 
   return (
     <div
-      style={{ borderColor: props.borderColor || colors.$4 }}
+      style={{ borderColor: props.borderColor || colors.$21 }}
       className={classNames(
         'border-b',
         {

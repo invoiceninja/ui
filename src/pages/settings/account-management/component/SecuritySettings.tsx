@@ -12,7 +12,7 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { Button, SelectField } from '../../../../components/forms';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
@@ -80,7 +80,7 @@ export function SecuritySettings() {
   };
 
   return (
-    <Card title={t('security_settings')}>
+    <>
       {/* <Element leftSide={t('password_timeout')}>
         <SelectField
           id="default_password_timeout"
@@ -136,6 +136,6 @@ export function SecuritySettings() {
           {t('logout')}
         </Button>
       </Element>
-    </Card>
+    </>
   );
 }

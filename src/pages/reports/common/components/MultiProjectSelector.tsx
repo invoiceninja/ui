@@ -13,11 +13,12 @@ import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue } from 'react-select';
+import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
 import { useProjectsQuery } from '$app/common/queries/projects';
 import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
 
 interface Props {
   value?: string;
@@ -28,7 +29,7 @@ export function MultiProjectSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const customStyles = useSelectorCustomStyles();
+  const { customStyles } = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
 
@@ -61,18 +62,16 @@ export function MultiProjectSelector(props: Props) {
     <>
       {projects ? (
         <Element leftSide={t('projects')}>
-          <Select
+          <CustomMultiSelect
             id="projectItemSelector"
-            placeholder={t('projects')}
             {...(value && {
               value: projects?.filter((option) =>
                 value.split(',').find((projectId) => projectId === option.value)
               ),
             })}
-            onChange={(options) => onValueChange(handleChange(options))}
+            onValueChange={(options) => onValueChange(handleChange(options))}
             options={projects}
-            isMulti={true}
-            styles={customStyles}
+            isSearchable={true}
           />
         </Element>
       ) : (

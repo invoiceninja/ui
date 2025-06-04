@@ -51,7 +51,6 @@ export function TransactionForm(props: Props) {
 
       <Element required leftSide={t('type')}>
         <SelectField
-          style={{ color: colors.$3, colorScheme: colors.$0 }}
           value={
             props.transaction.base_type === ApiTransactionType.Credit
               ? TransactionType.Deposit
@@ -67,6 +66,10 @@ export function TransactionForm(props: Props) {
           }
           errorMessage={props.errors?.errors.base_type}
           cypressRef="transactionTypeSelector"
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
+          customSelector
+          dismissable={false}
+          searchable={false}
         >
           {Object.values(transactionTypes).map((transactionType) => (
             <option key={transactionType} value={transactionType}>

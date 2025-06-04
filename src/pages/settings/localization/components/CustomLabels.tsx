@@ -16,25 +16,29 @@ import {
 import { Divider } from '$app/components/cards/Divider';
 import { Modal } from '$app/components/Modal';
 import { cloneDeep } from 'lodash';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { X } from 'react-feather';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import {
   Button,
   InputField,
   Link,
   SelectField,
 } from '../../../../components/forms';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export function CustomLabels() {
   const [t] = useTranslation();
-  const companyChanges = useCompanyChanges();
+
   const dispatch = useDispatch();
 
-  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
-  const [customLabel, setCustomLabel] = useState('');
+  const colors = useColorScheme();
+  const companyChanges = useCompanyChanges();
+
+  const [customLabel, setCustomLabel] = useState<string>('');
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState<boolean>(false);
 
   const defaultLabels = [
     { property: 'amount', translation: t('amount') },
@@ -165,62 +169,69 @@ export function CustomLabels() {
         </Link>
       </Modal>
 
-      <Card
-        title={t('custom_labels')}
-        onFormSubmit={(event: FormEvent<HTMLFormElement>) =>
-          event.preventDefault()
+      <Element
+        leftSide={
+          <SelectField
+            onValueChange={(value) => handleSelectChange(value)}
+            customSelector
+            clearAfterSelection
+          >
+            <option value=""></option>
+            {defaultLabelsFiltered.map((label) => (
+              <option key={label.property} value={label.property}>
+                {label.translation}
+              </option>
+            ))}
+          </SelectField>
         }
       >
-        <Element
-          leftSide={
-            <SelectField
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleSelectChange(event.target.value)
-              }
-              defaultValue=""
-            >
-              <option value=""></option>
-              {defaultLabelsFiltered.map((label) => (
-                <option key={label.property} value={label.property}>
-                  {label.translation}
-                </option>
-              ))}
-            </SelectField>
-          }
+        <Button
+          behavior="button"
+          type="secondary"
+          onClick={() => setIsCustomModalOpen(true)}
         >
-          <Button
-            behavior="button"
-            type="minimal"
-            onClick={() => setIsCustomModalOpen(true)}
-          >
-            {t('add_custom')}
-          </Button>
-        </Element>
+          {t('add_custom')}
+        </Button>
+      </Element>
 
-        {Object.keys(companyChanges?.settings?.translations ?? []).length >
-          0 && <Divider />}
+      {Object.keys(companyChanges?.settings?.translations ?? []).length > 0 && (
+        <div className="px-4 sm:px-6  pt-2 pb-4">
+          <Divider
+            className="border-dashed"
+            withoutPadding
+            borderColor={colors.$20}
+          />
+        </div>
+      )}
 
-        {Object.keys(companyChanges?.settings?.translations ?? []).map(
-          (translation) => (
-            <Element leftSide={labelLeftSide(translation)} key={translation}>
-              <div className="flex items-center space-x-4">
-                <InputField
-                  value={
-                    companyChanges?.settings?.translations[translation] || ''
-                  }
-                  onChange={handleChange}
-                  id={`settings.translations.${translation}`}
-                />
+      {Object.keys(companyChanges?.settings?.translations ?? []).map(
+        (translation) => (
+          <Element leftSide={labelLeftSide(translation)} key={translation}>
+            <div className="flex items-center space-x-4">
+              <InputField
+                value={
+                  companyChanges?.settings?.translations[translation] || ''
+                }
+                onChange={handleChange}
+                id={`settings.translations.${translation}`}
+              />
 
-                <X
-                  className="cursor-pointer"
-                  onClick={() => handleDelete(translation)}
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDelete(translation)}
+              >
+                <CircleXMark
+                  color={colors.$16}
+                  hoverColor={colors.$3}
+                  borderColor={colors.$5}
+                  hoverBorderColor={colors.$17}
+                  size="1.6rem"
                 />
               </div>
-            </Element>
-          )
-        )}
-      </Card>
+            </div>
+          </Element>
+        )
+      )}
     </>
   );
 }

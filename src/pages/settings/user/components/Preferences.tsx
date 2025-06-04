@@ -11,23 +11,26 @@
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, ClickableElement, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { updateChanges } from '$app/common/stores/slices/user';
 import {
   preferencesDefaults,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Inline } from '$app/components/Inline';
-import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { StatusColorTheme } from './StatusColorTheme';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
+import { Divider } from '$app/components/cards/Divider';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export function Preferences() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const handleChange = (property: string, value: string | number | boolean) => {
@@ -41,140 +44,135 @@ export function Preferences() {
 
   return (
     <div className="space-y-4">
-      <Card title={t('preferences')}>
-        <Element leftSide={t('show_pdf_preview')}>
-          <Toggle
-            checked={
-              typeof reactSettings.show_pdf_preview === 'boolean'
-                ? reactSettings.show_pdf_preview
-                : true
-            }
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.show_pdf_preview',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element leftSide={t('show_pdf_preview')}>
+        <Toggle
+          checked={
+            typeof reactSettings.show_pdf_preview === 'boolean'
+              ? reactSettings.show_pdf_preview
+              : true
+          }
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.show_pdf_preview', value)
+          }
+        />
+      </Element>
 
-        <Element leftSide={t('show_document_preview')}>
-          <Toggle
-            checked={Boolean(reactSettings.show_document_preview)}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.show_document_preview',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element leftSide={t('show_document_preview')}>
+        <Toggle
+          checked={Boolean(reactSettings.show_document_preview)}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.show_document_preview',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('react_notification_link')}
-          leftSideHelp={t('react_notification_link_help')}
-        >
-          <Toggle
-            checked={reactSettings.react_notification_link}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.react_notification_link',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('react_notification_link')}
+        leftSideHelp={t('react_notification_link_help')}
+      >
+        <Toggle
+          checked={reactSettings.react_notification_link}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.react_notification_link',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('number_precision')}
-          leftSideHelp={t('number_precision_help')}
-        >
-          <NumberInputField
-            precision={0}
-            value={reactSettings?.number_precision || ''}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.number_precision',
-                Number(value)
-              )
-            }
-            placeholder={t('number_precision')}
-            disablePrecision
-          />
-        </Element>
+      <Element
+        leftSide={t('number_precision')}
+        leftSideHelp={t('number_precision_help')}
+      >
+        <NumberInputField
+          precision={0}
+          value={reactSettings?.number_precision || ''}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.number_precision',
+              Number(value)
+            )
+          }
+          placeholder={t('number_precision')}
+          disablePrecision
+        />
+      </Element>
 
-        <Element leftSide={t('dark_mode')}>
-          <Toggle
-            checked={Boolean(reactSettings?.dark_mode)}
-            onChange={(value) =>
-              handleChange('company_user.react_settings.dark_mode', value)
-            }
-          />
-        </Element>
+      <Element leftSide={t('dark_mode')}>
+        <Toggle
+          checked={Boolean(reactSettings?.dark_mode)}
+          onChange={(value) =>
+            handleChange('company_user.react_settings.dark_mode', value)
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('show_table_footer')}
-          leftSideHelp={t('show_table_footer_help')}
-        >
-          <Toggle
-            checked={Boolean(reactSettings?.show_table_footer)}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.show_table_footer',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('show_table_footer')}
+        leftSideHelp={t('show_table_footer_help')}
+      >
+        <Toggle
+          checked={Boolean(reactSettings?.show_table_footer)}
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.show_table_footer', value)
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('auto_expand_product_table_notes')}
-          leftSideHelp={t('auto_expand_product_table_notes_help')}
-        >
-          <Toggle
-            checked={Boolean(
-              reactSettings.preferences.auto_expand_product_table_notes
-            )}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.preferences.auto_expand_product_table_notes',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('auto_expand_product_table_notes')}
+        leftSideHelp={t('auto_expand_product_table_notes_help')}
+      >
+        <Toggle
+          checked={Boolean(
+            reactSettings.preferences.auto_expand_product_table_notes
+          )}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.auto_expand_product_table_notes',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element leftSide={t('enable_public_notifications')} leftSideHelp={t('enable_public_notifications_help')}>
-          <Toggle
-            checked={Boolean(
-              reactSettings.preferences.enable_public_notifications
-            )}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.preferences.enable_public_notifications',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('enable_public_notifications')}
+        leftSideHelp={t('enable_public_notifications_help')}
+      >
+        <Toggle
+          checked={Boolean(
+            reactSettings.preferences.enable_public_notifications
+          )}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.enable_public_notifications',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <Element
-          leftSide={t('use_system_fonts')}
-          leftSideHelp={t('use_system_fonts_help')}
-        >
-          <Toggle
-            checked={Boolean(reactSettings.preferences.use_system_fonts)}
-            onValueChange={(value) =>
-              handleChange(
-                'company_user.react_settings.preferences.use_system_fonts',
-                value
-              )
-            }
-          />
-        </Element>
+      <Element
+        leftSide={t('use_system_fonts')}
+        leftSideHelp={t('use_system_fonts_help')}
+      >
+        <Toggle
+          checked={Boolean(reactSettings.preferences.use_system_fonts)}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.use_system_fonts',
+              value
+            )
+          }
+        />
+      </Element>
 
-        <StatusColorTheme />
-      </Card>
+      <StatusColorTheme />
 
       <PreferenceCard
         title={`${t('dashboard')} ${t('charts')}`}
@@ -203,6 +201,7 @@ interface PreferenceCardProps {
 }
 
 function PreferenceCard({ title, children, path }: PreferenceCardProps) {
+  const colors = useColorScheme();
   const { preferences } = usePreferences();
 
   if (
@@ -212,7 +211,23 @@ function PreferenceCard({ title, children, path }: PreferenceCardProps) {
     return null;
   }
 
-  return <Card title={title}>{children}</Card>;
+  return (
+    <>
+      <div className="px-4 sm:px-6 pt-4">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
+
+      <div className="px-4 sm:px-6">
+        <div className="text-lg pt-4 pb-2 font-medium">{title}</div>
+
+        <div>{children}</div>
+      </div>
+    </>
+  );
 }
 
 interface PreferenceProps {
@@ -220,6 +235,7 @@ interface PreferenceProps {
 }
 
 function Preference({ path }: PreferenceProps) {
+  const colors = useColorScheme();
   const { preferences, update } = usePreferences();
   const { t } = useTranslation();
 
@@ -236,18 +252,27 @@ function Preference({ path }: PreferenceProps) {
   }
 
   return (
-    <ClickableElement
-      onClick={() =>
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        update(`preferences.${path}`, get(preferencesDefaults, path))
-      }
-    >
-      <Inline className="space-x-2">
-        <div>{translations[path as keyof typeof translations]}</div>
+    <div className="flex items-center justify-between w-60 py-3 px-4 sm:px-6">
+      <div className="text-sm font-medium">
+        {translations[path as keyof typeof translations]}
+      </div>
 
-        <X size={18} />
-      </Inline>
-    </ClickableElement>
+      <div
+        className="hover:opacity-75 cursor-pointer"
+        onClick={() =>
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          update(`preferences.${path}`, get(preferencesDefaults, path))
+        }
+      >
+        <CircleXMark
+          color={colors.$16}
+          hoverColor={colors.$3}
+          borderColor={colors.$5}
+          hoverBorderColor={colors.$17}
+          size="1.6rem"
+        />
+      </div>
+    </div>
   );
 }

@@ -21,7 +21,7 @@ export default function CreatePage() {
     context;
 
   return (
-    <div className="flex flex-col xl:flex-row xl:gap-4">
+    <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:gap-4">
       <div className="w-full xl:w-1/2">
         <Details
           client={client}
@@ -31,7 +31,7 @@ export default function CreatePage() {
         />
       </div>
 
-      <div className="w-full xl:w-1/2">
+      <div className="w-full xl:w-1/2 space-y-4">
         <Contacts
           contacts={contacts}
           setContacts={setContacts}

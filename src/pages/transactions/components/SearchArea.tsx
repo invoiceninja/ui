@@ -13,12 +13,10 @@ import { trans } from '$app/common/helpers';
 import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { BiPlusCircle } from 'react-icons/bi';
-import { MdFilterAlt } from 'react-icons/md';
 import { FilterModal } from './FilterModal';
 import { SearchInput } from './ListBox';
 import { useColorScheme } from '$app/common/colors';
-import { Icon } from '$app/components/icons/Icon';
+import { Plus } from '$app/components/icons/Plus';
 
 interface Props {
   searchParams: SearchInput;
@@ -73,45 +71,39 @@ export function SearchArea(props: Props) {
 
       <div className="flex items-center pr-3">
         <InputField
-          changeOverride={true}
-          style={{
-            color: colors.$3,
-            colorScheme: colors.$0,
-            backgroundColor: colors.$1,
-            borderColor: colors.$4,
-          }}
-          placeholder={trans(`search_${props.dataKey}`, {
-            count: '',
-          })}
           value={props.searchParams.searchTerm}
           onValueChange={(value) =>
             handleChangeSearchParams('searchTerm', value)
           }
+          placeholder={trans(`search_${props.dataKey}`, {
+            count: '',
+          })}
+          changeOverride={true}
         />
 
         {isInvoicesDataKey || isPaymentsDataKey || isExpensesDataKey ? (
           <>
-            <Icon
+            {/* <Icon
               element={MdFilterAlt}
               className="ml-3 cursor-pointer"
               size={28}
               onClick={() =>
                 props.setIsFilterModalOpened((prevState) => !prevState)
               }
-            />
+            /> */}
           </>
         ) : (
           <>
-            <Icon
-              element={BiPlusCircle}
-              className="ml-3 cursor-pointer"
-              size={28}
+            <div
+              className="ml-3 cursor-pointer hover:opacity-75"
               onClick={() =>
                 props.dataKey === 'vendors'
                   ? setIsCreateVendorModalOpen(true)
                   : setIsCreateExpenseCategoryModalOpen(true)
               }
-            />
+            >
+              <Plus color={colors.$3} size="1.3rem" />
+            </div>
           </>
         )}
 

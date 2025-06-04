@@ -58,35 +58,39 @@ export default function Edit() {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {recurringInvoice && (
-            <div className="flex space-x-20">
-              <span
-                className="text-sm"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
-              >
-                {t('status')}
-              </span>
-              <RecurringInvoiceStatusBadge entity={recurringInvoice} />
-            </div>
-          )}
+        <Card
+          className="col-span-12 xl:col-span-4 h-max px-6 py-2 shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
+          <div className="flex flex-col space-y-4">
+            {recurringInvoice && (
+              <div className="flex items-center space-x-9">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('status')}
+                </span>
 
-          <ClientSelector
-            resource={recurringInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onLocationChange={(locationId) =>
-              handleChange('location_id', locationId)
-            }
-            onContactCheckboxChange={handleInvitationChange}
-            errorMessage={errors?.errors.client_id}
-            textOnly
-            readonly
-          />
+                <div>
+                  <RecurringInvoiceStatusBadge entity={recurringInvoice} />
+                </div>
+              </div>
+            )}
+
+            <ClientSelector
+              resource={recurringInvoice}
+              onChange={(id) => handleChange('client_id', id)}
+              onClearButtonClick={() => handleChange('client_id', '')}
+              onLocationChange={(locationId) =>
+                handleChange('location_id', locationId)
+              }
+              onContactCheckboxChange={handleInvitationChange}
+              errorMessage={errors?.errors.client_id}
+              textOnly
+              readonly
+            />
+          </div>
         </Card>
 
         <InvoiceDetails handleChange={handleChange} errors={errors} />

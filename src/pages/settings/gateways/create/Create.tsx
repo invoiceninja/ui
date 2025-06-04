@@ -41,8 +41,11 @@ import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import classNames from 'classnames';
-import { HelpWidget } from '$app/components/HelpWidget';
+import { $help, HelpWidget } from '$app/components/HelpWidget';
 import { DuplicatingGatewayModal } from './components/DuplicatingGatewayModal';
+import { useColorScheme } from '$app/common/colors';
+import { HelpCircle } from 'react-feather';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -104,6 +107,8 @@ export function Create() {
   ];
 
   const gateways = useGateways();
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
 
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
   const { data: companyGatewaysResponse } = useCompanyGatewaysQuery({
@@ -352,72 +357,119 @@ export function Create() {
         onCancel={handleOnDuplicatingGatewayCancel}
       />
 
-      <TabGroup
-        tabs={tabs}
-        defaultTabIndex={tabIndex}
-        onTabChange={(index) => setTabIndex(index)}
+      <Card
+        title={t('add_gateway')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+        topRight={
+          <>
+            {tabIndex === 1 && (
+              <button
+                style={{ color: '#0062FF' }}
+                type="button"
+                onClick={() =>
+                  $help('gateways', {
+                    moveToHeading: 'Credentials',
+                  })
+                }
+                className="inline-flex items-center space-x-1 text-sm"
+              >
+                <HelpCircle size={18} />
+
+                <span>{t('documentation')}</span>
+              </button>
+            )}
+
+            {tabIndex === 3 && (
+              <button
+                style={{ color: '#0062FF' }}
+                type="button"
+                onClick={() =>
+                  $help('gateways', {
+                    moveToHeading: 'Limits/Fees',
+                  })
+                }
+                className="inline-flex items-center space-x-1 text-sm"
+              >
+                <HelpCircle size={18} />
+                <span>{t('documentation')}</span>
+              </button>
+            )}
+          </>
+        }
       >
-        <Card title={t('add_gateway')}>
-          <Element leftSide={t('payment_provider')}>
-            <SelectField
-              value={gateway?.id || ''}
-              onValueChange={(value) => handleChange(value, true)}
-              errorMessage={errors?.errors.gateway_key}
-              customSelector
-              withBlank
-            >
-              {filteredGateways.map((gateway, index) => (
-                <option value={gateway.id} key={index}>
-                  {gateway.name}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-        </Card>
+        <TabGroup
+          tabs={tabs}
+          defaultTabIndex={tabIndex}
+          withHorizontalPadding
+          fullRightPadding
+          horizontalPaddingWidth="1.5rem"
+          onTabChange={(index) => setTabIndex(index)}
+        >
+          <div>
+            <Element leftSide={t('payment_provider')}>
+              <SelectField
+                value={gateway?.id || ''}
+                onValueChange={(value) => handleChange(value, true)}
+                errorMessage={errors?.errors.gateway_key}
+                customSelector
+                withBlank
+              >
+                {filteredGateways.map((gateway, index) => (
+                  <option value={gateway.id} key={index}>
+                    {gateway.name}
+                  </option>
+                ))}
+              </SelectField>
+            </Element>
+          </div>
 
-        <div>
-          {gateway && companyGateway && (
-            <Credentials
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-              errors={errors}
-            />
-          )}
-        </div>
+          <div>
+            {gateway && companyGateway && (
+              <Credentials
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          {gateway && companyGateway && (
-            <GatewaySettings
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-              errors={errors}
-            />
-          )}
-        </div>
+          <div>
+            {gateway && companyGateway && (
+              <GatewaySettings
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          {gateway && companyGateway && (
-            <RequiredFields
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-            />
-          )}
-        </div>
+          <div>
+            {gateway && companyGateway && (
+              <RequiredFields
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+              />
+            )}
+          </div>
 
-        <div>
-          {gateway && companyGateway && (
-            <LimitsAndFees
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-              errors={errors}
-            />
-          )}
-        </div>
-      </TabGroup>
+          <div>
+            {gateway && companyGateway && (
+              <LimitsAndFees
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+                errors={errors}
+              />
+            )}
+          </div>
+        </TabGroup>
+      </Card>
 
       {!tabIndex && (
         <div className="flex flex-wrap gap-4">
@@ -426,9 +478,16 @@ export function Create() {
               availableGatewayLogos.includes(
                 getGatewayNameByKey(gateway.key)
               ) && (
-                <Card key={index} className="w-52">
+                <Card
+                  key={index}
+                  className="w-52 shadow-sm"
+                  style={{ borderColor: colors.$24 }}
+                >
                   <div className="flex flex-col items-center justify-between h-52">
-                    <div className="flex justify-center items-center border-b border-b-gray-200 w-full h-28">
+                    <div
+                      className="flex justify-center items-center border-b w-full h-28"
+                      style={{ borderColor: colors.$20 }}
+                    >
                       <GatewayTypeIcon
                         name={
                           getGatewayNameByKey(gateway.key) as GatewayLogoName

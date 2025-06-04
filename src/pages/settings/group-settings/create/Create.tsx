@@ -23,12 +23,14 @@ import { useHandleCreate } from '../common/hooks/useHandleCreate';
 import { Card } from '$app/components/cards';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('new_group');
 
+  const colors = useColorScheme();
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
@@ -68,7 +70,12 @@ export function Create() {
       <AdvancedSettingsPlanAlert />
 
       {groupSettings && (
-        <Card title={t('new_group')}>
+        <Card
+          title={t('new_group')}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <GroupSettingsForm
             groupSettings={groupSettings}
             handleChange={handleChange}

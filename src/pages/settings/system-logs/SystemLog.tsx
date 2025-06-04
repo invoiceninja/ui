@@ -18,10 +18,11 @@ import { SystemLogRecord } from '$app/common/interfaces/system-log';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Card, Element } from '$app/components/cards';
-import { Divider } from '$app/components/cards/Divider';
 import { JSONTree } from 'react-json-tree';
 import { Badge } from '$app/components/Badge';
 import { Settings } from '$app/components/layouts/Settings';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 interface Category {
   id: number;
@@ -51,6 +52,9 @@ const jsonTreeTheme = {
 
 export function SystemLog() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('system_logs'), href: '/settings/system_logs' },
@@ -157,32 +161,45 @@ export function SystemLog() {
         </NonClickableElement>
       )}
 
-      <Card>
+      <Card
+        title={t('system_logs')}
+        className="shadow-sm pb-6"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+      >
         {data?.data.data.map(
           (
             systemLog: SystemLogRecord,
             index: number,
             { length }: { length: number }
           ) => (
-            <div key={index}>
-              <Element
+            <div className="px-4 sm:px-6">
+              <div
                 key={index}
-                leftSide={getCategory(systemLog.category_id)}
-                leftSideHelp={`${getType(systemLog.type_id)} ${formatDate(
-                  systemLog.created_at,
-                  dateFormat
-                )}`}
+                className={classNames('pt-4', {
+                  'border-b border-dashed pb-4': index !== length - 1,
+                })}
+                style={{ borderColor: colors.$20 }}
               >
-                <div className="flex flex-col space-y-2">
-                  <div>
-                    <Badge>{getEvent(systemLog.event_id)}</Badge>
+                <Element
+                  key={index}
+                  leftSide={getCategory(systemLog.category_id)}
+                  leftSideHelp={`${getType(systemLog.type_id)} ${formatDate(
+                    systemLog.created_at,
+                    dateFormat
+                  )}`}
+                  noExternalPadding
+                >
+                  <div className="flex flex-col space-y-2">
+                    <div>
+                      <Badge>{getEvent(systemLog.event_id)}</Badge>
+                    </div>
+
+                    <div>{getLog(systemLog.log)}</div>
                   </div>
-
-                  <div>{getLog(systemLog.log)}</div>
-                </div>
-              </Element>
-
-              {index + 1 !== length && <Divider />}
+                </Element>
+              </div>
             </div>
           )
         )}

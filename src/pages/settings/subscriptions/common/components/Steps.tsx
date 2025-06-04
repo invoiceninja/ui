@@ -1,10 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { SubscriptionProps } from './Overview';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
 import { useEffect, useState } from 'react';
-import { Icon } from '$app/components/icons/Icon';
-import { MdClose, MdDragHandle } from 'react-icons/md';
 import {
   DragDropContext,
   Draggable,
@@ -16,6 +14,9 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export type Steps = Record<
   string,
@@ -28,6 +29,8 @@ export function Steps({
   errors,
 }: SubscriptionProps) {
   const { t } = useTranslation();
+
+  const colors = useColorScheme();
 
   const steps = subscription.steps ? subscription.steps.split(',') : [];
 
@@ -94,7 +97,7 @@ export function Steps({
     });
 
   return (
-    <Card title={t('steps')}>
+    <>
       <Element leftSide={t('authentication')}>
         <SelectField
           value=""
@@ -102,6 +105,7 @@ export function Steps({
             handleChange('steps', [...steps, value].join(','));
           }}
           withBlank
+          customSelector
         >
           {auth.map((column, index) => (
             <option key={index} value={column.id}>
@@ -118,6 +122,7 @@ export function Steps({
             handleChange('steps', [...steps, value].join(','));
           }}
           withBlank
+          customSelector
         >
           {filtered
             .filter((step) => !step.id.startsWith('auth.'))
@@ -147,18 +152,27 @@ export function Steps({
                         className="flex items-center justify-between py-2"
                       >
                         <div className="flex space-x-2 items-center">
-                          <Icon
-                            className="cursor-pointer"
-                            element={MdClose}
-                            size={20}
-                            onClick={() => handleDelete(step)}
-                          />
+                          <div {...provided.dragHandleProps}>
+                            <GridDotsVertical
+                              size="1.2rem"
+                              color={colors.$17}
+                            />
+                          </div>
 
                           <p>{t(step)}</p>
                         </div>
 
-                        <div {...provided.dragHandleProps}>
-                          <Icon element={MdDragHandle} size={23} />
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => handleDelete(step)}
+                        >
+                          <CircleXMark
+                            color={colors.$16}
+                            hoverColor={colors.$3}
+                            borderColor={colors.$5}
+                            hoverBorderColor={colors.$17}
+                            size="1.6rem"
+                          />
                         </div>
                       </div>
                     )}
@@ -181,6 +195,6 @@ export function Steps({
           </div>
         ) : null}
       </Element>
-    </Card>
+    </>
   );
 }

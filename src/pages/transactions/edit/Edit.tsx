@@ -34,6 +34,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useCleanDescriptionText } from '../common/hooks/useCleanDescription';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -47,6 +48,7 @@ export default function Edit() {
   const { data } = useTransactionQuery({ id });
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   const resolveCurrencySeparator = useResolveCurrencySeparator();
 
@@ -147,7 +149,16 @@ export default function Edit() {
       }
     >
       <Container breadcrumbs={[]}>
-        <Card title={documentTitle}>
+        <Card
+          title={documentTitle}
+          className="shadow-sm"
+          style={{
+            borderColor: colors.$24,
+          }}
+          headerStyle={{
+            borderColor: colors.$20,
+          }}
+        >
           {transaction && currencySeparators && (
             <TransactionForm
               page="edit"

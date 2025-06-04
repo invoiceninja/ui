@@ -30,11 +30,15 @@ import { Permissions } from '../edit/components/Permissions';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   useTitle('new_user');
 
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -133,13 +137,32 @@ export function Create() {
         onClose={setIsPasswordConfirmModalOpen}
       />
 
-      <TabGroup tabs={tabs}>
-        <div>
-          {user && <Details user={user} setUser={setUser} errors={errors} />}
-        </div>
-        <div>{user && <Notifications user={user} setUser={setUser} />}</div>
-        <div>{user && <Permissions user={user} setUser={setUser} />}</div>
-      </TabGroup>
+      <Card
+        title={t('new_user')}
+        className="shadow-sm pb-6"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+      >
+        <TabGroup
+          tabs={tabs}
+          horizontalPaddingWidth="1.5rem"
+          withHorizontalPadding
+          fullRightPadding
+          withoutVerticalMargin
+        >
+          <div className="pt-4">
+            {user && <Details user={user} setUser={setUser} errors={errors} />}
+          </div>
+          <div className="pt-4">
+            {user && <Notifications user={user} setUser={setUser} />}
+          </div>
+          <div className="pt-4">
+            {user && <Permissions user={user} setUser={setUser} />}
+          </div>
+        </TabGroup>
+      </Card>
     </Settings>
   );
 }

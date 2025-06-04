@@ -10,7 +10,6 @@
 
 import { useTranslation } from 'react-i18next';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Card } from '$app/components/cards';
 import { Field } from '../components/Field';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
@@ -20,7 +19,6 @@ export function Tasks() {
 
   const [t] = useTranslation();
 
-  const title = `${t('custom_fields')}: ${t('tasks')}`;
   const company = useCompanyChanges();
   const handleChange = useHandleCustomFieldChange();
 
@@ -29,7 +27,7 @@ export function Tasks() {
   }
 
   return (
-    <Card title={title}>
+    <div className="px-4 sm:px-6">
       {['task1', 'task2', 'task3', 'task4'].map((field) => (
         <Field
           key={field}
@@ -37,8 +35,9 @@ export function Tasks() {
           placeholder={t('task_field')}
           onChange={(value) => handleChange(field, value)}
           initialValue={company.custom_fields[field]}
+          withArrowAsSeparator
         />
       ))}
-    </Card>
+    </div>
   );
 }

@@ -16,6 +16,7 @@ import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
+import { ClientShowCard } from '$app/pages/clients/show/components/CardsCustomizationModal';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -67,6 +68,7 @@ export interface ReactSettings {
   show_table_footer?: boolean;
   dark_mode?: boolean;
   color_theme?: ColorTheme;
+  client_show_cards?: ClientShowCard[];
 }
 
 export type ReactTableColumns =

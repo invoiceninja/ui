@@ -11,16 +11,24 @@
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { Link } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
 
 export default function ProductFields() {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   return (
-    <Card title={t('custom_fields')} withContainer>
-      <div>
+    <Card
+      title={t('custom_fields')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
+      <div className="px-6">
         <span className="text-sm">{t('custom_fields')} &nbsp;</span>
         <Link to="/settings/custom_fields/products" className="capitalize">
-          {t('click_here')}
+          {t('click_here')}.
         </Link>
       </div>
     </Card>

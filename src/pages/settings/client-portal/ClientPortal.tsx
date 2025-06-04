@@ -19,26 +19,26 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useTabs } from './common/hooks/useTabs';
 import { Tabs } from '$app/components/Tabs';
 import { Outlet } from 'react-router-dom';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function ClientPortal() {
   useTitle('client_portal');
 
-  useInjectCompanyChanges();
-
   const [t] = useTranslation();
+
+  useInjectCompanyChanges();
+  const onCancel = useDiscardChanges();
+  const onSave = useHandleCompanySave();
+
+  const tabs = useTabs();
+  const colors = useColorScheme();
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('client_portal'), href: '/settings/client_portal' },
   ];
-
-  const onSave = useHandleCompanySave();
-
-  const onCancel = useDiscardChanges();
-
-  const showPlanAlert = useShouldDisableAdvanceSettings();
-
-  const tabs = useTabs();
 
   return (
     <Settings
@@ -49,13 +49,27 @@ export function ClientPortal() {
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
     >
-      <Tabs tabs={tabs} className="mt-6" />
-
       <AdvancedSettingsPlanAlert />
 
-      <div className="my-4">
-        <Outlet />
-      </div>
+      <Card
+        title={t('client_portal')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+      >
+        <Tabs
+          tabs={tabs}
+          withHorizontalPadding
+          horizontalPaddingWidth="1.5rem"
+          fullRightPadding
+          withHorizontalPaddingOnSmallScreen
+        />
+
+        <div className="pt-4 pb-6">
+          <Outlet />
+        </div>
+      </Card>
     </Settings>
   );
 }

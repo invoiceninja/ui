@@ -59,7 +59,7 @@ import { DateRangePicker } from './datatables/DateRangePicker';
 import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useColorScheme } from '$app/common/colors';
 
 export interface DateRangeColumn {
   column: string;
@@ -101,7 +101,6 @@ interface StyleOptions {
   tBodyStyle?: CSSProperties;
   thClassName?: string;
   tdClassName?: string;
-  addRowSeparator?: boolean;
   thStyle?: CSSProperties;
   withoutThVerticalPadding?: boolean;
   useOnlyCurrentSortDirectionIcon?: boolean;
@@ -109,7 +108,7 @@ interface StyleOptions {
   disableThUppercase?: boolean;
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
-  rowSeparatorColor?: string;
+  withoutTdPadding?: boolean;
 }
 
 interface Props<T> extends CommonProps {
@@ -129,7 +128,6 @@ interface Props<T> extends CommonProps {
   withoutPagination?: boolean;
   rightSide?: ReactNode;
   withoutPadding?: boolean;
-  leftSideChevrons?: ReactNode;
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
@@ -168,11 +166,10 @@ export type PerPage = '10' | '50' | '100';
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const options = useDataTableOptions();
-
   const reactSettings = useReactSettings();
-
-  const themeColors = useThemeColorScheme();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -504,8 +501,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                   type="component"
                   guards={props.linkToCreateGuards || []}
                   component={
-                    <Button to={props.linkToCreate}>
-                      <span>{t(`new_${props.resource}`)}</span>
+                    <Button to={props.linkToCreate} className="shadow-sm">
+                      {t(`new_${props.resource}`)}
                     </Button>
                   }
                 />
@@ -515,7 +512,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           beforeFilter={props.beforeFilter}
           withoutStatusFilter={props.withoutStatusFilter}
         >
-          {!hideEditableOptions && (
+          {Boolean(!hideEditableOptions && selectedResources.length) && (
             <Dropdown
               label={t('actions')}
               disabled={!selected.length}
@@ -620,6 +617,10 @@ export function DataTable<T extends object>(props: Props<T>) {
             >
               <Checkbox
                 innerRef={mainCheckbox}
+                checked={
+                  selected.length === data?.data.data.length &&
+                  data?.data.data.length > 0
+                }
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   Array.from(
                     document.querySelectorAll('.child-checkbox')
@@ -687,12 +688,11 @@ export function DataTable<T extends object>(props: Props<T>) {
         <Tbody style={styleOptions?.tBodyStyle}>
           {isLoading && (
             <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
+              className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
               style={{
-                borderColor: styleOptions?.rowSeparatorColor,
+                borderColor: colors.$20,
               }}
             >
               <Td colSpan={100}>
@@ -703,12 +703,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
           {isError && (
             <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
+              className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
               style={{
-                borderColor: styleOptions?.rowSeparatorColor,
+                borderColor: colors.$20,
               }}
             >
               <Td className="text-center" colSpan={100}>
@@ -719,16 +718,19 @@ export function DataTable<T extends object>(props: Props<T>) {
 
           {data && data.data.data.length === 0 && (
             <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
+              className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
               style={{
-                borderColor: styleOptions?.rowSeparatorColor,
+                borderColor: colors.$20,
               }}
             >
               <Td className={styleOptions?.tdClassName} colSpan={100}>
-                {t('no_records_found')}
+                <div className="flex items-center justify-center py-10">
+                  <span className="text-sm" style={{ color: colors.$17 }}>
+                    {t('no_records_found')}
+                  </span>
+                </div>
               </Td>
             </Tr>
           )}
@@ -737,13 +739,15 @@ export function DataTable<T extends object>(props: Props<T>) {
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr
                 key={index}
-                className={classNames({
-                  'border-b border-gray-200': styleOptions?.addRowSeparator,
+                className={classNames('border-b', {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
-                backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
+                backgroundColor={index % 2 === 0 ? colors.$7 : ''}
                 style={{
-                  borderColor: styleOptions?.rowSeparatorColor,
+                  borderColor: colors.$20,
+                  backgroundColor: selected.includes(resource.id)
+                    ? colors.$7
+                    : 'transparent',
                 }}
               >
                 {!props.withoutActions && !hideEditableOptions && (
@@ -786,6 +790,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                               : document.getElementById(resource.id)?.click();
                           }
                         }}
+                        withoutPadding={styleOptions?.withoutTdPadding}
                         resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
                         {column.format
@@ -924,7 +929,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           onRowsChange={setPerPage}
           totalPages={data.data.meta.pagination.total_pages}
           totalRecords={data.data.meta.pagination.total}
-          leftSideChevrons={props.leftSideChevrons}
         />
       )}
     </div>

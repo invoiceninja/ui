@@ -26,10 +26,13 @@ interface Props extends CommonProps {
   withoutActionContainer?: boolean;
   topRight?: ReactNode;
   withoutDivider?: boolean;
+  withoutHeaderBorder?: boolean;
 }
 
 export function Slider(props: Props) {
   const colors = useColorScheme();
+
+  const { withoutHeaderBorder } = props;
 
   return (
     <Transition.Root show={props.visible} as={Fragment}>
@@ -55,12 +58,14 @@ export function Slider(props: Props) {
             >
               <form
                 onSubmit={(event) => event.preventDefault()}
-                className="border flex h-full flex-col divide-y divide-gray-200 shadow-xl"
-                style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+                className="border flex h-full flex-col shadow-xl"
+                style={{ backgroundColor: colors.$1, borderColor: colors.$20 }}
               >
                 <div className="flex flex-col flex-1 h-0 overflow-y-auto">
                   <div
-                    className="py-4 px-4 sm:px-6 border-b"
+                    className={classNames('py-4 px-4 sm:px-6', {
+                      'border-b': !withoutHeaderBorder,
+                    })}
                     style={{ borderColor: colors.$4 }}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -87,18 +92,21 @@ export function Slider(props: Props) {
                     <div
                       className={classNames('flex flex-col flex-1 w-full', {
                         'p-4': props.withContainer,
-                        'divide-y divide-gray-200': !props.withoutDivider,
+                        'divide-y': !props.withoutDivider,
                       })}
+                      style={{ borderColor: colors.$20 }}
                     >
                       {props.children}
                     </div>
                   </div>
                 </div>
+
                 {props.actionChildren && (
                   <div
-                    className={classNames('flex justify-center', {
+                    className={classNames('flex justify-center border-t', {
                       'p-4': !props.withoutActionContainer,
                     })}
+                    style={{ borderColor: colors.$20 }}
                   >
                     {props.actionChildren}
                   </div>

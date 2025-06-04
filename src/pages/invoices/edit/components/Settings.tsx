@@ -20,9 +20,12 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Card } from '$app/components/cards';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Settings() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const hasPermission = useHasPermission();
 
@@ -41,73 +44,80 @@ export default function Settings() {
   };
 
   return (
-    <Card title={t('settings')} className="w-full xl:w-2/3">
-      <div className="grid grid-cols-12 gap-4 px-6">
-        <div className="col-span-12 lg:col-span-6 space-y-6">
-          <div className="space-y-2">
-            <ProjectSelector
-              inputLabel={t('project')}
-              value={invoice?.project_id}
-              onChange={(project) => handleChange('project_id', project.id)}
-              errorMessage={errors?.errors.project_id}
-              onClearButtonClick={() => handleChange('project_id', '')}
+    <Card
+      title={t('settings')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
+      <div className="flex justify-center w-full pb-10 pt-2">
+        <div className="grid grid-cols-12 gap-4 px-6 w-full xl:w-2/3">
+          <div className="col-span-12 lg:col-span-6 space-y-6">
+            <div className="space-y-2">
+              <ProjectSelector
+                inputLabel={t('project')}
+                value={invoice?.project_id}
+                onChange={(project) => handleChange('project_id', project.id)}
+                errorMessage={errors?.errors.project_id}
+                onClearButtonClick={() => handleChange('project_id', '')}
+              />
+            </div>
+
+            <NumberInputField
+              label={t('exchange_rate')}
+              value={invoice?.exchange_rate || 1.0}
+              onValueChange={(value) =>
+                handleChange('exchange_rate', parseFloat(value) || 1.0)
+              }
+              errorMessage={errors?.errors.exchange_rate}
+              disablePrecision
             />
+
+            <Toggle
+              label={t('auto_bill_enabled')}
+              checked={invoice?.auto_bill_enabled || false}
+              onChange={(value) => handleChange('auto_bill_enabled', value)}
+            />
+
+            <div className="space-y-2">
+              <DesignSelector
+                inputLabel={t('design')}
+                value={invoice?.design_id}
+                onChange={(design) => handleChange('design_id', design.id)}
+                onClearButtonClick={() => handleChange('design_id', '')}
+                disableWithQueryParameter
+                errorMessage={errors?.errors.design_id}
+              />
+            </div>
           </div>
 
-          <NumberInputField
-            label={t('exchange_rate')}
-            value={invoice?.exchange_rate || 1.0}
-            onValueChange={(value) =>
-              handleChange('exchange_rate', parseFloat(value) || 1.0)
-            }
-            errorMessage={errors?.errors.exchange_rate}
-            disablePrecision
-          />
+          <div className="col-span-12 lg:col-span-6 space-y-6">
+            <div className="space-y-2">
+              <UserSelector
+                inputLabel={t('user')}
+                value={invoice?.assigned_user_id}
+                onChange={(user) => handleChange('assigned_user_id', user.id)}
+                errorMessage={errors?.errors.assigned_user_id}
+                readonly={!hasPermission('edit_invoice')}
+              />
+            </div>
 
-          <Toggle
-            label={t('auto_bill_enabled')}
-            checked={invoice?.auto_bill_enabled || false}
-            onChange={(value) => handleChange('auto_bill_enabled', value)}
-          />
+            <div className="space-y-2">
+              <VendorSelector
+                inputLabel={t('vendor')}
+                value={invoice?.vendor_id}
+                onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                onClearButtonClick={() => handleChange('vendor_id', '')}
+                errorMessage={errors?.errors.vendor_id}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <DesignSelector
-              inputLabel={t('design')}
-              value={invoice?.design_id}
-              onChange={(design) => handleChange('design_id', design.id)}
-              onClearButtonClick={() => handleChange('design_id', '')}
-              disableWithQueryParameter
-              errorMessage={errors?.errors.design_id}
+            <Toggle
+              label={t('inclusive_taxes')}
+              checked={invoice?.uses_inclusive_taxes || false}
+              onChange={(value) => handleChange('uses_inclusive_taxes', value)}
             />
           </div>
-        </div>
-
-        <div className="col-span-12 lg:col-span-6 space-y-6">
-          <div className="space-y-2">
-            <UserSelector
-              inputLabel={t('user')}
-              value={invoice?.assigned_user_id}
-              onChange={(user) => handleChange('assigned_user_id', user.id)}
-              errorMessage={errors?.errors.assigned_user_id}
-              readonly={!hasPermission('edit_invoice')}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <VendorSelector
-              inputLabel={t('vendor')}
-              value={invoice?.vendor_id}
-              onChange={(vendor) => handleChange('vendor_id', vendor.id)}
-              onClearButtonClick={() => handleChange('vendor_id', '')}
-              errorMessage={errors?.errors.vendor_id}
-            />
-          </div>
-
-          <Toggle
-            label={t('inclusive_taxes')}
-            checked={invoice?.uses_inclusive_taxes || false}
-            onChange={(value) => handleChange('uses_inclusive_taxes', value)}
-          />
         </div>
       </div>
     </Card>

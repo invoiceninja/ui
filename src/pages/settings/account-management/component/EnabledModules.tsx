@@ -12,7 +12,7 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 
 interface Module {
@@ -31,7 +31,7 @@ export enum ModuleBitmask {
   Expenses = 16,
   RecurringExpenses = 512,
   PurchaseOrders = 16384,
-  Transactions = 256, // old: 32768 
+  Transactions = 256, // old: 32768
 }
 
 export const modules: Module[] = [
@@ -76,7 +76,7 @@ export function EnabledModules() {
     );
 
   return (
-    <Card title={t('enabled_modules')}>
+    <>
       {modules.map((module, index) => (
         <Element key={index} leftSide={t(module.label)}>
           <Toggle
@@ -88,6 +88,6 @@ export function EnabledModules() {
           />
         </Element>
       ))}
-    </Card>
+    </>
   );
 }

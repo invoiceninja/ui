@@ -18,11 +18,14 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export default function Documents() {
   const [t] = useTranslation();
 
   const { id } = useParams();
+  const colors = useColorScheme();
 
   const context: ClientContext = useOutletContext();
   const { client } = context;
@@ -35,26 +38,41 @@ export default function Documents() {
   };
 
   return (
-    <Card title={t('documents')} className="w-full xl:w-2/3">
-      {id ? (
-        <div className="px-6">
-          <Upload
-            widgetOnly
-            endpoint={endpoint('/api/v1/clients/:id/upload', { id })}
-            onSuccess={onSuccess}
-          />
+    <Card
+      title={t('documents')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
+      <div
+        className={classNames('flex w-full px-6 py-2', {
+          'flex-col items-center': id,
+        })}
+      >
+        {id ? (
+          <>
+            <div className="w-full lg:w-2/3">
+              <Upload
+                widgetOnly
+                endpoint={endpoint('/api/v1/clients/:id/upload', { id })}
+                onSuccess={onSuccess}
+              />
+            </div>
 
-          <DocumentsTable
-            documents={client?.documents || []}
-            onDocumentDelete={onSuccess}
-            disableEditableOptions={
-              !entityAssigned(client, true) && !hasPermission('edit_client')
-            }
-          />
-        </div>
-      ) : (
-        <div className="px-6 text-sm">{t('save_to_upload_documents')}.</div>
-      )}
+            <div className="w-full lg:w-2/3">
+              <DocumentsTable
+                documents={client?.documents || []}
+                onDocumentDelete={onSuccess}
+                disableEditableOptions={
+                  !entityAssigned(client, true) && !hasPermission('edit_client')
+                }
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-sm">{t('save_to_upload_documents')}.</div>
+        )}
+      </div>
     </Card>
   );
 }

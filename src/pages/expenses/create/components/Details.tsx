@@ -26,7 +26,7 @@ import { CustomField } from '$app/components/CustomField';
 import { useCalculateExpenseAmount } from '../../common/hooks/useCalculateExpenseAmount';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Icon } from '$app/components/icons/Icon';
-import { MdLaunch, MdWarning } from 'react-icons/md';
+import { MdWarning } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { Link } from 'react-router-dom';
 import { Link as LinkBase } from '$app/components/forms';
@@ -36,6 +36,8 @@ import reactStringReplace from 'react-string-replace';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useColorScheme } from '$app/common/colors';
+import { ExternalLink } from '$app/components/icons/ExternalLink';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -58,6 +60,7 @@ export function Details(props: Props) {
 
   const { expense, handleChange, taxInputType, pageType, errors } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const { data: taxes } = useTaxRatesQuery({ status: ['active'] });
@@ -106,7 +109,7 @@ export function Details(props: Props) {
   return (
     <div className="flex flex-col space-y-4">
       {expense && (
-        <Card>
+        <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
           <Element leftSide={t('expense_total')} withoutWrappingLeftSide>
             {formatMoney(
               calculateExpenseAmount(expense),
@@ -117,14 +120,20 @@ export function Details(props: Props) {
         </Card>
       )}
 
-      <Card title={t('details')} isLoading={!expense}>
+      <Card
+        title={t('details')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        isLoading={!expense}
+      >
         {expense && pageType === 'edit' && (
           <>
             <Element leftSide={t('status')}>
               <ExpenseStatus entity={expense} />
             </Element>
 
-            <Element leftSide={t('expense_number')}>
+            <Element leftSide={t('number')}>
               <InputField
                 id="number"
                 value={expense.number}
@@ -148,7 +157,9 @@ export function Details(props: Props) {
                     })}
                     target="_blank"
                   >
-                    <Icon element={MdLaunch} size={18} />
+                    <div>
+                      <ExternalLink color="#0062FF" size="1.1rem" />
+                    </div>
                   </Link>
                 )}
               </div>
@@ -194,7 +205,9 @@ export function Details(props: Props) {
                     })}
                     target="_blank"
                   >
-                    <Icon element={MdLaunch} size={18} />
+                    <div>
+                      <ExternalLink color="#0062FF" size="1.1rem" />
+                    </div>
                   </Link>
                 )}
               </div>
