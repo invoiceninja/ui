@@ -290,7 +290,7 @@ function SignatorySelector({
       return;
     }
 
-    onSelect(value, type as 'user', entity as any); // @ts-expect-error It's safe
+    onSelect(value, type as 'user', entity as any);
   }
 
   return (
