@@ -207,14 +207,13 @@ export function EmailSettings() {
               customSelector
               dismissable={false}
             >
-              {emailProviders.map(
-                ({ value, label, enabled }) =>
-                  enabled && (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  )
-              )}
+              {emailProviders
+                .filter(({ enabled }) => enabled)
+                .map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
             </SelectField>
           </Element>
 
