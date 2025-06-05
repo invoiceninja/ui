@@ -596,7 +596,6 @@ export const defaultColumns: string[] = [
   'number',
   'client',
   'amount',
-  'net_amount',
   'remaining_cycles',
   'next_send_date',
   'frequency',

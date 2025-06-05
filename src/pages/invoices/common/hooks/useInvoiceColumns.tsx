@@ -60,7 +60,6 @@ export const defaultColumns: string[] = [
   'number',
   'client',
   'amount',
-  'net_amount',
   'balance',
   'date',
   'due_date',
