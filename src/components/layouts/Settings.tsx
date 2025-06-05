@@ -140,14 +140,13 @@ export function Settings(props: Props) {
             withBlank
             customSelector
           >
-            {basic.map(
-              (item) =>
-                item.enabled && (
-                  <option key={item.name} value={item.href}>
-                    {item.name}
-                  </option>
-                )
-            )}
+            {basic
+              .filter((item) => item.enabled)
+              .map((item) => (
+                <option key={item.name} value={item.href}>
+                  {item.name}
+                </option>
+              ))}
           </SelectField>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
@@ -198,14 +197,13 @@ export function Settings(props: Props) {
             withBlank
             customSelector
           >
-            {advanced.map(
-              (item) =>
-                item.enabled && (
-                  <option key={item.name} value={item.href}>
-                    {item.name}
-                  </option>
-                )
-            )}
+            {advanced
+              .filter((item) => item.enabled)
+              .map((item) => (
+                <option key={item.name} value={item.href}>
+                  {item.name}
+                </option>
+              ))}
           </SelectField>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
