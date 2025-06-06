@@ -11,7 +11,6 @@
 import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
-  ChangeEvent,
   CSSProperties,
   Dispatch,
   ReactElement,
@@ -34,13 +33,13 @@ import { Button, Checkbox } from './forms';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
+  MemoizedTr,
   Pagination,
   Table,
   Tbody,
   Td,
   Th,
   Thead,
-  Tr,
 } from './tables';
 import { useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
@@ -217,14 +216,11 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
-  const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
   const [arePreferencesApplied, setArePreferencesApplied] =
     useState<boolean>(false);
-
-  const mainCheckbox = useRef<HTMLInputElement>(null);
 
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
@@ -340,9 +336,21 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   );
 
+  const selectedResources = useMemo(() => {
+    if (!data) return [];
+
+    if (!selected?.length) return [];
+
+    return (
+      data?.data.data.filter((resource: T) =>
+        selected?.includes(resource?.['id' as keyof T] as string)
+      ) || []
+    );
+  }, [data, selected]);
+
   const showRestoreBulkAction = () => {
     return selectedResources.every(
-      (resource) => getEntityState(resource) !== EntityState.Active
+      (resource: T) => getEntityState(resource) !== EntityState.Active
     );
   };
 
@@ -357,10 +365,6 @@ export function DataTable<T extends object>(props: Props<T>) {
         toast.success(`${action}d_${props.resource}`);
 
         props.onBulkActionSuccess?.(response.data.data, action);
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        /** @ts-ignore: Unreachable, if element is null/undefined. */
-        mainCheckbox.current.checked = false;
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
@@ -431,26 +435,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [apiEndpoint.pathname]);
 
   useEffect(() => {
-    if (data) {
-      const filteredSelectedResources = data.data.data.filter((resource: any) =>
-        selected.includes(resource.id)
-      );
-
-      setSelectedResources(filteredSelectedResources);
-
-      const shouldDeselectMainCheckbox = data.data.data.some(
-        (resource: any) => !selected.includes(resource.id)
-      );
-
-      if (shouldDeselectMainCheckbox && mainCheckbox.current) {
-        mainCheckbox.current.checked = false;
-      } else if (mainCheckbox.current && data.data.data.length) {
-        mainCheckbox.current.checked = true;
-      }
-    }
-  }, [selected]);
-
-  useEffect(() => {
     if (data && !data.data.data.length) {
       setCurrentPage(1);
     }
@@ -465,10 +449,8 @@ export function DataTable<T extends object>(props: Props<T>) {
         setSelected(
           data.data.data
             .map((resource: any) => resource.id)
-            .filter((resourceId: string) => selected.includes(resourceId))
+            .filter((resourceId: string) => selected.includes(resourceId)) || []
         );
-      } else if (Number(perPage) > selected.length && mainCheckbox.current) {
-        mainCheckbox.current.checked = false;
       }
     }
   }, [perPage]);
@@ -521,7 +503,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.customBulkActions &&
                 props.customBulkActions.map(
                   (bulkAction: CustomBulkAction<T>, index: number) => (
-                    <div key={index}>
+                    <div key={`custom-bulk-action-${index}`}>
                       {bulkAction({
                         selectedIds: selected,
                         selectedResources,
@@ -616,29 +598,20 @@ export function DataTable<T extends object>(props: Props<T>) {
               disableUppercase={styleOptions?.disableThUppercase}
             >
               <Checkbox
-                innerRef={mainCheckbox}
                 checked={
                   selected.length === data?.data.data.length &&
                   data?.data.data.length > 0
                 }
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  Array.from(
-                    document.querySelectorAll('.child-checkbox')
-                  ).forEach((checkbox: HTMLInputElement | any) => {
-                    checkbox.checked = event.target.checked;
-
-                    if (event.target.checked) {
-                      const isAlreadyAdded = selected.find(
-                        (resourceId) => resourceId === checkbox.id
+                onValueChange={(_, checked) => {
+                  if (data) {
+                    if (checked) {
+                      setSelected(
+                        data.data.data.map((resource: any) => resource.id) || []
                       );
-
-                      if (!isAlreadyAdded) {
-                        setSelected((current) => [...current, checkbox.id]);
-                      }
                     } else {
                       setSelected([]);
                     }
-                  });
+                  }
                 }}
                 cypressRef="dataTableCheckbox"
               />
@@ -646,11 +619,11 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {props.columns.map(
-            (column, index) =>
+            (column) =>
               Boolean(!excludeColumns.includes(column.id)) && (
                 <Th
                   id={column.id}
-                  key={index}
+                  key={`table-header-${column.id}`}
                   className={styleOptions?.thClassName}
                   isCurrentlyUsed={sortedBy === column.id}
                   onColumnClick={(data: ColumnSortPayload) => {
@@ -687,7 +660,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
         <Tbody style={styleOptions?.tBodyStyle}>
           {isLoading && (
-            <Tr
+            <MemoizedTr
               className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
@@ -698,11 +671,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               <Td colSpan={100}>
                 <Spinner />
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
           {isError && (
-            <Tr
+            <MemoizedTr
               className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
@@ -713,11 +686,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
           {data && data.data.data.length === 0 && (
-            <Tr
+            <MemoizedTr
               className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
@@ -732,34 +705,38 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </span>
                 </div>
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
           {data &&
-            data?.data?.data?.map((resource: any, index: number) => (
-              <Tr
-                key={index}
-                className={classNames('border-b', {
+            data?.data?.data?.map((resource: any, rowIndex: number) => (
+              <MemoizedTr
+                key={resource.id}
+                className={classNames('border-b table-row', {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
-                backgroundColor={index % 2 === 0 ? colors.$7 : ''}
+                backgroundColor={rowIndex % 2 === 0 ? colors.$7 : ''}
                 style={{
                   borderColor: colors.$20,
                   backgroundColor: selected.includes(resource.id)
                     ? colors.$7
                     : 'transparent',
                 }}
+                resource={resource}
+                isSelected={selected.includes(resource.id)}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
                     className="cursor-pointer"
-                    onClick={() =>
-                      selected.includes(resource.id)
-                        ? setSelected((current) =>
-                            current.filter((v) => v !== resource.id)
-                          )
-                        : setSelected((current) => [...current, resource.id])
-                    }
+                    onClick={() => {
+                      if (selected.includes(resource.id)) {
+                        setSelected((current) =>
+                          current.filter((v) => v !== resource.id)
+                        );
+                      } else {
+                        setSelected((current) => [...current, resource.id]);
+                      }
+                    }}
                   >
                     <Checkbox
                       checked={selected.includes(resource.id)}
@@ -775,7 +752,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   (column, index) =>
                     Boolean(!excludeColumns.includes(column.id)) && (
                       <Td
-                        key={index}
+                        key={`table-cell-${column.id}-${rowIndex}`}
                         className={classNames(
                           {
                             'cursor-pointer': index < 3,
@@ -830,7 +807,11 @@ export function DataTable<T extends object>(props: Props<T>) {
                           ) =>
                             !bottomActionsKeys.includes(
                               action(resource)?.key || ''
-                            ) && <div key={index}>{action(resource)}</div>
+                            ) && (
+                              <div key={`custom-action-${rowIndex}-${index}`}>
+                                {action(resource)}
+                              </div>
+                            )
                         )}
 
                       {props.customActions &&
@@ -877,12 +858,16 @@ export function DataTable<T extends object>(props: Props<T>) {
                           ) =>
                             bottomActionsKeys.includes(
                               action(resource)?.key || ''
-                            ) && <div key={index}>{action(resource)}</div>
+                            ) && (
+                              <div key={`custom-action2-${rowIndex}-${index}`}>
+                                {action(resource)}
+                              </div>
+                            )
                         )}
                     </Dropdown>
                   </Td>
                 )}
-              </Tr>
+              </MemoizedTr>
             ))}
         </Tbody>
 
@@ -893,10 +878,10 @@ export function DataTable<T extends object>(props: Props<T>) {
               {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
               {props.columns.map(
-                (column, index) =>
+                (column) =>
                   Boolean(!excludeColumns.includes(column.id)) && (
                     <Td
-                      key={index}
+                      key={`table-footer-${column.id}`}
                       customizeTextColor
                       resizable={`${apiEndpoint.pathname}.${column.id}`}
                     >

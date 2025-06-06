@@ -11,15 +11,26 @@
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
+import { memo } from 'react';
+import { isEqual } from 'lodash';
 
 interface Props extends CommonProps {
   isLoading?: boolean;
   onClick?: () => unknown;
   backgroundColor?: string;
+  resource?: unknown;
+  isSelected?: boolean;
 }
 
 export function Tr(props: Props) {
-  const { onClick, innerRef, backgroundColor, ...otherProps } = props;
+  const {
+    onClick,
+    innerRef,
+    backgroundColor,
+    resource,
+    isSelected,
+    ...otherProps
+  } = props;
   const colors = useColorScheme();
 
   return (
@@ -46,3 +57,9 @@ export function Tr(props: Props) {
     </tr>
   );
 }
+
+export const MemoizedTr = memo(
+  Tr,
+  (prev, next) =>
+    isEqual(prev.resource, next.resource) && prev.isSelected === next.isSelected
+);
