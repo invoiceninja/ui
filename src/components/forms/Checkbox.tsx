@@ -44,7 +44,7 @@ const getCheckmarkSvgUrl = (color: string): string => {
   return `url("data:image/svg+xml,${encodedSvg}")`;
 };
 
-export function Checkbox$(props: Props) {
+export function Checkbox(props: Props) {
   const colors = useColorScheme();
 
   const checkmarkDataUrl = getCheckmarkSvgUrl(colors.$9);
@@ -94,5 +94,3 @@ export function Checkbox$(props: Props) {
     </div>
   );
 }
-
-export const Checkbox = React.memo(Checkbox$);

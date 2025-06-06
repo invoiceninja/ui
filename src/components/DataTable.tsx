@@ -33,13 +33,13 @@ import { Button, Checkbox } from './forms';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
+  MemoizedTr,
   Pagination,
   Table,
   Tbody,
   Td,
   Th,
   Thead,
-  Tr,
 } from './tables';
 import { useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
@@ -216,7 +216,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
-  const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
@@ -337,9 +336,21 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   );
 
+  const selectedResources = useMemo(() => {
+    if (!data) return [];
+
+    if (!selected?.length) return [];
+
+    return (
+      data?.data.data.filter((resource: T) =>
+        selected?.includes(resource?.['id' as keyof T] as string)
+      ) || []
+    );
+  }, [data, selected]);
+
   const showRestoreBulkAction = () => {
     return selectedResources.every(
-      (resource) => getEntityState(resource) !== EntityState.Active
+      (resource: T) => getEntityState(resource) !== EntityState.Active
     );
   };
 
@@ -354,9 +365,6 @@ export function DataTable<T extends object>(props: Props<T>) {
         toast.success(`${action}d_${props.resource}`);
 
         props.onBulkActionSuccess?.(response.data.data, action);
-
-        setSelected([]);
-        setSelectedResources([]);
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
@@ -441,7 +449,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         setSelected(
           data.data.data
             .map((resource: any) => resource.id)
-            .filter((resourceId: string) => selected.includes(resourceId))
+            .filter((resourceId: string) => selected.includes(resourceId)) || []
         );
       }
     }
@@ -595,14 +603,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                   data?.data.data.length > 0
                 }
                 onValueChange={(_, checked) => {
-                  if (checked) {
-                    setSelected(
-                      data?.data.data.map((resource: any) => resource.id)
-                    );
-                    setSelectedResources([...(data?.data.data || [])]);
-                  } else {
-                    setSelected([]);
-                    setSelectedResources([]);
+                  if (data) {
+                    if (checked) {
+                      setSelected(
+                        data.data.data.map((resource: any) => resource.id) || []
+                      );
+                    } else {
+                      setSelected([]);
+                    }
                   }
                 }}
                 cypressRef="dataTableCheckbox"
@@ -652,7 +660,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
         <Tbody style={styleOptions?.tBodyStyle}>
           {isLoading && (
-            <Tr
+            <MemoizedTr
               className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
@@ -663,11 +671,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               <Td colSpan={100}>
                 <Spinner />
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
           {isError && (
-            <Tr
+            <MemoizedTr
               className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
@@ -678,11 +686,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
           {data && data.data.data.length === 0 && (
-            <Tr
+            <MemoizedTr
               className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
               })}
@@ -697,14 +705,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </span>
                 </div>
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
           {data &&
             data?.data?.data?.map((resource: any, rowIndex: number) => (
-              <Tr
-                key={`table-row-${rowIndex}`}
-                className={classNames('border-b', {
+              <MemoizedTr
+                key={resource.id}
+                className={classNames('border-b table-row', {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
                 backgroundColor={rowIndex % 2 === 0 ? colors.$7 : ''}
@@ -714,6 +722,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                     ? colors.$7
                     : 'transparent',
                 }}
+                resource={resource}
+                isSelected={selected.includes(resource.id)}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
@@ -723,15 +733,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                         setSelected((current) =>
                           current.filter((v) => v !== resource.id)
                         );
-                        setSelectedResources((current) =>
-                          current.filter((v) => v !== resource)
-                        );
                       } else {
                         setSelected((current) => [...current, resource.id]);
-                        setSelectedResources((current) => [
-                          ...current,
-                          resource,
-                        ]);
                       }
                     }}
                   >
@@ -864,7 +867,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     </Dropdown>
                   </Td>
                 )}
-              </Tr>
+              </MemoizedTr>
             ))}
         </Tbody>
 
