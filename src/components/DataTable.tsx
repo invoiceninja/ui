@@ -11,7 +11,6 @@
 import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
-  ChangeEvent,
   CSSProperties,
   Dispatch,
   ReactElement,
@@ -224,8 +223,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [arePreferencesApplied, setArePreferencesApplied] =
     useState<boolean>(false);
 
-  const mainCheckbox = useRef<HTMLInputElement>(null);
-
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
     isInitialConfiguration,
@@ -358,9 +355,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
         props.onBulkActionSuccess?.(response.data.data, action);
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        /** @ts-ignore: Unreachable, if element is null/undefined. */
-        mainCheckbox.current.checked = false;
+        setSelected([]);
+        setSelectedResources([]);
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
@@ -431,26 +427,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [apiEndpoint.pathname]);
 
   useEffect(() => {
-    if (data) {
-      const filteredSelectedResources = data.data.data.filter((resource: any) =>
-        selected.includes(resource.id)
-      );
-
-      setSelectedResources(filteredSelectedResources);
-
-      const shouldDeselectMainCheckbox = data.data.data.some(
-        (resource: any) => !selected.includes(resource.id)
-      );
-
-      if (shouldDeselectMainCheckbox && mainCheckbox.current) {
-        mainCheckbox.current.checked = false;
-      } else if (mainCheckbox.current && data.data.data.length) {
-        mainCheckbox.current.checked = true;
-      }
-    }
-  }, [selected]);
-
-  useEffect(() => {
     if (data && !data.data.data.length) {
       setCurrentPage(1);
     }
@@ -467,8 +443,6 @@ export function DataTable<T extends object>(props: Props<T>) {
             .map((resource: any) => resource.id)
             .filter((resourceId: string) => selected.includes(resourceId))
         );
-      } else if (Number(perPage) > selected.length && mainCheckbox.current) {
-        mainCheckbox.current.checked = false;
       }
     }
   }, [perPage]);
@@ -521,7 +495,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.customBulkActions &&
                 props.customBulkActions.map(
                   (bulkAction: CustomBulkAction<T>, index: number) => (
-                    <div key={index}>
+                    <div key={`custom-bulk-action-${index}`}>
                       {bulkAction({
                         selectedIds: selected,
                         selectedResources,
@@ -616,29 +590,20 @@ export function DataTable<T extends object>(props: Props<T>) {
               disableUppercase={styleOptions?.disableThUppercase}
             >
               <Checkbox
-                innerRef={mainCheckbox}
                 checked={
                   selected.length === data?.data.data.length &&
                   data?.data.data.length > 0
                 }
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  Array.from(
-                    document.querySelectorAll('.child-checkbox')
-                  ).forEach((checkbox: HTMLInputElement | any) => {
-                    checkbox.checked = event.target.checked;
-
-                    if (event.target.checked) {
-                      const isAlreadyAdded = selected.find(
-                        (resourceId) => resourceId === checkbox.id
-                      );
-
-                      if (!isAlreadyAdded) {
-                        setSelected((current) => [...current, checkbox.id]);
-                      }
-                    } else {
-                      setSelected([]);
-                    }
-                  });
+                onValueChange={(_, checked) => {
+                  if (checked) {
+                    setSelected(
+                      data?.data.data.map((resource: any) => resource.id)
+                    );
+                    setSelectedResources([...(data?.data.data || [])]);
+                  } else {
+                    setSelected([]);
+                    setSelectedResources([]);
+                  }
                 }}
                 cypressRef="dataTableCheckbox"
               />
@@ -646,11 +611,11 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {props.columns.map(
-            (column, index) =>
+            (column) =>
               Boolean(!excludeColumns.includes(column.id)) && (
                 <Th
                   id={column.id}
-                  key={index}
+                  key={`table-header-${column.id}`}
                   className={styleOptions?.thClassName}
                   isCurrentlyUsed={sortedBy === column.id}
                   onColumnClick={(data: ColumnSortPayload) => {
@@ -736,13 +701,13 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {data &&
-            data?.data?.data?.map((resource: any, index: number) => (
+            data?.data?.data?.map((resource: any, rowIndex: number) => (
               <Tr
-                key={index}
+                key={`table-row-${rowIndex}`}
                 className={classNames('border-b', {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
-                backgroundColor={index % 2 === 0 ? colors.$7 : ''}
+                backgroundColor={rowIndex % 2 === 0 ? colors.$7 : ''}
                 style={{
                   borderColor: colors.$20,
                   backgroundColor: selected.includes(resource.id)
@@ -753,13 +718,22 @@ export function DataTable<T extends object>(props: Props<T>) {
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
                     className="cursor-pointer"
-                    onClick={() =>
-                      selected.includes(resource.id)
-                        ? setSelected((current) =>
-                            current.filter((v) => v !== resource.id)
-                          )
-                        : setSelected((current) => [...current, resource.id])
-                    }
+                    onClick={() => {
+                      if (selected.includes(resource.id)) {
+                        setSelected((current) =>
+                          current.filter((v) => v !== resource.id)
+                        );
+                        setSelectedResources((current) =>
+                          current.filter((v) => v !== resource)
+                        );
+                      } else {
+                        setSelected((current) => [...current, resource.id]);
+                        setSelectedResources((current) => [
+                          ...current,
+                          resource,
+                        ]);
+                      }
+                    }}
                   >
                     <Checkbox
                       checked={selected.includes(resource.id)}
@@ -775,7 +749,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   (column, index) =>
                     Boolean(!excludeColumns.includes(column.id)) && (
                       <Td
-                        key={index}
+                        key={`table-cell-${column.id}-${rowIndex}`}
                         className={classNames(
                           {
                             'cursor-pointer': index < 3,
@@ -830,7 +804,11 @@ export function DataTable<T extends object>(props: Props<T>) {
                           ) =>
                             !bottomActionsKeys.includes(
                               action(resource)?.key || ''
-                            ) && <div key={index}>{action(resource)}</div>
+                            ) && (
+                              <div key={`custom-action-${rowIndex}-${index}`}>
+                                {action(resource)}
+                              </div>
+                            )
                         )}
 
                       {props.customActions &&
@@ -877,7 +855,11 @@ export function DataTable<T extends object>(props: Props<T>) {
                           ) =>
                             bottomActionsKeys.includes(
                               action(resource)?.key || ''
-                            ) && <div key={index}>{action(resource)}</div>
+                            ) && (
+                              <div key={`custom-action2-${rowIndex}-${index}`}>
+                                {action(resource)}
+                              </div>
+                            )
                         )}
                     </Dropdown>
                   </Td>
@@ -893,10 +875,10 @@ export function DataTable<T extends object>(props: Props<T>) {
               {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
               {props.columns.map(
-                (column, index) =>
+                (column) =>
                   Boolean(!excludeColumns.includes(column.id)) && (
                     <Td
-                      key={index}
+                      key={`table-footer-${column.id}`}
                       customizeTextColor
                       resizable={`${apiEndpoint.pathname}.${column.id}`}
                     >

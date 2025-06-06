@@ -11,6 +11,7 @@
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
+import React from 'react';
 
 interface Props extends CommonProps {
   isLoading?: boolean;
@@ -18,7 +19,7 @@ interface Props extends CommonProps {
   backgroundColor?: string;
 }
 
-export function Tr(props: Props) {
+export function Tr$(props: Props) {
   const { onClick, innerRef, backgroundColor, ...otherProps } = props;
   const colors = useColorScheme();
 
@@ -46,3 +47,5 @@ export function Tr(props: Props) {
     </tr>
   );
 }
+
+export const Tr = React.memo(Tr$);
