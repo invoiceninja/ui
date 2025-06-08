@@ -12,6 +12,7 @@ import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { memo } from 'react';
+import { isEqual } from 'lodash';
 
 interface Props extends CommonProps {
   isLoading?: boolean;
@@ -19,7 +20,6 @@ interface Props extends CommonProps {
   backgroundColor?: string;
   resource?: unknown;
   withoutBackgroundColor?: boolean;
-  reRenderingAttribute?: unknown;
 }
 
 export function Tr(props: Props) {
@@ -32,8 +32,6 @@ export function Tr(props: Props) {
     ...otherProps
   } = props;
   const colors = useColorScheme();
-
-  console.log('ok');
 
   return (
     <tr
@@ -62,8 +60,6 @@ export function Tr(props: Props) {
   );
 }
 
-export const MemoizedTr = memo(
-  Tr,
-  (prev, next) =>
-    JSON.stringify(prev.resource) === JSON.stringify(next.resource)
+export const MemoizedTr = memo(Tr, (prev, next) =>
+  isEqual(prev.resource, next.resource)
 );

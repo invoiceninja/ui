@@ -8,9 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
-import { useEffect } from 'react';
 import { useReactSettings } from './hooks/useReactSettings';
 
 // export const $1 = {
@@ -27,7 +24,7 @@ import { useReactSettings } from './hooks/useReactSettings';
 //   $9: '#ffffff',
 // };
 
-export const $1 = {
+export const darkColorScheme = {
   name: 'invoiceninja.dark',
   $0: 'dark',
   $1: '#121212',
@@ -57,7 +54,7 @@ export const $1 = {
   $25: '#1f2e41', // Hover element background color
 };
 
-export const $2 = {
+export const lightColorScheme = {
   name: 'invoiceninja.light',
   $0: 'light',
   $1: '#ffffff', // Primary background
@@ -87,18 +84,8 @@ export const $2 = {
   $25: '#09090B0D', // Hover element background color
 };
 
-export const colorSchemeAtom = atomWithStorage('colorScheme', $2);
-
 export function useColorScheme() {
   const reactSettings = useReactSettings({ overwrite: false });
 
-  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
-
-  useEffect(() => {
-    if (reactSettings) {
-      reactSettings.dark_mode ? setColorScheme($1) : setColorScheme($2);
-    }
-  }, [reactSettings?.dark_mode]);
-
-  return colorScheme;
+  return reactSettings.dark_mode ? darkColorScheme : lightColorScheme;
 }

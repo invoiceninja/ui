@@ -60,6 +60,8 @@ import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
+import { useDebounce } from 'react-use';
+import { isEqual } from 'lodash';
 
 export interface DateRangeColumn {
   column: string;
@@ -255,6 +257,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     useState<boolean>(true);
   const [arePreferencesApplied, setArePreferencesApplied] =
     useState<boolean>(false);
+  const [currentData, setCurrentData] = useState<T[]>([]);
+  const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
 
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
@@ -355,21 +359,19 @@ export function DataTable<T extends object>(props: Props<T>) {
       [props.resource]: selected,
     }));
 
-    if (data) {
-      data.data.data.forEach((resource: any) => {
-        const row = document.querySelector(
-          `tr[row-id="${resource.id}"]`
-        ) as HTMLElement;
+    currentData.forEach((resource: any) => {
+      const row = document.querySelector(
+        `tr[row-id="${resource.id}"]`
+      ) as HTMLElement;
 
-        if (row) {
-          if (selected.includes(resource.id)) {
-            row.style.backgroundColor = colors.$7;
-          } else {
-            row.style.backgroundColor = 'transparent';
-          }
+      if (row) {
+        if (selected.includes(resource.id)) {
+          row.style.backgroundColor = colors.$7;
+        } else {
+          row.style.backgroundColor = 'transparent';
         }
-      });
-    }
+      }
+    });
   }, [selected, props.resource]);
 
   useEffect(() => {
@@ -382,7 +384,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     };
   }, []);
 
-  const { data, isLoading, isError } = useQuery(
+  const { data, isLoading, isFetching, isError } = useQuery(
     [
       ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
@@ -404,16 +406,14 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
 
   const selectedResources = useMemo(() => {
-    if (!data) return [];
-
     if (!selected?.length) return [];
 
     return (
-      data?.data?.data?.filter((resource: T) =>
+      currentData.filter((resource: T) =>
         selected?.includes(resource?.['id' as keyof T] as string)
       ) || []
     );
-  }, [data, selected]);
+  }, [currentData, selected]);
 
   const showRestoreBulkAction = () => {
     return selectedResources.every(
@@ -492,7 +492,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   };
 
   const getColumnValues = (columnId: string) => {
-    return data?.data?.data?.map(
+    return currentData.map(
       (resource: T) => resource[columnId as keyof typeof resource]
     );
   };
@@ -509,33 +509,86 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
 
   const handleAllCheckboxClick = useCallback(() => {
-    if (data) {
-      if (data.data.data.length === 0) {
-        setSelected([]);
-      } else if (
-        selected.length === data.data.data.length &&
-        data.data.data.length > 0
-      ) {
-        setSelected([]);
-      } else {
-        setSelected(data.data.data.map((resource: any) => resource.id) || []);
-      }
+    if (currentData.length === 0) {
+      setSelected([]);
+    } else if (
+      selected.length === currentData.length &&
+      currentData.length > 0
+    ) {
+      setSelected([]);
+    } else {
+      setSelected(currentData.map((resource: any) => resource.id) || []);
     }
-  }, [selected, data]);
+  }, [selected, currentData]);
 
   useEffect(() => {
     setInvalidationQueryAtom(apiEndpoint.pathname);
   }, [apiEndpoint.pathname]);
 
+  useDebounce(
+    () => {
+      if (data) {
+        setCurrentData(data.data.data);
+      }
+    },
+    10,
+    [data]
+  );
+
   useEffect(() => {
-    if (data && !data.data.data.length) {
+    if (isLoading) {
+      setCurrentData([]);
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    setAreRowsRendered(false);
+  }, [
+    queryIdentificator,
+    apiEndpoint.pathname,
+    props.endpoint,
+    perPage,
+    currentPage,
+    filter,
+    sort,
+    status,
+    customFilter,
+    dateRange,
+    dateRangeQueryParameter,
+  ]);
+
+  useEffect(() => {
+    if (isFetching || isLoading) {
+      setAreRowsRendered(false);
+      setCurrentData([]);
+    }
+  }, [isFetching, isLoading]);
+
+  useEffect(() => {
+    setAreRowsRendered(false);
+  }, [data]);
+
+  useEffect(() => {
+    if (!currentData.length) {
       setCurrentPage(1);
     }
 
-    if (data) {
-      console.log('data', data?.data?.data.length);
+    if (currentData.length <= 10) {
+      setAreRowsRendered(true);
     }
-  }, [data]);
+
+    if (currentData.length > 10 && currentData.length <= 50) {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 200);
+    }
+
+    if (currentData.length > 50 && currentData.length <= 100) {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 300);
+    }
+  }, [currentData]);
 
   useEffect(() => {
     if (
@@ -543,12 +596,12 @@ export function DataTable<T extends object>(props: Props<T>) {
       Number(perPage) === selected.length
     ) {
       setSelected(
-        data?.data?.data
+        currentData
           .map((resource: any) => resource.id)
           .filter((resourceId: string) => selected.includes(resourceId)) || []
       );
     }
-  }, [data, perPage]);
+  }, [currentData, perPage]);
 
   useEffect(() => {
     emitter.on('bulk.completed', () => setSelected([]));
@@ -695,7 +748,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             >
               <DataTableCheckbox
                 resource={props.resource}
-                dataLength={data?.data?.data?.length ?? 0}
+                dataLength={currentData.length}
               />
             </Th>
           )}
@@ -740,8 +793,17 @@ export function DataTable<T extends object>(props: Props<T>) {
           {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
         </Thead>
 
-        <Tbody style={styleOptions?.tBodyStyle}>
-          {isLoading && (
+        <Tbody
+          style={{
+            ...styleOptions?.tBodyStyle,
+            opacity: areRowsRendered || !currentData.length ? 1 : 0.5,
+            pointerEvents:
+              areRowsRendered || !currentData.length ? 'auto' : 'none',
+            cursor:
+              areRowsRendered || !currentData.length ? 'default' : 'progress',
+          }}
+        >
+          {(isLoading || !isEqual(currentData, data?.data?.data)) && (
             <MemoizedTr
               className={classNames('border-b', {
                 'last:border-b-0': hasVerticalOverflow,
@@ -771,173 +833,177 @@ export function DataTable<T extends object>(props: Props<T>) {
             </MemoizedTr>
           )}
 
-          {!isLoading && data?.data?.data?.length === 0 && (
-            <MemoizedTr
-              className={classNames('border-b', {
-                'last:border-b-0': hasVerticalOverflow,
-              })}
-              style={{
-                borderColor: colors.$20,
-              }}
-            >
-              <Td className={styleOptions?.tdClassName} colSpan={100}>
-                <div className="flex items-center justify-center py-10">
-                  <span className="text-sm" style={{ color: colors.$17 }}>
-                    {t('no_records_found')}
-                  </span>
-                </div>
-              </Td>
-            </MemoizedTr>
-          )}
-
-          {data?.data?.data?.map((resource: any, rowIndex: number) => (
-            <MemoizedTr
-              key={resource.id}
-              className={classNames('border-b table-row', {
-                'last:border-b-0': hasVerticalOverflow,
-              })}
-              style={{
-                borderColor: colors.$20,
-              }}
-              resource={resource}
-              withoutBackgroundColor
-            >
-              {!props.withoutActions && !hideEditableOptions && (
-                <Td
-                  className="cursor-pointer"
-                  onClick={() => handleCheckboxClick(resource.id)}
-                >
-                  <DataTableCheckbox
-                    resourceId={resource.id}
-                    resource={props.resource}
-                  />
+          {!isLoading &&
+            currentData?.length === 0 &&
+            isEqual(currentData, data?.data?.data) && (
+              <MemoizedTr
+                className={classNames('border-b', {
+                  'last:border-b-0': hasVerticalOverflow,
+                })}
+                style={{
+                  borderColor: colors.$20,
+                }}
+              >
+                <Td className={styleOptions?.tdClassName} colSpan={100}>
+                  <div className="flex items-center justify-center py-10">
+                    <span className="text-sm" style={{ color: colors.$17 }}>
+                      {t('no_records_found')}
+                    </span>
+                  </div>
                 </Td>
-              )}
+              </MemoizedTr>
+            )}
 
-              {props.columns.map(
-                (column, index) =>
-                  Boolean(!excludeColumns.includes(column.id)) && (
-                    <Td
-                      key={`table-cell-${column.id}-${rowIndex}`}
-                      className={classNames(
-                        {
-                          'cursor-pointer': index < 3,
-                          'py-4': hideEditableOptions,
-                        },
-                        styleOptions?.tdClassName
-                      )}
-                      onClick={() => {
-                        if (index < 3) {
-                          props.onTableRowClick
-                            ? props.onTableRowClick(resource)
-                            : document.getElementById(resource.id)?.click();
-                        }
-                      }}
-                      withoutPadding={styleOptions?.withoutTdPadding}
-                      resizable={`${apiEndpoint.pathname}.${column.id}`}
-                    >
-                      {column.format
-                        ? column.format(resource[column.id], resource)
-                        : resource[column.id]}
-                    </Td>
-                  )
-              )}
+          {isEqual(currentData, data?.data?.data) &&
+            currentData.map((resource: any, rowIndex: number) => (
+              <MemoizedTr
+                key={resource.id}
+                className={classNames('border-b table-row', {
+                  'last:border-b-0': hasVerticalOverflow,
+                })}
+                style={{
+                  borderColor: colors.$20,
+                }}
+                resource={resource}
+                withoutBackgroundColor
+              >
+                {!props.withoutActions && !hideEditableOptions && (
+                  <Td
+                    className="cursor-pointer"
+                    onClick={() => handleCheckboxClick(resource.id)}
+                  >
+                    <DataTableCheckbox
+                      resourceId={resource.id}
+                      resource={props.resource}
+                    />
+                  </Td>
+                )}
 
-              {props.withResourcefulActions && !hideEditableOptions && (
-                <Td>
-                  <Dropdown label={t('actions')}>
-                    {props.linkToEdit &&
-                      (props.showEdit?.(resource) || !props.showEdit) && (
-                        <DropdownElement
-                          to={route(props.linkToEdit, {
-                            id: resource?.id,
-                          })}
-                          icon={<Icon element={MdEdit} />}
-                        >
-                          {t('edit')}
-                        </DropdownElement>
-                      )}
+                {props.columns.map(
+                  (column, index) =>
+                    Boolean(!excludeColumns.includes(column.id)) && (
+                      <Td
+                        key={`table-cell-${column.id}-${rowIndex}`}
+                        className={classNames(
+                          {
+                            'cursor-pointer': index < 3,
+                            'py-4': hideEditableOptions,
+                          },
+                          styleOptions?.tdClassName
+                        )}
+                        onClick={() => {
+                          if (index < 3) {
+                            props.onTableRowClick
+                              ? props.onTableRowClick(resource)
+                              : document.getElementById(resource.id)?.click();
+                          }
+                        }}
+                        withoutPadding={styleOptions?.withoutTdPadding}
+                        resizable={`${apiEndpoint.pathname}.${column.id}`}
+                      >
+                        {column.format
+                          ? column.format(resource[column.id], resource)
+                          : resource[column.id]}
+                      </Td>
+                    )
+                )}
 
-                    {props.linkToEdit &&
-                      props.customActions &&
-                      showCustomActionDivider(resource) &&
-                      (props.showEdit?.(resource) || !props.showEdit) && (
-                        <Divider withoutPadding />
-                      )}
+                {props.withResourcefulActions && !hideEditableOptions && (
+                  <Td>
+                    <Dropdown label={t('actions')}>
+                      {props.linkToEdit &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <DropdownElement
+                            to={route(props.linkToEdit, {
+                              id: resource?.id,
+                            })}
+                            icon={<Icon element={MdEdit} />}
+                          >
+                            {t('edit')}
+                          </DropdownElement>
+                        )}
 
-                    {props.customActions &&
-                      props.customActions.map(
-                        (
-                          action: ResourceAction<typeof resource>,
-                          index: number
-                        ) =>
-                          !bottomActionsKeys.includes(
-                            action(resource)?.key || ''
-                          ) && (
-                            <div key={`custom-action-${rowIndex}-${index}`}>
-                              {action(resource)}
-                            </div>
-                          )
-                      )}
+                      {props.linkToEdit &&
+                        props.customActions &&
+                        showCustomActionDivider(resource) &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <Divider withoutPadding />
+                        )}
 
-                    {props.customActions &&
-                      (props.showRestore?.(resource) || !props.showRestore) && (
-                        <Divider withoutPadding />
-                      )}
+                      {props.customActions &&
+                        props.customActions.map(
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
+                            !bottomActionsKeys.includes(
+                              action(resource)?.key || ''
+                            ) && (
+                              <div key={`custom-action-${rowIndex}-${index}`}>
+                                {action(resource)}
+                              </div>
+                            )
+                        )}
 
-                    {resource?.archived_at === 0 &&
-                      (props.showArchive?.(resource) || !props.showArchive) && (
-                        <DropdownElement
-                          onClick={() => bulk('archive', resource.id)}
-                          icon={<Icon element={MdArchive} />}
-                        >
-                          {t('archive')}
-                        </DropdownElement>
-                      )}
+                      {props.customActions &&
+                        (props.showRestore?.(resource) ||
+                          !props.showRestore) && <Divider withoutPadding />}
 
-                    {resource?.archived_at > 0 &&
-                      (props.showRestore?.(resource) || !props.showRestore) && (
-                        <DropdownElement
-                          onClick={() => bulk('restore', resource.id)}
-                          icon={<Icon element={MdRestore} />}
-                        >
-                          {t('restore')}
-                        </DropdownElement>
-                      )}
+                      {resource?.archived_at === 0 &&
+                        (props.showArchive?.(resource) ||
+                          !props.showArchive) && (
+                          <DropdownElement
+                            onClick={() => bulk('archive', resource.id)}
+                            icon={<Icon element={MdArchive} />}
+                          >
+                            {t('archive')}
+                          </DropdownElement>
+                        )}
 
-                    {!resource?.is_deleted &&
-                      (props.showDelete?.(resource) || !props.showDelete) && (
-                        <DropdownElement
-                          onClick={() => bulk('delete', resource.id)}
-                          icon={<Icon element={MdDelete} />}
-                        >
-                          {t('delete')}
-                        </DropdownElement>
-                      )}
+                      {resource?.archived_at > 0 &&
+                        (props.showRestore?.(resource) ||
+                          !props.showRestore) && (
+                          <DropdownElement
+                            onClick={() => bulk('restore', resource.id)}
+                            icon={<Icon element={MdRestore} />}
+                          >
+                            {t('restore')}
+                          </DropdownElement>
+                        )}
 
-                    {props.customActions &&
-                      props.customActions.map(
-                        (
-                          action: ResourceAction<typeof resource>,
-                          index: number
-                        ) =>
-                          bottomActionsKeys.includes(
-                            action(resource)?.key || ''
-                          ) && (
-                            <div key={`custom-action2-${rowIndex}-${index}`}>
-                              {action(resource)}
-                            </div>
-                          )
-                      )}
-                  </Dropdown>
-                </Td>
-              )}
-            </MemoizedTr>
-          ))}
+                      {!resource?.is_deleted &&
+                        (props.showDelete?.(resource) || !props.showDelete) && (
+                          <DropdownElement
+                            onClick={() => bulk('delete', resource.id)}
+                            icon={<Icon element={MdDelete} />}
+                          >
+                            {t('delete')}
+                          </DropdownElement>
+                        )}
+
+                      {props.customActions &&
+                        props.customActions.map(
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
+                            bottomActionsKeys.includes(
+                              action(resource)?.key || ''
+                            ) && (
+                              <div key={`custom-action2-${rowIndex}-${index}`}>
+                                {action(resource)}
+                              </div>
+                            )
+                        )}
+                    </Dropdown>
+                  </Td>
+                )}
+              </MemoizedTr>
+            ))}
         </Tbody>
 
         {Boolean(footerColumns.length) &&
-          Boolean(data?.data?.data?.length) &&
+          Boolean(currentData?.length) &&
           Boolean(reactSettings.show_table_footer) && (
             <TFooter>
               {!props.withoutActions && !hideEditableOptions && <Th></Th>}
@@ -954,7 +1020,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         <div className="flex items-center space-x-3">
                           {getFooterColumn(column.id)?.format(
                             getColumnValues(column.id) as (string | number)[],
-                            data?.data?.data || []
+                            currentData || []
                           ) ?? '-/-'}
                         </div>
                       ) : (
