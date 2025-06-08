@@ -573,21 +573,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
 
-    if (currentData.length <= 10) {
-      setAreRowsRendered(true);
-    }
-
-    if (currentData.length > 10 && currentData.length <= 50) {
-      setTimeout(() => {
-        setAreRowsRendered(true);
-      }, 200);
-    }
-
-    if (currentData.length > 50 && currentData.length <= 100) {
-      setTimeout(() => {
-        setAreRowsRendered(true);
-      }, 300);
-    }
+    setAreRowsRendered(true);
   }, [currentData]);
 
   useEffect(() => {
