@@ -19,7 +19,8 @@ interface Props extends CommonProps {
   onClick?: () => unknown;
   backgroundColor?: string;
   resource?: unknown;
-  isSelected?: boolean;
+  withoutBackgroundColor?: boolean;
+  reRenderingAttribute?: unknown;
 }
 
 export function Tr(props: Props) {
@@ -28,7 +29,7 @@ export function Tr(props: Props) {
     innerRef,
     backgroundColor,
     resource,
-    isSelected,
+    withoutBackgroundColor = false,
     ...otherProps
   } = props;
   const colors = useColorScheme();
@@ -36,7 +37,9 @@ export function Tr(props: Props) {
   return (
     <tr
       style={{
-        backgroundColor: backgroundColor || colors.$1,
+        backgroundColor: withoutBackgroundColor
+          ? undefined
+          : backgroundColor || colors.$1,
         ...props.style,
       }}
       onClick={(event) =>
@@ -58,8 +61,6 @@ export function Tr(props: Props) {
   );
 }
 
-export const MemoizedTr = memo(
-  Tr,
-  (prev, next) =>
-    isEqual(prev.resource, next.resource) && prev.isSelected === next.isSelected
+export const MemoizedTr = memo(Tr, (prev, next) =>
+  isEqual(prev.resource, next.resource)
 );

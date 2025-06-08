@@ -13,7 +13,6 @@ import { styled } from 'styled-components';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { InputLabel } from './InputLabel';
-import React from 'react';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -80,7 +79,7 @@ export function Checkbox(props: Props) {
             props.onValueChange &&
               props.onValueChange(event.target.value, event.target.checked);
           }}
-          checked={props.checked}
+          checked={Boolean(props.checked)}
           disabled={props.disabled}
           data-cy={props.cypressRef}
         />
