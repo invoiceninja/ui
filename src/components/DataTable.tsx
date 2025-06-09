@@ -783,9 +783,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         >
           {(isLoading || !isEqual(currentData, data?.data?.data)) && (
             <MemoizedTr
-              className={classNames('border-b', {
-                'last:border-b-0': hasVerticalOverflow,
-              })}
+              className="border-b"
               style={{
                 borderColor: colors.$20,
               }}
@@ -798,9 +796,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
           {isError && !isLoading && (
             <MemoizedTr
-              className={classNames('border-b', {
-                'last:border-b-0': hasVerticalOverflow,
-              })}
+              className="border-b"
               style={{
                 borderColor: colors.$20,
               }}
@@ -815,9 +811,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             currentData?.length === 0 &&
             isEqual(currentData, data?.data?.data) && (
               <MemoizedTr
-                className={classNames('border-b', {
-                  'last:border-b-0': hasVerticalOverflow,
-                })}
+                className="border-b"
                 style={{
                   borderColor: colors.$20,
                 }}
@@ -836,9 +830,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             currentData.map((resource: any, rowIndex: number) => (
               <MemoizedTr
                 key={resource.id}
-                className={classNames('border-b table-row', {
-                  'last:border-b-0': hasVerticalOverflow,
-                })}
+                className="border-b table-row"
                 style={{
                   borderColor: colors.$20,
                 }}
