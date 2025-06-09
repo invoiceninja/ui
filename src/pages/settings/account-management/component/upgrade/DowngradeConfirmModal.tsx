@@ -32,12 +32,12 @@ export function DowngradeConfirmModal({ visible, onClose, onConfirm, isLoading }
       <div className="flex flex-col space-y-6">
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            {t('downgrade_confirmation_message')}
+            {t('downgrade_end_of_cycle')}
           </p>
           
           <div className="bg-yellow-50 p-4 rounded-md">
             <p className="text-sm text-yellow-800">
-              <strong>⚠️ {t('warning')}:</strong> {t('downgrade_warning_features')}
+                <strong>⚠️ {t('warning')}:</strong> {t('downgrade_to_free_description')}
             </p>
           </div>
         </div>
@@ -58,7 +58,7 @@ export function DowngradeConfirmModal({ visible, onClose, onConfirm, isLoading }
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isLoading ? t('processing') : t('downgrade_to_free')}
+            {isLoading ? t('processing') : t('confirm')}
           </Button>
         </div>
       </div>

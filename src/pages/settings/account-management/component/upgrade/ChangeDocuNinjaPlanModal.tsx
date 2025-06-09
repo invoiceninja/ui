@@ -54,7 +54,7 @@ export function ChangeDocuNinjaPlanModal({
 
   return (
     <Modal
-      title={t('change_docuninja_plan')}
+      title={t('change_plan')}
       visible={visible}
       onClose={onClose}
       size="small"
@@ -63,15 +63,12 @@ export function ChangeDocuNinjaPlanModal({
         <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-600 mb-2">
-              {t('current_docuninja_users')}: <strong>{currentUserCount}</strong>
-            </p>
-            <p className="text-sm text-gray-600">
-              {t('select_new_user_count_docuninja')}
+              {`${t('docuninja')} ${t('users')}`}: <strong>{currentUserCount}</strong>
             </p>
           </div>
 
           <SelectField
-            label={t('number_of_users')}
+            label={t('docuninja_change_users')}
             value={selectedUserCount.toString()}
             onValueChange={(value) => setSelectedUserCount(parseInt(value))}
           >
@@ -118,9 +115,7 @@ export function ChangeDocuNinjaPlanModal({
             >
               {isLoading 
                 ? t('processing') 
-                : selectedUserCount === 0 
-                  ? t('disable_docuninja')
-                  : t('update_plan')
+                  : t('confirm')
               }
             </Button>
           )}
