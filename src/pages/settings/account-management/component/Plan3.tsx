@@ -14,13 +14,9 @@ import { Card } from '$app/components/cards';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useTranslation } from 'react-i18next';
 import { HostedPlan } from './plan/HostedPlan';
-import { PlanUpgrade } from './upgrade/PlanUpgrade';
+import { Downgrade } from './upgrade/Downgrade';
 
 export function Plan3() {
-
-    const accentColor = useAccentColor();
-    const colors = useColorScheme();
-    const account = useCurrentAccount();
 
     const { t } = useTranslation();
 
@@ -34,7 +30,8 @@ export function Plan3() {
 
                     <HostedPlan />
 
-                    <PlanUpgrade />
+                    <Downgrade />
+
                 </div>
             </Card>
         </div>
