@@ -160,6 +160,7 @@ interface Props<T> extends CommonProps {
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
+  applyManualHeight?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -204,9 +205,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   const colors = useColorScheme();
   const options = useDataTableOptions();
   const reactSettings = useReactSettings();
-
-  const [hasVerticalOverflow, setHasVerticalOverflow] =
-    useState<boolean>(false);
 
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
@@ -703,21 +701,15 @@ export function DataTable<T extends object>(props: Props<T>) {
       )}
 
       <Table
-        className={classNames(props.className, {
-          'pr-0': !hasVerticalOverflow,
-        })}
+        className={props.className}
         withoutPadding={props.withoutPadding}
         withoutBottomBorder={styleOptions?.withoutBottomBorder}
         withoutTopBorder={styleOptions?.withoutTopBorder}
         withoutLeftBorder={styleOptions?.withoutLeftBorder}
         withoutRightBorder={styleOptions?.withoutRightBorder}
-        onVerticalOverflowChange={(hasOverflow) =>
-          setHasVerticalOverflow(hasOverflow)
-        }
         isDataLoading={isLoading}
         style={props.style}
         resizable={apiEndpoint.pathname}
-        isReadyForHeightCalculation={arePreferencesApplied}
       >
         <Thead
           backgroundColor={styleOptions?.headerBackgroundColor}
