@@ -384,7 +384,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     };
   }, []);
 
-  const { data, isLoading, isFetching, isError } = useQuery(
+  const { data, isLoading, isFetching, isError, isPlaceholderData } = useQuery(
     [
       ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
@@ -527,12 +527,12 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   useDebounce(
     () => {
-      if (data) {
+      if (data && !isFetching) {
         setCurrentData(data.data.data);
       }
     },
     10,
-    [data]
+    [data, isFetching]
   );
 
   useEffect(() => {
