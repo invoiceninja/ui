@@ -83,6 +83,17 @@ export function BuilderDemo() {
               sign: () => null,
               toolboxContext: ToolboxContext,
             },
+            styles: {
+              frame: {
+                backgroundColor: '#f7f7f7',
+              },
+              border: '#d1d5db',
+            },
+            options: {
+              header: {
+                sticky: false,
+              }
+            }
           }}
         >
           <Builder />
