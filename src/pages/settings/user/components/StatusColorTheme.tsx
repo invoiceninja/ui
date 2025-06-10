@@ -255,7 +255,7 @@ export function StatusColorTheme() {
     const updatedColorTheme = cloneDeep(reactSettings?.color_theme);
 
     if (updatedColorTheme) {
-      updatedColorTheme.status_color_theme = '';
+      updatedColorTheme.status_color_theme = 'light';
 
       CUSTOM_COLOR_FIELDS.forEach((fieldKey) => {
         updatedColorTheme[fieldKey] = '';
@@ -274,14 +274,13 @@ export function StatusColorTheme() {
     <>
       <Element leftSide={t('status_color_theme')}>
         <SelectField
-          value={reactSettings?.color_theme?.status_color_theme || ''}
+          value={reactSettings?.color_theme?.status_color_theme || 'light'}
           onValueChange={(value) =>
             handleUserChange(
               'company_user.react_settings.color_theme.status_color_theme',
               value
             )
           }
-          withBlank
           customSelector
         >
           {Object.keys(COLOR_THEMES).map((themeKey, index) => (
