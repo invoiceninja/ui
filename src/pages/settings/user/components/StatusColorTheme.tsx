@@ -102,7 +102,7 @@ interface Theme {
 }
 const COLOR_THEMES: Record<ThemeKey, Theme> = {
   light: {
-    palette: ['#58a6e4', '#324ea1', '#4c9a1d', '#cd8900', '#b83700'],
+    palette: ['#93C5FD26', '#1D4ED826', '#22C55E26', '#EAB30826', '#EF444426'],
   },
   dark: {
     palette: ['#298aaa', '#0c45a3', '#407535', '#a87001', '#8b3c40'],
@@ -255,6 +255,8 @@ export function StatusColorTheme() {
     const updatedColorTheme = cloneDeep(reactSettings?.color_theme);
 
     if (updatedColorTheme) {
+      updatedColorTheme.status_color_theme = '';
+
       CUSTOM_COLOR_FIELDS.forEach((fieldKey) => {
         updatedColorTheme[fieldKey] = '';
       });
@@ -272,13 +274,14 @@ export function StatusColorTheme() {
     <>
       <Element leftSide={t('status_color_theme')}>
         <SelectField
-          value={reactSettings?.color_theme?.status_color_theme || 'light'}
+          value={reactSettings?.color_theme?.status_color_theme || ''}
           onValueChange={(value) =>
             handleUserChange(
               'company_user.react_settings.color_theme.status_color_theme',
               value
             )
           }
+          withBlank
           customSelector
         >
           {Object.keys(COLOR_THEMES).map((themeKey, index) => (
@@ -295,7 +298,7 @@ export function StatusColorTheme() {
                     <div
                       key={paletteColor}
                       style={{
-                        backgroundColor: paletteColor,
+                        backgroundColor: paletteColor.slice(0, 7),
                         width: 50,
                         height: 20,
                       }}
