@@ -4,6 +4,10 @@ import { useState } from "react";
 import { DowngradeConfirmModal } from "./DowngradeConfirmModal";
 import { ChangeDocuNinjaPlanModal } from "./ChangeDocuNinjaPlanModal";
 import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
+import { toast } from "$app/common/helpers/toast/toast";
+import { endpoint } from "$app/common/helpers";
+import { request } from '$app/common/helpers/request';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 interface Props {
     docuninja_num_users?: number;
@@ -16,15 +20,21 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
     const [showChangeDocuNinjaModal, setShowChangeDocuNinjaModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const account = useCurrentAccount();
+    const refresh = useRefreshCompanyUsers();
 
     async function handleDowngradeConfirm() {
         setIsLoading(true);
         try {
-            // TODO: Implement actual downgrade API call
-            console.log('Downgrading to free plan...');
             
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            request('POST', endpoint('/api/client/account_management/free'))
+                .then(() => {
+                    toast.success();
+
+                    refresh();
+                    setShowDowngradeModal(false);
+                })
+                .catch(() => toast.error())
+                .finally(() => setIsLoading(false));
             
             // Close modal and show success message
             setShowDowngradeModal(false);
@@ -36,15 +46,21 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
             setIsLoading(false);
         }
     }
-
+    
     async function handleDocuNinjaChange(newUserCount: number) {
         setIsLoading(true);
         try {
-            // TODO: Implement actual DocuNinja plan change API call
-            console.log('Changing DocuNinja plan to:', newUserCount, 'users');
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
+                request('POST', endpoint('/api/client/account_management/docuninja/downgrade'), {
+                    num_users: newUserCount
+                })
+                .then(() => {   
+                    toast.success();
+
+                    refresh();
+                    setShowDowngradeModal(false);
+                })
+                .catch(() => toast.error())
+                .finally(() => setIsLoading(false));
             
             // Close modal and show success message
             setShowChangeDocuNinjaModal(false);
@@ -75,7 +91,7 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
                     <p className="text-white hover:text-red-600">{t('downgrade_to_free')}</p>
                 </button>
 
-                {account?.docuninja_num_users && account?.docuninja_num_users >= 1 && (
+                {account?.docuninja_num_users >= 1 && (
                     <button
                         type="button"
                         className="bg-red-500 p-4 rounded-md text-center hover:bg-red-900 transition duration-150 cursor-pointer"

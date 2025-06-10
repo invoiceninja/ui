@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Card } from '$app/components/cards';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +17,9 @@ import { Downgrade } from './upgrade/Downgrade';
 export function Plan3() {
 
     const { t } = useTranslation();
+
+    const account = useCurrentAccount();
+
 
     return(
         <div className="space-y-4">
@@ -30,8 +31,9 @@ export function Plan3() {
 
                     <HostedPlan />
 
-                    <Downgrade />
-
+                    {account?.plan !== '' && (
+                        <Downgrade />
+                    )}
                 </div>
             </Card>
         </div>
