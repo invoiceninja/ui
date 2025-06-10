@@ -12,9 +12,14 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
+import { useColorScheme } from '$app/common/colors';
+import { Wallet } from '$app/components/icons/Wallet';
 
 export default function CreditDetails() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const customField = useCustomField();
 
   const defaultVariables = [
@@ -44,7 +49,21 @@ export default function CreditDetails() {
   ];
 
   return (
-    <Card title={t('credit_details')} padding="small">
+    <Card
+      title={
+        <div className="flex items-center space-x-2">
+          <div>
+            <Wallet color="#2176FF" size="1.3rem" />
+          </div>
+
+          <span>{t('credit_details')}</span>
+        </div>
+      }
+      padding="small"
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <SortableVariableList
         for="credit_details"
         defaultVariables={defaultVariables}

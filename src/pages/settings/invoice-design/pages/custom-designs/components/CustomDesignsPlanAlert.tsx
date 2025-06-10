@@ -37,11 +37,9 @@ export function CustomDesignsPlanAlert(props?: CommonProps) {
               {user?.company_user && (
                 <Link
                   to={
-                    user.company_user.ninja_portal_url ||
                     route('/settings/account_management')
                   }
                   className="ml-10"
-                  external
                 >
                   {t('plan_change')}
                 </Link>

@@ -24,6 +24,7 @@ import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useStaticsQuery } from '$app/common/queries/statics';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Settings() {
   const [t] = useTranslation();
@@ -32,6 +33,7 @@ export default function Settings() {
 
   const { client, errors, setClient } = context;
 
+  const colors = useColorScheme();
   const languages = useLanguages();
   const currencies = useCurrencies();
   const { data: statics } = useStaticsQuery();
@@ -56,7 +58,12 @@ export default function Settings() {
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <Card title={t('settings')} className="col-span-12 lg:col-span-6">
+      <Card
+        title={t('settings')}
+        className="col-span-12 lg:col-span-6 shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         {currencies.length > 1 && (
           <Element leftSide={t('currency')}>
             <CurrencySelector
@@ -161,7 +168,12 @@ export default function Settings() {
         </Element>
       </Card>
 
-      <Card title={t('classify')} className="col-span-12 lg:col-span-6 h-max">
+      <Card
+        title={t('classify')}
+        className="col-span-12 lg:col-span-6 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         {statics && (
           <Element leftSide={t('size_id')}>
             <SelectField
@@ -205,7 +217,12 @@ export default function Settings() {
         )}
       </Card>
 
-      <Card title={t('notes')} className="col-span-12">
+      <Card
+        title={t('notes')}
+        className="col-span-12 shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element leftSide={t('public_notes')}>
           <MarkdownEditor
             value={client?.public_notes}

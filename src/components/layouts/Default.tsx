@@ -539,11 +539,12 @@ export function Default(props: Props) {
                       </Button>
 
                       <Dropdown
-                        className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                        className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
                         cardActions
                         disabled={
                           saveBtn?.disableSaveButton || props.disableSaveButton
                         }
+                        labelButtonBorderColor={colors.$1}
                       >
                         {props.additionalSaveOptions.map((option, index) => (
                           <DropdownElement
@@ -576,8 +577,8 @@ export function Default(props: Props) {
         <main className="flex-1">
           {(props.breadcrumbs || props.topRight || props.afterBreadcrumbs) &&
             props.breadcrumbs.length > 0 && (
-              <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-                <div className="flex items-center">
+              <div className="pt-4 px-4 md:px-6 md:pt-6 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+                <div className="flex items-center w-full">
                   {props.breadcrumbs && (
                     <Breadcrumbs pages={props.breadcrumbs} />
                   )}
@@ -590,8 +591,8 @@ export function Default(props: Props) {
             )}
 
           <div
-            style={{ color: colors.$3, backgroundColor: colors.$2 }}
-            className="p-4 md:py-8 xl:p-8 dark:text-gray-100"
+            style={{ color: colors.$3, backgroundColor: colors.$23 }}
+            className="p-4 xl:px-6 dark:text-gray-100"
           >
             {props.children}
           </div>

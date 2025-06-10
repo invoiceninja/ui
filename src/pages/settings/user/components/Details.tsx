@@ -17,7 +17,7 @@ import { CustomField } from '$app/components/CustomField';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { useAtom } from 'jotai';
@@ -51,7 +51,7 @@ export function Details() {
   return (
     <>
       {userChanges && (
-        <Card title={t('details')}>
+        <>
           <Element leftSide={t('first_name')}>
             <InputField
               value={userChanges?.first_name || user?.first_name || ''}
@@ -139,7 +139,7 @@ export function Details() {
               onValueChange={(value) => handleChange('custom_value4', value)}
             />
           )}
-        </Card>
+        </>
       )}
     </>
   );

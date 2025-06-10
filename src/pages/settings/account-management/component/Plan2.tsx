@@ -10,7 +10,6 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Card } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Check, Plus } from 'react-feather';
 import { useState } from 'react';
@@ -22,7 +21,6 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { get } from 'lodash';
 import { Free, Plan } from './plan/Plan';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { NewCreditCard } from './plan/NewCreditCard';
 import { DeleteCreditCard } from './plan/DeleteCreditCard';
 import { Popup } from './plan/Popup';
 import { CreditCard } from './plan/CreditCard';
@@ -31,6 +29,9 @@ import { usePlansQuery } from '$app/common/queries/plans';
 import { useTranslation } from 'react-i18next';
 import { useEnterpriseUtils } from '../common/hooks/useEnterpriseUtils';
 import { Downgrade } from './plan/Downgrade';
+import { StartTrial } from './plan/StartTrial';
+import { NewCreditCard } from './plan/NewCreditCard';
+import { Divider } from '$app/components/cards/Divider';
 
 export function Plan2() {
   const accentColor = useAccentColor();
@@ -40,7 +41,7 @@ export function Plan2() {
   const [popupVisible, setPopupVisible] = useState(false);
   const [deletePopupVisible, setDeletePopupVisible] = useState(false);
   const [createPopupVisible, setCreatePopupVisible] = useState(false);
-
+  const [startTrialFlag, setStartTrialFlag] = useState(false);
   const { data: methods } = useQuery({
     queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
@@ -67,166 +68,197 @@ export function Plan2() {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <div className="px-7 py-3 space-y-4">
-          <div className="flex justify-between items-center">
-            <h4 className="text-lg font-semibold">Your Plan</h4>
-          </div>
+      <div className="px-7 py-3 space-y-4">
+        <div className="flex justify-between items-center">
+          <h4 className="text-lg font-semibold">Your Plan</h4>
+        </div>
+        {account.plan === '' ? <Free /> : null}
+        {account.plan === 'enterprise' ? (
+          <Plan
+            title={<EnterpriseLabel />}
+            color={accentColor}
+            price={calculatePrice().toString()}
+            trial={account.trial_days_left}
+            custom={false}
+            term={account.plan_term === 'month' ? 'month' : 'year'}
+          />
+        ) : null}
+        {account.plan === 'pro' ? (
+          <Plan
+            title="Ninja Pro"
+            color="#5EC16A"
+            price={
+              account.plan_term === 'month'
+                ? get(plans, 'plans.pro_plan')!.toString()
+                : get(plans, 'plans.pro_plan_annual')!.toString()
+            }
+            trial={account.trial_days_left}
+            custom={false}
+            term={account.plan_term === 'month' ? 'month' : 'year'}
+          />
+        ) : null}
+        {account.plan === 'premium_business_plus' ? (
+          <Plan
+            title="Premium Business+"
+            color="#FFCB00"
+            price=""
+            trial={account.trial_days_left}
+            custom={false}
+            term={account.plan_term === 'month' ? 'month' : 'year'}
+          />
+        ) : null}
+        <div
+          className="rounded p-4 flex flex-col 2xl:flex-row justify-between items-center space-y-5 2xl:space-y-0"
+          style={{ backgroundColor: colors.$2 }}
+        >
+          <div className="flex flex-col space-y-2">
+            <p className="font-semibold text-center 2xl:text-left">
+              Upgrade to Pro or Enterprise Plans for advanced features!
+            </p>
 
-          {account.plan === '' ? <Free /> : null}
+            <div className="grid grid-cols-2 gap-20 text-sm">
+              <div className="space-y-2">
+                <h3 className="font-semibold mb-3">Pro</h3>
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">Remove Invoice Ninja logo</span>
+                </p>
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">Unlimited Clients</span>
+                </p>
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">Advanced Customization</span>
+                </p>
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">REST API Access</span>
+                </p>
+              </div>
 
-          {account.plan === 'enterprise' ? (
-            <Plan
-              title={<EnterpriseLabel />}
-              color={accentColor}
-              price={calculatePrice().toString()}
-              trial={account.trial_days_left}
-              custom={false}
-              term={account.plan_term === 'month' ? 'month' : 'year'}
-            />
-          ) : null}
+              <div className="space-y-2">
+                <h3 className="font-semibold mb-3">Enterprise</h3>
 
-          {account.plan === 'pro' ? (
-            <Plan
-              title="Ninja Pro"
-              color="#5EC16A"
-              price={
-                account.plan_term === 'month'
-                  ? get(plans, 'plans.pro_plan')!.toString()
-                  : get(plans, 'plans.pro_plan_annual')!.toString()
-              }
-              trial={account.trial_days_left}
-              custom={false}
-              term={account.plan_term === 'month' ? 'month' : 'year'}
-            />
-          ) : null}
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">Additional Account Users</span>
+                </p>
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">
+                    Attach Files to Emails (pdf, jpg, xls..)
+                  </span>
+                </p>
 
-          {account.plan === 'premium_business_plus' ? (
-            <Plan
-              title="Premium Business+"
-              color="#FFCB00"
-              price=""
-              trial={account.trial_days_left}
-              custom={false}
-              term={account.plan_term === 'month' ? 'month' : 'year'}
-            />
-          ) : null}
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">
+                    Custom URL “invoice.company.com”
+                  </span>
+                </p>
 
-          <div
-            className="rounded p-4 flex flex-col 2xl:flex-row justify-between items-center space-y-5 2xl:space-y-0"
-            style={{ backgroundColor: colors.$2 }}
-          >
-            <div className="flex flex-col space-y-2">
-              <p className="font-semibold text-center 2xl:text-left">
-                Upgrade to Pro or Enterprise Plans for advanced features!
-              </p>
-
-              <div className="grid grid-cols-2 gap-20 text-sm">
-                <div className="space-y-2">
-                  <h3 className="font-semibold mb-3">Pro</h3>
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">Remove Invoice Ninja logo</span>
-                  </p>
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">Unlimited Clients</span>
-                  </p>
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">Advanced Customization</span>
-                  </p>
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">REST API Access</span>
-                  </p>
-
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="font-semibold mb-3">Enterprise</h3>
-                
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">Additional Account Users</span>
-                  </p>
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">Attach Files to Emails (pdf, jpg, xls..)</span>
-                  </p>
-
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">Custom URL “invoice.company.com”</span>
-                  </p>
-
-                  <p className="flex items-center space-x-1">
-                    <Check size={18} style={{ color: accentColor }} />
-                    <span className="block">Auto-sync Bank Transactions</span>
-                  </p>
-                </div>
+                <p className="flex items-center space-x-1">
+                  <Check size={18} style={{ color: accentColor }} />
+                  <span className="block">Auto-sync Bank Transactions</span>
+                </p>
               </div>
             </div>
+          </div>
 
+          <div className="flex flex-col space-y-2">
             <Button behavior="button" onClick={() => setPopupVisible(true)}>
-              Upgrade Plan
+              {t('upgrade_plan')}
             </Button>
+            {account.can_trial && (
+              <div className="flex flex-col items-center space-y-2">
+                <p>or</p>
+                <Button
+                  behavior="button"
+                  type="secondary"
+                  onClick={() => setStartTrialFlag(true)}
+                >
+                  {t('trial_call_to_action')}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
-      </Card>
+      </div>
 
-      <Card>
-        <div className="px-7 py-3 space-y-4">
-          <div className="flex justify-between items-center">
-            <h4 className="text-lg font-semibold">Payment method</h4>
+      <div className="px-7 pt-3">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
 
+      <div className="px-7 py-3 space-y-4">
+        <div className="flex justify-between items-center">
+          <h4 className="text-lg font-semibold">Payment method</h4>
+
+          <button
+            type="button"
+            style={{ color: accentColor }}
+            className="text-sm hover:underline flex items-center space-x-1"
+            onClick={() => setCreatePopupVisible(true)}
+          >
+            <Plus size={18} /> <span>{t('add_payment_method')}</span>
+          </button>
+
+          <NewCreditCard
+            visible={createPopupVisible}
+            onClose={() => setCreatePopupVisible(false)}
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {methods?.length === 0 ? (
             <button
               type="button"
-              style={{ color: accentColor }}
-              className="text-sm hover:underline flex items-center space-x-1"
+              className="flex items-center flex-col w-full lg:w-72 p-8 rounded border"
+              style={{ borderColor: colors.$11.toString() }}
               onClick={() => setCreatePopupVisible(true)}
             >
-              <Plus size={18} /> <span>{t('add_payment_method')}</span>
+              <div className="flex flex-col items-center justify-center space-y-3">
+                <Plus size={48} />
+                <p>{t('add_payment_method')}</p>
+              </div>
             </button>
+          ) : null}
 
-            <NewCreditCard
-              visible={createPopupVisible}
-              onClose={() => setCreatePopupVisible(false)}
+          {methods?.map((method) => (
+            <CreditCard
+              key={method.id}
+              onDelete={() => {
+                setSelectedGateway(method);
+                setDeletePopupVisible(true);
+              }}
+              gateway={method}
             />
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            {methods?.length === 0 ? (
-              <button
-                type="button"
-                className="flex items-center flex-col w-full lg:w-72 p-8 rounded border"
-                style={{ borderColor: colors.$11.toString() }}
-                onClick={() => setCreatePopupVisible(true)}
-              >
-                <div className="flex flex-col items-center justify-center space-y-3">
-                  <Plus size={48} />
-                  <p>{t('add_payment_method')}</p>
-                </div>
-              </button>
-            ) : null}
-
-            {methods?.map((method) => (
-              <CreditCard
-                key={method.id}
-                onDelete={() => {
-                  setSelectedGateway(method);
-                  setDeletePopupVisible(true);
-                }}
-                gateway={method}
-              />
-            ))}
-          </div>
+          ))}
         </div>
-      </Card>
+      </div>
+
+      {account.plan !== '' && (
+        <div className="px-7 pt-3">
+          <Divider
+            className="border-dashed"
+            withoutPadding
+            borderColor={colors.$20}
+          />
+        </div>
+      )}
 
       {account.plan !== '' ? <Downgrade /> : null}
 
       <Popup visible={popupVisible} onClose={() => setPopupVisible(false)} />
+
+      <StartTrial
+        visible={startTrialFlag}
+        onClose={() => setStartTrialFlag(false)}
+      />
 
       <DeleteCreditCard
         gateway={selectedGateway}

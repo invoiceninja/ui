@@ -8,19 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
-import { MdClose } from 'react-icons/md';
 import { SubscriptionProps } from './Overview';
+import { Plus } from '$app/components/icons/Plus';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export function Webhook(props: SubscriptionProps) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const { subscription, handleChange, errors } = props;
@@ -61,7 +63,7 @@ export function Webhook(props: SubscriptionProps) {
   };
 
   return (
-    <Card title={t('webhook')}>
+    <>
       <Element leftSide={t('webhook_url')}>
         <InputField
           value={subscription.webhook_configuration.post_purchase_url}
@@ -89,8 +91,9 @@ export function Webhook(props: SubscriptionProps) {
           errorMessage={
             errors?.errors['webhook_configuration.post_purchase_rest_method']
           }
+          customSelector
         >
-          <option defaultChecked></option>
+          <option defaultChecked value=""></option>
           <option value="post">{t('post')}</option>
           <option value="put">{t('put')}</option>
         </SelectField>
@@ -111,11 +114,12 @@ export function Webhook(props: SubscriptionProps) {
               onValueChange={(value) => setHeaderValue(value)}
             />
 
-            <BiPlusCircle
-              className="mt-7 text-gray-800 cursor-pointer"
-              fontSize={25}
+            <div
+              className="mt-7 cursor-pointer hover:opacity-75"
               onClick={() => headerKey && headerValue && handleAddHeader()}
-            />
+            >
+              <Plus color={colors.$3} size="1.3rem" />
+            </div>
           </div>
 
           {headers?.map(([key, value], index) => (
@@ -127,12 +131,18 @@ export function Webhook(props: SubscriptionProps) {
 
               <span className="flex-1 text-start">{value}</span>
 
-              <MdClose
+              <div
                 className="cursor-pointer"
-                color={accentColor}
-                fontSize={22}
                 onClick={() => handleRemoveHeader(key)}
-              />
+              >
+                <CircleXMark
+                  color={colors.$16}
+                  hoverColor={colors.$3}
+                  borderColor={colors.$5}
+                  hoverBorderColor={colors.$17}
+                  size="1.6rem"
+                />
+              </div>
             </div>
           ))}
 
@@ -143,6 +153,6 @@ export function Webhook(props: SubscriptionProps) {
           )}
         </div>
       </Element>
-    </Card>
+    </>
   );
 }

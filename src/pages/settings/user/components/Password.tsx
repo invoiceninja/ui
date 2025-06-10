@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { RootState } from '$app/common/stores/store';
 
@@ -35,19 +35,17 @@ export function Password() {
   }, [isPasswordsChanged]);
 
   return (
-    <Card title={t('password')}>
-      <Element leftSide={t('new_password')}>
-        <InputField
-          type="password"
-          value={userChanges.password || ''}
-          onValueChange={(value) => {
-            dispatch(updateChanges({ property: 'password', value }));
+    <Element leftSide={t('new_password')}>
+      <InputField
+        type="password"
+        value={userChanges.password || ''}
+        onValueChange={(value) => {
+          dispatch(updateChanges({ property: 'password', value }));
 
-            !isPasswordsChanged && setIsPasswordsChanged(true);
-          }}
-          errorMessage={errors?.errors?.password}
-        />
-      </Element>
-    </Card>
+          !isPasswordsChanged && setIsPasswordsChanged(true);
+        }}
+        errorMessage={errors?.errors?.password}
+      />
+    </Element>
   );
 }

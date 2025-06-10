@@ -67,7 +67,7 @@ export function InvoiceStatus(props: Props) {
 
   if (isPastDue() && !isCancelledOrReversed) {
     return (
-      <Badge variant="yellow" style={{ backgroundColor: statusThemeColors.$5 }}>
+      <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
         {t('past_due')}
       </Badge>
     );

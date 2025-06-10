@@ -31,10 +31,11 @@ export interface SelectProps extends CommonProps {
   dismissable?: boolean;
   clearAfterSelection?: boolean;
   menuPosition?: 'fixed';
-  withoutSeparator?: boolean;
   searchable?: boolean;
   controlIcon?: ReactNode;
   controlStyle?: CSSProperties;
+  applyCustomDropdownIndicator?: boolean;
+  dropdownIndicatorClassName?: string;
 }
 
 export function SelectField(props: SelectProps) {
@@ -56,6 +57,7 @@ export function SelectField(props: SelectProps) {
     searchable = true,
     controlIcon,
     controlStyle,
+    dropdownIndicatorClassName,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -119,19 +121,17 @@ export function SelectField(props: SelectProps) {
         minHeight: '1.875rem',
       });
     },
-    ...(props.withoutSeparator && {
-      indicatorSeparator: () => {
-        return {
-          display: 'none',
-        };
-      },
-    }),
+    indicatorSeparator: () => {
+      return {
+        display: 'none',
+      };
+    },
   };
 
   return (
     <div className={classNames({ 'space-y-2': Boolean(customSelector) })}>
       {props.label && (
-        <InputLabel className="mb-2" for={props.id}>
+        <InputLabel className="mb-1" for={props.id}>
           {props.label}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </InputLabel>
@@ -192,35 +192,41 @@ export function SelectField(props: SelectProps) {
           )}
           blurInputOnSelect
           data-cy={cypressRef}
-          components={
-            controlIcon
-              ? {
-                  Control: ({ children, innerProps, isFocused }) => (
-                    <div
-                      className="flex items-center rounded-md border cursor-pointer pl-2"
-                      style={{
-                        height: '2.5rem',
-                        backgroundColor: colors.$1,
-                        borderColor: isFocused ? '#2463eb' : colors.$5,
-                        ...controlStyle,
-                      }}
-                      {...innerProps}
-                    >
-                      {controlIcon}
-                      {children}
-                    </div>
-                  ),
-                  DropdownIndicator: () => (
-                    <div
-                      className="flex items-center justify-center px-3 hover:opacity-75 h-full w-full"
-                      style={{ color: colors.$3 }}
-                    >
-                      <ChevronDown color={colors.$3} size="1rem" />
-                    </div>
-                  ),
-                }
-              : undefined
-          }
+          components={{
+            Control: ({ children, innerProps, isFocused }) => (
+              <div
+                className={classNames(
+                  'flex items-center rounded-md border cursor-pointer',
+                  {
+                    'pl-2': controlIcon,
+                    'pl-1': !controlIcon,
+                  }
+                )}
+                style={{
+                  height: '2.5rem',
+                  backgroundColor: colors.$1,
+                  borderColor: isFocused ? colors.$3 : colors.$24,
+                  ...controlStyle,
+                }}
+                {...innerProps}
+              >
+                {controlIcon}
+                {children}
+              </div>
+            ),
+
+            DropdownIndicator: () => (
+              <div
+                className={classNames(
+                  'flex items-center justify-center px-3 hover:opacity-75 h-full w-full',
+                  dropdownIndicatorClassName
+                )}
+                style={{ color: colors.$3 }}
+              >
+                <ChevronDown color={colors.$3} size="1rem" />
+              </div>
+            ),
+          }}
         />
       )}
 

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
-import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
 import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { route } from '$app/common/helpers/route';
 import { Link } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
+import { InfoCard } from '$app/components/InfoCard';
 
 interface Props {
   client: Client;
@@ -26,87 +26,108 @@ interface Props {
 export function Contacts(props: Props) {
   const [t] = useTranslation();
 
-  const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
   const { client } = props;
 
   return (
     <>
       {client && (
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoCard
-            title={t('contacts')}
-            value={
-              <div className="space-y-2">
-                {client.contacts.map(
-                  (contact: ClientContact, index: number) =>
-                    Boolean(
-                      contact.first_name ||
-                        contact.last_name ||
-                        contact.phone ||
-                        contact.email
-                    ) && (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center"
-                      >
-                        <div className="flex flex-col space-y-1">
-                          <p
-                            className="font-semibold"
-                            style={{ color: accentColor }}
+        <InfoCard
+          title={t('contacts')}
+          className="col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm h-full 2xl:h-max p-4"
+          style={{ borderColor: colors.$24 }}
+          withoutPadding
+        >
+          <div className="flex flex-col h-44 w-full overflow-y-auto">
+            {client.contacts.map(
+              (contact: ClientContact, index: number) =>
+                Boolean(
+                  contact.first_name ||
+                    contact.last_name ||
+                    contact.phone ||
+                    contact.email
+                ) && (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center first:pt-1 py-4 border-b border-dashed"
+                    style={{ borderColor: colors.$21 }}
+                  >
+                    <div className="flex flex-col space-y-1 text-sm">
+                      {Boolean(contact.first_name || contact.last_name) && (
+                        <span
+                          className="font-medium"
+                          style={{ color: colors.$3 }}
+                        >
+                          {contact.first_name} {contact.last_name}
+                        </span>
+                      )}
+
+                      {Boolean(contact.phone) && (
+                        <span
+                          className="font-medium"
+                          style={{ color: colors.$22 }}
+                        >
+                          {contact.phone}
+                        </span>
+                      )}
+
+                      {Boolean(contact.email) && (
+                        <div className="flex space-x-2">
+                          <span
+                            className="font-medium"
+                            style={{ color: colors.$22 }}
                           >
-                            {contact.first_name} {contact.last_name}
-                          </p>
+                            {contact.email}
+                          </span>
 
-                          <p>{contact.phone}</p>
-
-                          {Boolean(contact.email) && (
-                            <div className="flex space-x-1">
-                              <span>{contact.email}</span>
-
-                              <CopyToClipboardIconOnly text={contact.email} />
-                            </div>
-                          )}
-
-                          <div className="flex items-center space-x-2">
-                            <Link
-                              className="cursor-pointer"
-                              to={route(
-                                `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
-                                {
-                                  clientHash: client.client_hash,
-                                }
-                              )}
-                              external
-                            >
-                              {t('client_portal')}
-                            </Link>
-
-                            <Tooltip
-                              message={t('copy_link') as string}
-                              placement="top"
-                              width="auto"
-                              centerVertically
-                            >
-                              <CopyToClipboardIconOnly
-                                text={route(
-                                  `${client.contacts[index]?.link}?silent=true`
-                                )}
-                                iconColor={accentColor}
-                              />
-                            </Tooltip>
-                          </div>
+                          <Tooltip
+                            message={t('copy') as string}
+                            placement="top"
+                            width="auto"
+                            centerVertically
+                          >
+                            <CopyToClipboardIconOnly text={contact.email} />
+                          </Tooltip>
                         </div>
+                      )}
 
-                        {contact.is_locked && <UserUnsubscribedTooltip />}
+                      <div className="flex items-center space-x-2">
+                        <Link
+                          className="cursor-pointer"
+                          to={route(
+                            `${client.contacts[index]?.link}?silent=true&client_hash=:clientHash`,
+                            {
+                              clientHash: client.client_hash,
+                            }
+                          )}
+                          external
+                          withoutExternalIcon
+                        >
+                          {t('client_portal')}
+                        </Link>
+
+                        <Tooltip
+                          message={t('copy_link') as string}
+                          placement="top"
+                          width="auto"
+                          centerVertically
+                        >
+                          <CopyToClipboardIconOnly
+                            text={route(
+                              `${client.contacts[index]?.link}?silent=true`
+                            )}
+                          />
+                        </Tooltip>
                       </div>
-                    )
-                )}
-              </div>
-            }
-            className="h-full"
-          />
-        </div>
+                    </div>
+
+                    {contact.is_locked && <UserUnsubscribedTooltip />}
+                  </div>
+                )
+            )}
+          </div>
+        </InfoCard>
       )}
     </>
   );

@@ -22,6 +22,7 @@ import {
   useDisplayTemplateField,
 } from '../hooks/useDisplayTemplateField';
 import { EmailReport } from './EmailReport';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   schedule: Schedule;
@@ -42,6 +43,8 @@ export enum Templates {
 export function ScheduleForm(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   const { schedule, handleChange, errors, page } = props;
 
   const displayTemplateField = useDisplayTemplateField({
@@ -49,13 +52,22 @@ export function ScheduleForm(props: Props) {
   });
 
   return (
-    <Card title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}>
+    <Card
+      title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}
+      className="shadow-sm pb-6"
+      childrenClassName="pt-4"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutBodyPadding
+    >
       {displayTemplateField('template') && (
         <Element leftSide={t('template')} required>
           <SelectField
             value={schedule.template}
             onValueChange={(value) => handleChange('template', value)}
             errorMessage={errors?.errors.template}
+            customSelector
+            dismissable={false}
           >
             <option value="email_statement">{t('email_statement')}</option>
             <option value="email_record">{t('email_record')}</option>
@@ -78,9 +90,11 @@ export function ScheduleForm(props: Props) {
       {displayTemplateField('frequency') && (
         <Element leftSide={t('frequency')}>
           <SelectField
-            value={schedule.frequency_id}
+            value={schedule.frequency_id?.toString()}
             onValueChange={(value) => handleChange('frequency_id', value)}
             errorMessage={errors?.errors.frequency_id}
+            customSelector
+            dismissable={false}
           >
             {Object.keys(frequencies).map((frequency, index) => (
               <option key={index} value={frequency}>
@@ -94,15 +108,17 @@ export function ScheduleForm(props: Props) {
       {displayTemplateField('remaining_cycles') && (
         <Element leftSide={t('remaining_cycles')}>
           <SelectField
-            value={schedule.remaining_cycles}
+            value={schedule.remaining_cycles?.toString()}
             onValueChange={(value) =>
               handleChange('remaining_cycles', parseInt(value))
             }
             errorMessage={errors?.errors.remaining_cycles}
+            customSelector
+            dismissable={false}
           >
             <option value="-1">{t('endless')}</option>
             {[...Array(60).keys()].map((number, index) => (
-              <option value={number} key={index}>
+              <option value={number.toString()} key={index}>
                 {number}
               </option>
             ))}
@@ -110,7 +126,15 @@ export function ScheduleForm(props: Props) {
         </Element>
       )}
 
-      {schedule.template && <Divider />}
+      {schedule.template && (
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            withoutPadding
+            borderColor={colors.$20}
+          />
+        </div>
+      )}
 
       {schedule.template === Templates.EMAIL_STATEMENT && (
         <EmailStatement

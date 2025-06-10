@@ -23,11 +23,13 @@ import { useTranslation } from 'react-i18next';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ExpenseCardProps } from './Details';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();
   const { expense, handleChange, errors } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -141,7 +143,13 @@ export function AdditionalInfo(props: ExpenseCardProps) {
   }, [expense]);
 
   return (
-    <Card title={t('additional_info')} isLoading={!expense}>
+    <Card
+      title={t('additional_info')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      isLoading={!expense}
+    >
       {expense && (
         <Element
           leftSide={t('should_be_invoiced')}

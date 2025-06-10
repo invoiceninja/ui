@@ -29,6 +29,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function Edit() {
   const { setDocumentTitle } = useTitle('edit_tax_rate');
@@ -49,6 +50,7 @@ export function Edit() {
   const [errors, setErrors] = useState<Record<string, any>>({});
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   useEffect(() => {
     setDocumentTitle(data?.data.data.name);
@@ -89,7 +91,7 @@ export function Edit() {
       navigationTopRight={
         data && (
           <ResourceActions
-            label={t('more_actions')}
+            label={t('actions')}
             resource={data.data.data}
             actions={actions}
           />
@@ -106,10 +108,14 @@ export function Edit() {
       {data && (
         <div className="max-w-3xl">
           <Card
-            withSaveButton
-            onFormSubmit={formik.handleSubmit}
-            disableSubmitButton={formik.isSubmitting}
             title={data.data.data.name}
+            className="shadow-sm"
+            style={{ borderColor: colors.$24 }}
+            headerStyle={{ borderColor: colors.$20 }}
+            disableSubmitButton={formik.isSubmitting}
+            disableWithoutIcon
+            onFormSubmit={formik.handleSubmit}
+            withSaveButton
           >
             <Element leftSide={t('status')}>
               {!data.data.data.is_deleted && !data.data.data.archived_at && (

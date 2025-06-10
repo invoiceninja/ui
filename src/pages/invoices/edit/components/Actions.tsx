@@ -256,7 +256,7 @@ export function useActions(params?: Params) {
         })}
         entity="invoice"
         entityId={invoice.id}
-        label={`#${invoice.number}`}
+        label={invoice.number}
         labelElement={
           <EntityActionElement
             entity="invoice"

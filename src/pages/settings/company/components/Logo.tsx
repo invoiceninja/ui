@@ -8,13 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { AxiosResponse } from 'axios';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLogo } from '$app/common/hooks/useLogo';
@@ -32,16 +31,22 @@ import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   isSettingsPage?: boolean;
 }
 export function Logo({ isSettingsPage = true }: Props) {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
+
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState(new FormData());
+
   const logo = useLogo();
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+
+  const [formData, setFormData] = useState(new FormData());
 
   const {
     isGroupSettingsActive,
@@ -130,7 +135,7 @@ export function Logo({ isSettingsPage = true }: Props) {
   });
 
   return isSettingsPage ? (
-    <Card title={t('logo')}>
+    <>
       <Element leftSide={t('logo')}>
         <div className="grid grid-cols-12 lg:gap-4 space-y-4 lg:space-y-0">
           <div className="bg-gray-200 col-span-12 lg:col-span-5 rounded-lg p-6">
@@ -150,7 +155,11 @@ export function Logo({ isSettingsPage = true }: Props) {
         >
           <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <input {...getInputProps()} />
-            <Image className="mx-auto h-12 w-12 text-gray-400" />
+
+            <div className="flex justify-center">
+              <CloudUpload size="2.3rem" color={colors.$3} />
+            </div>
+
             <span className="mt-2 block text-sm font-medium">
               {isDragActive
                 ? 'drop_your_logo_here'
@@ -160,7 +169,7 @@ export function Logo({ isSettingsPage = true }: Props) {
         </div>
       </Element>
       <DeleteLogo />
-    </Card>
+    </>
   ) : (
     <div className="flex flex-col space-y-5">
       <span className="text-lg font-medium">{t('upload_logo')}</span>
@@ -182,7 +191,11 @@ export function Logo({ isSettingsPage = true }: Props) {
         >
           <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <input {...getInputProps()} />
-            <Image className="mx-auto h-12 w-12 text-gray-400" />
+
+            <div className="flex justify-center">
+              <CloudUpload size="2.3rem" color={colors.$3} />
+            </div>
+
             <span className="mt-2 block text-sm font-medium">
               {isDragActive
                 ? 'drop_your_logo_here'

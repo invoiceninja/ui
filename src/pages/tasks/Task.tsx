@@ -30,6 +30,7 @@ import {
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Page } from '$app/components/Breadcrumbs';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { InputLabel } from '$app/components/forms';
 
 export default function Task() {
   const { documentTitle } = useTitle('edit_task');
@@ -126,7 +127,13 @@ export default function Task() {
         entities={changeTemplateResources as TaskType[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(task) => `${t('number')}: ${task.number}`}
+        labelFn={(task) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{task.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/tasks/bulk"
       />
     </Default>

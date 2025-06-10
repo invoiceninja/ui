@@ -45,6 +45,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Guard } from '$app/common/guards/Guard';
 import { ImportButton } from '$app/components/import/ImportButton';
+import { InputLabel } from '$app/components/forms';
 
 export default function Payments() {
   useTitle('payments');
@@ -109,21 +110,22 @@ export default function Payments() {
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         showRestore={(resource: Payment) => !resource.is_deleted}
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={paymentColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="payment"
-          />
-        }
         rightSide={
-          <Guard
-            type="component"
-            component={<ImportButton route="/payments/import" />}
-            guards={[
-              or(permission('create_payment'), permission('edit_payment')),
-            ]}
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              columns={paymentColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="payment"
+            />
+
+            <Guard
+              type="component"
+              component={<ImportButton route="/payments/import" />}
+              guards={[
+                or(permission('create_payment'), permission('edit_payment')),
+              ]}
+            />
+          </div>
         }
         onTableRowClick={(payment) => {
           setSliderPaymentId(payment.id);
@@ -146,7 +148,20 @@ export default function Payments() {
         entities={changeTemplateResources as Payment[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(payment) => `${t('number')}: ${payment.number}`}
+        labelFn={(payment) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{payment.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(payment) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{payment.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/payments/bulk"
       />
     </Default>

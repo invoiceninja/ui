@@ -9,16 +9,16 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card, ClickableElement } from '../../../../components/cards';
+import { ClickableElement } from '../../../../components/cards';
 
 export function Documents() {
   const [t] = useTranslation();
 
   return (
-    <Card title={t('documents')}>
+    <>
       <ClickableElement to="/settings/company_details/documents">
         {t('default_documents')}
       </ClickableElement>
-    </Card>
+    </>
   );
 }

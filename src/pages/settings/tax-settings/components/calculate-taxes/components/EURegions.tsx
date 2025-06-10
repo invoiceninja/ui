@@ -48,8 +48,6 @@ export function EURegions() {
   };
 
   const divClickIntercept = (id: string) => {
-    console.log(id);
-
     const checkbox = document.getElementById(id.replace('.apply_tax', ''));
     checkbox?.click();
   };

@@ -9,7 +9,6 @@
  */
 
 import classNames from 'classnames';
-import { useEffect, useState } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 
@@ -19,74 +18,12 @@ interface Props extends CommonProps {
   withoutTopBorder?: boolean;
   withoutLeftBorder?: boolean;
   withoutRightBorder?: boolean;
-  onVerticalOverflowChange?: (overflow: boolean) => void;
   isDataLoading?: boolean;
   resizable?: string;
-  isReadyForHeightCalculation?: boolean;
+  withoutBorder?: boolean;
 }
 
 export function Table(props: Props) {
-  const { onVerticalOverflowChange } = props;
-
-  const [tableParentHeight, setTableParentHeight] = useState<number>();
-  const [tableHeight, setTableHeight] = useState<number>();
-  const [manualTableHeight, setManualTableHeight] = useState<
-    number | string | undefined
-  >(props.style?.height);
-  const [isVerticallyOverflow, setIsVerticallyOverflow] =
-    useState<boolean>(true);
-
-  const handleTableParentHeight = (element: HTMLDivElement | null) => {
-    if (element && onVerticalOverflowChange) {
-      setTableParentHeight(element.clientHeight);
-    }
-  };
-
-  const handleTableHeight = (element: HTMLTableElement | null) => {
-    if (element && onVerticalOverflowChange) {
-      setTableHeight(element.clientHeight);
-    }
-  };
-
-  useEffect(() => {
-    if (
-      typeof tableHeight === 'number' &&
-      typeof tableParentHeight === 'number' &&
-      !props.isDataLoading &&
-      onVerticalOverflowChange &&
-      props.isReadyForHeightCalculation
-    ) {
-      if (tableHeight > tableParentHeight) {
-        onVerticalOverflowChange(true);
-        setIsVerticallyOverflow(true);
-      } else {
-        onVerticalOverflowChange(false);
-        setIsVerticallyOverflow(false);
-      }
-    }
-  }, [
-    props.isDataLoading,
-    tableHeight,
-    tableParentHeight,
-    props.isReadyForHeightCalculation,
-  ]);
-
-  useEffect(() => {
-    if (props.style?.height && props.isReadyForHeightCalculation) {
-      setManualTableHeight(props.style.height);
-    }
-  }, [props.style?.height, props.isReadyForHeightCalculation]);
-
-  useEffect(() => {
-    if (
-      !isVerticallyOverflow &&
-      onVerticalOverflowChange &&
-      props.isReadyForHeightCalculation
-    ) {
-      setManualTableHeight('auto');
-    }
-  }, [isVerticallyOverflow, props.isReadyForHeightCalculation]);
-
   const colors = useColorScheme();
 
   return (
@@ -102,7 +39,7 @@ export function Table(props: Props) {
       >
         <div
           className={classNames(
-            'overflow-hidden border rounded border-b border-t',
+            'overflow-hidden border rounded-md border-b border-t',
             {
               'border-b-0': props.withoutBottomBorder,
               'border-t-0': props.withoutTopBorder,
@@ -113,19 +50,17 @@ export function Table(props: Props) {
           style={{
             backgroundColor: colors.$1,
             color: colors.$3,
-            borderColor: colors.$4,
+            borderColor: colors.$24,
           }}
         >
           <div
-            ref={handleTableParentHeight}
-            className={`overflow-auto min-w-full rounded ${props.className}`}
+            className={`overflow-auto min-w-full rounded-md shadow-sm ${props.className}`}
             style={{
               ...props.style,
-              height: manualTableHeight,
+              height: props.style?.height || 'auto',
             }}
           >
             <table
-              ref={handleTableHeight}
               className={classNames({
                 'min-w-full table-auto': !props.resizable,
                 'min-w-full table-fixed': props.resizable,

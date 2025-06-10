@@ -10,7 +10,9 @@
 
 import { toast } from '$app/common/helpers/toast/toast';
 import { MouseEvent } from 'react';
-import { MdOutlineContentCopy } from 'react-icons/md';
+import { CopyToClipboard } from './icons/CopyToClipboard';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 interface Props {
   text: string;
@@ -25,9 +27,9 @@ export function CopyToClipboardIconOnly({
   className,
   secure,
   limit = 0,
-  iconColor,
 }: Props) {
   const value = text || '';
+  const colors = useColorScheme();
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -37,18 +39,32 @@ export function CopyToClipboardIconOnly({
   };
 
   return (
-    <div className={`inline-flex space-x-2 ${className}`}>
-      <span>
-        {secure
-          ? text.split('').map(() => '*')
-          : value.length > limit
-          ? value.substring(0, limit).concat(' ')
-          : value}
-      </span>
+    <div
+      className={classNames(
+        'inline-flex',
+        {
+          'space-x-2': Boolean(value && limit),
+        },
+        className
+      )}
+    >
+      {Boolean(value) && (
+        <span>
+          {secure
+            ? text.split('').map(() => '*')
+            : value.length > limit
+            ? value.substring(0, limit).concat(' ')
+            : value}
+        </span>
+      )}
 
       {value.length > 0 && (
         <button type="button" onClick={handleClick}>
-          <MdOutlineContentCopy size={18} color={iconColor} />
+          <CopyToClipboard
+            size="1.1rem"
+            color={colors.$3}
+            filledColor="transparent"
+          />
         </button>
       )}
     </div>

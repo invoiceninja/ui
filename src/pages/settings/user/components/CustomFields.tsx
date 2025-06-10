@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { Field } from '$app/pages/settings/custom-fields/components';
@@ -26,7 +25,7 @@ export function CustomFields() {
     <>
       <AdvancedSettingsPlanAlert />
 
-      <Card title={t('custom_fields')}>
+      <div className="px-4 sm:px-6">
         {company &&
           ['user1', 'user2', 'user3', 'user4'].map((field) => (
             <Field
@@ -35,9 +34,10 @@ export function CustomFields() {
               field={field}
               placeholder={t('user_field')}
               onChange={(value) => handleCustomFieldChange(field, value)}
+              withArrowAsSeparator
             />
           ))}
-      </Card>
+      </div>
     </>
   );
 }

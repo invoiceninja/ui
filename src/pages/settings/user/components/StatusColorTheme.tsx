@@ -16,12 +16,14 @@ import { Button, InputField, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdClose, MdDone } from 'react-icons/md';
+import { MdDone } from 'react-icons/md';
 import hexColorRegex from 'hex-color-regex';
 import { toast } from '$app/common/helpers/toast/toast';
 import { cloneDeep } from 'lodash';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/user';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 type ThemeKey =
   | 'light'
@@ -361,6 +363,7 @@ export function DefaultColorPickerModal(props: ModalProps) {
 
   const { fieldKey } = props;
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const isColorValid = useIsColorValid();
@@ -391,17 +394,23 @@ export function DefaultColorPickerModal(props: ModalProps) {
           }}
         />
 
-        <Icon
+        <div
           className="cursor-pointer"
-          element={MdClose}
-          size={26}
           onClick={() =>
             handleUserChange(
               `company_user.react_settings.color_theme.${fieldKey}`,
               ''
             )
           }
-        />
+        >
+          <CircleXMark
+            color={colors.$16}
+            hoverColor={colors.$3}
+            borderColor={colors.$5}
+            hoverBorderColor={colors.$17}
+            size="1.6rem"
+          />
+        </div>
       </div>
 
       <Modal

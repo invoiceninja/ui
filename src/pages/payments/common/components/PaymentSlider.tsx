@@ -10,7 +10,7 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { TabGroup } from '$app/components/TabGroup';
-import { ClickableElement, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -22,7 +22,6 @@ import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { route } from '$app/common/helpers/route';
@@ -37,15 +36,29 @@ import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
 import paymentType from '$app/common/constants/payment-type';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useGenerateActivityElement } from '$app/pages/payments/common/hooks/useGenerateActivityElement';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { useNavigate } from 'react-router-dom';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
 
+const Box = styled.div`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
 export function PaymentSlider() {
   const [t] = useTranslation();
+  const colors = useColorScheme();
+  const navigate = useNavigate();
 
   const actions = useActions({
     showCommonBulkAction: true,
@@ -89,20 +102,33 @@ export function PaymentSlider() {
       title={`${t('payment')} ${payment?.number}`}
       topRight={
         payment &&
-        (hasPermission('edit_payment') || entityAssigned(payment)) && (
+        (hasPermission('edit_payment') || entityAssigned(payment)) ? (
           <ResourceActions
             label={t('actions')}
             resource={payment}
             actions={actions}
           />
-        )
+        ) : null
       }
       withoutActionContainer
+      withoutHeaderBorder
     >
-      <TabGroup tabs={[t('overview'), t('activity')]} width="full">
+      <TabGroup
+        tabs={[t('overview'), t('activity')]}
+        width="full"
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
+      >
         <div className="space-y-2">
-          <div>
-            <Element leftSide={t('payment_amount')} withoutWrappingLeftSide>
+          <div className="px-6">
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('payment_amount')}
+              withoutWrappingLeftSide
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {payment
                 ? formatMoney(
                     payment?.amount,
@@ -112,7 +138,13 @@ export function PaymentSlider() {
                 : null}
             </Element>
 
-            <Element leftSide={t('applied')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('applied')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {payment
                 ? formatMoney(
                     payment.applied,
@@ -122,110 +154,187 @@ export function PaymentSlider() {
                 : null}
             </Element>
 
-            <Element leftSide={t('date')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('date')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {payment ? date(payment.date, dateFormat) : null}
             </Element>
 
-            <Element leftSide={t('payment_type')}>
+            <Element
+              className="border-b border-dashed"
+              leftSide={t('payment_type')}
+              pushContentToRight
+              noExternalPadding
+              style={{ borderColor: colors.$20 }}
+            >
               {payment
                 ? t(paymentType[payment.type_id as keyof typeof paymentType])
                 : null}
             </Element>
 
-            <Element leftSide={t('status')}>
+            <Element
+              leftSide={t('status')}
+              pushContentToRight
+              noExternalPadding
+            >
               {payment ? <PaymentStatus entity={payment} /> : null}
             </Element>
           </div>
 
-          <Divider withoutPadding />
+          <Divider withoutPadding borderColor={colors.$20} />
 
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-4 px-6 py-5">
             {payment?.invoices?.map((invoice, index) => (
-              <ClickableElement
+              <Box
                 key={index}
-                to={route('/invoices/:id/edit', {
-                  id: invoice.id,
-                })}
-                disableNavigation={disableNavigation('invoice', invoice)}
+                className="flex flex-col items-start justify-center space-y-2 shadow-sm text-sm border p-5 w-full cursor-pointer rounded-md"
+                onClick={() => {
+                  !disableNavigation('invoice', invoice) &&
+                    navigate(
+                      route('/invoices/:id/edit', {
+                        id: invoice.id,
+                      })
+                    );
+                }}
+                style={{
+                  borderColor: colors.$20,
+                }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
               >
-                <div className="flex flex-col space-y-2">
-                  <p className="font-semibold">
-                    {t('invoice')} {invoice.number}
-                  </p>
+                <span className="font-medium" style={{ color: colors.$3 }}>
+                  {t('invoice')} {invoice.number}
+                </span>
 
-                  <div className="flex items-center space-x-1">
-                    <p>
-                      {formatMoney(
-                        invoice.amount,
-                        invoice.client?.country_id,
-                        invoice.client?.settings.currency_id
-                      )}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{date(invoice.date, dateFormat)}</p>
-                  </div>
+                <div
+                  className="inline-flex items-center space-x-1"
+                  style={{ color: colors.$17 }}
+                >
+                  <span>
+                    {formatMoney(
+                      invoice.amount,
+                      invoice.client?.country_id,
+                      invoice.client?.settings.currency_id
+                    )}
+                  </span>
 
-                  <div>
-                    <InvoiceStatus entity={invoice} />
-                  </div>
+                  <span>-</span>
+
+                  <span>{date(invoice.date, dateFormat)}</span>
                 </div>
-              </ClickableElement>
+
+                <div>
+                  <InvoiceStatus entity={invoice} />
+                </div>
+              </Box>
             ))}
           </div>
 
-          {Boolean(payment?.credits?.length) && <Divider withoutPadding />}
+          {Boolean(payment?.credits?.length) && (
+            <Divider withoutPadding borderColor={colors.$20} />
+          )}
 
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-4 px-6 py-5">
             {payment?.credits?.map((credit, index) => (
-              <ClickableElement
+              <Box
                 key={index}
-                to={route('/credits/:id/edit', {
-                  id: credit.id,
-                })}
-                disableNavigation={disableNavigation('credit', credit)}
+                className="flex flex-col items-start justify-center space-y-2 shadow-sm text-sm border p-5 w-full cursor-pointer rounded-md"
+                onClick={() => {
+                  !disableNavigation('credit', credit) &&
+                    navigate(
+                      route('/credits/:id/edit', {
+                        id: credit.id,
+                      })
+                    );
+                }}
+                style={{
+                  borderColor: colors.$20,
+                }}
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$4,
+                }}
               >
-                <div className="flex flex-col space-y-2">
-                  <p className="font-semibold">
-                    {t('credit')} {credit.number}
-                  </p>
+                <span className="font-medium" style={{ color: colors.$3 }}>
+                  {t('credit')} {credit.number}
+                </span>
 
-                  <div className="flex items-center space-x-1">
-                    <p>
-                      {formatMoney(
-                        credit.amount,
-                        credit.client?.country_id,
-                        credit.client?.settings.currency_id
-                      )}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{date(credit.date, dateFormat)}</p>
-                  </div>
+                <div
+                  className="inline-flex items-center space-x-1"
+                  style={{ color: colors.$17 }}
+                >
+                  <span>
+                    {formatMoney(
+                      credit.amount,
+                      credit.client?.country_id,
+                      credit.client?.settings.currency_id
+                    )}
+                  </span>
 
-                  <div>
-                    <CreditStatus entity={credit} />
-                  </div>
+                  <span>-</span>
+
+                  <span>{date(credit.date, dateFormat)}</span>
                 </div>
-              </ClickableElement>
+
+                <div>
+                  <CreditStatus entity={credit} />
+                </div>
+              </Box>
             ))}
           </div>
         </div>
 
-        <div className='divide-y'>
-          {activities?.map((activity) => (
-            <NonClickableElement
-              key={activity.id}
-              className="flex flex-col space-y-2"
-            >
-              <p>{activityElement(activity, payment)}</p>
-              <div className="inline-flex items-center space-x-1">
-                <p>
-                  {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
-                </p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </div>
-            </NonClickableElement>
-          ))}
+        <div>
+          <div className="flex flex-col pt-3 px-3">
+            {activities?.map((activity) => (
+              <Box
+                key={activity.id}
+                className="flex space-x-3 p-4 rounded-md flex-1 min-w-0"
+                theme={{
+                  backgroundColor: colors.$1,
+                  hoverBackgroundColor: colors.$25,
+                }}
+              >
+                <div className="flex items-center justify-center">
+                  <div
+                    className="p-2 rounded-full"
+                    style={{ backgroundColor: colors.$20 }}
+                  >
+                    <SquareActivityChart
+                      size="1.3rem"
+                      color={colors.$16}
+                      filledColor={colors.$16}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-0.5 flex-1 min-w-0">
+                  <div className="text-sm" style={{ color: colors.$3 }}>
+                    {activityElement(activity)}
+                  </div>
+
+                  <div
+                    className="flex w-full items-center space-x-1 text-xs truncate"
+                    style={{ color: colors.$17 }}
+                  >
+                    <span className="whitespace-nowrap">
+                      {date(activity.created_at, `${dateFormat} ${timeFormat}`)}
+                    </span>
+
+                    <span>-</span>
+
+                    <span>{activity.ip}</span>
+                  </div>
+                </div>
+              </Box>
+            ))}
+          </div>
         </div>
       </TabGroup>
     </Slider>

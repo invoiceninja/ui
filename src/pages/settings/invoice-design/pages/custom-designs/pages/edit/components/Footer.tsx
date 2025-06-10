@@ -42,7 +42,15 @@ export default function Footer() {
   useDebounce(() => handleBlockChange('footer', value || ''), 500, [value]);
 
   return (
-    <Card title={t('footer')} padding="small" height="full">
+    <Card
+      title={t('footer')}
+      className="shadow-sm"
+      childrenClassName="pt-6"
+      padding="small"
+      height="full"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         defaultLanguage="twig"

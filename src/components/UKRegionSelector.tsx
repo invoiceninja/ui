@@ -10,23 +10,24 @@
 
 import { GenericSelectorProps } from './CountrySelector';
 import { ukRegions } from '$app/common/constants/uk-regions';
-import { SearchableSelect } from './SearchableSelect';
+import { SelectField } from './forms';
 
 export function UKRegionSelector(props: GenericSelectorProps) {
   return (
-    <SearchableSelect
+    <SelectField
       value={props.value}
       label={props.label}
       disabled={props.disabled}
       onValueChange={props.onChange}
       errorMessage={props.errorMessage}
       dismissable
+      customSelector
     >
       {Object.entries(ukRegions).map((state, index) => (
         <option key={index} value={state[0]}>
           {state[1]}
         </option>
       ))}
-    </SearchableSelect>
+    </SelectField>
   );
 }

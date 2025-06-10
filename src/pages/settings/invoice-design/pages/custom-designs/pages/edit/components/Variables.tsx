@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { TabGroup } from '$app/components/TabGroup';
 import { Card } from '$app/components/cards';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
@@ -17,8 +18,17 @@ import { useTranslation } from 'react-i18next';
 export default function Variables() {
   const { t } = useTranslation();
 
+  const colors = useColorScheme();
+
   return (
-    <Card title={t('variables')} padding="small" childrenClassName="px-5">
+    <Card
+      title={t('variables')}
+      className="shadow-sm"
+      padding="small"
+      childrenClassName="px-5 pt-6"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <TabGroup tabs={[t('invoice'), t('client'), t('contact'), t('company')]}>
         <section>
           {variables.invoice.map((variable, index) => (

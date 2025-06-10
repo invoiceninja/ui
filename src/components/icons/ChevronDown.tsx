@@ -12,10 +12,16 @@ interface Params {
   size?: string;
   color?: string;
   withoutColor?: boolean;
+  strokeWidth?: string;
 }
 
 export function ChevronDown(props: Params) {
-  const { color = '#000', size = '1.2rem', withoutColor = false } = props;
+  const {
+    color = '#000',
+    size = '1.2rem',
+    withoutColor = false,
+    strokeWidth = '2',
+  } = props;
 
   return (
     <svg
@@ -32,7 +38,7 @@ export function ChevronDown(props: Params) {
         {...(!withoutColor && { stroke: color })}
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth={strokeWidth}
       ></polyline>
     </svg>
   );

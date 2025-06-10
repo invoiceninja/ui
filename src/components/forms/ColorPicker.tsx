@@ -11,19 +11,21 @@
 import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import classNames from 'classnames';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 import { Button } from './Button';
 import { Icon } from '../icons/Icon';
 import { MdDone } from 'react-icons/md';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   value?: string;
   onValueChange?: (color: string) => unknown;
   disabled?: boolean;
   includeDefaultPalette?: boolean;
+  renderLabelBox?: (color: string) => ReactNode;
 }
 
 const DEFAULT_COLORS = [
@@ -56,9 +58,10 @@ const DEFAULT_COLORS = [
 export function ColorPicker(props: Props) {
   const { t } = useTranslation();
 
-  const { includeDefaultPalette } = props;
+  const { includeDefaultPalette, renderLabelBox } = props;
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const [color, setColor] = useState(props.value || '#000000');
 
@@ -80,33 +83,50 @@ export function ColorPicker(props: Props) {
         onClose={setIsModalOpen}
         centerContent
         disableClosing={isDefaultPaletteModalOpen}
+        size="micro"
       >
-        <HexColorPicker color={color} onChange={setColor} />
-        <HexColorInput
-          color={color}
-          onChange={setColor}
-          className="border rounded-md my-2 p-2 border-gray-300"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
-        />
+        <div className="flex flex-col space-y-2 w-full">
+          <HexColorPicker
+            color={color}
+            onChange={setColor}
+            style={{ width: '100%' }}
+          />
 
-        <div className="flex w-full justify-between">
-          {includeDefaultPalette && (
+          <HexColorInput
+            color={color}
+            onChange={setColor}
+            className={classNames(
+              'border rounded-md my-2 p-2 focus:outline-none focus:ring-0',
+              {
+                'border-[#d1d5db] focus:border-black': !reactSettings.dark_mode,
+                'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
+              }
+            )}
+            style={{
+              backgroundColor: colors.$1,
+              width: '100%',
+            }}
+          />
+
+          <div className="flex w-full justify-between">
+            {includeDefaultPalette && (
+              <Button
+                behavior="button"
+                type="secondary"
+                onClick={() => setIsDefaultPaletteModalOpen(true)}
+              >
+                {t('default')}
+              </Button>
+            )}
+
             <Button
+              className={classNames({ 'w-full': !includeDefaultPalette })}
               behavior="button"
-              type="secondary"
-              onClick={() => setIsDefaultPaletteModalOpen(true)}
+              onClick={() => setIsModalOpen(false)}
             >
-              {t('default')}
+              {t('done')}
             </Button>
-          )}
-
-          <Button
-            className={classNames({ 'w-full': !includeDefaultPalette })}
-            behavior="button"
-            onClick={() => setIsModalOpen(false)}
-          >
-            {t('done')}
-          </Button>
+          </div>
         </div>
       </Modal>
 
@@ -149,18 +169,22 @@ export function ColorPicker(props: Props) {
         </div>
       </Modal>
 
-      <div
-        style={{ backgroundColor: color }}
-        className={classNames('w-16 h-6 shadow rounded-md', {
-          'opacity-75 cursor-not-allowed': props.disabled,
-          'cursor-pointer':
-            typeof props.disabled === 'undefined' || !props.disabled,
-        })}
-        onClick={() =>
-          (!props.disabled || typeof props.disabled === 'undefined') &&
-          setIsModalOpen(true)
-        }
-      ></div>
+      {renderLabelBox ? (
+        <div onClick={() => setIsModalOpen(true)}>{renderLabelBox(color)}</div>
+      ) : (
+        <div
+          style={{ backgroundColor: color }}
+          className={classNames('w-16 h-6 shadow rounded-md', {
+            'opacity-75 cursor-not-allowed': props.disabled,
+            'cursor-pointer':
+              typeof props.disabled === 'undefined' || !props.disabled,
+          })}
+          onClick={() =>
+            (!props.disabled || typeof props.disabled === 'undefined') &&
+            setIsModalOpen(true)
+          }
+        />
+      )}
     </div>
   );
 }

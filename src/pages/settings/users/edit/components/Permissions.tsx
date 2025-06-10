@@ -8,13 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Checkbox } from '$app/components/forms';
 import { User } from '$app/common/interfaces/user';
 import Toggle from '$app/components/forms/Toggle';
 import { clone } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Permissions as PermissionsType } from '$app/common/hooks/permissions/useHasPermission';
+import { useColorScheme } from '$app/common/colors';
+import { Divider } from '$app/components/cards/Divider';
 
 interface Props {
   user: User;
@@ -24,6 +26,8 @@ interface Props {
 export function Permissions(props: Props) {
   const [t] = useTranslation();
   const { user, setUser } = props;
+
+  const colors = useColorScheme();
 
   const permissions = [
     'client',
@@ -132,7 +136,7 @@ export function Permissions(props: Props) {
   };
 
   return (
-    <Card title={t('permissions')}>
+    <>
       <Element
         leftSide={t('administrator')}
         leftSideHelp={t('administrator_help')}
@@ -167,7 +171,8 @@ export function Permissions(props: Props) {
         />
       </Element>
 
-      <Element leftSide={t('disable_emails')}
+      <Element
+        leftSide={t('disable_emails')}
         leftSideHelp={t('disable_emails_help')}
       >
         <Toggle
@@ -178,11 +183,25 @@ export function Permissions(props: Props) {
         />
       </Element>
 
+      <div className="px-4 sm:px-6 py-4">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
+
       <Element>
         <div className="grid grid-cols-3 md:grid-cols-6">
-          <div className="col-1">{t('create')}</div>
-          <div className="col-1">{t('view')}</div>
-          <div className="col-1">{t('edit')}</div>
+          <div className="col-1" style={{ color: colors.$22 }}>
+            {t('create')}
+          </div>
+          <div className="col-1" style={{ color: colors.$22 }}>
+            {t('view')}
+          </div>
+          <div className="col-1" style={{ color: colors.$22 }}>
+            {t('edit')}
+          </div>
         </div>
       </Element>
 
@@ -266,6 +285,6 @@ export function Permissions(props: Props) {
           </div>
         </Element>
       ))}
-    </Card>
+    </>
   );
 }

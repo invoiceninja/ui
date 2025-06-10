@@ -86,7 +86,7 @@ export default function Transactions() {
       >
         <DataTable
           resource="transaction"
-          endpoint="/api/v1/bank_transactions?sort=id|desc"
+          endpoint="/api/v1/bank_transactions?sort=id|desc&active_banks=true"
           bulkRoute="/api/v1/bank_transactions/bulk"
           columns={columns}
           linkToCreate="/transactions/create"
@@ -97,23 +97,24 @@ export default function Transactions() {
           customBulkActions={customBulkActions}
           customFilterPlaceholder="status"
           rightSide={
-            <Guard
-              type="component"
-              guards={[
-                or(
-                  permission('create_bank_transaction'),
-                  permission('edit_bank_transaction')
-                ),
-              ]}
-              component={<ImportButton route="/transactions/import" />}
-            />
-          }
-          leftSideChevrons={
-            <DataTableColumnsPicker
-              table="transaction"
-              columns={transactionColumns as unknown as string[]}
-              defaultColumns={defaultColumns}
-            />
+            <div className="flex items-center space-x-2">
+              <DataTableColumnsPicker
+                table="transaction"
+                columns={transactionColumns as unknown as string[]}
+                defaultColumns={defaultColumns}
+              />
+
+              <Guard
+                type="component"
+                guards={[
+                  or(
+                    permission('create_bank_transaction'),
+                    permission('edit_bank_transaction')
+                  ),
+                ]}
+                component={<ImportButton route="/transactions/import" />}
+              />
+            </div>
           }
           withResourcefulActions
           linkToCreateGuards={[permission('create_bank_transaction')]}

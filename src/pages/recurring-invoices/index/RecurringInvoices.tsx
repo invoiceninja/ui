@@ -40,7 +40,6 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
-import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function RecurringInvoices() {
@@ -108,38 +107,29 @@ export default function RecurringInvoices() {
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={
-          <Guard
-            type="component"
-            guards={[
-              or(
-                permission('create_recurring_invoice'),
-                permission('edit_recurring_invoice')
-              ),
-            ]}
-            component={<ImportButton route="/recurring_invoices/import" />}
-          />
-        }
-        leftSideChevrons={
-          <div
-            className={classNames('flex items-center space-x-1', {
-              'pr-4': Boolean(reactSettings.show_table_footer),
-            })}
-          >
+          <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (
-              <>
-                <DataTableFooterColumnsPicker
-                  table="recurringInvoice"
-                  columns={allFooterColumns}
-                />
-
-                <span>|</span>
-              </>
+              <DataTableFooterColumnsPicker
+                table="recurringInvoice"
+                columns={allFooterColumns}
+              />
             )}
 
             <DataTableColumnsPicker
               columns={recurringInvoiceColumns as unknown as string[]}
               defaultColumns={defaultColumns}
               table="recurringInvoice"
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(
+                  permission('create_recurring_invoice'),
+                  permission('edit_recurring_invoice')
+                ),
+              ]}
+              component={<ImportButton route="/recurring_invoices/import" />}
             />
           </div>
         }

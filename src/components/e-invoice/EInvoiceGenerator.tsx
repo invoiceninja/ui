@@ -22,7 +22,6 @@ import { useTranslation } from 'react-i18next';
 import { Element } from '../cards';
 import { Icon } from '../icons/Icon';
 import { MdAdd, MdDelete } from 'react-icons/md';
-import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
 import { cloneDeep, flatMapDeep, get, isObject, keys, set } from 'lodash';
@@ -1624,7 +1623,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             <>
               {Boolean(eInvoice) && (
                 <Element leftSide={t('fields')}>
-                  <SearchableSelect
+                  <SelectField
                     value=""
                     onValueChange={(value) => {
                       const currentGroup = allAvailableGroups.find(
@@ -1674,6 +1673,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       }
                     }}
                     clearAfterSelection
+                    customSelector
                   >
                     {currentAvailableGroups
                       .sort((a, b) => a.label.localeCompare(b.label))
@@ -1682,7 +1682,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                           {label}
                         </option>
                       ))}
-                  </SearchableSelect>
+                  </SelectField>
                 </Element>
               )}
 
