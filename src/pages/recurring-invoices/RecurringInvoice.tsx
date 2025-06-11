@@ -18,7 +18,7 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { useAtom, useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
@@ -95,6 +95,10 @@ export default function RecurringInvoice() {
     recurringInvoice && calculateInvoiceSum(recurringInvoice);
   }, [recurringInvoice]);
 
+  const handleSave = useCallback(() => {
+    save(recurringInvoice as RecurringInvoiceType);
+  }, [recurringInvoice]);
+
   return (
     <Default
       title={documentTitle}
@@ -105,7 +109,7 @@ export default function RecurringInvoice() {
           navigationTopRight: (
             <ResourceActions
               resource={recurringInvoice}
-              onSaveClick={() => save(recurringInvoice)}
+              onSaveClick={handleSave}
               // label={t('more_actions')}
               actions={actions}
               cypressRef="recurringInvoiceActionDropdown"

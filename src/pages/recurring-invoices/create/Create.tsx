@@ -20,7 +20,13 @@ import { Default, SaveOption } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
@@ -231,12 +237,16 @@ export default function Create() {
     },
   ];
 
+  const handleSave = useCallback(() => {
+    save(recurringInvoice as RecurringInvoice);
+  }, [recurringInvoice]);
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       disableSaveButton={!recurringInvoice?.client_id}
-      onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
+      onSaveClick={handleSave}
       additionalSaveOptions={saveOptions}
     >
       {!isLoading ? (
