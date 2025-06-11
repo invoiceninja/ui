@@ -24,24 +24,16 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
 
     async function handleDowngradeConfirm() {
         setIsLoading(true);
+        
         try {
+            await request('POST', endpoint('/api/client/account_management/free'));
             
-            request('POST', endpoint('/api/client/account_management/free'))
-                .then(() => {
-                    toast.success();
-
-                    refresh();
-                    setShowDowngradeModal(false);
-                })
-                .catch(() => toast.error())
-                .finally(() => setIsLoading(false));
-            
-            // Close modal and show success message
+            toast.success();
+            refresh();
             setShowDowngradeModal(false);
-            // You might want to show a toast notification here
         } catch (error) {
             console.error('Downgrade failed:', error);
-            // Handle error - show toast notification
+            toast.error();
         } finally {
             setIsLoading(false);
         }
@@ -49,25 +41,18 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
     
     async function handleDocuNinjaChange(newUserCount: number) {
         setIsLoading(true);
+        
         try {
-                request('POST', endpoint('/api/client/account_management/docuninja/downgrade'), {
-                    num_users: newUserCount
-                })
-                .then(() => {   
-                    toast.success();
-
-                    refresh();
-                    setShowDowngradeModal(false);
-                })
-                .catch(() => toast.error())
-                .finally(() => setIsLoading(false));
+            await request('POST', endpoint('/api/client/account_management/docuninja/downgrade'), {
+                num_users: newUserCount
+            });
             
-            // Close modal and show success message
+            toast.success();
+            refresh();
             setShowChangeDocuNinjaModal(false);
-            // You might want to show a toast notification here
         } catch (error) {
             console.error('DocuNinja plan change failed:', error);
-            // Handle error - show toast notification
+            toast.error();
         } finally {
             setIsLoading(false);
         }
