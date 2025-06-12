@@ -52,6 +52,9 @@ const Locations = lazy(
 const CreatePage = lazy(
   () => import('$app/pages/clients/create/ common/components/CreatePage')
 );
+const ShowSettings = lazy(
+  () => import('$app/pages/clients/show/pages/Settings')
+);
 
 export const clientRoutes = (
   <Route path="clients">
@@ -209,6 +212,14 @@ export const clientRoutes = (
         element={
           <Suspense fallback={<TabLoader />}>
             <Documents />
+          </Suspense>
+        }
+      />
+      <Route
+        path="settings_configuration"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <ShowSettings />
           </Suspense>
         }
       />
