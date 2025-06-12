@@ -137,6 +137,7 @@ export interface Client {
     updated_at: string;
     archived_at: string | null;
     contacts?: ClientContact[];
+    client_hash?: string;
 }
 
 export interface ClientContact {
@@ -162,6 +163,7 @@ export interface ClientContact {
     user?: User;
     company?: Company;
     client?: Client;
+    contact_key?: string;
 }
 
 export interface CompanyUser {
