@@ -78,6 +78,10 @@ export function useTabs(params: Params) {
         <DocumentsTabLabel numberOfDocuments={client?.documents?.length} />
       ),
     },
+    {
+      name: t('settings_configuration'),
+      href: route('/clients/:id/settings_configuration', { id }),
+    },
   ];
 
   modules.forEach((module) => {
