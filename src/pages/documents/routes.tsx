@@ -11,31 +11,23 @@
 import { Guard } from '$app/common/guards/Guard';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
+import { Builder } from './builder/Builder';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
 
 export const documentsRoutes = (
-    <Route path="documents">
-        <Route
-            path=""
-            element={
-                <Guard
-                    guards={[]}
-                    component={<Document />}
-                />
-            }
-        />
-        
-    
-     <Route
+  <Route path="documents">
+    <Route path="" element={<Guard guards={[]} component={<Document />} />} />
+
+    <Route
       path=":id"
-      element={
-        <Guard
-          guards={[]}
-          component={<DocumentShow />}
-        />
-      }
+      element={<Guard guards={[]} component={<DocumentShow />} />}
     />
-    </Route>
+
+    <Route
+      path=":id/builder"
+      element={<Guard guards={[]} component={<Builder />} />}
+    />
+  </Route>
 );
