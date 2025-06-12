@@ -12,8 +12,10 @@ import React, { useState, useCallback, ReactNode } from 'react';
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
-import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
 import { useResizeColumn } from '$app/common/hooks/useResizeColumn';
+import { ChevronDown } from '../icons/ChevronDown';
+import { ChevronUp } from '../icons/ChevronUp';
+import styled from 'styled-components';
 
 export interface ColumnSortPayload {
   sort: string;
@@ -32,14 +34,25 @@ interface Props extends CommonProps {
   textSize?: 'extraSmall' | 'small';
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
+  withoutHorizontalPadding?: boolean;
 }
 
 const defaultProps: Props = {
   isCurrentlyUsed: false,
 };
 
+const StyledSpan = styled.span`
+  background-color: ${({ theme }) => theme.backgroundColor};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+  }
+`;
+
 export function Th$(props: Props) {
   props = { ...defaultProps, ...props };
+
+  const colors = useColorScheme();
 
   const {
     thRef,
@@ -62,27 +75,25 @@ export function Th$(props: Props) {
     }
   }, [order, props.onColumnClick, props.id]);
 
-  const colors = useColorScheme();
-
   return (
     <th
       ref={thRef}
       style={{
-        color: props.textColor || colors.$9,
-        borderColor: colors.$4,
+        color: props.textColor || colors.$17,
+        borderColor: colors.$20,
         width: currentWidth,
         ...props.style,
       }}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       className={classNames(
-        `px-2 lg:px-2.5 xl:px-4 text-left font-medium tracking-wider whitespace-nowrap ${props.className}`,
+        `text-left font-normal tracking-wider whitespace-nowrap ${props.className}`,
         {
           'border-r relative': props.resizable,
-          uppercase: !props.disableUppercase,
-          'py-2': !props.withoutVerticalPadding,
-          'text-xs': props.textSize === 'extraSmall' || !props.textSize,
-          'text-sm': props.textSize === 'small',
+          'py-2.5': !props.withoutVerticalPadding,
+          'text-xs': props.textSize === 'extraSmall',
+          'text-sm': props.textSize === 'small' || !props.textSize,
+          'px-2 lg:px-2.5 xl:px-4': !props.withoutHorizontalPadding,
         }
       )}
       onMouseMove={handleMouseMove}
@@ -121,23 +132,41 @@ export function Th$(props: Props) {
               ) : (
                 <>
                   {props.isCurrentlyUsed ? (
-                    <div className="flex flex-col items-center justify-center -space-y-4">
-                      <FaSortUp
-                        className={classNames({
-                          'opacity-30': order !== 'asc',
-                        })}
-                        size={16}
-                      />
+                    <div className="flex flex-col items-center justify-center -space-y-1">
+                      <div>
+                        <ChevronUp
+                          size="0.7rem"
+                          strokeWidth="3"
+                          color={order === 'asc' ? colors.$3 : colors.$17}
+                        />
+                      </div>
 
-                      <FaSortDown
-                        className={classNames({
-                          'opacity-30': order !== 'desc',
-                        })}
-                        size={16}
-                      />
+                      <div>
+                        <ChevronDown
+                          size="0.7rem"
+                          strokeWidth="3"
+                          color={order === 'desc' ? colors.$3 : colors.$17}
+                        />
+                      </div>
                     </div>
                   ) : (
-                    <FaSort size={16} className="opacity-30" />
+                    <div className="flex flex-col items-center justify-center -space-y-1">
+                      <div>
+                        <ChevronUp
+                          size="0.7rem"
+                          color={colors.$17}
+                          strokeWidth="3"
+                        />
+                      </div>
+
+                      <div>
+                        <ChevronDown
+                          size="0.7rem"
+                          color={colors.$17}
+                          strokeWidth="3"
+                        />
+                      </div>
+                    </div>
                   )}
                 </>
               )}
@@ -149,14 +178,13 @@ export function Th$(props: Props) {
       </div>
 
       {props.resizable ? (
-        <span
-          className={classNames(
-            'column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:bg-white hover:transition duration-50',
-            {
-              'bg-white': isResizing,
-            }
-          )}
-        ></span>
+        <StyledSpan
+          className="column-resizer block absolute inset-y-0 right-0 m-0 w-1 h-full p-0 cursor-col-resize border border-transparent hover:transition duration-50"
+          theme={{
+            backgroundColor: isResizing ? colors.$3 : 'transparent',
+            hoverBackgroundColor: colors.$3,
+          }}
+        ></StyledSpan>
       ) : null}
     </th>
   );

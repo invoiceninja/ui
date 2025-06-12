@@ -13,6 +13,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer, Element } from '../../../../components/cards';
 import { InputField, SelectField } from '../../../../components/forms';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { useColorScheme } from '$app/common/colors';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
 
 export enum AvailableTypes {
   SingleLineText = 'single_line_text',
@@ -28,10 +31,13 @@ interface Props {
   placeholder: string;
   onChange?: (value: string, field: string, type: AvailableTypes) => unknown;
   noExternalPadding?: boolean;
+  withArrowAsSeparator?: boolean;
 }
 
 export function Field(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const [initialValue, setInitialValue] = useState('');
   const [dropdownInitialValue, setDropdownInitialValue] = useState('');
@@ -95,6 +101,58 @@ export function Field(props: Props) {
     props.onChange &&
       props.onChange(currentValue, props.field, adjustedCurrentType);
   };
+
+  if (props.withArrowAsSeparator) {
+    return (
+      <>
+        <div className="flex flex-col sm:flex-row w-full space-y-3 sm:space-y-0 sm:space-x-3 items-center justify-between py-3 text-sm">
+          <div className="w-full sm:w-2/6">
+            <InputField
+              id={props.field}
+              innerRef={inputRef}
+              placeholder={props.placeholder}
+              onValueChange={() => handleChange()}
+              value={initialValue}
+              disabled={disabledInputCustomFields}
+            />
+          </div>
+
+          <div className="hidden sm:inline-block">
+            <ArrowRight size="1.2rem" color={colors.$17} strokeWidth="1.5" />
+          </div>
+
+          <div className="inline-block sm:hidden">
+            <ArrowDown size="1.2rem" color={colors.$17} strokeWidth="1.5" />
+          </div>
+
+          <div className="w-full sm:w-4/6">
+            <SelectField
+              value={dropdownType}
+              onValueChange={(value) => handleChange(value as AvailableTypes)}
+              dismissable={false}
+              customSelector
+            >
+              <option value="single_line_text">{t('single_line_text')}</option>
+              <option value="multi_line_text">{t('multi_line_text')}</option>
+              <option value="switch">{t('switch')}</option>
+              <option value="dropdown">{t('dropdown')}</option>
+              <option value="date">{t('date')}</option>
+            </SelectField>
+          </div>
+        </div>
+
+        {dropdownType === AvailableTypes.Dropdown && (
+          <InputField
+            id="multi_line_text"
+            innerRef={dropdownInputRef}
+            placeholder={t('comma_sparated_list')}
+            value={dropdownInitialValue}
+            onValueChange={() => handleChange()}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>

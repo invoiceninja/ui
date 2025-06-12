@@ -13,7 +13,7 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useFormik } from 'formik';
@@ -24,11 +24,17 @@ export function Downgrade() {
   const { t } = useTranslation();
 
   return (
-    <Card title={t('downgrade')}>
-      <Element leftSide={t('downgrade_to_free')}>
-        {t('downgrade_to_free_description')} <Popup />
-      </Element>
-    </Card>
+    <>
+      <div className="px-7 py-3 space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-semibold">{t('downgrade')}</span>
+        </div>
+
+        <Element leftSide={t('downgrade_to_free')} noExternalPadding>
+          {t('downgrade_to_free_description')} <Popup />
+        </Element>
+      </div>
+    </>
   );
 }
 

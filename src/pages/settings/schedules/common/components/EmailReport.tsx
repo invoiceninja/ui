@@ -198,6 +198,8 @@ export function EmailReport(props: Props) {
           }
           errorMessage={errors?.errors['parameters.report_name']}
           cypressRef="scheduleReportName"
+          customSelector
+          dismissable={false}
         >
           {reports.map((report, i) => (
             <option
@@ -344,6 +346,8 @@ export function EmailReport(props: Props) {
             }
             errorMessage={errors?.errors['parameters.date_range']}
             cypressRef="scheduleDateRange"
+            customSelector
+            dismissable={false}
           >
             {ranges.map((range, i) => (
               <option value={range.scheduleIdentifier} key={i}>

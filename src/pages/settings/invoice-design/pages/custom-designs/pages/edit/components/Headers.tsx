@@ -32,7 +32,15 @@ export default function Header() {
   const colors = useColorScheme();
 
   return (
-    <Card title={t('header')} padding="small" height="full">
+    <Card
+      title={t('header')}
+      className="shadow-sm"
+      childrenClassName="pt-6"
+      padding="small"
+      height="full"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         defaultLanguage="twig"

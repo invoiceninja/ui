@@ -161,6 +161,9 @@ export default function EInvoice() {
             {t('validate')}
           </Button>
         }
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
       >
         {Boolean(eInvoiceValidationEntityResponse && invoice) && (
           <div className="flex px-6">

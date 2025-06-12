@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import {
   DragDropContext,
   DropResult,
@@ -21,7 +20,6 @@ import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import { useTranslation } from 'react-i18next';
-import { ChevronsRight, X } from 'react-feather';
 import { itemMap } from '$app/common/constants/exports/item-map';
 import { vendorMap } from '$app/common/constants/exports/vendor-map';
 import { purchaseorderMap } from '$app/common/constants/exports/purchase-order-map';
@@ -36,6 +34,8 @@ import { Entity } from '$app/common/hooks/useEntityCustomFields';
 import { invoiceMap } from '$app/common/constants/exports/invoice-map';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { customField } from '$app/components/CustomField';
+import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
+import { XMark } from '$app/components/icons/XMark';
 
 export const reportColumn = 11;
 
@@ -120,24 +120,48 @@ export function Column({
 
   return (
     <div>
-      <h2 className="text-gray-500 font-medium">
+      <h2 className="font-medium" style={{ color: colors.$17 }}>
         {typeof title === 'string' ? <p>{title}</p> : title()}
       </h2>
 
-      <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
+      <Droppable
+        droppableId={droppableId}
+        isDropDisabled={isDropDisabled}
+        renderClone={(provided, _, rubric) => {
+          const record = data[rubric.source.index];
+
+          return (
+            <div
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              <div
+                className="p-2 flex border justify-between items-center cursor-grab text-sm shadow-sm"
+                style={{
+                  color: colors.$3,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$24,
+                }}
+              >
+                {translateLabel(record)}
+              </div>
+            </div>
+          );
+        }}
+      >
         {(provided) => (
           <div
-            style={{
-              color: colors.$3,
-              colorScheme: colors.$0,
-              backgroundColor: colors.$1,
-              borderColor: colors.$4,
-            }}
             className="w-80 flex-column"
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
-            <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
+            <div
+              className="overflow-y-scroll h-96 mt-2 border rounded-md"
+              style={{
+                borderColor: colors.$24,
+              }}
+            >
               {data &&
                 data.map((record: Record, i: number) => (
                   <Draggable
@@ -151,15 +175,14 @@ export function Column({
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                       >
-                        <span
+                        <div
+                          key={i}
+                          className="border-b p-2 flex justify-between items-center cursor-grab text-sm"
                           style={{
                             color: colors.$3,
-                            colorScheme: colors.$0,
+                            borderColor: colors.$24,
                             backgroundColor: colors.$1,
-                            borderColor: colors.$4,
                           }}
-                          className="p-2 flex justify-between items-center cursor-move ml-2 text-sm"
-                          key={i}
                         >
                           {translateLabel(record)}
 
@@ -176,10 +199,10 @@ export function Column({
                                 onRemove ? onRemove(record) : null
                               }
                             >
-                              <X size={15} />
+                              <XMark size="0.85rem" color={colors.$3} />
                             </button>
                           )}
-                        </span>
+                        </div>
                       </div>
                     )}
                   </Draggable>
@@ -265,7 +288,11 @@ export function useColumns({ report, columns }: Props) {
 
 export function SortableColumns({ report, columns }: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const { update } = usePreferences();
+
   const { data, defaultColumns } = useColumns({ report, columns });
 
   const onDragEnd = (result: DropResult) => {
@@ -329,57 +356,28 @@ export function SortableColumns({ report, columns }: Props) {
 
     update(`preferences.reports.columns.${report}`, [...$data]);
   };
-  const colors = useColorScheme();
 
   return (
     <div
-      className="overflow-x-auto w-full my-6"
-      style={{
-        color: colors.$3,
-        borderColor: colors.$4,
-      }}
+      className="overflow-x-auto border rounded-md w-full my-6 shadow-sm"
+      style={{ borderColor: colors.$24 }}
     >
       <div
         style={{
           minWidth: 'min-content',
         }}
       >
-        <Card>
+        <div className="py-4" style={{ backgroundColor: colors.$1 }}>
           <DragDropContext onDragEnd={onDragEnd}>
-            <div
-              className="flex w-full py-2 px-6 space-x-4"
-              style={{
-                color: colors.$3,
-                colorScheme: colors.$0,
-                backgroundColor: colors.$1,
-                borderColor: colors.$4,
-              }}
-            >
+            <div className="flex w-full py-2 px-6 space-x-4">
               {columns.includes('client') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('client')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('client')}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(0)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(0)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -393,19 +391,10 @@ export function SortableColumns({ report, columns }: Props) {
                 <Column
                   title={() => (
                     <div className="flex justify-between items-center">
-                      <p>{t('invoice')}</p>
+                      <span style={{ color: colors.$3 }}>{t('invoice')}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(1)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(1)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -418,28 +407,11 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('credit') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('credit')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('credit')}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(2)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(2)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -452,19 +424,11 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('quote') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('quote')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('quote')}</span>
 
                       <button type="button" onClick={() => onAddAll(3)}>
-                        <ChevronsRight size={16} />
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -477,28 +441,11 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('payment') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('payment')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('payment')}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(4)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(4)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -511,28 +458,11 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('vendor') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('vendor')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('vendor')}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(5)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(5)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -545,19 +475,13 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('purchase_order') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('purchase_order')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>
+                        {t('purchase_order')}
+                      </span>
 
                       <button type="button" onClick={() => onAddAll(6)}>
-                        <ChevronsRight size={16} />
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -570,28 +494,11 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('task') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('task')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('task')}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(7)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(7)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -604,19 +511,11 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('expense') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('expense')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('expense')}</span>
 
                       <button type="button" onClick={() => onAddAll(8)}>
-                        <ChevronsRight size={16} />
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -629,28 +528,13 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('recurring_invoice') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('recurring_invoice')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>
+                        {t('recurring_invoice')}
+                      </span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(9)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(9)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -663,28 +547,11 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('contact') && (
                 <Column
                   title={() => (
-                    <div
-                      className="flex justify-between items-center"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      <p>{t('contact')}</p>
+                    <div className="flex justify-between items-center">
+                      <span style={{ color: colors.$3 }}>{t('contact')}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onAddAll(10)}
-                        style={{
-                          color: colors.$3,
-                          colorScheme: colors.$0,
-                          backgroundColor: colors.$1,
-                          borderColor: colors.$4,
-                        }}
-                      >
-                        <ChevronsRight size={16} />
+                      <button type="button" onClick={() => onAddAll(10)}>
+                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
                       </button>
                     </div>
                   )}
@@ -696,31 +563,22 @@ export function SortableColumns({ report, columns }: Props) {
 
               <Column
                 title={() => (
-                  <div
-                    className="flex items-center justify-between"
-                    style={{
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <p>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: colors.$3 }}>
                       {t('report')} {t('columns')}
-                    </p>
+                    </span>
 
                     <div
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                      className="flex items-end space-x-1 cursor-pointer"
+                      className="flex items-center space-x-1 cursor-pointer"
                       onClick={onRemoveAll}
                     >
-                      <X size={19} />
-                      <span className="text-xs">({t('reset')})</span>
+                      <div>
+                        <XMark size="0.85rem" color={colors.$3} />
+                      </div>
+
+                      <span className="text-xs" style={{ color: colors.$3 }}>
+                        ({t('reset')})
+                      </span>
                     </div>
                   </div>
                 )}
@@ -731,7 +589,7 @@ export function SortableColumns({ report, columns }: Props) {
               />
             </div>
           </DragDropContext>
-        </Card>
+        </div>
       </div>
     </div>
   );

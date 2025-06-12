@@ -33,6 +33,7 @@ interface Props extends CommonProps {
   customLabel?: ReactNode;
   minWidth?: string;
   maxWidth?: string;
+  labelButtonBorderColor?: string;
 }
 
 const LabelButton = styled.button`
@@ -51,6 +52,7 @@ export function Dropdown(props: Props) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const [children, setChildren] = useState<ReactNode>();
@@ -77,8 +79,6 @@ export function Dropdown(props: Props) {
     setChildren(Children.toArray(props.children));
   }, [props.children]);
 
-  const colors = useColorScheme();
-
   return (
     <div ref={ref}>
       <Tippy
@@ -91,7 +91,7 @@ export function Dropdown(props: Props) {
             className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal ${props.className}`}
             style={{
               backgroundColor: colors.$1,
-              borderColor: colors.$4,
+              borderColor: colors.$19,
               minWidth: props.minWidth ?? '12rem',
               maxWidth: props.maxWidth ?? '14.7rem',
             }}
@@ -125,15 +125,15 @@ export function Dropdown(props: Props) {
         ) : (
           <LabelButton
             theme={{
-              backgroundColor: accentColor,
-              color: colors.$9,
-              borderColor: colors.$5,
+              backgroundColor: colors.$18,
+              color: colors.$1,
+              borderColor: props.labelButtonBorderColor || colors.$24,
             }}
             type="button"
             disabled={props.disabled}
             onClick={() => setVisible(!visible)}
             className={classNames(
-              `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
+              `border inline-flex items-center space-x-2 px-4 justify-center rounded-md text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
               {
                 'hover:bg-white hover:border-gray-300': !props.cardActions,
                 'hover:opacity-90': props.cardActions,

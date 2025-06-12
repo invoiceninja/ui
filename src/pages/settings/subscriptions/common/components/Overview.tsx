@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { Product } from '$app/common/interfaces/product';
@@ -41,7 +41,7 @@ export function Overview(props: OverviewSubscriptionProps) {
   const { subscription, handleChange, errors, products, page } = props;
 
   return (
-    <Card title={t('overview')}>
+    <>
       <Element leftSide={t('name')} required>
         <InputField
           value={subscription.name}
@@ -123,6 +123,6 @@ export function Overview(props: OverviewSubscriptionProps) {
           />
         </Element>
       )}
-    </Card>
+    </>
   );
 }

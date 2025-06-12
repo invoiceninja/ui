@@ -32,7 +32,10 @@ import collect from 'collect.js';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { isEqual } from 'lodash';
-import { HelpWidget } from '$app/components/HelpWidget';
+import { $help, HelpWidget } from '$app/components/HelpWidget';
+import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { CircleQuestion } from '$app/components/icons/CircleQuestion';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_gateway');
@@ -43,12 +46,17 @@ export function Edit() {
   const { id } = useParams();
   const actions = useActions();
   const gateways = useGateways();
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
 
   const { data } = useCompanyGatewayQuery({ id });
 
   const defaultTab = [t('payment_provider')];
 
   const [gateway, setGateway] = useState<Gateway>();
+  const [tabIndex, setTabIndex] = useState<number>(
+    Number(searchParams.get('tab')) ?? 0
+  );
   const [errors, setErrors] = useState<ValidationBag>();
   const [tabs, setTabs] = useState<string[]>(defaultTab);
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
@@ -117,85 +125,132 @@ export function Edit() {
         url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
       />
 
-      <TabGroup
-        tabs={tabs}
-        defaultTabIndex={Number(searchParams.get('tab')) ?? 0}
+      <Card
+        title={t('edit_gateway')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+        topRight={
+          <>
+            {tabIndex === 1 && (
+              <button
+                style={{ color: accentColor }}
+                type="button"
+                onClick={() =>
+                  $help('gateways', {
+                    moveToHeading: 'Credentials',
+                  })
+                }
+                className="inline-flex items-center space-x-1 text-sm"
+              >
+                <CircleQuestion color={accentColor} size="1.3rem" />
+
+                <span>{t('documentation')}</span>
+              </button>
+            )}
+
+            {tabIndex === 3 && (
+              <button
+                style={{ color: accentColor }}
+                type="button"
+                onClick={() =>
+                  $help('gateways', {
+                    moveToHeading: 'Limits/Fees',
+                  })
+                }
+                className="inline-flex items-center space-x-1 text-sm"
+              >
+                <CircleQuestion color={accentColor} size="1.3rem" />
+
+                <span>{t('documentation')}</span>
+              </button>
+            )}
+          </>
+        }
       >
-        <div>
-          {companyGateway && (
-            <div className="space-y-4">
-              <Card title={t('edit_gateway')}>
+        <TabGroup
+          tabs={tabs}
+          defaultTabIndex={tabIndex}
+          withHorizontalPadding
+          fullRightPadding
+          horizontalPaddingWidth="1.5rem"
+          onTabChange={(index) => setTabIndex(index)}
+        >
+          <div>
+            {companyGateway && (
+              <div className="space-y-4">
                 <Element leftSide={t('payment_provider')}>
                   {companyGateway.label}
                 </Element>
-              </Card>
 
-              {gateway?.key === 'd14dd26a37cecc30fdd65700bfb55b23' ? (
-                <ImportCustomers />
-              ) : null}
+                {gateway?.key === 'd14dd26a37cecc30fdd65700bfb55b23' ? (
+                  <ImportCustomers />
+                ) : null}
 
-              {gateway &&
-                collect(Object.values(gateway.options))
-                  .pluck('webhooks')
-                  .flatten()
-                  .unique()
-                  .whereNotNull()
-                  .count() >= 1 && (
-                  <WebhookConfiguration
-                    companyGateway={companyGateway}
-                    gateway={gateway}
-                  />
+                {gateway &&
+                  collect(Object.values(gateway.options))
+                    .pluck('webhooks')
+                    .flatten()
+                    .unique()
+                    .whereNotNull()
+                    .count() >= 1 && (
+                    <WebhookConfiguration
+                      companyGateway={companyGateway}
+                      gateway={gateway}
+                    />
+                  )}
+              </div>
+            )}
+          </div>
+
+          <div>
+            {gateway && companyGateway && (
+              <Credentials
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+                errors={errors}
+                isGatewaySaved={Boolean(
+                  data && isEqual(companyGateway, data.data.data)
                 )}
-            </div>
-          )}
-        </div>
+              />
+            )}
+          </div>
 
-        <div>
-          {gateway && companyGateway && (
-            <Credentials
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-              errors={errors}
-              isGatewaySaved={Boolean(
-                data && isEqual(companyGateway, data.data.data)
-              )}
-            />
-          )}
-        </div>
+          <div>
+            {gateway && companyGateway && (
+              <GatewaySettings
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          {gateway && companyGateway && (
-            <GatewaySettings
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-              errors={errors}
-            />
-          )}
-        </div>
+          <div>
+            {gateway && companyGateway && (
+              <RequiredFields
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+              />
+            )}
+          </div>
 
-        <div>
-          {gateway && companyGateway && (
-            <RequiredFields
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-            />
-          )}
-        </div>
-
-        <div>
-          {gateway && companyGateway && (
-            <LimitsAndFees
-              gateway={gateway}
-              companyGateway={companyGateway}
-              setCompanyGateway={setCompanyGateway}
-              errors={errors}
-            />
-          )}
-        </div>
-      </TabGroup>
+          <div>
+            {gateway && companyGateway && (
+              <LimitsAndFees
+                gateway={gateway}
+                companyGateway={companyGateway}
+                setCompanyGateway={setCompanyGateway}
+                errors={errors}
+              />
+            )}
+          </div>
+        </TabGroup>
+      </Card>
     </Settings>
   );
 }

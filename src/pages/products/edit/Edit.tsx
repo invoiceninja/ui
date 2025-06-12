@@ -18,6 +18,7 @@ import { Spinner } from '$app/components/Spinner';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Product } from '$app/common/interfaces/product';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useColorScheme } from '$app/common/colors';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -30,6 +31,8 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_product');
 
   const { id } = useParams();
+
+  const colors = useColorScheme();
 
   const { data: productResponse } = useProductQuery({ id });
 
@@ -48,7 +51,12 @@ export default function Edit() {
   return (
     <>
       {productResponse && product ? (
-        <Card title={productResponse.data.data.product_key || documentTitle}>
+        <Card
+          title={productResponse.data.data.product_key || documentTitle}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <ProductForm
             product={product}
             errors={errors}

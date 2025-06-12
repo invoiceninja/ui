@@ -9,6 +9,8 @@ import { useAtom } from 'jotai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import React, { useEffect } from 'react';
 import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
+import classNames from 'classnames';
+import { CSSProperties } from 'styled-components';
 
 interface Props extends CommonProps {
   colSpan?: number;
@@ -16,6 +18,8 @@ interface Props extends CommonProps {
   width?: string;
   customizeTextColor?: boolean;
   resizable?: string;
+  withoutPadding?: boolean;
+  style?: CSSProperties;
 }
 
 export function Td$(props: Props) {
@@ -59,9 +63,15 @@ function HtmlTd(props: HtmlTdProps) {
       colSpan={props.colSpan}
       rowSpan={props.rowSpan}
       onClick={props.onClick}
-      className={`px-2 lg:px-2.5 xl:px-4 py-2 text-sm break-words ${props.className} overflow-hidden whitespace-nowrap text-ellipsis`}
+      className={classNames(
+        `text-sm break-words ${props.className} overflow-hidden whitespace-nowrap text-ellipsis`,
+        {
+          'px-2 lg:px-2.5 xl:px-4 py-2': !props.withoutPadding,
+        }
+      )}
       style={{
         color: props.color,
+        ...props.style,
       }}
       ref={tdRef}
     >

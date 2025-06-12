@@ -106,7 +106,7 @@ export function ConnectAccounts() {
             <div
               className="flex flex-col cursor-pointer border-4"
               style={{
-                borderColor: account === 'yodlee' ? accentColor : colors.$5,
+                borderColor: account === 'yodlee' ? accentColor : colors.$24,
                 height: '10.25rem',
               }}
               onClick={() => setAccount('yodlee')}
@@ -135,7 +135,7 @@ export function ConnectAccounts() {
               data-cy="nordigenBox"
               className="flex flex-col items-center cursor-pointer border-4"
               style={{
-                borderColor: account === 'nordigen' ? accentColor : colors.$5,
+                borderColor: account === 'nordigen' ? accentColor : colors.$24,
                 height: '10.25rem',
               }}
               onClick={() => setAccount('nordigen')}
@@ -162,6 +162,7 @@ export function ConnectAccounts() {
           )}
 
           <Button
+            behavior="button"
             onClick={handleConnectAccount}
             disableWithoutIcon
             disabled={!account}

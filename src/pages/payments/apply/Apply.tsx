@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -20,7 +20,6 @@ import { usePaymentQuery } from '$app/common/queries/payments';
 import { Alert } from '$app/components/Alert';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
-import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
@@ -32,11 +31,16 @@ import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export default function Apply() {
-  const { id } = useParams();
   const [t] = useTranslation();
+
+  const { id } = useParams();
+  const colors = useColorScheme();
   const { data: payment, isLoading } = usePaymentQuery({ id });
+
   const [errors, setErrors] = useState<ValidationBag>();
 
   const navigate = useNavigate();
@@ -131,7 +135,12 @@ export default function Apply() {
   );
 
   return (
-    <Card title={t('apply_payment')}>
+    <Card
+      title={t('apply_payment')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Element leftSide={t('number')}>{payment?.number}</Element>
 
       {payment && payment.client && (
@@ -243,14 +252,18 @@ export default function Apply() {
                 }
               />
 
-              <Button
-                className="mt-7"
-                behavior="button"
-                type="minimal"
+              <div
+                className="cursor-pointer focus:outline-none focus:ring-0 mt-6"
                 onClick={() => handleRemovingInvoice(record._id)}
               >
-                <X />
-              </Button>
+                <CircleXMark
+                  color={colors.$16}
+                  hoverColor={colors.$3}
+                  borderColor={colors.$5}
+                  hoverBorderColor={colors.$17}
+                  size="1.6rem"
+                />
+              </div>
             </div>
 
             {errors?.errors[`invoices.${[index]}.invoice_id`] && (

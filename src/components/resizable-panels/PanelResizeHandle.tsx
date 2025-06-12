@@ -31,7 +31,7 @@ export function PanelResizeHandle(props: Props) {
   return renderBasePanelResizeHandler ? (
     <PanelResizeHandleBaseStyled
       className="flex items-center"
-      theme={{ hoverColor: '#3366CC', backgroundColor: colors.$5 }}
+      theme={{ hoverColor: '#3366CC', backgroundColor: colors.$21 }}
       style={{ width: '2.5px' }}
     />
   ) : (

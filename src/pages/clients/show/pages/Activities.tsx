@@ -24,11 +24,14 @@ import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Context } from './Documents';
 import Toggle from '$app/components/forms/Toggle';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Activities() {
-  const { id } = useParams();
-
   const [t] = useTranslation();
+
+  const { id } = useParams();
+  const colors = useColorScheme();
+
   const activityElement = useGenerateActivityElement();
 
   const context: Context = useOutletContext();
@@ -53,7 +56,7 @@ export default function Activities() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-full relative"
+      className="h-full relative shadow-sm"
       topRight={
         <div className="flex items-center space-x-10">
           <Toggle
@@ -70,9 +73,11 @@ export default function Activities() {
         </div>
       }
       withoutBodyPadding
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
     >
-      <div className="pl-6 pr-4">
-        <div className="flex flex-col overflow-y-auto pr-4">
+      <div className="px-6 pb-6 pt-2">
+        <div className="flex flex-col overflow-y-auto max-h-96">
           {activities
             ?.filter(
               (activity) =>

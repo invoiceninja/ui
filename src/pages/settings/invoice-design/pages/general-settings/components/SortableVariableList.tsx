@@ -9,21 +9,24 @@
  */
 
 import { Element } from '$app/components/cards';
-import { Button, SelectField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import { arrayMoveImmutable } from 'array-move';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { injectInChanges } from '$app/common/stores/slices/company-users';
 import { cloneDeep, set } from 'lodash';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
 } from '@hello-pangea/dnd';
-import { Menu, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import classNames from 'classnames';
 
 interface Props {
   defaultVariables: { value: string; label: string }[];
@@ -37,6 +40,8 @@ export function SortableVariableList(props: Props) {
   const dispatch = useDispatch();
 
   const { disabled } = props;
+
+  const colors = useColorScheme();
 
   const defaultVariables = props.defaultVariables;
 
@@ -55,10 +60,8 @@ export function SortableVariableList(props: Props) {
     return defaultVariables.find((field) => field.value === key);
   };
 
-  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const selectedOption = event.target.options[event.target.selectedIndex];
-
-    if (selectedOption.value === '') {
+  const handleSelectChange = (value: string): void => {
+    if (value === '') {
       return;
     }
 
@@ -72,13 +75,9 @@ export function SortableVariableList(props: Props) {
       }
     }
 
-    companyClone.settings.pdf_variables?.[props.for]?.push(
-      selectedOption.value
-    );
+    companyClone.settings.pdf_variables?.[props.for]?.push(value);
 
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
-
-    event.target.value = '';
   };
 
   const remove = (property: string) => {
@@ -110,7 +109,13 @@ export function SortableVariableList(props: Props) {
   return (
     <>
       <Element leftSide={t('fields')}>
-        <SelectField onChange={handleSelectChange} disabled={disabled}>
+        <SelectField
+          value=""
+          onValueChange={(value) => handleSelectChange(value)}
+          disabled={disabled}
+          customSelector
+          clearAfterSelection
+        >
           <option></option>
 
           {defaultVariablesFiltered.map((option, index) => (
@@ -121,7 +126,7 @@ export function SortableVariableList(props: Props) {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('variables')}>
+      <Element leftSide={t('variables')} textVerticalAlign="top">
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId={props.for} isDropDisabled={disabled}>
             {(provided) => (
@@ -139,24 +144,35 @@ export function SortableVariableList(props: Props) {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           ref={provided.innerRef}
-                          className="flex items-center justify-between space-y-6"
+                          className="flex items-center justify-between"
                           key={label}
                         >
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              type="minimal"
-                              onClick={() => remove(label)}
-                              behavior="button"
-                              disableWithoutIcon={disabled}
-                              disabled={disabled}
-                            >
-                              <X />
-                            </Button>
+                          <div className="flex items-center space-x-2 py-2">
+                            <div>
+                              <GridDotsVertical
+                                size="1.2rem"
+                                color={colors.$17}
+                              />
+                            </div>
 
                             <span>{resolveTranslation(label)?.label}</span>
                           </div>
 
-                          <Menu size={16} />
+                          <div
+                            className={classNames({
+                              'cursor-not-allowed opacity-75': disabled,
+                              'cursor-pointer': !disabled,
+                            })}
+                            onClick={() => !disabled && remove(label)}
+                          >
+                            <CircleXMark
+                              color={colors.$16}
+                              hoverColor={colors.$3}
+                              borderColor={colors.$5}
+                              hoverBorderColor={colors.$17}
+                              size="1.5rem"
+                            />
+                          </div>
                         </div>
                       )}
                     </Draggable>

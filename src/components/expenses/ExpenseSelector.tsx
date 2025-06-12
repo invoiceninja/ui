@@ -26,6 +26,7 @@ interface Props {
   clientId?: string;
   exclude?: string[];
   clientStatus?: string;
+  withShadow?: boolean;
 }
 
 export function ExpenseSelector(props: Props) {
@@ -63,6 +64,7 @@ export function ExpenseSelector(props: Props) {
         nullable
         clearInputAfterSelection={props.clearInputAfterSelection}
         exclude={props.exclude}
+        withShadow={props.withShadow}
       />
 
       {props.errorMessage && (

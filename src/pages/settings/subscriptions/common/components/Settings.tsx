@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SubscriptionProps } from './Overview';
 import frequencies from '$app/common/constants/frequency';
@@ -36,12 +36,14 @@ export function Settings(props: SubscriptionProps) {
   }, [subscription.trial_enabled, subscription.allow_cancellation]);
 
   return (
-    <Card title={t('settings')}>
+    <>
       <Element leftSide={t('frequency')}>
         <SelectField
           value={subscription.frequency_id}
           errorMessage={errors?.errors.frequency_id}
           onValueChange={(value) => handleChange('frequency_id', value)}
+          customSelector
+          dismissable={false}
         >
           <option value="">{t('once')}</option>
           {Object.keys(frequencies).map((frequency, index) => (
@@ -52,32 +54,30 @@ export function Settings(props: SubscriptionProps) {
         </SelectField>
       </Element>
 
-
       <Element leftSide={t('remaining_cycles')}>
         <SelectField
-          value={subscription?.remaining_cycles}
+          value={subscription?.remaining_cycles.toString()}
           onValueChange={(value) => handleChange('remaining_cycles', value)}
           errorMessage={errors?.errors.remaining_cycles}
+          customSelector
         >
           <option value="-1">{t('endless')}</option>
           {[...Array(37).keys()].map((number, index) => (
-            <option value={number} key={index}>
+            <option value={number.toString()} key={index}>
               {number}
             </option>
           ))}
         </SelectField>
       </Element>
 
-
-
-
       <Element leftSide={t('auto_bill')}>
         <SelectField
-          value={subscription.auto_bill}
+          value={subscription.auto_bill || ''}
           onValueChange={(value) => handleChange('auto_bill', value)}
           errorMessage={errors?.errors.auto_bill}
+          customSelector
         >
-          <option defaultChecked></option>
+          <option defaultChecked value=""></option>
           <option value="always">{t('enabled')}</option>
           <option value="optout">{t('optout')}</option>
           <option value="optin">{t('optin')}</option>
@@ -96,6 +96,21 @@ export function Settings(props: SubscriptionProps) {
       <Element leftSide={t('promo_discount')}>
         <Inline>
           <div className="w-full lg:w-1/2">
+            <SelectField
+              value={subscription.is_amount_discount.toString()}
+              onValueChange={(value) =>
+                handleChange('is_amount_discount', JSON.parse(value))
+              }
+              errorMessage={errors?.errors.is_amount_discount}
+              customSelector
+              dismissable={false}
+            >
+              <option value="true">{t('amount')}</option>
+              <option value="false">{t('percent')}</option>
+            </SelectField>
+          </div>
+
+          <div className="w-full lg:w-1/2">
             <NumberInputField
               value={subscription.promo_discount || ''}
               onValueChange={(value) =>
@@ -103,19 +118,6 @@ export function Settings(props: SubscriptionProps) {
               }
               errorMessage={errors?.errors.promo_discount}
             />
-          </div>
-
-          <div className="w-full lg:w-1/2">
-            <SelectField
-              value={subscription.is_amount_discount.toString()}
-              onValueChange={(value) =>
-                handleChange('is_amount_discount', JSON.parse(value))
-              }
-              errorMessage={errors?.errors.is_amount_discount}
-            >
-              <option value="true">{t('amount')}</option>
-              <option value="false">{t('percent')}</option>
-            </SelectField>
           </div>
         </Inline>
       </Element>
@@ -264,6 +266,6 @@ export function Settings(props: SubscriptionProps) {
           />
         </Element>
       )}
-    </Card>
+    </>
   );
 }

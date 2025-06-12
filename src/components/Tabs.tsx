@@ -10,7 +10,6 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import classNames from 'classnames';
 import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
@@ -21,6 +20,8 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom';
+import styled from 'styled-components';
+import { SelectField } from './forms';
 
 interface Props {
   className?: string;
@@ -30,6 +31,11 @@ interface Props {
   rightSide?: ReactNode;
   tabBarClassName?: string;
   withoutDefaultTabSpace?: boolean;
+  withHorizontalPadding?: boolean;
+  horizontalPaddingWidth?: string;
+  fullRightPadding?: boolean;
+  withHorizontalPaddingOnSmallScreen?: boolean;
+  paddingTabsHeight?: string;
 }
 
 export type Tab = {
@@ -41,15 +47,30 @@ export type Tab = {
 };
 export type Matcher = (params: Readonly<Params<string>>) => string;
 
+const StyledLink = styled(Link)`
+  border-color: ${({ theme }) => theme.borderColor};
+  color: ${({ theme }) => theme.textColor};
+
+  &:hover {
+    color: ${({ theme }) => theme.hoverTextColor};
+  }
+`;
+
 export function Tabs(props: Props) {
   const navigate = useNavigate();
 
-  const { visible = true, withoutDefaultTabSpace, tabBarClassName } = props;
+  const {
+    visible = true,
+    tabBarClassName,
+    withHorizontalPadding,
+    horizontalPaddingWidth = '1.5rem',
+    fullRightPadding,
+    paddingTabsHeight = '2.8rem',
+  } = props;
 
   const params = useParams();
   const location = useLocation();
   const colors = useColorScheme();
-  const accentColor = useAccentColor();
   const [searchParams] = useSearchParams();
   const tabBar = useRef<HTMLDivElement>(null);
 
@@ -94,67 +115,109 @@ export function Tabs(props: Props) {
 
   return visible ? (
     <div className={props.className} data-cy="tabs">
-      <div className="flex flex-col space-y-5 sm:hidden">
+      <div
+        className={classNames('flex flex-col space-y-5 sm:hidden', {
+          'px-4': props.withHorizontalPaddingOnSmallScreen,
+        })}
+      >
         <label htmlFor="tabs" className="sr-only">
           Select a tab
         </label>
 
         {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
-        <select
+        <SelectField
           id="tabs"
-          name="tabs"
-          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          className="text-sm sm:text-sm"
           defaultValue={props.tabs.find((tab) => tab)?.name}
-          onChange={(e) => navigate(e.currentTarget.value)}
+          onValueChange={(value) => navigate(value)}
+          customSelector
+          dismissable={false}
         >
           {props.tabs.map(
             (tab) =>
               (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                <option key={tab.name} value={tab.href}>{tab.formatName?.() || tab.name}</option>
+                <option key={tab.name} value={tab.href}>
+                  {tab.formatName?.() || tab.name}
+                </option>
               )
           )}
-        </select>
+        </SelectField>
 
         {props.rightSide}
       </div>
 
       <div className="hidden sm:block">
-        <div
-          className="flex justify-between border-b"
-          style={{ borderColor: colors.$5 }}
-        >
+        <div className="flex items-center justify-between">
           <nav
             ref={tabBar}
             className={classNames(
-              '-mb-px flex relative scroll-smooth overflow-x-auto',
-              {
-                'space-x-8': !withoutDefaultTabSpace,
-              },
+              'flex flex-1 relative scroll-smooth overflow-x-auto',
               tabBarClassName
             )}
             aria-label="Tabs"
           >
+            {withHorizontalPadding && (
+              <div
+                style={{
+                  width: horizontalPaddingWidth,
+                  height: paddingTabsHeight,
+                  borderBottom: `1px solid ${colors.$20}`,
+                  flexShrink: 0,
+                }}
+              />
+            )}
+
             {props.tabs.map(
               (tab) =>
                 (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                  <Link
+                  <StyledLink
                     key={tab.name}
                     to={tab.href}
                     onClick={(event) => handleScroll(event)}
-                    style={{
-                      borderColor: isActive(tab) ? accentColor : 'transparent',
-                      color: isActive(tab) ? accentColor : colors.$3,
+                    theme={{
+                      textColor: isActive(tab) ? colors.$3 : colors.$17,
+                      hoverTextColor: colors.$3,
                     }}
-                    className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                    className="whitespace-nowrap font-medium text-sm px-4 py-3"
                     aria-current={isActive(tab) ? 'page' : undefined}
+                    style={{
+                      borderBottom: isActive(tab)
+                        ? `1px solid ${colors.$3}`
+                        : `1px solid ${colors.$20}`,
+                    }}
                   >
-                    {tab.formatName?.() || tab.name}
-                  </Link>
+                    <div>{tab.formatName?.() || tab.name}</div>
+                  </StyledLink>
                 )
             )}
+
+            <div
+              className={classNames({
+                'flex-1': !withHorizontalPadding || fullRightPadding,
+              })}
+              style={{
+                ...(withHorizontalPadding && !fullRightPadding
+                  ? {
+                      width: horizontalPaddingWidth,
+                      flexShrink: 0,
+                    }
+                  : {
+                      minWidth: horizontalPaddingWidth,
+                    }),
+                height: paddingTabsHeight,
+                borderBottom: `1px solid ${colors.$20}`,
+              }}
+            />
           </nav>
 
-          {props.rightSide}
+          {props.rightSide && (
+            <div
+              className="flex items-center border-b pl-4"
+              style={{ borderColor: colors.$20, height: '2.8rem' }}
+            >
+              {props.rightSide}
+            </div>
+          )}
         </div>
       </div>
     </div>

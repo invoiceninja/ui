@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -20,8 +20,7 @@ import { Alert } from '$app/components/Alert';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useFormik } from 'formik';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { X } from 'react-feather';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
@@ -32,9 +31,14 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export default function Refund() {
+  const [t] = useTranslation();
+
   const { id } = useParams();
+  const colors = useColorScheme();
   const { data: payment } = usePaymentQuery({ id });
 
   const formatMoney = useFormatMoney();
@@ -45,7 +49,6 @@ export default function Refund() {
     enabled: Boolean(payment?.company_gateway_id),
   });
 
-  const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
   const [invoices, setInvoices] = useState<string[]>([]);
   const [email, setEmail] = useState(false);
@@ -173,7 +176,12 @@ export default function Refund() {
   );
 
   return (
-    <Card title={t('refund_payment')}>
+    <Card
+      title={t('refund_payment')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Element leftSide={t('number')}>
         <InputField disabled value={payment?.number} />
       </Element>
@@ -198,17 +206,18 @@ export default function Refund() {
 
       <Element leftSide={t('invoices')}>
         <SelectField
-          onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+          onValueChange={(value) => {
             if (
               formik.values.invoices.filter(
-                (invoice: { invoice_id: string }) =>
-                  invoice.invoice_id == event.target.value
+                (invoice: { invoice_id: string }) => invoice.invoice_id == value
               ).length < 1
-            )
-              setInvoices([...invoices, event.target.value]);
-            event.target.value = '';
+            ) {
+              setInvoices([...invoices, value]);
+            }
           }}
           withBlank
+          customSelector
+          clearAfterSelection
         >
           {refundableInvoices()?.map((invoice: Invoice, index: number) => (
             <option key={index} value={invoice.id}>
@@ -252,9 +261,8 @@ export default function Refund() {
                         }
                       />
 
-                      <Button
-                        behavior="button"
-                        type="minimal"
+                      <div
+                        className="cursor-pointer focus:outline-none focus:ring-0"
                         onClick={() => {
                           formik.setFieldValue(
                             'invoices',
@@ -266,8 +274,14 @@ export default function Refund() {
                           );
                         }}
                       >
-                        <X />
-                      </Button>
+                        <CircleXMark
+                          color={colors.$16}
+                          hoverColor={colors.$3}
+                          borderColor={colors.$5}
+                          hoverBorderColor={colors.$17}
+                          size="1.6rem"
+                        />
+                      </div>
                     </div>
                   </Element>
 
@@ -285,7 +299,11 @@ export default function Refund() {
           }
         )}
 
-      <Divider />
+      {Boolean(
+        payment &&
+          Array.isArray(payment.invoices) &&
+          formik.values.invoices.length
+      ) && <Divider className="pt-4" withoutPadding />}
 
       <Element leftSide={t('send_email')} leftSideHelp={t('email_receipt')}>
         <Toggle

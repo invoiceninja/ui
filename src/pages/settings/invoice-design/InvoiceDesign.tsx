@@ -32,6 +32,7 @@ import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDet
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
+import { Sparkle } from '$app/components/icons/Sparkle';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -63,9 +64,25 @@ export default function InvoiceDesign() {
     ? location.pathname.endsWith('/custom_designs')
     : true;
 
+  const ProBadge = () => (
+    <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
+      <div>
+        <Sparkle size="1rem" color="#2176FF" />
+      </div>
+
+      <span className="font-medium" style={{ color: '#2176FF' }}>
+        {t('pro')}
+      </span>
+    </div>
+  );
+
   const pages: Page[] = [
     { name: t('settings'), href: '/settings' },
-    { name: t('invoice_design'), href: '/settings/invoice_design' },
+    {
+      name: t('invoice_design'),
+      href: '/settings/invoice_design',
+      afterName: <ProBadge />,
+    },
   ];
 
   const pages2: Page[] = [
@@ -80,6 +97,7 @@ export default function InvoiceDesign() {
       href: id
         ? route('/settings/invoice_design/custom_designs/:id/edit', { id })
         : '/settings/invoice_design/custom_designs/create',
+      afterName: <ProBadge />,
     },
   ];
 
@@ -140,10 +158,11 @@ export default function InvoiceDesign() {
   return (
     <Default title={documentTitle} breadcrumbs={showsMainTabs ? pages : pages2}>
       <Tabs
-        tabBarClassName="space-x-5"
         tabs={tabs}
         visible={showsMainTabs}
         withoutDefaultTabSpace
+        fullRightPadding
+        paddingTabsHeight="2.9rem"
       />
 
       <div

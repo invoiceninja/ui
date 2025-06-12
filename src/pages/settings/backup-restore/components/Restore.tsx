@@ -8,13 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 import { UploadCompanyImport } from '$app/components/import/UploadCompanyImport';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export function Restore() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const [isDataImported, setIsDataImported] = useState<boolean>(false);
 
@@ -29,9 +31,12 @@ export function Restore() {
             onFileImported={() => setIsDataImported(true)}
           />
         ) : (
-          <Card title={t('restore')}>
-            <span className="text-gray-600 pl-6">{t('import_started')}</span>
-          </Card>
+          <div
+            className="px-4 sm:px-6 text-sm pt-2"
+            style={{ color: colors.$3 }}
+          >
+            {t('import_started')}
+          </div>
         )}
       </div>
     </div>

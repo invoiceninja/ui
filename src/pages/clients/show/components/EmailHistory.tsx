@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
@@ -20,6 +21,8 @@ import { useParams } from 'react-router-dom';
 
 export function EmailHistory() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const { id } = useParams();
@@ -47,11 +50,14 @@ export function EmailHistory() {
   return (
     <>
       {Boolean(emailRecords.length) && (
-        <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4">
-          <InfoCard
-            title={t('email_history')}
-            className="max-h-96 overflow-y-auto h-full"
-            value={emailRecords.map(
+        <InfoCard
+          title={t('email_history')}
+          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-5 2xl:col-span-4 shadow-sm p-4"
+          style={{ borderColor: colors.$24 }}
+          withoutPadding
+        >
+          <div className="flex flex-col pt-1 h-44 overflow-y-auto">
+            {emailRecords.map(
               (emailRecord, index) =>
                 emailRecord && (
                   <EmailRecord
@@ -63,8 +69,8 @@ export function EmailHistory() {
                   />
                 )
             )}
-          />
-        </div>
+          </div>
+        </InfoCard>
       )}
     </>
   );

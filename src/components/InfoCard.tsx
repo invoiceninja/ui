@@ -19,6 +19,7 @@ interface Props {
   className?: string;
   style?: CSSProperties;
   withoutTruncate?: boolean;
+  withoutPadding?: boolean;
 }
 
 export function InfoCard(props: Props) {
@@ -26,7 +27,13 @@ export function InfoCard(props: Props) {
 
   return (
     <div
-      className={`border px-4 py-5 shadow rounded overflow-auto sm:p-6 space-y-2 ${props.className}`}
+      className={classNames(
+        'border shadow rounded overflow-auto space-y-2',
+        {
+          'px-4 py-5 sm:p-6': !props.withoutPadding,
+        },
+        props.className
+      )}
       style={{
         backgroundColor: colors.$1,
         borderColor: colors.$5,

@@ -27,6 +27,7 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Project } from '$app/common/interfaces/project';
+import { InputLabel } from '$app/components/forms';
 
 export default function Projects() {
   useTitle('projects');
@@ -62,7 +63,7 @@ export default function Projects() {
         linkToCreate="/projects/create"
         linkToEdit="/projects/:id/edit"
         withResourcefulActions
-        leftSideChevrons={
+        rightSide={
           <DataTableColumnsPicker
             columns={projectColumns as unknown as string[]}
             defaultColumns={defaultColumns}
@@ -79,7 +80,20 @@ export default function Projects() {
         entities={changeTemplateResources as Project[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(project) => `${t('number')}: ${project.number}`}
+        labelFn={(project) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{project.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(project) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{project.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/projects/bulk"
       />
     </Default>

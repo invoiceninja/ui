@@ -60,20 +60,21 @@ export default function Expenses() {
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={
-          <Guard
-            type="component"
-            guards={[
-              or(permission('create_expense'), permission('edit_expense')),
-            ]}
-            component={<ImportButton route="/expenses/import" />}
-          />
-        }
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={expenseColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="expense"
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              columns={expenseColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="expense"
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(permission('create_expense'), permission('edit_expense')),
+              ]}
+              component={<ImportButton route="/expenses/import" />}
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_expense')]}
         hideEditableOptions={!hasPermission('edit_expense')}

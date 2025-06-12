@@ -20,6 +20,7 @@ import { recurringInvoiceAtom } from '../atoms';
 import dayjs from 'dayjs';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -27,16 +28,21 @@ interface Props {
 }
 
 export function InvoiceDetails(props: Props) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
   const { handleChange } = props;
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const [recurringInvoice] = useAtom(recurringInvoiceAtom);
 
   return (
     <>
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('frequency')}>
           <SelectField
             value={recurringInvoice?.frequency_id}
@@ -124,7 +130,10 @@ export function InvoiceDetails(props: Props) {
         )}
       </Card>
 
-      <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
+      <Card
+        className="col-span-12 lg:col-span-6 xl:col-span-4 h-max shadow-sm"
+        style={{ borderColor: colors.$24 }}
+      >
         <Element leftSide={t('invoice_number_short')}>
           <InputField
             id="number"
@@ -146,16 +155,6 @@ export function InvoiceDetails(props: Props) {
         <Element leftSide={t('discount')}>
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
-              <NumberInputField
-                value={recurringInvoice?.discount || ''}
-                onValueChange={(value) =>
-                  handleChange('discount', parseFloat(value))
-                }
-                errorMessage={props.errors?.errors.discount}
-              />
-            </div>
-
-            <div className="w-full lg:w-1/2">
               <SelectField
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
@@ -168,6 +167,16 @@ export function InvoiceDetails(props: Props) {
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
               </SelectField>
+            </div>
+
+            <div className="w-full lg:w-1/2">
+              <NumberInputField
+                value={recurringInvoice?.discount || ''}
+                onValueChange={(value) =>
+                  handleChange('discount', parseFloat(value))
+                }
+                errorMessage={props.errors?.errors.discount}
+              />
             </div>
           </div>
         </Element>

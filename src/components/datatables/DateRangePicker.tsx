@@ -140,7 +140,7 @@ export function DateRangePicker(props: Props) {
         >
           <Icon
             element={Calendar}
-            color={isCurrentDateRangeActive() ? 'lightgreen' : 'white'}
+            color={isCurrentDateRangeActive() ? '#22c55e' : colors.$17}
             style={{ width: '1.4rem', height: '1.4rem' }}
           />
         </div>

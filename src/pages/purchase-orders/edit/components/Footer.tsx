@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { PurchaseOrderCardProps } from './Details';
 import { Dispatch, SetStateAction } from 'react';
 import Toggle from '$app/components/forms/Toggle';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends PurchaseOrderCardProps {
   isDefaultTerms: boolean;
@@ -25,6 +26,8 @@ interface Props extends PurchaseOrderCardProps {
 export function Footer(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   const {
     purchaseOrder,
     handleChange,
@@ -34,12 +37,35 @@ export function Footer(props: Props) {
     setIsDefaultTerms,
   } = props;
 
-  const tabs = [t('terms'), t('footer'), t('public_notes'), t('private_notes')];
+  const tabs = [t('public_notes'), t('private_notes'), t('terms'), t('footer')];
 
   return (
-    <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs} withoutVerticalMargin>
-        <div>
+    <Card
+      className="col-span-12 xl:col-span-8 shadow-sm h-max"
+      style={{ borderColor: colors.$24 }}
+    >
+      <TabGroup
+        tabs={tabs}
+        withoutVerticalMargin
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
+        fullRightPadding
+      >
+        <div className="mb-4 px-6">
+          <MarkdownEditor
+            value={purchaseOrder.public_notes || ''}
+            onChange={(value) => handleChange('public_notes', value)}
+          />
+        </div>
+
+        <div className="mb-4 px-6">
+          <MarkdownEditor
+            value={purchaseOrder.private_notes || ''}
+            onChange={(value) => handleChange('private_notes', value)}
+          />
+        </div>
+
+        <div className="px-6">
           <MarkdownEditor
             value={purchaseOrder.terms || ''}
             onChange={(value) => handleChange('terms', value)}
@@ -60,7 +86,7 @@ export function Footer(props: Props) {
           </Element>
         </div>
 
-        <div>
+        <div className="px-6">
           <MarkdownEditor
             value={purchaseOrder.footer || ''}
             onChange={(value) => handleChange('footer', value)}
@@ -79,20 +105,6 @@ export function Footer(props: Props) {
           >
             <span className="font-medium">{t('save_as_default_footer')}</span>
           </Element>
-        </div>
-
-        <div className="mb-4">
-          <MarkdownEditor
-            value={purchaseOrder.public_notes || ''}
-            onChange={(value) => handleChange('public_notes', value)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <MarkdownEditor
-            value={purchaseOrder.private_notes || ''}
-            onChange={(value) => handleChange('private_notes', value)}
-          />
         </div>
       </TabGroup>
     </Card>

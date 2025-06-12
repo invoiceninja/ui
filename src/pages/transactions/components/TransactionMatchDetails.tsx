@@ -40,26 +40,21 @@ interface Props {
 export function TransactionMatchDetails(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const { transactionRule } = props;
 
   const invalidationQuery = useAtomValue(invalidationQueryAtom);
 
+  const [vendorIds, setVendorIds] = useState<string[]>([]);
+  const [invoiceIds, setInvoiceIds] = useState<string[]>([]);
+  const [paymentIds, setPaymentIds] = useState<string[]>([]);
+  const [expenseIds, setExpenseIds] = useState<string[]>([]);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
+  const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>([]);
   const [isTransactionConverted, setIsTransactionConverted] =
     useState<boolean>(true);
-
-  const [invoiceIds, setInvoiceIds] = useState<string[]>([]);
-
-  const [vendorIds, setVendorIds] = useState<string[]>([]);
-
-  const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>([]);
-
-  const [paymentIds, setPaymentIds] = useState<string[]>([]);
-
-  const [expenseIds, setExpenseIds] = useState<string[]>([]);
 
   const tabs = [
     props.isCreditTransactionType ? t('create_payment') : t('create_expense'),
@@ -218,17 +213,22 @@ export function TransactionMatchDetails(props: Props) {
     }
   }, [transactionRule]);
 
-  const colors = useColorScheme();
-
   return (
     <div className="flex flex-col flex-1">
-      <div className="flex flex-col flex-1">
+      <div
+        className="flex flex-col flex-1 border-t"
+        style={{
+          borderColor: colors.$24,
+        }}
+      >
         {!isTransactionConverted && (
           <TabGroup
-            className="flex flex-col flex-1 border-t border-gray-200"
+            className="flex flex-col flex-1 mt-2"
             tabs={tabs}
             height="full"
             width="full"
+            withHorizontalPadding
+            horizontalPaddingWidth="1rem"
           >
             <div>
               {props.isCreditTransactionType ? (
@@ -274,13 +274,17 @@ export function TransactionMatchDetails(props: Props) {
                 </>
               )}
 
-              <div className="px-3 py-3 w-full border-t border-gray-200">
+              <div
+                className="px-3 py-3 w-full border-t"
+                style={{
+                  borderColor: colors.$24,
+                }}
+              >
                 <Button
                   style={{
                     color: colors.$3,
-                    colorScheme: colors.$0,
                     backgroundColor: colors.$1,
-                    borderColor: colors.$4,
+                    borderColor: colors.$24,
                   }}
                   className="w-full"
                   onClick={
@@ -343,13 +347,17 @@ export function TransactionMatchDetails(props: Props) {
                 />
               )}
 
-              <div className="px-3 py-3 w-full border-t border-gray-200">
+              <div
+                className="px-3 py-3 w-full border-t"
+                style={{
+                  borderColor: colors.$24,
+                }}
+              >
                 <Button
                   style={{
                     color: colors.$3,
-                    colorScheme: colors.$0,
                     backgroundColor: colors.$1,
-                    borderColor: colors.$4,
+                    borderColor: colors.$24,
                   }}
                   className="w-full"
                   onClick={

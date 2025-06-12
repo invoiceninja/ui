@@ -18,7 +18,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway, Option } from '$app/common/interfaces/statics';
@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   gateway: Gateway;
@@ -45,6 +46,9 @@ interface OptionWithGatewayTypeId extends Option {
 
 export function Settings(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const [gateway, setGateway] = useState<Gateway>(props.gateway);
   const [options, setOptions] = useState<OptionWithGatewayTypeId[]>([]);
 
@@ -91,7 +95,7 @@ export function Settings(props: Props) {
   };
 
   return (
-    <Card title={t('settings')}>
+    <>
       <Element leftSide={t('label')}>
         <InputField
           value={props.companyGateway.label || gateway.name}
@@ -117,7 +121,13 @@ export function Settings(props: Props) {
         </Element>
       )}
 
-      <Divider />
+      <div className="px-4 sm:px-6 pt-4 pb-4">
+        <Divider
+          className="border-dashed"
+          withoutPadding
+          borderColor={colors.$20}
+        />
+      </div>
 
       {options.map((option, index) => (
         <Element
@@ -140,6 +150,6 @@ export function Settings(props: Props) {
           />
         </Element>
       ))}
-    </Card>
+    </>
   );
 }

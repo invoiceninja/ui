@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
@@ -22,14 +23,17 @@ export function ClientCard(props: Props) {
 
   const { client } = props;
 
+  const colors = useColorScheme();
+
   return (
     <>
       {client && (
-        <div className="col-span-12 lg:col-span-3">
+        <div className="col-span-12 lg:col-span-3 px-4 sm:px-6">
           <InfoCard
             title={t('client')}
             value={<ClientActionButtons displayClientName client={client} />}
             className="h-full"
+            style={{ borderColor: colors.$24 }}
           />
         </div>
       )}

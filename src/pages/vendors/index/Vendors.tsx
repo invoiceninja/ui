@@ -54,20 +54,21 @@ export default function Vendors() {
         customActions={actions}
         customBulkActions={customBulkActions}
         rightSide={
-          <Guard
-            type="component"
-            guards={[
-              or(permission('create_vendor'), permission('edit_vendor')),
-            ]}
-            component={<ImportButton route="/vendors/import" />}
-          />
-        }
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={vendorColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="vendor"
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              columns={vendorColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="vendor"
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(permission('create_vendor'), permission('edit_vendor')),
+              ]}
+              component={<ImportButton route="/vendors/import" />}
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_vendor')]}
         hideEditableOptions={!hasPermission('edit_vendor')}

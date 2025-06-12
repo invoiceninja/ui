@@ -12,13 +12,23 @@ import { Card } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
+import { useColorScheme } from '$app/common/colors';
 
 export function Notes(props: ExpenseCardProps) {
   const [t] = useTranslation();
   const { expense, handleChange, errors } = props;
 
+  const colors = useColorScheme();
+
   return (
-    <Card title={t('notes')} isLoading={!expense} withContainer>
+    <Card
+      title={t('notes')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      isLoading={!expense}
+      withContainer
+    >
       {expense && (
         <InputField
           value={expense.public_notes}

@@ -9,7 +9,6 @@
  */
 
 import { Client } from '$app/common/interfaces/client';
-import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { MdChevronRight, MdDelete, MdLaunch, MdPayment } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
@@ -34,7 +33,8 @@ import {
 import { useSetAtom } from 'jotai';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { ChevronDown } from 'react-feather';
+import { ChevronDown } from '$app/components/icons/ChevronDown';
+import { InfoCard } from '$app/components/InfoCard';
 
 interface Props {
   client: Client;
@@ -127,18 +127,24 @@ export function Gateways(props: Props) {
         disabledButton={isFormBusy}
       />
 
-      <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4">
-        <InfoCard
-          title={t('payment_methods')}
-          className="max-h-96 overflow-y-auto h-full"
-        >
+      <InfoCard
+        title={t('payment_methods')}
+        className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-5 2xl:col-span-4 shadow-sm p-4"
+        style={{ borderColor: colors.$24 }}
+        withoutPadding
+      >
+        <div className="flex flex-col h-44 overflow-y-auto text-sm">
           {client.gateway_tokens.map((token) => (
             <div
               key={token.id}
-              className={classNames('flex flex-col space-y-1.5 border-b py-4', {
-                'h-22': !token.is_default,
-                'h-20': token.is_default,
-              })}
+              className={classNames(
+                'flex flex-col space-y-1.5 border-b border-dashed py-4',
+                {
+                  'h-22': !token.is_default,
+                  'h-20': token.is_default,
+                }
+              )}
+              style={{ borderColor: colors.$24 }}
             >
               <div className="flex items-center justify-between h-12">
                 <div className="flex flex-col space-y-1.5">
@@ -165,12 +171,15 @@ export function Gateways(props: Props) {
                       name={token.meta.brand as GatewayLogoName}
                     />
 
-                    <div className="flex items-center">
+                    <div
+                      className="flex items-center"
+                      style={{ color: colors.$17 }}
+                    >
                       <span className="mt-1">****</span>
                       <span className="ml-1">{token.meta.last4}</span>
                     </div>
 
-                    <span>
+                    <span style={{ color: colors.$17 }}>
                       {token.meta.exp_month}/{token.meta.exp_year}
                     </span>
                   </div>
@@ -227,15 +236,12 @@ export function Gateways(props: Props) {
                               className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
                               style={{
                                 borderColor: colors.$5,
-                                paddingTop: '0.16rem',
-                                paddingBottom: '0.16rem',
+                                paddingTop: '0.24rem',
+                                paddingBottom: '0.24rem',
                               }}
                               theme={{ hoverBgColor: colors.$4 }}
                             >
-                              <Icon
-                                element={ChevronDown}
-                                style={{ width: '1.1rem', height: '1.1rem' }}
-                              />
+                              <ChevronDown size="0.9rem" color={colors.$3} />
                             </Div>
                           }
                           minWidth="9rem"
@@ -279,15 +285,12 @@ export function Gateways(props: Props) {
                             className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
                             style={{
                               borderColor: colors.$5,
-                              paddingTop: '0.16rem',
-                              paddingBottom: '0.16rem',
+                              paddingTop: '0.21rem',
+                              paddingBottom: '0.21rem',
                             }}
-                            theme={{ hoverBgColor: colors.$5 }}
+                            theme={{ hoverBgColor: colors.$4 }}
                           >
-                            <Icon
-                              element={ChevronDown}
-                              style={{ width: '1.1rem', height: '1.1rem' }}
-                            />
+                            <ChevronDown size="0.9rem" color={colors.$3} />
                           </Div>
                         }
                         minWidth="10rem"
@@ -309,8 +312,8 @@ export function Gateways(props: Props) {
               )}
             </div>
           ))}
-        </InfoCard>
-      </div>
+        </div>
+      </InfoCard>
     </>
   );
 }

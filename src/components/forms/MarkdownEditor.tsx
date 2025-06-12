@@ -13,6 +13,7 @@ import { debounce } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   value?: string | undefined;
@@ -25,6 +26,8 @@ interface Props {
 export function MarkdownEditor(props: Props) {
   const [value, setValue] = useState<string | undefined>();
   const editorRef = useRef<Editor | null>(null);
+
+  const reactSettings = useReactSettings();
 
   useEffect(() => {
     setValue(props.value);
@@ -44,6 +47,58 @@ export function MarkdownEditor(props: Props) {
   };
 
   const colors = useColorScheme();
+
+  useEffect(() => {
+    const isDarkMode = colors.$0 === 'dark';
+
+    if (editorRef.current?.editor) {
+      try {
+        const editor = editorRef.current.editor;
+
+        const darkSkinUrl =
+          editor.editorManager.baseURL + '/skins/ui/oxide-dark/skin.min.css';
+        const lightSkinUrl =
+          editor.editorManager.baseURL + '/skins/ui/oxide/skin.min.css';
+
+        editor.ui.styleSheetLoader.unload(darkSkinUrl);
+        editor.ui.styleSheetLoader.unload(lightSkinUrl);
+
+        editor.ui.styleSheetLoader.load(
+          isDarkMode ? darkSkinUrl : lightSkinUrl
+        );
+
+        const iframeDoc = editor.getDoc();
+
+        if (iframeDoc) {
+          const links = iframeDoc.querySelectorAll('link[rel="stylesheet"]');
+
+          links.forEach((link) => {
+            const currentHref = link.getAttribute('href');
+
+            if (
+              currentHref?.endsWith('/skins/content/dark/content.min.css') ||
+              currentHref?.endsWith('/tinymce_6.4.2/tinymce/content.css')
+            ) {
+              link.parentNode?.removeChild(link);
+            }
+          });
+
+          const newLink = iframeDoc.createElement('link');
+
+          newLink.rel = 'stylesheet';
+
+          newLink.href = isDarkMode
+            ? editor.editorManager.baseURL +
+              '/skins/content/dark/content.min.css'
+            : '/tinymce_6.4.2/tinymce/content.css';
+
+          iframeDoc.head.appendChild(newLink);
+        }
+      } catch (e) {
+        console.error('Error updating content CSS:', e);
+      }
+    }
+  }, [colors.$0]);
 
   return (
     <div className="space-y-4" style={{ zIndex: 0 }}>
@@ -82,7 +137,8 @@ export function MarkdownEditor(props: Props) {
             'blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | emoticons link image media',
             'alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | table | searchreplace | removeformat | code | help',
           ],
-          font_family_formats: 'Arial=arial,helvetica,sans-serif;' +
+          font_family_formats:
+            'Arial=arial,helvetica,sans-serif;' +
             'Courier New=courier new,courier,monospace;' +
             'Georgia=georgia,palatino;' +
             'Helvetica=helvetica;' +

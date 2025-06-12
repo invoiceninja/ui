@@ -9,6 +9,7 @@
  */
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
 export function useTotalVariables() {
@@ -16,9 +17,16 @@ export function useTotalVariables() {
   const [columns, setColumns] = useState<string[]>([]);
 
   useEffect(() => {
+    if (company?.settings.pdf_variables.total_columns.length > 0) {
+      setColumns(cloneDeep(company?.settings.pdf_variables.total_columns));
+      return;
+    }
+
     // We need to clone the product columns to local object,
     // because by default it's frozen.
     let variables: string[] = ['$subtotal'];
+    variables.push('$total');
+
     // clone(company?.settings.pdf_variables.total_columns) || [];
 
     // In case we have `$line_taxes` or `$total_taxes` we want to remove them
@@ -56,7 +64,6 @@ export function useTotalVariables() {
     }
 
     variables.push('$discount');
-    variables.push('$total');
     variables.push('$paid_to_date');
     variables.push('$balance_due');
     variables.push('$taxes');
