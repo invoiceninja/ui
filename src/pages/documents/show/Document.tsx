@@ -12,7 +12,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useDocumentQuery, useDocumentTimelineQuery } from '$app/common/queries/docuninja/documents';
 import { Page } from '$app/components/Breadcrumbs';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Default } from '$app/components/layouts/Default';
 import { Alert } from '$app/components/Alert';
@@ -141,9 +141,11 @@ export default function Document() {
                     <h1 className="text-2xl font-bold">{document.description}</h1>
                     <span className="text-sm text-gray-500">{getStatusBadge(document.status_id)}</span>
                 </div>
-                <Button type="primary" onClick={() => {}}>
-                    {t('edit')}
-                </Button>
+                <Link to={`/documents/${document.id}/builder`}>
+                    <Button type="primary" behavior="button">
+                        {t('edit')}
+                    </Button>
+                </Link>
             </div>
             <div className="grid grid-cols-3 gap-4">
                 <Invitations document={document} />
