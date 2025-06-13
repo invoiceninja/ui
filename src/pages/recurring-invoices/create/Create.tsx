@@ -83,9 +83,10 @@ export default function Create() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const company = useCurrentCompany();
-  const save = useCreate({ setErrors });
+  const save = useCreate({ setErrors, setIsFormBusy, isFormBusy });
   const clientResolver = useClientResolver();
 
   const { handleChange, calculateInvoiceSum } = useRecurringInvoiceUtilities({
@@ -235,7 +236,7 @@ export default function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!recurringInvoice?.client_id}
+      disableSaveButton={!recurringInvoice?.client_id || isFormBusy}
       onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
       additionalSaveOptions={saveOptions}
     >
