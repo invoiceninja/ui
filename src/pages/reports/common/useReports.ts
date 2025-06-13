@@ -55,6 +55,7 @@ export type Identifier =
   | 'quote'
   | 'quote_item'
   | 'recurring_invoice'
+  | 'recurring_invoice_item'
   | 'payment'
   | 'product'
   | 'product_sales'
@@ -223,6 +224,7 @@ export function useReports() {
         date_key: '',
         date_range: 'all',
         report_keys: [],
+        product_key: '',
         send_email: false,
         document_email_attachment: false,
         include_deleted: false,
@@ -263,6 +265,7 @@ export function useReports() {
         end_date: '',
         date_key: '',
         date_range: 'all',
+        product_key: '',
         report_keys: [],
         send_email: false,
         document_email_attachment: false,
@@ -306,6 +309,7 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        product_key: '',
         document_email_attachment: false,
         include_deleted: false,
         status: '',
@@ -332,6 +336,28 @@ export function useReports() {
         client_id: '',
       },
       preview: '/api/v1/reports/recurring_invoices?output=json',
+      supports_previews: true,
+    },
+    {
+      identifier: 'recurring_invoice_item',
+      label: 'recurring_invoice_item',
+      endpoint: '/api/v1/reports/recurring_invoice_items',
+      allow_custom_column: true,
+      custom_columns: ['client', 'recurring_invoice', 'item'],
+      payload: {
+        start_date: '',
+        end_date: '',
+        date_key: '',
+        date_range: 'all',
+        report_keys: [],
+        product_key: '',
+        send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
+        status: '',
+        client_id: '',
+      },
+      preview: '/api/v1/reports/recurring_invoice_items?output=json',
       supports_previews: true,
     },
     {
