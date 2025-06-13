@@ -13,7 +13,7 @@ import { admin, owner } from '$app/common/guards/guards/admin';
 import { Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
-import { isDemo, isHosted } from '$app/common/helpers';
+import { isDemo } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 import { or } from '$app/common/guards/guards/or';
 
