@@ -102,7 +102,7 @@ export function InvoiceTotals(props: Props) {
       innerRef={cardRef}
     >
       {isAnyTaxHidden() && (
-        <div className="flex items-center space-x-3 px-6">
+        <div className="flex items-center space-x-3 px-6 pt-4">
           <div>
             <Icon element={MdWarning} size={20} color="orange" />
           </div>
