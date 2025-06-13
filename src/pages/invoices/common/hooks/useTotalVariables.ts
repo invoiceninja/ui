@@ -69,6 +69,9 @@ export function useTotalVariables() {
     variables.push('$paid_to_date');
     variables.push('$balance_due');
     variables.push('$taxes');
+    variables.push('$tax1');
+    variables.push('$tax2');
+    variables.push('$tax3');
 
     setColumns(variables);
   }, [company]);
