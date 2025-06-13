@@ -11,8 +11,10 @@
 import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
 import { ReactNode } from 'react';
+import { CSSProperties } from 'styled-components';
 
 interface Props {
+  style?: CSSProperties;
   leftSide?: ReactNode;
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
@@ -26,10 +28,13 @@ interface Props {
   disabledLabels?: boolean;
   noVerticalPadding?: boolean;
   twoGridColumns?: boolean;
+  textVerticalAlign?: 'top' | 'middle' | 'bottom';
 }
 
 export function Element(props: Props) {
   const colors = useColorScheme();
+
+  const { style } = props;
 
   return (
     <div
@@ -38,17 +43,18 @@ export function Element(props: Props) {
         {
           'px-5 sm:px-6': !props.noExternalPadding,
           'py-4 sm:py-3': !props.noVerticalPadding,
-          'lg:items-center': !props.withoutItemsCenter,
+          'sm:items-center': !props.withoutItemsCenter,
           'sm:grid-cols-2': props.twoGridColumns,
           'sm:grid-cols-3': !props.twoGridColumns,
         }
       )}
       onClick={props.onClick}
-      style={{ color: colors.$3, colorScheme: colors.$0 }}
+      style={{ color: colors.$3, colorScheme: colors.$0, ...style }}
     >
       <dt
         className={classNames('text-sm flex flex-col', {
           'opacity-75': props.disabledLabels,
+          'h-full justify-start': props.textVerticalAlign === 'top',
         })}
         style={{ color: colors.$3, colorScheme: colors.$0 }}
       >
@@ -56,7 +62,7 @@ export function Element(props: Props) {
           className={classNames('font-medium', {
             'whitespace-nowrap': props.withoutWrappingLeftSide,
           })}
-          style={{ color: colors.$3, colorScheme: colors.$0 }}
+          style={{ color: colors.$22, colorScheme: colors.$0 }}
         >
           {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
@@ -70,7 +76,11 @@ export function Element(props: Props) {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               dangerouslySetInnerHTML={{ __html: props.leftSideHelp }}
-              style={{ color: colors.$3, colorScheme: colors.$0, opacity: 0.8 }}
+              style={{
+                color: colors.$22,
+                colorScheme: colors.$0,
+                opacity: 0.8,
+              }}
             ></span>
           ))}
       </dt>

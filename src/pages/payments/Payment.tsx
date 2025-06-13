@@ -36,6 +36,7 @@ import {
   WithSocketId,
 } from '$app/common/queries/sockets';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { InputLabel } from '$app/components/forms';
 
 export default function Payment() {
   const [t] = useTranslation();
@@ -129,7 +130,13 @@ export default function Payment() {
         entities={changeTemplateResources as PaymentEntity[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(payment) => `${t('number')}: ${payment.number}`}
+        labelFn={(payment) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{payment.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/payments/bulk"
       />
     </Default>

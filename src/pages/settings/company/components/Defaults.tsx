@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
 import { updateChanges } from '$app/common/stores/slices/company-users';
@@ -31,7 +31,7 @@ export function Defaults() {
   return (
     <>
       {companyChanges?.settings && (
-        <Card title={t('defaults')}>
+        <>
           <Element
             leftSide={
               <PropertyCheckbox
@@ -226,7 +226,7 @@ export function Defaults() {
               disabled={disableSettingsField('purchase_order_footer')}
             />
           </Element>
-        </Card>
+        </>
       )}
     </>
   );

@@ -32,6 +32,8 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import classNames from 'classnames';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { useColorScheme } from '$app/common/colors';
+import { Toggle as ToggleIcon } from '$app/components/icons/Toggle';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -773,6 +775,7 @@ export default function GeneralSettings() {
   const [t] = useTranslation();
 
   const company = useCompanyChanges();
+  const colorsScheme = useColorScheme();
   const currentCompany = useCurrentCompany();
 
   const disableSettingsField = useDisableSettingsField();
@@ -859,7 +862,21 @@ export default function GeneralSettings() {
     <>
       <AdvancedSettingsPlanAlert />
 
-      <Card title={t('general_settings')} padding="small">
+      <Card
+        title={
+          <div className="flex items-center space-x-2">
+            <ToggleIcon size="1.3rem" color="#2176FF" />
+
+            <span style={{ color: colorsScheme.$3 }}>
+              {t('general_settings')}
+            </span>
+          </div>
+        }
+        className="shadow-sm pb-6"
+        padding="small"
+        style={{ borderColor: colorsScheme.$24 }}
+        headerStyle={{ borderColor: colorsScheme.$20 }}
+      >
         <Element
           leftSide={
             <PropertyCheckbox
@@ -1301,7 +1318,20 @@ export default function GeneralSettings() {
           }
         >
           <div className="w-full inline-flex items-center space-x-2">
-            <div className="w-full">
+            <div className="w-1/3">
+              <SelectField
+                value={logoSizeType}
+                onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
+                disabled={disableSettingsField('company_logo_size')}
+                customSelector
+                dismissable={false}
+              >
+                <option value="%">{t('percent')}</option>
+                <option value="px">{t('pixels')}</option>
+              </SelectField>
+            </div>
+
+            <div className="w-2/3">
               <NumberInputField
                 value={(company?.settings.company_logo_size || '')
                   ?.replaceAll('px', '')
@@ -1316,23 +1346,16 @@ export default function GeneralSettings() {
                 errorMessage={errors?.errors['settings.company_logo_size']}
               />
             </div>
-
-            <div className="w-1/3">
-              <SelectField
-                value={logoSizeType}
-                onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
-                disabled={disableSettingsField('company_logo_size')}
-                customSelector
-                dismissable={false}
-              >
-                <option value="%">{t('percent')}</option>
-                <option value="px">{t('pixels')}</option>
-              </SelectField>
-            </div>
           </div>
         </Element>
 
-        <Divider />
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            withoutPadding
+            borderColor={colorsScheme.$20}
+          />
+        </div>
 
         <Element
           leftSide={
@@ -1349,32 +1372,6 @@ export default function GeneralSettings() {
             onValueChange={(value) => handleChange('primary_font', value)}
             disabled={disableSettingsField('primary_font')}
             errorMessage={errors?.errors['settings.primary_font']}
-            customSelector
-            dismissable={false}
-          >
-            {fonts.map((font) => (
-              <option key={font.label} value={font.value}>
-                {font.label}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="secondary_font"
-              labelElement={<SettingsLabel label={t('secondary_font')} />}
-              defaultValue="roboto"
-            />
-          }
-        >
-          <SelectField
-            id="settings.secondary_font"
-            value={company?.settings?.secondary_font || 'roboto'}
-            onValueChange={(value) => handleChange('secondary_font', value)}
-            disabled={disableSettingsField('secondary_font')}
-            errorMessage={errors?.errors['settings.secondary_font']}
             customSelector
             dismissable={false}
           >
@@ -1406,7 +1403,56 @@ export default function GeneralSettings() {
             }}
             disabled={disableSettingsField('primary_color')}
             includeDefaultPalette
+            renderLabelBox={(color) => (
+              <div
+                className="rounded-md flex items-center space-x-2 border p-1 cursor-pointer"
+                style={{ borderColor: colorsScheme.$24 }}
+              >
+                <div
+                  className="w-7 h-7 rounded-sm"
+                  style={{ backgroundColor: color }}
+                />
+
+                <span className="text-sm" style={{ color: colorsScheme.$3 }}>
+                  {color.replace('#', '')}
+                </span>
+              </div>
+            )}
           />
+        </Element>
+
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            withoutPadding
+            borderColor={colorsScheme.$20}
+          />
+        </div>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="secondary_font"
+              labelElement={<SettingsLabel label={t('secondary_font')} />}
+              defaultValue="roboto"
+            />
+          }
+        >
+          <SelectField
+            id="settings.secondary_font"
+            value={company?.settings?.secondary_font || 'roboto'}
+            onValueChange={(value) => handleChange('secondary_font', value)}
+            disabled={disableSettingsField('secondary_font')}
+            errorMessage={errors?.errors['settings.secondary_font']}
+            customSelector
+            dismissable={false}
+          >
+            {fonts.map((font) => (
+              <option key={font.label} value={font.value}>
+                {font.label}
+              </option>
+            ))}
+          </SelectField>
         </Element>
 
         <Element
@@ -1432,10 +1478,31 @@ export default function GeneralSettings() {
             }}
             disabled={disableSettingsField('secondary_color')}
             includeDefaultPalette
+            renderLabelBox={(color) => (
+              <div
+                className="rounded-md flex items-center space-x-2 border p-1 cursor-pointer"
+                style={{ borderColor: colorsScheme.$24 }}
+              >
+                <div
+                  className="w-7 h-7 rounded-sm"
+                  style={{ backgroundColor: color }}
+                />
+
+                <span className="text-sm" style={{ color: colorsScheme.$3 }}>
+                  {color.replace('#', '')}
+                </span>
+              </div>
+            )}
           />
         </Element>
 
-        <Divider />
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            withoutPadding
+            borderColor={colorsScheme.$20}
+          />
+        </div>
 
         <Element
           leftSide={
@@ -1492,7 +1559,13 @@ export default function GeneralSettings() {
           />
         </Element>
 
-        <Divider />
+        <div className="px-4 sm:px-6 pb-4 pt-3">
+          <Divider
+            className="border-dashed"
+            withoutPadding
+            borderColor={colorsScheme.$20}
+          />
+        </div>
 
         <Element
           leftSide={

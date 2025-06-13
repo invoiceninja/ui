@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Element } from '$app/components/cards';
@@ -24,6 +25,7 @@ import { MdOutlineWarning } from 'react-icons/md';
 export function CalculateTaxesNotificationModal() {
   const { t } = useTranslation();
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
   const companyChanges = useCompanyChanges();
 
@@ -86,34 +88,42 @@ export function CalculateTaxesNotificationModal() {
       </Modal>
 
       <Element
-        leftSide={t('calculate_taxes')}
+        leftSide={
+          <div className="flex items-center gap-2">
+            <span>{t('calculate_taxes')}</span>
+
+            <div className="flex">
+              <span style={{ color: colors.$22 }}>(</span>
+
+              <button
+                type="button"
+                style={{ color: accentColor }}
+                onClick={() =>
+                  $help('calculate-taxes', {
+                    moveToHeading: 'Turn on Calculate Taxes',
+                  })
+                }
+                className="inline-flex items-center space-x-1"
+              >
+                <span>{t('learn_more')}</span>
+              </button>
+
+              <span style={{ color: colors.$22 }}>)</span>
+            </div>
+          </div>
+        }
         leftSideHelp={t('calculate_taxes_help')}
       >
-        <div className="flex items-center gap-4">
-          <Toggle
-            checked={Boolean(companyChanges?.calculate_taxes)}
-            onValueChange={(value) => {
-              handleChange('calculate_taxes', value);
+        <Toggle
+          checked={Boolean(companyChanges?.calculate_taxes)}
+          onValueChange={(value) => {
+            handleChange('calculate_taxes', value);
 
-              if (value) {
-                setIsModalOpen(true);
-              }
-            }}
-          />
-
-          <button
-            type="button"
-            style={{ color: accentColor }}
-            onClick={() =>
-              $help('calculate-taxes', {
-                moveToHeading: 'Turn on Calculate Taxes',
-              })
+            if (value) {
+              setIsModalOpen(true);
             }
-            className="inline-flex items-center space-x-1"
-          >
-            <span>{t('learn_more')}</span>
-          </button>
-        </div>
+          }}
+        />
       </Element>
     </>
   );

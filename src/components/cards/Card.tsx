@@ -15,6 +15,7 @@ import {
   FormEvent,
   ReactElement,
   ReactNode,
+  RefObject,
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +60,7 @@ interface Props {
   headerStyle?: CSSProperties;
   headerClassName?: string;
   withoutHeaderPadding?: boolean;
+  innerRef?: RefObject<HTMLDivElement>;
 }
 
 export function Card(props: Props) {
@@ -72,6 +74,7 @@ export function Card(props: Props) {
 
   return (
     <div
+      ref={props.innerRef}
       className={classNames(
         `border rounded-md overflow-visible ${props.className}`,
         {
@@ -164,7 +167,7 @@ export function Card(props: Props) {
         {(props.withSaveButton || props.additionalAction) && (
           <div
             className="border-t px-4 py-5 sm:p-0"
-            style={{ borderColor: colors.$4 }}
+            style={{ borderColor: colors.$20 }}
           >
             <dl className="sm:divide-y sm:divide-gray-200">
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
@@ -192,9 +195,10 @@ export function Card(props: Props) {
                     </Button>
 
                     <Dropdown
-                      className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                      className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
                       disabled={props.disableSubmitButton}
                       cardActions
+                      labelButtonBorderColor={colors.$1}
                     >
                       {props.additionalSaveOptions.map((action, i) => (
                         <DropdownElement

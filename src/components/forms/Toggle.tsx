@@ -52,7 +52,7 @@ export default function Toggle(props: Props) {
         theme={{
           ringColor: colors.$5,
           borderColor: colors.$5,
-          backgroundColor: checked ? accentColor : colors.$5,
+          backgroundColor: checked ? colors.$3 : colors.$5,
         }}
         className={classNames(
           'relative inline-flex items-center flex-shrink-0 h-6 w-11 rounded-full transition-colors ease-in-out duration-200',
@@ -82,7 +82,9 @@ export default function Toggle(props: Props) {
       </StyledSwitch>
       {props.label && (
         <Switch.Label as="span" className="ml-3">
-          <span className="text-sm">{props.label}</span>
+          <span className="text-sm" style={{ color: colors.$3 }}>
+            {props.label}
+          </span>
         </Switch.Label>
       )}
     </Switch.Group>

@@ -42,4 +42,6 @@ export interface Account {
   is_migrated: boolean;
   hosted_client_count: number;
   hosted_company_count: number;
+  can_trial: boolean;
+  docuninja_num_users: number;
 }

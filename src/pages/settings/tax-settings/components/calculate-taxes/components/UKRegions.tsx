@@ -48,8 +48,6 @@ export function UKRegions() {
   };
 
   const divClickIntercept = (id: string) => {
-    console.log(id);
-
     const checkbox = document.getElementById(id.replace('.apply_tax', ''));
     checkbox?.click();
   };
@@ -116,7 +114,9 @@ export function UKRegions() {
                 value={`tax_data.regions.UK.subregions.${value[0]}.apply_tax`}
                 checked={value[1].apply_tax ? true : false}
                 className="flex justify-end h-6 w-6 rounded-half shadow"
-                disabled={companyChanges?.tax_data?.regions?.UK?.tax_all_subregions}
+                disabled={
+                  companyChanges?.tax_data?.regions?.UK?.tax_all_subregions
+                }
                 onValueChange={(value, checked) => handleChange(value, checked)}
               ></Checkbox>
 
@@ -141,7 +141,9 @@ export function UKRegions() {
                 type="primary"
                 className=""
                 disableWithoutIcon={true}
-                disabled={companyChanges?.tax_data.regions?.UK?.tax_all_subregions}
+                disabled={
+                  companyChanges?.tax_data.regions?.UK?.tax_all_subregions
+                }
                 onClick={(e: ChangeEvent<HTMLInputElement>) => {
                   e.preventDefault();
                   setTaxSetting(value[1]);

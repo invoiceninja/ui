@@ -21,6 +21,9 @@ import { useColorScheme } from '$app/common/colors';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
 import { ClientActionButtons } from './ClientActionButtons';
 import { Tooltip } from '$app/components/Tooltip';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
+import { Element } from '$app/components/cards';
 
 interface Props {
   readonly?: boolean;
@@ -38,12 +41,12 @@ export function ClientSelector(props: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+  const clientResolver = useClientResolver();
 
   const [client, setClient] = useState<Client>();
 
   const { resource } = props;
-
-  const clientResolver = useClientResolver();
 
   const handleCheckedState = (contactId: string) => {
     const potential = resource?.invitations.find(
@@ -61,13 +64,21 @@ export function ClientSelector(props: Props) {
   }, [resource?.client_id]);
 
   return (
-    <>
+    <div className="flex flex-col space-y-4">
       <div
-        className="flex flex-col justify-between space-y-2"
+        className="flex flex-col justify-between space-y-0.5"
         style={{ color: colors.$3 }}
       >
         {props.textOnly ? (
-          <p className="text-sm">{resource?.client?.display_name}</p>
+          <div className="flex space-x-10">
+            <span className="text-sm font-medium" style={{ color: colors.$22 }}>
+              {t('client')}
+            </span>
+
+            <span className="text-sm font-medium">
+              {resource?.client?.display_name}
+            </span>
+          </div>
         ) : (
           <Selector
             inputLabel={t('client')}
@@ -75,7 +86,10 @@ export function ClientSelector(props: Props) {
             value={resource?.client_id}
             readonly={props.readonly || !resource}
             clearButton={Boolean(resource?.client_id)}
-            onClearButtonClick={props.onClearButtonClick}
+            onClearButtonClick={() => {
+              setClient(undefined);
+              props.onClearButtonClick();
+            }}
             initiallyVisible={!resource?.client_id}
             errorMessage={props.errorMessage}
             disableWithSpinner={props.disableWithSpinner}
@@ -87,19 +101,24 @@ export function ClientSelector(props: Props) {
         {Boolean(resource?.client_id) && (
           <>
             {Boolean(client?.locations?.length) && props.onLocationChange && (
-              <div className="pt-4">
-                <SelectField
-                  label={t('location')}
-                  value={resource?.location_id}
-                  onValueChange={(value) => props.onLocationChange?.(value)}
-                  customSelector
+              <div className="pt-3">
+                <Element
+                  leftSide={t('location')}
+                  noExternalPadding
+                  noVerticalPadding
                 >
-                  {client?.locations.map((location) => (
-                    <option key={location.id} value={location.id}>
-                      {location.name}
-                    </option>
-                  ))}
-                </SelectField>
+                  <SelectField
+                    value={resource?.location_id}
+                    onValueChange={(value) => props.onLocationChange?.(value)}
+                    customSelector
+                  >
+                    {client?.locations.map((location) => (
+                      <option key={location.id} value={location.id}>
+                        {location.name}
+                      </option>
+                    ))}
+                  </SelectField>
+                </Element>
               </div>
             )}
           </>
@@ -111,42 +130,69 @@ export function ClientSelector(props: Props) {
           {Boolean(
             (props.onLocationChange && Boolean(client?.locations?.length)) ||
               location
-          ) && <InputLabel className="mb-2">{t('contacts')}</InputLabel>}
+          ) && <InputLabel className="mb-2.5">{t('contacts')}</InputLabel>}
 
-          <div className="flex flex-col space-y-2">
+          <div
+            className={classNames('divide-y divide-dashed', {
+              'divide-[#09090B1A]': !reactSettings.dark_mode,
+              'divide-[#1f2e41]': reactSettings.dark_mode,
+            })}
+          >
             {client.contacts.map((contact, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <div>
-                  <Checkbox
-                    id={contact.id}
-                    value={contact.id}
-                    label={
-                      contact.first_name.length >= 1
-                        ? `${contact.first_name} ${contact.last_name}`
-                        : contact.email || client.display_name
-                    }
-                    checked={handleCheckedState(contact.id)}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                      props.onContactCheckboxChange(
-                        event.target.value,
-                        event.target.checked
-                      )
-                    }
-                  />
+              <div
+                key={index}
+                className={classNames(
+                  'flex justify-between items-center first:pt-0 pt-2',
+                  {
+                    'pb-1.5': !resource.invitations[0].link,
+                  }
+                )}
+              >
+                <div className="flex flex-col w-full">
+                  <div className="flex space-x-2.5 w-full">
+                    <Checkbox
+                      id={contact.id}
+                      value={contact.id}
+                      checked={handleCheckedState(contact.id)}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        props.onContactCheckboxChange(
+                          event.target.value,
+                          event.target.checked
+                        )
+                      }
+                    />
 
-                  <div className="relative">
-                    {contact.first_name && (
-                      <p className="text-sm" style={{ color: colors.$3 }}>
-                        {contact.email}
-                      </p>
-                    )}
+                    <div
+                      className={classNames('flex truncate', {
+                        'flex-col': !resource.invitations[0].link,
+                        'space-x-4': resource.invitations[0].link,
+                      })}
+                    >
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: colors.$3 }}
+                      >
+                        {contact.first_name.length >= 1
+                          ? `${contact.first_name} ${contact.last_name}`
+                          : contact.email || client.display_name}
+                      </span>
 
+                      {contact.first_name && (
+                        <span className="text-sm" style={{ color: colors.$22 }}>
+                          {contact.email}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col relative left-7">
                     {Boolean(
                       resource.invitations.length >= 1 &&
                         resource.invitations[0].link
                     ) && (
-                      <div className="flex space-x-2 mt-1">
+                      <div className="flex items-center space-x-2">
                         <Link
+                          className="font-medium"
                           to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
                           external
                         >
@@ -159,9 +205,11 @@ export function ClientSelector(props: Props) {
                           message={t('copy_link') as string}
                           withoutArrow
                         >
-                          <CopyToClipboardIconOnly
-                            text={resource.invitations[0].link}
-                          />
+                          <div className="mt-1.5">
+                            <CopyToClipboardIconOnly
+                              text={resource.invitations[0].link}
+                            />
+                          </div>
                         </Tooltip>
                       </div>
                     )}
@@ -174,6 +222,6 @@ export function ClientSelector(props: Props) {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

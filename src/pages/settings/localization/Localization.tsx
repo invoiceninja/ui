@@ -16,12 +16,15 @@ import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useLocalizationTabs } from './common/hooks/useLocalizationTabs';
+import { useColorScheme } from '$app/common/colors';
+import { Card } from '$app/components/cards';
 
 export function Localization() {
   const [t] = useTranslation();
 
   useTitle('localization');
 
+  const colors = useColorScheme();
   const tabs = useLocalizationTabs();
 
   const pages = [
@@ -41,10 +44,24 @@ export function Localization() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#localization"
     >
-      <Tabs tabs={tabs} className="mt-6" />
-      <div className="my-4">
-        <Outlet />
-      </div>
+      <Card
+        className="shadow-sm"
+        title={t('user_details')}
+        withoutBodyPadding
+        withoutHeaderBorder
+        style={{ borderColor: colors.$24 }}
+      >
+        <Tabs
+          tabs={tabs}
+          withHorizontalPadding
+          fullRightPadding
+          withHorizontalPaddingOnSmallScreen
+        />
+
+        <div className="pt-4 pb-8">
+          <Outlet />
+        </div>
+      </Card>
     </Settings>
   );
 }

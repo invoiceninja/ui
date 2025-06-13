@@ -8,12 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
 import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
-import { InfoCard } from '$app/components/InfoCard';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
@@ -21,6 +19,8 @@ import { route } from '$app/common/helpers/route';
 import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useColorScheme } from '$app/common/colors';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { InfoCard } from '$app/components/InfoCard';
 
 interface Props {
   client: Client;
@@ -37,115 +37,200 @@ export function Details(props: Props) {
   const getSetting = useGetSetting();
   const formatMoney = useFormatMoney();
   const customField = useCustomField();
+  const resolveCountry = useResolveCountry();
   const formatCustomFieldValue = useFormatCustomFieldValue();
+
+  const isAnyCustomFieldPopulated = () => {
+    const fields = ['client1', 'client2', 'client3', 'client4'];
+
+    return fields.some((field) => {
+      const label = customField(field as CustomFields).label();
+      const value = client[`custom_value${field.slice(-1)}` as keyof Client];
+
+      return Boolean(label && value);
+    });
+  };
 
   return (
     <>
       {client && (
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoCard
-            title={t('details')}
-            value={
-              <>
-                <div className="space-y-2 mb-4">
-                  <Element
-                    leftSide={t('status')}
-                    noExternalPadding
-                    noVerticalPadding
-                  >
-                    <EntityStatus entity={client} />
-                  </Element>
+        <InfoCard
+          title={t('details')}
+          className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm p-4"
+          style={{ borderColor: colors.$24 }}
+          withoutPadding
+        >
+          <div className="flex flex-col pt-1 space-y-3 h-44 overflow-y-auto">
+            <div className="flex flex-col space-y-1">
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$22 }}
+              >
+                {t('status')}
+              </span>
 
-                  <Element
-                    leftSide={t('number')}
-                    noExternalPadding
-                    noVerticalPadding
-                  >
-                    {client.number}
-                  </Element>
-                </div>
+              <div>
+                <EntityStatus entity={client} />
+              </div>
+            </div>
 
-                {client.group_settings_id && (
-                  <Element leftSide={t('group')} noExternalPadding>
-                    <Link
-                      to={route('/settings/group_settings/:id/edit', {
-                        id: client.group_settings_id,
-                      })}
-                    >
-                      {client.group_settings?.name}
-                    </Link>
-                  </Element>
-                )}
+            <div className="flex flex-col space-y-1">
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$22 }}
+              >
+                {t('number')}
+              </span>
 
-                <Link to={client.website} external>
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$3 }}
+              >
+                {client.number}
+              </span>
+            </div>
+
+            {client.group_settings_id && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('group')}
+                </span>
+
+                <Link
+                  className="font-medium"
+                  to={route('/settings/group_settings/:id/edit', {
+                    id: client.group_settings_id,
+                  })}
+                >
+                  {client.group_settings?.name}
+                </Link>
+              </div>
+            )}
+
+            {client.website && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('website')}
+                </span>
+
+                <Link
+                  className="font-medium"
+                  to={client.website}
+                  external
+                  style={{ textAlign: 'left' }}
+                >
                   {client.website}
                 </Link>
+              </div>
+            )}
 
-                {client.vat_number.length > 1 && (
-                  <p>
-                    {t('vat_number')}: {client.vat_number}
-                  </p>
-                )}
+            {client.vat_number.length > 1 && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('vat_number')}
+                </span>
 
-                {client.phone.length > 1 && (
-                  <p>
-                    {t('phone')}: {client.phone}
-                  </p>
-                )}
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$3 }}
+                >
+                  {client.vat_number}
+                </span>
+              </div>
+            )}
 
-                {parseFloat(client.settings.default_task_rate) > 0 && (
-                  <p className="space-x-1">
-                    <span>{t('task_rate')}:</span>
-                    <span>
-                      {client.settings.default_task_rate
-                        ? formatMoney(
-                            client.settings.default_task_rate,
-                            client.country_id,
-                            client.settings.currency_id
-                          )
-                        : formatMoney(
-                            company.settings.default_task_rate,
-                            client.country_id,
-                            company.settings.currency_id
-                          )}
-                    </span>
-                  </p>
-                )}
+            {client.phone.length > 1 && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('phone')}
+                </span>
 
-                {import.meta.env.VITE_IS_TEST === 'true' && (
-                  <span data-cy="settingsTestingSpan">
-                    {getSetting(props.client, 'military_time')}
-                  </span>
-                )}
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$3 }}
+                >
+                  {client.phone}
+                </span>
+              </div>
+            )}
 
-                <div className="flex flex-col space-y-1 mt-2">
-                  {['client1', 'client2', 'client3', 'client4'].map((field) => {
-                    const label = customField(field as CustomFields).label();
-                    const value =
-                      client[`custom_value${field.slice(-1)}` as keyof Client];
+            {parseFloat(client.settings.default_task_rate) > 0 && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('task_rate')}
+                </span>
 
-                    return (
-                      Boolean(label && value) && (
-                        <div key={field} className="flex space-x-2">
-                          <span
-                            className="font-medium"
-                            style={{ color: colors.$3, colorScheme: colors.$0 }}
-                          >
-                            {label}
-                          </span>
-                          <span>
-                            {formatCustomFieldValue(field, value as string)}
-                          </span>
-                        </div>
+                <span
+                  className="text-sm font-medium font-mono"
+                  style={{ color: colors.$3 }}
+                >
+                  {client.settings.default_task_rate
+                    ? formatMoney(
+                        client.settings.default_task_rate,
+                        client.country_id,
+                        client.settings.currency_id
                       )
-                    );
-                  })}
-                </div>
-              </>
-            }
-            className="h-full"
-          />
-        </div>
+                    : formatMoney(
+                        company.settings.default_task_rate,
+                        client.country_id,
+                        company.settings.currency_id
+                      )}
+                </span>
+              </div>
+            )}
+
+            {import.meta.env.VITE_IS_TEST === 'true' && (
+              <span data-cy="settingsTestingSpan">
+                {getSetting(props.client, 'military_time')}
+              </span>
+            )}
+
+            {isAnyCustomFieldPopulated() && (
+              <div className="flex flex-col space-y-1">
+                {['client1', 'client2', 'client3', 'client4'].map((field) => {
+                  const label = customField(field as CustomFields).label();
+                  const value =
+                    client[`custom_value${field.slice(-1)}` as keyof Client];
+
+                  return (
+                    Boolean(label && value) && (
+                      <div key={field} className="flex flex-col space-y-1">
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: colors.$22 }}
+                        >
+                          {label}
+                        </span>
+
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: colors.$3 }}
+                        >
+                          {formatCustomFieldValue(field, value as string)}
+                        </span>
+                      </div>
+                    )
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </InfoCard>
       )}
     </>
   );

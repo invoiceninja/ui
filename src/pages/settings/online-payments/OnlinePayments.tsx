@@ -33,6 +33,7 @@ import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsFie
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
 
 export function OnlinePayments() {
   useTitle('online_payments');
@@ -41,9 +42,12 @@ export function OnlinePayments() {
   const dispatch = useDispatch();
   const disableSettingsField = useDisableSettingsField();
 
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
-
+  const colors = useColorScheme();
+  const company = useInjectCompanyChanges();
   const { data: statics } = useStaticsQuery();
+  const errors = useAtomValue(companySettingsErrorsAtom);
+  const { data: termsResponse } = usePaymentTermsQuery({});
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -52,16 +56,9 @@ export function OnlinePayments() {
 
   const [paymentTerms, setPaymentTerms] = useState<PaymentTerm[]>();
 
-  const { data: termsResponse } = usePaymentTermsQuery({});
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
-
-  const company = useInjectCompanyChanges();
-
-  const handleChangeProperty = useHandleCurrentCompanyChangeProperty();
-
-  const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
+  const onSave = useHandleCompanySave();
+  const handleChangeProperty = useHandleCurrentCompanyChangeProperty();
 
   const handleToggleChange = (id: string, value: boolean) => {
     dispatch(
@@ -89,7 +86,12 @@ export function OnlinePayments() {
     >
       <Gateways />
 
-      <Card title={t('settings')}>
+      <Card
+        title={t('settings')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
         <Element
           leftSide={
             <PropertyCheckbox
@@ -244,44 +246,62 @@ export function OnlinePayments() {
         </Element>
 
         {paymentTerms && (
-          <>
-            <Element
-              leftSide={
-                <PropertyCheckbox
-                  propertyKey="payment_terms"
-                  labelElement={
-                    <SettingsLabel
-                      label={t('payment_terms')}
-                      helpLabel={t('payment_terms_help')}
-                    />
-                  }
-                />
-              }
-            >
-              <SelectField
-                value={company?.settings?.payment_terms || ''}
-                onValueChange={(value) =>
-                  handleChangeProperty('settings.payment_terms', value)
-                }
-                disabled={disableSettingsField('payment_terms')}
-                errorMessage={errors?.errors['settings.payment_terms']}
-                customSelector
-                withBlank
-              >
-                {paymentTerms.map((type: PaymentTerm) => (
-                  <option key={type.id} value={type.num_days.toString()}>
-                    {type.name}
-                  </option>
-                ))}
-              </SelectField>
-            </Element>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="payment_terms"
+                labelElement={
+                  <SettingsLabel
+                    label={
+                      <div className="flex items-center space-x-1 whitespace-nowrap">
+                        <span className="text-sm" style={{ color: colors.$3 }}>
+                          {t('payment_terms')}
+                        </span>
 
-            <Element className="py-0 sm:py-0">
-              <Link to="/settings/payment_terms">
-                {t('configure_payment_terms')}
-              </Link>
-            </Element>
-          </>
+                        <div className="flex">
+                          <span
+                            className="text-sm"
+                            style={{ color: colors.$3 }}
+                          >
+                            (
+                          </span>
+
+                          <Link to="/settings/payment_terms">
+                            {t('configure')}
+                          </Link>
+
+                          <span
+                            className="text-sm"
+                            style={{ color: colors.$3 }}
+                          >
+                            )
+                          </span>
+                        </div>
+                      </div>
+                    }
+                    helpLabel={t('payment_terms_help')}
+                  />
+                }
+              />
+            }
+          >
+            <SelectField
+              value={company?.settings?.payment_terms || ''}
+              onValueChange={(value) =>
+                handleChangeProperty('settings.payment_terms', value)
+              }
+              disabled={disableSettingsField('payment_terms')}
+              errorMessage={errors?.errors['settings.payment_terms']}
+              customSelector
+              withBlank
+            >
+              {paymentTerms.map((type: PaymentTerm) => (
+                <option key={type.id} value={type.num_days.toString()}>
+                  {type.name}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
         )}
 
         <Element
@@ -658,7 +678,11 @@ export function OnlinePayments() {
           leftSide={
             <PropertyCheckbox
               propertyKey="unlock_invoice_documents_after_payment"
-              labelElement={<SettingsLabel label={t('unlock_invoice_documents_after_payment')} />}
+              labelElement={
+                <SettingsLabel
+                  label={t('unlock_invoice_documents_after_payment')}
+                />
+              }
               defaultValue={false}
             />
           }
@@ -666,15 +690,20 @@ export function OnlinePayments() {
         >
           <Toggle
             id="unlock_invoice_documents_after_payment"
-            checked={Boolean(company?.settings.unlock_invoice_documents_after_payment)}
+            checked={Boolean(
+              company?.settings.unlock_invoice_documents_after_payment
+            )}
             onChange={(value) =>
-              handleChangeProperty('settings.unlock_invoice_documents_after_payment', value)
+              handleChangeProperty(
+                'settings.unlock_invoice_documents_after_payment',
+                value
+              )
             }
-            disabled={disableSettingsField('unlock_invoice_documents_after_payment')}
+            disabled={disableSettingsField(
+              'unlock_invoice_documents_after_payment'
+            )}
           />
         </Element>
-
-        
       </Card>
     </Settings>
   );

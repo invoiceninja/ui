@@ -46,7 +46,7 @@ export function Users() {
     {
       id: 'name',
       label: 'name',
-      format: (field, resource) => (
+      format: (_, resource) => (
         <Link to={route('/settings/users/:id/edit', { id: resource.id })}>
           {resource.first_name} {resource.last_name}
         </Link>
@@ -79,6 +79,10 @@ export function Users() {
             setSelectedUserIds(selectedUserIds);
             setAction(action);
             setIsPasswordConfirmModalOpen(true);
+          }}
+          styleOptions={{
+            tdClassName: 'py-4',
+            withoutTdPadding: true,
           }}
           enableSavingFilterPreference
         />

@@ -34,6 +34,8 @@ import { useBlankSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Steps } from '../common/components/Steps';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const { documentTitle } = useTitle('new_payment_link');
@@ -49,6 +51,7 @@ export function Create() {
     status: ['active'],
   });
 
+  const colors = useColorScheme();
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
@@ -59,11 +62,9 @@ export function Create() {
 
   const tabs = [t('overview'), t('settings'), t('webhook'), t('steps')];
 
-  const [subscription, setSubscription] = useState<Subscription>();
-
-  const [products, setProducts] = useState<Product[]>();
-
   const [errors, setErrors] = useState<ValidationBag>();
+  const [products, setProducts] = useState<Product[]>();
+  const [subscription, setSubscription] = useState<Subscription>();
 
   const handleChange = useHandleChange({
     setErrors,
@@ -129,49 +130,64 @@ export function Create() {
     >
       <AdvancedSettingsPlanAlert />
 
-      <TabGroup tabs={tabs}>
-        <div>
-          {subscription && (
-            <Overview
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-              products={products}
-              page="create"
-            />
-          )}
-        </div>
+      <Card
+        title={t('new_payment_link')}
+        className="shadow-sm"
+        childrenClassName="pb-4"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutHeaderBorder
+        withoutBodyPadding
+      >
+        <TabGroup
+          tabs={tabs}
+          withHorizontalPadding
+          fullRightPadding
+          horizontalPaddingWidth="1.5rem"
+        >
+          <div>
+            {subscription && (
+              <Overview
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+                products={products}
+                page="create"
+              />
+            )}
+          </div>
 
-        <div>
-          {subscription && (
-            <SubscriptionSettings
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-            />
-          )}
-        </div>
+          <div>
+            {subscription && (
+              <SubscriptionSettings
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          {subscription && (
-            <Webhook
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-            />
-          )}
-        </div>
+          <div>
+            {subscription && (
+              <Webhook
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+              />
+            )}
+          </div>
 
-        <div>
-          {subscription && (
-            <Steps
-              subscription={subscription}
-              handleChange={handleChange}
-              errors={errors}
-            />
-          )}
-        </div>
-      </TabGroup>
+          <div>
+            {subscription && (
+              <Steps
+                subscription={subscription}
+                handleChange={handleChange}
+                errors={errors}
+              />
+            )}
+          </div>
+        </TabGroup>
+      </Card>
     </Settings>
   );
 }

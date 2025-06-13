@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,7 @@ export function TwoFactorAuthentication() {
         setIsDisableModalOpen={setIsDisableModalOpen}
       />
 
-      <Card title={t('enable_two_factor')}>
+      <>
         <Element leftSide="2FA">
           {!user?.google_2fa_secret && (
             <Button
@@ -55,7 +55,7 @@ export function TwoFactorAuthentication() {
             </Button>
           )}
         </Element>
-      </Card>
+      </>
     </>
   );
 }

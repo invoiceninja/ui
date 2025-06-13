@@ -16,12 +16,14 @@ import { Button, InputField, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdClose, MdDone } from 'react-icons/md';
+import { MdDone } from 'react-icons/md';
 import hexColorRegex from 'hex-color-regex';
 import { toast } from '$app/common/helpers/toast/toast';
 import { cloneDeep } from 'lodash';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/user';
+import { useColorScheme } from '$app/common/colors';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 type ThemeKey =
   | 'light'
@@ -100,7 +102,7 @@ interface Theme {
 }
 const COLOR_THEMES: Record<ThemeKey, Theme> = {
   light: {
-    palette: ['#58a6e4', '#324ea1', '#4c9a1d', '#cd8900', '#b83700'],
+    palette: ['#93C5FD26', '#1D4ED826', '#22C55E26', '#EAB30826', '#EF444426'],
   },
   dark: {
     palette: ['#298aaa', '#0c45a3', '#407535', '#a87001', '#8b3c40'],
@@ -253,6 +255,8 @@ export function StatusColorTheme() {
     const updatedColorTheme = cloneDeep(reactSettings?.color_theme);
 
     if (updatedColorTheme) {
+      updatedColorTheme.status_color_theme = 'light';
+
       CUSTOM_COLOR_FIELDS.forEach((fieldKey) => {
         updatedColorTheme[fieldKey] = '';
       });
@@ -293,7 +297,7 @@ export function StatusColorTheme() {
                     <div
                       key={paletteColor}
                       style={{
-                        backgroundColor: paletteColor,
+                        backgroundColor: paletteColor.slice(0, 7),
                         width: 50,
                         height: 20,
                       }}
@@ -361,6 +365,7 @@ export function DefaultColorPickerModal(props: ModalProps) {
 
   const { fieldKey } = props;
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const isColorValid = useIsColorValid();
@@ -391,17 +396,23 @@ export function DefaultColorPickerModal(props: ModalProps) {
           }}
         />
 
-        <Icon
+        <div
           className="cursor-pointer"
-          element={MdClose}
-          size={26}
           onClick={() =>
             handleUserChange(
               `company_user.react_settings.color_theme.${fieldKey}`,
               ''
             )
           }
-        />
+        >
+          <CircleXMark
+            color={colors.$16}
+            hoverColor={colors.$3}
+            borderColor={colors.$5}
+            hoverBorderColor={colors.$17}
+            size="1.6rem"
+          />
+        </div>
       </div>
 
       <Modal

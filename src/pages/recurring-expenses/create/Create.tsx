@@ -34,6 +34,7 @@ import { cloneDeep } from 'lodash';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import dayjs from 'dayjs';
+import { useCallback } from 'react';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -107,7 +108,7 @@ export default function Create() {
     });
   }, [data]);
 
-  const onSave = (recurringExpense: RecurringExpense) => {
+  const onSave = useCallback((recurringExpense: RecurringExpense) => {
     toast.processing();
 
     setErrors(undefined);
@@ -128,13 +129,19 @@ export default function Create() {
           toast.dismiss();
         }
       });
-  };
+  }, [navigate]);
+
+  const handleSaveClick = useCallback(() => {
+    if (recurringExpense) {
+      onSave(recurringExpense);
+    }
+  }, [recurringExpense, onSave]);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => recurringExpense && onSave(recurringExpense)}
+      onSaveClick={handleSaveClick}
     >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">

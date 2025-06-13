@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
@@ -17,16 +17,19 @@ import { useTranslation } from 'react-i18next';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useColorScheme } from '$app/common/colors';
 
 export function Authorization() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const company = useCompanyChanges();
-  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const disableSettingsField = useDisableSettingsField();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   return (
-    <Card title={t('authorization')}>
+    <>
       <Element
         leftSide={
           <PropertyCheckbox
@@ -96,7 +99,13 @@ export function Authorization() {
         />
       </Element>
 
-      <Divider />
+      <div className="px-4 sm:px-6 py-4">
+        <Divider
+          className="border-dashed"
+          borderColor={colors.$20}
+          withoutPadding
+        />
+      </div>
 
       <Element
         leftSide={
@@ -189,6 +198,6 @@ export function Authorization() {
           disabled={disableSettingsField('signature_on_pdf')}
         />
       </Element>
-    </Card>
+    </>
   );
 }

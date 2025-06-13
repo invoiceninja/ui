@@ -10,7 +10,7 @@
 
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { GenericSelectorProps } from './CountrySelector';
-import { SearchableSelect } from './SearchableSelect';
+import { SelectField } from './forms';
 
 interface AdditionalCurrency {
   id: string;
@@ -27,12 +27,13 @@ export function CurrencySelector(props: CurrencySelectorProps) {
   const { additionalCurrencies = [] } = props;
 
   return (
-    <SearchableSelect
+    <SelectField
       value={props.value}
       onValueChange={props.onChange}
       label={props.label}
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
+      customSelector
     >
       {additionalCurrencies.map((currency, index) => (
         <option key={index} value={currency.id}>
@@ -45,6 +46,6 @@ export function CurrencySelector(props: CurrencySelectorProps) {
           {currency.name} ({currency.code})
         </option>
       ))}
-    </SearchableSelect>
+    </SelectField>
   );
 }

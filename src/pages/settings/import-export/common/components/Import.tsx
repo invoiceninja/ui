@@ -19,6 +19,7 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import { Alert } from '$app/components/Alert';
+import { useColorScheme } from '$app/common/colors';
 
 const FILE_KEY = {
   clients: 'client',
@@ -51,6 +52,8 @@ export interface ImportedFile {
 }
 export function Import() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const [importType, setImportType] = useState<ImportType>('freshbooks');
 
@@ -105,6 +108,7 @@ export function Import() {
   return (
     <Card
       title={t('import')}
+      className="shadow-sm"
       saveButtonLabel={t('import')}
       onSaveClick={(event) => {
         event.preventDefault();
@@ -113,12 +117,16 @@ export function Import() {
       disableSubmitButton={disableSubmitButton() || isFormBusy}
       withSaveButton
       disableWithoutIcon
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
     >
       <Element leftSide={t('import_type')}>
         <SelectField
           value={importType}
           onValueChange={(value) => setImportType(value as ImportType)}
           errorMessage={errors?.errors.import_type}
+          customSelector
+          dismissable={false}
         >
           <option value="freshbooks">{t('freshbooks')}</option>
           <option value="invoice2go">{t('invoice2go')}</option>

@@ -13,9 +13,14 @@ import { useCustomField } from '$app/components/CustomField';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { useColorScheme } from '$app/common/colors';
+import { Files } from '$app/components/icons/Files';
 
 export default function ProductQuoteColumns() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const customField = useCustomField();
 
   const defaultVariables = [
@@ -50,7 +55,21 @@ export default function ProductQuoteColumns() {
   return (
     <>
       {!company?.settings.sync_invoice_quote_columns && (
-        <Card title={t('quote_product_columns')} padding="small">
+        <Card
+          title={
+            <div className="flex items-center space-x-2">
+              <div>
+                <Files color="#2176FF" size="1.3rem" />
+              </div>
+
+              <span>{t('quote_product_columns')}</span>
+            </div>
+          }
+          padding="small"
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
           <SortableVariableList
             for="product_quote_columns"
             defaultVariables={defaultVariables}

@@ -44,9 +44,9 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import classNames from 'classnames';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { InputLabel } from '$app/components/forms';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -116,20 +116,7 @@ export default function Invoices() {
         customFilters={filters}
         customFilterPlaceholder="status"
         rightSide={
-          <Guard
-            type="component"
-            component={<ImportButton route="/invoices/import" />}
-            guards={[
-              or(permission('create_invoice'), permission('edit_invoice')),
-            ]}
-          />
-        }
-        leftSideChevrons={
-          <div
-            className={classNames('flex items-center space-x-1', {
-              'pr-4': Boolean(reactSettings.show_table_footer),
-            })}
-          >
+          <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (
               <DataTableFooterColumnsPicker
                 table="invoice"
@@ -141,6 +128,14 @@ export default function Invoices() {
               table="invoice"
               columns={invoiceColumns as unknown as string[]}
               defaultColumns={defaultColumns}
+            />
+
+            <Guard
+              type="component"
+              component={<ImportButton route="/invoices/import" />}
+              guards={[
+                or(permission('create_invoice'), permission('edit_invoice')),
+              ]}
             />
           </div>
         }
@@ -161,7 +156,20 @@ export default function Invoices() {
         entities={changeTemplateResources as Invoice[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+        labelFn={(invoice) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{invoice.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(invoice) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{invoice.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/invoices/bulk"
       />
     </Default>

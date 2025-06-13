@@ -31,12 +31,14 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { route } from '$app/common/helpers/route';
 import { useBlankTransactionQuery } from '$app/common/queries/transactions';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
 
   const { data } = useBlankTransactionQuery();
@@ -121,7 +123,16 @@ export default function Create() {
       onSaveClick={onSave}
     >
       <Container breadcrumbs={[]}>
-        <Card title={documentTitle}>
+        <Card
+          title={documentTitle}
+          className="shadow-sm"
+          style={{
+            borderColor: colors.$24,
+          }}
+          headerStyle={{
+            borderColor: colors.$20,
+          }}
+        >
           {currencySeparators && transaction && (
             <TransactionForm
               errors={errors}

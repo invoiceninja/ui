@@ -14,9 +14,10 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { License } from '.';
-import { Card, Element } from '../../../../components/cards';
+import { Element } from '../../../../components/cards';
 import { Link } from '../../../../components/forms';
 import dayjs from 'dayjs';
+import { route } from '$app/common/helpers/route';
 
 export function Plan() {
   const [t] = useTranslation();
@@ -25,7 +26,7 @@ export function Plan() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
-    <Card title={t('plan')}>
+    <div className="flex flex-col pb-4">
       <Element className="mb-3" leftSide={t('plan')}>
         {isHosted() ? (
           <>
@@ -60,17 +61,13 @@ export function Plan() {
 
       {isHosted() && user?.company_user?.is_owner && (
         <Element>
-          <Link
-            className="mt-4"
-            external
-            to={user?.company_user?.ninja_portal_url}
-          >
+          <Link className="mt-4" to={route('/settings/account_management')}>
             {t('plan_change')}
           </Link>
         </Element>
       )}
 
       {isSelfHosted() && !isDemo() && <License />}
-    </Card>
+    </div>
   );
 }

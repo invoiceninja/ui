@@ -12,7 +12,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Element } from '$app/components/cards';
 import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -24,6 +23,7 @@ import { Alert } from '../Alert';
 import { Button } from '../forms';
 import { Icon } from '../icons/Icon';
 import styled from 'styled-components';
+import { CloudUpload } from '../icons/CloudUpload';
 
 interface Props {
   entity: 'expense';
@@ -189,14 +189,18 @@ export function XMLImport(props: Props) {
             className="flex flex-col md:flex-row md:items-center"
           >
             <Div
-              className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2"
-              theme={{ borderColor: colors.$5, hoverBorderColor: colors.$3 }}
+              className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
+              theme={{
+                borderColor: colors.$21,
+                hoverBorderColor: colors.$17,
+              }}
             >
               <input {...getInputProps()} />
-              <Image
-                className="mx-auto h-12 w-12"
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
-              />
+
+              <div className="flex justify-center">
+                <CloudUpload size="2.3rem" color={colors.$3} />
+              </div>
+
               <span
                 className="mt-2 block text-sm font-medium"
                 style={{ color: colors.$3, colorScheme: colors.$0 }}

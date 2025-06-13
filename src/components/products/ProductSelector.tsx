@@ -18,6 +18,7 @@ import { endpoint, trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import classNames from 'classnames';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -33,12 +34,15 @@ interface Props {
   label?: string | undefined;
   withoutAction?: boolean;
   clearInputAfterSelection?: boolean;
+  withShadow?: boolean;
 }
 
 export function ProductSelector(props: Props) {
   const [t] = useTranslation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const colors = useColorScheme();
   const currentCompany = useCurrentCompany();
 
   const hasPermission = useHasPermission();
@@ -62,7 +66,8 @@ export function ProductSelector(props: Props) {
           dropdownLabelFn: (product) => (
             <div>
               <div className="flex space-x-1">
-                <p className="font-semibold">{product.product_key}</p>
+                <p className="font-medium">{product.product_key}</p>
+
                 {currentCompany?.track_inventory &&
                   props.displayStockQuantity && (
                     <p
@@ -78,10 +83,9 @@ export function ProductSelector(props: Props) {
                     </p>
                   )}
               </div>
-              <p className="text-sm truncate">
-                {product.notes.length > 35
-                  ? product.notes.substring(0, 35).concat('...')
-                  : product.notes}
+
+              <p className="text-xs font-medium" style={{ color: colors.$22 }}>
+                {product.notes}
               </p>
             </div>
           ),
@@ -98,6 +102,7 @@ export function ProductSelector(props: Props) {
         nullable
         key="product_selector"
         clearInputAfterSelection={props.clearInputAfterSelection}
+        withShadow={props.withShadow}
       />
 
       {props.errorMessage && (

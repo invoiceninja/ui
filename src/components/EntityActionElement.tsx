@@ -18,6 +18,7 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 import { Entity } from './CommonActionsPreferenceModal';
 import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   onClick?: () => void;
@@ -33,8 +34,9 @@ interface Props extends CommonProps {
 }
 
 export function EntityActionElement(props: Props) {
-  const navigate = useNavigate();
+  const colors = useColorScheme();
 
+  const navigate = useNavigate();
   const preventNavigation = usePreventNavigation({
     disablePrevention: props.disablePreventNavigation,
   });
@@ -75,7 +77,7 @@ export function EntityActionElement(props: Props) {
             })
           }
         >
-          <Icon element={icon} size={23.5} />
+          <Icon element={icon} size={23.5} color={colors.$3} />
         </div>
       </Tooltip>
     );

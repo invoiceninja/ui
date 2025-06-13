@@ -36,6 +36,14 @@ export function apiEndpoint(): string {
   );
 }
 
+export function docuNinjaApiEndpoint(): string {
+  return import.meta.env.VITE_DOCUNINJA_API_URL || 'https://docuninja.co';
+}
+
+export function docuNinjaEndpoint(endpoint: string, params = {}): string {
+  return docuNinjaApiEndpoint() + route(endpoint, params);
+}
+
 export function endpoint(endpoint: string, params = {}): string {
   return apiEndpoint() + route(endpoint, params);
 }

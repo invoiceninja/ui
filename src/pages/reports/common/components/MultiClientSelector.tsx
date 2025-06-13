@@ -13,11 +13,11 @@ import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue } from 'react-select';
+import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
 import { useClientsQuery } from '$app/common/queries/clients';
-import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
 
 interface Props {
   value?: string;
@@ -27,8 +27,6 @@ interface Props {
 export function MultiClientSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
-
-  const customStyles = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
 
@@ -61,18 +59,16 @@ export function MultiClientSelector(props: Props) {
     <>
       {clients ? (
         <Element leftSide={t('clients')}>
-          <Select
+          <CustomMultiSelect
             id="clientItemSelector"
-            placeholder={t('clients')}
             {...(value && {
               value: clients?.filter((option) =>
                 value.split(',').find((clientId) => clientId === option.value)
               ),
             })}
-            onChange={(options) => onValueChange(handleChange(options))}
+            onValueChange={(options) => onValueChange(handleChange(options))}
             options={clients}
-            isMulti={true}
-            styles={customStyles}
+            isSearchable={true}
           />
         </Element>
       ) : (

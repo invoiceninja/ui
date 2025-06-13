@@ -25,6 +25,9 @@ import { MdInfoOutline } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
+import { route } from '$app/common/helpers/route';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
+import styled from 'styled-components';
 
 interface Props {
   endpoint: string;
@@ -33,12 +36,20 @@ interface Props {
   disableUpload?: boolean;
 }
 
+const Box = styled.div`
+  border-color: ${(props) => props.theme.borderColor};
+  &:hover {
+    border-color: ${(props) => props.theme.hoverBorderColor};
+  }
+`;
+
 export function Upload(props: Props) {
   const [t] = useTranslation();
 
   const { disableUpload = false } = props;
 
   const user = useCurrentUser();
+  const colors = useColorScheme();
 
   const [formData, setFormData] = useState(new FormData());
 
@@ -85,8 +96,6 @@ export function Upload(props: Props) {
     },
   });
 
-  const colors = useColorScheme();
-
   if (props.widgetOnly) {
     return (
       <>
@@ -100,8 +109,7 @@ export function Upload(props: Props) {
               {user?.company_user && (
                 <Link
                   className="ml-10"
-                  external
-                  to={user.company_user.ninja_portal_url}
+                  to={route('/settings/account_management')}
                 >
                   {t('plan_change')}
                 </Link>
@@ -114,18 +122,28 @@ export function Upload(props: Props) {
           {...getRootProps()}
           className="flex flex-col md:flex-row md:items-center"
         >
-          <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <Box
+            className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
+            theme={{
+              borderColor: colors.$21,
+              hoverBorderColor: colors.$17,
+            }}
+          >
             <input {...getInputProps()} />
-            <Image className="mx-auto h-12 w-12 text-gray-400" />
+
+            <div className="flex justify-center">
+              <CloudUpload size="2.3rem" color={colors.$3} />
+            </div>
+
             <span
-              className="mt-2 block text-sm font-medium"
-              style={{ color: colors.$3 }}
+              className="mt-3 block text-sm font-medium"
+              style={{ color: colors.$17 }}
             >
               {isDragActive
                 ? t('drop_file_here')
                 : t('dropzone_default_message')}
             </span>
-          </div>
+          </Box>
         </div>
 
         {errors &&
@@ -150,8 +168,7 @@ export function Upload(props: Props) {
             {user?.company_user && (
               <Link
                 className="ml-10"
-                external
-                to={user.company_user.ninja_portal_url}
+                to={route('/settings/account_management')}
               >
                 {t('plan_change')}
               </Link>
@@ -166,7 +183,13 @@ export function Upload(props: Props) {
             {...getRootProps()}
             className="flex flex-col md:flex-row md:items-center"
           >
-            <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Box
+              className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
+              theme={{
+                borderColor: colors.$21,
+                hoverBorderColor: colors.$17,
+              }}
+            >
               <input {...getInputProps()} />
               <Image className="mx-auto h-12 w-12 text-gray-400" />
               <span
@@ -177,7 +200,7 @@ export function Upload(props: Props) {
                   ? 'drop_file_here'
                   : t('dropzone_default_message')}
               </span>
-            </div>
+            </Box>
           </div>
         </Element>
       </Card>

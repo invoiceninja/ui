@@ -13,8 +13,13 @@ import { Element } from './cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InputField } from './forms';
 import { NumberInputField } from './forms/NumberInputField';
+import { CSSProperties } from 'styled-components';
 
 interface Props {
+  elementClassName?: string;
+  elementStyle?: CSSProperties;
+  elementNoExternalPadding?: boolean;
+  elementWithoutWrappingLeftSide?: boolean;
   defaultValue: string | number;
   field: string;
   type?: string;
@@ -31,7 +36,13 @@ export function CustomSurchargeField(props: Props) {
   }, []);
 
   return (
-    <Element leftSide={label}>
+    <Element
+      leftSide={label}
+      className={props.elementClassName}
+      style={props.elementStyle}
+      noExternalPadding={props.elementNoExternalPadding}
+      withoutWrappingLeftSide={props.elementWithoutWrappingLeftSide}
+    >
       {props.type === 'number' ? (
         <NumberInputField {...props} />
       ) : (

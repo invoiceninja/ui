@@ -13,10 +13,8 @@ import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Project } from '$app/common/interfaces/project';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Icon } from '$app/components/icons/Icon';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
@@ -33,6 +31,19 @@ import { Transaction } from '$app/common/interfaces/transactions';
 import { Tooltip } from './Tooltip';
 import { useTranslation } from 'react-i18next';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import styled from 'styled-components';
+import { ChevronLeft } from './icons/ChevronLeft';
+import { useColorScheme } from '$app/common/colors';
+import { ChevronRight } from './icons/ChevronRight';
+
+const Button = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
+  border-color: ${(props) => props.theme.borderColor};
+
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 type Entity =
   | 'recurring_invoice'
@@ -88,6 +99,7 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
   const navigate = useNavigate();
   const preventNavigation = usePreventNavigation();
 
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const { isEditPage } = useEntityPageIdentifier({
@@ -176,7 +188,7 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
   }
 
   return (
-    <div className="relative flex items-center ml-9">
+    <div className="relative flex flex-1 space-x-2 items-center justify-end">
       <Tooltip
         message={t('previous') as string}
         width="auto"
@@ -184,19 +196,27 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
         withoutArrow
         withoutWrapping
       >
-        <div
-          className={classNames({
-            'cursor-not-allowed opacity-50': getPreviousIndex() === null,
-            'cursor-pointer': getPreviousIndex() !== null,
-          })}
+        <Button
+          className={classNames(
+            'p-2 sm:p-[0.725rem] border rounded-md shadow-sm',
+            {
+              'cursor-not-allowed opacity-50': getPreviousIndex() === null,
+              'cursor-pointer': getPreviousIndex() !== null,
+            }
+          )}
           onClick={() => {
             preventNavigation({
               fn: () => navigateToPrevious(),
             });
           }}
+          theme={{
+            hoverColor: colors.$4,
+            backgroundColor: colors.$1,
+            borderColor: colors.$24,
+          }}
         >
-          <Icon element={MdKeyboardArrowLeft} size={29} />
-        </div>
+          <ChevronLeft size="0.9rem" color={colors.$3} />
+        </Button>
       </Tooltip>
 
       <Tooltip
@@ -206,19 +226,27 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
         withoutArrow
         withoutWrapping
       >
-        <div
-          className={classNames({
-            'cursor-not-allowed opacity-50': getNextIndex() === null,
-            'cursor-pointer': getNextIndex() !== null,
-          })}
+        <Button
+          className={classNames(
+            'p-2 sm:p-[0.725rem] border rounded-md shadow-sm',
+            {
+              'cursor-not-allowed opacity-50': getNextIndex() === null,
+              'cursor-pointer': getNextIndex() !== null,
+            }
+          )}
           onClick={() => {
             preventNavigation({
               fn: () => navigateToNext(),
             });
           }}
+          theme={{
+            hoverColor: colors.$4,
+            backgroundColor: colors.$1,
+            borderColor: colors.$24,
+          }}
         >
-          <Icon element={MdKeyboardArrowRight} size={29} />
-        </div>
+          <ChevronRight size="0.9rem" color={colors.$3} />
+        </Button>
       </Tooltip>
     </div>
   );

@@ -37,6 +37,7 @@ import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { useAtom } from 'jotai';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { InputLabel } from '$app/components/forms';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -150,7 +151,13 @@ export default function Edit() {
         entities={changeTemplateResources as IQuote[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
-        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        labelFn={(quote) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{quote.number}</span>
+          </div>
+        )}
         bulkUrl="/api/v1/quotes/bulk"
       />
     </Default>

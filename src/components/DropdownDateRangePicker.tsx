@@ -206,7 +206,6 @@ export function DropdownDateRangePicker(props: Props) {
         style={{ width: '9.7rem', borderRadius: '0.375rem' }}
         customSelector
         dismissable={false}
-        withoutSeparator
         searchable={false}
         controlIcon={<Calendar color={colors.$3} />}
         {...(props.value === 'custom' && {

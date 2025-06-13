@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { ChangeEvent } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import classNames from 'classnames';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   options: {
@@ -25,7 +25,7 @@ interface Props extends CommonProps {
 }
 
 export function Radio(props: Props) {
-  const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
   return (
     <fieldset>
@@ -48,8 +48,8 @@ export function Radio(props: Props) {
               name={props.name}
               type="radio"
               checked={option.value === props.defaultSelected}
-              className="focus:ring-gray-500 h-4 w-4 border-gray-300 disabled:opacity-75 disabled:cursor-not-allowed"
-              style={{ color: accentColor }}
+              className="focus:ring-0 h-4 w-4 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
+              style={{ color: colors.$3 }}
             />
             <label
               htmlFor={option.id}
