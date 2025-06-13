@@ -18,7 +18,9 @@ export function useTotalVariables() {
 
   useEffect(() => {
     if (company?.settings.pdf_variables.total_columns.length > 0) {
-      setColumns(cloneDeep(company?.settings.pdf_variables.total_columns));
+      const columns = cloneDeep(company?.settings.pdf_variables.total_columns);
+      columns.push('$tax1', '$tax2', '$tax3');
+      setColumns(columns);
       return;
     }
 
