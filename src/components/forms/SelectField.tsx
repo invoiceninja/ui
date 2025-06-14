@@ -98,14 +98,18 @@ export function SelectField(props: SelectProps) {
         zIndex: 50,
       });
     },
-    control: (base, { isDisabled }) => {
+    control: (base, { isDisabled, isFocused }) => {
       return merge(base, {
         borderRadius: '0.375rem',
         backgroundColor: colors.$1,
         color: colors.$3,
-        borderColor: colors.$5,
+        borderColor: isFocused ? colors.$3 : colors.$24,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
         pointerEvents: isDisabled ? 'auto' : 'unset',
+        boxShadow: 'none',
+        '&:hover': {
+          borderColor: isFocused ? colors.$3 : colors.$24,
+        },
         ...controlStyle,
       });
     },
@@ -173,11 +177,11 @@ export function SelectField(props: SelectProps) {
           defaultValue={defaultEntry}
           value={clearAfterSelection ? { label: '', value: '' } : selectedEntry}
           onChange={(v) => {
-            if (v === null) {
+            if (!v) {
               return onValueChange?.((blankOptionValue as string) ?? '');
             }
 
-            return onValueChange?.(v.value as string);
+            return onValueChange?.((v as SelectOption).value as string);
           }}
           menuPosition={props.menuPosition}
           isDisabled={disabled}
@@ -193,27 +197,29 @@ export function SelectField(props: SelectProps) {
           blurInputOnSelect
           data-cy={cypressRef}
           components={{
-            Control: ({ children, innerProps, isFocused }) => (
-              <div
-                className={classNames(
-                  'flex items-center rounded-md border cursor-pointer',
-                  {
-                    'pl-2': controlIcon,
-                    'pl-1': !controlIcon,
-                  }
-                )}
-                style={{
-                  height: '2.5rem',
-                  backgroundColor: colors.$1,
-                  borderColor: isFocused ? colors.$3 : colors.$24,
-                  ...controlStyle,
-                }}
-                {...innerProps}
-              >
-                {controlIcon}
-                {children}
-              </div>
-            ),
+            ...((controlIcon || props.menuPosition !== 'fixed') && {
+              Control: ({ children: controlChildren, ...rest }) => (
+                <div
+                  className={classNames(
+                    'flex items-center rounded-md border cursor-pointer',
+                    {
+                      'pl-2': controlIcon,
+                      'pl-1': !controlIcon,
+                    }
+                  )}
+                  style={{
+                    height: '2.5rem',
+                    backgroundColor: colors.$1,
+                    borderColor: rest.isFocused ? colors.$3 : colors.$24,
+                    ...controlStyle,
+                  }}
+                  {...rest.innerProps}
+                >
+                  {controlIcon}
+                  {controlChildren}
+                </div>
+              ),
+            }),
 
             DropdownIndicator: () => (
               <div
