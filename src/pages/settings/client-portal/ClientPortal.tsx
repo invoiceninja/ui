@@ -15,12 +15,16 @@ import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanA
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useTabs } from './common/hooks/useTabs';
 import { Tabs } from '$app/components/Tabs';
 import { Outlet } from 'react-router-dom';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
 
 export function ClientPortal() {
   useTitle('client_portal');
@@ -35,6 +39,8 @@ export function ClientPortal() {
   const colors = useColorScheme();
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('client_portal'), href: '/settings/client_portal' },
@@ -47,7 +53,7 @@ export function ClientPortal() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={showPlanAlert || isFormBusy}
     >
       <AdvancedSettingsPlanAlert />
 
