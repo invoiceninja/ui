@@ -43,8 +43,8 @@ export type ClientShowCard =
   | 'address'
   | 'contacts'
   | 'standing'
-  | 'gateways'
   | 'email_history'
+  | 'gateways'
   | 'public_notes'
   | 'private_notes';
 
@@ -54,7 +54,6 @@ const ALL_CARDS: ClientShowCard[] = [
   'contacts',
   'standing',
   'gateways',
-  'email_history',
   'public_notes',
   'private_notes',
 ];
@@ -126,7 +125,11 @@ export function CardsCustomizationModal() {
   useEffect(() => {
     if (user?.company_user?.react_settings?.client_show_cards) {
       setCurrentCards(
-        cloneDeep(user.company_user.react_settings.client_show_cards)
+        cloneDeep(
+          user.company_user.react_settings.client_show_cards.filter(
+            (card) => card !== 'email_history'
+          )
+        )
       );
     } else {
       setCurrentCards(['details', 'address', 'contacts', 'standing']);
