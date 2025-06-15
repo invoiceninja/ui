@@ -105,7 +105,11 @@ export function Create() {
   }, [blankTaxRate]);
 
   return (
-    <Settings title={t('tax_rates')} breadcrumbs={pages}>
+    <Settings
+      title={t('tax_rates')}
+      breadcrumbs={pages}
+      disableSaveButton={isFormBusy}
+    >
       <div className="max-w-3xl">
         <Card
           title={documentTitle}

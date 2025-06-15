@@ -157,7 +157,7 @@ export default function InvoiceDesign() {
       displayButton: displaySaveButtonAndPreview,
       disableSaveButton: isFormBusy,
     },
-    [company, updatingRecords, location]
+    [company, updatingRecords, location, isFormBusy]
   );
 
   return (

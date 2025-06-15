@@ -53,6 +53,7 @@ export function Create() {
   const { data: response } = useBlankUserQuery();
   const [user, setUser] = useState<User>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
 
@@ -86,6 +87,12 @@ export function Create() {
   }, [response?.data.data]);
 
   const onSave = (password: string, isPasswordRequired: boolean) => {
+    if (isFormBusy) {
+      return;
+    }
+
+    setIsFormBusy(true);
+
     toast.processing();
 
     setIsPasswordConfirmModalOpen(false);
@@ -119,7 +126,8 @@ export function Create() {
 
           setErrors(errorMessages);
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   return (
@@ -127,7 +135,7 @@ export function Create() {
       title={t('new_user')}
       breadcrumbs={pages}
       onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
-      disableSaveButton={!enterprisePlan() && isHosted()}
+      disableSaveButton={(!enterprisePlan() && isHosted()) || isFormBusy}
     >
       {!enterprisePlan() && isHosted() && <UsersPlanAlert />}
 

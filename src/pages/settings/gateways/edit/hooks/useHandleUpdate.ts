@@ -16,17 +16,27 @@ import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
-export function useHandleUpdate(
-  companyGateway: CompanyGateway | undefined,
-  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>
-) {
+interface Params {
+  companyGateway: CompanyGateway | undefined;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+  isFormBusy: boolean;
+}
+
+export function useHandleUpdate({
+  companyGateway,
+  setErrors,
+  setIsFormBusy,
+  isFormBusy,
+}: Params) {
   return () => {
-    if (!companyGateway) {
+    if (!companyGateway || isFormBusy) {
       return;
     }
 
     setErrors(undefined);
     toast.processing();
+    setIsFormBusy(true);
 
     request(
       'PUT',
@@ -43,6 +53,7 @@ export function useHandleUpdate(
           toast.dismiss();
           setErrors(error.response.data);
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 }

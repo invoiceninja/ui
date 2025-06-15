@@ -51,6 +51,7 @@ export default function Create() {
   const { data } = useBlankDesignQuery();
 
   const [design, setDesign] = useState<Design | null>(null);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const handleChange = <T extends keyof Design>(key: T, value: Design[T]) => {
@@ -70,6 +71,11 @@ export default function Create() {
   useSaveBtn(
     {
       onClick() {
+        if (isFormBusy) {
+          return;
+        }
+
+        setIsFormBusy(true);
         toast.processing();
         setErrors(null);
 
@@ -90,11 +96,12 @@ export default function Create() {
               toast.dismiss();
               setErrors(e.response.data);
             }
-          });
+          })
+          .finally(() => setIsFormBusy(false));
       },
-      disableSaveButton: !proPlan() && !enterprisePlan(),
+      disableSaveButton: (!proPlan() && !enterprisePlan()) || isFormBusy,
     },
-    [design]
+    [design, isFormBusy]
   );
 
   const [type, setType] = useState<'design' | 'template'>('design');
