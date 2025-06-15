@@ -19,7 +19,10 @@ import { Card, Element } from '../../../components/cards';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
@@ -46,6 +49,7 @@ export function ProductSettings() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
   const handleToggleChange = (id: string, value: boolean) => {
     dispatch(
@@ -64,6 +68,7 @@ export function ProductSettings() {
       title={t('product_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#product_settings"
+      disableSaveButton={isFormBusy}
     >
       <Card
         title={t('settings')}

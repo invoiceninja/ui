@@ -17,7 +17,10 @@ import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { Link, SelectField } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Gateways } from '../gateways/index/Gateways';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
@@ -48,6 +51,7 @@ export function OnlinePayments() {
   const errors = useAtomValue(companySettingsErrorsAtom);
   const { data: termsResponse } = usePaymentTermsQuery({});
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -83,6 +87,7 @@ export function OnlinePayments() {
       docsLink="en/basic-settings/#online_payments"
       onSaveClick={onSave}
       onCancelClick={onCancel}
+      disableSaveButton={isFormBusy}
     >
       <Gateways />
 

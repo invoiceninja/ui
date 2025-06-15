@@ -118,7 +118,7 @@ export function Edit() {
       <Settings
         title={documentTitle}
         breadcrumbs={pages}
-        disableSaveButton={!apiToken}
+        disableSaveButton={!apiToken || isFormBusy}
         onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
         navigationTopRight={
           apiToken && (

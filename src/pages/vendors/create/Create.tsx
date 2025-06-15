@@ -57,7 +57,7 @@ export default function Create() {
 
   const [vendor, setVendor] = useState<Vendor>();
   const [errors, setErrors] = useState<ValidationBag>();
-
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [contacts, setContacts] = useState<Partial<VendorContact>[]>([
     {
       first_name: '',
@@ -78,8 +78,13 @@ export default function Create() {
   }, [data]);
 
   const handleSave = () => {
-    set(vendor as Vendor, 'contacts', contacts);
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
+    setIsFormBusy(true);
+    set(vendor as Vendor, 'contacts', contacts);
 
     const requests = [request('POST', endpoint('/api/v1/vendors'), vendor)];
 
@@ -114,7 +119,8 @@ export default function Create() {
           toast.dismiss();
           setErrors(error.response.data);
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   return (
@@ -122,6 +128,7 @@ export default function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={vendor && handleSave}
+      disableSaveButton={!vendor || isFormBusy}
     >
       {vendor && (
         <Form

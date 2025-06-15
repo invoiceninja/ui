@@ -47,9 +47,9 @@ export default function Project() {
 
   const actions = useActions();
 
-  const [projectValue, setProjectValue] = useState<ProjectEntity>();
-
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [projectValue, setProjectValue] = useState<ProjectEntity>();
 
   const [t] = useTranslation();
 
@@ -90,8 +90,13 @@ export default function Project() {
   ];
 
   const onSave = () => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
     setErrors(undefined);
+    setIsFormBusy(true);
 
     request('PUT', endpoint('/api/v1/projects/:id', { id }), projectValue)
       .then(() => {
@@ -104,6 +109,9 @@ export default function Project() {
           toast.dismiss();
           setErrors(error.response.data);
         }
+      })
+      .finally(() => {
+        setIsFormBusy(false);
       });
   };
 
@@ -117,7 +125,6 @@ export default function Project() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!projectValue}
       navigationTopRight={
         projectValue && (
           <ResourceActions
@@ -125,6 +132,7 @@ export default function Project() {
             onSaveClick={onSave}
             actions={actions}
             cypressRef="projectActionDropdown"
+            disableSaveButton={!projectValue || isFormBusy}
           />
         )
       }

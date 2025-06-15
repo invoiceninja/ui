@@ -78,15 +78,24 @@ import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/S
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { Dispatch, SetStateAction } from 'react';
 
 interface CreateProps {
   isDefaultTerms: boolean;
   isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+  const {
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  } = props;
 
   const navigate = useNavigate();
 
@@ -94,8 +103,13 @@ export function useCreate(props: CreateProps) {
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (purchaseOrder: PurchaseOrder) => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
     setErrors(undefined);
+    setIsFormBusy(true);
 
     let apiEndpoint = '/api/v1/purchase_orders?';
 
@@ -137,7 +151,10 @@ export function useCreate(props: CreateProps) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }
 

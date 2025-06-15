@@ -69,6 +69,7 @@ export default function Credit() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
@@ -83,7 +84,13 @@ export default function Credit() {
     changeTemplateResources,
   } = useChangeTemplate();
 
-  const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
+  const save = useSave({
+    setErrors,
+    isDefaultFooter,
+    isDefaultTerms,
+    isFormBusy,
+    setIsFormBusy,
+  });
 
   useEffect(() => {
     if (data) {
@@ -126,6 +133,7 @@ export default function Credit() {
               onSaveClick={() => save(credit)}
               actions={actions}
               cypressRef="creditActionDropdown"
+              disableSaveButton={!credit || isFormBusy}
             />
           ),
         })}

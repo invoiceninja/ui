@@ -40,9 +40,8 @@ export default function Edit() {
   const { data } = useVendorQuery({ id });
 
   const [vendor, setVendor] = useState<Vendor>();
-
   const [errors, setErrors] = useState<ValidationBag>();
-
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [contacts, setContacts] = useState<Partial<VendorContact>[]>([]);
 
   const actions = useActions();
@@ -63,8 +62,13 @@ export default function Edit() {
   const saveCompany = useHandleCompanySave();
 
   const onSave = async () => {
-    set(vendor as Vendor, 'contacts', contacts);
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
+    set(vendor as Vendor, 'contacts', contacts);
+    setIsFormBusy(true);
 
     await saveCompany({ excludeToasters: true });
 
@@ -79,7 +83,8 @@ export default function Edit() {
           toast.dismiss();
           setErrors(error.response.data);
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   return (
@@ -92,6 +97,7 @@ export default function Edit() {
             onSaveClick={onSave}
             resource={vendor}
             actions={actions}
+            disableSaveButton={!vendor || isFormBusy}
           />
         )
       }

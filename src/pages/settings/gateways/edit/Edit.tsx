@@ -59,6 +59,7 @@ export function Edit() {
   );
   const [errors, setErrors] = useState<ValidationBag>();
   const [tabs, setTabs] = useState<string[]>(defaultTab);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
   const additionalTabs = [
@@ -77,7 +78,12 @@ export function Edit() {
     },
   ];
 
-  const onSave = useHandleUpdate(companyGateway, setErrors);
+  const onSave = useHandleUpdate({
+    companyGateway,
+    setErrors,
+    setIsFormBusy,
+    isFormBusy,
+  });
 
   useEffect(() => {
     companyGateway &&

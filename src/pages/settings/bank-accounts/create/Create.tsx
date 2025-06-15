@@ -71,7 +71,7 @@ export function Create() {
       title={t('new_bank_account')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#create_bank_account"
-      disableSaveButton={!enterprisePlan() && isHosted()}
+      disableSaveButton={(!enterprisePlan() && isHosted()) || isFormBusy}
       onSaveClick={handleSave}
     >
       {!enterprisePlan() && isHosted() && <BankAccountsPlanAlert />}

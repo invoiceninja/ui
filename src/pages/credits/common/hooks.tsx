@@ -97,6 +97,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
+import { Dispatch, SetStateAction } from 'react';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -219,10 +220,18 @@ interface CreateProps {
   isDefaultTerms: boolean;
   isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
+  const {
+    setErrors,
+    isDefaultFooter,
+    isDefaultTerms,
+    isFormBusy,
+    setIsFormBusy,
+  } = props;
 
   const navigate = useNavigate();
 
@@ -231,7 +240,12 @@ export function useCreate(props: CreateProps) {
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (credit: Credit) => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
+    setIsFormBusy(true);
     setErrors(undefined);
 
     await saveCompany({ excludeToasters: true });
@@ -275,7 +289,10 @@ export function useCreate(props: CreateProps) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }
 

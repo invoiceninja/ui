@@ -16,11 +16,15 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useGeneratedNumbersTabs } from './common/hooks/useGeneratedNumbersTabs';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
 
 export function GeneratedNumbers() {
   useTitle('generated_numbers');
@@ -37,6 +41,7 @@ export function GeneratedNumbers() {
   const colors = useColorScheme();
   const tabs = useGeneratedNumbersTabs();
   const showPlanAlert = useShouldDisableAdvanceSettings();
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
   const onCancel = useDiscardChanges();
   const onSave = useHandleCompanySave();
@@ -48,7 +53,7 @@ export function GeneratedNumbers() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={showPlanAlert || isFormBusy}
     >
       <AdvancedSettingsPlanAlert />
 

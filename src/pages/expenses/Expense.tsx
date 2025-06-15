@@ -71,12 +71,13 @@ export default function Expense() {
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [expense, setExpense] = useState<ExpenseType>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
 
-  const save = useSave({ setErrors });
+  const save = useSave({ setErrors, isFormBusy, setIsFormBusy });
 
   useEffect(() => {
     if (data) {

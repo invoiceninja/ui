@@ -47,8 +47,9 @@ export default function Create() {
     },
   ];
 
-  const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [client, setClient] = useState<Client | undefined>();
 
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([
     {
@@ -74,6 +75,10 @@ export default function Create() {
   }, [blankClient]);
 
   const onSave = async () => {
+    if (isFormBusy) {
+      return;
+    }
+
     set(client as Client, 'contacts', contacts);
     toast.processing();
     setErrors(undefined);
@@ -94,6 +99,8 @@ export default function Create() {
       return onSave;
     }
 
+    setIsFormBusy(true);
+
     await saveCompany({ excludeToasters: true });
 
     request('POST', endpoint('/api/v1/clients'), client)
@@ -109,11 +116,17 @@ export default function Create() {
           setErrors(error.response.data);
           toast.dismiss();
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={onSave}
+      disableSaveButton={isFormBusy}
+    >
       {errors ? (
         <ValidationAlert
           errors={errors}

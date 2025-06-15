@@ -13,12 +13,16 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { Tabs } from '$app/components/Tabs';
 import { Outlet } from 'react-router-dom';
 import { useCompanyDetailsTabs } from './common/hooks/useCompanyDetailsTabs';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
@@ -33,6 +37,8 @@ export function CompanyDetails() {
   const onCancel = useDiscardChanges();
   const onSave = useHandleCompanySave();
 
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('company_details'), href: '/settings/company_details' },
@@ -45,6 +51,7 @@ export function CompanyDetails() {
       title={t('company_details')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#company_details"
+      disableSaveButton={isFormBusy}
     >
       <Card
         className="shadow-sm"

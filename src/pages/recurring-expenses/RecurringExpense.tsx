@@ -78,6 +78,7 @@ export default function RecurringExpense() {
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   useEffect(() => {
     if (data) {
@@ -87,9 +88,13 @@ export default function RecurringExpense() {
   }, [data]);
 
   const handleSave = () => {
-    toast.processing();
+    if (isFormBusy) {
+      return;
+    }
 
+    toast.processing();
     setErrors(undefined);
+    setIsFormBusy(true);
 
     request(
       'PUT',
@@ -108,7 +113,8 @@ export default function RecurringExpense() {
           setErrors(error.response.data);
           toast.dismiss();
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   return (
@@ -123,7 +129,7 @@ export default function RecurringExpense() {
               resource={recurringExpense}
               actions={actions}
               onSaveClick={handleSave}
-              disableSaveButton={!recurringExpense}
+              disableSaveButton={!recurringExpense || isFormBusy}
               cypressRef="recurringExpenseActionDropdown"
             />
           ),

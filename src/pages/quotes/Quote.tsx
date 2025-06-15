@@ -64,11 +64,18 @@ export default function Edit() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const tabs = useTabs({ quote });
-  const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
+  const save = useSave({
+    setErrors,
+    isDefaultFooter,
+    isDefaultTerms,
+    isFormBusy,
+    setIsFormBusy,
+  });
 
   const { calculateInvoiceSum } = useQuoteUtilities({ client });
 
@@ -107,6 +114,7 @@ export default function Edit() {
               resource={quote}
               actions={actions}
               onSaveClick={() => quote && save(quote)}
+              disableSaveButton={!quote || isFormBusy}
               cypressRef="quoteActionDropdown"
             />
           ),

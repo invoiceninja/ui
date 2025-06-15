@@ -70,12 +70,19 @@ export function UserDetails() {
 
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState<boolean>(false);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const userState = useSelector((state: RootState) => state.user);
 
   const { save } = usePreferences();
 
   const onSave = (password: string, passwordIsRequired: boolean) => {
+    if (isFormBusy) {
+      return;
+    }
+
+    setIsFormBusy(true);
+
     toast.processing();
     setErrors(undefined);
 
@@ -141,7 +148,8 @@ export function UserDetails() {
           toast.dismiss();
           setErrors(error.response.data);
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
 
     save({ silent: true });
   };
@@ -158,6 +166,7 @@ export function UserDetails() {
         title={t('user_details')}
         breadcrumbs={pages}
         docsLink="en/basic-settings/#user_details"
+        disableSaveButton={isFormBusy}
       >
         <PasswordConfirmation
           show={isPasswordConfirmModalOpen}

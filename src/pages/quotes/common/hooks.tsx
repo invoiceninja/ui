@@ -46,7 +46,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback } from 'react';
 import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
@@ -223,10 +223,18 @@ interface CreateProps {
   isDefaultTerms: boolean;
   isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+  const {
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  } = props;
 
   const refreshCompanyUsers = useRefreshCompanyUsers();
 
@@ -237,8 +245,13 @@ export function useCreate(props: CreateProps) {
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (quote: Quote) => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
     setErrors(undefined);
+    setIsFormBusy(true);
 
     await saveCompany({ excludeToasters: true });
 
@@ -278,12 +291,21 @@ export function useCreate(props: CreateProps) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }
 
 export function useSave(props: CreateProps) {
-  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+  const {
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  } = props;
 
   const refreshCompanyUsers = useRefreshCompanyUsers();
 
@@ -291,8 +313,13 @@ export function useSave(props: CreateProps) {
   const saveCompany = useHandleCompanySave();
 
   return async (quote: Quote) => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
     setErrors(undefined);
+    setIsFormBusy(true);
 
     await saveCompany({ excludeToasters: true });
 
@@ -330,7 +357,10 @@ export function useSave(props: CreateProps) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }
 

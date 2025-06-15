@@ -106,6 +106,7 @@ export function Edit() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#edit_bank_account"
       onSaveClick={handleSave}
+      disableSaveButton={isFormBusy}
     >
       <Card
         onFormSubmit={handleSave}
@@ -113,6 +114,7 @@ export function Edit() {
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
+        disableSubmitButton={isFormBusy}
       >
         <Element leftSide={t('account_name')}>
           <InputField

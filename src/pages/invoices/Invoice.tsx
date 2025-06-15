@@ -66,6 +66,7 @@ export default function Invoice() {
 
   const actions = useActions();
 
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [triggerValidationQuery, setTriggerValidationQuery] =
     useState<boolean>(true);
 
@@ -97,7 +98,13 @@ export default function Invoice() {
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
-  const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
+  const save = useHandleSave({
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  });
 
   const tabs = useTabs({
     invoice,
@@ -162,9 +169,10 @@ export default function Invoice() {
                 actions={actions}
                 onSaveClick={() => setSaveChanges(true)}
                 disableSaveButton={
-                  invoice &&
-                  (invoice.status_id === InvoiceStatus.Cancelled ||
-                    invoice.is_deleted)
+                  (invoice &&
+                    (invoice.status_id === InvoiceStatus.Cancelled ||
+                      invoice.is_deleted)) ||
+                  isFormBusy
                 }
                 disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"

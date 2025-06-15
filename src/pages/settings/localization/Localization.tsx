@@ -14,10 +14,14 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useLocalizationTabs } from './common/hooks/useLocalizationTabs';
 import { useColorScheme } from '$app/common/colors';
 import { Card } from '$app/components/cards';
+import { useAtomValue } from 'jotai';
 
 export function Localization() {
   const [t] = useTranslation();
@@ -32,9 +36,10 @@ export function Localization() {
     { name: t('localization'), href: '/settings/localization' },
   ];
 
+  const onCancel = useDiscardChanges();
   const onSave = useHandleCompanySave();
 
-  const onCancel = useDiscardChanges();
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
   return (
     <Settings
@@ -43,6 +48,7 @@ export function Localization() {
       title={t('localization')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#localization"
+      disableSaveButton={isFormBusy}
     >
       <Card
         className="shadow-sm"

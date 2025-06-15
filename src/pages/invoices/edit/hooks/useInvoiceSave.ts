@@ -25,9 +25,17 @@ interface Params {
   isDefaultTerms: boolean;
   isDefaultFooter: boolean;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
 }
 export function useHandleSave(params: Params) {
-  const { setErrors, isDefaultTerms, isDefaultFooter } = params;
+  const {
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  } = params;
 
   const [searchParams] = useSearchParams();
 
@@ -36,8 +44,14 @@ export function useHandleSave(params: Params) {
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (invoice: Invoice) => {
-    setErrors(undefined);
+    console.log('isFormBusy', isFormBusy);
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
+    setErrors(undefined);
+    setIsFormBusy(true);
 
     await saveCompany({ excludeToasters: true });
 
@@ -79,6 +93,9 @@ export function useHandleSave(params: Params) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }

@@ -19,12 +19,16 @@ import { InputField, Radio } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { ExpenseCategories } from '../expense-categories';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { isSelfHosted } from '$app/common/helpers';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
 
 export function ExpenseSettings() {
   useTitle('expense_settings');
@@ -38,6 +42,7 @@ export function ExpenseSettings() {
   const colors = useColorScheme();
   const companyChanges = useInjectCompanyChanges();
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
   const dispatch = useDispatch();
   const onCancel = useDiscardChanges();
@@ -52,6 +57,7 @@ export function ExpenseSettings() {
       title={t('expense_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#expense_settings"
+      disableSaveButton={isFormBusy}
     >
       <Card
         title={t('settings')}

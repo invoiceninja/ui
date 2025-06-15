@@ -48,9 +48,9 @@ export default function Payment() {
 
   const { data } = usePaymentQuery({ id, include: 'credits' });
 
-  const [paymentValue, setPaymentValue] = useState<PaymentEntity>();
-
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [paymentValue, setPaymentValue] = useState<PaymentEntity>();
 
   const pages: Page[] = [
     { name: t('payments'), href: '/payments' },
@@ -62,7 +62,7 @@ export default function Payment() {
 
   const tabs = useTabs({ payment: paymentValue });
 
-  const onSave = useSave(setErrors);
+  const onSave = useSave({ setErrors, isFormBusy, setIsFormBusy });
 
   const actions = useActions();
 
@@ -104,7 +104,7 @@ export default function Payment() {
               cypressRef="paymentActionDropdown"
             />
           ),
-          disableSaveButton: !paymentValue,
+          disableSaveButton: !paymentValue || isFormBusy,
         })}
       aboveMainContainer={
         <Banner id="paymentUpdateBanner" className="hidden" variant="orange">

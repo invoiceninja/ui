@@ -106,7 +106,6 @@ export default function Product() {
     <Default
       title={t('edit_product')}
       breadcrumbs={pages}
-      disableSaveButton={!productData || isFormBusy}
       {...(productData &&
         (hasPermission('edit_product') ||
           entityAssigned(productData.data.data)) && {
@@ -116,6 +115,7 @@ export default function Product() {
               resource={productData.data.data}
               actions={actions}
               cypressRef="productActionDropdown"
+              disableSaveButton={!productData || isFormBusy}
             />
           ),
         })}

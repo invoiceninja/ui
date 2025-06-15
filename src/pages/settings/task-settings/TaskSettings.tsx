@@ -22,7 +22,10 @@ import { SelectField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
@@ -48,6 +51,7 @@ export function TaskSettings() {
   const colors = useColorScheme();
   const companyChanges = useCompanyChanges();
   const errors = useAtomValue(companySettingsErrorsAtom);
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const pages = [
@@ -89,6 +93,7 @@ export function TaskSettings() {
       title={t('task_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#task_settings"
+      disableSaveButton={isFormBusy}
     >
       <Card
         title={t('settings')}
