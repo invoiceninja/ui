@@ -25,7 +25,6 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Context } from './Documents';
 import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
 import { EmailRecord } from '$app/components/EmailRecord';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { Spinner } from '$app/components/Spinner';
@@ -42,9 +41,8 @@ export default function HistoryAndActivities() {
   const { displayName } = context;
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
-  const [showActivities, setShowActivities] = useState<boolean>(false);
 
-  const { data: activities } = useQuery({
+  const { data: activities, isLoading: isLoadingActivities } = useQuery({
     queryKey: ['/api/v1/activities/entity', id],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
@@ -72,79 +70,76 @@ export default function HistoryAndActivities() {
   });
 
   return (
-    <Card
-      title={showActivities ? t('recent_activity') : t('email_history')}
-      className="h-full relative shadow-sm"
-      headerClassName={classNames('px-4 sm:px-6', {
-        'py-5': showActivities,
-        'py-[1.7rem]': !showActivities,
-      })}
-      topRight={
-        <div className="flex items-center space-x-10">
-          {showActivities && (
+    <div className="flex flex-col xl:flex-row gap-4 w-full">
+      <Card
+        title={t('email_history')}
+        className="h-full relative shadow-sm w-full xl:w-1/2"
+        headerClassName="px-4 sm:px-6 py-[1.7rem]"
+        withoutBodyPadding
+        style={{ borderColor: colors.$24 }}
+        withoutHeaderPadding
+        headerStyle={{ borderColor: colors.$20 }}
+      >
+        <div className="px-4 sm:px-6 pb-6 pt-4">
+          {isLoadingEmailRecords && <Spinner />}
+
+          <div className="flex flex-col overflow-y-auto max-h-96 space-y-4">
+            {emailRecords?.map(
+              (emailRecord, index) =>
+                emailRecord && (
+                  <EmailRecord
+                    key={index}
+                    emailRecord={emailRecord}
+                    index={index}
+                    withAllBorders
+                    withEntityNavigationIcon
+                  />
+                )
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <Card
+        title={t('recent_activity')}
+        className="h-full relative shadow-sm w-full xl:w-1/2"
+        topRight={
+          <div className="flex flex-col space-x-0 space-y-3 sm:space-y-0 sm:space-x-10 sm:flex-row items-end sm:items-center">
             <Toggle
               label={t('comments_only')}
               checked={commentsOnly}
               onValueChange={(value) => setCommentsOnly(value)}
             />
-          )}
 
-          {showActivities && (
             <AddActivityComment
               entity="client"
               entityId={id}
               label={displayName}
             />
-          )}
+          </div>
+        }
+        withoutBodyPadding
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
+        <div className="px-4 sm:px-6 pb-6 pt-4">
+          {isLoadingActivities && <Spinner />}
 
-          {!isLoadingEmailRecords && (
-            <Toggle
-              label={t('show_activities')}
-              checked={showActivities}
-              onValueChange={(value) => setShowActivities(value)}
-            />
-          )}
+          <div className="flex flex-col overflow-y-auto max-h-96">
+            {activities
+              ?.filter(
+                (activity) =>
+                  (commentsOnly && activity.activity_type_id === 141) ||
+                  !commentsOnly
+              )
+              .map((record: ActivityRecord, index: number) => (
+                <React.Fragment key={index}>
+                  {activityElement(record)}
+                </React.Fragment>
+              ))}
+          </div>
         </div>
-      }
-      withoutBodyPadding
-      withoutHeaderPadding
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
-    >
-      <div className="px-4 sm:px-6 pb-6 pt-4">
-        {isLoadingEmailRecords && <Spinner />}
-
-        <div
-          className={classNames('flex flex-col overflow-y-auto max-h-96', {
-            'space-y-4': !showActivities,
-          })}
-        >
-          {showActivities
-            ? activities
-                ?.filter(
-                  (activity) =>
-                    (commentsOnly && activity.activity_type_id === 141) ||
-                    !commentsOnly
-                )
-                .map((record: ActivityRecord, index: number) => (
-                  <React.Fragment key={index}>
-                    {activityElement(record)}
-                  </React.Fragment>
-                ))
-            : emailRecords?.map(
-                (emailRecord, index) =>
-                  emailRecord && (
-                    <EmailRecord
-                      key={index}
-                      emailRecord={emailRecord}
-                      index={index}
-                      withAllBorders
-                      withEntityNavigationIcon
-                    />
-                  )
-              )}
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
