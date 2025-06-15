@@ -78,11 +78,13 @@ export default function Edit() {
   ];
 
   const onSave = async () => {
-    setErrors(undefined);
-
-    setIsFormBusy(true);
+    if (isFormBusy) {
+      return;
+    }
 
     toast.processing();
+    setIsFormBusy(true);
+    setErrors(undefined);
 
     request(
       'PUT',
