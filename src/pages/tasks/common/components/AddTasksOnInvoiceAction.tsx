@@ -12,7 +12,7 @@ import { endpoint, trans } from '$app/common/helpers';
 import { Task } from '$app/common/interfaces/task';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MdAddCircleOutline } from 'react-icons/md';
 import { AddTasksOnInvoiceModal } from './AddTasksOnInvoiceModal';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -30,7 +30,7 @@ interface Props {
 }
 
 export function AddTasksOnInvoiceAction(props: Props) {
-  const { tasks, isBulkAction, setSelected } = props;
+  const { tasks, isBulkAction } = props;
 
   const queryClient = useQueryClient();
 
@@ -101,10 +101,6 @@ export function AddTasksOnInvoiceAction(props: Props) {
         setIsModalVisible(true);
       });
   };
-
-  useEffect(() => {
-    !isModalVisible && setSelected?.([]);
-  }, [isModalVisible]);
 
   return ((tasks.length && tasks[0].client_id && !tasks[0].invoice_id) ||
     isBulkAction) &&
