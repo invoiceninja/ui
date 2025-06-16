@@ -79,7 +79,7 @@ export function useTabs(params: Params) {
       ),
     },
     {
-      name: t('settings_configuration'),
+      name: t('settings'),
       href: route('/clients/:id/settings_configuration', { id }),
     },
   ];
