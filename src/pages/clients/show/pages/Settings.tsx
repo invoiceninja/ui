@@ -118,7 +118,7 @@ export default function Settings() {
         !Array.isArray(clientGroupSettings?.group_settings) &&
         Object.keys(clientGroupSettings.group_settings).length > 0 ? (
           <div className="flex flex-col space-y-2 px-4 sm:px-6">
-            {Object.entries(clientGroupSettings.client_settings)
+            {Object.entries(clientGroupSettings.group_settings)
               .filter(
                 ([key, value]) => key.toLowerCase() !== 'id' || !key || !value
               )
