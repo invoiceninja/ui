@@ -40,6 +40,7 @@ export function BuilderDemo() {
       <div className="max-w-7xl mx-auto">
         {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
+          // @ts-expect-error It's safe
           value={{
             token: import.meta.env.VITE_DOCUNINJA_TOKEN as string,
             document: import.meta.env.VITE_DOCUNINJA_DOCUMENT as string,
@@ -288,7 +289,7 @@ function SignatorySelector({
       return;
     }
 
-    onSelect(value, type as 'user', entity as any); // @ts-expect-error It's safe
+    onSelect(value, type as 'user', entity as any);
   }
 
   return (

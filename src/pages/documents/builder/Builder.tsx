@@ -56,6 +56,7 @@ export function Builder() {
   return (
     <Default breadcrumbs={pages}>
       <div className="max-w-7xl mx-auto">
+        {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
