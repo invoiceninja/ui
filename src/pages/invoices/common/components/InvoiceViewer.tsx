@@ -125,6 +125,9 @@ export function InvoiceViewer(props: Props) {
         ref={iframeRef}
         width="100%"
         height={isLoading ? 0 : props.height || 1500}
+        loading="lazy"
+        tabIndex={-1}
+
       />
     </>
   );
