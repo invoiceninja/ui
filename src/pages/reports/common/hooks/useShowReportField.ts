@@ -54,6 +54,7 @@ const ReportFields: Record<Identifier, Field[]> = {
     'include_deleted',
     'status',
     'client',
+    'product_key',
   ],
   credit: [
     'document_email_attachment',
@@ -86,11 +87,19 @@ const ReportFields: Record<Identifier, Field[]> = {
     'document_email_attachment',
     'include_deleted',
     'status',
+    'product_key'
   ],
   project: ['clients', 'projects'],
   activity: ['activity_type_id'],
   contact: [],
   recurring_invoice: ['include_deleted', 'status', 'client'],
+  recurring_invoice_item: [
+    'document_email_attachment',
+    'product_key',
+    'include_deleted',
+    'status',
+    'client',
+  ],
   product_sales: ['product_key', 'client'],
   aged_receivable_detailed_report: [],
   aged_receivable_summary_report: [],
