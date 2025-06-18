@@ -571,7 +571,21 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
 
-    setAreRowsRendered(true);
+    if (perPage === '10') {
+      setAreRowsRendered(true);
+    }
+
+    if (perPage === '50') {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 50);
+    }
+
+    if (perPage === '100') {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 150);
+    }
   }, [currentData]);
 
   useEffect(() => {
@@ -635,7 +649,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.customBulkActions &&
                 props.customBulkActions.map(
                   (bulkAction: CustomBulkAction<T>, index: number) => (
-                    <div key={`custom-bulk-action-${index}`}>
+                    <div key={index}>
                       {bulkAction({
                         selectedIds: selected,
                         selectedResources,
@@ -732,11 +746,11 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {props.columns.map(
-            (column) =>
+            (column, index) =>
               Boolean(!excludeColumns.includes(column.id)) && (
                 <Th
                   id={column.id}
-                  key={`table-header-${column.id}`}
+                  key={index}
                   className={styleOptions?.thClassName}
                   isCurrentlyUsed={sortedBy === column.id}
                   onColumnClick={(data: ColumnSortPayload) => {
@@ -829,7 +843,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           {isEqual(currentData, data?.data?.data) &&
             currentData.map((resource: any, rowIndex: number) => (
               <MemoizedTr
-                key={resource.id}
+                key={rowIndex}
                 className="border-b table-row"
                 style={{
                   borderColor: colors.$20,
@@ -853,7 +867,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   (column, index) =>
                     Boolean(!excludeColumns.includes(column.id)) && (
                       <Td
-                        key={`table-cell-${column.id}-${rowIndex}`}
+                        key={index}
                         className={classNames(
                           {
                             'cursor-pointer': index < 3,
@@ -908,11 +922,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                           ) =>
                             !bottomActionsKeys.includes(
                               action(resource)?.key || ''
-                            ) && (
-                              <div key={`custom-action-${rowIndex}-${index}`}>
-                                {action(resource)}
-                              </div>
-                            )
+                            ) && <div key={index}>{action(resource)}</div>
                         )}
 
                       {props.customActions &&
@@ -959,11 +969,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                           ) =>
                             bottomActionsKeys.includes(
                               action(resource)?.key || ''
-                            ) && (
-                              <div key={`custom-action2-${rowIndex}-${index}`}>
-                                {action(resource)}
-                              </div>
-                            )
+                            ) && <div key={index}>{action(resource)}</div>
                         )}
                     </Dropdown>
                   </Td>
@@ -979,10 +985,10 @@ export function DataTable<T extends object>(props: Props<T>) {
               {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
               {props.columns.map(
-                (column) =>
+                (column, index) =>
                   Boolean(!excludeColumns.includes(column.id)) && (
                     <Td
-                      key={`table-footer-${column.id}`}
+                      key={index}
                       customizeTextColor
                       resizable={`${apiEndpoint.pathname}.${column.id}`}
                     >
