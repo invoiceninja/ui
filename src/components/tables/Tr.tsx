@@ -30,6 +30,7 @@ export function Tr(props: Props) {
     backgroundColor,
     resource,
     withoutBackgroundColor = false,
+    memoValue,
     ...otherProps
   } = props;
   const colors = useColorScheme();
