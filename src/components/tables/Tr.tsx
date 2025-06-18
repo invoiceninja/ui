@@ -20,6 +20,7 @@ interface Props extends CommonProps {
   backgroundColor?: string;
   resource?: unknown;
   withoutBackgroundColor?: boolean;
+  memoValue?: unknown;
 }
 
 export function Tr(props: Props) {
@@ -60,6 +61,9 @@ export function Tr(props: Props) {
   );
 }
 
-export const MemoizedTr = memo(Tr, (prev, next) =>
-  isEqual(prev.resource, next.resource)
+export const MemoizedTr = memo(
+  Tr,
+  (prev, next) =>
+    isEqual(prev.resource, next.resource) &&
+    isEqual(prev.memoValue, next.memoValue)
 );
