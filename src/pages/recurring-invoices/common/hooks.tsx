@@ -925,6 +925,12 @@ export function useRecurringInvoiceFilters() {
 
   const filters: SelectOption[] = [
     {
+      label: t('draft'),
+      value: 'draft',
+      color: 'white',
+      backgroundColor: '#6B7280',
+    },
+    {
       label: t('active'),
       value: 'active',
       color: 'white',
