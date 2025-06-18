@@ -144,7 +144,7 @@ export function ClientSelector(props: Props) {
                 className={classNames(
                   'flex justify-between items-center first:pt-0 pt-2',
                   {
-                    'pb-1.5': !resource.invitations[0].link,
+                    'pb-1.5': !resource.invitations[0]?.link,
                   }
                 )}
               >
@@ -164,8 +164,8 @@ export function ClientSelector(props: Props) {
 
                     <div
                       className={classNames('flex truncate', {
-                        'flex-col': !resource.invitations[0].link,
-                        'space-x-4': resource.invitations[0].link,
+                        'flex-col': !resource.invitations[0]?.link,
+                        'space-x-4': resource.invitations[0]?.link,
                       })}
                     >
                       <span
