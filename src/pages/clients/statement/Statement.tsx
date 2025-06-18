@@ -354,6 +354,9 @@ export default function Statement() {
         width="100%"
         height={1500}
         style={{ display: !isLoadingPdf ? 'block' : 'none' }}
+        tabIndex={-1}
+        loading="lazy"
+
       />
 
       {isLoadingPdf && (
