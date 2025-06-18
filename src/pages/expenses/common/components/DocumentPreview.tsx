@@ -160,6 +160,9 @@ export function DocumentPreview(props: Props) {
             height={
               isFormBusy || !isDocumentPdf() || unableToPreview ? 0 : 1500
             }
+            tabIndex={-1}
+            loading="lazy"
+
           />
 
           {unableToPreview && (

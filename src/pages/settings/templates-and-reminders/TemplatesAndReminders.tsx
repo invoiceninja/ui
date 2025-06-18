@@ -604,6 +604,8 @@ export function TemplatesAndReminders() {
               frameBorder="0"
               width="100%"
               height={800}
+              tabIndex={-1}
+              loading="lazy"
             />
           ) : (
             <div
