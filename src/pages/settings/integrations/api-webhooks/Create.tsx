@@ -128,7 +128,7 @@ export function Create() {
     <Settings
       title={t('api_webhooks')}
       breadcrumbs={pages}
-      disableSaveButton={!apiWebHook}
+      disableSaveButton={!apiWebHook || isFormBusy}
       onSaveClick={handleSave}
     >
       <Card

@@ -63,6 +63,7 @@ export default function Create() {
   });
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const handleChange = useHandleChange({ setRecurringExpense, setErrors });
 
@@ -108,9 +109,13 @@ export default function Create() {
     });
   }, [data]);
 
-  const onSave = useCallback((recurringExpense: RecurringExpense) => {
-    toast.processing();
+  const onSave = (recurringExpense: RecurringExpense) => {
+    if (isFormBusy) {
+      return;
+    }
 
+    toast.processing();
+    setIsFormBusy(true);
     setErrors(undefined);
 
     request('POST', endpoint('/api/v1/recurring_expenses'), recurringExpense)
@@ -128,20 +133,16 @@ export default function Create() {
           setErrors(error.response.data);
           toast.dismiss();
         }
-      });
-  }, [navigate]);
-
-  const handleSaveClick = useCallback(() => {
-    if (recurringExpense) {
-      onSave(recurringExpense);
-    }
-  }, [recurringExpense, onSave]);
+      })
+      .finally(() => setIsFormBusy(false));
+  };
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={handleSaveClick}
+      onSaveClick={() => recurringExpense && onSave(recurringExpense)}
+      disableSaveButton={!recurringExpense || isFormBusy}
     >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">

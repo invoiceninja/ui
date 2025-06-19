@@ -19,38 +19,38 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   setErrors?: (errors: ValidationBag | undefined) => unknown;
-  isFormBusy?: boolean;
-  setIsFormBusy?: Dispatch<SetStateAction<boolean>>;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
 }
 
 export function useSave(params: Props) {
   const { setErrors, isFormBusy, setIsFormBusy } = params;
 
   return (expense: Expense) => {
-    if (!isFormBusy) {
-      toast.processing();
-
-      setErrors?.(undefined);
-
-      setIsFormBusy?.(true);
-
-      request(
-        'PUT',
-        endpoint('/api/v1/expenses/:id', { id: expense.id }),
-        expense
-      )
-        .then(() => {
-          toast.success('updated_expense');
-
-          $refetch(['expenses']);
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          if (error.response?.status === 422) {
-            setErrors?.(error.response.data);
-            toast.dismiss();
-          }
-        })
-        .finally(() => setIsFormBusy?.(false));
+    if (isFormBusy) {
+      return;
     }
+
+    toast.processing();
+    setErrors?.(undefined);
+    setIsFormBusy(true);
+
+    request(
+      'PUT',
+      endpoint('/api/v1/expenses/:id', { id: expense.id }),
+      expense
+    )
+      .then(() => {
+        toast.success('updated_expense');
+
+        $refetch(['expenses']);
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors?.(error.response.data);
+          toast.dismiss();
+        }
+      })
+      .finally(() => setIsFormBusy(false));
   };
 }

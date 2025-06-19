@@ -849,6 +849,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   borderColor: colors.$20,
                 }}
                 resource={resource}
+                memoValue={props.columns}
                 withoutBackgroundColor
               >
                 {!props.withoutActions && !hideEditableOptions && (
