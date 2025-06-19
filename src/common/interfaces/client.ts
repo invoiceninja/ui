@@ -23,7 +23,7 @@ interface Meta {
   type: number;
 }
 
-interface GatewayToken {
+export interface GatewayToken {
   id: string;
   archived_at: number;
   company_gateway_id: string;
