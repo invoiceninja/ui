@@ -19,7 +19,10 @@ import { useAtomValue } from 'jotai';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { updatingRecordsAtom } from './common/atoms';
 import { useEffect, useState } from 'react';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { useTabs } from './pages/general-settings/hooks/useTabs';
@@ -56,6 +59,7 @@ export default function InvoiceDesign() {
   const displaySaveButtonAndPreview =
     !location.pathname.includes('custom_designs');
 
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
   const activeSettingsValue = useAtomValue(activeSettingsAtom);
 
   const onSave = useHandleCompanySave();
@@ -151,8 +155,9 @@ export default function InvoiceDesign() {
     {
       onClick: handleSave,
       displayButton: displaySaveButtonAndPreview,
+      disableSaveButton: isFormBusy,
     },
-    [company, updatingRecords, location]
+    [company, updatingRecords, location, isFormBusy]
   );
 
   return (

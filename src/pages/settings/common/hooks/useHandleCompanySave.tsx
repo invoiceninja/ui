@@ -18,7 +18,7 @@ import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAtom, useSetAtom } from 'jotai';
+import { atom, useAtom, useSetAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
@@ -32,6 +32,8 @@ interface SaveOptions {
   excludeToasters?: boolean;
   syncSendTime?: boolean;
 }
+
+export const isCompanySettingsFormBusy = atom<boolean>(false);
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
@@ -49,12 +51,17 @@ export function useHandleCompanySave() {
   } = useCurrentSettingsLevel();
 
   const setErrors = useSetAtom(companySettingsErrorsAtom);
+  const [isFormBusy, setIsFormBusy] = useAtom(isCompanySettingsFormBusy);
 
   const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
     hasLanguageChangedAtom
   );
 
   return async (options?: SaveOptions) => {
+    if (isFormBusy) {
+      return;
+    }
+
     const { excludeToasters = false, syncSendTime } = options || {};
 
     if (!shouldUpdate() && isCompanySettingsActive) {
@@ -75,6 +82,7 @@ export function useHandleCompanySave() {
     !adjustedExcludeToaster && toast.processing();
 
     setErrors(undefined);
+    setIsFormBusy(true);
 
     let endpointUrl = '/api/v1/companies/:id';
 
@@ -105,6 +113,7 @@ export function useHandleCompanySave() {
           setErrors(error.response.data);
           toast.dismiss();
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 }

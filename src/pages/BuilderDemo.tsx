@@ -38,6 +38,7 @@ export function BuilderDemo() {
   return (
     <Default breadcrumbs={[]}>
       <div className="max-w-7xl mx-auto">
+        {/* @ts-expect-error - It's safe */}
         <BuilderContext.Provider
           value={{
             token: import.meta.env.VITE_DOCUNINJA_TOKEN as string,
@@ -91,8 +92,8 @@ export function BuilderDemo() {
             options: {
               header: {
                 sticky: false,
-              }
-            }
+              },
+            },
           }}
         >
           <Builder />

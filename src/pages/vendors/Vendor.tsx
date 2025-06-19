@@ -10,7 +10,6 @@
 
 import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCountries } from '$app/common/hooks/useCountries';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useVendorQuery } from '$app/common/queries/vendor';
@@ -40,7 +39,6 @@ export default function Vendor() {
   const { data: vendor } = useVendorQuery({ id });
 
   const countries = useCountries();
-  const accentColor = useAccentColor();
 
   const actions = useActions();
 

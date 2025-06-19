@@ -24,14 +24,27 @@ interface Props {
   isDefaultTerms: boolean;
   isDefaultFooter: boolean;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
 }
 export function useSave(props: Props) {
-  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
+  const {
+    setErrors,
+    isDefaultFooter,
+    isDefaultTerms,
+    isFormBusy,
+    setIsFormBusy,
+  } = props;
 
   const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (purchaseOrder: PurchaseOrder) => {
+    if (isFormBusy) {
+      return;
+    }
+
+    setIsFormBusy(true);
     setErrors(undefined);
     toast.processing();
 
@@ -75,6 +88,8 @@ export function useSave(props: Props) {
         setIsDeleteActionTriggered(undefined);
 
         $refetch(['purchase_orders']);
+
+        setIsFormBusy(false);
       });
   };
 }

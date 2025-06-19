@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTablePreference } from './useDataTablePreference';
 import { PerPage } from '$app/components/DataTable';
@@ -19,10 +19,10 @@ import { GenericSingleResourceResponse } from '../interfaces/generic-api-respons
 import { CompanyUser } from '../interfaces/company-user';
 import { endpoint } from '../helpers';
 import { request } from '../helpers/request';
-import { useUserChanges } from './useInjectUserChanges';
 import { useDispatch } from 'react-redux';
 import { injectInChangesWithData, updateUser } from '../stores/slices/user';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
+import { useCurrentUser } from './useCurrentUser';
 
 interface Params {
   apiEndpoint: URL;
@@ -43,8 +43,10 @@ interface Params {
 }
 
 export function useDataTablePreferences(params: Params) {
-  const user = useUserChanges();
+  const user = useCurrentUser();
   const dispatch = useDispatch();
+
+  const currentUserRef = useRef<User | undefined>();
 
   const {
     apiEndpoint,
@@ -77,9 +79,7 @@ export function useDataTablePreferences(params: Params) {
 
       $refetch(['company_users']);
 
-      dispatch(updateUser(updatedUser));
-
-      dispatch(injectInChangesWithData(updatedUser));
+      currentUserRef.current = updatedUser;
     });
   };
 
@@ -176,6 +176,15 @@ export function useDataTablePreferences(params: Params) {
       setArePreferencesApplied(true);
     }
   }, [isInitialConfiguration]);
+
+  useEffect(() => {
+    return () => {
+      if (currentUserRef.current) {
+        dispatch(updateUser(currentUserRef.current));
+        dispatch(injectInChangesWithData(currentUserRef.current));
+      }
+    };
+  }, []);
 
   return { handleUpdateTableFilters };
 }

@@ -19,7 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
@@ -30,7 +30,7 @@ import {
   useAdmin,
   useHasPermission,
 } from './common/hooks/permissions/useHasPermission';
-import { colorSchemeAtom } from './common/colors';
+import { darkColorScheme, lightColorScheme } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { $refetch, useRefetch } from './common/hooks/useRefetch';
 import { toast } from './common/helpers/toast/toast';
@@ -44,6 +44,7 @@ import {
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
+import { useReactSettings } from './common/hooks/useReactSettings';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';
@@ -84,7 +85,7 @@ export function App() {
   const resolveDayJSLocale = useResolveDayJSLocale();
   const switchToCompanySettings = useSwitchToCompanySettings();
 
-  const colorScheme = useAtomValue(colorSchemeAtom);
+  const reactSettings = useReactSettings({ overwrite: false });
   const setIsPasswordRequired = useSetAtom(isPasswordRequiredAtom);
   const setRefreshEntityDataBanner = useSetAtom(refreshEntityDataBannerAtom);
 
@@ -123,9 +124,14 @@ export function App() {
   };
 
   useEffect(() => {
-    document.body.style.backgroundColor = colorScheme.$23;
-    document.body.style.colorScheme = colorScheme.$0;
-  }, [colorScheme]);
+    if (reactSettings) {
+      const colorScheme = reactSettings.dark_mode
+        ? darkColorScheme
+        : lightColorScheme;
+      document.body.style.backgroundColor = colorScheme.$23;
+      document.body.style.colorScheme = colorScheme.$0;
+    }
+  }, [reactSettings]);
 
   useEffect(() => {
     if (resolvedLanguage?.locale) {

@@ -70,11 +70,13 @@ export default function Create() {
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setErrors(undefined);
-
-    setIsFormBusy(true);
+    if (isFormBusy) {
+      return;
+    }
 
     toast.processing();
+    setErrors(undefined);
+    setIsFormBusy(true);
 
     request('POST', endpoint('/api/v1/bank_transactions'), transaction)
       .then((response: GenericSingleResourceResponse<Transaction>) => {

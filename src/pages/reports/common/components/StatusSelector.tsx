@@ -74,7 +74,7 @@ export function StatusSelector(props: Props) {
       setOptions(quoteFilters);
     }
 
-    if (report === 'recurring_invoice') {
+    if (report === 'recurring_invoice' || report === 'recurring_invoice_item') {
       setOptions(recurringInvoiceFilters);
     }
 
