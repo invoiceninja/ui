@@ -113,7 +113,7 @@ export function Create() {
         title={documentTitle}
         breadcrumbs={pages}
         onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
-        disableSaveButton={!apiToken}
+        disableSaveButton={!apiToken || isFormBusy}
       >
         <Card
           title={t('new_token')}

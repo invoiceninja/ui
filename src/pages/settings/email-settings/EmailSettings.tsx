@@ -21,7 +21,10 @@ import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useAtomValue } from 'jotai';
@@ -58,6 +61,7 @@ export function EmailSettings() {
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
   const [isSendTimeModalOpen, setIsSendTimeModalOpen] =
     useState<boolean>(false);
@@ -86,7 +90,7 @@ export function EmailSettings() {
         breadcrumbs={pages}
         onSaveClick={handleOnSaveClick}
         onCancelClick={onCancel}
-        disableSaveButton={showPlanAlert}
+        disableSaveButton={showPlanAlert || isFormBusy}
       >
         <AdvancedSettingsPlanAlert />
 

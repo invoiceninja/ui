@@ -69,6 +69,7 @@ export default function Create() {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
   const [client, setClient] = useState<Client | undefined>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
@@ -97,7 +98,13 @@ export default function Create() {
 
   const { handleChange, calculateInvoiceSum } = useInvoiceUtilities({ client });
 
-  const save = useHandleCreate({ setErrors, isDefaultTerms, isDefaultFooter });
+  const save = useHandleCreate({
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  });
 
   useEffect(() => {
     setInvoiceSum(undefined);
@@ -243,7 +250,7 @@ export default function Create() {
         title={documentTitle}
         breadcrumbs={pages}
         onSaveClick={() => save(invoice as Invoice)}
-        disableSaveButton={invoice?.client_id.length === 0}
+        disableSaveButton={invoice?.client_id.length === 0 || isFormBusy}
       >
         {!isLoading ? (
           <div className="space-y-4">

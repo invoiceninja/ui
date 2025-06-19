@@ -18,7 +18,19 @@ export function useTotalVariables() {
 
   useEffect(() => {
     if (company?.settings.pdf_variables.total_columns.length > 0) {
-      setColumns(cloneDeep(company?.settings.pdf_variables.total_columns));
+      const columns = cloneDeep(company?.settings.pdf_variables.total_columns);
+
+      if (company?.enabled_tax_rates > 0) {
+        columns.push('$tax1');
+      }
+      if (company?.enabled_tax_rates > 1) {
+        columns.push('$tax2');
+      }
+      if (company?.enabled_tax_rates > 2) {
+        columns.push('$tax3');
+      }
+
+      setColumns(columns);
       return;
     }
 
@@ -67,6 +79,16 @@ export function useTotalVariables() {
     variables.push('$paid_to_date');
     variables.push('$balance_due');
     variables.push('$taxes');
+
+    if (company?.enabled_tax_rates > 0) {
+      variables.push('$tax1');
+    }
+    if (company?.enabled_tax_rates > 1) {
+      variables.push('$tax2');
+    }
+    if (company?.enabled_tax_rates > 2) {
+      variables.push('$tax3');
+    }
 
     setColumns(variables);
   }, [company]);

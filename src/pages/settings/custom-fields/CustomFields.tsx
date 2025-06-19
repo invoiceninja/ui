@@ -13,11 +13,15 @@ import { Settings } from '../../../components/layouts/Settings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Tabs } from '$app/components/Tabs';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
 
 export function CustomFields() {
   useTitle('custom_fields');
@@ -50,6 +54,8 @@ export function CustomFields() {
   const save = useHandleCompanySave();
   const cancel = useDiscardChanges();
 
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
+
   return (
     <Settings
       title={t('custom_fields')}
@@ -57,6 +63,7 @@ export function CustomFields() {
       docsLink="en/advanced-settings/#custom_fields"
       onSaveClick={save}
       onCancelClick={cancel}
+      disableSaveButton={isFormBusy}
     >
       {location.pathname.endsWith('custom_fields') && (
         <Navigate to="/settings/custom_fields/company" />

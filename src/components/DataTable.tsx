@@ -11,12 +11,12 @@
 import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
-  ChangeEvent,
   CSSProperties,
   Dispatch,
   ReactElement,
   ReactNode,
   SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -34,15 +34,15 @@ import { Button, Checkbox } from './forms';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
+  MemoizedTr,
   Pagination,
   Table,
   Tbody,
   Td,
   Th,
   Thead,
-  Tr,
 } from './tables';
-import { useSetAtom } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -60,6 +60,8 @@ import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
+import { useDebounce } from 'react-use';
+import { isEqual } from 'lodash';
 
 export interface DateRangeColumn {
   column: string;
@@ -165,6 +167,38 @@ export type ResourceAction<T> = (resource: T) => ReactElement;
 
 export type PerPage = '10' | '50' | '100';
 
+export const dataTableSelectedAtom = atom<Record<string, string[]>>({});
+
+function DataTableCheckbox({
+  resourceId,
+  resource,
+  dataLength,
+}: {
+  resourceId?: string;
+  resource: string;
+  dataLength?: number;
+}) {
+  const selected = useAtomValue(dataTableSelectedAtom);
+
+  if (resourceId) {
+    return (
+      <Checkbox
+        checked={selected?.[resource]?.includes(resourceId)}
+        className="child-checkbox"
+        value={resourceId}
+        id={resourceId}
+        cypressRef="dataTableCheckbox"
+      />
+    );
+  }
+
+  return (
+    <Checkbox
+      checked={selected?.[resource]?.length === dataLength && dataLength > 0}
+    />
+  );
+}
+
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
 
@@ -215,14 +249,14 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
-  const [selectedResources, setSelectedResources] = useState<T[]>([]);
+  const setGlobalSelected = useSetAtom(dataTableSelectedAtom);
 
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
   const [arePreferencesApplied, setArePreferencesApplied] =
     useState<boolean>(false);
-
-  const mainCheckbox = useRef<HTMLInputElement>(null);
+  const [currentData, setCurrentData] = useState<T[]>([]);
+  const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
 
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
@@ -317,7 +351,38 @@ export function DataTable<T extends object>(props: Props<T>) {
     dateRangeQueryParameter,
   ]);
 
-  const { data, isLoading, isError } = useQuery(
+  useEffect(() => {
+    setGlobalSelected((current) => ({
+      ...current,
+      [props.resource]: selected,
+    }));
+
+    currentData.forEach((resource: any) => {
+      const row = document.querySelector(
+        `tr[row-id="${resource.id}"]`
+      ) as HTMLElement;
+
+      if (row) {
+        if (selected.includes(resource.id)) {
+          row.style.backgroundColor = colors.$7;
+        } else {
+          row.style.backgroundColor = 'transparent';
+        }
+      }
+    });
+  }, [selected, props.resource]);
+
+  useEffect(() => {
+    return () => {
+      setSelected([]);
+      setGlobalSelected((current) => ({
+        ...current,
+        [props.resource]: [],
+      }));
+    };
+  }, []);
+
+  const { data, isLoading, isFetching, isError, isPlaceholderData } = useQuery(
     [
       ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
@@ -338,9 +403,19 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   );
 
+  const selectedResources = useMemo(() => {
+    if (!selected?.length) return [];
+
+    return (
+      currentData.filter((resource: T) =>
+        selected?.includes(resource?.['id' as keyof T] as string)
+      ) || []
+    );
+  }, [currentData, selected]);
+
   const showRestoreBulkAction = () => {
     return selectedResources.every(
-      (resource) => getEntityState(resource) !== EntityState.Active
+      (resource: T) => getEntityState(resource) !== EntityState.Active
     );
   };
 
@@ -355,10 +430,6 @@ export function DataTable<T extends object>(props: Props<T>) {
         toast.success(`${action}d_${props.resource}`);
 
         props.onBulkActionSuccess?.(response.data.data, action);
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        /** @ts-ignore: Unreachable, if element is null/undefined. */
-        mainCheckbox.current.checked = false;
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
@@ -419,57 +490,116 @@ export function DataTable<T extends object>(props: Props<T>) {
   };
 
   const getColumnValues = (columnId: string) => {
-    return data?.data.data.map(
+    return currentData.map(
       (resource: T) => resource[columnId as keyof typeof resource]
     );
   };
+
+  const handleCheckboxClick = useCallback(
+    (id: string) => {
+      setSelected((current) =>
+        current.includes(id)
+          ? current.filter((v) => v !== id)
+          : [...current, id]
+      );
+    },
+    [selected]
+  );
+
+  const handleAllCheckboxClick = useCallback(() => {
+    if (currentData.length === 0) {
+      setSelected([]);
+    } else if (
+      selected.length === currentData.length &&
+      currentData.length > 0
+    ) {
+      setSelected([]);
+    } else {
+      setSelected(currentData.map((resource: any) => resource.id) || []);
+    }
+  }, [selected, currentData]);
 
   useEffect(() => {
     setInvalidationQueryAtom(apiEndpoint.pathname);
   }, [apiEndpoint.pathname]);
 
-  useEffect(() => {
-    if (data) {
-      const filteredSelectedResources = data.data.data.filter((resource: any) =>
-        selected.includes(resource.id)
-      );
-
-      setSelectedResources(filteredSelectedResources);
-
-      const shouldDeselectMainCheckbox = data.data.data.some(
-        (resource: any) => !selected.includes(resource.id)
-      );
-
-      if (shouldDeselectMainCheckbox && mainCheckbox.current) {
-        mainCheckbox.current.checked = false;
-      } else if (mainCheckbox.current && data.data.data.length) {
-        mainCheckbox.current.checked = true;
+  useDebounce(
+    () => {
+      if (data && !isFetching) {
+        setCurrentData(data.data.data);
       }
-    }
-  }, [selected]);
+    },
+    10,
+    [data, isFetching]
+  );
 
   useEffect(() => {
-    if (data && !data.data.data.length) {
-      setCurrentPage(1);
+    if (isLoading) {
+      setCurrentData([]);
     }
+  }, [isLoading]);
+
+  useEffect(() => {
+    setAreRowsRendered(false);
+  }, [
+    queryIdentificator,
+    apiEndpoint.pathname,
+    props.endpoint,
+    perPage,
+    currentPage,
+    filter,
+    sort,
+    status,
+    customFilter,
+    dateRange,
+    dateRangeQueryParameter,
+  ]);
+
+  useEffect(() => {
+    if (isFetching || isLoading) {
+      setAreRowsRendered(false);
+      setCurrentData([]);
+    }
+  }, [isFetching, isLoading]);
+
+  useEffect(() => {
+    setAreRowsRendered(false);
   }, [data]);
 
   useEffect(() => {
-    if (data) {
-      if (
-        Number(perPage) < selected.length ||
-        Number(perPage) === selected.length
-      ) {
-        setSelected(
-          data.data.data
-            .map((resource: any) => resource.id)
-            .filter((resourceId: string) => selected.includes(resourceId))
-        );
-      } else if (Number(perPage) > selected.length && mainCheckbox.current) {
-        mainCheckbox.current.checked = false;
-      }
+    if (!currentData.length) {
+      setCurrentPage(1);
     }
-  }, [perPage]);
+
+    if (perPage === '10') {
+      setAreRowsRendered(true);
+    }
+
+    if (perPage === '50') {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 50);
+    }
+
+    if (perPage === '100') {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 150);
+    }
+  }, [currentData]);
+
+  useEffect(() => {
+    if (
+      Number(perPage) < selected.length ||
+      Number(perPage) === selected.length
+    ) {
+      setSelected(
+        currentData
+          .map((resource: any) => resource.id)
+          .filter((resourceId: string) => selected.includes(resourceId)) || []
+      );
+    }
+  }, [currentData, perPage]);
 
   useEffect(() => {
     emitter.on('bulk.completed', () => setSelected([]));
@@ -606,33 +736,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               withoutVerticalPadding={styleOptions?.withoutThVerticalPadding}
               textSize={styleOptions?.thTextSize}
               disableUppercase={styleOptions?.disableThUppercase}
+              onClick={handleAllCheckboxClick}
             >
-              <Checkbox
-                innerRef={mainCheckbox}
-                checked={
-                  selected.length === data?.data.data.length &&
-                  data?.data.data.length > 0
-                }
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  Array.from(
-                    document.querySelectorAll('.child-checkbox')
-                  ).forEach((checkbox: HTMLInputElement | any) => {
-                    checkbox.checked = event.target.checked;
-
-                    if (event.target.checked) {
-                      const isAlreadyAdded = selected.find(
-                        (resourceId) => resourceId === checkbox.id
-                      );
-
-                      if (!isAlreadyAdded) {
-                        setSelected((current) => [...current, checkbox.id]);
-                      }
-                    } else {
-                      setSelected([]);
-                    }
-                  });
-                }}
-                cypressRef="dataTableCheckbox"
+              <DataTableCheckbox
+                resource={props.resource}
+                dataLength={currentData.length}
               />
             </Th>
           )}
@@ -677,9 +785,18 @@ export function DataTable<T extends object>(props: Props<T>) {
           {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
         </Thead>
 
-        <Tbody style={styleOptions?.tBodyStyle}>
-          {isLoading && (
-            <Tr
+        <Tbody
+          style={{
+            ...styleOptions?.tBodyStyle,
+            opacity: areRowsRendered || !currentData.length ? 1 : 0.5,
+            pointerEvents:
+              areRowsRendered || !currentData.length ? 'auto' : 'none',
+            cursor:
+              areRowsRendered || !currentData.length ? 'default' : 'progress',
+          }}
+        >
+          {(isLoading || !isEqual(currentData, data?.data?.data)) && (
+            <MemoizedTr
               className="border-b"
               style={{
                 borderColor: colors.$20,
@@ -688,11 +805,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               <Td colSpan={100}>
                 <Spinner />
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
-          {isError && (
-            <Tr
+          {isError && !isLoading && (
+            <MemoizedTr
               className="border-b"
               style={{
                 borderColor: colors.$20,
@@ -701,56 +818,48 @@ export function DataTable<T extends object>(props: Props<T>) {
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
               </Td>
-            </Tr>
+            </MemoizedTr>
           )}
 
-          {data && data.data.data.length === 0 && (
-            <Tr
-              className="border-b"
-              style={{
-                borderColor: colors.$20,
-              }}
-            >
-              <Td className={styleOptions?.tdClassName} colSpan={100}>
-                <div className="flex items-center justify-center py-10">
-                  <span className="text-sm" style={{ color: colors.$17 }}>
-                    {t('no_records_found')}
-                  </span>
-                </div>
-              </Td>
-            </Tr>
-          )}
-
-          {data &&
-            data?.data?.data?.map((resource: any, index: number) => (
-              <Tr
-                key={index}
+          {!isLoading &&
+            currentData?.length === 0 &&
+            isEqual(currentData, data?.data?.data) && (
+              <MemoizedTr
                 className="border-b"
-                backgroundColor={index % 2 === 0 ? colors.$7 : ''}
                 style={{
                   borderColor: colors.$20,
-                  backgroundColor: selected.includes(resource.id)
-                    ? colors.$7
-                    : 'transparent',
                 }}
+              >
+                <Td className={styleOptions?.tdClassName} colSpan={100}>
+                  <div className="flex items-center justify-center py-10">
+                    <span className="text-sm" style={{ color: colors.$17 }}>
+                      {t('no_records_found')}
+                    </span>
+                  </div>
+                </Td>
+              </MemoizedTr>
+            )}
+
+          {isEqual(currentData, data?.data?.data) &&
+            currentData.map((resource: any, rowIndex: number) => (
+              <MemoizedTr
+                key={rowIndex}
+                className="border-b table-row"
+                style={{
+                  borderColor: colors.$20,
+                }}
+                resource={resource}
+                memoValue={props.columns}
+                withoutBackgroundColor
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
                     className="cursor-pointer"
-                    onClick={() =>
-                      selected.includes(resource.id)
-                        ? setSelected((current) =>
-                            current.filter((v) => v !== resource.id)
-                          )
-                        : setSelected((current) => [...current, resource.id])
-                    }
+                    onClick={() => handleCheckboxClick(resource.id)}
                   >
-                    <Checkbox
-                      checked={selected.includes(resource.id)}
-                      className="child-checkbox"
-                      value={resource.id}
-                      id={resource.id}
-                      cypressRef="dataTableCheckbox"
+                    <DataTableCheckbox
+                      resourceId={resource.id}
+                      resource={props.resource}
                     />
                   </Td>
                 )}
@@ -866,12 +975,12 @@ export function DataTable<T extends object>(props: Props<T>) {
                     </Dropdown>
                   </Td>
                 )}
-              </Tr>
+              </MemoizedTr>
             ))}
         </Tbody>
 
         {Boolean(footerColumns.length) &&
-          Boolean(data?.data.data.length) &&
+          Boolean(currentData?.length) &&
           Boolean(reactSettings.show_table_footer) && (
             <TFooter>
               {!props.withoutActions && !hideEditableOptions && <Th></Th>}
@@ -887,8 +996,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                       {getFooterColumn(column.id) ? (
                         <div className="flex items-center space-x-3">
                           {getFooterColumn(column.id)?.format(
-                            getColumnValues(column.id) || [],
-                            data?.data.data || []
+                            getColumnValues(column.id) as (string | number)[],
+                            currentData || []
                           ) ?? '-/-'}
                         </div>
                       ) : (

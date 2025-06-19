@@ -18,9 +18,12 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import Toggle from '$app/components/forms/Toggle';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useFormik } from 'formik';
@@ -113,6 +116,8 @@ export function EInvoice() {
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
+
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
   const [formData, setFormData] = useState(new FormData());
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
@@ -211,6 +216,7 @@ export function EInvoice() {
         eInvoiceRef?.current?.saveEInvoice();
         onSave();
       }}
+      disableSaveButton={isFormBusy}
     >
       <PEPPOLPlanBanner />
 

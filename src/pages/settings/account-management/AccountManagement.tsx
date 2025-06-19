@@ -15,10 +15,14 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useAccountManagementTabs } from './common/hooks/useAccountManagementTabs';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
 
 export function AccountManagement() {
   const [t] = useTranslation();
@@ -36,6 +40,8 @@ export function AccountManagement() {
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
 
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
+
   const tabs: Tab[] = useAccountManagementTabs();
 
   return (
@@ -45,6 +51,7 @@ export function AccountManagement() {
       title={t('account_management')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#account_management"
+      disableSaveButton={isFormBusy}
     >
       <Card
         title={t('account_management')}

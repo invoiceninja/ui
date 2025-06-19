@@ -68,7 +68,7 @@ export const keys = {
   },
   group_settings: {
     path: '/api/v1/group_settings',
-    dependencies: ['/api/v1/clients'],
+    dependencies: ['/api/v1/clients', '/api/v1/clients/show_settings'],
   },
   payments: {
     path: '/api/v1/payments',
@@ -165,6 +165,7 @@ export const keys = {
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
       '/api/v1/documents',
+      '/api/v1/clients/show_settings',
     ],
   },
   products: {

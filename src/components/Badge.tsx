@@ -11,6 +11,11 @@
 import classNames from 'classnames';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import CommonProps from '../common/interfaces/common-props.interface';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
 
 interface Props extends CommonProps {
   variant?:
@@ -38,6 +43,8 @@ export function Badge(props: Props) {
 
   const accentColor = useAccentColor();
 
+  const adjustColorDarkness = useAdjustColorDarkness();
+
   const styles: React.CSSProperties = { ...props.style };
 
   if (props.variant === 'primary') {
@@ -45,9 +52,26 @@ export function Badge(props: Props) {
     styles.color = 'white';
   }
 
+  const getTextContrastColor = (color: string) => {
+    if (color.length === 7) {
+      const { red, green, blue, hex } = hexToRGB(color);
+
+      const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+      return adjustColorDarkness(hex, darknessAmount);
+    }
+
+    return undefined;
+  };
+
   return (
     <span
-      style={styles}
+      style={{
+        ...styles,
+        color: styles.backgroundColor
+          ? getTextContrastColor(styles.backgroundColor)
+          : undefined,
+      }}
       className={classNames(
         'text-xs px-2 py-1 rounded font-medium',
         {

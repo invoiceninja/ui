@@ -23,17 +23,30 @@ import { route } from '$app/common/helpers/route';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
-export function useHandleCreate(
-  companyGateway: CompanyGateway | undefined,
-  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>
-) {
+interface Params {
+  companyGateway: CompanyGateway | undefined;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+}
+
+export function useHandleCreate({
+  companyGateway,
+  setErrors,
+  isFormBusy,
+  setIsFormBusy,
+}: Params) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (defaultTabIndex: number) => {
-    toast.processing();
+    if (isFormBusy) {
+      return;
+    }
 
+    toast.processing();
+    setIsFormBusy(true);
     setErrors(undefined);
 
     request('POST', endpoint('/api/v1/company_gateways'), companyGateway)
@@ -57,6 +70,7 @@ export function useHandleCreate(
           toast.dismiss();
           setErrors(error.response.data);
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 }

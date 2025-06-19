@@ -36,8 +36,8 @@ const RecurringExpenses = lazy(
 );
 const Statement = lazy(() => import('$app/pages/clients/statement/Statement'));
 const Invoices = lazy(() => import('$app/pages/clients/show/pages/Invoices'));
-const Activities = lazy(
-  () => import('$app/pages/clients/show/pages/Activities')
+const HistoryAndActivities = lazy(
+  () => import('$app/pages/clients/show/pages/HistoryAndActivities')
 );
 const Documents = lazy(() => import('$app/pages/clients/show/pages/Documents'));
 const Settings = lazy(
@@ -51,6 +51,9 @@ const Locations = lazy(
 );
 const CreatePage = lazy(
   () => import('$app/pages/clients/create/ common/components/CreatePage')
+);
+const ShowSettings = lazy(
+  () => import('$app/pages/clients/show/pages/Settings')
 );
 
 export const clientRoutes = (
@@ -197,10 +200,10 @@ export const clientRoutes = (
         }
       />
       <Route
-        path="activities"
+        path="history_and_activities"
         element={
           <Suspense fallback={<TabLoader />}>
-            <Activities />
+            <HistoryAndActivities />
           </Suspense>
         }
       />
@@ -209,6 +212,14 @@ export const clientRoutes = (
         element={
           <Suspense fallback={<TabLoader />}>
             <Documents />
+          </Suspense>
+        }
+      />
+      <Route
+        path="settings_configuration"
+        element={
+          <Suspense fallback={<TabLoader />}>
+            <ShowSettings />
           </Suspense>
         }
       />
