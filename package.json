@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "file:../builder2.0",
+    "@docuninja/builder2.0": "^0.0.4",
     "@emotion/styled": "^11.14.0",
     "@headlessui/react": "^1.7.19",
     "@headlessui/tailwindcss": "^0.2.2",
@@ -125,7 +125,6 @@
     "husky": "^8.0.3",
     "jest": "^29.7.0",
     "postcss": "^8.5.3",
-    "postcss-import": "^16.1.0",
     "prettier": "2.8.8",
     "tailwindcss": "^3.4.17",
     "ts-jest": "^29.2.6",

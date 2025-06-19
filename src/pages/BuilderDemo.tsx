@@ -38,7 +38,6 @@ export function BuilderDemo() {
   return (
     <Default breadcrumbs={[]}>
       <div className="max-w-7xl mx-auto">
-        {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
           // @ts-expect-error It's safe
           value={{
@@ -84,6 +83,17 @@ export function BuilderDemo() {
               sign: () => null,
               toolboxContext: ToolboxContext,
             },
+            styles: {
+              frame: {
+                backgroundColor: '#f7f7f7',
+              },
+              border: '#d1d5db',
+            },
+            options: {
+              header: {
+                sticky: false,
+              }
+            }
           }}
         >
           <Builder />
@@ -225,6 +235,7 @@ function CreateClientForm({ fields, errors }: CreateClientTabProps) {
           <InputField
             label={t(field.name)}
             errorMessage={errors?.errors[field.name]}
+            onValueChange={field.onValueChange}
           />
         </div>
       ))}
@@ -242,6 +253,7 @@ function CreateUserForm({ fields, errors }: CreateClientTabProps) {
           <InputField
             label={t(field.name)}
             errorMessage={errors?.errors[field.name]}
+            onValueChange={field.onValueChange}
           />
         </div>
       ))}
