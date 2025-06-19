@@ -88,6 +88,7 @@ export function CreateDocumentModal() {
             setPayload({ ...payload, description: value })
           }
           errorMessage={errors?.errors.description}
+          changeOverride
         />
 
         <Button

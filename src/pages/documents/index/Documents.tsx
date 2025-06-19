@@ -12,7 +12,6 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { useDocumentsQuery } from '$app/common/queries/docuninja/documents';
 import { useState } from 'react';
-import { FileText } from 'react-feather';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Td } from '$app/components/tables/Td';
@@ -20,6 +19,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdViewCozy } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import {
+  MemoizedTr,
   Pagination,
   Table,
   Tbody,
@@ -35,6 +35,7 @@ import { Checkbox, InputField } from '$app/components/forms';
 import { CreateDocumentModal } from '../components/CreateDocumentModal';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { FileContent } from '$app/components/icons/FileContent';
 
 interface DocumentFile {
   id: string;
@@ -212,21 +213,18 @@ export default function Documents() {
               >
                 <Td colSpan={5}>
                   <div className="flex flex-col items-center justify-center space-y-4 text-center py-12">
-                    <FileText
-                      className="mx-auto h-12 w-12"
-                      style={{ color: colors.$17 }}
-                    />
+                    <FileContent size="3.5rem" color={colors.$17} />
 
                     <div className="flex flex-col items-center space-y-1">
                       <span
                         className="mt-2 text-sm font-medium"
                         style={{ color: colors.$3 }}
                       >
-                        No documents
+                        {t('no_documents')}
                       </span>
 
                       <p className="text-sm" style={{ color: colors.$17 }}>
-                        Get started by creating a new document.
+                        {t('creating_new_document')}
                       </p>
                     </div>
                   </div>
@@ -236,7 +234,7 @@ export default function Documents() {
 
             {documentsResponse &&
               documentsResponse.data.data.map((document: Document) => (
-                <Tr key={document.id}>
+                <MemoizedTr key={document.id} resource={document}>
                   <Td>
                     <Checkbox
                       checked={selected.includes(document.id)}
@@ -252,7 +250,7 @@ export default function Documents() {
 
                   <Td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <FileText className="h-5 w-5 mr-3" />
+                      <FileContent size="1.3rem" color={colors.$17} />
 
                       <div>
                         <div className="text-sm font-medium">
@@ -312,7 +310,7 @@ export default function Documents() {
                       </DropdownElement>
                     </Dropdown>
                   </Td>
-                </Tr>
+                </MemoizedTr>
               ))}
           </Tbody>
         </Table>
