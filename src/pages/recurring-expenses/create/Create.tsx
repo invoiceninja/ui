@@ -34,7 +34,6 @@ import { cloneDeep } from 'lodash';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import dayjs from 'dayjs';
-import { useCallback } from 'react';
 
 export default function Create() {
   const [t] = useTranslation();
