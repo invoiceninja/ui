@@ -16,16 +16,24 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Dispatch, SetStateAction } from 'react';
 
-export function useSave(
-  setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
-) {
+interface Params {
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+}
+export function useSave({ setErrors, isFormBusy, setIsFormBusy }: Params) {
   const saveCompany = useHandleCompanySave();
 
   return async (payment: Payment) => {
-    setErrors(undefined);
+    if (isFormBusy) {
+      return;
+    }
 
     toast.processing();
+    setIsFormBusy(true);
+    setErrors(undefined);
 
     await saveCompany({ excludeToasters: true });
 
@@ -50,6 +58,9 @@ export function useSave(
           setErrors(error.response.data);
         }
       })
-      .finally(() => $refetch(['payments']));
+      .finally(() => {
+        $refetch(['payments']);
+        setIsFormBusy(false);
+      });
   };
 }

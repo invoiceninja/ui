@@ -120,13 +120,19 @@ export function Create() {
   const [tabIndex, setTabIndex] = useState<number>(0);
   const [errors, setErrors] = useState<ValidationBag>();
   const [tabs, setTabs] = useState<string[]>(defaultTab);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [createBySetup, setCreateBySetup] = useState<boolean>(false);
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
   const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
   const [isDuplicatingGatewayModalOpen, setIsDuplicatingGatewayModalOpen] =
     useState<boolean>(false);
 
-  const onSave = useHandleCreate(companyGateway, setErrors);
+  const onSave = useHandleCreate({
+    companyGateway,
+    setErrors,
+    setIsFormBusy,
+    isFormBusy,
+  });
 
   const handleChange = (value: string, isManualChange?: boolean) => {
     const gateway = gateways.find((gateway) => gateway.id === value);
@@ -344,7 +350,7 @@ export function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={() => onSave(1)}
-      disableSaveButton={!gateway}
+      disableSaveButton={!gateway || isFormBusy}
     >
       <HelpWidget
         id="gateways"

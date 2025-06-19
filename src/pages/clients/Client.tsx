@@ -65,6 +65,7 @@ export default function Client() {
 
   const [client, setClient] = useState<ClientType>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
 
   const tabs = useTabs({ client });
@@ -108,7 +109,12 @@ export default function Client() {
   const saveCompany = useHandleCompanySave();
 
   const onSave = async () => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
+    setIsFormBusy(true);
 
     await saveCompany({ excludeToasters: true });
 
@@ -128,7 +134,8 @@ export default function Client() {
           toast.dismiss();
           setErrors(error.response.data);
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   const {
@@ -148,7 +155,7 @@ export default function Client() {
               resource={client}
               actions={actions}
               onSaveClick={onSave}
-              disableSaveButton={!client}
+              disableSaveButton={!client || isFormBusy}
               cypressRef="clientActionDropdown"
             />
           ),

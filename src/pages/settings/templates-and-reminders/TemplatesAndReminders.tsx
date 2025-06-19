@@ -25,7 +25,10 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Settings } from '$app/components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Variable } from './common/components/Variable';
 import { commonVariables } from './common/constants/variables/common-variables';
@@ -43,6 +46,7 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
 import { route } from '$app/common/helpers/route';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -61,6 +65,7 @@ export function TemplatesAndReminders() {
 
   const colors = useColorScheme();
   const company = useInjectCompanyChanges();
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const onCancel = useDiscardChanges();
@@ -344,7 +349,7 @@ export function TemplatesAndReminders() {
       breadcrumbs={pages}
       onSaveClick={handleSave}
       onCancelClick={onCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={showPlanAlert || isFormBusy}
     >
       <AdvancedSettingsPlanAlert />
 

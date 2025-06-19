@@ -65,6 +65,7 @@ export function Edit() {
   const queryClient = useQueryClient();
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const onWrongPasswordEnter = useOnWrongPasswordEnter();
 
@@ -80,6 +81,12 @@ export function Edit() {
   }, [response?.data.data]);
 
   const onSave = () => {
+    if (isFormBusy) {
+      return;
+    }
+
+    setIsFormBusy(true);
+
     toast.processing();
 
     request(
@@ -97,7 +104,8 @@ export function Edit() {
           setErrors(error.response.data);
           toast.dismiss();
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   const onPasswordSave = (password: string, isPasswordRequired: boolean) => {
@@ -133,6 +141,7 @@ export function Edit() {
       title={t('edit_user')}
       onSaveClick={onSave}
       navigationTopRight={user && <Actions user={user} />}
+      disableSaveButton={isFormBusy}
     >
       <PasswordConfirmation
         show={!passwordValidated}
