@@ -115,7 +115,8 @@ export function useBulk(params?: Params) {
       | 'mark_paid'
       | 'download'
       | 'cancel'
-      | 'auto_bill',
+      | 'auto_bill'
+      | 'delete',
     emailType?: EmailType
   ) => {
     toast.processing();

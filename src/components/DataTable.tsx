@@ -161,6 +161,7 @@ interface Props<T> extends CommonProps {
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
   applyManualHeight?: boolean;
+  onDeleteBulkAction?: (selectedIds: string[]) => void;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -228,6 +229,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutSortQueryParameter = false,
     showRestoreBulk,
     enableSavingFilterPreference = false,
+    onDeleteBulkAction,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -680,7 +682,9 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                   <DropdownElement
                     onClick={() => {
-                      if (onBulkActionCall) {
+                      if (onDeleteBulkAction) {
+                        onDeleteBulkAction(selected);
+                      } else if (onBulkActionCall) {
                         onBulkActionCall(selected, 'delete');
                       } else {
                         bulk('delete');
