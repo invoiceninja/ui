@@ -11,7 +11,6 @@
 import { useState } from 'react';
 import { Switch } from '@headlessui/react';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useEffect } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
@@ -36,7 +35,6 @@ const StyledSwitch = styled(Switch)`
 
 export default function Toggle(props: Props) {
   const colors = useColorScheme();
-  const accentColor = useAccentColor();
 
   const [checked, setChecked] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -57,7 +55,7 @@ export default function Toggle(props: Props) {
         className={classNames(
           'relative inline-flex items-center flex-shrink-0 h-6 w-11 rounded-full transition-colors ease-in-out duration-200',
           {
-            'pointer-events-none opacity-75': disabled,
+            'cursor-not-allowed opacity-75': disabled,
             'border cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2':
               !disabled,
           }

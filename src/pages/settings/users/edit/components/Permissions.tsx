@@ -46,6 +46,14 @@ export function Permissions(props: Props) {
     'recurring_expense',
   ];
 
+  const isPermissionDisabled = () => {
+    if (user?.company_user?.is_admin) {
+      return true;
+    }
+
+    return false;
+  };
+
   const handleAdministratorToggle = (value: boolean) => {
     setUser(
       (user) =>
@@ -54,12 +62,17 @@ export function Permissions(props: Props) {
           company_user: user.company_user && {
             ...user.company_user,
             is_admin: value,
+            permissions: value ? '' : user.company_user.permissions,
           },
         }
     );
   };
 
   const isPermissionChecked = (permission: PermissionsType) => {
+    if (user?.company_user?.is_admin) {
+      return true;
+    }
+
     const permissions = user?.company_user?.permissions;
     const [type] = permission.split('_');
 
@@ -119,6 +132,28 @@ export function Permissions(props: Props) {
       currentPermissions.push(permission);
     }
 
+    if (!currentPermissions.includes(`${permissionType}_all`)) {
+      const permissionsFromTypeLength = currentPermissions.filter(
+        (currentPermission) =>
+          currentPermission.startsWith(permissionType) &&
+          currentPermission !== 'view_reports' &&
+          currentPermission !== 'view_dashboard' &&
+          currentPermission !== 'disable_emails'
+      ).length;
+
+      if (permissionsFromTypeLength === permissions.length) {
+        currentPermissions = currentPermissions.filter(
+          (currentPermission) =>
+            !currentPermission.startsWith(permissionType) ||
+            currentPermission === 'view_reports' ||
+            currentPermission === 'view_dashboard' ||
+            currentPermission === 'disable_emails'
+        );
+
+        currentPermissions.push(`${permissionType}_all`);
+      }
+    }
+
     if (currentPermissions[0] === '') {
       currentPermissions.shift();
     }
@@ -155,6 +190,7 @@ export function Permissions(props: Props) {
             handlePermissionChange('view_dashboard', value)
           }
           cypressRef="viewDashboard"
+          disabled={isPermissionDisabled()}
         />
       </Element>
 
@@ -168,6 +204,7 @@ export function Permissions(props: Props) {
             handlePermissionChange('view_reports', value)
           }
           cypressRef="viewReports"
+          disabled={isPermissionDisabled()}
         />
       </Element>
 
@@ -180,6 +217,7 @@ export function Permissions(props: Props) {
           onValueChange={(value) =>
             handlePermissionChange('disable_emails', value)
           }
+          disabled={isPermissionDisabled()}
         />
       </Element>
 
@@ -214,6 +252,7 @@ export function Permissions(props: Props) {
                 handlePermissionChange('create_all', event.target.checked)
               }
               cypressRef="create_all"
+              disabled={isPermissionDisabled()}
             />
           </div>
           <div className="col-1">
@@ -223,6 +262,7 @@ export function Permissions(props: Props) {
                 handlePermissionChange('view_all', event.target.checked)
               }
               cypressRef="view_all"
+              disabled={isPermissionDisabled()}
             />
           </div>
           <div className="col-1">
@@ -232,6 +272,7 @@ export function Permissions(props: Props) {
                 handlePermissionChange('edit_all', event.target.checked)
               }
               cypressRef="edit_all"
+              disabled={isPermissionDisabled()}
             />
           </div>
         </div>
@@ -245,13 +286,14 @@ export function Permissions(props: Props) {
                 checked={isPermissionChecked(
                   `create_${permission}` as PermissionsType
                 )}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                onValueChange={(_, checked) =>
                   handlePermissionChange(
                     `create_${permission}` as PermissionsType,
-                    event.target.checked
+                    Boolean(checked)
                   )
                 }
                 cypressRef={`create_${permission}`}
+                disabled={isPermissionDisabled()}
               />
             </div>
             <div className="col-1">
@@ -259,13 +301,14 @@ export function Permissions(props: Props) {
                 checked={isPermissionChecked(
                   `view_${permission}` as PermissionsType
                 )}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                onValueChange={(_, checked) =>
                   handlePermissionChange(
                     `view_${permission}` as PermissionsType,
-                    event.target.checked
+                    Boolean(checked)
                   )
                 }
                 cypressRef={`view_${permission}`}
+                disabled={isPermissionDisabled()}
               />
             </div>
             <div className="col-1">
@@ -273,13 +316,14 @@ export function Permissions(props: Props) {
                 checked={isPermissionChecked(
                   `edit_${permission}` as PermissionsType
                 )}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                onValueChange={(_, checked) =>
                   handlePermissionChange(
                     `edit_${permission}` as PermissionsType,
-                    event.target.checked
+                    Boolean(checked)
                   )
                 }
                 cypressRef={`edit_${permission}`}
+                disabled={isPermissionDisabled()}
               />
             </div>
           </div>
