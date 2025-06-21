@@ -30,7 +30,7 @@ import {
   invoiceSliderAtom,
   invoiceSliderVisibilityAtom,
 } from '../common/components/InvoiceSlider';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -47,6 +47,11 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { InputLabel } from '$app/components/forms';
+import { useBulk } from '$app/common/queries/invoices';
+import {
+  ConfirmActionModal,
+  confirmActionModalAtom,
+} from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -58,8 +63,14 @@ export default function Invoices() {
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
+  const deselectAll = () => {
+    setSelectedInvoiceIds([]);
+  };
+
   const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
   const [invoiceSlider, setInvoiceSlider] = useAtom(invoiceSliderAtom);
+  const setIsConfirmActionModalOpen = useSetAtom(confirmActionModalAtom);
+  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [invoiceSliderVisibility, setInvoiceSliderVisibility] = useAtom(
     invoiceSliderVisibilityAtom
   );
@@ -67,6 +78,10 @@ export default function Invoices() {
   const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
 
   const actions = useActions();
+  const bulk = useBulk({
+    onSuccess: deselectAll,
+  });
+
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
   const reactSettings = useReactSettings();
@@ -147,6 +162,10 @@ export default function Invoices() {
         }}
         dateRangeColumns={dateRangeColumns}
         enableSavingFilterPreference
+        onDeleteBulkAction={(selected) => {
+          setSelectedInvoiceIds(selected);
+          setIsConfirmActionModalOpen(true);
+        }}
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
@@ -171,6 +190,15 @@ export default function Invoices() {
           </div>
         )}
         bulkUrl="/api/v1/invoices/bulk"
+      />
+
+      <ConfirmActionModal
+        title={t('delete_invoices')}
+        message={t('delete_invoices_confirmation')}
+        disabledButton={selectedInvoiceIds.length === 0}
+        onClick={() => {
+          bulk(selectedInvoiceIds, 'delete');
+        }}
       />
     </Default>
   );
