@@ -58,7 +58,7 @@ export function Checkbox(props: Props) {
           aria-describedby="comments-description"
           type="checkbox"
           className={classNames(
-            'rounded border cursor-pointer disabled:opacity-50',
+            'rounded border disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed',
             props.className
           )}
           style={{
