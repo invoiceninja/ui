@@ -19,6 +19,7 @@ import { PurchaseOrderContext } from '../../create/Create';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
+import Toggle from '$app/components/forms/Toggle';
 
 export default function Settings() {
   const [t] = useTranslation();
@@ -94,6 +95,16 @@ export default function Settings() {
                 onClearButtonClick={() => handleChange('design_id', '')}
                 disableWithQueryParameter
                 errorMessage={errors?.errors.design_id}
+              />
+            </div>
+
+            <div className="lg:pt-[1.85rem]">
+              <Toggle
+                label={t('inclusive_taxes')}
+                checked={purchaseOrder?.uses_inclusive_taxes ?? false}
+                onValueChange={(value) =>
+                  handleChange('uses_inclusive_taxes', value)
+                }
               />
             </div>
           </div>
