@@ -47,11 +47,8 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { InputLabel } from '$app/components/forms';
-import { useBulk } from '$app/common/queries/invoices';
-import {
-  ConfirmActionModal,
-  confirmActionModalAtom,
-} from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
+import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
+import { DeleteInvoicesConfirmationModal } from '../common/components/DeleteInvoicesConfirmationModal';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -62,10 +59,6 @@ export default function Invoices() {
 
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
-
-  const deselectAll = () => {
-    setSelectedInvoiceIds([]);
-  };
 
   const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
   const [invoiceSlider, setInvoiceSlider] = useAtom(invoiceSliderAtom);
@@ -78,9 +71,6 @@ export default function Invoices() {
   const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
 
   const actions = useActions();
-  const bulk = useBulk({
-    onSuccess: deselectAll,
-  });
 
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
@@ -192,13 +182,9 @@ export default function Invoices() {
         bulkUrl="/api/v1/invoices/bulk"
       />
 
-      <ConfirmActionModal
-        title={t('delete_invoices')}
-        message={t('delete_invoices_confirmation')}
-        disabledButton={selectedInvoiceIds.length === 0}
-        onClick={() => {
-          bulk(selectedInvoiceIds, 'delete');
-        }}
+      <DeleteInvoicesConfirmationModal
+        selectedInvoiceIds={selectedInvoiceIds}
+        setSelectedInvoiceIds={setSelectedInvoiceIds}
       />
     </Default>
   );

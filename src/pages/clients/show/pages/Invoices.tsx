@@ -18,26 +18,13 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { permission } from '$app/common/guards/guards/permission';
 import { useFooterColumns } from '$app/pages/invoices/common/hooks/useFooterColumns';
 import { useSetAtom } from 'jotai';
-import {
-  ConfirmActionModal,
-  confirmActionModalAtom,
-} from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
+import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { useState } from 'react';
-import { useBulk } from '$app/common/queries/invoices';
-import { useTranslation } from 'react-i18next';
+import { DeleteInvoicesConfirmationModal } from '$app/pages/invoices/common/components/DeleteInvoicesConfirmationModal';
 
 export default function Invoices() {
-  const [t] = useTranslation();
-
   const { id } = useParams();
 
-  const deselectAll = () => {
-    setSelectedInvoiceIds([]);
-  };
-
-  const bulk = useBulk({
-    onSuccess: deselectAll,
-  });
   const hasPermission = useHasPermission();
 
   const actions = useActions();
@@ -73,13 +60,9 @@ export default function Invoices() {
         }}
       />
 
-      <ConfirmActionModal
-        title={t('delete_invoices')}
-        message={t('delete_invoices_confirmation')}
-        disabledButton={selectedInvoiceIds.length === 0}
-        onClick={() => {
-          bulk(selectedInvoiceIds, 'delete');
-        }}
+      <DeleteInvoicesConfirmationModal
+        selectedInvoiceIds={selectedInvoiceIds}
+        setSelectedInvoiceIds={setSelectedInvoiceIds}
       />
     </>
   );

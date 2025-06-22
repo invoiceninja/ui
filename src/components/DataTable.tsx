@@ -384,7 +384,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     };
   }, []);
 
-  const { data, isLoading, isFetching, isError, isPlaceholderData } = useQuery(
+  const { data, isLoading, isFetching, isError } = useQuery(
     [
       ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
@@ -666,53 +666,54 @@ export function DataTable<T extends object>(props: Props<T>) {
               )}
 
               {!props.withoutDefaultBulkActions && (
-                <>
+                <DropdownElement
+                  onClick={() => {
+                    if (onBulkActionCall) {
+                      onBulkActionCall(selected, 'archive');
+                    } else {
+                      bulk('archive');
+                    }
+                  }}
+                  icon={<Icon element={MdArchive} />}
+                >
+                  {t('archive')}
+                </DropdownElement>
+              )}
+
+              {!props.withoutDefaultBulkActions && (
+                <DropdownElement
+                  onClick={() => {
+                    if (onDeleteBulkAction) {
+                      onDeleteBulkAction(selected);
+                    } else if (onBulkActionCall) {
+                      onBulkActionCall(selected, 'delete');
+                    } else {
+                      bulk('delete');
+                    }
+                  }}
+                  icon={<Icon element={MdDelete} />}
+                >
+                  {t('delete')}
+                </DropdownElement>
+              )}
+
+              {!props.withoutDefaultBulkActions &&
+                (showRestoreBulk
+                  ? showRestoreBulk(selectedResources)
+                  : showRestoreBulkAction()) && (
                   <DropdownElement
                     onClick={() => {
                       if (onBulkActionCall) {
-                        onBulkActionCall(selected, 'archive');
+                        onBulkActionCall(selected, 'restore');
                       } else {
-                        bulk('archive');
+                        bulk('restore');
                       }
                     }}
-                    icon={<Icon element={MdArchive} />}
+                    icon={<Icon element={MdRestore} />}
                   >
-                    {t('archive')}
+                    {t('restore')}
                   </DropdownElement>
-
-                  <DropdownElement
-                    onClick={() => {
-                      if (onDeleteBulkAction) {
-                        onDeleteBulkAction(selected);
-                      } else if (onBulkActionCall) {
-                        onBulkActionCall(selected, 'delete');
-                      } else {
-                        bulk('delete');
-                      }
-                    }}
-                    icon={<Icon element={MdDelete} />}
-                  >
-                    {t('delete')}
-                  </DropdownElement>
-
-                  {(showRestoreBulk
-                    ? showRestoreBulk(selectedResources)
-                    : showRestoreBulkAction()) && (
-                    <DropdownElement
-                      onClick={() => {
-                        if (onBulkActionCall) {
-                          onBulkActionCall(selected, 'restore');
-                        } else {
-                          bulk('restore');
-                        }
-                      }}
-                      icon={<Icon element={MdRestore} />}
-                    >
-                      {t('restore')}
-                    </DropdownElement>
-                  )}
-                </>
-              )}
+                )}
             </Dropdown>
           )}
         </Actions>
