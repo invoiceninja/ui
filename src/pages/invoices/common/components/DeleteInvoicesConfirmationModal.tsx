@@ -41,8 +41,8 @@ export function DeleteInvoicesConfirmationModal({
 
   return (
     <ConfirmActionModal
-      title={t('delete')}
-      message={t('delete_invoices_confirmation')}
+      title={t('confirmation')}
+      message={t('are_you_sure')}
       disabledButton={selectedInvoiceIds.length === 0}
       disableButtonWithoutLoadingIcon
       onClose={deselectAll}
