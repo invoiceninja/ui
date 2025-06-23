@@ -47,9 +47,9 @@ export function InvoiceViewer(props: Props) {
       toast.processing();
     }
 
-    setIsLoading(true);
-
     if (props.enabled !== false) {
+      setIsLoading(true);
+
       queryClient.fetchQuery({
         queryKey: [props.link, JSON.stringify(props.resource)],
         retry: 0,
@@ -127,7 +127,6 @@ export function InvoiceViewer(props: Props) {
         height={isLoading ? 0 : props.height || 1500}
         loading="lazy"
         tabIndex={-1}
-
       />
     </>
   );

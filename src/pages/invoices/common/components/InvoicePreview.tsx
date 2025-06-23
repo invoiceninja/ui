@@ -92,6 +92,7 @@ export function InvoicePreview(props: Props) {
           })}
           resource={props.resource}
           method="POST"
+          enabled={props.observable ? isIntersecting : true}
         />
       </div>
     );
@@ -114,6 +115,7 @@ export function InvoicePreview(props: Props) {
           )}
           resource={props.resource}
           method="POST"
+          enabled={props.observable ? isIntersecting : true}
         />
 
         {props.withRemoveLogoCTA && <RemoveLogoCTA />}
