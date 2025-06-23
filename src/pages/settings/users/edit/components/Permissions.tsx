@@ -23,6 +23,12 @@ interface Props {
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
 }
 
+const SPECIAL_PERMISSIONS = [
+  'view_reports',
+  'view_dashboard',
+  'disable_emails',
+];
+
 export function Permissions(props: Props) {
   const [t] = useTranslation();
   const { user, setUser } = props;
@@ -107,15 +113,11 @@ export function Permissions(props: Props) {
       currentPermissions = currentPermissions.filter(
         (currentPermission) =>
           !currentPermission.startsWith(permissionType) ||
-          currentPermission === 'view_reports' ||
-          currentPermission === 'view_dashboard' ||
-          currentPermission === 'disable_emails'
+          SPECIAL_PERMISSIONS.includes(currentPermission)
       );
     } else if (
       currentPermissions.includes(`${permissionType}_all`) &&
-      permission !== 'view_reports' &&
-      permission !== 'view_dashboard' &&
-      permission !== 'disable_emails'
+      !SPECIAL_PERMISSIONS.includes(permission)
     ) {
       const permissionsByType = permissions
         .map((currentPermission) => `${permissionType}_${currentPermission}`)
@@ -136,18 +138,14 @@ export function Permissions(props: Props) {
       const permissionsFromTypeLength = currentPermissions.filter(
         (currentPermission) =>
           currentPermission.startsWith(permissionType) &&
-          currentPermission !== 'view_reports' &&
-          currentPermission !== 'view_dashboard' &&
-          currentPermission !== 'disable_emails'
+          !SPECIAL_PERMISSIONS.includes(currentPermission)
       ).length;
 
       if (permissionsFromTypeLength === permissions.length) {
         currentPermissions = currentPermissions.filter(
           (currentPermission) =>
             !currentPermission.startsWith(permissionType) ||
-            currentPermission === 'view_reports' ||
-            currentPermission === 'view_dashboard' ||
-            currentPermission === 'disable_emails'
+            SPECIAL_PERMISSIONS.includes(currentPermission)
         );
 
         currentPermissions.push(`${permissionType}_all`);
