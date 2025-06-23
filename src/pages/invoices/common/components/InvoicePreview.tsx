@@ -64,12 +64,12 @@ export function InvoicePreview(props: Props) {
             setIsIntersecting(false);
           }
         },
-        { threshold: 0.1 }
+        { threshold: 0.1, rootMargin: '50px' }
       );
     });
 
     if (divRef.current) {
-      observer.observe(divRef.current!);
+      observer.observe(divRef.current);
     }
 
     return () => {

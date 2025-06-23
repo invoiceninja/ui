@@ -43,11 +43,11 @@ export function InvoiceViewer(props: Props) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (props.withToast) {
-      toast.processing();
-    }
-
     if (props.enabled !== false) {
+      if (props.withToast) {
+        toast.processing();
+      }
+
       setIsLoading(true);
 
       queryClient.fetchQuery({
@@ -111,11 +111,14 @@ export function InvoiceViewer(props: Props) {
   }
 
   return (
-    <>
+    <div
+      className="flex flex-col w-full"
+      style={{ height: props.height || 1500 }}
+    >
       {isLoading && (
         <div
-          className="flex justify-center items-center"
-          style={{ height: props.height || 1500 }}
+          className="flex justify-center items-center w-full"
+          style={{ height: '100%' }}
         >
           <Spinner />
         </div>
@@ -124,10 +127,10 @@ export function InvoiceViewer(props: Props) {
       <iframe
         ref={iframeRef}
         width="100%"
-        height={isLoading ? 0 : props.height || 1500}
+        height={isLoading ? 0 : '100%'}
         loading="lazy"
         tabIndex={-1}
       />
-    </>
+    </div>
   );
 }
