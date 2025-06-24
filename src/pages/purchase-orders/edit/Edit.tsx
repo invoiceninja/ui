@@ -165,6 +165,8 @@ export default function Edit() {
               relationType="vendor_id"
               endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
               withRemoveLogoCTA
+              observable={true}
+              initiallyVisible={false}
             />
           )}
         </div>
