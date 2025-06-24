@@ -15,9 +15,15 @@ import { Builder } from './builder/Builder';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
+const Create = lazy(() => import('$app/pages/documents/create/Create'));
 
 export const documentsRoutes = (
   <Route path="documents">
+    <Route
+      path="create"
+      element={<Guard guards={[]} component={<Create />} />}
+    />
+
     <Route path="" element={<Guard guards={[]} component={<Document />} />} />
 
     <Route

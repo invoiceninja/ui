@@ -31,8 +31,7 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Spinner } from '$app/components/Spinner';
 import { PerPage } from '$app/components/DataTable';
-import { Checkbox, InputField } from '$app/components/forms';
-import { CreateDocumentModal } from '../components/CreateDocumentModal';
+import { Button, Checkbox, InputField } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { FileContent } from '$app/components/icons/FileContent';
@@ -104,8 +103,6 @@ export default function Documents() {
     filter,
   });
 
-  console.log(documentsResponse);
-
   const getStatusBadge = (statusId: number) => {
     const label =
       STATUS_LABELS[statusId as keyof typeof STATUS_LABELS] || 'Unknown';
@@ -137,7 +134,7 @@ export default function Documents() {
             onValueChange={(value) => setFilter(value)}
           />
 
-          <CreateDocumentModal />
+          <Button to="/documents/create">{t('create')}</Button>
         </div>
 
         <Table>
@@ -248,9 +245,11 @@ export default function Documents() {
                     />
                   </Td>
 
-                  <Td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <FileContent size="1.3rem" color={colors.$17} />
+                  <Td>
+                    <div className="flex space-x-2 items-center whitespace-nowrap">
+                      <div>
+                        <FileContent size="1.3rem" color={colors.$17} />
+                      </div>
 
                       <div>
                         <div className="text-sm font-medium">
