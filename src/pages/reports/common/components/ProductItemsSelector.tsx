@@ -168,8 +168,6 @@ export function ProductItemsSelector(props: Props) {
       .join(',');
   };
 
-  console.log(value);
-
   return (
     <>
       {productItems && !isInitial ? (
