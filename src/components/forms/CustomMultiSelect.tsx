@@ -112,7 +112,9 @@ function ValueContainer(props: ValueContainerProps<SelectOption, true>) {
             />
           </div>
         ) : (
-          <div className="truncate text-sm flex-1">{valueDisplay}</div>
+          <div className="truncate text-sm max-w-48 lg:max-w-20 xl:max-w-48">
+            {valueDisplay}
+          </div>
         )}
       </div>
     </components.ValueContainer>
@@ -235,6 +237,7 @@ function CustomSelect(props: any) {
     onChange,
     components: customComponents,
     isSearchable,
+    onInputChange,
     ...restProps
   } = props;
 
@@ -250,6 +253,7 @@ function CustomSelect(props: any) {
 
   const onMenuClose = () => {
     setInputValue('');
+    onInputChange?.('');
 
     if (restProps.onMenuClose) {
       restProps.onMenuClose();
@@ -258,6 +262,7 @@ function CustomSelect(props: any) {
 
   const handleInputChange = (value: string) => {
     setInputValue(value);
+    onInputChange?.(value);
   };
 
   const filterOption = (option: any, inputValue: string) => {
