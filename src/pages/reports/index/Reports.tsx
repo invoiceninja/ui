@@ -297,26 +297,26 @@ export default function Reports() {
       );
     }
 
-    if (typeof currentCell.display_value !== 'string') {
-      return currentCell.display_value;
-    }
+    // if (typeof currentCell.display_value !== 'string') {
+    //   return currentCell.display_value;
+    // }
 
-    if (
-      numberFormattableColumns.some((currentColumn) =>
-        currentCell.identifier.endsWith(currentColumn)
-      )
-    ) {
-      const parsedDisplayValue = parseFloat(
-        currentCell.display_value.toString()
-      );
+    // if (
+    //   numberFormattableColumns.some((currentColumn) =>
+    //     currentCell.identifier.endsWith(currentColumn)
+    //   )
+    // ) {
+    //   const parsedDisplayValue = parseFloat(
+    //     currentCell.display_value.toString()
+    //   );
 
-      if (
-        !isNaN(parsedDisplayValue) &&
-        typeof parsedDisplayValue === 'number'
-      ) {
-        return numericFormatter(currentCell.display_value.toString());
-      }
-    }
+    //   if (
+    //     !isNaN(parsedDisplayValue) &&
+    //     typeof parsedDisplayValue === 'number'
+    //   ) {
+    //     return numericFormatter(currentCell.display_value.toString());
+    //   }
+    // }
 
     return currentCell.display_value;
   };
