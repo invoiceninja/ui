@@ -54,7 +54,6 @@ import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-import { numberFormattableColumns } from '../common/constants/columns';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
