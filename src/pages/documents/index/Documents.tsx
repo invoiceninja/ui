@@ -11,12 +11,12 @@
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { useDocumentsQuery } from '$app/common/queries/docuninja/documents';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Td } from '$app/components/tables/Td';
 import { Icon } from '$app/components/icons/Icon';
-import { MdViewCozy } from 'react-icons/md';
+import { MdPageview } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import {
   MemoizedTr,
@@ -31,10 +31,12 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Spinner } from '$app/components/Spinner';
 import { PerPage } from '$app/components/DataTable';
-import { Button, Checkbox, InputField } from '$app/components/forms';
+import { Button, Checkbox, InputField, Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { FileContent } from '$app/components/icons/FileContent';
+import { useDebounce } from 'react-use';
+import { Badge, BadgeVariant } from '$app/components/Badge';
 
 interface DocumentFile {
   id: string;
@@ -58,26 +60,12 @@ interface Document {
   files: DocumentFile[];
 }
 
-interface PaginationLink {
-  url: string | null;
-  label: string;
-  active: boolean;
-}
-
-const STATUS_LABELS = {
-  1: 'Draft',
-  2: 'Sent',
-  3: 'Viewed',
-  4: 'Completed',
-  5: 'Cancelled',
-};
-
-const STATUS_COLORS = {
-  1: 'bg-gray-100 text-gray-800',
-  2: 'bg-blue-100 text-blue-800',
-  3: 'bg-yellow-100 text-yellow-800',
-  4: 'bg-green-100 text-green-800',
-  5: 'bg-red-100 text-red-800',
+const STATUS_VARIANTS = {
+  1: 'generic',
+  2: 'light-blue',
+  3: 'orange',
+  4: 'green',
+  5: 'red',
 };
 
 export default function Documents() {
@@ -92,32 +80,75 @@ export default function Documents() {
   const [perPage, setPerPage] = useState<number>(20);
   const [selected, setSelected] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentData, setCurrentData] = useState<Document[]>([]);
+  const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
+
+  const STATUS_LABELS = useMemo(
+    () => ({
+      1: t('draft'),
+      2: t('sent'),
+      3: t('viewed'),
+      4: t('completed'),
+      5: t('cancelled'),
+    }),
+    []
+  );
 
   const {
     data: documentsResponse,
     isLoading,
     error,
+    isFetching,
   } = useDocumentsQuery({
     currentPage: currentPage.toString(),
     perPage: perPage.toString(),
     filter,
   });
 
-  const getStatusBadge = (statusId: number) => {
-    const label =
-      STATUS_LABELS[statusId as keyof typeof STATUS_LABELS] || 'Unknown';
-    const colorClass =
-      STATUS_COLORS[statusId as keyof typeof STATUS_COLORS] ||
-      'bg-gray-100 text-gray-800';
+  useDebounce(
+    () => {
+      if (documentsResponse && !isFetching) {
+        setCurrentData(documentsResponse.data.data);
+      }
+    },
+    10,
+    [documentsResponse, isFetching]
+  );
 
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}`}
-      >
-        {label}
-      </span>
-    );
-  };
+  useEffect(() => {
+    if (isLoading) {
+      setCurrentData([]);
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isFetching || isLoading) {
+      setAreRowsRendered(false);
+      setCurrentData([]);
+    }
+  }, [isFetching, isLoading]);
+
+  useEffect(() => {
+    if (!currentData.length) {
+      setCurrentPage(1);
+    }
+
+    if (perPage === 10) {
+      setAreRowsRendered(true);
+    }
+
+    if (perPage === 50) {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 50);
+    }
+
+    if (perPage === 100) {
+      setTimeout(() => {
+        setAreRowsRendered(true);
+      }, 150);
+    }
+  }, [currentData]);
 
   return (
     <Card
@@ -134,7 +165,7 @@ export default function Documents() {
             onValueChange={(value) => setFilter(value)}
           />
 
-          <Button to="/documents/create">{t('create')}</Button>
+          <Button to="/documents/create">{t('new_document')}</Button>
         </div>
 
         <Table>
@@ -159,7 +190,8 @@ export default function Documents() {
               />
             </Th>
 
-            <Th>{t('document')}</Th>
+            <Th>{t('id')}</Th>
+            <Th>{t('name')}</Th>
             <Th>{t('files')}</Th>
             <Th>{t('status')}</Th>
             <Th>{t('created_at')}</Th>
@@ -246,52 +278,55 @@ export default function Documents() {
                   </Td>
 
                   <Td>
-                    <div className="flex space-x-2 items-center whitespace-nowrap">
-                      <div>
-                        <FileContent size="1.3rem" color={colors.$17} />
-                      </div>
-
-                      <div>
-                        <div className="text-sm font-medium">
-                          {document.description || 'Untitled Document'}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          ID: {document.id.slice(-8)}
-                        </div>
-                      </div>
-                    </div>
+                    <Link to={route('/documents/:id', { id: document.id })}>
+                      {document.id.slice(-8)}
+                    </Link>
                   </Td>
 
-                  <Td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {document.files.length > 0 ? (
-                        <div>
-                          <div className="font-medium">
-                            {document.files[0].filename}
-                          </div>
-                          {document.files.length > 1 && (
-                            <div className="text-xs">
-                              +{document.files.length - 1} more files
-                            </div>
-                          )}
+                  <Td>{document.description || t('untitled_document')}</Td>
+
+                  <Td>
+                    {document.files.length > 0 ? (
+                      <div>
+                        <div className="font-medium">
+                          {document.files[0].filename}
+                        </div>
+                        {document.files.length > 1 && (
                           <div className="text-xs">
-                            {document.files[0].page_count}{' '}
-                            {document.files[0].page_count === 1
-                              ? 'page'
-                              : 'pages'}
+                            +{document.files.length - 1} more files
                           </div>
+                        )}
+                        <div className="text-xs">
+                          {document.files[0].page_count}{' '}
+                          {document.files[0].page_count === 1
+                            ? 'page'
+                            : 'pages'}
                         </div>
-                      ) : (
-                        <span className="text-gray-500">No files</span>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <span style={{ color: colors.$17 }}>
+                        {t('no_files')}.
+                      </span>
+                    )}
                   </Td>
 
-                  <Td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(document.status_id)}
+                  <Td>
+                    <Badge
+                      variant={
+                        STATUS_VARIANTS[
+                          document.status_id as keyof typeof STATUS_VARIANTS
+                        ] as BadgeVariant
+                      }
+                    >
+                      {
+                        STATUS_LABELS[
+                          document.status_id as keyof typeof STATUS_LABELS
+                        ]
+                      }
+                    </Badge>
                   </Td>
 
-                  <Td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <Td>
                     {document.files.length > 0
                       ? date(document.files[0].created_at, dateFormat)
                       : '-'}
@@ -303,7 +338,7 @@ export default function Documents() {
                         to={route('/documents/:id', {
                           id: document.id,
                         })}
-                        icon={<Icon element={MdViewCozy} />}
+                        icon={<Icon element={MdPageview} />}
                       >
                         {t('view')}
                       </DropdownElement>
@@ -319,8 +354,8 @@ export default function Documents() {
             currentPage={currentPage}
             onPageChange={setCurrentPage}
             onRowsChange={(rows: PerPage) => setPerPage(Number(rows))}
-            totalPages={documentsResponse?.data.meta.total_pages}
-            totalRecords={documentsResponse?.data.meta.total}
+            totalPages={documentsResponse?.data.meta.last_page || 1}
+            totalRecords={documentsResponse?.data.meta.total || 0}
           />
         )}
       </div>

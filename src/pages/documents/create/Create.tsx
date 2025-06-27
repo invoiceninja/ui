@@ -18,9 +18,9 @@ import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
-import { Settings } from '$app/components/layouts/Settings';
+import { Default } from '$app/components/layouts/Default';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,7 +67,7 @@ export default function Create() {
         .then((response: GenericSingleResourceResponse<Document>) => {
           toast.success('created_document');
 
-          $refetch(['documents']);
+          $refetch(['docuninja_documents']);
 
           setPayload({
             description: '',
@@ -86,27 +86,30 @@ export default function Create() {
   };
 
   return (
-    <Settings
+    <Default
       title={t('create_document')}
       breadcrumbs={pages}
       onSaveClick={handleCreate}
       disableSaveButton={isFormBusy}
     >
-      <Card
-        title={t('create_document')}
-        className="shadow-sm"
-        style={{ borderColor: colors.$24 }}
-        headerStyle={{ borderColor: colors.$20 }}
-      >
-        <InputField
-          label={t('document_name')}
-          value={payload.description}
-          onValueChange={(value) =>
-            setPayload({ ...payload, description: value })
-          }
-          errorMessage={errors?.errors.description}
-        />
-      </Card>
-    </Settings>
+      <div className="flex justify-center">
+        <Card
+          title={t('create_document')}
+          className="shadow-sm w-full xl:w-1/2"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
+          <Element leftSide={t('name')}>
+            <InputField
+              value={payload.description}
+              onValueChange={(value) =>
+                setPayload({ ...payload, description: value })
+              }
+              errorMessage={errors?.errors.description}
+            />
+          </Element>
+        </Card>
+      </div>
+    </Default>
   );
 }
