@@ -32,7 +32,6 @@ export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const queryClient = useQueryClient();
-
   const customStyles = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
@@ -79,8 +78,9 @@ export function ProductItemsSelector(props: Props) {
   useEffect(() => {
     if (value && isInitial) {
       (async () => {
-        for (let index = 0; index < value.split(',').length; index++) {
-          const currentFilter = value.split(',')[index];
+        for (let index = 0; index < value.split("',").length; index++) {
+          const currentFilter =
+            value.split("',")[index]?.trim().replace(/'/g, '') || '';
 
           const productsResponse = await queryClient.fetchQuery<Product[]>(
             ['/api/v1/products', 'perPage=500', 'status=active', currentFilter],
@@ -132,7 +132,7 @@ export function ProductItemsSelector(props: Props) {
     products: MultiValue<{ value: string; label: string }>
   ) => {
     return (products as SelectOption[])
-      .map((option: { value: string; label: string }) => option.value)
+      .map((option: { value: string; label: string }) => `'${option.value}'`)
       .join(',');
   };
 
@@ -144,12 +144,14 @@ export function ProductItemsSelector(props: Props) {
             <div className="flex-1">
               <Select
                 id="productItemSelector"
-                placeholder={t('products')}
                 {...(value && {
                   defaultValue: productItems?.filter((option) =>
                     value
-                      .split(',')
-                      .find((productKey) => productKey === option.value)
+                      .split("',")
+                      .find(
+                        (productKey) =>
+                          productKey.trim().replace(/'/g, '') === option.value
+                      )
                   ),
                 })}
                 onChange={(options) => onValueChange(handleChange(options))}
