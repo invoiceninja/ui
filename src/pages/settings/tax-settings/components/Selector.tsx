@@ -22,12 +22,15 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { cloneDeep } from 'lodash';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   title?: string;
 }
 export function Selector(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const companyChanges = useCompanyChanges();
 
   const handlePropertyChange = useHandleCurrentCompanyChangeProperty();
@@ -62,7 +65,11 @@ export function Selector(props: Props) {
   return (
     <>
       {companyChanges?.enabled_tax_rates > 0 && (
-        <Card title={title ? t(title) : undefined}>
+        <Card
+          title={title ? t(title) : undefined}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+        >
           {companyChanges?.enabled_tax_rates > 0 && (
             <Element
               leftSide={
