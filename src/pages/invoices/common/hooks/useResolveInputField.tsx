@@ -1,5 +1,3 @@
- 
-
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -96,6 +94,10 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 
 export function useResolveInputField(props: Props) {
   const location = useLocation();
+  const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
+
+  const { resource } = props;
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
@@ -112,7 +114,6 @@ export function useResolveInputField(props: Props) {
     return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
-   
   const cleanLineItemsList = useCallback(
     (lineItems: InvoiceItem[]) => {
       let typeId = InvoiceItemType.Product;
@@ -177,10 +178,6 @@ export function useResolveInputField(props: Props) {
     await props.onLineItemPropertyChange(key, value, index);
   };
 
-  const company = useCurrentCompany();
-  const reactSettings = useReactSettings();
-  const resource = props.resource;
-
   const onProductChange = async (
     index: number,
     value: string,
@@ -200,6 +197,11 @@ export function useResolveInputField(props: Props) {
     }
 
     if (product && company && company.enabled_item_tax_rates === 1) {
+      if (company.settings?.tax_name1 && !product.tax_name1) {
+        updatedProduct.tax_name1 = company.settings.tax_name1;
+        updatedProduct.tax_rate1 = company.settings.tax_rate1;
+      }
+
       updatedProduct.tax_name2 = '';
       updatedProduct.tax_rate2 = 0;
       updatedProduct.tax_name3 = '';
@@ -207,8 +209,20 @@ export function useResolveInputField(props: Props) {
     }
 
     if (product && company && company.enabled_item_tax_rates === 2) {
+      if (company.settings?.tax_name2 && !product.tax_name2) {
+        updatedProduct.tax_name2 = company.settings.tax_name2;
+        updatedProduct.tax_rate2 = company.settings.tax_rate2;
+      }
+
       updatedProduct.tax_name3 = '';
       updatedProduct.tax_rate3 = 0;
+    }
+
+    if (product && company && company.enabled_item_tax_rates === 3) {
+      if (company.settings?.tax_name3 && !product.tax_name3) {
+        updatedProduct.tax_name3 = company.settings.tax_name3;
+        updatedProduct.tax_rate3 = company.settings.tax_rate3;
+      }
     }
 
     await handleProductChange(index, value, updatedProduct);
