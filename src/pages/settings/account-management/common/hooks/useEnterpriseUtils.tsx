@@ -163,6 +163,16 @@ export function useEnterpriseUtils() {
       return 0;
     }
 
+    if (account.plan === '') {
+      return 0;
+    }
+
+    if (account.plan === 'pro') {
+      return term === 'month'
+        ? get(plans, 'plans.pro_plan')
+        : get(plans, 'plans.pro_plan_annual');
+    }
+
     if (account.num_users <= 2) {
       return term === 'month'
         ? get(plans, 'plans.enterprise_plan')

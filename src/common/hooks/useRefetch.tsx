@@ -224,6 +224,10 @@ export const keys = {
     path: '/api/v1/einvoice/validateEntity',
     dependencies: [],
   },
+  docuninja_documents: {
+    path: '/api/documents',
+    dependencies: [],
+  },
 };
 
 export type RefetchKey = keyof typeof keys;

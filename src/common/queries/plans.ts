@@ -21,6 +21,16 @@ interface Plans {
     pro_plan: string[];
   };
   plans: Record<string, number>;
+  products: {
+    [key: string]: {
+      price: number;
+      description: string;
+      subscription_id: number | null;
+      users: number;
+      plan: string | null;
+      term: string | null;
+    };
+  };
 }
 
 export function usePlansQuery() {
