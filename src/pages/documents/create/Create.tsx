@@ -40,7 +40,7 @@ export default function Create() {
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
-      name: t('create_document'),
+      name: t('new_document'),
       href: route('/documents/create'),
     },
   ];
@@ -87,14 +87,14 @@ export default function Create() {
 
   return (
     <Default
-      title={t('create_document')}
+      title={t('new_document')}
       breadcrumbs={pages}
       onSaveClick={handleCreate}
       disableSaveButton={isFormBusy}
     >
       <div className="flex justify-center">
         <Card
-          title={t('create_document')}
+          title={t('new_document')}
           className="shadow-sm w-full xl:w-1/2"
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}

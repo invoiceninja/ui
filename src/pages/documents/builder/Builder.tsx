@@ -1,6 +1,8 @@
+import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
+import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField } from '$app/components/forms';
@@ -38,8 +40,10 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 export function Builder() {
+  const [t] = useTranslation();
+
   const { id } = useParams();
-  const { t } = useTranslation();
+  const colors = useColorScheme();
 
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
@@ -54,8 +58,12 @@ export function Builder() {
   ];
 
   return (
-    <Default breadcrumbs={pages}>
-      <div className="max-w-7xl mx-auto">
+    <Default title={t('builder')} breadcrumbs={pages}>
+      <Card
+        className="shadow-sm px-3"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+      >
         {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
           value={{
@@ -103,9 +111,9 @@ export function Builder() {
             },
             styles: {
               frame: {
-                backgroundColor: '#f7f7f7',
+                backgroundColor: colors.$1,
               },
-              border: '#d1d5db',
+              border: colors.$24,
             },
             options: {
               header: {
@@ -117,14 +125,14 @@ export function Builder() {
         >
           <Builder$ />
         </BuilderContext.Provider>
-      </div>
+      </Card>
     </Default>
   );
 }
 
 function Loading() {
   return (
-    <div className="max-w-4xl mx-auto flex flex-col space-y-3 my-5">
+    <div className="flex justify-center items-center py-6 sm:py-8 px-4 sm:px-6">
       <Spinner />
     </div>
   );
@@ -157,7 +165,11 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
 }
 
 function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
-  return <Button disabled={isSubmitting}>Send invitations</Button>;
+  return (
+    <Button behavior="button" disabled={isSubmitting}>
+      Send invitations
+    </Button>
+  );
 }
 
 function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
@@ -183,7 +195,7 @@ function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
 
 function Upload({ ...props }: UploadProps) {
   return (
-    <Button type="secondary" {...props} className="w-full">
+    <Button behavior="button" type="secondary" {...props} className="w-full">
       Upload
     </Button>
   );
@@ -287,7 +299,7 @@ function CreateDialogTabButton({
   return (
     <Button
       form={form}
-      behavior="submit"
+      behavior="button"
       disabled={isSubmitting}
       className="w-full"
     >
@@ -353,7 +365,7 @@ function UninviteDialog({
 
 function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
   return (
-    <Button form={form} behavior="submit" disabled={isSubmitting}>
+    <Button form={form} behavior="button" disabled={isSubmitting}>
       Continue
     </Button>
   );
