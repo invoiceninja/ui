@@ -28,19 +28,32 @@ interface Params {
   isDefaultTerms: boolean;
   isDefaultFooter: boolean;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  isFormBusy: boolean;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
 }
 export function useHandleCreate(params: Params) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const { setErrors, isDefaultTerms, isDefaultFooter } = params;
+  const {
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    setIsFormBusy,
+    isFormBusy,
+  } = params;
 
   const refreshCompanyUsers = useRefreshCompanyUsers();
   const saveCompany = useHandleCompanySave();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (invoice: Invoice) => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
+    setIsFormBusy(true);
     setErrors(undefined);
 
     await saveCompany({ excludeToasters: true });
@@ -90,6 +103,9 @@ export function useHandleCreate(params: Params) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }

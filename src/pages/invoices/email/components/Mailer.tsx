@@ -270,6 +270,9 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               )}
               width="100%"
               height={800}
+              tabIndex={-1}
+              loading="lazy"
+
             />
           </Card>
         )}

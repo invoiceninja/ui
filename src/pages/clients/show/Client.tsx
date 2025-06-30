@@ -25,7 +25,6 @@ import { Gateways } from './components/Gateways';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { useTabs } from './hooks/useTabs';
-import { EmailHistory } from './components/EmailHistory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import {
@@ -157,7 +156,6 @@ export default function Client() {
             {isCardVisible('contacts') && <Contacts client={client} />}
             {isCardVisible('standing') && <Standing client={client} />}
             {isCardVisible('gateways') && <Gateways client={client} />}
-            {isCardVisible('email_history') && <EmailHistory />}
             {isCardVisible('public_notes') && (
               <ClientPublicNotes client={client} />
             )}

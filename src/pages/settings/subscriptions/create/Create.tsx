@@ -64,6 +64,7 @@ export function Create() {
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [products, setProducts] = useState<Product[]>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [subscription, setSubscription] = useState<Subscription>();
 
   const handleChange = useHandleChange({
@@ -97,6 +98,12 @@ export function Create() {
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (isFormBusy) {
+      return;
+    }
+
+    setIsFormBusy(true);
+
     setErrors(undefined);
 
     toast.processing();
@@ -118,7 +125,8 @@ export function Create() {
           setErrors(error.response.data);
           toast.dismiss();
         }
-      });
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   return (
@@ -126,7 +134,7 @@ export function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={handleSave}
-      disableSaveButton={!subscription || showPlanAlert}
+      disableSaveButton={!subscription || showPlanAlert || isFormBusy}
     >
       <AdvancedSettingsPlanAlert />
 

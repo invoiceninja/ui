@@ -43,7 +43,7 @@ export default function Create() {
   const [task, setTask] = useAtom(taskAtom);
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
-
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
 
@@ -111,11 +111,17 @@ export default function Create() {
   };
 
   const handleSave = (task: Task) => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
 
     if (isOverlapping(task)) {
       return toast.error('task_errors');
     }
+
+    setIsFormBusy(true);
 
     request('POST', endpoint('/api/v1/tasks'), task)
       .then((response) => {
@@ -132,6 +138,9 @@ export default function Create() {
           toast.dismiss();
           setErrors(error.response.data);
         }
+      })
+      .finally(() => {
+        setIsFormBusy(false);
       });
   };
 

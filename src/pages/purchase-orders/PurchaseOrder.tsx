@@ -62,6 +62,7 @@ export default function PurchaseOrder() {
   ];
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [invoiceSum, setInvoiceSum] = useState<
     InvoiceSum | InvoiceSumInclusive
   >();
@@ -75,7 +76,13 @@ export default function PurchaseOrder() {
 
   const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
 
-  const onSave = useSave({ setErrors, isDefaultTerms, isDefaultFooter });
+  const onSave = useSave({
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  });
 
   const {
     changeTemplateVisible,
@@ -120,6 +127,7 @@ export default function PurchaseOrder() {
               onSaveClick={() => onSave(purchaseOrder)}
               actions={actions}
               cypressRef="purchaseOrderActionDropdown"
+              disableSaveButton={!purchaseOrder || isFormBusy}
             />
           ),
         })}

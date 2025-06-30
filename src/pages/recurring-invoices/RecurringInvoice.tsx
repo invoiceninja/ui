@@ -71,8 +71,9 @@ export default function RecurringInvoice() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const save = useSave({ setErrors });
+  const save = useSave({ setErrors, setIsFormBusy, isFormBusy });
   const tabs = useTabs({ recurringInvoice });
 
   const { calculateInvoiceSum } = useRecurringInvoiceUtilities({ client });
@@ -105,10 +106,11 @@ export default function RecurringInvoice() {
           navigationTopRight: (
             <ResourceActions
               resource={recurringInvoice}
-              onSaveClick={() => save(recurringInvoice)}
+              onSaveClick={() => save(recurringInvoice as RecurringInvoiceType)}
               // label={t('more_actions')}
               actions={actions}
               cypressRef="recurringInvoiceActionDropdown"
+              disableSaveButton={isFormBusy}
             />
           ),
         })}

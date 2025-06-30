@@ -79,6 +79,7 @@ export default function Create() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
@@ -88,7 +89,13 @@ export default function Create() {
     enabled: typeof quote === 'undefined',
   });
 
-  const save = useCreate({ setErrors, isDefaultFooter, isDefaultTerms });
+  const save = useCreate({
+    setErrors,
+    isDefaultFooter,
+    isDefaultTerms,
+    isFormBusy,
+    setIsFormBusy,
+  });
   const { handleChange, calculateInvoiceSum } = useQuoteUtilities({ client });
 
   const settingResolver = (client: Client, taxNumber: '1' | '2' | '3') => {
@@ -214,7 +221,7 @@ export default function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={() => save(quote!)}
-      disableSaveButton={quote?.client_id.length === 0}
+      disableSaveButton={quote?.client_id.length === 0 || isFormBusy}
     >
       {!isLoading ? (
         <div className="space-y-4">

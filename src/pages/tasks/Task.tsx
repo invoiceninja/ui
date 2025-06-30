@@ -92,7 +92,6 @@ export default function Task() {
     <Default
       breadcrumbs={pages}
       title={documentTitle}
-      disableSaveButton={isFormBusy}
       {...((hasPermission('edit_task') || entityAssigned(task)) &&
         task && {
           navigationTopRight: (
@@ -101,6 +100,7 @@ export default function Task() {
               onSaveClick={() => handleSave(task)}
               actions={actions}
               cypressRef="taskActionDropdown"
+              disableSaveButton={!task || isFormBusy}
             />
           ),
         })}

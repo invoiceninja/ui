@@ -130,7 +130,7 @@ export function MarkdownEditor(props: Props) {
             'preview',
             'help',
             'wordcount',
-            'mceCodeEditor',
+            // 'mceCodeEditor': https://github.com/invoiceninja/invoiceninja/issues/11060
             'emoticons',
           ],
           toolbar: [

@@ -87,6 +87,7 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { confirmActionModalAtom } from './components/ConfirmActionModal';
 import classNames from 'classnames';
+import { Dispatch, SetStateAction } from 'react';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -216,10 +217,12 @@ export function useRecurringInvoiceUtilities(
 
 interface RecurringInvoiceSaveProps {
   setErrors: (errors: ValidationBag | undefined) => unknown;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+  isFormBusy: boolean;
 }
 
 export function useSave(props: RecurringInvoiceSaveProps) {
-  const { setErrors } = props;
+  const { setErrors, setIsFormBusy, isFormBusy } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -227,8 +230,13 @@ export function useSave(props: RecurringInvoiceSaveProps) {
     recurringInvoice: RecurringInvoice,
     queryAction?: 'send_now' | 'start'
   ) => {
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
     setErrors(undefined);
+    setIsFormBusy(true);
 
     const endpointUrl = queryAction
       ? `/api/v1/recurring_invoices/:id?${queryAction}=true`
@@ -257,7 +265,10 @@ export function useSave(props: RecurringInvoiceSaveProps) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }
 
@@ -546,7 +557,11 @@ export function useActions(params?: Params) {
   return actions;
 }
 
-export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
+export function useCreate({
+  setErrors,
+  setIsFormBusy,
+  isFormBusy,
+}: RecurringInvoiceSaveProps) {
   const navigate = useNavigate();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
@@ -555,8 +570,13 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
     recurringInvoice: RecurringInvoice,
     queryAction?: 'start' | 'send_now'
   ) => {
+    if (isFormBusy) {
+      return;
+    }
+
     setErrors(undefined);
     toast.processing();
+    setIsFormBusy(true);
 
     const endpointUrl = queryAction
       ? `/api/v1/recurring_invoices?${queryAction}=true`
@@ -587,7 +607,10 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
           setErrors(errorMessages);
         }
       })
-      .finally(() => setIsDeleteActionTriggered(undefined));
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+        setIsFormBusy(false);
+      });
   };
 }
 
@@ -924,6 +947,12 @@ export function useRecurringInvoiceFilters() {
   const statusThemeColors = useStatusThemeColorScheme();
 
   const filters: SelectOption[] = [
+    {
+      label: t('draft'),
+      value: 'draft',
+      color: 'white',
+      backgroundColor: '#6B7280',
+    },
     {
       label: t('active'),
       value: 'active',

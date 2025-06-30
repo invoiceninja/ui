@@ -94,9 +94,11 @@ export function Th$(props: Props) {
           'text-xs': props.textSize === 'extraSmall',
           'text-sm': props.textSize === 'small' || !props.textSize,
           'px-2 lg:px-2.5 xl:px-4': !props.withoutHorizontalPadding,
+          'cursor-pointer': props.onClick,
         }
       )}
       onMouseMove={handleMouseMove}
+      onClick={props.onClick}
     >
       <div
         className={`flex items-center space-x-1 ${props.childrenClassName} select-none`}

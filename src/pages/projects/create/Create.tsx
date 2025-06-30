@@ -55,6 +55,7 @@ export default function Create() {
 
   const [project, setProject] = useAtom(projectAtom);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const handleChange = (property: keyof Project, value: unknown) => {
     setProject((project) => project && { ...project, [property]: value });
@@ -66,8 +67,14 @@ export default function Create() {
 
   const onSave = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isFormBusy) {
+      return;
+    }
+
     toast.processing();
     setErrors(undefined);
+    setIsFormBusy(true);
 
     request('POST', endpoint('/api/v1/projects'), project)
       .then((response) => {
@@ -82,6 +89,9 @@ export default function Create() {
           toast.dismiss();
           setErrors(error.response.data);
         }
+      })
+      .finally(() => {
+        setIsFormBusy(false);
       });
   };
 
@@ -127,7 +137,7 @@ export default function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!project}
+      disableSaveButton={!project || isFormBusy}
       onSaveClick={onSave}
     >
       <Container breadcrumbs={[]}>

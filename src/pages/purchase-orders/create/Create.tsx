@@ -91,6 +91,7 @@ export default function Create() {
     InvoiceSum | InvoiceSumInclusive
   >();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
@@ -103,7 +104,13 @@ export default function Create() {
 
   const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
 
-  const onSave = useCreate({ setErrors, isDefaultTerms, isDefaultFooter });
+  const onSave = useCreate({
+    setErrors,
+    isDefaultTerms,
+    isDefaultFooter,
+    isFormBusy,
+    setIsFormBusy,
+  });
 
   useEffect(() => {
     setPurchaseOrder((current) => {

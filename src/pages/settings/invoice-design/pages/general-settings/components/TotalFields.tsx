@@ -13,26 +13,20 @@ import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
 import { useColorScheme } from '$app/common/colors';
 import { Calculator } from '$app/components/icons/Calculator';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function TotalFields() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
 
-  const company = useCurrentCompany();
-
   const customField = useCustomField();
 
-  let defaultVariables = [
+  const defaultVariables = [
     { value: '$subtotal', label: t('subtotal') },
     { value: '$net_subtotal', label: t('net_subtotal') },
     { value: '$discount', label: t('discount') },
     { value: '$line_taxes', label: t('line_taxes') },
     { value: '$total_taxes', label: t('total_taxes') },
-    { value: '$tax1', label: t('tax_rate1') },
-    { value: '$tax2', label: t('tax_rate2') },
-    { value: '$tax3', label: t('tax_rate3') },
     {
       value: '$custom_surcharge1',
       label: customField('surcharge1').label() || t('custom_surcharge1'),
@@ -53,24 +47,6 @@ export default function TotalFields() {
     { value: '$total', label: t('total') },
     { value: '$outstanding', label: t('balance_due') },
   ];
-
-  if (!company?.enabled_tax_rates) {
-    defaultVariables = defaultVariables.filter(
-      (variable) => variable.value !== '$tax1'
-    );
-  }
-
-  if (company?.enabled_tax_rates < 2) {
-    defaultVariables = defaultVariables.filter(
-      (variable) => variable.value !== '$tax2'
-    );
-  }
-
-  if (company?.enabled_tax_rates < 3) {
-    defaultVariables = defaultVariables.filter(
-      (variable) => variable.value !== '$tax3'
-    );
-  }
 
   return (
     <Card

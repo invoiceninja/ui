@@ -79,6 +79,7 @@ export default function Create() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
@@ -92,7 +93,13 @@ export default function Create() {
     client,
   });
 
-  const save = useCreate({ setErrors, isDefaultFooter, isDefaultTerms });
+  const save = useCreate({
+    setErrors,
+    isDefaultFooter,
+    isDefaultTerms,
+    isFormBusy,
+    setIsFormBusy,
+  });
 
   const settingResolver = (client: Client, taxNumber: '1' | '2' | '3') => {
     if (client?.settings?.[`tax_name${taxNumber}`]) {
@@ -223,7 +230,7 @@ export default function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={() => save(credit!)}
-      disableSaveButton={credit?.client_id.length === 0}
+      disableSaveButton={credit?.client_id.length === 0 || isFormBusy}
     >
       {!isLoading ? (
         <div className="space-y-4">
