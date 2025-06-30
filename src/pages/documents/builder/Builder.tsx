@@ -1,4 +1,6 @@
+import { route } from '$app/common/helpers/route';
 import { Alert } from '$app/components/Alert';
+import { Page } from '$app/components/Breadcrumbs';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField } from '$app/components/forms';
@@ -10,7 +12,7 @@ import { SearchableSelect } from '$app/components/SearchableSelect';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import {
-  Builder,
+  Builder as Builder$,
   BuilderContext,
   ConfirmationDialogButtonProps,
   ConfirmationDialogProps,
@@ -33,16 +35,31 @@ import {
 } from '@docuninja/builder2.0';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
-export function BuilderDemo() {
+export function Builder() {
+  const { id } = useParams();
+  const { t } = useTranslation();
+
+  const pages: Page[] = [
+    { name: t('documents'), href: '/documents' },
+    {
+      name: t('Document'),
+      href: route('/documents/:id', { id }),
+    },
+    {
+      name: t('Builder'),
+      href: route('/documents/:id/builder', { id }),
+    },
+  ];
+
   return (
-    <Default breadcrumbs={[]}>
+    <Default breadcrumbs={pages}>
       <div className="max-w-7xl mx-auto">
-        
         <BuilderContext.Provider
           value={{
-            token: import.meta.env.VITE_DOCUNINJA_TOKEN as string,
-            document: import.meta.env.VITE_DOCUNINJA_DOCUMENT as string,
+            token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
+            document: id as string,
             components: {
               skeleton: Loading,
               save: Save,
@@ -94,9 +111,10 @@ export function BuilderDemo() {
                 sticky: false,
               },
             },
+            endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
           }}
         >
-          <Builder />
+          <Builder$ />
         </BuilderContext.Provider>
       </div>
     </Default>
