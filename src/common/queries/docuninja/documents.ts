@@ -41,7 +41,7 @@ export function useDocumentsQuery(params: Params) {
           },
         }
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: true }
   );
 }
 
