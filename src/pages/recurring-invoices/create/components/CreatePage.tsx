@@ -155,6 +155,8 @@ export default function CreatePage() {
             entity="recurring_invoice"
             relationType="client_id"
             endpoint="/api/v1/live_preview?entity=:entity"
+            observable={true}
+            initiallyVisible={false}
           />
         )}
       </div>
