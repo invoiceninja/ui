@@ -197,7 +197,11 @@ export function useResolveInputField(props: Props) {
     }
 
     if (product && company && company.enabled_item_tax_rates === 1) {
-      if (company.settings?.tax_name1 && !product.tax_name1) {
+      if (
+        company.settings?.tax_name1 &&
+        !product.tax_name1 &&
+        !Number(company.enabled_tax_rates)
+      ) {
         updatedProduct.tax_name1 = company.settings.tax_name1;
         updatedProduct.tax_rate1 = company.settings.tax_rate1;
       }
@@ -209,7 +213,11 @@ export function useResolveInputField(props: Props) {
     }
 
     if (product && company && company.enabled_item_tax_rates === 2) {
-      if (company.settings?.tax_name2 && !product.tax_name2) {
+      if (
+        company.settings?.tax_name2 &&
+        !product.tax_name2 &&
+        !Number(company.enabled_tax_rates)
+      ) {
         updatedProduct.tax_name2 = company.settings.tax_name2;
         updatedProduct.tax_rate2 = company.settings.tax_rate2;
       }
@@ -219,7 +227,11 @@ export function useResolveInputField(props: Props) {
     }
 
     if (product && company && company.enabled_item_tax_rates === 3) {
-      if (company.settings?.tax_name3 && !product.tax_name3) {
+      if (
+        company.settings?.tax_name3 &&
+        !product.tax_name3 &&
+        !Number(company.enabled_tax_rates)
+      ) {
         updatedProduct.tax_name3 = company.settings.tax_name3;
         updatedProduct.tax_rate3 = company.settings.tax_rate3;
       }

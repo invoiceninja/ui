@@ -81,8 +81,6 @@ export function TaxSettings() {
   const onCancel = useDiscardChanges();
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
-  console.log(companyChanges.enabled_tax_rates);
-
   return (
     <Settings
       onSaveClick={onSave}
