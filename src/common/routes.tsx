@@ -34,9 +34,8 @@ import { TestingPage } from '$app/components/TestingPage';
 import { activityRoutes } from '$app/pages/activities/routes';
 import { Guard } from './guards/Guard';
 import { permission } from './guards/guards/permission';
-import { documentsRoutes } from '$app/pages/documents/routes';
 import { BuilderDemo } from '$app/pages/BuilderDemo';
-
+import { documentsRoutes } from '$app/pages/documents/routes';
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
 const NotFound = lazy(() => import('$app/components/NotFound'));
 
