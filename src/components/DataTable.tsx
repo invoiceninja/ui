@@ -569,7 +569,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [data]);
 
   useEffect(() => {
-    if (!currentData.length) {
+    if (!currentData.length && !isLoading && !isFetching) {
       setCurrentPage(1);
     }
 
