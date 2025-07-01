@@ -54,7 +54,7 @@ export function DefaultLineItemTaxes() {
   return (
     <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
       {companyChanges?.enabled_item_tax_rates > 0 && data && (
-        <Element leftSide={t('default_item_tax_rate')}>
+        <Element leftSide={t('default_tax_rate')}>
           <SelectField
             value={
               companyChanges?.settings?.tax_name1
@@ -85,7 +85,7 @@ export function DefaultLineItemTaxes() {
       )}
 
       {companyChanges?.enabled_item_tax_rates > 1 && data && (
-        <Element leftSide={t('default_item_tax_rate')}>
+        <Element leftSide={t('default_tax_rate')}>
           <SelectField
             value={
               companyChanges?.settings?.tax_name2
@@ -116,7 +116,7 @@ export function DefaultLineItemTaxes() {
       )}
 
       {companyChanges?.enabled_item_tax_rates > 2 && data && (
-        <Element leftSide={t('default_item_tax_rate')}>
+        <Element leftSide={t('default_tax_rate')}>
           <SelectField
             value={
               companyChanges?.settings?.tax_name3
