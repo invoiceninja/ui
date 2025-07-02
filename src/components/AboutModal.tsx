@@ -37,6 +37,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import dayjs from 'dayjs';
 
 interface SystemInfo {
   system_health: boolean;
@@ -131,7 +132,15 @@ export function AboutModal(props: Props) {
 
       request('GET', endpoint('/api/v1/ping?clear_cache=true'))
         .then(() => {
-          request('POST', endpoint('/api/v1/refresh?current_company=true'))
+          request(
+            'POST',
+            endpoint(
+              '/api/v1/refresh?current_company=true&updated_at=:updatedAt',
+              {
+                updatedAt: dayjs().unix(),
+              }
+            )
+          )
             .then((response) => {
               dispatch(updateCompanyUsers(response.data.data));
               dispatch(resetChanges('company'));

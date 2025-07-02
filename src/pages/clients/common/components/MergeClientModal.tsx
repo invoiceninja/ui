@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import dayjs from 'dayjs';
 
 interface Props {
   visible: boolean;
@@ -77,7 +78,12 @@ export function MergeClientModal(props: Props) {
         .then(() => {
           $refetch(['clients']);
 
-          request('POST', endpoint('/api/v1/refresh'))
+          request(
+            'POST',
+            endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+              updatedAt: dayjs().unix(),
+            })
+          )
             .then((response: AxiosResponse) => {
               toast.success('merged_clients');
 
