@@ -34,6 +34,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
 import { Popover } from '@headlessui/react';
+import dayjs from 'dayjs';
 
 interface VerificationProps {
   visible: boolean;
@@ -66,13 +67,16 @@ function Confirmation({
 
       $refetch(['users', 'company_users']);
 
-      request('POST', endpoint('/api/v1/refresh')).then(
-        (response: GenericSingleResourceResponse<CompanyUser>) => {
-          dispatch(updateCompanyUsers(response.data.data));
-          dispatch(resetChanges('company'));
-          onComplete();
-        }
-      );
+      request(
+        'POST',
+        endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+          updatedAt: dayjs().unix(),
+        })
+      ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+        dispatch(updateCompanyUsers(response.data.data));
+        dispatch(resetChanges('company'));
+        onComplete();
+      });
     });
   };
 
