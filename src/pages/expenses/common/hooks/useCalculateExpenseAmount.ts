@@ -43,3 +43,39 @@ export function useCalculateExpenseAmount() {
     return finalAmount;
   };
 }
+
+
+export function useCalculateExpenseExclusiveAmount() {
+  return (expense: Expense | RecurringExpense) => {
+    if (!expense.uses_inclusive_taxes) {
+      return expense.amount;
+    }
+
+    if (expense.calculate_tax_by_amount) {
+
+      if (expense.uses_inclusive_taxes) {
+        return expense.amount - expense.tax_amount1 - expense.tax_amount2 - expense.tax_amount3;
+      }
+    }
+
+    let finalAmount = expense.amount;
+
+      if (expense.tax_rate1 > 0 || expense.tax_rate1 < 0) {
+        let taxAmount1 = (expense.amount / (1 + (expense.tax_rate1 / 100)));
+        finalAmount -= taxAmount1;
+      }
+
+      if (expense.tax_rate2 > 0 || expense.tax_rate2 < 0) {
+        let taxAmount2 = (expense.amount / (1 + (expense.tax_rate2 / 100)));
+        finalAmount -= taxAmount2;
+      }
+
+      if (expense.tax_rate3 > 0 || expense.tax_rate3 < 0) {
+        let taxAmount3 = (expense.amount / (1 + (expense.tax_rate3 / 100)));
+        finalAmount -= taxAmount3;
+      }
+
+      return expense.amount - finalAmount;
+
+  };
+}
