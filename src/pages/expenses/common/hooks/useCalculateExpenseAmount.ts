@@ -61,17 +61,17 @@ export function useCalculateExpenseExclusiveAmount() {
     let finalAmount = expense.amount;
 
       if (expense.tax_rate1 > 0 || expense.tax_rate1 < 0) {
-        let taxAmount1 = (expense.amount / (1 + (expense.tax_rate1 / 100)));
+        const taxAmount1 = (expense.amount / (1 + (expense.tax_rate1 / 100)));
         finalAmount -= taxAmount1;
       }
 
       if (expense.tax_rate2 > 0 || expense.tax_rate2 < 0) {
-        let taxAmount2 = (expense.amount / (1 + (expense.tax_rate2 / 100)));
+        const taxAmount2 = (expense.amount / (1 + (expense.tax_rate2 / 100)));
         finalAmount -= taxAmount2;
       }
 
       if (expense.tax_rate3 > 0 || expense.tax_rate3 < 0) {
-        let taxAmount3 = (expense.amount / (1 + (expense.tax_rate3 / 100)));
+        const taxAmount3 = (expense.amount / (1 + (expense.tax_rate3 / 100)));
         finalAmount -= taxAmount3;
       }
 
