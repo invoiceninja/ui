@@ -12,14 +12,7 @@ import { useEffect, useRef } from 'react';
 import { clearLocalStorage } from '../helpers/local-storage';
 import { useCurrentCompany } from './useCurrentCompany';
 
-const events = [
-  'mousedown',
-  'mousemove',
-  'wheel',
-  'keydown',
-  'touchstart',
-  'scroll',
-];
+const events = ['mousemove', 'wheel', 'keydown', 'touchstart', 'scroll'];
 
 export function useWebSessionTimeout() {
   const currentCompany = useCurrentCompany();

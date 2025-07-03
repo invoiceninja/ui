@@ -23,7 +23,7 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Settings } from '$app/components/layouts/Settings';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   isCompanySettingsFormBusy,
@@ -73,14 +73,21 @@ export function TemplatesAndReminders() {
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
+  const previewDivRef = useRef<HTMLDivElement>(null);
+
+  const isInitialLoad = useRef<boolean>(true);
+  const triggerUpdate = useRef<boolean>(false);
+  const isCurrentlyIntersecting = useRef<boolean>(false);
+  const intersectionTimer = useRef<NodeJS.Timeout | null>(null);
+
   const { data: statics } = useStaticsQuery();
   const [templateId, setTemplateId] = useState(
     isCompanySettingsActive || company?.settings.email_template_invoice
       ? 'invoice'
       : ''
   );
-  const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
+  const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
   const [isInitial, setIsInitial] = useState<boolean>(true);
@@ -325,17 +332,51 @@ export function TemplatesAndReminders() {
       handleChange(`settings.${emailSubjectKey}`, templateBody?.subject);
       handleChange(`settings.${emailTemplateKey}`, templateBody?.body);
 
-      setIsLoadingPdf(true);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (intersectionTimer.current) {
+              clearTimeout(intersectionTimer.current);
+              intersectionTimer.current = null;
+            }
 
-      request('POST', endpoint('/api/v1/templates'), {
-        body: templateBody?.body,
-        subject: templateBody?.subject,
-        entity: '',
-        entity_id: '',
-        template: emailTemplateKey,
-      })
-        .then((response) => setPreview(response.data))
-        .finally(() => setIsLoadingPdf(false));
+            if (entry.isIntersecting) {
+              intersectionTimer.current = setTimeout(() => {
+                setIsLoadingPdf(true);
+
+                isCurrentlyIntersecting.current = true;
+
+                request('POST', endpoint('/api/v1/templates'), {
+                  body: templateBody?.body,
+                  subject: templateBody?.subject,
+                  entity: '',
+                  entity_id: '',
+                  template: emailTemplateKey,
+                })
+                  .then((response) => setPreview(response.data))
+                  .finally(() => setIsLoadingPdf(false));
+              }, 1000);
+            } else {
+              isCurrentlyIntersecting.current = false;
+            }
+          });
+        },
+        {
+          threshold: 0.3,
+          rootMargin: '0px',
+        }
+      );
+
+      if (previewDivRef.current) {
+        observer.observe(previewDivRef.current);
+      }
+
+      return () => {
+        observer.disconnect();
+        if (intersectionTimer.current) {
+          clearTimeout(intersectionTimer.current);
+        }
+      };
     }
   }, [templateBody]);
 
@@ -611,32 +652,39 @@ export function TemplatesAndReminders() {
           </Card>
         )}
 
-      {preview && (
-        <Card
-          className="scale-y-100 shadow-sm"
-          style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-          title={preview.subject}
+      <Card
+        className="scale-y-100 shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        title={preview && !isLoadingPdf ? preview.subject : t('loading')}
+      >
+        <div
+          ref={previewDivRef}
+          className="flex flex-col w-full"
+          style={{ height: 800 }}
         >
-          {!isLoadingPdf ? (
-            <iframe
-              srcDoc={generateEmailPreview(preview.body, preview.wrapper)}
-              frameBorder="0"
-              width="100%"
-              height={800}
-              tabIndex={-1}
-              loading="lazy"
-            />
-          ) : (
+          {isLoadingPdf && (
             <div
-              className="flex justify-center items-center"
-              style={{ height: 800 }}
+              className="flex justify-center items-center w-full"
+              style={{ height: '100%' }}
             >
               <Spinner />
             </div>
           )}
-        </Card>
-      )}
+
+          <iframe
+            srcDoc={
+              preview
+                ? generateEmailPreview(preview.body, preview.wrapper)
+                : undefined
+            }
+            width="100%"
+            height={isLoadingPdf ? 0 : '100%'}
+            loading="lazy"
+            tabIndex={-1}
+          />
+        </div>
+      </Card>
 
       <Card
         title={t('variables')}

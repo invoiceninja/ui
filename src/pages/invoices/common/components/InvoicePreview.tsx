@@ -51,8 +51,9 @@ export function InvoicePreview(props: Props) {
   const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
   const divRef = useRef<HTMLDivElement>(null);
 
-  const triggerUpdate = useRef(false);
-  const isCurrentlyIntersecting = useRef(false);
+  const isInitialLoad = useRef<boolean>(true);
+  const triggerUpdate = useRef<boolean>(false);
+  const isCurrentlyIntersecting = useRef<boolean>(false);
   const intersectionTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -60,19 +61,19 @@ export function InvoicePreview(props: Props) {
       return;
     }
 
-    const debouncedKeydown = debounce(() => {
-      console.log('debounced keydown triggered');
+    const debouncedMouseDown = debounce(() => {
       triggerUpdate.current = true;
+
       if (isCurrentlyIntersecting.current) {
         setIsIntersecting(true);
       }
     }, 1000);
 
-    const handleKeydown = () => {
-      debouncedKeydown();
+    const handleMouseDown = () => {
+      debouncedMouseDown();
     };
 
-    window.addEventListener('keydown', handleKeydown);
+    window.addEventListener('mousedown', handleMouseDown);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -83,19 +84,14 @@ export function InvoicePreview(props: Props) {
           }
 
           if (entry.isIntersecting) {
-            console.log('intersection maintained for required time');
             intersectionTimer.current = setTimeout(() => {
               isCurrentlyIntersecting.current = true;
-              if (triggerUpdate.current) {
-                console.log(
-                  'intersection with pending update, refreshing view'
-                );
+              if (triggerUpdate.current || isInitialLoad.current) {
                 setIsIntersecting(true);
                 triggerUpdate.current = false;
               }
             }, 1000);
           } else {
-            console.log('not intersecting NOW');
             isCurrentlyIntersecting.current = false;
             setIsIntersecting(false);
           }
@@ -112,8 +108,8 @@ export function InvoicePreview(props: Props) {
     }
 
     return () => {
-      window.removeEventListener('keydown', handleKeydown);
-      debouncedKeydown.cancel();
+      window.removeEventListener('mousedown', handleMouseDown);
+      debouncedMouseDown.cancel();
       observer.disconnect();
       if (intersectionTimer.current) {
         clearTimeout(intersectionTimer.current);
