@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { InvoiceViewer } from './InvoiceViewer';
 import { RelationType } from './ProductsTable';
 import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
+import { debounce } from 'lodash';
 
 export type Resource =
   | Invoice
@@ -50,32 +51,75 @@ export function InvoicePreview(props: Props) {
   const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
   const divRef = useRef<HTMLDivElement>(null);
 
+  const triggerUpdate = useRef(false);
+  const isCurrentlyIntersecting = useRef(false);
+  const intersectionTimer = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (!props.observable) {
       return;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(
-        (entry) => {
+    const debouncedKeydown = debounce(() => {
+      console.log('debounced keydown triggered');
+      triggerUpdate.current = true;
+      if (isCurrentlyIntersecting.current) {
+        setIsIntersecting(true);
+      }
+    }, 1000);
+
+    const handleKeydown = () => {
+      debouncedKeydown();
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (intersectionTimer.current) {
+            clearTimeout(intersectionTimer.current);
+            intersectionTimer.current = null;
+          }
+
           if (entry.isIntersecting) {
-            setIsIntersecting(true);
+            console.log('intersection maintained for required time');
+            intersectionTimer.current = setTimeout(() => {
+              isCurrentlyIntersecting.current = true;
+              if (triggerUpdate.current) {
+                console.log(
+                  'intersection with pending update, refreshing view'
+                );
+                setIsIntersecting(true);
+                triggerUpdate.current = false;
+              }
+            }, 1000);
           } else {
+            console.log('not intersecting NOW');
+            isCurrentlyIntersecting.current = false;
             setIsIntersecting(false);
           }
-        },
-        { threshold: 0.1, rootMargin: '50px' }
-      );
-    });
+        });
+      },
+      {
+        threshold: 0.3,
+        rootMargin: '0px',
+      }
+    );
 
     if (divRef.current) {
       observer.observe(divRef.current);
     }
 
     return () => {
+      window.removeEventListener('keydown', handleKeydown);
+      debouncedKeydown.cancel();
       observer.disconnect();
+      if (intersectionTimer.current) {
+        clearTimeout(intersectionTimer.current);
+      }
     };
-  }, [divRef.current]);
+  }, [divRef.current, props.observable]);
 
   useEffect(() => {
     if (!props.observable) {
@@ -105,18 +149,20 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <div className="flex flex-col space-y-3">
-        <InvoiceViewer
-          link={previewEndpoint(
-            '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
-            {
-              entity: props.entity,
-              id: props.resource?.id,
-            }
-          )}
-          resource={props.resource}
-          method="POST"
-          enabled={props.observable ? isIntersecting : true}
-        />
+        <div ref={divRef}>
+          <InvoiceViewer
+            link={previewEndpoint(
+              '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
+              {
+                entity: props.entity,
+                id: props.resource?.id,
+              }
+            )}
+            resource={props.resource}
+            method="POST"
+            enabled={props.observable ? isIntersecting : true}
+          />
+        </div>
 
         {props.withRemoveLogoCTA && <RemoveLogoCTA />}
       </div>
