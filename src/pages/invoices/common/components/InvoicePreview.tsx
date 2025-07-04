@@ -31,15 +31,15 @@ interface Props {
   for: 'create' | 'invoice';
   resource: Resource;
   entity:
-    | 'invoice'
-    | 'recurring_invoice'
-    | 'quote'
-    | 'credit'
-    | 'purchase_order';
+  | 'invoice'
+  | 'recurring_invoice'
+  | 'quote'
+  | 'credit'
+  | 'purchase_order';
   relationType: RelationType;
   endpoint?:
-    | '/api/v1/live_preview?entity=:entity'
-    | '/api/v1/live_preview/purchase_order?entity=:entity';
+  | '/api/v1/live_preview?entity=:entity'
+  | '/api/v1/live_preview/purchase_order?entity=:entity';
   initiallyVisible?: boolean;
   observable?: boolean;
   withRemoveLogoCTA?: boolean;
@@ -80,7 +80,6 @@ export function InvoicePreview(props: Props) {
       debouncedKeydown();
     };
 
-    window.addEventListener('keydown', handleKeydown);
     window.addEventListener('mousedown', handleKeydown);
 
     const observer = new IntersectionObserver((entries) => {
@@ -110,7 +109,6 @@ export function InvoicePreview(props: Props) {
     }
 
     return () => {
-      window.removeEventListener('keydown', handleKeydown);
       window.removeEventListener('mousedown', handleKeydown);
       debouncedKeydown.cancel();
       observer.disconnect();
