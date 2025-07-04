@@ -15,9 +15,21 @@ import { Builder } from './builder/Builder';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
+const Create = lazy(() => import('$app/pages/documents/create/Create'));
+const Blueprints = lazy(
+  () => import('$app/pages/documents/pages/blueprints/Blueprints')
+);
+const CreateBlueprint = lazy(
+  () => import('$app/pages/documents/pages/blueprints/create/Create')
+);
 
 export const documentsRoutes = (
   <Route path="documents">
+    <Route
+      path="create"
+      element={<Guard guards={[]} component={<Create />} />}
+    />
+
     <Route path="" element={<Guard guards={[]} component={<Document />} />} />
 
     <Route
@@ -28,6 +40,16 @@ export const documentsRoutes = (
     <Route
       path=":id/builder"
       element={<Guard guards={[]} component={<Builder />} />}
+    />
+
+    <Route
+      path="blueprints"
+      element={<Guard guards={[]} component={<Blueprints />} />}
+    />
+
+    <Route
+      path="blueprints/create"
+      element={<Guard guards={[]} component={<CreateBlueprint />} />}
     />
   </Route>
 );

@@ -246,7 +246,7 @@ export default function EInvoice() {
         )}
       </Card>
 
-      {Boolean(invoice?.status_id === InvoiceStatus.Sent) && (
+      {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Paid, InvoiceStatus.Partial].includes((invoice?.status_id?.toString() ?? InvoiceStatus.Draft) as InvoiceStatus)) && (
         <Card title={t('status')}>
           <div className="flex px-6 text-sm">
             <div
