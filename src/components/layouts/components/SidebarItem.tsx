@@ -15,9 +15,7 @@ import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import classNames from 'classnames';
 import { Link } from '$app/components/forms';
-import { ChevronDown } from '$app/components/icons/ChevronDown';
 import { useState } from 'react';
-import { ChevronUp } from '$app/components/icons/ChevronUp';
 
 const Div = styled.div`
   background-color: ${(props) => props.theme.color};
@@ -94,22 +92,6 @@ export function SidebarItem(props: Props) {
               />
 
               {!isMiniSidebar && <span>{item.name}</span>}
-
-              {item.subOptions && (
-                <div
-                  className="absolute right-[1.1rem] cursor-pointer hover:opacity-75 px-[0.2rem] pt-[0.2rem] pb-[0.25rem]"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setAreSubOptionsVisible((current) => !current);
-                  }}
-                >
-                  {areSubOptionsVisible ? (
-                    <ChevronUp color={colors.$1} size="1.1rem" />
-                  ) : (
-                    <ChevronDown color={colors.$1} size="1.1rem" />
-                  )}
-                </div>
-              )}
             </div>
           </LinkStyled>
         </div>
@@ -135,8 +117,7 @@ export function SidebarItem(props: Props) {
         )}
       </Div>
 
-      {(areSubOptionsVisible ||
-        item.subOptions?.some((subOption) => subOption.current)) && (
+      {item.current && (
         <div className="flex flex-col justify-center w-full pl-2">
           {item.subOptions && (
             <div className="flex flex-col">

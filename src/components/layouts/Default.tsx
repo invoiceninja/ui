@@ -363,6 +363,12 @@ export function Default(props: Props) {
       href: '/documents',
       icon: ArrowsTransaction,
       current: location.pathname.startsWith('/documents'),
+      rightButton: {
+        icon: Plus,
+        to: '/documents/create',
+        label: t('new_document'),
+        visible: true,
+      },
       visible: true, //isHosted(), //@TODO: switch back @ release @docuninja
       subOptions: [
         {
@@ -371,6 +377,12 @@ export function Default(props: Props) {
           icon: File,
           visible: true,
           current: location.pathname.startsWith('/documents/blueprints'),
+          rightButton: {
+            icon: Plus,
+            to: '/documents/blueprints/create',
+            label: t('new_blueprint'),
+            visible: true,
+          },
         },
         {
           name: t('users'),
@@ -378,6 +390,12 @@ export function Default(props: Props) {
           icon: Users,
           visible: true,
           current: location.pathname.startsWith('/documents/users'),
+          rightButton: {
+            icon: Plus,
+            to: '/documents/users/create',
+            label: t('new_user'),
+            visible: true,
+          },
         },
         {
           name: t('settings'),

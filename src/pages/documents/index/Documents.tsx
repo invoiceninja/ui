@@ -240,7 +240,7 @@ export default function Documents() {
                   borderColor: colors.$20,
                 }}
               >
-                <Td colSpan={5}>
+                <Td colSpan={7}>
                   <div className="flex flex-col items-center justify-center space-y-4 text-center py-12">
                     <FileContent size="3.5rem" color={colors.$17} />
 

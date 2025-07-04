@@ -228,6 +228,10 @@ export const keys = {
     path: '/api/documents',
     dependencies: [],
   },
+  blueprints: {
+    path: '/api/blueprints',
+    dependencies: [],
+  },
 };
 
 export type RefetchKey = keyof typeof keys;
