@@ -24,6 +24,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
 import { Element } from '$app/components/cards';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   readonly?: boolean;
@@ -43,7 +44,7 @@ export function ClientSelector(props: Props) {
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
   const clientResolver = useClientResolver();
-
+  const hasPermission = useHasPermission();
   const [client, setClient] = useState<Client>();
 
   const { resource } = props;
@@ -188,7 +189,8 @@ export function ClientSelector(props: Props) {
                   <div className="flex flex-col relative left-7">
                     {Boolean(
                       resource.invitations.length >= 1 &&
-                        resource.invitations[0].link
+                        resource.invitations[0].link &&
+                        hasPermission('edit_client')
                     ) && (
                       <div className="flex items-center space-x-2">
                         <Link

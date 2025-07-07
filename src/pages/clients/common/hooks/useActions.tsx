@@ -77,7 +77,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (client) =>
-      Boolean(!client.is_deleted && !isShowPage) && (
+      Boolean(!client.is_deleted && !isShowPage && hasPermission('edit_client')) && (
         <DropdownElement
           onClick={() =>
             window.open(

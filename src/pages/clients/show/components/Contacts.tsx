@@ -18,6 +18,7 @@ import { route } from '$app/common/helpers/route';
 import { Link } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 import { InfoCard } from '$app/components/InfoCard';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   client: Client;
@@ -29,6 +30,8 @@ export function Contacts(props: Props) {
   const colors = useColorScheme();
 
   const { client } = props;
+
+  const hasPermission = useHasPermission();
 
   return (
     <>
@@ -92,7 +95,8 @@ export function Contacts(props: Props) {
                         </div>
                       )}
 
-                      <div className="flex items-center space-x-2">
+                      {hasPermission('edit_client') && (
+                        <div className="flex items-center space-x-2">
                         <Link
                           className="cursor-pointer"
                           to={route(
@@ -120,6 +124,7 @@ export function Contacts(props: Props) {
                           />
                         </Tooltip>
                       </div>
+                      )}
                     </div>
 
                     {contact.is_locked && <UserUnsubscribedTooltip />}
