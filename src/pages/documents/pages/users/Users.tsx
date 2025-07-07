@@ -33,9 +33,9 @@ import { PerPage } from '$app/components/DataTable';
 import { Button, Checkbox, InputField, Link } from '$app/components/forms';
 import { FileContent } from '$app/components/icons/FileContent';
 import { useDebounce } from 'react-use';
-import { useBlueprintsQuery } from '$app/common/queries/docuninja/blueprints';
-import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { Default } from '$app/components/layouts/Default';
+import { useUsersQuery } from '$app/common/queries/docuninja/users';
+import { User } from '$app/common/interfaces/docuninja/api';
 
 interface DocumentFile {
   id: string;
@@ -78,8 +78,8 @@ export default function Blueprints() {
       href: '/documents',
     },
     {
-      name: t('blueprints'),
-      href: '/documents/blueprints',
+      name: t('users'),
+      href: '/documents/users',
     },
   ];
 
@@ -93,11 +93,11 @@ export default function Blueprints() {
   const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
 
   const {
-    data: blueprintsResponse,
+    data: usersResponse,
     isLoading,
     error,
     isFetching,
-  } = useBlueprintsQuery({
+  } = useUsersQuery({
     currentPage: currentPage.toString(),
     perPage: perPage.toString(),
     filter,
@@ -105,12 +105,12 @@ export default function Blueprints() {
 
   useDebounce(
     () => {
-      if (blueprintsResponse && !isFetching) {
-        setCurrentData(blueprintsResponse.data.data);
+      if (usersResponse && !isFetching) {
+        setCurrentData(usersResponse.data.data);
       }
     },
     10,
-    [blueprintsResponse, isFetching]
+    [usersResponse, isFetching]
   );
 
   useEffect(() => {
@@ -149,9 +149,9 @@ export default function Blueprints() {
   }, [currentData]);
 
   return (
-    <Default title={t('blueprints')} breadcrumbs={pages}>
+    <Default title={t('users')} breadcrumbs={pages}>
       <Card
-        title={t('blueprints')}
+        title={t('users')}
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
@@ -164,9 +164,7 @@ export default function Blueprints() {
               onValueChange={(value) => setFilter(value)}
             />
 
-            <Button to="/documents/blueprints/create">
-              {t('new_blueprint')}
-            </Button>
+            <Button to="/documents/users/create">{t('new_user')}</Button>
           </div>
 
           <Table>
@@ -174,13 +172,13 @@ export default function Blueprints() {
               <Th>
                 <Checkbox
                   checked={
-                    selected.length === blueprintsResponse?.data?.data.length &&
-                    blueprintsResponse?.data?.data.length > 0
+                    selected.length === usersResponse?.data?.data.length &&
+                    usersResponse?.data?.data.length > 0
                   }
                   onValueChange={(_, checked?: boolean) => {
                     if (checked) {
                       setSelected(
-                        blueprintsResponse?.data?.data.map(
+                        usersResponse?.data?.data.map(
                           (document: Document) => document.id
                         )
                       );
@@ -207,8 +205,8 @@ export default function Blueprints() {
               )}
 
               {Boolean(
-                blueprintsResponse &&
-                  !blueprintsResponse.data.data.length &&
+                usersResponse &&
+                  !usersResponse.data.data.length &&
                   !isLoading &&
                   error
               ) && (
@@ -220,7 +218,7 @@ export default function Blueprints() {
                 >
                   <Td colSpan={100}>
                     <div className="flex space-x-4 text-red-600">
-                      <span>Error loading blueprints:</span>
+                      <span>Error loading users:</span>
 
                       <span>{(error as any)?.message || 'Unknown error'}</span>
                     </div>
@@ -229,9 +227,7 @@ export default function Blueprints() {
               )}
 
               {Boolean(
-                blueprintsResponse &&
-                  !blueprintsResponse.data.data.length &&
-                  !isLoading
+                usersResponse && !usersResponse.data.data.length && !isLoading
               ) && (
                 <Tr
                   className="border-b"
@@ -248,11 +244,11 @@ export default function Blueprints() {
                           className="mt-2 text-sm font-medium"
                           style={{ color: colors.$3 }}
                         >
-                          {t('no_blueprints')}
+                          {t('no_users')}
                         </span>
 
                         <p className="text-sm" style={{ color: colors.$17 }}>
-                          {t('new_blueprint')}
+                          {t('new_user')}
                         </p>
                       </div>
                     </div>
@@ -260,12 +256,12 @@ export default function Blueprints() {
                 </Tr>
               )}
 
-              {blueprintsResponse &&
-                blueprintsResponse.data.data.map((blueprint: Blueprint) => (
-                  <MemoizedTr key={blueprint.id} resource={blueprint}>
+              {usersResponse &&
+                usersResponse.data.data.map((user: User) => (
+                  <MemoizedTr key={user.id} resource={user}>
                     <Td>
                       <Checkbox
-                        checked={selected.includes(blueprint.id)}
+                        checked={selected.includes(user.id)}
                         onValueChange={(value) =>
                           selected.includes(value)
                             ? setSelected((current) =>
@@ -278,21 +274,23 @@ export default function Blueprints() {
 
                     <Td>
                       <Link
-                        to={route('/documents/blueprints/:id/edit', {
-                          id: blueprint.id,
+                        to={route('/documents/users/:id/edit', {
+                          id: user.id,
                         })}
                       >
-                        {blueprint.id.slice(-8)}
+                        {user.id.slice(-8)}
                       </Link>
                     </Td>
 
-                    <Td>{blueprint.name || t('untitled_blueprint')}</Td>
+                    <Td>
+                      {user.first_name} {user.last_name}
+                    </Td>
 
                     <Td>
                       <Dropdown label={t('actions')}>
                         <DropdownElement
-                          to={route('/documents/blueprints/:id/edit', {
-                            id: blueprint.id,
+                          to={route('/documents/users/:id/edit', {
+                            id: user.id,
                           })}
                           icon={<Icon element={MdEdit} />}
                         >
@@ -305,13 +303,13 @@ export default function Blueprints() {
             </Tbody>
           </Table>
 
-          {blueprintsResponse && (
+          {usersResponse && (
             <Pagination
               currentPage={currentPage}
               onPageChange={setCurrentPage}
               onRowsChange={(rows: PerPage) => setPerPage(Number(rows))}
-              totalPages={blueprintsResponse?.data.meta.last_page || 1}
-              totalRecords={blueprintsResponse?.data.meta.total || 0}
+              totalPages={usersResponse?.data.meta.last_page || 1}
+              totalRecords={usersResponse?.data.meta.total || 0}
             />
           )}
         </div>

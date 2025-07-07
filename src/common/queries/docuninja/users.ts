@@ -13,14 +13,14 @@ import { Params } from '../common/params.interface';
 import { request } from '$app/common/helpers/request';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 
-export function useBlueprintsQuery(params: Params) {
+export function useUsersQuery(params: Params) {
   return useQuery(
-    ['/api/blueprints', params],
+    ['/api/users/docuninja', params],
     () =>
       request(
         'GET',
         docuNinjaEndpoint(
-          '/api/blueprints?per_page=:per_page&page=:page&filter=:filter',
+          '/api/users?per_page=:per_page&page=:page&filter=:filter',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
@@ -40,17 +40,17 @@ export function useBlueprintsQuery(params: Params) {
   );
 }
 
-interface BlueprintParams {
+interface UserParams {
   id: string | undefined;
 }
 
-export function useBlueprintQuery(params: BlueprintParams) {
+export function useUserQuery(params: UserParams) {
   return useQuery(
-    ['/api/blueprints', params],
+    ['/api/users/docuninja', params],
     () =>
       request(
         'GET',
-        docuNinjaEndpoint('/api/blueprints/:id', {
+        docuNinjaEndpoint('/api/users/:id', {
           id: params.id,
         }),
         {},
