@@ -219,8 +219,8 @@ export function PaymentSlider() {
                   <span>
                     {formatMoney(
                       invoice.amount,
-                      invoice.client?.country_id,
-                      invoice.client?.settings.currency_id
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
                     )}
                   </span>
 
@@ -272,8 +272,8 @@ export function PaymentSlider() {
                   <span>
                     {formatMoney(
                       credit.amount,
-                      credit.client?.country_id,
-                      credit.client?.settings.currency_id
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
                     )}
                   </span>
 
