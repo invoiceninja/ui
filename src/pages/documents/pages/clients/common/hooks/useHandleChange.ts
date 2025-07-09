@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { User } from '$app/common/interfaces/docuninja/api';
+import { Client, ClientContact } from '$app/common/interfaces/docuninja/api';
 import { cloneDeep, set } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
-  setUser: Dispatch<SetStateAction<User | undefined>>;
+  setClient: Dispatch<SetStateAction<Client | undefined>>;
 }
 
-export function useHandleChange({ setUser }: Params) {
-  return (key: string, value: string | number | boolean) => {
-    setUser((current) => {
+export function useHandleChange({ setClient }: Params) {
+  return (key: string, value: string | number | boolean | ClientContact[]) => {
+    setClient((current) => {
       if (!current) return current;
 
-      const updatedUser = cloneDeep(current);
+      const updatedClient = cloneDeep(current);
 
-      set(updatedUser, key, value);
+      set(updatedClient, key, value);
 
-      return updatedUser;
+      return updatedClient;
     });
   };
 }

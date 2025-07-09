@@ -123,20 +123,20 @@ export interface Client {
   phone: string | null;
   balance: number;
   paid_to_date: number;
-  currency_id: number | null;
+  currency_id: string | null;
   address1: string | null;
   address2: string | null;
   city: string | null;
   state: string | null;
   postal_code: string | null;
-  country_id: number | null;
+  country_id: string | null;
   is_deleted: boolean;
   vat_number: string | null;
   id_number: string | null;
   created_at: string;
   updated_at: string;
   archived_at: string | null;
-  contacts?: ClientContact[];
+  contacts: ClientContact[];
   client_hash?: string;
 }
 
@@ -144,7 +144,7 @@ export interface ClientContact {
   id: string;
   user_id: string;
   company_id: string;
-  client_id: string;
+  client_id: string | null;
   first_name: string | null;
   last_name: string | null;
   phone: string | null;

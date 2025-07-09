@@ -25,9 +25,14 @@ const CreateBlueprint = lazy(
 const EditBlueprint = lazy(
   () => import('$app/pages/documents/pages/blueprints/edit/Edit')
 );
-const Users = lazy(() => import('$app/pages/documents/pages/users/Users'));
-const CreateUser = lazy(
-  () => import('$app/pages/documents/pages/users/create/Create')
+const Clients = lazy(
+  () => import('$app/pages/documents/pages/clients/Clients')
+);
+const CreateClient = lazy(
+  () => import('$app/pages/documents/pages/clients/create/Create')
+);
+const EditClient = lazy(
+  () => import('$app/pages/documents/pages/clients/edit/Edit')
 );
 
 export const documentsRoutes = (
@@ -64,11 +69,19 @@ export const documentsRoutes = (
       element={<Guard guards={[]} component={<EditBlueprint />} />}
     />
 
-    <Route path="users" element={<Guard guards={[]} component={<Users />} />} />
+    <Route
+      path="clients"
+      element={<Guard guards={[]} component={<Clients />} />}
+    />
 
     <Route
-      path="users/create"
-      element={<Guard guards={[]} component={<CreateUser />} />}
+      path="clients/create"
+      element={<Guard guards={[]} component={<CreateClient />} />}
+    />
+
+    <Route
+      path="clients/:id/edit"
+      element={<Guard guards={[]} component={<EditClient />} />}
     />
   </Route>
 );

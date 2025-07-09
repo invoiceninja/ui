@@ -9,7 +9,7 @@ import { Alert } from '$app/components/Alert';
 import { Company } from '$app/common/interfaces/docuninja/api';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { UpgradeModal } from './components/UpgradeModal';
+import { UpgradeModal } from './common/components/UpgradeModal';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useQueryClient } from 'react-query';
 import { useLogin } from '$app/common/queries/docuninja/docuninja';

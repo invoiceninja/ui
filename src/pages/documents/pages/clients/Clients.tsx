@@ -14,11 +14,10 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
-import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { useTableColumns } from './common/hooks/useTableColumns';
 
-export default function Blueprints() {
-  useTitle('blueprints');
+export default function Clients() {
+  useTitle('clients');
 
   const [t] = useTranslation();
 
@@ -31,28 +30,28 @@ export default function Blueprints() {
       href: '/documents',
     },
     {
-      name: t('blueprints'),
-      href: '/documents/blueprints',
+      name: t('clients'),
+      href: '/documents/clients',
     },
   ];
 
   return (
-    <Default title={t('blueprints')} breadcrumbs={pages}>
+    <Default title={t('clients')} breadcrumbs={pages}>
       <Card
-        title={t('blueprints')}
+        title={t('clients')}
         className="shadow-sm"
         childrenClassName="px-4 sm:px-6 pt-6 pb-8"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-        <DataTable<Blueprint>
-          resource="blueprint"
-          endpoint="/api/blueprints?sort=id|desc"
+        <DataTable
+          resource="client"
+          endpoint="/api/clients?sort=id|desc"
           columns={columns}
           withResourcefulActions
-          bulkRoute="/api/blueprints/bulk"
-          linkToCreate="/documents/blueprints/create"
-          linkToEdit="/documents/blueprints/:id/edit"
+          bulkRoute="/api/clients/bulk"
+          linkToCreate="/documents/clients/create"
+          linkToEdit="/documents/clients/:id/edit"
           useDocuNinjaApi
           endpointHeaders={{
             Authorization: `Bearer ${localStorage.getItem(

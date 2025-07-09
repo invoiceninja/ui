@@ -129,7 +129,7 @@ export function SidebarItem(props: Props) {
                       : themeColors.$3 || 'transparent',
                     hoverColor: themeColors.$1 || colors.$8,
                   }}
-                  key={item.name}
+                  key={subOption.name}
                   className={classNames(
                     'flex items-center justify-between group px-1.5 text-sm font-medium rounded-md w-full',
                     {

@@ -236,6 +236,10 @@ export const keys = {
     path: '/api/users/docuninja',
     dependencies: [],
   },
+  docuninja_clients: {
+    path: '/api/clients/docuninja',
+    dependencies: [],
+  },
 };
 
 export type RefetchKey = keyof typeof keys;
