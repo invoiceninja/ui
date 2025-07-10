@@ -54,6 +54,7 @@ export function InvoicePreview(props: Props) {
   const triggerUpdate = useRef(false);
   const isCurrentlyIntersecting = useRef(false);
   const intersectionTimer = useRef<NodeJS.Timeout | null>(null);
+  const hasInitialLoadOccurred = useRef(false);
 
   // Debounce resource updates
   useEffect(() => {
@@ -92,6 +93,15 @@ export function InvoicePreview(props: Props) {
         if (entry.isIntersecting) {
           intersectionTimer.current = setTimeout(() => {
             isCurrentlyIntersecting.current = true;
+            
+            // Handle initial load case
+            if (!hasInitialLoadOccurred.current) {
+              hasInitialLoadOccurred.current = true;
+              setIsIntersecting(true);
+              return;
+            }
+
+            // Handle regular updates
             if (triggerUpdate.current) {
               setIsIntersecting(true);
               triggerUpdate.current = false;
