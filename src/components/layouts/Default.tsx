@@ -385,19 +385,6 @@ export function Default(props: Props) {
           },
         },
         {
-          name: t('clients'),
-          href: '/documents/clients',
-          icon: Users,
-          visible: true,
-          current: location.pathname.startsWith('/documents/clients'),
-          rightButton: {
-            icon: Plus,
-            to: '/documents/clients/create',
-            label: t('new_client'),
-            visible: true,
-          },
-        },
-        {
           name: t('settings'),
           href: '/documents/settings',
           icon: Gear,

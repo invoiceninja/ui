@@ -5,12 +5,11 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
-import { SearchableSelect } from '$app/components/SearchableSelect';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import {
@@ -38,97 +37,6 @@ import {
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-
-export function Builder() {
-  const [t] = useTranslation();
-
-  const { id } = useParams();
-  const colors = useColorScheme();
-
-  const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
-    {
-      name: t('Document'),
-      href: route('/documents/:id', { id }),
-    },
-    {
-      name: t('Builder'),
-      href: route('/documents/:id/builder', { id }),
-    },
-  ];
-
-  return (
-    <Default title={t('builder')} breadcrumbs={pages}>
-      <Card
-        className="shadow-sm px-3"
-        style={{ borderColor: colors.$24 }}
-        withoutBodyPadding
-      >
-        {/* @ts-expect-error It's safe */}
-        <BuilderContext.Provider
-          value={{
-            token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
-            document: id as string,
-            components: {
-              skeleton: Loading,
-              save: Save,
-              send: {
-                trigger: Send,
-                dialog: SendDialog,
-                button: SendDialogButton,
-              },
-              delete: {
-                dialog: DeleteDialog,
-                button: DeleteButton,
-              },
-              upload: {
-                trigger: Upload,
-                dialog: UploadDialog,
-              },
-              confirmation: {
-                dialog: ConfirmationDialog,
-                button: ConfirmationDialogButton,
-              },
-              createSignatory: {
-                dialog: CreateDialog,
-                client: {
-                  form: CreateClientForm,
-                  button: CreateDialogTabButton,
-                },
-                user: {
-                  form: CreateUserForm,
-                  button: CreateDialogTabButton,
-                },
-              },
-              signatorySelector: SignatorySelector,
-              uninvite: {
-                dialog: UninviteDialog,
-                button: UninviteButton,
-              },
-              validationErrors: ValidationErrors,
-              sign: () => null,
-              toolboxContext: ToolboxContext,
-            },
-            styles: {
-              frame: {
-                backgroundColor: colors.$1,
-              },
-              border: colors.$24,
-            },
-            options: {
-              header: {
-                sticky: false,
-              },
-            },
-            endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
-          }}
-        >
-          <Builder$ />
-        </BuilderContext.Provider>
-      </Card>
-    </Default>
-  );
-}
 
 function Loading() {
   return (
@@ -194,17 +102,21 @@ function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
 }
 
 function Upload({ ...props }: UploadProps) {
+  const [t] = useTranslation();
+
   return (
     <Button behavior="button" type="secondary" {...props} className="w-full">
-      Upload
+      {t('upload')}
     </Button>
   );
 }
 
 function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
+  const [t] = useTranslation();
+
   return (
     <Modal
-      title="Upload document"
+      title={t('upload_document')}
       visible={open}
       onClose={onOpenChange}
       size="small"
@@ -314,6 +226,8 @@ function SignatorySelector({
   value,
   setCreateDialogOpen,
 }: SignatorySelectorProps) {
+  const [t] = useTranslation();
+
   function handleSelect(v: string | undefined) {
     if (!v) {
       return;
@@ -336,16 +250,20 @@ function SignatorySelector({
   }
 
   return (
-    <SearchableSelect value={value} onValueChange={handleSelect}>
-      <option disabled>Select user or client...</option>
-      <option value="create">Create client or user</option>
+    <SelectField
+      placeholder={t('select_user_or_client')}
+      value={value}
+      onValueChange={handleSelect}
+      customSelector
+    >
+      <option value="create">{t('create_client_or_user')}</option>
 
       {results.map((result) => (
         <option value={`${result.type}|${result.value}`} key={result.value}>
           {result.label}
         </option>
       ))}
-    </SearchableSelect>
+    </SelectField>
   );
 }
 
@@ -423,3 +341,96 @@ function ToolboxContext({ options }: ToolboxContextProps) {
     </Dropdown>
   );
 }
+
+function Builder() {
+  const [t] = useTranslation();
+
+  const { id } = useParams();
+  const colors = useColorScheme();
+
+  const pages: Page[] = [
+    { name: t('documents'), href: '/documents' },
+    {
+      name: t('Document'),
+      href: route('/documents/:id', { id }),
+    },
+    {
+      name: t('Builder'),
+      href: route('/documents/:id/builder', { id }),
+    },
+  ];
+
+  return (
+    <Default title={t('builder')} breadcrumbs={pages}>
+      <Card
+        className="shadow-sm px-3"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+      >
+        {/* @ts-expect-error It's safe */}
+        <BuilderContext.Provider
+          value={{
+            token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
+            document: id as string,
+            components: {
+              skeleton: Loading,
+              save: Save,
+              send: {
+                trigger: Send,
+                dialog: SendDialog,
+                button: SendDialogButton,
+              },
+              delete: {
+                dialog: DeleteDialog,
+                button: DeleteButton,
+              },
+              upload: {
+                trigger: Upload,
+                dialog: UploadDialog,
+              },
+              confirmation: {
+                dialog: ConfirmationDialog,
+                button: ConfirmationDialogButton,
+              },
+              createSignatory: {
+                dialog: CreateDialog,
+                client: {
+                  form: CreateClientForm,
+                  button: CreateDialogTabButton,
+                },
+                user: {
+                  form: CreateUserForm,
+                  button: CreateDialogTabButton,
+                },
+              },
+              signatorySelector: SignatorySelector,
+              uninvite: {
+                dialog: UninviteDialog,
+                button: UninviteButton,
+              },
+              validationErrors: ValidationErrors,
+              sign: () => null,
+              toolboxContext: ToolboxContext,
+            },
+            styles: {
+              frame: {
+                backgroundColor: colors.$1,
+              },
+              border: colors.$24,
+            },
+            options: {
+              header: {
+                sticky: false,
+              },
+            },
+            endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
+          }}
+        >
+          <Builder$ />
+        </BuilderContext.Provider>
+      </Card>
+    </Default>
+  );
+}
+
+export default Builder;

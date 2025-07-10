@@ -11,7 +11,6 @@
 import { Guard } from '$app/common/guards/Guard';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
-import { Builder } from './builder/Builder';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
@@ -25,15 +24,10 @@ const CreateBlueprint = lazy(
 const EditBlueprint = lazy(
   () => import('$app/pages/documents/pages/blueprints/edit/Edit')
 );
-const Clients = lazy(
-  () => import('$app/pages/documents/pages/clients/Clients')
+const Settings = lazy(
+  () => import('$app/pages/documents/pages/settings/Settings')
 );
-const CreateClient = lazy(
-  () => import('$app/pages/documents/pages/clients/create/Create')
-);
-const EditClient = lazy(
-  () => import('$app/pages/documents/pages/clients/edit/Edit')
-);
+const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
 
 export const documentsRoutes = (
   <Route path="documents">
@@ -43,6 +37,11 @@ export const documentsRoutes = (
     />
 
     <Route path="" element={<Guard guards={[]} component={<Document />} />} />
+
+    <Route
+      path="settings"
+      element={<Guard guards={[]} component={<Settings />} />}
+    />
 
     <Route
       path=":id"
@@ -67,21 +66,6 @@ export const documentsRoutes = (
     <Route
       path="blueprints/:id/edit"
       element={<Guard guards={[]} component={<EditBlueprint />} />}
-    />
-
-    <Route
-      path="clients"
-      element={<Guard guards={[]} component={<Clients />} />}
-    />
-
-    <Route
-      path="clients/create"
-      element={<Guard guards={[]} component={<CreateClient />} />}
-    />
-
-    <Route
-      path="clients/:id/edit"
-      element={<Guard guards={[]} component={<EditClient />} />}
     />
   </Route>
 );
