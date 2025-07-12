@@ -54,7 +54,6 @@ import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-import { numberFormattableColumns } from '../common/constants/columns';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { cloneDeep } from 'lodash';
@@ -303,26 +302,26 @@ export default function Reports() {
       );
     }
 
-    if (typeof currentCell.display_value !== 'string') {
-      return currentCell.display_value;
-    }
+    // if (typeof currentCell.display_value !== 'string') {
+    //   return currentCell.display_value;
+    // }
 
-    if (
-      numberFormattableColumns.some((currentColumn) =>
-        currentCell.identifier.endsWith(currentColumn)
-      )
-    ) {
-      const parsedDisplayValue = parseFloat(
-        currentCell.display_value.toString()
-      );
+    // if (
+    //   numberFormattableColumns.some((currentColumn) =>
+    //     currentCell.identifier.endsWith(currentColumn)
+    //   )
+    // ) {
+    //   const parsedDisplayValue = parseFloat(
+    //     currentCell.display_value.toString()
+    //   );
 
-      if (
-        !isNaN(parsedDisplayValue) &&
-        typeof parsedDisplayValue === 'number'
-      ) {
-        return numericFormatter(currentCell.display_value.toString());
-      }
-    }
+    //   if (
+    //     !isNaN(parsedDisplayValue) &&
+    //     typeof parsedDisplayValue === 'number'
+    //   ) {
+    //     return numericFormatter(currentCell.display_value.toString());
+    //   }
+    // }
 
     return currentCell.display_value;
   };
