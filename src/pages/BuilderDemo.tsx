@@ -75,6 +75,7 @@ export function BuilderDemo() {
                 },
               },
               signatorySelector: SignatorySelector,
+              signatorySwap: () => null,
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,

@@ -65,20 +65,30 @@ export function useTableColumns() {
       format: (_, document) => (
         <>
           {document.files && document.files.length > 0 ? (
-            <div>
-              <div className="font-medium">{document.files[0].filename}</div>
-              {document.files.length > 1 && (
-                <div className="text-xs">
-                  +{document.files.length - 1} more files
-                </div>
-              )}
-              <div className="text-xs">
-                {document.files[0].page_count}{' '}
-                {document.files[0].page_count === 1 ? 'page' : 'pages'}
+            <div className="flex items-center gap-3">
+              <div className="bg-emerald-500 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                <span className="font-medium">
+                  {document.files[0].page_count}
+                </span>
+
+                <span className="text-xs">
+                  {document.files[0].page_count === 1 ? t('page') : t('pages')}
+                </span>
+              </div>
+
+              <div>
+                <span className="text-gray-900 font-medium">
+                  {document.files[0].filename.split('.')[0]}
+                </span>
+                {document.files.length > 1 && (
+                  <span className="ml-2" style={{ color: colors.$17 }}>
+                    & {document.files.length - 1} more
+                  </span>
+                )}
               </div>
             </div>
           ) : (
-            <span style={{ color: colors.$17 }}>{t('no_files')}.</span>
+            <span className="text-gray-400">—</span>
           )}
         </>
       ),

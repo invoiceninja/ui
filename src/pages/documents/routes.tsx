@@ -28,6 +28,15 @@ const Settings = lazy(
   () => import('$app/pages/documents/pages/settings/Settings')
 );
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
+const EmailSettings = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/email-settings/EmailSettings'
+    )
+);
+const Users = lazy(
+  () => import('$app/pages/documents/pages/settings/pages/users/Users')
+);
 
 export const documentsRoutes = (
   <Route path="documents">
@@ -41,7 +50,19 @@ export const documentsRoutes = (
     <Route
       path="settings"
       element={<Guard guards={[]} component={<Settings />} />}
-    />
+    >
+      <Route
+        path=""
+        element={
+          <Guard guards={[]} type="subPage" component={<EmailSettings />} />
+        }
+      />
+
+      <Route
+        path="users"
+        element={<Guard guards={[]} type="subPage" component={<Users />} />}
+      />
+    </Route>
 
     <Route
       path=":id"

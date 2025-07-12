@@ -1,5 +1,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
+import { Client } from '$app/common/interfaces/client';
+import { useClientsQuery } from '$app/common/queries/docuninja/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -22,7 +24,6 @@ import {
   CreateDialogTabButtonProps,
   DeleteDialogButtonProps,
   DeleteDialogProps,
-  SaveButtonProps,
   SendButtonProps,
   SendDialogButtonProps,
   SendDialogProps,
@@ -36,6 +37,7 @@ import {
 } from '@docuninja/builder2.0';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 
 function Loading() {
@@ -43,14 +45,6 @@ function Loading() {
     <div className="flex justify-center items-center py-6 sm:py-8 px-4 sm:px-6">
       <Spinner />
     </div>
-  );
-}
-
-function Save({ isSubmitting, ...props }: SaveButtonProps) {
-  return (
-    <Button {...props} disabled={isSubmitting}>
-      Save
-    </Button>
   );
 }
 
@@ -228,6 +222,8 @@ function SignatorySelector({
 }: SignatorySelectorProps) {
   const [t] = useTranslation();
 
+  const { data: clients } = useClientsQuery({ perPage: 1000 });
+
   function handleSelect(v: string | undefined) {
     if (!v) {
       return;
@@ -255,12 +251,13 @@ function SignatorySelector({
       value={value}
       onValueChange={handleSelect}
       customSelector
+      menuPosition="fixed"
     >
       <option value="create">{t('create_client_or_user')}</option>
 
-      {results.map((result) => (
-        <option value={`${result.type}|${result.value}`} key={result.value}>
-          {result.label}
+      {clients?.data.data.map((client: Client) => (
+        <option value={`contact|${client.id}`} key={client.id}>
+          {client.display_name || client.name}
         </option>
       ))}
     </SelectField>
@@ -348,6 +345,8 @@ function Builder() {
   const { id } = useParams();
   const colors = useColorScheme();
 
+  const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
+
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
@@ -355,7 +354,7 @@ function Builder() {
       href: route('/documents/:id', { id }),
     },
     {
-      name: t('Builder'),
+      name: t('builder'),
       href: route('/documents/:id/builder', { id }),
     },
   ];
@@ -363,7 +362,7 @@ function Builder() {
   return (
     <Default title={t('builder')} breadcrumbs={pages}>
       <Card
-        className="shadow-sm px-3"
+        className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
@@ -374,7 +373,7 @@ function Builder() {
             document: id as string,
             components: {
               skeleton: Loading,
-              save: Save,
+              save: () => null,
               send: {
                 trigger: Send,
                 dialog: SendDialog,
@@ -404,6 +403,7 @@ function Builder() {
                 },
               },
               signatorySelector: SignatorySelector,
+              signatorySwap: () => null,
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,
@@ -411,12 +411,57 @@ function Builder() {
               validationErrors: ValidationErrors,
               sign: () => null,
               toolboxContext: ToolboxContext,
+              helper: () => (
+                <span className="text-sm" style={{ color: colors.$17 }}>
+                  {t('select_signatory')}
+                </span>
+              ),
             },
             styles: {
               frame: {
                 backgroundColor: colors.$1,
+                borderBottom: `1px solid ${colors.$24}`,
+                paddingLeft: 0,
+                paddingRight: 0,
+                paddingTop: 0,
+                paddingBottom: 0,
+                borderTopLeftRadius: '0.375rem',
+                borderTopRightRadius: '0.375rem',
+                height: 'max-content',
               },
               border: colors.$24,
+              childrenWrapper: {
+                paddingLeft: isSmallScreen ? '1rem' : '1.5rem',
+                paddingRight: isSmallScreen ? '1rem' : '1.5rem',
+                paddingTop: '2rem',
+                paddingBottom: '3rem',
+              },
+              title: {
+                paddingLeft: isSmallScreen ? '1rem' : '1.5rem',
+                paddingRight: isSmallScreen ? '1rem' : '1.5rem',
+                paddingTop: '1.25rem',
+                paddingBottom: '1.25rem',
+                marginTop: 0,
+                fontSize: '1.125rem',
+                fontWeight: 500,
+                lineHeight: '1.5rem',
+              },
+              filesWrapper: {
+                height: 'auto',
+              },
+              signatoriesWrapper: {
+                height: 'auto',
+              },
+              signatories: {
+                title: {
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: colors.$22,
+                },
+                panel: {
+                  marginBottom: '0.5rem',
+                },
+              },
             },
             options: {
               header: {

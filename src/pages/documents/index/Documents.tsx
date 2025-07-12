@@ -24,17 +24,6 @@ export default function Blueprints() {
   const colors = useColorScheme();
   const columns = useTableColumns();
 
-  const pages = [
-    {
-      name: t('documents'),
-      href: '/documents',
-    },
-    {
-      name: t('documents'),
-      href: '/documents',
-    },
-  ];
-
   return (
     <Card
       title={t('documents')}
