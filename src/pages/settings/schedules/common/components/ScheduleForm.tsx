@@ -23,6 +23,8 @@ import {
 } from '../hooks/useDisplayTemplateField';
 import { EmailReport } from './EmailReport';
 import { useColorScheme } from '$app/common/colors';
+import { InvoiceOutstandingTasks } from './InvoiceOutstandingTasks';
+import { PaymentSchedule } from './PaymentSchedule';
 
 interface Props {
   schedule: Schedule;
@@ -38,6 +40,8 @@ export enum Templates {
   EMAIL_STATEMENT = 'email_statement',
   EMAIL_RECORD = 'email_record',
   EMAIL_REPORT = 'email_report',
+  INVOICE_OUTSTANDING_TASKS = 'invoice_outstanding_tasks',
+  PAYMENT_SCHEDULE = 'payment_schedule',
 }
 
 export function ScheduleForm(props: Props) {
@@ -72,6 +76,8 @@ export function ScheduleForm(props: Props) {
             <option value="email_statement">{t('email_statement')}</option>
             <option value="email_record">{t('email_record')}</option>
             <option value="email_report">{t('email_report')}</option>
+            <option value="invoice_outstanding_tasks">{t('invoice_outstanding_tasks')}</option>
+            <option value="payment_schedule">{t('payment_schedule')}</option>
           </SelectField>
         </Element>
       )}
@@ -155,6 +161,22 @@ export function ScheduleForm(props: Props) {
 
       {schedule.template === Templates.EMAIL_REPORT && (
         <EmailReport
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      )}
+
+      {schedule.template === Templates.INVOICE_OUTSTANDING_TASKS && (
+        <InvoiceOutstandingTasks
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      )}
+
+      {schedule.template === Templates.PAYMENT_SCHEDULE && (
+        <PaymentSchedule
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
