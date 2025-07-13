@@ -47,6 +47,7 @@ function Settings() {
           tabs={tabs}
           withHorizontalPadding
           horizontalPaddingWidth="1.5rem"
+          paddingTabsHeight="2.85rem"
           fullRightPadding
           withHorizontalPaddingOnSmallScreen
         />

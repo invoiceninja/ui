@@ -13,8 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { DataTable } from '$app/components/DataTable';
-import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { useTableColumns } from '../common/hooks/useTableColumns';
+import { Document } from '$app/common/interfaces/docuninja/api';
 
 export default function Blueprints() {
   useTitle('blueprints');
@@ -32,7 +32,7 @@ export default function Blueprints() {
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
     >
-      <DataTable<Blueprint>
+      <DataTable<Document>
         resource="document"
         endpoint="/api/documents?sort=id|desc"
         columns={columns}
