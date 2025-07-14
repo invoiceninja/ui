@@ -17,18 +17,18 @@ import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { route } from '$app/common/helpers/route';
 import { AxiosError } from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
-import { useBlankDocuNinjaUserQuery } from '$app/common/queries/docuninja/users';
+import { useDocuNinjaUserQuery } from '$app/common/queries/docuninja/users';
 
 function Create() {
   const [t] = useTranslation();
+
+  const { id } = useParams();
 
   const navigate = useNavigate();
 
@@ -36,7 +36,9 @@ function Create() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const { data: blankUser, isLoading } = useBlankDocuNinjaUserQuery();
+  const { data: userResponse, isLoading } = useDocuNinjaUserQuery({
+    id,
+  });
 
   const handleChange = (key: keyof User, value: string) => {
     const updatedUser = cloneDeep(user) as User;
@@ -54,23 +56,24 @@ function Create() {
 
       setIsFormBusy(true);
 
-      request('POST', docuNinjaEndpoint('/api/users'), user, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-        },
-      })
-        .then((response: GenericSingleResourceResponse<User>) => {
-          toast.success('created_blueprint');
+      request(
+        'PUT',
+        docuNinjaEndpoint('/api/users/:id', {
+          id,
+        }),
+        user,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
+      )
+        .then(() => {
+          toast.success('updated_user');
 
           $refetch(['docuninja_users']);
-
-          setUser(cloneDeep(blankUser));
-
-          navigate(
-            route('/documents/settings/users/:id/edit', {
-              id: response.data.data.id,
-            })
-          );
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
@@ -83,10 +86,10 @@ function Create() {
   };
 
   useEffect(() => {
-    if (blankUser) {
-      setUser(blankUser);
+    if (userResponse) {
+      setUser(userResponse);
     }
-  }, [blankUser]);
+  }, [userResponse]);
 
   useSaveBtn(
     {

@@ -21,17 +21,6 @@ export default function Users() {
 
   const columns = useUserColumns();
 
-  const pages = [
-    {
-      name: t('documents'),
-      href: '/documents',
-    },
-    {
-      name: t('users'),
-      href: '/documents/settings/users',
-    },
-  ];
-
   return (
     <div className="px-4 sm:px-6 pt-6 pb-6">
       <DataTable<User>

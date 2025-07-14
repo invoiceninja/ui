@@ -40,6 +40,9 @@ const Users = lazy(
 const CreateUser = lazy(
   () => import('$app/pages/documents/pages/settings/pages/users/create/Create')
 );
+const EditUser = lazy(
+  () => import('$app/pages/documents/pages/settings/pages/users/edit/Edit')
+);
 
 export const documentsRoutes = (
   <Route path="documents">
@@ -71,6 +74,11 @@ export const documentsRoutes = (
         element={
           <Guard guards={[]} type="subPage" component={<CreateUser />} />
         }
+      />
+
+      <Route
+        path="users/:id/edit"
+        element={<Guard guards={[]} type="subPage" component={<EditUser />} />}
       />
     </Route>
 

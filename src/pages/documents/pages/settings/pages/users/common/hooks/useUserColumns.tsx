@@ -41,8 +41,6 @@ export function useUserColumns() {
       id: 'status',
       label: t('status'),
       format: (_, user) => {
-        console.log(user);
-
         if (user.is_deleted) {
           return <Badge variant="red">{t('deleted')}</Badge>;
         }

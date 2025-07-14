@@ -40,13 +40,33 @@ export function useUsersQuery(params: Params) {
   );
 }
 
+export function useBlankDocuNinjaUserQuery() {
+  return useQuery(
+    ['/api/users/docuninja/blank'],
+    () =>
+      request(
+        'GET',
+        docuNinjaEndpoint('/api/users/create'),
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
+      ).then((res) => res.data.data),
+    { staleTime: Infinity }
+  );
+}
+
 interface UserParams {
   id: string | undefined;
 }
 
-export function useUserQuery(params: UserParams) {
+export function useDocuNinjaUserQuery(params: UserParams) {
   return useQuery(
-    ['/api/users/docuninja', params],
+    ['/api/users/docuninja/:id', params],
     () =>
       request(
         'GET',
@@ -61,7 +81,7 @@ export function useUserQuery(params: UserParams) {
             )}`,
           },
         }
-      ),
+      ).then((res) => res.data.data),
     { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
