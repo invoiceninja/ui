@@ -45,6 +45,9 @@ import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
 import { useReactSettings } from './common/hooks/useReactSettings';
+import { useLogin } from './common/queries/docuninja/docuninja';
+import { Company } from './common/interfaces/docuninja/api';
+import { useCurrentAccount } from './common/hooks/useCurrentAccount';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';
@@ -74,9 +77,16 @@ export function App() {
   const user = useCurrentUser();
   const location = useLocation();
   const company = useCurrentCompany();
+  const account = useCurrentAccount();
 
   useWebSessionTimeout();
   useAddPreventNavigationEvents();
+
+  const { data: docuData } = useLogin({
+    enabled:
+      (account?.plan === 'pro' || account?.plan === 'enterprise') &&
+      Boolean(company?.company_key),
+  });
 
   const refetch = useRefetch();
   const hasPermission = useHasPermission();
@@ -186,6 +196,18 @@ export function App() {
       window.removeEventListener('display.error.toaster', handleToasterErrors);
     };
   }, [id, location]);
+
+  useEffect(() => {
+    if (docuData) {
+      const docuCompany = docuData?.companies?.find(
+        (c: Company) => c.ninja_company_key === company?.company_key
+      );
+
+      if (docuCompany) {
+        localStorage.setItem('X-DOCU-NINJA-TOKEN', docuCompany?.token);
+      }
+    }
+  }, [docuData, company]);
 
   useEffect(() => {
     const companyName = company?.settings?.name;

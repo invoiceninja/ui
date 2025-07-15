@@ -385,6 +385,19 @@ export function Default(props: Props) {
           },
         },
         {
+          name: t('users'),
+          href: '/documents/users',
+          icon: Users,
+          current: location.pathname.startsWith('/documents/users'),
+          visible: true,
+          rightButton: {
+            icon: Plus,
+            to: '/documents/users/create',
+            label: t('new_user'),
+            visible: true,
+          },
+        },
+        {
           name: t('settings'),
           href: '/documents/settings',
           icon: Gear,
@@ -393,6 +406,7 @@ export function Default(props: Props) {
         },
       ],
     },
+
     {
       name: t('settings'),
       href:

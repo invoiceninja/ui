@@ -34,14 +34,12 @@ const EmailSettings = lazy(
       '$app/pages/documents/pages/settings/pages/email-settings/EmailSettings'
     )
 );
-const Users = lazy(
-  () => import('$app/pages/documents/pages/settings/pages/users/Users')
-);
+const Users = lazy(() => import('$app/pages/documents/pages/users/Users'));
 const CreateUser = lazy(
-  () => import('$app/pages/documents/pages/settings/pages/users/create/Create')
+  () => import('$app/pages/documents/pages/users/create/Create')
 );
 const EditUser = lazy(
-  () => import('$app/pages/documents/pages/settings/pages/users/edit/Edit')
+  () => import('$app/pages/documents/pages/users/edit/Edit')
 );
 
 export const documentsRoutes = (
@@ -62,23 +60,6 @@ export const documentsRoutes = (
         element={
           <Guard guards={[]} type="subPage" component={<EmailSettings />} />
         }
-      />
-
-      <Route
-        path="users"
-        element={<Guard guards={[]} type="subPage" component={<Users />} />}
-      />
-
-      <Route
-        path="users/create"
-        element={
-          <Guard guards={[]} type="subPage" component={<CreateUser />} />
-        }
-      />
-
-      <Route
-        path="users/:id/edit"
-        element={<Guard guards={[]} type="subPage" component={<EditUser />} />}
       />
     </Route>
 
@@ -105,6 +86,18 @@ export const documentsRoutes = (
     <Route
       path="blueprints/:id/edit"
       element={<Guard guards={[]} component={<EditBlueprint />} />}
+    />
+
+    <Route path="users" element={<Guard guards={[]} component={<Users />} />} />
+
+    <Route
+      path="users/create"
+      element={<Guard guards={[]} component={<CreateUser />} />}
+    />
+
+    <Route
+      path="users/:id/edit"
+      element={<Guard guards={[]} component={<EditUser />} />}
     />
   </Route>
 );

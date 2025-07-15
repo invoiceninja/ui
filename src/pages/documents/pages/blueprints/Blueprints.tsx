@@ -10,8 +10,6 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
@@ -22,7 +20,6 @@ export default function Blueprints() {
 
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
   const columns = useTableColumns();
 
   const pages = [
@@ -38,31 +35,21 @@ export default function Blueprints() {
 
   return (
     <Default title={t('blueprints')} breadcrumbs={pages}>
-      <Card
-        title={t('blueprints')}
-        className="shadow-sm"
-        childrenClassName="px-4 sm:px-6 pt-6 pb-8"
-        style={{ borderColor: colors.$24 }}
-        headerStyle={{ borderColor: colors.$20 }}
-      >
-        <DataTable<Blueprint>
-          resource="blueprint"
-          endpoint="/api/blueprints?sort=id|desc"
-          columns={columns}
-          withResourcefulActions
-          bulkRoute="/api/blueprints/bulk"
-          linkToCreate="/documents/blueprints/create"
-          linkToEdit="/documents/blueprints/:id/edit"
-          useDocuNinjaApi
-          endpointHeaders={{
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          }}
-          totalPagesPropPath="data.meta.last_page"
-          totalRecordsPropPath="data.meta.total"
-        />
-      </Card>
+      <DataTable<Blueprint>
+        resource="blueprint"
+        endpoint="/api/blueprints?sort=id|desc"
+        columns={columns}
+        withResourcefulActions
+        bulkRoute="/api/blueprints/bulk"
+        linkToCreate="/documents/blueprints/create"
+        linkToEdit="/documents/blueprints/:id/edit"
+        useDocuNinjaApi
+        endpointHeaders={{
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        }}
+        totalPagesPropPath="data.meta.last_page"
+        totalRecordsPropPath="data.meta.total"
+      />
     </Default>
   );
 }
