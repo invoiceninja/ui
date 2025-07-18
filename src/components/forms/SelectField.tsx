@@ -36,6 +36,7 @@ export interface SelectProps extends CommonProps {
   controlStyle?: CSSProperties;
   applyCustomDropdownIndicator?: boolean;
   dropdownIndicatorClassName?: string;
+  placeholder?: string | null;
 }
 
 export function SelectField(props: SelectProps) {
@@ -174,6 +175,7 @@ export function SelectField(props: SelectProps) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           options={$entries}
+          placeholder={props.placeholder}
           defaultValue={defaultEntry}
           value={clearAfterSelection ? { label: '', value: '' } : selectedEntry}
           onChange={(v) => {

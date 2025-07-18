@@ -17,21 +17,23 @@ import {
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
 
+export type BadgeVariant =
+  | 'primary'
+  | 'white'
+  | 'yellow'
+  | 'red'
+  | 'generic'
+  | 'light-blue'
+  | 'blue'
+  | 'orange'
+  | 'dark-blue'
+  | 'green'
+  | 'black'
+  | 'purple'
+  | 'transparent';
+
 interface Props extends CommonProps {
-  variant?:
-    | 'primary'
-    | 'white'
-    | 'yellow'
-    | 'red'
-    | 'generic'
-    | 'light-blue'
-    | 'blue'
-    | 'orange'
-    | 'dark-blue'
-    | 'green'
-    | 'black'
-    | 'purple'
-    | 'transparent';
+  variant?: BadgeVariant;
 }
 
 const defaultProps: Props = {

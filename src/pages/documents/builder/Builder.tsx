@@ -1,14 +1,15 @@
+import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
+import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
-import { SearchableSelect } from '$app/components/SearchableSelect';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import {
@@ -21,7 +22,6 @@ import {
   CreateDialogTabButtonProps,
   DeleteDialogButtonProps,
   DeleteDialogProps,
-  SaveButtonProps,
   SendButtonProps,
   SendDialogButtonProps,
   SendDialogProps,
@@ -35,105 +35,14 @@ import {
 } from '@docuninja/builder2.0';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
-
-export function Builder() {
-  const { id } = useParams();
-  const { t } = useTranslation();
-
-  const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
-    {
-      name: t('Document'),
-      href: route('/documents/:id', { id }),
-    },
-    {
-      name: t('Builder'),
-      href: route('/documents/:id/builder', { id }),
-    },
-  ];
-
-  return (
-    <Default breadcrumbs={pages}>
-      <div className="max-w-7xl mx-auto">
-        <BuilderContext.Provider
-          value={{
-            token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
-            document: id as string,
-            components: {
-              skeleton: Loading,
-              save: Save,
-              send: {
-                trigger: Send,
-                dialog: SendDialog,
-                button: SendDialogButton,
-              },
-              delete: {
-                dialog: DeleteDialog,
-                button: DeleteButton,
-              },
-              upload: {
-                trigger: Upload,
-                dialog: UploadDialog,
-              },
-              confirmation: {
-                dialog: ConfirmationDialog,
-                button: ConfirmationDialogButton,
-              },
-              createSignatory: {
-                dialog: CreateDialog,
-                client: {
-                  form: CreateClientForm,
-                  button: CreateDialogTabButton,
-                },
-                user: {
-                  form: CreateUserForm,
-                  button: CreateDialogTabButton,
-                },
-              },
-              signatorySelector: SignatorySelector,
-              uninvite: {
-                dialog: UninviteDialog,
-                button: UninviteButton,
-              },
-              validationErrors: ValidationErrors,
-              sign: () => null,
-              toolboxContext: ToolboxContext,
-            },
-            styles: {
-              frame: {
-                backgroundColor: '#f7f7f7',
-              },
-              border: '#d1d5db',
-            },
-            options: {
-              header: {
-                sticky: false,
-              },
-            },
-            endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
-          }}
-        >
-          <Builder$ />
-        </BuilderContext.Provider>
-      </div>
-    </Default>
-  );
-}
 
 function Loading() {
   return (
-    <div className="max-w-4xl mx-auto flex flex-col space-y-3 my-5">
+    <div className="flex justify-center items-center py-6 sm:py-8 px-4 sm:px-6">
       <Spinner />
     </div>
-  );
-}
-
-function Save({ isSubmitting, ...props }: SaveButtonProps) {
-  return (
-    <Button {...props} disabled={isSubmitting}>
-      Save
-    </Button>
   );
 }
 
@@ -156,7 +65,11 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
 }
 
 function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
-  return <Button disabled={isSubmitting}>Send invitations</Button>;
+  return (
+    <Button behavior="button" disabled={isSubmitting}>
+      Send invitations
+    </Button>
+  );
 }
 
 function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
@@ -173,25 +86,31 @@ function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
 }
 
 function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
+  const [t] = useTranslation();
+
   return (
     <Button behavior="button" disabled={isSubmitting} className="w-full">
-      Delete
+      {t('delete')}
     </Button>
   );
 }
 
 function Upload({ ...props }: UploadProps) {
+  const [t] = useTranslation();
+
   return (
-    <Button type="secondary" {...props} className="w-full">
-      Upload
+    <Button behavior="button" type="secondary" {...props} className="w-full">
+      {t('upload')}
     </Button>
   );
 }
 
 function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
+  const [t] = useTranslation();
+
   return (
     <Modal
-      title="Upload document"
+      title={t('upload_document')}
       visible={open}
       onClose={onOpenChange}
       size="small"
@@ -233,9 +152,14 @@ export function CreateDialog({
   client,
   user,
 }: CreateDialogProps) {
+  const [t] = useTranslation();
   return (
-    <Modal title="Create client or user" visible={open} onClose={onOpenChange}>
-      <TabGroup tabs={['Client', 'User']}>
+    <Modal
+      title={t('create_client_or_user')}
+      visible={open}
+      onClose={onOpenChange}
+    >
+      <TabGroup tabs={[t('client'), t('user')]}>
         <div>{client}</div>
         <div>{user}</div>
       </TabGroup>
@@ -283,14 +207,16 @@ function CreateDialogTabButton({
   form,
   isSubmitting,
 }: CreateDialogTabButtonProps) {
+  const [t] = useTranslation();
+
   return (
     <Button
       form={form}
-      behavior="submit"
+      behavior="button"
       disabled={isSubmitting}
       className="w-full"
     >
-      Create
+      {t('create')}
     </Button>
   );
 }
@@ -301,6 +227,8 @@ function SignatorySelector({
   value,
   setCreateDialogOpen,
 }: SignatorySelectorProps) {
+  const [t] = useTranslation();
+
   function handleSelect(v: string | undefined) {
     if (!v) {
       return;
@@ -313,7 +241,7 @@ function SignatorySelector({
     }
 
     const [type, value] = v.split('|');
-    const entity = results.find((r) => r.value === value);
+    const entity = results.find((r: any) => r.value === value);
 
     if (!entity) {
       return;
@@ -323,16 +251,21 @@ function SignatorySelector({
   }
 
   return (
-    <SearchableSelect value={value} onValueChange={handleSelect}>
-      <option disabled>Select user or client...</option>
-      <option value="create">Create client or user</option>
+    <SelectField
+      placeholder={t('select_user_or_client')}
+      value={value}
+      onValueChange={handleSelect}
+      customSelector
+      menuPosition="fixed"
+    >
+      <option value="create">{t('create_client_or_user')}</option>
 
-      {results.map((result) => (
-        <option value={`${result.type}|${result.value}`} key={result.value}>
+      {results.map((result: any) => (
+        <option value={`${result.type}|${result.value}`} key={result.id}>
           {result.label}
         </option>
       ))}
-    </SearchableSelect>
+    </SelectField>
   );
 }
 
@@ -352,7 +285,7 @@ function UninviteDialog({
 
 function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
   return (
-    <Button form={form} behavior="submit" disabled={isSubmitting}>
+    <Button form={form} behavior="button" disabled={isSubmitting}>
       Continue
     </Button>
   );
@@ -410,3 +343,148 @@ function ToolboxContext({ options }: ToolboxContextProps) {
     </Dropdown>
   );
 }
+
+function Builder() {
+  const [t] = useTranslation();
+
+  const { id } = useParams();
+  const colors = useColorScheme();
+
+  const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
+
+  const pages: Page[] = [
+    { name: t('documents'), href: '/documents' },
+    {
+      name: t('Document'),
+      href: route('/documents/:id', { id }),
+    },
+    {
+      name: t('builder'),
+      href: route('/documents/:id/builder', { id }),
+    },
+  ];
+
+  const handleSave = () => {
+    window.dispatchEvent(new CustomEvent('builder:save'));
+  };
+
+  return (
+    <Default title={t('builder')} breadcrumbs={pages} onSaveClick={handleSave}>
+      <Card
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        withoutBodyPadding
+      >
+        {/* @ts-expect-error It's safe */}
+        <BuilderContext.Provider
+          value={{
+            token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
+            document: id as string,
+            components: {
+              skeleton: Loading,
+              save: () => null,
+              send: {
+                trigger: Send,
+                dialog: SendDialog,
+                button: SendDialogButton,
+              },
+              delete: {
+                dialog: DeleteDialog,
+                button: DeleteButton,
+              },
+              upload: {
+                trigger: Upload,
+                dialog: UploadDialog,
+              },
+              confirmation: {
+                dialog: ConfirmationDialog,
+                button: ConfirmationDialogButton,
+              },
+              createSignatory: {
+                dialog: CreateDialog,
+                client: {
+                  form: CreateClientForm,
+                  button: CreateDialogTabButton,
+                },
+                user: {
+                  form: CreateUserForm,
+                  button: CreateDialogTabButton,
+                },
+              },
+              signatorySelector: SignatorySelector,
+              signatorySwap: () => null,
+              uninvite: {
+                dialog: UninviteDialog,
+                button: UninviteButton,
+              },
+              validationErrors: ValidationErrors,
+              sign: () => null,
+              toolboxContext: ToolboxContext,
+              helper: () => (
+                <span className="text-sm" style={{ color: colors.$17 }}>
+                  {t('select_signatory')}
+                </span>
+              ),
+            },
+            styles: {
+              frame: {
+                backgroundColor: colors.$1,
+                borderBottom: `1px solid ${colors.$24}`,
+                paddingLeft: 0,
+                paddingRight: 0,
+                paddingTop: 0,
+                paddingBottom: 0,
+                borderTopLeftRadius: '0.375rem',
+                borderTopRightRadius: '0.375rem',
+                height: 'max-content',
+              },
+              border: colors.$24,
+              childrenWrapper: {
+                paddingLeft: isSmallScreen ? '1rem' : '1.5rem',
+                paddingRight: isSmallScreen ? '1rem' : '1.5rem',
+                paddingTop: '2rem',
+                paddingBottom: '3rem',
+              },
+              title: {
+                paddingLeft: isSmallScreen ? '1rem' : '1.5rem',
+                paddingRight: isSmallScreen ? '1rem' : '1.5rem',
+                paddingTop: '1.25rem',
+                paddingBottom: '1.25rem',
+                marginTop: 0,
+                fontSize: '1.125rem',
+                fontWeight: 500,
+                lineHeight: '1.5rem',
+              },
+              filesWrapper: {
+                height: 'auto',
+              },
+              signatoriesWrapper: {
+                height: 'auto',
+              },
+              signatories: {
+                title: {
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: colors.$22,
+                },
+                panel: {
+                  marginBottom: '0.5rem',
+                },
+              },
+            },
+            options: {
+              header: {
+                sticky: false,
+              },
+            },
+            endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
+          }}
+        >
+          <Builder$ />
+        </BuilderContext.Provider>
+      </Card>
+    </Default>
+  );
+}
+
+export default Builder;

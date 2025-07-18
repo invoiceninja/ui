@@ -79,9 +79,9 @@ export function ProductForm(props: Props) {
 
       {company?.enable_product_cost && (
         <Element leftSide={t('cost')}>
-          <InputField
-            value={product.cost}
-            onValueChange={(value) => handleChange('cost', value)}
+          <NumberInputField
+            value={product.cost || ''}
+            onValueChange={(value) => handleChange('cost', parseFloat(value))}
             errorMessage={errors?.errors.cost}
           />
         </Element>

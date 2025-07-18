@@ -149,6 +149,8 @@ export default function Create() {
               entity="purchase_order"
               relationType="vendor_id"
               endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+              observable={true}
+              initiallyVisible={false}
             />
           )}
         </div>
