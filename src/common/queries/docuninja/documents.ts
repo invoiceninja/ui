@@ -20,7 +20,7 @@ import { AxiosResponse } from 'axios';
 
 export function useDocumentsQuery(params: Params) {
   return useQuery(
-    ['/api/documents', params],
+    ['/api/documents/docuninja', params],
     () =>
       request(
         'GET',
@@ -47,7 +47,7 @@ export function useDocumentsQuery(params: Params) {
 
 export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
   return useQuery(
-    ['/api/documents', id],
+    ['/api/documents/docuninja', id],
     () =>
       request(
         'GET',

@@ -19,10 +19,9 @@ import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Default } from '$app/components/layouts/Default';
 import { Alert } from '$app/components/Alert';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Badge, BadgeVariant } from '$app/components/Badge';
 import { Spinner } from '$app/components/Spinner';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Button } from '$app/components/forms';
 import type { DocumentFile } from '$app/common/interfaces/docuninja/api';
 import { TimelineLayout } from './components/timeline-layout';
@@ -45,10 +44,6 @@ export default function Document() {
   const { id } = useParams();
   const colors = useColorScheme();
 
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const [error, setError] = useState<string | null>(null);
-
   const STATUS_LABELS = useMemo(
     () => ({
       1: t('draft'),
@@ -60,7 +55,11 @@ export default function Document() {
     []
   );
 
-  const { data: document, isLoading } = useDocumentQuery({
+  const {
+    data: document,
+    isLoading,
+    error,
+  } = useDocumentQuery({
     id,
     enabled: Boolean(id),
   });
@@ -107,12 +106,6 @@ export default function Document() {
       {!document && !isLoading && !error && (
         <Alert type="danger" className="mb-4">
           {t('document_not_found')}
-        </Alert>
-      )}
-
-      {error && !isLoading && (
-        <Alert type="danger" className="mb-4">
-          {error}
         </Alert>
       )}
 

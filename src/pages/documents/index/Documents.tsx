@@ -39,7 +39,7 @@ export default function Blueprints() {
         withResourcefulActions
         bulkRoute="/api/documents/bulk"
         linkToCreate="/documents/create"
-        linkToEdit="/documents/:id/edit"
+        linkToEdit="/documents/:id/builder"
         useDocuNinjaApi
         endpointHeaders={{
           Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,

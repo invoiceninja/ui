@@ -1,7 +1,5 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
-import { Client } from '$app/common/interfaces/client';
-import { useClientsQuery } from '$app/common/queries/docuninja/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -88,9 +86,11 @@ function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
 }
 
 function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
+  const [t] = useTranslation();
+
   return (
     <Button behavior="button" disabled={isSubmitting} className="w-full">
-      Delete
+      {t('delete')}
     </Button>
   );
 }
@@ -152,9 +152,14 @@ export function CreateDialog({
   client,
   user,
 }: CreateDialogProps) {
+  const [t] = useTranslation();
   return (
-    <Modal title="Create client or user" visible={open} onClose={onOpenChange}>
-      <TabGroup tabs={['Client', 'User']}>
+    <Modal
+      title={t('create_client_or_user')}
+      visible={open}
+      onClose={onOpenChange}
+    >
+      <TabGroup tabs={[t('client'), t('user')]}>
         <div>{client}</div>
         <div>{user}</div>
       </TabGroup>
@@ -202,6 +207,8 @@ function CreateDialogTabButton({
   form,
   isSubmitting,
 }: CreateDialogTabButtonProps) {
+  const [t] = useTranslation();
+
   return (
     <Button
       form={form}
@@ -209,7 +216,7 @@ function CreateDialogTabButton({
       disabled={isSubmitting}
       className="w-full"
     >
-      Create
+      {t('create')}
     </Button>
   );
 }
@@ -221,8 +228,6 @@ function SignatorySelector({
   setCreateDialogOpen,
 }: SignatorySelectorProps) {
   const [t] = useTranslation();
-
-  const { data: clients } = useClientsQuery({ perPage: 1000 });
 
   function handleSelect(v: string | undefined) {
     if (!v) {
@@ -236,7 +241,7 @@ function SignatorySelector({
     }
 
     const [type, value] = v.split('|');
-    const entity = results.find((r) => r.value === value);
+    const entity = results.find((r: any) => r.value === value);
 
     if (!entity) {
       return;
@@ -255,9 +260,9 @@ function SignatorySelector({
     >
       <option value="create">{t('create_client_or_user')}</option>
 
-      {clients?.data.data.map((client: Client) => (
-        <option value={`contact|${client.id}`} key={client.id}>
-          {client.display_name || client.name}
+      {results.map((result: any) => (
+        <option value={`${result.type}|${result.value}`} key={result.id}>
+          {result.label}
         </option>
       ))}
     </SelectField>
@@ -359,8 +364,12 @@ function Builder() {
     },
   ];
 
+  const handleSave = () => {
+    window.dispatchEvent(new CustomEvent('builder:save'));
+  };
+
   return (
-    <Default title={t('builder')} breadcrumbs={pages}>
+    <Default title={t('builder')} breadcrumbs={pages} onSaveClick={handleSave}>
       <Card
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
