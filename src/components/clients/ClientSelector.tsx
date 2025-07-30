@@ -65,7 +65,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || Infinity}
-        sortBy={null}
+        sortBy="display_name|asc"
         exclude={props.exclude}
         action={{
           label: t('new_client'),
