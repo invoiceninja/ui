@@ -38,7 +38,7 @@ export interface Parameters {
   include_project_tasks?: boolean;
   auto_send?: boolean;
   invoice_id?: string;
-  schedule?: ScheduleParams
+  schedule?: ScheduleParams[]
 }
 export interface ScheduleParams {
   date: string;

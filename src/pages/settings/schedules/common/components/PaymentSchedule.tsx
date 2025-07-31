@@ -9,10 +9,10 @@
  */
 
 import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Client } from '$app/common/interfaces/client';
-import { Parameters, Schedule } from '$app/common/interfaces/schedule';
+import { Parameters, Schedule, ScheduleParams } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
@@ -22,6 +22,15 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import colors from '$app/common/constants/colors';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { Plus} from 'react-feather';
+import styled from 'styled-components';
 
 interface Props {
     schedule: Schedule;
@@ -32,188 +41,237 @@ interface Props {
     errors: ValidationBag | undefined;
     page?: 'create' | 'edit';
 }
+interface NewSchedule {
+    date: string;
+    amount: number;
+    percentage: number;
+}
+
+const defaultnewSchedule: NewSchedule = {
+    date: '',
+    amount: 0,
+    percentage: 0,
+};
+
 
 export const scheduleParametersAtom = atom<Parameters | undefined>(undefined);
 
 export function PaymentSchedule(props: Props) {
     const [t] = useTranslation();
+    const formatMoney = useFormatMoney();
+    const [newSchedule, setNewSchedule] = useState<NewSchedule>(defaultnewSchedule);
 
-    const colors = useColorScheme();
-    const accentColor = useAccentColor();
+    const formatEntityLabel = (entity: Invoice) => {
+        return `${entity.number} (${formatMoney(
+            entity.amount,
+            entity?.client?.country_id,
+            entity?.client?.settings.currency_id
+        )})`;
+    };
 
     const parametersAtom = useAtomValue(scheduleParametersAtom);
 
     const { schedule, handleChange, errors, page } = props;
+    const [paymentSchedules, setPaymentSchedules] = useState<ScheduleParams[]>([]);
 
-    const { data: clientsResponse } = useClientsQuery({
-        enabled: page === 'edit' || Boolean(parametersAtom),
-    });
-
-    const [selectedClients, setSelectedClients] = useState<Client[]>([]);
-
-    const handleChangeParameters = (clients: Client[]) => {
-        const currentParameters = { ...schedule.parameters };
-        currentParameters.clients = clients.map(({ id }) => id);
-
-        handleChange('parameters', currentParameters);
+    const handleChangeSchedule = (property: keyof NewSchedule, value: NewSchedule[keyof NewSchedule]) => {
+        setNewSchedule(
+            (newSchedule) =>
+                newSchedule && {
+                    ...newSchedule,
+                    [property]: value,
+                }
+        );
     };
+    
+    const AddRuleButton = styled.div`
+    background-color: ${({ theme }) => theme.backgroundColor};
 
-    const handleRemoveClient = (clientIndex: number) => {
-        const updatedClientsList = selectedClients.filter(
-            (client, index) => index !== clientIndex
+    &:hover {
+        background-color: ${({ theme }) => theme.hoverBackgroundColor};
+    }
+    `;
+
+    const handleAddSchedule = (schedule: ScheduleParams) => {
+
+        paymentSchedules.push(schedule);
+        setPaymentSchedules(paymentSchedules);
+
+    }
+
+    const handleRemoveSchedule = (scheduleIndex: number) => {
+        const updatedScheduleList = paymentSchedules.filter(
+            (schedule, index) => index !== scheduleIndex
         );
 
-        handleChangeParameters(updatedClientsList);
-
-        setSelectedClients(updatedClientsList);
+        setPaymentSchedules(updatedScheduleList);
     };
 
     useEffect(() => {
-        if ((page === 'edit' || parametersAtom) && clientsResponse) {
-            const clients = clientsResponse?.filter((client: Client) =>
-                schedule.parameters.clients?.includes(client.id)
-            );
-
-            setSelectedClients(clients);
-        }
-    }, [clientsResponse]);
+        
+    }, []);
 
     return (
         <>
-            <Element leftSide={t('date_range')}>
-                <SelectField
-                    value={schedule.parameters.date_range}
-                    onValueChange={(value) =>
-                        handleChange('parameters.date_range' as keyof Schedule, value)
-                    }
-                    errorMessage={errors?.errors['parameters.date_range']}
-                    customSelector
-                    dismissable={false}
-                >
-                    <option value="last7_days">{t('last7_days')}</option>
-                    <option value="last30_days">{t('last30_days')}</option>
-                    <option value="last365_days">{t('last365_days')}</option>
-                    <option value="this_month">{t('this_month')}</option>
-                    <option value="last_month">{t('last_month')}</option>
-                    <option value="this_quarter">{t('this_quarter')}</option>
-                    <option value="last_quarter">{t('last_quarter')}</option>
-                    <option value="this_year">{t('this_year')}</option>
-                    <option value="last_year">{t('last_year')}</option>
-                    <option value="all_time">{t('all_time')}</option>
-                </SelectField>
-            </Element>
-
-            <Element leftSide={t('status')}>
-                <SelectField
-                    value={schedule.parameters.status}
-                    onValueChange={(value) =>
-                        handleChange('parameters.status' as keyof Schedule, value)
-                    }
-                    errorMessage={errors?.errors['parameters.status']}
-                    customSelector
-                    dismissable={false}
-                >
-                    <option value="all">{t('all')}</option>
-                    <option value="paid">{t('paid')}</option>
-                    <option value="unpaid">{t('unpaid')}</option>
-                </SelectField>
-            </Element>
-
-            <Element leftSide={t('show_aging_table')}>
-                <Toggle
-                    checked={schedule.parameters.show_aging_table}
-                    onValueChange={(value) =>
-                        handleChange('parameters.show_aging_table' as keyof Schedule, value)
-                    }
-                />
-            </Element>
-
-            <Element leftSide={t('show_payments_table')}>
-                <Toggle
-                    checked={schedule.parameters.show_payments_table}
-                    onValueChange={(value) =>
+            
+            <Element leftSide={t('invoice')}>
+                <ComboboxAsync<Invoice>
+                    endpoint={endpoint(
+                        '/api/v1/invoices?include=client.group_settings&filter_deleted_clients=true&status=active'
+                    )}
+                    onChange={(invoice: Entry<Invoice>) =>
+                        invoice.resource &&
                         handleChange(
-                            'parameters.show_payments_table' as keyof Schedule,
-                            value
+                            'parameters.invoice_id' as keyof Schedule,
+                            invoice.resource.id
                         )
                     }
-                />
-            </Element>
-
-            <Element leftSide={t('show_credits_table')}>
-                <Toggle
-                    checked={schedule.parameters.show_credits_table}
-                    onValueChange={(value) =>
-                        handleChange(
-                            'parameters.show_credits_table' as keyof Schedule,
-                            value
-                        )
-                    }
-                />
-            </Element>
-
-            <Element leftSide={t('only_clients_with_invoices')}>
-                <Toggle
-                    checked={schedule.parameters.only_clients_with_invoices}
-                    onValueChange={(value) =>
-                        handleChange(
-                            'parameters.only_clients_with_invoices' as keyof Schedule,
-                            value
-                        )
-                    }
-                />
-            </Element>
-
-            <Element leftSide={t('client')}>
-                <ClientSelector
-                    onChange={(client) => {
-                        setSelectedClients((prevState) => {
-                            const currentClients = [...prevState, client];
-                            handleChangeParameters(currentClients);
-
-                            return currentClients;
-                        });
+                    inputOptions={{
+                        value: schedule.parameters.invoice_id || '',
                     }}
-                    withoutAction
-                    clearInputAfterSelection
-                    exclude={schedule.parameters.clients}
+                    entryOptions={{
+                        id: 'id',
+                        label: 'number',
+                        value: 'id',
+                        dropdownLabelFn: (invoice) => formatEntityLabel(invoice),
+                        inputLabelFn: (invoice) =>
+                            invoice ? formatEntityLabel(invoice) : '',
+                    }}
+                    onDismiss={() =>
+                        handleChange('parameters.invoice_id' as keyof Schedule, '')
+                    }
+                    errorMessage={errors?.errors['parameters.invoice_id']}
                 />
+            </Element>
 
+{schedule.parameters.invoice_id && (
+    <div>
+    
+                    <Table>
+                        <Thead>
+                            <Th key="date">{t('date')}</Th>
+                            <Th key="amount">{t('amount')}</Th>
+                        </Thead>
+
+                        <Tbody>
+                            {paymentSchedules.map((schedule: ScheduleParams, index) => (
+
+                            <Tr
+                                key={index}
+                                className="py-2 border-b"
+                            >
+                                <Td width="30%">{t(schedule.date)}</Td>
+
+                                <Td>
+                                    {schedule.amount > 0 && (
+                                        schedule.amount
+                                    )}
+
+                                        {schedule.percentage > 0 && (
+                                            schedule.percentage
+                                        )}%
+                                </Td>
+                            </Tr>
+
+                            ))}   
+
+                            <Tr>
+                                <Td colSpan={100} className="p-1" withoutPadding>
+                                    <AddRuleButton
+                                        className="w-full py-2 inline-flex justify-center items-center space-x-2 rounded-[0.1875rem] cursor-pointer"
+                                        onClick={() => {
+                                            setRuleIndex(-1);
+                                            setIsRuleModalOpen(true);
+                                        }}
+                                        theme={{
+                                            backgroundColor: colors.$1,
+                                            hoverBackgroundColor: colors.$20,
+                                        }}
+                                    >
+                                        <Plus color={colors.$3} size="1rem" />
+
+                                        <span>{t('add_rule')}</span>
+                                    </AddRuleButton>
+                                </Td>
+                            </Tr>                             
+                        </Tbody>
+                    </Table>
+
+            <Element leftSide={t('schedule')}>
                 <div className="flex justify-center">
                     <div className="flex flex-col space-y-2 pt-3">
-                        {selectedClients?.map((client, index) => (
-                            <div
-                                key={client.id}
-                                className="flex items-center justify-between"
-                            >
-                                <span>{client.display_name}</span>
-
-                                <div
-                                    className="cursor-pointer ml-16"
-                                    onClick={() => handleRemoveClient(index)}
-                                >
-                                    <CircleXMark
-                                        color={colors.$16}
-                                        hoverColor={colors.$3}
-                                        borderColor={colors.$5}
-                                        hoverBorderColor={colors.$17}
-                                        size="1.6rem"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {!selectedClients?.length && (
-                        <span
-                            className="self-center text-xl mt-4"
-                            style={{ color: colors.$17 }}
+                    {paymentSchedules.map((schedule: ScheduleParams, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center justify-between"
                         >
-                            {t('all_clients')}
-                        </span>
-                    )}
+                            <span>{schedule.date}</span>
+                            {schedule.percentage > 0 && (
+                                <span>{schedule.percentage} %</span>
+                            )}
+                            {schedule.amount > 0 && (
+                                <span>{schedule.amount}</span>
+                            )}
+                            <div
+                                className="cursor-pointer ml-16"
+                                onClick={() => handleRemoveClient(index)}
+                            >
+                                <CircleXMark
+                                    color={colors.$16}
+                                    hoverColor={colors.$3}
+                                    borderColor={colors.$5}
+                                    hoverBorderColor={colors.$17}
+                                    size="1.6rem"
+                                />
+                            </div>
+                        </div>
+                    ))}  
+                    </div>
                 </div>
             </Element>
+
+            <Element leftSide={t('add_schedule')}>
+                <InputField
+                    type="date"
+                    min={new Date().toISOString()}
+                    value={newSchedule.date}
+                    onValueChange={(value) => handleChangeSchedule('date', value)}
+                    errorMessage={errors?.errors.date}
+                />
+
+                <NumberInputField
+                    label={t('amount')}
+                    value={newSchedule.amount || 0}
+                    onValueChange={(value) =>
+                        handleChangeSchedule('amount', parseFloat(value))
+                    }
+                    errorMessage={errors?.errors.amount}
+                />
+
+                <NumberInputField
+                    label={t('percentage')}
+                    precision={0}
+                    value={newSchedule.percentage || 0}
+                    onValueChange={(value) =>
+                        handleChangeSchedule('percentage', parseFloat(value))
+                    }
+                    errorMessage={errors?.errors.amount}
+                />
+            </Element>
+
+            <Element leftSide={t('auto_bill')}>
+                <Toggle
+                    checked={schedule.parameters.auto_bill}
+                    onValueChange={(value) =>
+                        handleChange(
+                            'parameters.auto_bill' as keyof Schedule,
+                            value
+                        )
+                    }
+                />
+            </Element>
+            </div>
+            )}
         </>
     );
 }
