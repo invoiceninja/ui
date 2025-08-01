@@ -33,6 +33,7 @@ interface Props {
     value: Schedule[keyof Schedule]
   ) => void;
   errors: ValidationBag | undefined;
+  setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>;
   page?: 'create' | 'edit';
 }
 
@@ -49,7 +50,7 @@ export function ScheduleForm(props: Props) {
 
   const colors = useColorScheme();
 
-  const { schedule, handleChange, errors, page } = props;
+  const { schedule, handleChange, errors, setErrors, page } = props;
 
   const displayTemplateField = useDisplayTemplateField({
     template: schedule.template as Template,
@@ -72,6 +73,7 @@ export function ScheduleForm(props: Props) {
             errorMessage={errors?.errors.template}
             customSelector
             dismissable={false}
+            disabled={page === 'edit'}
           >
             <option value="email_statement">{t('email_statement')}</option>
             <option value="email_record">{t('email_record')}</option>
@@ -180,6 +182,8 @@ export function ScheduleForm(props: Props) {
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
+          setErrors={setErrors}
+          page={page}
         />
       )}
     </Card>

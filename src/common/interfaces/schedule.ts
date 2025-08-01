@@ -41,9 +41,10 @@ export interface Parameters {
   schedule?: ScheduleParams[]
 }
 export interface ScheduleParams {
+  id: number;
   date: string;
   amount: number;
-  percentage: number;
+  is_amount: boolean;
 }
 export interface Schedule {
   id: string;
