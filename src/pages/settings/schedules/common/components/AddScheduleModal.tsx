@@ -91,7 +91,6 @@ export function AddScheduleModal(props: Props) {
             ? Number((totalAmount - scheduledAmount).toFixed(2))
             : Number((100 - scheduledAmount).toFixed(0));
 
-        console.log('remainingAmount', remaining);
         return remaining;
     };
 
@@ -142,23 +141,16 @@ export function AddScheduleModal(props: Props) {
 
     // Reset amount when toggling between % and $ modes
     const handleModeChange = (isAmount: boolean) => {
-
-        console.log('isAmount', isAmount);
         const totalAmount = selectedInvoice?.amount || 0;
         const modalRemaining = calculateModalRemaining(isAmount);
         let newAmount: number;
 
-        console.log('modalRemaining', modalRemaining);
         if (isAmount) {
             newAmount = Number(modalRemaining.toFixed(2)); // 2 decimal places for dollars
         } else {
             // Converting from $ to %
-                console.log('totalAmount', totalAmount);
-                console.log('currentSchedule.amount', currentSchedule.amount);
             const percentage = Math.min(modalRemaining, 100);
-                newAmount = Number(percentage.toFixed(0)); // Whole number for percentage
-            
-            console.log('newAmount', newAmount);
+            newAmount = Number(percentage.toFixed(0)); // Whole number for percentage
         }
         
         setCurrentSchedule(prev => ({
@@ -193,8 +185,8 @@ export function AddScheduleModal(props: Props) {
             const modalRemaining = calculateModalRemaining(currentSchedule.is_amount);
             if (currentSchedule.amount > modalRemaining) {
                 errors.amount = [currentSchedule.is_amount 
-                    ? t('amount_exceeds_remaining_balance', { amount: modalRemaining })
-                    : t('percentage_exceeds_remaining', { percent: modalRemaining })];
+                    ? t('max_amount') + ' ' + modalRemaining
+                    : t('max_amount') + ' ' + modalRemaining + '%'];
             }
         }
 
@@ -261,7 +253,7 @@ export function AddScheduleModal(props: Props) {
                     />
 
                     <div className="text-sm text-gray-600 mt-1">
-                        {currentSchedule.is_amount ? `Remaining: $${calculateModalRemaining(currentSchedule.is_amount)} of $${selectedInvoice?.amount || 0}` : `Remaining: ${calculateModalRemaining(currentSchedule.is_amount)}% of invoice`}
+                        {currentSchedule.is_amount ? `Remaining: $${calculateModalRemaining(currentSchedule.is_amount)} of ${selectedInvoice?.amount || 0}` : `Remaining: ${calculateModalRemaining(currentSchedule.is_amount)}% of invoice`}
                     </div>
                 </div>
 
