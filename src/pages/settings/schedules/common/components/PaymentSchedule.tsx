@@ -11,8 +11,8 @@
 import { Element } from '$app/components/cards';
 import { Parameters, Schedule, ScheduleParams } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { atom, useAtomValue } from 'jotai';
-import { useState, useEffect, useCallback } from 'react';
+import { atom } from 'jotai';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -23,8 +23,7 @@ import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { AddScheduleModal } from './AddScheduleModal';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { Icon } from '$app/components/icons/Icon';
-import { MdAdd } from 'react-icons/md';
+
 
 interface Props {
     schedule: Schedule;
