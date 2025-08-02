@@ -34,6 +34,7 @@ interface Props {
     errors: ValidationBag | undefined;
     setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>;
     page?: 'create' | 'edit';
+    disableInvoiceSelection?: boolean;
 }
 
 interface PaymentScheduleParameters extends Parameters {
@@ -51,7 +52,7 @@ export function PaymentSchedule(props: Props) {
     const [selectedScheduleIndex, setSelectedScheduleIndex] = useState(-1);
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
-    const { schedule, handleChange, errors, setErrors, page } = props;
+    const { schedule, handleChange, errors, setErrors, page, disableInvoiceSelection } = props;
 
     // Fetch invoice data if invoice_id exists in schedule parameters
     const { data: fetchedInvoice } = useInvoiceQuery({ 
@@ -349,36 +350,54 @@ export function PaymentSchedule(props: Props) {
     return (
         <>
             <Element leftSide={t('invoice')}>
-                <ComboboxAsync<Invoice>
-                    endpoint={endpoint(
-                        '/api/v1/invoices?include=client.group_settings&filter_deleted_clients=true&status=active'
-                    )}
-                    onChange={(invoice: Entry<Invoice>) => {
-                        if (invoice.resource) {
-                            setSelectedInvoice(invoice.resource);
-                            handleChange(
-                                'parameters.invoice_id' as keyof Schedule,
-                                invoice.resource.id
-                            );
+                {disableInvoiceSelection && selectedInvoice ? (
+                    // Show readonly display when invoice selection is disabled
+                    <div>
+                        <div className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                            <span className="text-sm text-gray-700">
+                                {formatEntityLabel(selectedInvoice)}
+                            </span>
+                        </div>
+                        {errors?.errors['parameters.invoice_id'] && (
+                            <div className="mt-2 p-2 bg-red-50 text-red-700 rounded-md text-sm">
+                                {errors.errors['parameters.invoice_id'].map((error, index) => (
+                                    <div key={index}>{error}</div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <ComboboxAsync<Invoice>
+                        endpoint={endpoint(
+                            '/api/v1/invoices?include=client.group_settings&filter_deleted_clients=true&status=active&show_schedule=true'
+                        )}
+                        onChange={(invoice: Entry<Invoice>) => {
+                            if (invoice.resource) {
+                                setSelectedInvoice(invoice.resource);
+                                handleChange(
+                                    'parameters.invoice_id' as keyof Schedule,
+                                    invoice.resource.id
+                                );
+                            }
+                        }}
+                        inputOptions={{
+                            value: schedule.parameters.invoice_id || '',
+                        }}
+                        readonly={page === 'edit'} // Only disable for edit mode, not for disableInvoiceSelection
+                        entryOptions={{
+                            id: 'id',
+                            label: 'number',
+                            value: 'id',
+                            dropdownLabelFn: (invoice) => formatEntityLabel(invoice),
+                            inputLabelFn: (invoice) =>
+                                invoice ? formatEntityLabel(invoice) : '',
+                        }}
+                        onDismiss={() =>
+                            handleChange('parameters.invoice_id' as keyof Schedule, '')
                         }
-                    }}
-                    inputOptions={{
-                        value: schedule.parameters.invoice_id || '',
-                    }}
-                    readonly={page === 'edit'} // Disable when editing
-                    entryOptions={{
-                        id: 'id',
-                        label: 'number',
-                        value: 'id',
-                        dropdownLabelFn: (invoice) => formatEntityLabel(invoice),
-                        inputLabelFn: (invoice) =>
-                            invoice ? formatEntityLabel(invoice) : '',
-                    }}
-                    onDismiss={() =>
-                        handleChange('parameters.invoice_id' as keyof Schedule, '')
-                    }
-                    errorMessage={errors?.errors['parameters.invoice_id']}
-                />
+                        errorMessage={errors?.errors['parameters.invoice_id']}
+                    />
+                )}
             </Element>
             
             <Element

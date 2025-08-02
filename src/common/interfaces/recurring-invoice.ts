@@ -12,6 +12,7 @@ import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
+import { ScheduleItem } from './schedule';
 
 export interface RecurringInvoice {
   id: string;
@@ -82,4 +83,6 @@ export interface RecurringInvoice {
   activities?: Activity[];
   location_id: string;
   e_invoice?: EInvoiceType;
+  schedule?: ScheduleItem[]
 }
+

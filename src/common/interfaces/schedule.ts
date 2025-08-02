@@ -46,6 +46,13 @@ export interface ScheduleParams {
   amount: number;
   is_amount: boolean;
 }
+
+export interface ScheduleItem {
+  date: string;
+  amount: string;
+  auto_bill: boolean;
+}
+
 export interface Schedule {
   id: string;
   name: string;
