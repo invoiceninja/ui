@@ -306,7 +306,7 @@ function PaymentSchedule() {
         .finally(() => {
           setIsCreatingSchedule(false);
           queryClient.invalidateQueries({ queryKey: ['/api/v1/invoices', invoice?.id] });
-          console.log('invalidated');
+          
         });
     }
   };
@@ -343,10 +343,7 @@ function PaymentSchedule() {
               ...prev,
               schedule: response.data.data.schedule
             } : undefined);
-          } else {
-            // If no schedule in response, just show success
-            console.log('Schedule created but no schedule data in response');
-          }
+          } 
         })
         .catch((error) => {
           if (error instanceof AxiosError && error.response?.status === 422) {
@@ -359,7 +356,6 @@ function PaymentSchedule() {
         .finally(() => {
           setIsCreatingSchedule(false);
           queryClient.invalidateQueries({ queryKey: ['/api/v1/invoices', invoice?.id] });
-          console.log('invalidated');
         });
     }
   };
