@@ -678,28 +678,7 @@ function PaymentSchedule() {
               disableInvoiceSelection={true}
             />
 
-            {/* Schedule completion status */}
-            {schedule.parameters.schedule && schedule.parameters.schedule.length > 0 && (
-              <>
-                {isComplete && (
-                  <div 
-                    className="p-4 rounded-md flex justify-center"
-                    style={{ backgroundColor: colors.$19, color: colors.$4 }}
-                  >
-                    {t('complete')} {formatRemainingAmount()}
-                  </div>
-                )}
-
-                {!isComplete && (
-                  <div 
-                    className="p-4 rounded-md flex justify-center"
-                    style={{ backgroundColor: colors.$18, color: colors.$4 }}
-                  >
-                    {formatRemainingAmount()}
-                  </div>
-                )}
-              </>
-            )}
+            
           </div>
         );
 
