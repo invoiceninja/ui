@@ -115,7 +115,10 @@ export function InvoiceOutstandingTasks(props: Props) {
                 </SelectField>
             </Element>
             
-            <Element leftSide={t('auto_send')}>
+            <Element 
+                leftSide={t('auto_send')}
+                leftSideHelp={t('auto_send_help')}
+            >
                 <Toggle
                     checked={schedule.parameters.auto_send}
                     onValueChange={(value) =>
@@ -124,7 +127,10 @@ export function InvoiceOutstandingTasks(props: Props) {
                 />
             </Element>
 
-            <Element leftSide={t('include_project_tasks')}>
+            <Element 
+                leftSide={t('include_project_tasks')}
+                leftSideHelp={t('include_project_tasks_help')}
+            >
                 <Toggle
                     checked={schedule.parameters.include_project_tasks}
                     onValueChange={(value) =>
