@@ -293,7 +293,6 @@ function PaymentSchedule() {
             } : undefined);
 
            
-          } else {
           }
         })
         .catch((e: AxiosError<ValidationBag>) => {
