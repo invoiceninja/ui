@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Paymentable } from '$app/common/interfaces/payment';
 
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Context } from '../Edit';
@@ -18,7 +17,7 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Card } from '$app/components/cards';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms';
 import { SelectField } from '$app/components/forms';
@@ -31,16 +30,16 @@ import frequencies from '$app/common/constants/frequency';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
+import { History as HistoryIcon } from '$app/components/icons/History';
 
-const Box = styled.div`
-  background-color: ${({ theme }) => theme.backgroundColor};
+const ScheduleBox = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
 
   &:hover {
-    background-color: ${({ theme }) => theme.hoverBackgroundColor};
+    background-color: ${(props) => props.theme.hoverBackgroundColor};
   }
 `;
 
@@ -81,6 +80,10 @@ function PaymentSchedule() {
   
   // Local invoice state to handle updates without page reload
   const [localInvoice, setLocalInvoice] = useState(invoice);
+  
+  // Schedule validation state
+  const [isComplete, setIsComplete] = useState(true);
+  const [remainingAmount, setRemainingAmount] = useState(0);
 
   // Schedule state for the PaymentSchedule component
   const [schedule, setSchedule] = useState<Schedule>({
@@ -139,6 +142,60 @@ function PaymentSchedule() {
   useEffect(() => {
     setLocalInvoice(invoice);
   }, [invoice]);
+
+  // Calculate schedule completion when schedule changes
+  useEffect(() => {
+    if (!schedule.parameters.schedule || schedule.parameters.schedule.length === 0) {
+      setIsComplete(false);
+      setRemainingAmount(0);
+      return;
+    }
+
+    if (!localInvoice) {
+      // No invoice selected - calculate remaining based on schedules
+      const isAmountMode = schedule.parameters.schedule[0]?.is_amount ?? true;
+      
+      if (isAmountMode) {
+        // For amount mode, estimate remaining based on total scheduled
+        const totalScheduled = schedule.parameters.schedule.reduce((sum, s) => sum + s.amount, 0);
+        // Assume a reasonable remaining amount (e.g., 10% of total scheduled)
+        const estimatedTotal = totalScheduled / 0.9; // If 90% is scheduled, 10% remains
+        const remaining = Math.max(0, estimatedTotal - totalScheduled);
+        
+        setIsComplete(remaining <= 0);
+        setRemainingAmount(remaining);
+      } else {
+        // For percentage mode, calculate remaining percentage
+        const totalPercentage = schedule.parameters.schedule.reduce((sum, s) => sum + s.amount, 0);
+        const remaining = Math.max(0, 100 - totalPercentage);
+        
+        setIsComplete(remaining <= 0);
+        setRemainingAmount(remaining);
+      }
+      return;
+    }
+
+    // Calculate remaining amount with invoice
+    const isAmountMode = schedule.parameters.schedule[0]?.is_amount ?? true;
+    const totalAmount = localInvoice.amount;
+    
+    const scheduledAmount = schedule.parameters.schedule.reduce((sum, s) => {
+      if (s.is_amount !== isAmountMode) {
+        return sum + (isAmountMode 
+          ? (s.amount * totalAmount / 100)
+          : (s.amount / totalAmount * 100)
+        );
+      }
+      return sum + s.amount;
+    }, 0);
+    
+    const remaining = isAmountMode 
+      ? Number((totalAmount - scheduledAmount).toFixed(2))
+      : Number((100 - scheduledAmount).toFixed(0));
+    
+    setIsComplete(remaining <= 0);
+    setRemainingAmount(remaining);
+  }, [schedule.parameters.schedule, localInvoice]);
 
 
 
@@ -363,6 +420,17 @@ function PaymentSchedule() {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // Helper function to format remaining amount
+  const formatRemainingAmount = () => {
+    const isAmountMode = schedule.parameters.schedule?.[0]?.is_amount ?? true;
+
+    if (isAmountMode) {
+      return formatMoney(remainingAmount, '', '') + ' ' + t('remaining');
+    } else {
+      return remainingAmount + ' % ' + t('remaining');
+    }
+  };
+
   const renderStep = () => {
     // Check if invoice has an existing schedule
     const hasExistingSchedule = localInvoice?.schedule && localInvoice.schedule.length > 0;
@@ -370,63 +438,53 @@ function PaymentSchedule() {
     // If there's an existing schedule, display it instead of the wizard
     if (hasExistingSchedule) {
       return (
-        <div className="space-y-6">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-4">{t('existing_payment_schedule')}</h2>
-            <p className="text-gray-600 mb-6">{t('invoice_has_existing_schedule')}</p>
-          </div>
           
-          <div className="space-y-4">
-            {/* Schedule Display */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                <h3 className="font-medium text-gray-900">{t('payment_schedule')}</h3>
-              </div>
+          <div className="">
               
-              <div className="divide-y divide-gray-200">
-                {localInvoice.schedule?.map((scheduleItem, index) => {
-                  const isPast = isDateInPast(scheduleItem.date);
-                  return (
-                    <div 
-                      key={index}
-                      className={`px-4 py-3 flex justify-between items-center ${
-                        isPast ? 'bg-gray-50 opacity-75' : 'bg-white'
-                      }`}
+            {localInvoice.schedule?.map((scheduleItem, index) => {
+              const isPast = isDateInPast(scheduleItem.date);
+              return (
+                <ScheduleBox 
+                  key={index}
+                  className="py-4 flex justify-between items-center"
+                  theme={{
+                    backgroundColor: colors.$1,
+                    hoverBackgroundColor: colors.$25,
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div
+                      className="p-2 rounded-full"
+                      style={{ backgroundColor: colors.$20 }}
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-2 h-2 rounded-full ${
-                          isPast ? 'bg-gray-400' : 'bg-green-500'
-                        }`} />
-                        <div>
-                          <div className={`font-medium ${
-                            isPast ? 'text-gray-500' : 'text-gray-900'
-                          }`}>
-                            {formatDate(scheduleItem.date)}
-                          </div>
-                          <div className={`text-sm ${
-                            isPast ? 'text-gray-400' : 'text-gray-600'
-                          }`}>
-                            {isPast ? t('past_due') : t('upcoming')}
-                          </div>
-                          <div className={`text-sm ${isPast ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                            {t('auto_bill')}: {scheduleItem.auto_bill ? t('enabled') : t('disabled')}
-                          </div>
-                        </div>
+                      <HistoryIcon
+                        size="1.3rem"
+                        color={colors.$16}
+                        filledColor={colors.$16}
+                      />
+                    </div>
+                    <div>
+                      <div 
+                        className="flex space-x-1 text-sm"
+                        style={{ color: isPast ? colors.$17 : colors.$3 }}
+                      >
+                        {formatDate(scheduleItem.date)} | {scheduleItem.amount}
                       </div>
-                      <div className={`font-medium ${
-                        isPast ? 'text-gray-500' : 'text-gray-900'
-                      }`}>
-                        {scheduleItem.amount}
+                      <div 
+                        className="text-sm"
+                        style={{ color: isPast ? colors.$17 : colors.$17 }}
+                      >
+                        {isPast ? t('past_due') : t('upcoming')} - {t('auto_bill')}: {scheduleItem.auto_bill ? t('enabled') : t('disabled')}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
+                  </div>
+                  
+                </ScheduleBox>
+              );
+            })}
+              
             {/* Remove Schedule Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-end">
               <Button 
                 onClick={handleRemoveSchedule}
                 disabled={isRemovingSchedule}
@@ -437,12 +495,14 @@ function PaymentSchedule() {
             </div>
 
             {scheduleErrors && (
-              <div className="p-4 bg-red-50 text-red-700 rounded-md">
+              <div 
+                className="p-4 rounded-md"
+                style={{ backgroundColor: colors.$18, color: colors.$4 }}
+              >
                 {Object.values(scheduleErrors.errors).flat().join(', ')}
               </div>
             )}
           </div>
-        </div>
       );
     }
 
@@ -452,8 +512,7 @@ function PaymentSchedule() {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-semibold mb-4">{t('create_payment_schedule')}</h2>
-              <p className="text-gray-600 mb-6">{t('choose_schedule_type')}</p>
+              <h2 className="text-xl font-semibold mb-4">{t('choose_schedule_type')}</h2>
             </div>
             
             <div className="space-y-4">
@@ -466,8 +525,8 @@ function PaymentSchedule() {
                 )}
                 onClick={() => setScheduleType('number-payments')}
               >
-                <h3 className="font-medium mb-2">{t('split_into_payments')}</h3>
-                <p className="text-sm text-gray-600">{t('split_into_payments_description')}</p>
+                <h3 className="font-medium mb-2">{t('split_payments')}</h3>
+                <p className="text-sm text-gray-600">{t('split_payments_help')}</p>
               </div>
               
               <div 
@@ -480,7 +539,7 @@ function PaymentSchedule() {
                 onClick={() => setScheduleType('custom')}
               >
                 <h3 className="font-medium mb-2">{t('custom_schedule')}</h3>
-                <p className="text-sm text-gray-600">{t('custom_schedule_description')}</p>
+                <p className="text-sm text-gray-600">{t('custom_schedule_help')}</p>
               </div>
             </div>
           </div>
@@ -490,8 +549,8 @@ function PaymentSchedule() {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-semibold mb-4">{t('how_many_payments')}</h2>
-              <p className="text-gray-600 mb-6">{t('split_invoice_into_payments')}</p>
+              <h2 className="text-xl font-semibold mb-4">{t('number_of_payments')}</h2>
+              <p className="text-gray-600 mb-6">{t('number_of_payments_helper')}</p>
             </div>
             
             <Element leftSide={t('number_of_payments')}>
@@ -509,8 +568,8 @@ function PaymentSchedule() {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-semibold mb-4">{t('payment_frequency')}</h2>
-              <p className="text-gray-600 mb-6">{t('how_often_payments')}</p>
+              <h2 className="text-xl font-semibold mb-4">{t('frequency')}</h2>
+              <p className="text-gray-600 mb-6">{t('schedule_frequency_help')}</p>
             </div>
             
             <Element leftSide={t('frequency')}>
@@ -538,7 +597,7 @@ function PaymentSchedule() {
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-xl font-semibold mb-4">{t('first_payment_date')}</h2>
-              <p className="text-gray-600 mb-6">{t('when_first_payment_due')}</p>
+              <p className="text-gray-600 mb-6">{t('first_payment_date_help')}</p>
             </div>
             
             <Element leftSide={t('first_payment_date')}>
@@ -555,7 +614,10 @@ function PaymentSchedule() {
 
             {/* Display specific field errors */}
             {scheduleErrors?.errors['parameters.first_payment_date'] && (
-              <div className="mt-2 p-2 bg-red-50 text-red-700 rounded-md text-sm">
+              <div 
+                className="mt-2 p-2 rounded-md text-sm"
+                style={{ backgroundColor: colors.$18, color: colors.$4 }}
+              >
                 {scheduleErrors.errors['parameters.first_payment_date'].map((error, index) => (
                   <div key={index}>{error}</div>
                 ))}
@@ -564,7 +626,10 @@ function PaymentSchedule() {
 
             {/* Display general schedule errors */}
             {scheduleErrors && Object.keys(scheduleErrors.errors).length > 0 && (
-              <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
+              <div 
+                className="mb-4 p-4 rounded-md"
+                style={{ backgroundColor: colors.$18, color: colors.$4 }}
+              >
                 {Object.values(scheduleErrors.errors).flat().join(', ')}
               </div>
             )}
@@ -595,14 +660,9 @@ function PaymentSchedule() {
           </div>
         );
 
-      case 'custom-schedule':
+            case 'custom-schedule':
         return (
           <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold mb-4">{t('custom_payment_schedule')}</h2>
-              <p className="text-gray-600 mb-6">{t('create_custom_schedule')}</p>
-            </div>
-            
             <ScheduleComponent
               schedule={schedule}
               handleChange={(property, value) => {
@@ -617,6 +677,29 @@ function PaymentSchedule() {
               page="create"
               disableInvoiceSelection={true}
             />
+
+            {/* Schedule completion status */}
+            {schedule.parameters.schedule && schedule.parameters.schedule.length > 0 && (
+              <>
+                {isComplete && (
+                  <div 
+                    className="p-4 rounded-md flex justify-center"
+                    style={{ backgroundColor: colors.$19, color: colors.$4 }}
+                  >
+                    {t('complete')} {formatRemainingAmount()}
+                  </div>
+                )}
+
+                {!isComplete && (
+                  <div 
+                    className="p-4 rounded-md flex justify-center"
+                    style={{ backgroundColor: colors.$18, color: colors.$4 }}
+                  >
+                    {formatRemainingAmount()}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         );
 
@@ -629,8 +712,16 @@ function PaymentSchedule() {
     <Card
       title={t('payment_schedule')}
       className="shadow-sm"
-      style={{ maxHeight: '42.5rem', borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
+      style={{ 
+        borderColor: colors.$24,
+        backgroundColor: colors.$1,
+        color: colors.$3
+      }}
+      headerStyle={{ 
+        borderColor: colors.$20,
+        backgroundColor: colors.$1,
+        color: colors.$3
+      }}
       withoutBodyPadding
       withScrollableBody
     >
@@ -660,7 +751,7 @@ function PaymentSchedule() {
               {currentStep === 'custom-schedule' && (
                 <Button 
                   onClick={handleCreateCustomSchedule}
-                  disabled={isCreatingSchedule}
+                  disabled={isCreatingSchedule || !isComplete}
                   className="ml-auto"
                 >
                   {isCreatingSchedule ? t('creating') : t('save')}
