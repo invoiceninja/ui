@@ -13,22 +13,22 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Badge } from '$app/components/Badge';
-import { Icon } from '$app/components/icons/Icon';
-import { MdSend } from 'react-icons/md';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date } from '$app/common/helpers';
+import { date, docuNinjaEndpoint } from '$app/common/helpers';
 import type {
   Document as DocumentType,
   DocumentInvitation,
 } from '$app/common/interfaces/docuninja/api';
 import { route } from '$app/common/helpers/route';
-import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Tooltip } from '$app/components/Tooltip';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { Plus } from '$app/components/icons/Plus';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '$app/components/forms';
+import { MdSend } from 'react-icons/md';
+import { Icon } from '$app/components/icons/Icon';
+import { request } from '$app/common/helpers/request';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 type InvitationsProps = {
   document: DocumentType;
@@ -70,7 +70,7 @@ export function Invitations({ document }: InvitationsProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-4">
       {document.invitations?.map((invitation: DocumentInvitation) => (
         <Invitation
           key={invitation.id}
@@ -88,13 +88,13 @@ type InvitationProps = {
 };
 
 function Invitation({ invitation, document }: InvitationProps) {
-  const { dateFormat } = useCurrentCompanyDateFormats();
   const [t] = useTranslation();
 
-  const accentColor = useAccentColor();
-  const [sendingInvitations, setSendingInvitations] = useState<
-    DocumentInvitation[]
-  >([]);
+  const colors = useColorScheme();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const [isSendingInvitation, setIsSendingInvitation] =
+    useState<boolean>(false);
 
   const getInvitationStatus = (invitation: DocumentInvitation) => {
     if (invitation.signed_date) {
@@ -159,9 +159,33 @@ function Invitation({ invitation, document }: InvitationProps) {
   };
 
   const handleSendInvitation = () => {
-    setSendingInvitations([invitation]);
-    // TODO: Implement send invitation logic
-    toast.success(t('invitation_sent') || 'Invitation sent successfully');
+    if (!isSendingInvitation) {
+      toast.processing();
+      setIsSendingInvitation(true);
+
+      request(
+        'POST',
+        docuNinjaEndpoint('/api/documents/:id/send', {
+          id: document.id,
+        }),
+        {
+          invitations: [invitation],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
+      )
+        .then(() => {
+          $refetch(['docuninja_documents']);
+
+          toast.success('document_queued_for_sending');
+        })
+        .finally(() => setIsSendingInvitation(false));
+    }
   };
 
   const getEntityLink = () => {
@@ -174,54 +198,70 @@ function Invitation({ invitation, document }: InvitationProps) {
   };
 
   return (
-    <div className="border rounded-lg p-4 transition-colors bg-white">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <div className="flex items-center justify-between space-x-3 mb-2">
-            <span className="text-sm font-medium text-gray-900">
-              {getName(invitation)}
-            </span>
-
-            {getInvitationStatus(invitation)}
+    <div
+      className="flex flex-col space-y-4 border border-dashed rounded-md px-4 pt-4 md:w-full md:max-w-[25rem]"
+      style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
+    >
+      <div className="flex flex-col space-y-2.5 w-full">
+        <div className="flex items-center justify-between md:space-x-4">
+          <div
+            className="text-sm font-medium truncate w-3/4"
+            style={{ color: colors.$3 }}
+          >
+            {getName(invitation)}
           </div>
 
-          <div className="text-sm text-gray-600 mb-2">
-            {invitation.entity === 'contact' ? t('client_contact') : t('user')}
-            {invitation.contact?.email || invitation.user?.email ? (
-              <span className="ml-2">
-                ({invitation.contact?.email || invitation.user?.email})
-              </span>
-            ) : null}
-          </div>
-
-          <div className="flex items-center justify-between ">
-            {getInvitationDate(invitation)}
-
-            <div className="flex space-x-4">
-              {getEntityLink() && (
-                <Tooltip
-                  width="auto"
-                  placement="bottom"
-                  message={t('copy_link') || 'Copy Link'}
-                  withoutArrow
-                >
-                  <CopyToClipboardIconOnly text={getEntityLink()!} />
-                </Tooltip>
-              )}
-
-              <Tooltip
-                width="auto"
-                placement="bottom"
-                message={t('send_email') || 'Send Email'}
-                withoutArrow
-              >
-                <div onClick={() => handleSendInvitation()}>
-                  <Icon element={MdSend} />
-                </div>
-              </Tooltip>
-            </div>
-          </div>
+          <div>{getInvitationStatus(invitation)}</div>
         </div>
+
+        <div className="flex space-x-2 text-sm" style={{ color: colors.$3 }}>
+          <span>
+            {invitation.entity === 'contact'
+              ? `${t('client_contact')}:`
+              : `${t('user')}:`}
+          </span>
+
+          {invitation.contact?.email || invitation.user?.email ? (
+            <span className="truncate">
+              {invitation.contact?.email || invitation.user?.email}
+            </span>
+          ) : null}
+        </div>
+
+        <div className="flex items-center justify-between ">
+          {getInvitationDate(invitation)}
+        </div>
+      </div>
+
+      <div className="flex justify-between space-x-4 pb-4">
+        {getEntityLink() && (
+          <Button
+            className="py-1"
+            type="minimal"
+            behavior="button"
+            onClick={handleCopyLink}
+            disabled={isSendingInvitation}
+            disableWithoutIcon
+          >
+            {t('copy_link')}
+          </Button>
+        )}
+
+        <Button
+          type="minimal"
+          behavior="button"
+          onClick={handleSendInvitation}
+          disabled={isSendingInvitation}
+          disableWithoutIcon
+        >
+          <div className="flex items-center space-x-2">
+            <div>
+              <Icon element={MdSend} size={17} />
+            </div>
+
+            <span>{t('send_email')}</span>
+          </div>
+        </Button>
       </div>
     </div>
   );

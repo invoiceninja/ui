@@ -50,8 +50,12 @@ export function Badge(props: Props) {
   const styles: React.CSSProperties = { ...props.style };
 
   if (props.variant === 'primary') {
-    styles.backgroundColor = styles.backgroundColor || accentColor;
-    styles.color = 'white';
+    const { red, green, blue } = hexToRGB(
+      styles.backgroundColor || accentColor
+    );
+
+    styles.backgroundColor = `rgba(${red}, ${green}, ${blue}, 0.15)`;
+    styles.color = `rgba(${red}, ${green}, ${blue}, 1)`;
   }
 
   const getTextContrastColor = (color: string) => {
@@ -97,6 +101,7 @@ export function Badge(props: Props) {
           'bg-black bg-opacity-15 text-black': props.variant === 'black',
           'bg-purple-500 bg-opacity-15 text-purple-500':
             props.variant === 'purple',
+          'bg-opacity-15': props.variant === 'primary',
         },
         props.className
       )}

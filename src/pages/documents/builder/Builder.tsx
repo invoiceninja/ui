@@ -1,5 +1,10 @@
 import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Document } from '$app/common/interfaces/docuninja/api';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -7,6 +12,7 @@ import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
@@ -33,8 +39,10 @@ import {
   UploadProps,
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
-import { Check } from 'react-feather';
+import { Check, Loader } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { MdSend } from 'react-icons/md';
+import { useQuery, useQueryClient } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 
@@ -47,38 +55,112 @@ function Loading() {
 }
 
 function Send({ ...props }: SendButtonProps) {
+  const [t] = useTranslation();
+
   return (
     <Button type="secondary" {...props}>
-      Send
+      <div>
+        <Icon element={MdSend} />
+      </div>
+
+      {t('send')}
     </Button>
   );
 }
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
+  const [t] = useTranslation();
+
   return (
-    <Modal visible={open} onClose={onOpenChange}>
+    <Modal
+      title={t('send_confirmation_description')}
+      visible={open}
+      onClose={onOpenChange}
+    >
       {content}
 
-      <div className="flex justify-end">{action}</div>
+      {action}
     </Modal>
   );
 }
 
-function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
+function SendDialogButton({ isSubmitting, ...props }: SendDialogButtonProps) {
+  const [t] = useTranslation();
+
+  const params = useParams();
+  const queryClient = useQueryClient();
+
+  const { data: document } = useQuery({
+    queryKey: ['/api/documents', params.id],
+    queryFn: () =>
+      request(
+        'GET',
+        docuNinjaEndpoint(
+          `/api/documents/${params.id}?includeUrl&includePreviews`
+        )
+      ).then(
+        (response: GenericSingleResourceResponse<Document>) =>
+          response.data.data
+      ),
+    refetchOnWindowFocus: false,
+    initialData: null,
+  });
+
+  const handleSend = async () => {
+    if (!document) {
+      toast.error('document_not_found');
+      return;
+    }
+
+    try {
+      await request(
+        'POST',
+        docuNinjaEndpoint(`/api/documents/${document.id}/send`),
+        {
+          invitations: document.invitations || [],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
+      );
+
+      queryClient.invalidateQueries({ queryKey: ['/api/documents'] });
+      toast.success('document_queued_for_sending');
+
+      window.dispatchEvent(new CustomEvent('builder:send.request-reset'));
+      window.dispatchEvent(new CustomEvent('builder:send.submit'));
+
+      if ('onClick' in props && typeof props.onClick === 'function') {
+        props.onClick();
+      }
+    } catch (error) {
+      toast.error('something_went_wrong');
+    }
+  };
+
   return (
-    <Button behavior="button" disabled={isSubmitting}>
-      Send invitations
+    <Button
+      behavior="button"
+      disabled={isSubmitting}
+      onClick={handleSend}
+      {...props}
+    >
+      {isSubmitting ? <Loader className="animate-spin" /> : null}
+      {t('send')}
     </Button>
   );
 }
 
 function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
+  const [t] = useTranslation();
+
   return (
-    <Modal title="Delete document" visible={open} onClose={onOpenChange}>
-      <p>
-        Are you sure you want to delete this document? This action cannot be
-        undone.
-      </p>
+    <Modal title={t('delete_document')} visible={open} onClose={onOpenChange}>
+      <p>{t('delete_docuninja_document_confirmation')}</p>
 
       {action}
     </Modal>
@@ -139,9 +221,11 @@ function ConfirmationDialog({
 }
 
 function ConfirmationDialogButton({ ...props }: ConfirmationDialogButtonProps) {
+  const [t] = useTranslation();
+
   return (
     <Button behavior="button" {...props}>
-      Confirm
+      {t('confirm')}
     </Button>
   );
 }
@@ -368,8 +452,30 @@ function Builder() {
     window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
+  const handleSend = () => {
+    window.dispatchEvent(new CustomEvent('builder:send'));
+  };
+
   return (
-    <Default title={t('builder')} breadcrumbs={pages} onSaveClick={handleSave}>
+    <Default
+      title={t('builder')}
+      breadcrumbs={pages}
+      navigationTopRight={
+        <div className="flex items-center gap-2">
+          <Button type="secondary" behavior="button" onClick={handleSend}>
+            <div>
+              <Icon element={MdSend} />
+            </div>
+
+            <span>{t('send')}</span>
+          </Button>
+
+          <Button behavior="button" onClick={handleSave}>
+            {t('save')}
+          </Button>
+        </div>
+      }
+    >
       <Card
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}

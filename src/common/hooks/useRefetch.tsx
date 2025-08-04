@@ -225,7 +225,7 @@ export const keys = {
     dependencies: [],
   },
   docuninja_documents: {
-    path: '/api/documents',
+    path: '/api/documents/docuninja',
     dependencies: [],
   },
   blueprints: {

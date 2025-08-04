@@ -15,7 +15,7 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { GenericQueryOptions } from '../invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Client, Document, User } from '$app/common/interfaces/docuninja/api';
-import { TimelineItemType } from '$app/pages/documents/show/components/timeline-layout';
+import { TimelineItemType } from '$app/pages/documents/show/components/TimelineLayout';
 import { AxiosResponse } from 'axios';
 
 export function useDocumentsQuery(params: Params) {

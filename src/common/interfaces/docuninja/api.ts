@@ -178,6 +178,7 @@ export interface CompanyUser {
   created_at: string; // ISO 8601 date string
   updated_at: string; // ISO 8601 date string
   archived_at: string | null; // ISO 8601 date string
+  notifications: string[];
 }
 
 export interface Document {
@@ -192,6 +193,7 @@ export interface Document {
   created_at: string | null; // ISO date string
   updated_at: string | null; // ISO date string
   archived_at: string | null; // ISO date string
+  expires_at: string | null; // ISO date string
 
   // Relations
   user?: User | null;
@@ -281,7 +283,7 @@ export interface User {
   phone_number: string | null;
   email: string;
   phone_number_verified: boolean;
-  is_deleted: boolean;
+  is_deleted: number;
   referral_code: string | null;
   oauth_user_id: string | null;
   oauth_user_token: string | null;
@@ -297,6 +299,8 @@ export interface User {
   email_verified_at: string | null; // ISO date string
   companies?: Company[]; // Related companies
   account: Account | null;
+  permissions: string[];
+  company_user?: CompanyUser;
 }
 
 export interface Timezone {
@@ -356,4 +360,15 @@ export interface Plan {
   };
   features: string[];
   highlighted_features: string[];
+}
+
+export enum DocumentStatus {
+  Draft = 1,
+  PendingApproval = 2,
+  Approved = 3,
+  Rejected = 4,
+  Sent = 5,
+  Completed = 6,
+  Expired = 7,
+  Voided = 8,
 }
