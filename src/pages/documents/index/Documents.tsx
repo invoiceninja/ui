@@ -10,28 +10,28 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
 import { DataTable } from '$app/components/DataTable';
 import { useTableColumns } from '../common/hooks/useTableColumns';
 import { Document } from '$app/common/interfaces/docuninja/api';
+import { Default } from '$app/components/layouts/Default';
+import { Page } from '$app/components/Breadcrumbs';
 
 export default function Blueprints() {
-  useTitle('blueprints');
+  useTitle('documents');
 
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
   const columns = useTableColumns();
 
+  const pages: Page[] = [
+    {
+      name: t('documents'),
+      href: '/documents',
+    },
+  ];
+
   return (
-    <Card
-      title={t('documents')}
-      className="shadow-sm"
-      childrenClassName="px-4 sm:px-6 pt-6 pb-8"
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
-    >
+    <Default title={t('documents')} breadcrumbs={pages}>
       <DataTable<Document>
         resource="document"
         endpoint="/api/documents?sort=id|desc"
@@ -47,6 +47,6 @@ export default function Blueprints() {
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
       />
-    </Card>
+    </Default>
   );
 }

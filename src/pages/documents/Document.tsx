@@ -7,17 +7,17 @@ import { request } from '$app/common/helpers/request';
 import { useEffect, useState } from 'react';
 import { Alert } from '$app/components/Alert';
 import { Company } from '$app/common/interfaces/docuninja/api';
-import { useNavigate } from 'react-router-dom';
-import { UpgradeModal } from './common/components/UpgradeModal';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useQueryClient } from 'react-query';
 import { useLogin } from '$app/common/queries/docuninja/docuninja';
-import Documents from './index/Documents';
-import { atom } from 'jotai';
+import { atom, useSetAtom } from 'jotai';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Spinner } from '$app/components/Spinner';
+import { useColorScheme } from '$app/common/colors';
+import { Card } from '$app/components/cards';
 
-export const docuNinjaDataAtom = atom<Company | null>(null);
+export const isPaidDocuninjaUserAtom = atom<boolean>(false);
 
 export default function Document() {
   const { documentTitle } = useTitle('documents');
@@ -28,13 +28,15 @@ export default function Document() {
 
   const queryClient = useQueryClient();
 
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
   const account = useCurrentAccount();
+
+  const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
 
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
 
-  const company = useCurrentCompany();
   const pages = [{ name: t('documents'), href: '/documents' }];
 
   const {
@@ -44,7 +46,7 @@ export default function Document() {
   } = useLogin({
     enabled:
       (account?.plan === 'pro' || account?.plan === 'enterprise') &&
-      !!company?.company_key,
+      Boolean(company?.company_key),
   });
 
   const is401Error =
@@ -70,7 +72,7 @@ export default function Document() {
       {},
       { skipIntercept: true }
     )
-      .then((response) => {
+      .then(() => {
         queryClient.invalidateQueries(['/api/docuninja/login']);
       })
       .catch((error) => {
@@ -89,96 +91,103 @@ export default function Document() {
     }
   }, [loginError, is401Error, error]);
 
+  useEffect(() => {
+    setIsPaidDocuninjaUser(isPaidUser);
+  }, [isPaidUser]);
+
+  useEffect(() => {
+    if (docuData) {
+      const docuCompany = docuData?.companies?.find(
+        (c: Company) => c.ninja_company_key === company?.company_key
+      );
+
+      if (docuCompany) {
+        localStorage.setItem('X-DOCU-NINJA-TOKEN', docuCompany?.token);
+      }
+    }
+  }, [docuData, company]);
+
+  if (
+    !isLoading &&
+    !(
+      docuAccount?.plan !== 'pro' ||
+      needsAccountCreation ||
+      Boolean(hasAccount && !docuCompany)
+    )
+  ) {
+    return <Outlet />;
+  }
+
   return (
     <Default title={documentTitle} breadcrumbs={pages} docsLink="en/documents">
-      {error && (
+      {error && !isLoading && (
         <Alert type="danger" className="mb-4">
           {error}
         </Alert>
       )}
 
-      {isLoading && (
-        <div className="flex justify-center items-center py-6">
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
           <Spinner />
         </div>
-      )}
+      ) : (
+        <>
+          {docuAccount?.plan !== 'pro' && (
+            <div className="flex flex-col items-center gap-4 p-6">
+              <span style={{ color: colors.$17 }}>
+                {t('upgrade_plan_docuninja')}
+              </span>
 
-      {docuAccount?.plan !== 'pro' && (
-        <div className="flex flex-col items-center gap-4 p-6">
-          <p className="text-gray-600 mb-4">
-            Upgrade to a paid plan to access Docuninja
-          </p>
-
-          <Button
-            onClick={() => navigate('/settings/account_management')}
-            behavior="button"
-          >
-            {t('upgrade_plan')}
-          </Button>
-        </div>
-      )}
-
-      {Boolean(needsAccountCreation) && (
-        <div className="flex flex-col items-center gap-4 p-6">
-          <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
-          <p className="text-gray-600 mb-4">
-            To create your DocuNinja account for this company, please click the
-            button below.
-          </p>
-          <Button
-            onClick={() => create()}
-            disabled={isCreating || isLoading}
-            behavior="button"
-          >
-            {t('create')}
-          </Button>
-        </div>
-      )}
-
-      {Boolean(hasAccount && !docuCompany) && (
-        <div className="flex flex-col items-center gap-4 p-6">
-          <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
-          <p className="text-gray-600 mb-4">
-            Your account exists but this company is not set up yet. Please click
-            the button below to set it up.
-          </p>
-          <Button
-            onClick={() => create()}
-            disabled={isCreating || isLoading}
-            behavior="button"
-          >
-            {t('setup_company')}
-          </Button>
-        </div>
-      )}
-
-      {Boolean(docuCompany) && (
-        <div className="space-y-6">
-          {!isPaidUser && ( //TODO: handle trial upgrade CTA
-            <Alert type="warning" className="mb-4">
-              <div className="flex justify-between items-center">
-                <span>{t('upgrade_account_message')}</span>
-                <Button
-                  onClick={() => setShowUpgradeModal(true)}
-                  behavior="button"
-                >
-                  {t('upgrade_now')}
-                </Button>
-              </div>
-            </Alert>
+              <Button
+                onClick={() => navigate('/settings/account_management')}
+                behavior="button"
+              >
+                {t('upgrade_plan')}
+              </Button>
+            </div>
           )}
 
-          <UpgradeModal
-            visible={showUpgradeModal}
-            onClose={() => setShowUpgradeModal(false)}
-            onPaymentComplete={() => {
-              queryClient.invalidateQueries(['/api/docuninja/login']);
-              setShowUpgradeModal(false);
-            }}
-          />
+          {Boolean(needsAccountCreation) && (
+            <div className="flex justify-center items-center">
+              <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
+                <div className="flex flex-col items-center gap-4 p-6">
+                  <span style={{ color: colors.$3 }}>
+                    {t('welcome_to_docuninja')}
+                  </span>
+                  <span className="text-center" style={{ color: colors.$17 }}>
+                    {t('create_docuninja_account')}
+                  </span>
 
-          <Documents />
-        </div>
+                  <Button
+                    className="mt-4"
+                    onClick={() => create()}
+                    disabled={isCreating || isLoading}
+                    behavior="button"
+                  >
+                    {t('create')}
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {Boolean(hasAccount && !docuCompany) && (
+            <div className="flex flex-col items-center gap-4 p-6">
+              <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
+              <p className="text-gray-600 mb-4">
+                Your account exists but this company is not set up yet. Please
+                click the button below to set it up.
+              </p>
+              <Button
+                onClick={() => create()}
+                disabled={isCreating || isLoading}
+                behavior="button"
+              >
+                {t('setup_company')}
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </Default>
   );

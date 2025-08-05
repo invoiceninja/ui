@@ -118,25 +118,27 @@ export function SidebarItem(props: Props) {
       </Div>
 
       {item.current && (
-        <div className="flex flex-col justify-center w-full pl-2">
+        <div
+          className={classNames('flex flex-col justify-center w-full', {
+            'pl-2': !isMiniSidebar,
+          })}
+        >
           {item.subOptions && (
-            <div className="flex flex-col">
+            <div className="flex flex-col space-y-1">
               {item.subOptions.map((subOption) => (
                 <Div
+                  key={subOption.name}
                   theme={{
                     color: subOption.current
                       ? themeColors.$1 || colors.$8
                       : themeColors.$3 || 'transparent',
                     hoverColor: themeColors.$1 || colors.$8,
                   }}
-                  key={subOption.name}
                   className={classNames(
-                    'flex items-center justify-between group px-1.5 text-sm font-medium rounded-md w-full',
+                    'flex items-center justify-between group pl-2.5 pr-1.5 text-sm font-medium rounded-md w-full',
                     {
-                      'text-white border-l-4 border-transparent':
-                        subOption.current,
-                      'text-gray-300 border-l-4 border-transparent':
-                        !subOption.current,
+                      'text-white': subOption.current,
+                      'text-gray-300': !subOption.current,
                     }
                   )}
                 >
@@ -147,7 +149,13 @@ export function SidebarItem(props: Props) {
                       withoutDefaultStyling
                     >
                       <div
-                        className="flex justify-start items-center my-2 space-x-3 w-full"
+                        className={classNames(
+                          'flex items-center my-2 space-x-3 w-full',
+                          {
+                            'justify-start': !isMiniSidebar,
+                            'justify-center': isMiniSidebar,
+                          }
+                        )}
                         style={{
                           color: subOption.current
                             ? themeColors.$2
@@ -155,7 +163,7 @@ export function SidebarItem(props: Props) {
                         }}
                       >
                         <subOption.icon
-                          size="1.275rem"
+                          size={isMiniSidebar ? '1.1rem' : '1.275rem'}
                           color={
                             subOption.current
                               ? themeColors.$2 || 'white'

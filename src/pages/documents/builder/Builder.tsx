@@ -242,10 +242,18 @@ export function CreateDialog({
       title={t('create_client_or_user')}
       visible={open}
       onClose={onOpenChange}
+      withoutHorizontalPadding
+      withoutVerticalMargin
     >
-      <TabGroup tabs={[t('client'), t('user')]}>
-        <div>{client}</div>
-        <div>{user}</div>
+      <TabGroup
+        tabs={[t('client'), t('user')]}
+        withHorizontalPadding
+        horizontalPaddingWidth="1.5rem"
+        width="full"
+        className="pt-3"
+      >
+        <div className="px-4 sm:px-6 pt-2">{client}</div>
+        <div className="px-4 sm:px-6 pt-2">{user}</div>
       </TabGroup>
     </Modal>
   );
@@ -313,7 +321,7 @@ function SignatorySelector({
 }: SignatorySelectorProps) {
   const [t] = useTranslation();
 
-  function handleSelect(v: string | undefined) {
+  const handleSelect = (v: string | undefined) => {
     if (!v) {
       return;
     }
@@ -332,7 +340,7 @@ function SignatorySelector({
     }
 
     onSelect(value, type as 'user', entity as any);
-  }
+  };
 
   return (
     <SelectField

@@ -41,15 +41,19 @@ const CreateUser = lazy(
 const EditUser = lazy(
   () => import('$app/pages/documents/pages/users/edit/Edit')
 );
+const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 
 export const documentsRoutes = (
-  <Route path="documents">
+  <Route
+    path="documents"
+    element={<Guard guards={[]} component={<Document />} />}
+  >
     <Route
       path="create"
       element={<Guard guards={[]} component={<Create />} />}
     />
 
-    <Route path="" element={<Guard guards={[]} component={<Document />} />} />
+    <Route path="" element={<Guard guards={[]} component={<Documents />} />} />
 
     <Route
       path="settings"
