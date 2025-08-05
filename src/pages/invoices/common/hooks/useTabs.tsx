@@ -101,7 +101,7 @@ export function useTabs(params: Params) {
     {
       name: t('payments'),
       href: route('/invoices/:id/payments', { id }),
-      enabled: invoice?.status_id === InvoiceStatus.Paid,
+      enabled: invoice?.status_id === InvoiceStatus.Paid || invoice?.status_id === InvoiceStatus.Partial,
     },
   ];
 
