@@ -30,6 +30,10 @@ import { DeleteDocumentAction } from '../components/DeleteDocumentAction';
 import { Divider } from '$app/components/cards/Divider';
 import { ArchiveDocumentAction } from '../components/ArchiveDocumentAction';
 import { RestoreDocumentAction } from '../components/RestoreDocumentAction';
+import { useNavigate } from 'react-router-dom';
+import { route } from '$app/common/helpers/route';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { FaFileSignature } from 'react-icons/fa';
 
 interface DocumentAction {
   label: string;
@@ -44,6 +48,10 @@ interface Params {
 
 export function useDocumentActions({ document }: Params) {
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const currentUser = useCurrentUser();
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
@@ -61,7 +69,37 @@ export function useDocumentActions({ document }: Params) {
 
   const { voidDocument, isFormBusy: isVoidingDocumentBusy } = useVoidDocument();
 
+  const userInvitation = document?.invitations?.find(
+    (invitation) =>
+      invitation.entity === 'user' && invitation.user_id === currentUser?.id
+  );
+
+  const hasRectangles = () => {
+    return (
+      document?.files?.some(
+        (file) =>
+          file.metadata?.rectangles &&
+          Array.isArray(file.metadata.rectangles) &&
+          file.metadata.rectangles.length > 0
+      ) ?? false
+    );
+  };
+
   const actions: DocumentAction[] = [
+    {
+      label: t('sign'),
+      icon: <Icon element={FaFileSignature} />,
+      onClick: () =>
+        navigate(
+          route('/documents/sign/:documentId/:userInvitationId', {
+            documentId: document?.id,
+            userInvitationId: userInvitation?.id,
+          })
+        ),
+      // visible:
+      //   (document?.status_id ?? 0) <= 2 && userInvitation && hasRectangles(),
+      visible: true,
+    },
     {
       label: t('download'),
       icon: <Icon element={MdDownload} />,

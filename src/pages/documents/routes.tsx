@@ -42,6 +42,7 @@ const EditUser = lazy(
   () => import('$app/pages/documents/pages/users/edit/Edit')
 );
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
+const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 
 export const documentsRoutes = (
   <Route
@@ -102,6 +103,11 @@ export const documentsRoutes = (
     <Route
       path="users/:id/edit"
       element={<Guard guards={[]} component={<EditUser />} />}
+    />
+
+    <Route
+      path="sign/:documentId/:userInvitationId"
+      element={<Guard guards={[]} component={<Sign />} />}
     />
   </Route>
 );
