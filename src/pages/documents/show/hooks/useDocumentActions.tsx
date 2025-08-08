@@ -32,8 +32,9 @@ import { ArchiveDocumentAction } from '../components/ArchiveDocumentAction';
 import { RestoreDocumentAction } from '../components/RestoreDocumentAction';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { FaFileSignature } from 'react-icons/fa';
+import { useAtomValue } from 'jotai';
+import { docuCompanyAccountDetailsAtom } from '../../Document';
 
 interface DocumentAction {
   label: string;
@@ -51,7 +52,7 @@ export function useDocumentActions({ document }: Params) {
 
   const navigate = useNavigate();
 
-  const currentUser = useCurrentUser();
+  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
@@ -71,7 +72,11 @@ export function useDocumentActions({ document }: Params) {
 
   const userInvitation = document?.invitations?.find(
     (invitation) =>
-      invitation.entity === 'user' && invitation.user_id === currentUser?.id
+      invitation.entity === 'user' &&
+      invitation.user_id ===
+        docuCompanyAccountDetails?.account?.users?.find(
+          (user) => user.company_user?.is_owner
+        )?.id
   );
 
   const hasRectangles = () => {
@@ -90,15 +95,15 @@ export function useDocumentActions({ document }: Params) {
       label: t('sign'),
       icon: <Icon element={FaFileSignature} />,
       onClick: () =>
-        navigate(
-          route('/documents/sign/:documentId/:userInvitationId', {
-            documentId: document?.id,
-            userInvitationId: userInvitation?.id,
-          })
+        window.open(
+          route('/documents/sign/:document/:invitation', {
+            document: document?.id,
+            invitation: userInvitation?.id,
+          }),
+          '_blank'
         ),
-      // visible:
-      //   (document?.status_id ?? 0) <= 2 && userInvitation && hasRectangles(),
-      visible: true,
+      visible:
+        (document?.status_id ?? 0) <= 2 && userInvitation && hasRectangles(),
     },
     {
       label: t('download'),

@@ -6,18 +6,26 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useEffect, useState } from 'react';
 import { Alert } from '$app/components/Alert';
-import { Company } from '$app/common/interfaces/docuninja/api';
+import { Account, Company } from '$app/common/interfaces/docuninja/api';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useQueryClient } from 'react-query';
 import { useLogin } from '$app/common/queries/docuninja/docuninja';
-import { atom, useSetAtom } from 'jotai';
+import { atom, useAtom, useSetAtom } from 'jotai';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Spinner } from '$app/components/Spinner';
 import { useColorScheme } from '$app/common/colors';
 import { Card } from '$app/components/cards';
 
 export const isPaidDocuninjaUserAtom = atom<boolean>(false);
+
+type DocuCompanyAccountDetails = {
+  account: Account;
+  company: Company;
+};
+
+export const docuCompanyAccountDetailsAtom =
+  atom<DocuCompanyAccountDetails | null>(null);
 
 export default function Document() {
   const { documentTitle } = useTitle('documents');
@@ -33,6 +41,9 @@ export default function Document() {
   const account = useCurrentAccount();
 
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
+  const [docuCompanyAccountDetails, setDocuCompanyAccountDetails] = useAtom(
+    docuCompanyAccountDetailsAtom
+  );
 
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState<boolean>(false);
@@ -54,13 +65,10 @@ export default function Document() {
   const hasAccount = !!docuData && !is401Error;
   const needsAccountCreation = is401Error;
 
-  const docuAccount = docuData?.account;
-  const docuCompany = docuData?.companies?.find(
-    (c: Company) => c.ninja_company_key === company?.company_key
-  );
   const isPaidUser =
-    docuAccount?.plan !== 'free' &&
-    new Date(docuAccount?.plan_expires ?? '') > new Date();
+    docuCompanyAccountDetails?.account?.plan !== 'free' &&
+    new Date(docuCompanyAccountDetails?.account?.plan_expires ?? '') >
+      new Date();
 
   const create = () => {
     setError(null);
@@ -107,12 +115,26 @@ export default function Document() {
     }
   }, [docuData, company]);
 
+  useEffect(() => {
+    const docuAccount = docuData?.account;
+    const docuCompany = docuData?.companies?.find(
+      (c: Company) => c.ninja_company_key === company?.company_key
+    );
+
+    if (docuData && docuCompany) {
+      setDocuCompanyAccountDetails({
+        account: docuAccount,
+        company: docuCompany,
+      });
+    }
+  }, [docuData]);
+
   if (
     !isLoading &&
     !(
-      docuAccount?.plan !== 'pro' ||
+      docuCompanyAccountDetails?.account?.plan !== 'pro' ||
       needsAccountCreation ||
-      Boolean(hasAccount && !docuCompany)
+      Boolean(hasAccount && !docuCompanyAccountDetails?.company)
     )
   ) {
     return <Outlet />;
@@ -132,7 +154,7 @@ export default function Document() {
         </div>
       ) : (
         <>
-          {docuAccount?.plan !== 'pro' && (
+          {docuCompanyAccountDetails?.account?.plan !== 'pro' && (
             <div className="flex flex-col items-center gap-4 p-6">
               <span style={{ color: colors.$17 }}>
                 {t('upgrade_plan_docuninja')}
@@ -171,7 +193,7 @@ export default function Document() {
             </div>
           )}
 
-          {Boolean(hasAccount && !docuCompany) && (
+          {Boolean(hasAccount && !docuCompanyAccountDetails?.company) && (
             <div className="flex flex-col items-center gap-4 p-6">
               <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
               <p className="text-gray-600 mb-4">

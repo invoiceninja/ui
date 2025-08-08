@@ -322,6 +322,7 @@ function SignatorySelector({
   const [t] = useTranslation();
 
   const handleSelect = (v: string | undefined) => {
+    console.log(v);
     if (!v) {
       return;
     }
@@ -498,7 +499,7 @@ function Builder() {
               skeleton: Loading,
               save: () => null,
               send: {
-                trigger: Send,
+                trigger: () => null,
                 dialog: SendDialog,
                 button: SendDialogButton,
               },

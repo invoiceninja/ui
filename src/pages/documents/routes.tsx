@@ -106,7 +106,7 @@ export const documentsRoutes = (
     />
 
     <Route
-      path="sign/:documentId/:userInvitationId"
+      path="sign/:document/:invitation"
       element={<Guard guards={[]} component={<Sign />} />}
     />
   </Route>
