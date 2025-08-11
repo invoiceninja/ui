@@ -90,6 +90,11 @@ export interface Invoice {
 
 export interface Backup {
   guid?: string;
+  cancelled_invoice_id?: string;
+  cancelled_invoice_number?: string;
+  cancellation_reason?: string;
+  credit_invoice_id?: string;
+  credit_invoice_number?: string;
 }
 
 export interface Activity {
