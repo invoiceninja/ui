@@ -46,6 +46,7 @@ import { CircleWarning } from './icons/CircleWarning';
 import { Message } from './icons/Message';
 import { CircleQuestion } from './icons/CircleQuestion';
 import { CircleInfo } from './icons/CircleInfo';
+import dayjs from 'dayjs';
 
 interface Props {
   docsLink?: string;
@@ -126,7 +127,12 @@ export function HelpSidebarIcons(props: Props) {
   const refreshData = () => {
     setDisabledButton(true);
 
-    request('POST', endpoint('/api/v1/refresh')).then((data) => {
+    request(
+      'POST',
+      endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+        updatedAt: dayjs().unix(),
+      })
+    ).then((data) => {
       dispatch(updateCompanyUsers(data.data.data));
       dispatch(resetChanges('company'));
       setDisabledButton(false);

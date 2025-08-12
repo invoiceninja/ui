@@ -163,12 +163,14 @@ export default function Edit() {
         <div className="my-4">
           {purchaseOrder && (
             <InvoicePreview
-              for="invoice"
+              for="create"
               resource={purchaseOrder}
               entity="purchase_order"
               relationType="vendor_id"
               endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
               withRemoveLogoCTA
+              observable={true}
+              initiallyVisible={false}
             />
           )}
         </div>

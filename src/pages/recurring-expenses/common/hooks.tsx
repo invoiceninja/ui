@@ -55,7 +55,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
 import {
   extractTextFromHTML,
   sanitizeHTML,
@@ -141,7 +141,7 @@ export function useRecurringExpenseColumns() {
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
   const calculateExpenseAmount = useCalculateExpenseAmount();
-
+  const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
   type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
 
@@ -323,7 +323,7 @@ export function useRecurringExpenseColumns() {
       label: t('net_amount'),
       format: (value, recurringExpense) =>
         formatMoney(
-          value,
+          calculateExpenseExclusiveAmount(recurringExpense),
           recurringExpense.client?.country_id,
           recurringExpense.currency_id ||
             recurringExpense.client?.settings.currency_id

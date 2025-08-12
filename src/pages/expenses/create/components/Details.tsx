@@ -23,7 +23,7 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import { ExpenseStatus } from '../../common/components/ExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
-import { useCalculateExpenseAmount } from '../../common/hooks/useCalculateExpenseAmount';
+import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from '../../common/hooks/useCalculateExpenseAmount';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
@@ -67,7 +67,7 @@ export function Details(props: Props) {
 
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
-
+  const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
   const isAnyTaxHidden = () => {
     if (
       company.enabled_expense_tax_rates === 0 &&
@@ -110,8 +110,13 @@ export function Details(props: Props) {
     <div className="flex flex-col space-y-4">
       {expense && (
         <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
-          <Element leftSide={t('expense_total')} withoutWrappingLeftSide>
-            {formatMoney(
+          <Element leftSide={t('net_amount')} withoutWrappingLeftSide>
+            {expense.uses_inclusive_taxes ? formatMoney(
+              calculateExpenseExclusiveAmount(expense),
+              expense.client?.country_id,
+              expense.currency_id || expense.client?.settings.currency_id
+            )
+            : formatMoney(
               calculateExpenseAmount(expense),
               expense.client?.country_id,
               expense.currency_id || expense.client?.settings.currency_id

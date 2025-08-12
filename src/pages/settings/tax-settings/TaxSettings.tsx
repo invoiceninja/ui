@@ -36,6 +36,7 @@ import { HelpWidget } from '$app/components/HelpWidget';
 import { CalculateTaxesNotificationModal } from './components/calculate-taxes/components/CalculateTaxesNotificationModal';
 import { useColorScheme } from '$app/common/colors';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { DefaultLineItemTaxes } from './components/DefaultLineItemTaxes';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -104,7 +105,7 @@ export function TaxSettings() {
                 <SelectField
                   value={companyChanges?.enabled_tax_rates?.toString() || '0'}
                   onValueChange={(value) =>
-                    handleChange('enabled_tax_rates', value)
+                    handleChange('enabled_tax_rates', Number(value))
                   }
                   errorMessage={errors?.errors.enabled_tax_rates}
                   customSelector
@@ -124,7 +125,7 @@ export function TaxSettings() {
                   companyChanges?.enabled_item_tax_rates?.toString() || '0'
                 }
                 onValueChange={(value) =>
-                  handleChange('enabled_item_tax_rates', value)
+                  handleChange('enabled_item_tax_rates', Number(value))
                 }
                 errorMessage={errors?.errors.enabled_item_tax_rates}
                 customSelector
@@ -143,7 +144,7 @@ export function TaxSettings() {
                   companyChanges?.enabled_expense_tax_rates?.toString() || '0'
                 }
                 onValueChange={(value) =>
-                  handleChange('enabled_expense_tax_rates', value)
+                  handleChange('enabled_expense_tax_rates', Number(value))
                 }
                 errorMessage={errors?.errors.enabled_expense_tax_rates}
                 customSelector
@@ -195,6 +196,9 @@ export function TaxSettings() {
           </Card>
 
           <Selector />
+
+          {companyChanges.enabled_item_tax_rates > 0 &&
+            !companyChanges.enabled_tax_rates && <DefaultLineItemTaxes />}
         </>
       )}
 
