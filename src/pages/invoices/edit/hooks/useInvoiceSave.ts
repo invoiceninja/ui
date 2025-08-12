@@ -44,7 +44,6 @@ export function useHandleSave(params: Params) {
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (invoice: Invoice) => {
-    console.log('isFormBusy', isFormBusy);
     if (isFormBusy) {
       return;
     }

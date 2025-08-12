@@ -46,6 +46,92 @@ import { useQuery, useQueryClient } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 
+export function Builder() {
+  const { id } = useParams();
+  const { t } = useTranslation();
+
+  const pages: Page[] = [
+    { name: t('documents'), href: '/documents' },
+    {
+      name: t('Document'),
+      href: route('/documents/:id', { id }),
+    },
+    {
+      name: t('Builder'),
+      href: route('/documents/:id/builder', { id }),
+    },
+  ];
+
+  return (
+    <Default breadcrumbs={pages}>
+      <div className="max-w-7xl mx-auto">
+        {/* @ts-expect-error TODO: Fix type error with BuilderContext.Provider value prop */}
+        <BuilderContext.Provider
+          value={{
+            token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
+            document: id as string,
+            components: {
+              skeleton: Loading,
+              save: Save,
+              send: {
+                trigger: Send,
+                dialog: SendDialog,
+                button: SendDialogButton,
+              },
+              delete: {
+                dialog: DeleteDialog,
+                button: DeleteButton,
+              },
+              upload: {
+                trigger: Upload,
+                dialog: UploadDialog,
+              },
+              confirmation: {
+                dialog: ConfirmationDialog,
+                button: ConfirmationDialogButton,
+              },
+              createSignatory: {
+                dialog: CreateDialog,
+                client: {
+                  form: CreateClientForm,
+                  button: CreateDialogTabButton,
+                },
+                user: {
+                  form: CreateUserForm,
+                  button: CreateDialogTabButton,
+                },
+              },
+              signatorySelector: SignatorySelector,
+              uninvite: {
+                dialog: UninviteDialog,
+                button: UninviteButton,
+              },
+              signatorySwap: () => null,
+              validationErrors: ValidationErrors,
+              sign: () => null,
+              toolboxContext: ToolboxContext,
+            },
+            styles: {
+              frame: {
+                backgroundColor: '#f7f7f7',
+              },
+              border: '#d1d5db',
+            },
+            options: {
+              header: {
+                sticky: false,
+              },
+            },
+            endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
+          }}
+        >
+          <Builder$ />
+        </BuilderContext.Provider>
+      </div>
+    </Default>
+  );
+}
+
 function Loading() {
   return (
     <div className="flex justify-center items-center py-6 sm:py-8 px-4 sm:px-6">

@@ -155,10 +155,8 @@ export class InvoiceSum {
       });
     }
 
-    console.log(this.totalTaxes);
     this.totalTaxes = parseFloat(calculatedTax.toFixed(this.currency?.precision || 2));
 
-    console.log(this.totalTaxes);
     return this;
   }
 

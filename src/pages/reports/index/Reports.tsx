@@ -302,6 +302,7 @@ export default function Reports() {
       );
     }
 
+    // We will keep this commented out for now, but we will need to add it back in when we have a way to format numbers.
     // if (typeof currentCell.display_value !== 'string') {
     //   return currentCell.display_value;
     // }

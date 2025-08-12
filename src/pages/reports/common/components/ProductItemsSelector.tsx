@@ -63,16 +63,49 @@ export function ProductItemsSelector(props: Props) {
 
   useEffect(() => {
     if (products && !isInitial) {
-      setProductItems(
-        products.map((product) => ({
-          value: product.product_key,
-          label: product.product_key,
-          color: colors.$3,
-          backgroundColor: colors.$1,
-        }))
-      );
+      const existingValues = value
+        ? value
+            .split("',")
+            .map((val) => val.trim().replace(/'/g, ''))
+            .filter(Boolean)
+        : [];
+
+      const newProductItems = products.map((product) => ({
+        value: product.product_key,
+        label: product.product_key,
+        color: colors.$3,
+        backgroundColor: colors.$1,
+      }));
+
+      let finalProductItems;
+
+      if (productItems !== undefined && productItems.length > 0) {
+        const newItems = newProductItems.filter(
+          (product) =>
+            !productItems.some(
+              (currentItem) => currentItem.value === product.value
+            )
+        );
+
+        finalProductItems = [...productItems, ...newItems];
+      } else {
+        finalProductItems = newProductItems;
+      }
+
+      const sortedItems = finalProductItems.sort((a, b) => {
+        const aIndex = existingValues.indexOf(a.value);
+        const bIndex = existingValues.indexOf(b.value);
+
+        if (aIndex !== -1 && bIndex === -1) return -1;
+        if (bIndex !== -1 && aIndex === -1) return 1;
+        if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+
+        return 0;
+      });
+
+      setProductItems(sortedItems);
     }
-  }, [products, isInitial]);
+  }, [products, isInitial, value]);
 
   useEffect(() => {
     if (value && isInitial) {
@@ -131,7 +164,7 @@ export function ProductItemsSelector(props: Props) {
     products: MultiValue<{ value: string; label: string }>
   ) => {
     return (products as SelectOption[])
-      .map((option: { value: string; label: string }) => option.value)
+      .map((option: { value: string; label: string }) => `'${option.value}'`)
       .join(',');
   };
 

@@ -64,9 +64,9 @@ export function ProductSelector(props: Props) {
           value: 'id',
           searchable: 'notes',
           dropdownLabelFn: (product) => (
-            <div>
+            <div className="flex flex-col flex-1 max-w-64">
               <div className="flex space-x-1">
-                <p className="font-medium">{product.product_key}</p>
+                <p className="font-medium truncate">{product.product_key}</p>
 
                 {currentCompany?.track_inventory &&
                   props.displayStockQuantity && (
@@ -84,7 +84,10 @@ export function ProductSelector(props: Props) {
                   )}
               </div>
 
-              <p className="text-xs font-medium" style={{ color: colors.$22 }}>
+              <p
+                className="text-xs font-medium truncate"
+                style={{ color: colors.$22 }}
+              >
                 {product.notes}
               </p>
             </div>

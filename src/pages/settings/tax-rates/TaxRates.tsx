@@ -17,6 +17,7 @@ import {
   resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
+import dayjs from 'dayjs';
 
 export function TaxRates() {
   const dispatch = useDispatch();
@@ -24,7 +25,12 @@ export function TaxRates() {
 
   const onBulkActionsSuccess = (action: 'archive' | 'delete' | 'restore') => {
     if (action === 'archive' || action === 'delete') {
-      request('POST', endpoint('/api/v1/refresh')).then((response) => {
+      request(
+        'POST',
+        endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+          updatedAt: dayjs().unix(),
+        })
+      ).then((response) => {
         dispatch(updateCompanyUsers(response.data.data));
         dispatch(resetChanges('company'));
       });

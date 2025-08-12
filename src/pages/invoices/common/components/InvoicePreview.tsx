@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { InvoiceViewer } from './InvoiceViewer';
 import { RelationType } from './ProductsTable';
 import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
+import { debounce } from 'lodash';
 
 export type Resource =
   | Invoice
@@ -42,55 +43,105 @@ interface Props {
   initiallyVisible?: boolean;
   observable?: boolean;
   withRemoveLogoCTA?: boolean;
+  debouncedTrigger?: number; // Increments on debounced changes
 }
 
 export function InvoicePreview(props: Props) {
   const [isIntersecting, setIsIntersecting] = useState(false);
-
+  const [debouncedResource, setDebouncedResource] = useState<Resource>(
+    props.resource
+  );
   const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
   const divRef = useRef<HTMLDivElement>(null);
+  const triggerUpdate = useRef(false);
+  const isCurrentlyIntersecting = useRef(false);
+  const intersectionTimer = useRef<NodeJS.Timeout | null>(null);
+  const hasInitialLoadOccurred = useRef(false);
+
+  // Debounce resource updates
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedResource(props.resource);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [props.resource]);
 
   useEffect(() => {
     if (!props.observable) {
       return;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(
-        (entry) => {
+    const debouncedKeydown = debounce(() => {
+      triggerUpdate.current = true;
+      if (isCurrentlyIntersecting.current) {
+        setIsIntersecting(true);
+      }
+    }, 1000);
+
+    const handleKeydown = () => {
+      debouncedKeydown();
+    };
+
+    window.addEventListener('mousedown', handleKeydown);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (intersectionTimer.current) {
+            clearTimeout(intersectionTimer.current);
+            intersectionTimer.current = null;
+          }
+
           if (entry.isIntersecting) {
-            setIsIntersecting(true);
+            intersectionTimer.current = setTimeout(() => {
+              isCurrentlyIntersecting.current = true;
+
+              // Handle initial load case
+              if (!hasInitialLoadOccurred.current) {
+                hasInitialLoadOccurred.current = true;
+                setIsIntersecting(true);
+                return;
+              }
+
+              // Handle regular updates
+              if (triggerUpdate.current) {
+                setIsIntersecting(true);
+                triggerUpdate.current = false;
+              }
+            }, 1000);
           } else {
+            isCurrentlyIntersecting.current = false;
             setIsIntersecting(false);
           }
-        },
-        { threshold: 0.1, rootMargin: '50px' }
-      );
-    });
+        });
+      },
+      { threshold: 0.3, rootMargin: '0px' }
+    );
 
     if (divRef.current) {
       observer.observe(divRef.current);
     }
 
     return () => {
+      window.removeEventListener('mousedown', handleKeydown);
+      debouncedKeydown.cancel();
       observer.disconnect();
+      if (intersectionTimer.current) {
+        clearTimeout(intersectionTimer.current);
+      }
     };
-  }, [divRef.current]);
+  }, [divRef.current, props.observable]);
 
-  useEffect(() => {
-    if (!props.observable) {
-      return;
-    }
-  }, [props.resource]);
-
-  if (props.resource?.[props.relationType] && props.for === 'create') {
+  // Modify all render conditions to use debouncedResource instead of props.resource
+  if (debouncedResource?.[props.relationType] && props.for === 'create') {
     return (
       <div ref={divRef}>
         <InvoiceViewer
           link={previewEndpoint(endpoint, {
             entity: props.entity,
           })}
-          resource={props.resource}
+          resource={debouncedResource}
           method="POST"
           enabled={props.observable ? isIntersecting : true}
         />
@@ -99,8 +150,8 @@ export function InvoicePreview(props: Props) {
   }
 
   if (
-    props.resource?.id &&
-    props.resource?.[props.relationType] &&
+    debouncedResource?.id &&
+    debouncedResource?.[props.relationType] &&
     props.entity === 'purchase_order'
   ) {
     return (
@@ -110,10 +161,10 @@ export function InvoicePreview(props: Props) {
             '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
             {
               entity: props.entity,
-              id: props.resource?.id,
+              id: debouncedResource?.id,
             }
           )}
-          resource={props.resource}
+          resource={debouncedResource}
           method="POST"
           enabled={props.observable ? isIntersecting : true}
         />
@@ -124,8 +175,8 @@ export function InvoicePreview(props: Props) {
   }
 
   if (
-    props.resource?.id &&
-    props.resource?.[props.relationType] &&
+    debouncedResource?.id &&
+    debouncedResource?.[props.relationType] &&
     props.for === 'invoice'
   ) {
     return (
@@ -136,11 +187,11 @@ export function InvoicePreview(props: Props) {
               '/api/v1/live_preview?entity=:entity&entity_id=:id',
               {
                 entity: props.entity,
-                id: props.resource?.id,
+                id: debouncedResource?.id,
               }
             )}
             method="POST"
-            resource={props.resource}
+            resource={debouncedResource}
             enabled={props.observable ? isIntersecting : true}
           />
         </div>
