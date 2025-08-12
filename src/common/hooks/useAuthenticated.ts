@@ -22,6 +22,7 @@ import { AuthenticationTypes } from '../dtos/authentication';
 import { endpoint } from '../helpers';
 import { authenticate } from '../stores/slices/user';
 import { RootState } from '../stores/store';
+import dayjs from 'dayjs';
 
 export function useAuthenticated(): boolean {
   const user = useSelector((state: RootState) => state.user);
@@ -40,7 +41,12 @@ export function useAuthenticated(): boolean {
   }
 
   queryClient.fetchQuery('/api/v1/refresh', () =>
-    request('POST', endpoint('/api/v1/refresh'))
+    request(
+      'POST',
+      endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+        updatedAt: dayjs().unix(),
+      })
+    )
       .then((response) => {
         let currentIndex = 0;
 
@@ -75,7 +81,7 @@ export function useAuthenticated(): boolean {
         dispatch(changeCurrentIndex(currentIndex));
       })
       .catch((e) => {
-        console.error(e)
+        console.error(e);
 
         localStorage.removeItem('X-NINJA-TOKEN');
 

@@ -128,6 +128,33 @@ export function Notifications() {
     dispatch(injectInChangesWithData(user));
   };
 
+
+  const handleDisableRecurringPaymentNotificationChange = (value: boolean) => {
+    const emailNotifications = userChanges?.company_user?.notifications?.email;
+
+    let updatedNotifications: string[] = [...emailNotifications];
+
+    if (!value) {
+      updatedNotifications = updatedNotifications.filter(
+        (notificationKey) => notificationKey !== 'disable_recurring_payment_notification'
+      );
+    } else {
+      const isAlreadyAdded = updatedNotifications.find(
+        (notificationKey) => notificationKey === 'disable_recurring_payment_notification'
+      );
+
+      if (!isAlreadyAdded) {
+        updatedNotifications = [...updatedNotifications, 'disable_recurring_payment_notification'];
+      }
+    }
+
+    const user = cloneDeep(userChanges);
+
+    set(user, 'company_user.notifications.email', updatedNotifications);
+
+    dispatch(injectInChangesWithData(user));
+  };
+
   useEffect(() => {
     const emailNotifications = userChanges?.company_user?.notifications?.email;
 
@@ -168,7 +195,22 @@ export function Notifications() {
               (key: string) => key === 'task_assigned'
             )
           )}
-          onChange={(value) => handleTaskAssignedNotificationChange(value)}
+            onChange={(value) => handleTaskAssignedNotificationChange(value)}
+        />
+      </Element>
+
+      <Element
+        className="mb-4"
+        leftSide={t('disable_recurring_payment_notification')}
+        leftSideHelp={t('disable_recurring_payment_notification_help')}
+      >
+        <Toggle
+          checked={userChanges?.company_user?.notifications?.email?.find(
+            (key: string) => key === 'disable_recurring_payment_notification'
+          )}
+          onChange={(value) =>
+            handleDisableRecurringPaymentNotificationChange(value)
+          }
         />
       </Element>
 

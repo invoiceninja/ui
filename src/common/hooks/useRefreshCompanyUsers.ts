@@ -15,12 +15,18 @@ import {
   updateCompanyUsers,
 } from '../stores/slices/company-users';
 import { useDispatch } from 'react-redux';
+import dayjs from 'dayjs';
 
 export function useRefreshCompanyUsers() {
   const dispatch = useDispatch();
 
   return async () => {
-    return request('POST', endpoint('/api/v1/refresh')).then((response) => {
+    return request(
+      'POST',
+      endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+        updatedAt: dayjs().unix(),
+      })
+    ).then((response) => {
       dispatch(updateCompanyUsers(response.data.data));
       dispatch(resetChanges('company'));
     });

@@ -56,6 +56,7 @@ export function Builder() {
   return (
     <Default breadcrumbs={pages}>
       <div className="max-w-7xl mx-auto">
+        {/* @ts-expect-error TODO: Fix type error with BuilderContext.Provider value prop */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
@@ -96,6 +97,7 @@ export function Builder() {
                 dialog: UninviteDialog,
                 button: UninviteButton,
               },
+              signatorySwap: () => null,
               validationErrors: ValidationErrors,
               sign: () => null,
               toolboxContext: ToolboxContext,

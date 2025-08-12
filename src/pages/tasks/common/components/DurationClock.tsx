@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { Task } from '$app/common/interfaces/task';
 import { PauseCircle } from 'react-feather';
@@ -27,12 +27,44 @@ export function DurationClock({ start, task }: Props) {
     Math.floor(Date.now() / 1000) - start
   );
 
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined
+  );
+
+  const handleVisibilityChange = () => {
+    setElapsedTime(Math.floor(Date.now() / 1000) - start);
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(() => {
+      setElapsedTime((prevTime) => prevTime + 1);
+    }, 1000);
+  };
+
   useEffect(() => {
-    const timer = setInterval(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    setElapsedTime(Math.floor(Date.now() / 1000) - start);
+
+    intervalRef.current = setInterval(() => {
       setElapsedTime((prevTime) => prevTime + 1);
     }, 1000);
 
-    return () => clearInterval(timer);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   useEffect(() => {
