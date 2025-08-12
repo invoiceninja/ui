@@ -125,6 +125,7 @@ export function Create() {
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
+          setErrors={setErrors}
         />
       ) : (
         <Spinner />
