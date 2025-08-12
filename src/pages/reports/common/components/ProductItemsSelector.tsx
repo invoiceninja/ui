@@ -131,7 +131,7 @@ export function ProductItemsSelector(props: Props) {
     products: MultiValue<{ value: string; label: string }>
   ) => {
     return (products as SelectOption[])
-      .map((option: { value: string; label: string }) => `'${option.value}'`)
+      .map((option: { value: string; label: string }) => option.value)
       .join(',');
   };
 

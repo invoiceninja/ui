@@ -18,45 +18,41 @@ import {
 export function useIsSendable() {
   const user = useCurrentUser();
   const { isAdmin, isOwner } = useAdmin();
-
   const hasPermission = useHasPermission();
 
-  /**
-   * Checks permission in this order:
-   * 1. If the user is an admin
-   * 2. If the document is approved, and the user is restricted
-   * 3. If the document is in draft, pending approval, or sent, the user can edit it
-   * 4. If the document is in draft, pending approval, or sent, the user can create it if they are the owner of the document
-   */
-
   return (document: Document) => {
-    return Boolean(
-      ([
-        DocumentStatus.Draft,
-        DocumentStatus.PendingApproval,
-        DocumentStatus.Approved,
-        DocumentStatus.Sent,
-      ].includes(document.status_id) &&
-        (isAdmin || isOwner)) ||
-        (document.status_id === DocumentStatus.Approved &&
-          hasPermission('requires_approval')) ||
-        ([
-          DocumentStatus.Draft,
-          DocumentStatus.PendingApproval,
-          DocumentStatus.Approved,
-          DocumentStatus.Sent,
-        ].includes(document.status_id) &&
-          !hasPermission('requires_approval') &&
-          hasPermission('edit_documents')) ||
-        ([
-          DocumentStatus.Draft,
-          DocumentStatus.PendingApproval,
-          DocumentStatus.Approved,
-          DocumentStatus.Sent,
-        ].includes(document.status_id) &&
-          !hasPermission('requires_approval') &&
-          hasPermission('create_documents') &&
-          document.user_id === user?.id)
+    // === BASIC CHECKS ===
+    const allowedStatuses = [
+      DocumentStatus.Draft,
+      DocumentStatus.PendingApproval,
+      DocumentStatus.Approved,
+      DocumentStatus.Sent,
+    ];
+    const isStatusAllowed = allowedStatuses.includes(document.status_id);
+    const isApproved = document.status_id === DocumentStatus.Approved;
+
+    // === USER CHECKS ===
+    const isAdminOrOwner = isAdmin || isOwner;
+    const isDocumentOwner = document.user_id === user?.id;
+
+    // === PERMISSION CHECKS ===
+    const requiresApproval = hasPermission('requires_approval');
+    const canEdit = hasPermission('edit_documents');
+    const canCreate = hasPermission('create_documents');
+
+    // === COMBINED CONDITIONS ===
+    const adminOrOwnerWithAllowedStatus = isStatusAllowed && isAdminOrOwner;
+    const approvedWithApprovalPermission = isApproved && requiresApproval;
+    const canEditWithoutApproval =
+      isStatusAllowed && !requiresApproval && canEdit;
+    const canCreateOwnWithoutApproval =
+      isStatusAllowed && !requiresApproval && canCreate && isDocumentOwner;
+
+    return (
+      adminOrOwnerWithAllowedStatus ||
+      approvedWithApprovalPermission ||
+      canEditWithoutApproval ||
+      canCreateOwnWithoutApproval
     );
   };
 }
