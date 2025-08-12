@@ -95,8 +95,10 @@ export interface Backup {
   cancellation_reason?: string;
   credit_invoice_id?: string;
   credit_invoice_number?: string;
+  redirect?: string;
+  modified_invoice_id?: string;
+  replaced_invoice_id?: string;
 }
-
 export interface Activity {
   id: string;
   activity_type_id: string;
