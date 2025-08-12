@@ -31,6 +31,8 @@ const TemplateProperties = {
     'remaining_cycles',
     'parameters',
   ],
+  invoice_outstanding_tasks: ['template', 'next_run', 'parameters'],
+  payment_schedule: ['template', 'next_run', 'parameters'],
 };
 
 const NullableProperties = ['vendors', 'projects', 'categories'];

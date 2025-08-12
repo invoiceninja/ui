@@ -103,6 +103,11 @@ export function useTabs(params: Params) {
       href: route('/invoices/:id/payments', { id }),
       enabled: invoice?.status_id === InvoiceStatus.Paid,
     },
+    {
+      name: t('payment_schedule'),
+      href: route('/invoices/:id/payment_schedule', { id }),
+      enabled: invoice?.status_id === InvoiceStatus.Draft || invoice?.status_id === InvoiceStatus.Sent || invoice?.status_id === InvoiceStatus.Partial && canEditAndView,
+    },
   ];
 
   return tabs;
