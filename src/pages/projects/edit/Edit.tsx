@@ -95,7 +95,6 @@ export default function Edit() {
           onChange={(user) => handleChange('assigned_user_id', user.id)}
           onClearButtonClick={() => handleChange('assigned_user_id', '')}
           errorMessage={errors?.errors.assigned_user_id}
-          readonly
         />
       </Element>
 
