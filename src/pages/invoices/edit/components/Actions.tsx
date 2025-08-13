@@ -132,6 +132,37 @@ export function useActions(params?: Params) {
     navigate('/invoices/create?action=clone');
   };
 
+  const cloneToNegativeInvoice = (invoice: Invoice) => {
+    
+    // Create a deep copy of the invoice with negative quantities for all line items
+    const negativeInvoice = {
+      ...invoice,
+      id: '',
+      number: '',
+      documents: [],
+      due_date: '',
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+      partial: 0,
+      partial_due_date: '',
+      line_items: invoice.line_items.map(item => ({
+        ...item,
+        quantity: -Math.abs(item.quantity),
+      })),
+      modified_invoice_id: invoice.id,
+    };
+
+    setInvoice(negativeInvoice);
+    navigate('/invoices/create?action=clone');
+  };
+
   return [
     (invoice: Invoice) =>
       Boolean(showEditAction) && (
@@ -504,6 +535,24 @@ export function useActions(params?: Params) {
           disablePreventNavigation
         >
           {t('cancel_invoice')}
+        </EntityActionElement>
+      ),
+    (invoice: Invoice) =>
+      (invoice.status_id === InvoiceStatus.Sent &&
+        invoice.client?.country_id === '724' &&
+        // company?.settings.e_invoice_type === 'verifactu' &&
+        !invoice.is_deleted) && (
+        <EntityActionElement
+          key="credit_note"
+          entity="invoice"
+          actionKey="credit_note"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('credit_note')}
+          onClick={() => cloneToNegativeInvoice(invoice)}
+          icon={MdCancel}
+          disablePreventNavigation
+        >
+          {t('credit_note')}
         </EntityActionElement>
       ),
   ];
