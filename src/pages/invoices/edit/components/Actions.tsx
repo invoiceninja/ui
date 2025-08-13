@@ -26,6 +26,7 @@ import {
   MdCloudCircle,
   MdComment,
   MdControlPointDuplicate,
+  MdCreditScore,
   MdDelete,
   MdDesignServices,
   MdDownload,
@@ -152,9 +153,19 @@ export function useActions(params?: Params) {
       paid_to_date: 0,
       partial: 0,
       partial_due_date: '',
+      // Reverse monetary amounts for credit note
+      amount: -Math.abs(invoice.amount),
+      balance: -Math.abs(invoice.balance),
+      // Iterate through all line items and set quantities to negative
       line_items: invoice.line_items.map(item => ({
         ...item,
         quantity: -Math.abs(item.quantity),
+        // Recalculate line totals for negative quantities
+        line_total: -Math.abs(item.line_total),
+        gross_line_total: -Math.abs(item.gross_line_total),
+        // Reverse cost and product_cost if they exist
+        cost: item.cost ? -Math.abs(item.cost) : item.cost,
+        product_cost: item.product_cost ? -Math.abs(item.product_cost) : item.product_cost,
       })),
       modified_invoice_id: invoice.id,
     };
@@ -540,6 +551,8 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent &&
         invoice.client?.country_id === '724' &&
+        invoice.backup?.document_type === 'F1' &&
+        (invoice.backup?.adjustable_amount ?? 0) > 0 &&
         // company?.settings.e_invoice_type === 'verifactu' &&
         !invoice.is_deleted) && (
         <EntityActionElement
@@ -549,10 +562,10 @@ export function useActions(params?: Params) {
           isCommonActionSection={!dropdown}
           tooltipText={t('credit_note')}
           onClick={() => cloneToNegativeInvoice(invoice)}
-          icon={MdCancel}
+          icon={MdCreditScore}
           disablePreventNavigation
         >
-          {t('credit_note')}
+          {t('rectify')}
         </EntityActionElement>
       ),
   ];

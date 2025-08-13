@@ -91,14 +91,12 @@ export interface Invoice {
 
 export interface Backup {
   guid?: string;
-  cancelled_invoice_id?: string;
-  cancelled_invoice_number?: string;
-  cancellation_reason?: string;
-  credit_invoice_id?: string;
-  credit_invoice_number?: string;
+  parent_invoice_id?: string;
+  parent_invoice_number?: string;
+  document_type?: string;
+  child_invoice_ids?: string[];
   redirect?: string;
-  modified_invoice_id?: string;
-  replaced_invoice_id?: string;
+  adjustable_amount?: number
 }
 export interface Activity {
   id: string;
