@@ -33,6 +33,7 @@ export default function Blueprints() {
   return (
     <Default title={t('documents')} breadcrumbs={pages}>
       <DataTable<Document>
+        queryIdentificator="/api/documents/docuninja"
         resource="document"
         endpoint="/api/documents?sort=id|desc"
         columns={columns}

@@ -3,6 +3,7 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Alert } from '$app/components/Alert';
@@ -304,7 +305,7 @@ function CreateDialogTabButton({
   return (
     <Button
       form={form}
-      behavior="button"
+      behavior="submit"
       disabled={isSubmitting}
       className="w-full"
     >
@@ -459,10 +460,18 @@ function Builder() {
 
   const handleSave = () => {
     window.dispatchEvent(new CustomEvent('builder:save'));
+
+    setTimeout(() => {
+      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
+    }, 1000);
   };
 
   const handleSend = () => {
     window.dispatchEvent(new CustomEvent('builder:send'));
+
+    setTimeout(() => {
+      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
+    }, 1000);
   };
 
   return (

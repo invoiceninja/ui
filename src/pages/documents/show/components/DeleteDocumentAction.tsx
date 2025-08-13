@@ -20,6 +20,7 @@ import { Document } from '$app/common/interfaces/docuninja/api';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { MdDelete } from 'react-icons/md';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   document: Document;
@@ -52,6 +53,8 @@ export function DeleteDocumentAction({ document }: Props) {
       )
         .then(() => {
           toast.success('deleted_document');
+
+          $refetch(['docuninja_documents']);
 
           setIsModalOpen(false);
 

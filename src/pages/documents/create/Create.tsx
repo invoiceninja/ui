@@ -73,7 +73,9 @@ export default function Create() {
             description: '',
           });
 
-          navigate(route('/documents/:id', { id: response.data.data.id }));
+          navigate(
+            route('/documents/:id/builder', { id: response.data.data.id })
+          );
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

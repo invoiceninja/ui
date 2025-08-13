@@ -32,6 +32,7 @@ export default function Users() {
   return (
     <Default title={t('users')} breadcrumbs={pages}>
       <DataTable<User>
+        queryIdentificator="/api/users/docuninja"
         resource="user"
         endpoint="/api/users?sort=id|desc"
         columns={columns}

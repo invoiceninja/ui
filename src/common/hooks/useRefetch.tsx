@@ -244,6 +244,10 @@ export const keys = {
     path: '/api/templates/docuninja',
     dependencies: [],
   },
+  docuninja_document_timeline: {
+    path: '/api/documents/docuninja/timeline',
+    dependencies: [],
+  },
 };
 
 export type RefetchKey = keyof typeof keys;

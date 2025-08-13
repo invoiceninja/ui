@@ -49,6 +49,7 @@ export default function Document() {
     data: document,
     isLoading,
     error,
+    isFetching: isDocumentFetching,
   } = useDocumentQuery({
     id,
     enabled: Boolean(id),
@@ -75,11 +76,14 @@ export default function Document() {
 
   const actions = useDocumentActions({ document });
 
-  const { data: timelineData, isLoading: isTimelineLoading } =
-    useDocumentTimelineQuery({
-      id,
-      enabled: Boolean(id),
-    });
+  const {
+    data: timelineData,
+    isLoading: isTimelineLoading,
+    isFetching: isTimelineFetching,
+  } = useDocumentTimelineQuery({
+    id,
+    enabled: Boolean(id),
+  });
 
   return (
     <Default
@@ -111,62 +115,63 @@ export default function Document() {
         </Alert>
       )}
 
-      {isLoading && (
+      {(isLoading ||
+        isTimelineLoading ||
+        isDocumentFetching ||
+        isTimelineFetching) && (
         <Card
           title={documentTitle}
           className="shadow-sm"
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
         >
-          <div className="flex justify-start py-4 sm:py-6 px-4 sm:px-6">
+          <div className="flex justify-center py-4 sm:py-6 px-4 sm:px-6">
             <Spinner />
           </div>
         </Card>
       )}
 
-      {document && !isLoading && (
-        <Card
-          title={
-            <div className="flex space-x-4 items-center">
-              <span>{document.description || documentTitle}</span>
+      {document &&
+        !isLoading &&
+        !isTimelineLoading &&
+        !isTimelineFetching &&
+        !isDocumentFetching && (
+          <Card
+            title={
+              <div className="flex space-x-4 items-center">
+                <span>{document.description || documentTitle}</span>
 
-              {document && !isLoading && (
-                <Badge
-                  variant={
-                    (STATUS_VARIANTS[
-                      document.status_id as keyof typeof STATUS_VARIANTS
-                    ] || 'primary') as BadgeVariant
-                  }
-                >
-                  {STATUS_LABELS[
-                    document.status_id as keyof typeof STATUS_LABELS
-                  ] || 'Unknown'}
-                </Badge>
-              )}
-            </div>
-          }
-          className="shadow-sm"
-          childrenClassName="px-4 sm:px-6"
-          style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-        >
-          <div className="flex flex-col xl:flex-row justify-between gap-4 pt-3 w-full">
-            <div className="flex">
-              <Invitations document={document} />
-            </div>
+                {document && !isLoading && (
+                  <Badge
+                    variant={
+                      (STATUS_VARIANTS[
+                        document.status_id as keyof typeof STATUS_VARIANTS
+                      ] || 'primary') as BadgeVariant
+                    }
+                  >
+                    {STATUS_LABELS[
+                      document.status_id as keyof typeof STATUS_LABELS
+                    ] || 'Unknown'}
+                  </Badge>
+                )}
+              </div>
+            }
+            className="shadow-sm"
+            childrenClassName="px-4 sm:px-6"
+            style={{ borderColor: colors.$24 }}
+            headerStyle={{ borderColor: colors.$20 }}
+          >
+            <div className="flex flex-col xl:flex-row justify-between gap-4 pt-3 w-full">
+              <div className="flex">
+                <Invitations document={document} />
+              </div>
 
-            <div className="flex-1">
-              {isTimelineLoading ? (
-                <div className="flex justify-center py-8">
-                  <Spinner />
-                </div>
-              ) : (
+              <div className="flex-1">
                 <TimelineLayout items={timelineData || []} />
-              )}
+              </div>
             </div>
-          </div>
-        </Card>
-      )}
+          </Card>
+        )}
     </Default>
   );
 }

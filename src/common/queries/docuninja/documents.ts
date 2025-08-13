@@ -75,7 +75,7 @@ export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
 
 export function useDocumentTimelineQuery({ id, enabled }: GenericQueryOptions) {
   return useQuery(
-    ['/api/documents/:id/timeline', id],
+    ['/api/documents/docuninja/timeline', id],
     () =>
       request(
         'POST',

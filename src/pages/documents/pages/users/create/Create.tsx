@@ -75,14 +75,14 @@ function Create() {
         },
       })
         .then((response: GenericSingleResourceResponse<User>) => {
-          toast.success('created_blueprint');
+          toast.success('created_user');
 
           $refetch(['docuninja_users']);
 
           setUser(cloneDeep(blankUser));
 
           navigate(
-            route('/documents/settings/users/:id/edit', {
+            route('/documents/users/:id/edit', {
               id: response.data.data.id,
             })
           );
