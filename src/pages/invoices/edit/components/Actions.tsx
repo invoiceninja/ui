@@ -550,7 +550,7 @@ export function useActions(params?: Params) {
         invoice.client?.country_id === '724' &&
         invoice.backup?.document_type === 'F1' &&
         (invoice.backup?.adjustable_amount ?? 0) > 0 &&
-        // company?.settings.e_invoice_type === 'verifactu' &&
+        company?.settings.e_invoice_type === 'VERIFACTU' &&
         !invoice.is_deleted) && (
         <EntityActionElement
           key="credit_note"

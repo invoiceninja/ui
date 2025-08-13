@@ -75,6 +75,32 @@ export function useTabs(params: Params) {
       ),
     },
     {
+      name: t('verifactu'),
+      href: route('/invoices/:id/verifactu', { id }),
+      enabled: Boolean(
+        company?.settings.e_invoice_type === 'VERIFACTU' 
+      ),
+      formatName: () => (
+        <div className="flex space-x-1">
+          <span>{t('verifactu')}</span>
+
+          {Boolean(
+            eInvoiceValidationResponse?.client.length ||
+            eInvoiceValidationResponse?.company.length ||
+            eInvoiceValidationResponse?.invoice.length
+          ) && (
+              <span className="font-bold">
+                (
+                {(eInvoiceValidationResponse?.client.length || 0) +
+                  (eInvoiceValidationResponse?.company.length || 0) +
+                  (eInvoiceValidationResponse?.invoice.length || 0)}
+                )
+              </span>
+            )}
+        </div>
+      ),
+    },
+    {
       name: t('documents'),
       href: route('/invoices/:id/documents', { id }),
       enabled: canEditAndView,

@@ -59,6 +59,7 @@ export interface EInvoiceComponent {
 
 const INVOICE_TYPES = {
   PEPPOL: 'PEPPOL',
+  VERIFACTU: 'VERIFACTU',
   FACT1: 'FACT1',
   EN16931: 'EN16931',
   XInvoice_3_0: 'XInvoice_3.0',
