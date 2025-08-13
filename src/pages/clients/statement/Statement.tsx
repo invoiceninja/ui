@@ -23,7 +23,6 @@ import quarter from 'dayjs/plugin/quarterOfYear';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
