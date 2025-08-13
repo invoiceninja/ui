@@ -240,7 +240,7 @@ export function Details(props: Props) {
         )}
 
         {expense && (
-          <Element leftSide={t('user')}>
+          <Element leftSide={t('assigned_user')}>
             <UserSelector
               value={expense.assigned_user_id}
               clearButton={Boolean(expense.assigned_user_id)}
