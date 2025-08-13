@@ -163,9 +163,6 @@ export function useActions(params?: Params) {
         // Recalculate line totals for negative quantities
         line_total: -Math.abs(item.line_total),
         gross_line_total: -Math.abs(item.gross_line_total),
-        // Reverse cost and product_cost if they exist
-        cost: item.cost ? -Math.abs(item.cost) : item.cost,
-        product_cost: item.product_cost ? -Math.abs(item.product_cost) : item.product_cost,
       })),
       modified_invoice_id: invoice.id,
     };
