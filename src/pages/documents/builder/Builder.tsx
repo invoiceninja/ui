@@ -6,6 +6,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useClientsQuery } from '$app/common/queries/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -323,8 +324,9 @@ function SignatorySelector({
 }: SignatorySelectorProps) {
   const [t] = useTranslation();
 
+  const { data: clients } = useClientsQuery({ status: ['active'] });
+
   const handleSelect = (v: string | undefined) => {
-    console.log(v);
     if (!v) {
       return;
     }
@@ -345,8 +347,6 @@ function SignatorySelector({
     onSelect(value, type as 'user', entity as any);
   };
 
-  console.log(results);
-
   return (
     <SelectField
       placeholder={t('select_user_or_client')}
@@ -356,6 +356,20 @@ function SignatorySelector({
       menuPosition="fixed"
     >
       <option value="create">{t('create_client_or_user')}</option>
+
+      {clients
+        ?.filter(
+          (client) =>
+            client.contacts.length > 0 && client.contacts[0].contact_key
+        )
+        .map((client) => (
+          <option
+            value={`client|${client.contacts[0].contact_key}`}
+            key={client.id}
+          >
+            {client.name}
+          </option>
+        ))}
 
       {results.map((result: any) => (
         <option value={`${result.type}|${result.value}`} key={result.id}>
