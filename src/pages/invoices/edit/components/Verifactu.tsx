@@ -11,7 +11,7 @@ import {
     useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import {
     EntityError,
     ValidationEntityResponse,
@@ -61,6 +61,8 @@ export default function Verifactu() {
     } = context;
 
     const colors = useColorScheme();
+    const location = useLocation();
+    
     const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
 
     const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -94,10 +96,7 @@ export default function Verifactu() {
             ),
         enabled:
             invoice !== null &&
-            location.pathname.includes('verifactu') &&
-            Boolean(
-                (invoice?.status_id === InvoiceStatus.Draft || invoice?.status_id === InvoiceStatus.Sent) && invoice?.backup?.guid
-            ),
+            location.pathname.includes('verifactu'),
         staleTime: Infinity,
     });
     
@@ -246,22 +245,6 @@ export default function Verifactu() {
                             {invoice?.backup?.guid ? (
                                 <div className="flex flex-col space-y-2.5">
                                     <span>{invoice?.backup?.guid}</span>
-
-                                    {activities
-                                        ?.filter((activity) =>
-                                            EINVOICE_ACTIVITY_TYPES.includes(
-                                                activity.activity_type_id
-                                            )
-                                        )
-                                        .map((activity) => (
-                                            <div
-                                                key={activity.id}
-                                                className="flex items-center space-x-4"
-                                            >
-                                                <span className="font-medium">{t('message')}:</span>
-                                                <div>{getActivityText(activity.activity_type_id)}</div>
-                                            </div>
-                                        ))}
                                 </div>
                             ) : (
                                 <Button
@@ -274,6 +257,24 @@ export default function Verifactu() {
                                 </Button>
                             )}
                         </div>
+                        
+                    </div>
+                    <div className="mt-4 px-6 text-sm">
+                        {activities
+                            ?.filter((activity) =>
+                                EINVOICE_ACTIVITY_TYPES.includes(
+                                    activity.activity_type_id
+                                )
+                            )
+                            .map((activity) => (
+                                <div
+                                    key={activity.id}
+                                    className="flex items-center space-x-4 py-1"
+                                >
+                                    <span className="font-medium">{t('message')}:</span>
+                                    <div>{getActivityText(activity.activity_type_id)}</div>
+                                </div>
+                            ))}
                     </div>
                 </Card>
             )}
