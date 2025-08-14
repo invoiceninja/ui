@@ -46,13 +46,12 @@ export interface Context {
     setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
+const EINVOICE_ACTIVITY_TYPES = [150, 151, 152, 153] as number[];
+
 export default function Verifactu() {
     const [t] = useTranslation();
 
     const context: Context = useOutletContext();
-
-    const colors = useColorScheme();
-    const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
 
     const {
         invoice,
@@ -61,6 +60,48 @@ export default function Verifactu() {
         setInvoice,
         errors,
     } = context;
+
+    const colors = useColorScheme();
+    const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
+
+    const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+    const handleSend = () => {
+        if (!isFormBusy) {
+            toast.processing();
+            setIsFormBusy(true);
+
+            request('POST', endpoint('/api/v1/einvoice/peppol/send'), {
+                entity: 'invoice',
+                entity_id: invoice?.id,
+            })
+                .then(() => {
+                    $refetch(['invoices']);
+                    toast.success('success');
+                })
+                .finally(() => setIsFormBusy(false));
+        }
+    };
+
+    const { data: activities } = useQuery({
+        queryKey: ['/api/v1/activities/entity', invoice?.id],
+        queryFn: () =>
+            request('POST', endpoint('/api/v1/activities/entity'), {
+                entity: 'invoice',
+                entity_id: invoice?.id,
+            }).then(
+                (response: AxiosResponse<GenericManyResponse<InvoiceActivity>>) =>
+                    response.data.data
+            ),
+        enabled:
+            invoice !== null &&
+            location.pathname.includes('verifactu') &&
+            Boolean(
+                (invoice?.status_id === InvoiceStatus.Draft || invoice?.status_id === InvoiceStatus.Sent) && invoice?.backup?.guid
+            ),
+        staleTime: Infinity,
+    });
+    
 
     return (
         <>
@@ -161,6 +202,56 @@ export default function Verifactu() {
                     </div>
                 )}
             </Card>
+
+            {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Cancelled].includes((invoice?.status_id?.toString()) as InvoiceStatus)) && (
+                <Card title={t('status')}>
+                    <div className="flex px-6 text-sm">
+                        <div
+                            className="flex items-center space-x-4 border-l-2 pl-4 py-4"
+                            style={{
+                                borderColor: colors.$5,
+                            }}
+                        >
+                            {invoice?.backup?.guid && (
+                                <span className="whitespace-nowrap font-medium">
+                                    {t('reference')}:
+                                </span>
+                            )}
+
+                            {invoice?.backup?.guid ? (
+                                <div className="flex flex-col space-y-2.5">
+                                    <span>{invoice?.backup?.guid}</span>
+
+                                    {activities
+                                        ?.filter((activity) =>
+                                            EINVOICE_ACTIVITY_TYPES.includes(
+                                                activity.activity_type_id
+                                            )
+                                        )
+                                        .map((activity) => (
+                                            <div
+                                                key={activity.id}
+                                                className="flex items-center space-x-4"
+                                            >
+                                                <span className="font-medium">{t('message')}:</span>
+                                                <div>{getActivityText(activity.activity_type_id)}</div>
+                                            </div>
+                                        ))}
+                                </div>
+                            ) : (
+                                <Button
+                                    behavior="button"
+                                    onClick={handleSend}
+                                    disabled={isFormBusy}
+                                    disableWithoutIcon
+                                >
+                                    {t('send')}
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                </Card>
+            )}
         </>
     );
 }
