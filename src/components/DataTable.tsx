@@ -171,6 +171,10 @@ interface Props<T> extends CommonProps {
   endpointHeaders?: Record<string, string>;
   totalPagesPropPath?: string;
   totalRecordsPropPath?: string;
+  withoutActionBulkPayloadProperty?: boolean;
+  withoutIdsBulkPayloadProperty?: boolean;
+  useDeleteMethod?: boolean;
+  deleteBulkRoute?: string;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -245,6 +249,10 @@ export function DataTable<T extends object>(props: Props<T>) {
     totalPagesPropPath,
     totalRecordsPropPath,
     onDeleteBulkAction,
+    withoutActionBulkPayloadProperty = false,
+    withoutIdsBulkPayloadProperty = false,
+    useDeleteMethod = false,
+    deleteBulkRoute,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -445,14 +453,23 @@ export function DataTable<T extends object>(props: Props<T>) {
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
+    const method = useDeleteMethod && action === 'delete' ? 'DELETE' : 'POST';
+
+    const route =
+      useDeleteMethod && action === 'delete'
+        ? deleteBulkRoute
+        : props.bulkRoute ?? `${props.endpoint}/bulk`;
+
     request(
-      'POST',
+      method,
       props.useDocuNinjaApi
-        ? docuNinjaEndpoint(props.bulkRoute ?? `${props.endpoint}/bulk`)
-        : endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`),
+        ? docuNinjaEndpoint(route as string, { id })
+        : endpoint(route as string),
       {
-        action,
-        ids: id ? [id] : Array.from(selected),
+        ...(withoutActionBulkPayloadProperty ? {} : { action }),
+        ...(withoutIdsBulkPayloadProperty
+          ? {}
+          : { ids: id ? [id] : Array.from(selected) }),
       },
       { headers: props.endpointHeaders }
     )

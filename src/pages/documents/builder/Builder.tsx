@@ -40,6 +40,7 @@ import {
   UploadProps,
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
+import { useEffect } from 'react';
 import { Check, Loader } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
@@ -344,6 +345,8 @@ function SignatorySelector({
     onSelect(value, type as 'user', entity as any);
   };
 
+  console.log(results);
+
   return (
     <SelectField
       placeholder={t('select_user_or_client')}
@@ -473,6 +476,24 @@ function Builder() {
       $refetch(['docuninja_documents', 'docuninja_document_timeline']);
     }, 1000);
   };
+
+  useEffect(() => {
+    const refetchDocuninjaDocument = () => {
+      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
+    };
+
+    window.addEventListener(
+      'refetch.docuninja.document',
+      refetchDocuninjaDocument
+    );
+
+    return () => {
+      window.removeEventListener(
+        'refetch.docuninja.document',
+        refetchDocuninjaDocument
+      );
+    };
+  }, []);
 
   return (
     <Default
