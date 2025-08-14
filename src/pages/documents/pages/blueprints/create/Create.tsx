@@ -78,7 +78,9 @@ export default function Create() {
           });
 
           navigate(
-            route('/documents/blueprints/:id', { id: response.data.data.id })
+            route('/documents/blueprints/:id/edit', {
+              id: response.data.data.id,
+            })
           );
         })
         .catch((error: AxiosError<ValidationBag>) => {

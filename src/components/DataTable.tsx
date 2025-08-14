@@ -175,6 +175,7 @@ interface Props<T> extends CommonProps {
   withoutIdsBulkPayloadProperty?: boolean;
   useDeleteMethod?: boolean;
   deleteBulkRoute?: string;
+  useRestoreForDeletedResources?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -253,6 +254,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutIdsBulkPayloadProperty = false,
     useDeleteMethod = false,
     deleteBulkRoute,
+    useRestoreForDeletedResources = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -995,16 +997,19 @@ export function DataTable<T extends object>(props: Props<T>) {
                           </DropdownElement>
                         )}
 
-                      {resource?.archived_at > 0 &&
-                        (props.showRestore?.(resource) ||
-                          !props.showRestore) && (
-                          <DropdownElement
-                            onClick={() => bulk('restore', resource.id)}
-                            icon={<Icon element={MdRestore} />}
-                          >
-                            {t('restore')}
-                          </DropdownElement>
-                        )}
+                      {Boolean(
+                        (resource?.archived_at > 0 ||
+                          (useRestoreForDeletedResources &&
+                            resource?.is_deleted)) &&
+                          (props.showRestore?.(resource) || !props.showRestore)
+                      ) && (
+                        <DropdownElement
+                          onClick={() => bulk('restore', resource.id)}
+                          icon={<Icon element={MdRestore} />}
+                        >
+                          {t('restore')}
+                        </DropdownElement>
+                      )}
 
                       {!resource?.is_deleted &&
                         (props.showDelete?.(resource) || !props.showDelete) && (

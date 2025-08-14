@@ -49,6 +49,10 @@ export default function Blueprints() {
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
+        withoutActionBulkPayloadProperty
+        withoutIdsBulkPayloadProperty
+        useDeleteMethod
+        deleteBulkRoute="/api/blueprints/:id"
       />
     </Default>
   );
