@@ -48,6 +48,7 @@ import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { useColorScheme } from '$app/common/colors';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -97,6 +98,21 @@ export function EInvoice() {
       isPlanActive &&
       PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
     );
+  };
+
+  const shouldShowVERIFACTUOption = () => {
+    if (import.meta.env.DEV) {
+      return true;
+    }
+
+    if (import.meta.env.VITE_ENABLE_VERIFACTU_STANDARD !== 'true') {
+      return false;
+    }
+
+    const isPlanActive =
+      (isHosted() && (proPlan() || enterprisePlan()));
+
+    return isPlanActive && company?.settings.country_id === '724';
   };
 
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
@@ -247,7 +263,15 @@ export function EInvoice() {
               customSelector
             >
               {Object.entries(INVOICE_TYPES)
-                .filter(([key]) => key !== 'PEPPOL' || shouldShowPEPPOLOption())
+                .filter(([key]) => {
+                  if (key === 'PEPPOL') {
+                    return shouldShowPEPPOLOption();
+                  }
+                  if (key === 'VERIFACTU') {
+                    return shouldShowVERIFACTUOption();
+                  }
+                  return true;
+                })
                 .map(([key, value]) => (
                   <option key={key} value={key}>
                     {value}
