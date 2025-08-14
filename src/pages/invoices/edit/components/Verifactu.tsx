@@ -101,9 +101,9 @@ export default function Verifactu() {
     });
     
 
-    const getActivityText = (activityTypeId: number) => {
+    const getActivityText = (activity: InvoiceActivity) => {
         let text = trans(
-            `activity_${activityTypeId}`,
+            `activity_${activity.activity_type_id}`,
             {}
         ) as unknown as ReactNode[];
         const invoiceElement = (
@@ -118,7 +118,7 @@ export default function Verifactu() {
             </Link>
         );
 
-        const notesElement = '';
+        const notesElement = `[ ${activity.notes} ]`;
 
         text = reactStringReplace(text, `:invoice`, () => invoiceElement);
         text = reactStringReplace(text, `:client`, () => clientElement);
@@ -272,7 +272,7 @@ export default function Verifactu() {
                                     className="flex items-center space-x-4 py-1"
                                 >
                                     <span className="font-medium">{t('message')}:</span>
-                                    <div>{getActivityText(activity.activity_type_id)}</div>
+                                    <div>{getActivityText(activity)}</div>
                                 </div>
                             ))}
                     </div>
