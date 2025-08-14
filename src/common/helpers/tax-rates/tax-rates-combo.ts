@@ -42,7 +42,7 @@ export function getTaxRateComboValue(
 
   const taxRateProp = nameProperty.replace('name', 'rate') as keyof Resource;
 
-  if (resource && resource[taxRateProp]) {
+  if (resource && resource[taxRateProp] !== undefined) {
     return `${resource[nameProperty as keyof Resource]}||${
       resource[taxRateProp]
     }`;
