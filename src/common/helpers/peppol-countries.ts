@@ -9,15 +9,23 @@
  */
 
 export const PEPPOL_COUNTRIES = [
-  '40',
-  '56',
-  '208',
-  '276',
-  '352',
-  '372',
-  '442',
-  '528',
-  '578',
-  '752',
-  '826',
+  '40',   // Austria
+  '56',   // Belgium
+  '208',  // Denmark
+  '233',  // Estonia
+  '246',  // Finland
+  '276',  // Germany
+  '352',  // Iceland
+  '372',  // Ireland
+  '440',  // Lithuania
+  '442',  // Luxembourg
+  '528',  // Netherlands
+  '578',  // Norway
+  '752',  // Sweden
+  '756',  // Switzerland
+  '724',  // Spain
+  '250',  // France
+  '380',  // Italy
+  '616',  // Poland
+  '642',  // Romania
 ];
