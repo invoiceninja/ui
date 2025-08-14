@@ -25,7 +25,9 @@ export const PEPPOL_COUNTRIES = [
   '756',  // Switzerland
   '724',  // Spain
   '250',  // France
-  '380',  // Italy
-  '616',  // Poland
   '642',  // Romania
+  '826',  // Great Britain
+  '300',  // Greece
+  '620',  // Portugal
+  '705',  // Slovenia
 ];
