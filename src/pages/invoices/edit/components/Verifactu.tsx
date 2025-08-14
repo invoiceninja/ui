@@ -1,22 +1,21 @@
 
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card, Element } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { EInvoiceComponent } from '$app/pages/settings';
 import {
     Dispatch,
-    ReactNode,
     RefObject,
     SetStateAction,
     useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import {
     EntityError,
     ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { Button, InputField, Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCheckCircle } from 'react-icons/md';
@@ -24,14 +23,12 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint, trans } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { useQuery } from 'react-query';
-import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
-import { cloneDeep, get, set } from 'lodash';
 
 export interface Context {
     invoice: Invoice | undefined;
