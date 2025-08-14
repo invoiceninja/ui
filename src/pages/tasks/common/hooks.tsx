@@ -371,7 +371,7 @@ export function useTaskColumns() {
     {
       column: 'user',
       id: 'user_id',
-      label: t('user'),
+      label: t('creator'),
       format: (value, task) => formatUserName(task?.user),
     },
     {

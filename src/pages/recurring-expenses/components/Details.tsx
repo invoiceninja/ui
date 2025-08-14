@@ -212,7 +212,7 @@ export function Details(props: Props) {
         )}
 
         {recurringExpense && (
-          <Element leftSide={t('user')}>
+          <Element leftSide={t('assigned_user')}>
             <UserSelector
               value={recurringExpense.assigned_user_id}
               clearButton={Boolean(recurringExpense.assigned_user_id)}

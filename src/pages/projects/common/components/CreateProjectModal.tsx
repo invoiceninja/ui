@@ -145,7 +145,7 @@ export function CreateProjectModal(props: Props) {
             />
 
             <UserSelector
-              inputLabel={t('user')}
+              inputLabel={t('assigned_user')}
               value={project.assigned_user_id}
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
