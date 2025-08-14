@@ -5,6 +5,7 @@ import { Card } from '$app/components/cards';
 import { EInvoiceComponent } from '$app/pages/settings';
 import {
     Dispatch,
+    ReactNode,
     RefObject,
     SetStateAction,
     useState,
@@ -23,12 +24,13 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { useQuery } from 'react-query';
 import { useColorScheme } from '$app/common/colors';
+import reactStringReplace from 'react-string-replace';
 
 export interface Context {
     invoice: Invoice | undefined;
@@ -100,6 +102,32 @@ export default function Verifactu() {
     });
     
 
+    const getActivityText = (activityTypeId: number) => {
+        let text = trans(
+            `activity_${activityTypeId}`,
+            {}
+        ) as unknown as ReactNode[];
+        const invoiceElement = (
+            <Link to={route('/invoices/:id/edit', { id: invoice?.id })}>
+                {invoice?.number}
+            </Link>
+        );
+
+        const clientElement = (
+            <Link to={route('/clients/:id', { id: invoice?.client_id })}>
+                {invoice?.client?.display_name}
+            </Link>
+        );
+
+        const notesElement = '';
+
+        text = reactStringReplace(text, `:invoice`, () => invoiceElement);
+        text = reactStringReplace(text, `:client`, () => clientElement);
+        text = reactStringReplace(text, `:notes`, () => notesElement);
+
+        return text;
+    };
+    
     return (
         <>
             <Card
