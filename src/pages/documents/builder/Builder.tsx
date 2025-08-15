@@ -338,7 +338,13 @@ function SignatorySelector({
     }
 
     const [type, value] = v.split('|');
-    const entity = results.find((r: any) => r.value === value);
+    let entity = clients?.find(
+      (client) => client.contacts?.[0]?.contact_key === value
+    );
+
+    if (!entity) {
+      entity = results.find((r: any) => r.value === value) as unknown as any;
+    }
 
     if (!entity) {
       return;
