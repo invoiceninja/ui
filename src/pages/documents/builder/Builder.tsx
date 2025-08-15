@@ -30,7 +30,6 @@ import {
   CreateDialogTabButtonProps,
   DeleteDialogButtonProps,
   DeleteDialogProps,
-  SendButtonProps,
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
@@ -41,7 +40,7 @@ import {
   UploadProps,
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, Loader } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
@@ -57,20 +56,6 @@ function Loading() {
   );
 }
 
-function Send({ ...props }: SendButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button type="secondary" {...props}>
-      <div>
-        <Icon element={MdSend} />
-      </div>
-
-      {t('send')}
-    </Button>
-  );
-}
-
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
 
@@ -82,7 +67,18 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
     >
       {content}
 
-      {action}
+      <div
+        onClick={(event) => {
+          event.stopPropagation();
+
+          window.dispatchEvent(
+            new CustomEvent('builder:start.sending.document')
+          );
+          window.dispatchEvent(new CustomEvent('builder:send.document.submit'));
+        }}
+      >
+        {action}
+      </div>
     </Modal>
   );
 }
@@ -392,8 +388,14 @@ function UninviteDialog({
   content,
   action,
 }: UninviteDialogProps) {
+  const [t] = useTranslation();
+
   return (
-    <Modal title="Remove invitation(s)" visible={open} onClose={onOpenChange}>
+    <Modal
+      title={t('remove_invitations')}
+      visible={open}
+      onClose={onOpenChange}
+    >
       {content}
       {action}
     </Modal>
@@ -467,6 +469,9 @@ function Builder() {
   const { id } = useParams();
   const colors = useColorScheme();
 
+  const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
+  const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
+
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
@@ -482,19 +487,15 @@ function Builder() {
   ];
 
   const handleSave = () => {
-    window.dispatchEvent(new CustomEvent('builder:save'));
+    toast.processing();
 
-    setTimeout(() => {
-      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
-    }, 1000);
+    setIsDocumentSaving(true);
+
+    window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
   const handleSend = () => {
-    window.dispatchEvent(new CustomEvent('builder:send'));
-
-    setTimeout(() => {
-      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
-    }, 1000);
+    window.dispatchEvent(new CustomEvent('builder:open.send.confirmation'));
   };
 
   useEffect(() => {
@@ -502,15 +503,87 @@ function Builder() {
       $refetch(['docuninja_documents', 'docuninja_document_timeline']);
     };
 
+    const handleSuccessfullySavedDocument = () => {
+      toast.success('updated_document');
+    };
+
+    const handleSuccessfullySentDocument = () => {
+      toast.success('document_queued_for_sending');
+    };
+
+    const handleFinalizeDocumentSave = () => {
+      setIsDocumentSaving(false);
+    };
+
+    const handleFinalizeDocumentSend = () => {
+      setIsDocumentSending(false);
+    };
+
+    const handleStartSendingDocument = () => {
+      toast.processing();
+
+      setIsDocumentSending(true);
+    };
+
     window.addEventListener(
       'refetch.docuninja.document',
       refetchDocuninjaDocument
+    );
+
+    window.addEventListener(
+      'builder:document.successfully.saved',
+      handleSuccessfullySavedDocument
+    );
+
+    window.addEventListener(
+      'builder:document.finalize.save',
+      handleFinalizeDocumentSave
+    );
+
+    window.addEventListener(
+      'builder:document.successfully.sent',
+      handleSuccessfullySentDocument
+    );
+
+    window.addEventListener(
+      'builder:document.finalize.send',
+      handleFinalizeDocumentSend
+    );
+
+    window.addEventListener(
+      'builder:start.sending.document',
+      handleStartSendingDocument
     );
 
     return () => {
       window.removeEventListener(
         'refetch.docuninja.document',
         refetchDocuninjaDocument
+      );
+
+      window.removeEventListener(
+        'builder:document.successfully.saved',
+        handleSuccessfullySavedDocument
+      );
+
+      window.removeEventListener(
+        'builder:document.finalize.save',
+        handleFinalizeDocumentSave
+      );
+
+      window.removeEventListener(
+        'builder:document.successfully.sent',
+        handleSuccessfullySentDocument
+      );
+
+      window.removeEventListener(
+        'builder:document.finalize.send',
+        handleFinalizeDocumentSend
+      );
+
+      window.removeEventListener(
+        'builder:start.sending.document',
+        handleStartSendingDocument
       );
     };
   }, []);
@@ -521,7 +594,13 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-          <Button type="secondary" behavior="button" onClick={handleSend}>
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={handleSend}
+            disabled={isDocumentSaving || isDocumentSending}
+            disableWithoutIcon
+          >
             <div>
               <Icon element={MdSend} />
             </div>
@@ -529,7 +608,12 @@ function Builder() {
             <span>{t('send')}</span>
           </Button>
 
-          <Button behavior="button" onClick={handleSave}>
+          <Button
+            behavior="button"
+            onClick={handleSave}
+            disabled={isDocumentSaving || isDocumentSending}
+            disableWithoutIcon
+          >
             {t('save')}
           </Button>
         </div>
