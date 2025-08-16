@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useNavigate } from 'react-router';
 import { Modal } from '$app/components/Modal';
 import { useState } from 'react';
 import { docuNinjaEndpoint } from '$app/common/helpers';
@@ -28,8 +27,6 @@ interface Props {
 
 export function DeleteDocumentAction({ document }: Props) {
   const [t] = useTranslation();
-
-  const navigate = useNavigate();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -57,8 +54,6 @@ export function DeleteDocumentAction({ document }: Props) {
           $refetch(['docuninja_documents']);
 
           setIsModalOpen(false);
-
-          navigate('/documents');
         })
         .finally(() => setIsFormBusy(false));
     }

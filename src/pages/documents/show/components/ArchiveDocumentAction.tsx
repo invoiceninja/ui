@@ -43,7 +43,7 @@ export function ArchiveDocumentAction({ document }: Props) {
         'POST',
         docuNinjaEndpoint('/api/documents/bulk'),
         {
-          id: [document.id],
+          ids: [document.id],
           action: 'archive',
         },
         {

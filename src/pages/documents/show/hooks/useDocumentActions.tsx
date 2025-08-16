@@ -175,7 +175,7 @@ export function useDocumentActions({ document }: Params) {
         <ArchiveDocumentAction document={document!} />
       )}
 
-      {Boolean(document && document.archived_at && !document.is_deleted) && (
+      {Boolean(document && (document.archived_at || document.is_deleted)) && (
         <RestoreDocumentAction document={document!} />
       )}
 
