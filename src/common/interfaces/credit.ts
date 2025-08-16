@@ -12,6 +12,7 @@ import { Client } from './client';
 import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
+import { ScheduleItem } from './schedule';
 
 export interface Credit {
   id: string;
@@ -84,4 +85,5 @@ export interface Credit {
   payments?: Payment[];
   reminder_schedule?: string;
   location_id: string;
+  schedule?: ScheduleItem[]
 }
