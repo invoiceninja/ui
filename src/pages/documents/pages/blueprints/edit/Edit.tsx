@@ -22,18 +22,19 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useActions } from '../common/hooks/useActions';
 
 export default function Edit() {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
-
   const { id } = useParams();
+  const actions = useActions();
   const colors = useColorScheme();
 
   const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
@@ -99,8 +100,15 @@ export default function Edit() {
     <Default
       title={t('edit_blueprint')}
       breadcrumbs={pages}
-      onSaveClick={handleEdit}
-      disableSaveButton={isFormBusy || !blueprint}
+      navigationTopRight={
+        <ResourceActions
+          resource={blueprint}
+          actions={actions}
+          disableSaveButton={isFormBusy || !blueprint}
+          saveButtonLabel={t('save')}
+          onSaveClick={handleEdit}
+        />
+      }
     >
       <div className="flex justify-center">
         <Card

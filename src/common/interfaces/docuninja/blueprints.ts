@@ -14,4 +14,6 @@ export interface Blueprint {
   description: string;
   created_at: string;
   updated_at: string;
+  archived_at: string;
+  is_deleted: boolean;
 }
