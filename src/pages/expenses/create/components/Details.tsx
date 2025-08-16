@@ -106,18 +106,14 @@ export function Details(props: Props) {
     return [];
   };
 
+
   return (
     <div className="flex flex-col space-y-4">
       {expense && (
         <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
           <Element leftSide={t('net_amount')} withoutWrappingLeftSide>
-            {expense.uses_inclusive_taxes ? formatMoney(
+            {formatMoney(
               calculateExpenseExclusiveAmount(expense),
-              expense.client?.country_id,
-              expense.currency_id || expense.client?.settings.currency_id
-            )
-            : formatMoney(
-              calculateExpenseAmount(expense),
               expense.client?.country_id,
               expense.currency_id || expense.client?.settings.currency_id
             )}
