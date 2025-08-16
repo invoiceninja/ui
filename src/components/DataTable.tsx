@@ -171,8 +171,8 @@ interface Props<T> extends CommonProps {
   endpointHeaders?: Record<string, string>;
   totalPagesPropPath?: string;
   totalRecordsPropPath?: string;
-  withoutActionBulkPayloadProperty?: boolean;
-  withoutIdsBulkPayloadProperty?: boolean;
+  withoutActionBulkPayloadPropertyForDeleteAction?: boolean;
+  withoutIdsBulkPayloadPropertyForDeleteAction?: boolean;
   useDeleteMethod?: boolean;
   deleteBulkRoute?: string;
   useRestoreForDeletedResources?: boolean;
@@ -250,8 +250,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     totalPagesPropPath,
     totalRecordsPropPath,
     onDeleteBulkAction,
-    withoutActionBulkPayloadProperty = false,
-    withoutIdsBulkPayloadProperty = false,
+    withoutActionBulkPayloadPropertyForDeleteAction = false,
+    withoutIdsBulkPayloadPropertyForDeleteAction = false,
     useDeleteMethod = false,
     deleteBulkRoute,
     useRestoreForDeletedResources = false,
@@ -462,16 +462,24 @@ export function DataTable<T extends object>(props: Props<T>) {
         ? deleteBulkRoute
         : props.bulkRoute ?? `${props.endpoint}/bulk`;
 
+    const updatedAction =
+      withoutActionBulkPayloadPropertyForDeleteAction && action === 'delete'
+        ? {}
+        : { action };
+
+    const updatedIds =
+      withoutIdsBulkPayloadPropertyForDeleteAction && action === 'delete'
+        ? []
+        : { ids: id ? [id] : Array.from(selected) };
+
     request(
       method,
       props.useDocuNinjaApi
         ? docuNinjaEndpoint(route as string, { id })
         : endpoint(route as string),
       {
-        ...(withoutActionBulkPayloadProperty ? {} : { action }),
-        ...(withoutIdsBulkPayloadProperty
-          ? {}
-          : { ids: id ? [id] : Array.from(selected) }),
+        ...updatedAction,
+        ...updatedIds,
       },
       { headers: props.endpointHeaders }
     )
@@ -998,7 +1006,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         )}
 
                       {Boolean(
-                        (resource?.archived_at > 0 ||
+                        (resource?.archived_at ||
                           (useRestoreForDeletedResources &&
                             resource?.is_deleted)) &&
                           (props.showRestore?.(resource) || !props.showRestore)
