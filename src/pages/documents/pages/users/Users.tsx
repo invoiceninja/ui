@@ -46,7 +46,6 @@ export default function Users() {
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
-        useRestoreForDeletedResources
       />
     </Default>
   );

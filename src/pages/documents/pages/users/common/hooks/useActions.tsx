@@ -13,37 +13,37 @@ import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
-import { useBulk } from '$app/common/queries/docuninja/blueprints';
-import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
+import { useBulk } from '$app/common/queries/docuninja/users';
+import { User } from '$app/common/interfaces/docuninja/api';
 
 export function useActions() {
   const [t] = useTranslation();
 
   const bulk = useBulk();
 
-  const actions: Action<Blueprint>[] = [
-    (blueprint) =>
-      !blueprint?.archived_at && (
+  const actions: Action<User>[] = [
+    (user) =>
+      !user?.archived_at && (
         <DropdownElement
-          onClick={() => bulk([blueprint.id], 'archive')}
+          onClick={() => bulk([user.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
         </DropdownElement>
       ),
-    (blueprint) =>
-      Boolean(blueprint?.archived_at || blueprint?.is_deleted) && (
+    (user) =>
+      Boolean(user?.archived_at || user?.is_deleted) && (
         <DropdownElement
-          onClick={() => bulk([blueprint.id], 'restore')}
+          onClick={() => bulk([user.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
         </DropdownElement>
       ),
-    (blueprint) =>
-      !blueprint?.is_deleted && (
+    (user) =>
+      !user?.is_deleted && (
         <DropdownElement
-          onClick={() => bulk([blueprint.id], 'delete')}
+          onClick={() => bulk([user.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

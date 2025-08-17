@@ -8,10 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { Params } from '../common/params.interface';
 import { request } from '$app/common/helpers/request';
 import { docuNinjaEndpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useBlueprintsQuery(params: Params) {
   return useQuery(
@@ -64,4 +68,41 @@ export function useBlueprintQuery(params: BlueprintParams) {
       ),
     { staleTime: Infinity, enabled: Boolean(params.id) }
   );
+}
+
+export function useBulk() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return async (ids: string[], action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    return request(
+      action === 'delete' ? 'DELETE' : 'POST',
+      docuNinjaEndpoint(
+        action === 'delete' ? '/api/blueprints/:id' : '/api/blueprints/bulk',
+        {
+          id: ids[0],
+        }
+      ),
+      {
+        ...(action !== 'delete' && { action }),
+        ...(action !== 'delete' && { ids }),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
+      }
+    ).then(() => {
+      const message = `${action}d_blueprint`;
+
+      toast.success(message);
+
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+
+      $refetch(['blueprints']);
+    });
+  };
 }

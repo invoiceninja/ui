@@ -21,18 +21,21 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { AxiosError } from 'axios';
 import { useParams } from 'react-router-dom';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
 import { useDocuNinjaUserQuery } from '$app/common/queries/docuninja/users';
 import { Default } from '$app/components/layouts/Default';
 import { route } from '$app/common/helpers/route';
 import { useColorScheme } from '$app/common/colors';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../common/hooks/useActions';
 
 function Create() {
   const [t] = useTranslation();
 
   const { id } = useParams();
   const colors = useColorScheme();
+
+  const actions = useActions();
 
   const pages = [
     {
@@ -104,16 +107,20 @@ function Create() {
     }
   }, [userResponse]);
 
-  useSaveBtn(
-    {
-      onClick: handleCreate,
-      disableSaveButton: isFormBusy || !user,
-    },
-    [user]
-  );
-
   return (
-    <Default title={t('edit_user')} breadcrumbs={pages}>
+    <Default
+      title={t('edit_user')}
+      breadcrumbs={pages}
+      navigationTopRight={
+        <ResourceActions
+          resource={user}
+          actions={actions}
+          disableSaveButton={isFormBusy || !user}
+          saveButtonLabel={t('save')}
+          onSaveClick={handleCreate}
+        />
+      }
+    >
       <div className="flex justify-center">
         <Card
           title={t('edit_user')}

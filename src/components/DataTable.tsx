@@ -993,8 +993,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         (props.showRestore?.(resource) ||
                           !props.showRestore) && <Divider withoutPadding />}
 
-                      {(resource?.archived_at === 0 ||
-                        resource?.archived_at === null) &&
+                      {!resource?.archived_at &&
                         (props.showArchive?.(resource) ||
                           !props.showArchive) && (
                           <DropdownElement
