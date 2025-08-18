@@ -226,7 +226,7 @@ export function useProjectColumns() {
       column: 'total_hours',
       id: 'current_hours',
       label: t('total_hours'),
-      format: (value) => <>{+Number(value || 0).toFixed(4)}</>,
+      format: (value) => parseFloat((Number(value) || 0).toFixed(4)),
     },
     {
       column: 'entity_state',
