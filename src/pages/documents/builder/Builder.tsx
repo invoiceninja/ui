@@ -498,6 +498,7 @@ function Builder() {
 
     const handleSuccessfullySavedDocument = () => {
       toast.success('updated_document');
+      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
     };
 
     const handleFinalizeDocumentSave = () => {
