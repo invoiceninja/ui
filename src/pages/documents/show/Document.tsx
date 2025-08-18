@@ -161,7 +161,7 @@ export default function Document() {
             style={{ borderColor: colors.$24 }}
             headerStyle={{ borderColor: colors.$20 }}
           >
-            <div className="flex flex-col xl:flex-row justify-between gap-4 pt-3 w-full">
+            <div className="flex flex-col xl:flex-row justify-between gap-4 pt-3 pb-4 w-full">
               <div className="flex">
                 <Invitations document={document} />
               </div>

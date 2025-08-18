@@ -41,10 +41,10 @@ import {
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
 import { useEffect, useState } from 'react';
-import { Check, Loader } from 'react-feather';
+import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 
@@ -71,9 +71,6 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
         onClick={(event) => {
           event.stopPropagation();
 
-          window.dispatchEvent(
-            new CustomEvent('builder:start.sending.document')
-          );
           window.dispatchEvent(new CustomEvent('builder:send.document.submit'));
         }}
       >
@@ -83,20 +80,27 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   );
 }
 
-function SendDialogButton({ isSubmitting, ...props }: SendDialogButtonProps) {
+function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
   const [t] = useTranslation();
 
   const params = useParams();
-  const queryClient = useQueryClient();
 
   const { data: document } = useQuery({
-    queryKey: ['/api/documents', params.id],
+    queryKey: ['/api/documents/docuninja', params.id],
     queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint(
           `/api/documents/${params.id}?includeUrl&includePreviews`
-        )
+        ),
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
       ).then(
         (response: GenericSingleResourceResponse<Document>) =>
           response.data.data
@@ -111,44 +115,33 @@ function SendDialogButton({ isSubmitting, ...props }: SendDialogButtonProps) {
       return;
     }
 
-    try {
-      await request(
-        'POST',
-        docuNinjaEndpoint(`/api/documents/${document.id}/send`),
-        {
-          invitations: document.invitations || [],
+    toast.processing();
+
+    request(
+      'POST',
+      docuNinjaEndpoint(`/api/documents/${document.id}/send`),
+      {
+        invitations: document.invitations || [],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      );
-
-      queryClient.invalidateQueries({ queryKey: ['/api/documents'] });
-      toast.success('document_queued_for_sending');
-
-      window.dispatchEvent(new CustomEvent('builder:send.request-reset'));
-      window.dispatchEvent(new CustomEvent('builder:send.submit'));
-
-      if ('onClick' in props && typeof props.onClick === 'function') {
-        props.onClick();
       }
-    } catch (error) {
-      toast.error('something_went_wrong');
-    }
+    ).then(() => {
+      toast.success('document_queued_for_sending');
+      $refetch(['docuninja_documents']);
+    });
   };
 
   return (
     <Button
+      className="w-full"
       behavior="button"
       disabled={isSubmitting}
       onClick={handleSend}
-      {...props}
+      disableWithoutIcon
     >
-      {isSubmitting ? <Loader className="animate-spin" /> : null}
       {t('send')}
     </Button>
   );
@@ -507,22 +500,8 @@ function Builder() {
       toast.success('updated_document');
     };
 
-    const handleSuccessfullySentDocument = () => {
-      toast.success('document_queued_for_sending');
-    };
-
     const handleFinalizeDocumentSave = () => {
       setIsDocumentSaving(false);
-    };
-
-    const handleFinalizeDocumentSend = () => {
-      setIsDocumentSending(false);
-    };
-
-    const handleStartSendingDocument = () => {
-      toast.processing();
-
-      setIsDocumentSending(true);
     };
 
     window.addEventListener(
@@ -540,21 +519,6 @@ function Builder() {
       handleFinalizeDocumentSave
     );
 
-    window.addEventListener(
-      'builder:document.successfully.sent',
-      handleSuccessfullySentDocument
-    );
-
-    window.addEventListener(
-      'builder:document.finalize.send',
-      handleFinalizeDocumentSend
-    );
-
-    window.addEventListener(
-      'builder:start.sending.document',
-      handleStartSendingDocument
-    );
-
     return () => {
       window.removeEventListener(
         'refetch.docuninja.document',
@@ -569,21 +533,6 @@ function Builder() {
       window.removeEventListener(
         'builder:document.finalize.save',
         handleFinalizeDocumentSave
-      );
-
-      window.removeEventListener(
-        'builder:document.successfully.sent',
-        handleSuccessfullySentDocument
-      );
-
-      window.removeEventListener(
-        'builder:document.finalize.send',
-        handleFinalizeDocumentSend
-      );
-
-      window.removeEventListener(
-        'builder:start.sending.document',
-        handleStartSendingDocument
       );
     };
   }, []);
