@@ -303,7 +303,7 @@ export function UploadImport(props: Props) {
   const validateCSVWithPapaParse = (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
       papaParse<CSVRow>(file, {
-        header: true,
+        header: false,
         skipEmptyLines: true,
         dynamicTyping: true,
         complete: (results: ParseResult<CSVRow>) => {
