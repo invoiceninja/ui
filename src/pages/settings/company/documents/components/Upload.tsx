@@ -28,6 +28,7 @@ import { AxiosError } from 'axios';
 import { route } from '$app/common/helpers/route';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import styled from 'styled-components';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Props {
   endpoint: string;
@@ -148,9 +149,9 @@ export function Upload(props: Props) {
 
         {errors &&
           Object.keys(errors.errors).map((key, index) => (
-            <Alert key={index} className="mt-2" type="danger">
+            <ErrorMessage key={index} className="mt-2">
               {errors.errors[key]}
-            </Alert>
+            </ErrorMessage>
           ))}
       </>
     );

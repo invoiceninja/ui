@@ -17,7 +17,6 @@ import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
-import { Alert } from '$app/components/Alert';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,6 +32,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 export default function Apply() {
   const [t] = useTranslation();
@@ -219,7 +219,7 @@ export default function Apply() {
 
         {errors?.errors.invoices && (
           <div className="py-2">
-            <Alert type="danger">{errors.errors.invoices}</Alert>
+            <ErrorMessage>{errors.errors.invoices}</ErrorMessage>
           </div>
         )}
       </Element>
@@ -268,9 +268,9 @@ export default function Apply() {
 
             {errors?.errors[`invoices.${[index]}.invoice_id`] && (
               <div className="py-2">
-                <Alert type="danger">
+                <ErrorMessage>
                   {errors.errors[`invoices.${[index]}.invoice_id`]}
-                </Alert>
+                </ErrorMessage>
               </div>
             )}
           </Element>

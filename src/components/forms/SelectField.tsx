@@ -9,7 +9,6 @@
  */
 
 import classNames from 'classnames';
-import { Alert } from '$app/components/Alert';
 import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
@@ -18,6 +17,7 @@ import { SelectOption } from '../datatables/Actions';
 import Select, { StylesConfig } from 'react-select';
 import { ChevronDown } from '../icons/ChevronDown';
 import { merge } from 'lodash';
+import { ErrorMessage } from '../ErrorMessage';
 
 export interface SelectProps extends CommonProps {
   defaultValue?: any;
@@ -236,11 +236,7 @@ export function SelectField(props: SelectProps) {
         />
       )}
 
-      {props.errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </div>
   );
 }

@@ -13,10 +13,10 @@ import { Entry } from './forms/Combobox';
 import { v4 } from 'uuid';
 import Select, { StylesConfig } from 'react-select';
 import { InputLabel } from './forms';
-import { Alert } from './Alert';
 import { useColorScheme } from '$app/common/colors';
 import { SelectOption } from './datatables/Actions';
 import { merge } from 'lodash';
+import { ErrorMessage } from './ErrorMessage';
 
 interface Props {
   children: ReactNode;
@@ -147,11 +147,7 @@ export function SearchableSelect({
         styles={customStyles}
       />
 
-      {errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>
     </div>
   );
 }

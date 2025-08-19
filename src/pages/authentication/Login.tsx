@@ -17,7 +17,6 @@ import { InputField } from '../../components/forms/InputField';
 import { Button } from '../../components/forms/Button';
 import { Link } from '../../components/forms/Link';
 import { InputLabel } from '../../components/forms/InputLabel';
-import { Alert } from '../../components/Alert';
 import { HostedLinks } from './components/HostedLinks';
 import { Header } from './components/Header';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -31,6 +30,7 @@ import { useColorScheme } from '$app/common/colors';
 import { version } from '$app/common/helpers/version';
 import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 export function Login() {
   useTitle('login');
@@ -163,11 +163,7 @@ export function Login() {
               />
             )}
 
-            {message && (
-              <Alert className="mt-4" type="danger">
-                {message}
-              </Alert>
-            )}
+            <ErrorMessage className="mt-4">{message}</ErrorMessage>
 
             <Button disabled={isFormBusy} className="mt-4" variant="block">
               {t('login')}
