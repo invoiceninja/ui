@@ -16,6 +16,8 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Spinner } from '$app/components/Spinner';
 import { useColorScheme } from '$app/common/colors';
 import { Card } from '$app/components/cards';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const isPaidDocuninjaUserAtom = atom<boolean>(false);
 
@@ -128,6 +130,15 @@ export default function Document() {
       });
     }
   }, [docuData]);
+
+  useSocketEvent({
+    on: [
+      'App\\Events\\Document\\DocumentWasSigned',
+      'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated',
+    ],
+    callback: () =>
+      $refetch(['docuninja_documents', 'docuninja_document_timeline']),
+  });
 
   if (
     !isLoading &&

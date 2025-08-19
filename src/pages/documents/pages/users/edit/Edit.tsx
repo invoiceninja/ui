@@ -28,6 +28,7 @@ import { route } from '$app/common/helpers/route';
 import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
+import { useSocketEvent } from '$app/common/queries/sockets';
 
 function Create() {
   const [t] = useTranslation();
@@ -106,6 +107,11 @@ function Create() {
       setUser(userResponse);
     }
   }, [userResponse]);
+
+  useSocketEvent({
+    on: ['App\\Events\\User\\UserWasVerified'],
+    callback: () => $refetch(['docuninja_users']),
+  });
 
   return (
     <Default

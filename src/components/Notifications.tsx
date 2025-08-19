@@ -281,9 +281,6 @@ export function Notifications() {
       'App\\Events\\Credit\\CreditWasCreated',
       'App\\Events\\Credit\\CreditWasUpdated',
       'App\\Events\\Payment\\PaymentWasUpdated',
-      'App\\Events\\Document\\DocumentWasSigned',
-      'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated',
-      'App\\Events\\User\\UserWasVerified',
     ],
     callback: ({ event, data }) => {
       console.log(event, data);

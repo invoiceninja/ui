@@ -14,6 +14,8 @@ import { DataTable } from '$app/components/DataTable';
 import { User } from '$app/common/interfaces/docuninja/api';
 import { useUserColumns } from './common/hooks/useUserColumns';
 import { Default } from '$app/components/layouts/Default';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Users() {
   useTitle('users');
@@ -28,6 +30,11 @@ export default function Users() {
       href: '/documents/users',
     },
   ];
+
+  useSocketEvent({
+    on: ['App\\Events\\User\\UserWasVerified'],
+    callback: () => $refetch(['docuninja_users']),
+  });
 
   return (
     <Default title={t('users')} breadcrumbs={pages}>
