@@ -171,7 +171,7 @@ function Verification({ visible, onClose }: VerificationProps) {
           />
         </div>
 
-        <ErrorMessage className="mt-2">{errors?.errors.phone}</ErrorMessage>
+        <ErrorMessage>{errors?.errors.phone}</ErrorMessage>
 
         <Button
           className="self-end"

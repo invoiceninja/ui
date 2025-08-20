@@ -22,7 +22,7 @@ export function ErrorMessage({ children, className }: Props) {
     const errorMessageBox = document.querySelector('.error-message-box');
 
     if (errorMessageBox) {
-      errorMessageBox.scrollIntoView({ behavior: 'smooth' });
+      errorMessageBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [children]);
 
