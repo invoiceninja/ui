@@ -273,6 +273,85 @@ export function EmailSettings() {
             </Element>
           )}
 
+          {company?.settings.email_sending_method === 'client_ses' && (
+            <>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="ses_secret_key"
+                    labelElement={<SettingsLabel label={t('ses_secret_key')} />}
+                />
+              }
+            >
+              <InputField
+                value={company?.settings.ses_secret_key || ''}
+                onValueChange={(value) =>
+                  handleChange('settings.ses_secret_key', value)
+                }
+                disabled={disableSettingsField('ses_secret_key')}
+                errorMessage={errors?.errors['settings.ses_secret_key']}
+              />
+            </Element>
+
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="ses_access_key_id"
+                    labelElement={<SettingsLabel label={t('ses_access_key_id')} />}
+                />
+              }
+            >
+              <InputField
+                value={company?.settings.ses_access_key_id || ''}
+                onValueChange={(value) =>
+                  handleChange('settings.ses_access_key_id', value)
+                }
+                disabled={disableSettingsField('ses_access_key_id')}
+                errorMessage={errors?.errors['settings.ses_access_key_id']}
+              />
+            </Element>
+
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="ses_region"
+                  labelElement={<SettingsLabel label={t('region')} />}
+                />
+              }
+              leftSideHelp={t('ses_region_help')}
+              >
+                <InputField
+                  value={company?.settings.ses_region || ''}
+                  onValueChange={(value) =>
+                    handleChange('settings.ses_region', value)
+                  }
+                  disabled={disableSettingsField('ses_region')}
+                  errorMessage={errors?.errors['settings.ses_region']}
+                />
+            </Element>
+
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="ses_topic_arn"
+                  labelElement={<SettingsLabel label={t('topic_arn')} />}
+                />
+              }
+              leftSideHelp={t('ses_topic_arn_help')}
+            >
+                <InputField
+                  value={company?.settings.ses_topic_arn || ''}
+                  onValueChange={(value) =>
+                    handleChange('settings.ses_topic_arn', value)
+                  }
+                  disabled={disableSettingsField('ses_topic_arn')}
+                  errorMessage={errors?.errors['settings.ses_topic_arn']}
+                />
+
+            </Element>
+            </>
+          )}
+
           {company?.settings.email_sending_method === 'client_mailgun' && (
             <>
               <Element
