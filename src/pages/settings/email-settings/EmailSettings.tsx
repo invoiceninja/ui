@@ -296,18 +296,18 @@ export function EmailSettings() {
             <Element
               leftSide={
                 <PropertyCheckbox
-                  propertyKey="ses_access_key_id"
-                    labelElement={<SettingsLabel label={t('ses_access_key_id')} />}
+                  propertyKey="ses_access_key"
+                    labelElement={<SettingsLabel label={t('ses_access_key')} />}
                 />
               }
             >
               <InputField
-                value={company?.settings.ses_access_key_id || ''}
+                value={company?.settings.ses_access_key || ''}
                 onValueChange={(value) =>
-                  handleChange('settings.ses_access_key_id', value)
+                  handleChange('settings.ses_access_key', value)
                 }
-                disabled={disableSettingsField('ses_access_key_id')}
-                errorMessage={errors?.errors['settings.ses_access_key_id']}
+                disabled={disableSettingsField('ses_access_key')}
+                errorMessage={errors?.errors['settings.ses_access_key']}
               />
             </Element>
 
