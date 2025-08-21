@@ -18,8 +18,8 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
-import { Alert } from '$app/components/Alert';
 import { useColorScheme } from '$app/common/colors';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 const FILE_KEY = {
   clients: 'client',
@@ -146,9 +146,7 @@ export function Import() {
           Object.keys(errors.errors).map(
             (key, index) =>
               key !== 'import_type' && (
-                <Alert key={index} type="danger">
-                  {errors.errors[key]}
-                </Alert>
+                <ErrorMessage key={index}>{errors.errors[key]}</ErrorMessage>
               )
           )}
       </Element>

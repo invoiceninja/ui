@@ -9,10 +9,10 @@
  */
 
 import { ComboboxAsync, Entry } from '../forms/Combobox';
-import { Alert } from '../Alert';
 import { date, endpoint } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Expense } from '$app/common/interfaces/expense';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -67,11 +67,7 @@ export function ExpenseSelector(props: Props) {
         withShadow={props.withShadow}
       />
 
-      {props.errorMessage && (
-        <Alert type="danger" className="mt-2">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </>
   );
 }

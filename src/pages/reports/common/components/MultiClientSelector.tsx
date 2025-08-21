@@ -15,9 +15,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
-import { Alert } from '$app/components/Alert';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Props {
   value?: string;
@@ -77,11 +77,7 @@ export function MultiClientSelector(props: Props) {
         </div>
       )}
 
-      {errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>
     </>
   );
 }

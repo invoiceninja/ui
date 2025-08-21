@@ -9,7 +9,7 @@
  */
 import { useValidationMessageAlias } from '$app/common/hooks/useValidationMessageAlias';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Alert } from './Alert';
+import { ErrorMessage } from './ErrorMessage';
 
 interface Props {
   errors: ValidationBag;
@@ -24,7 +24,7 @@ export function ValidationAlert(props: Props) {
   const validationMessageAlias = useValidationMessageAlias({ entity });
 
   return (
-    <Alert className="mb-6" type="danger">
+    <ErrorMessage className="mb-6">
       {!withoutTopMessage && <p>{props.errors.message}</p>}
 
       <ul>
@@ -35,6 +35,6 @@ export function ValidationAlert(props: Props) {
           </li>
         ))}
       </ul>
-    </Alert>
+    </ErrorMessage>
   );
 }
