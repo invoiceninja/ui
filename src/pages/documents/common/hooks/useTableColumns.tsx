@@ -18,12 +18,15 @@ import { DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 
-const STATUS_VARIANTS = {
+export const STATUS_VARIANTS = {
   1: 'generic',
   2: 'light-blue',
-  3: 'orange',
-  4: 'green',
-  5: 'red',
+  3: 'green',
+  4: 'red',
+  5: 'blue',
+  6: 'dark-blue',
+  7: 'orange',
+  8: 'purple',
 };
 
 export function useTableColumns() {
@@ -34,10 +37,13 @@ export function useTableColumns() {
 
   const STATUS_LABELS = {
     1: t('draft'),
-    2: t('sent'),
-    3: t('viewed'),
-    4: t('completed'),
-    5: t('cancelled'),
+    2: t('pending_approval'),
+    3: t('approved'),
+    4: t('rejected'),
+    5: t('sent'),
+    6: t('completed'),
+    7: t('expired'),
+    8: t('voided'),
   };
 
   const columns: DataTableColumns<Document> = [

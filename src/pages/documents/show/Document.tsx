@@ -29,14 +29,7 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { useDocumentActions } from './hooks/useDocumentActions';
-
-const STATUS_VARIANTS = {
-  1: 'generic',
-  2: 'dark-blue',
-  3: 'yellow',
-  4: 'green',
-  5: 'red',
-};
+import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
 
 export default function Document() {
   const { documentTitle } = useTitle('view_document');
@@ -66,10 +59,13 @@ export default function Document() {
   const STATUS_LABELS = useMemo(
     () => ({
       1: t('draft'),
-      2: t('sent'),
-      3: t('viewed'),
-      4: t('completed'),
-      5: t('cancelled'),
+      2: t('pending_approval'),
+      3: t('approved'),
+      4: t('rejected'),
+      5: t('sent'),
+      6: t('completed'),
+      7: t('expired'),
+      8: t('voided'),
     }),
     []
   );
