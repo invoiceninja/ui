@@ -615,7 +615,7 @@ export function useActions(params: ActionsParams = {}) {
         </EntityActionElement>
       ),
     (purchaseOrder) =>
-      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
+      purchaseOrder.status_id < PurchaseOrderStatus.Sent && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'mark_sent',
