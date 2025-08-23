@@ -11,9 +11,7 @@
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { User } from '$app/common/interfaces/docuninja/api';
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -27,9 +25,12 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
 import { useBlankDocuNinjaUserQuery } from '$app/common/queries/docuninja/users';
 import { Default } from '$app/components/layouts/Default';
-import { useColorScheme } from '$app/common/colors';
+import { Tab } from '$app/components/Tabs';
+import { TabGroup } from '$app/components/TabGroup';
+import Permissions from '../common/components/Permissions';
+import Details from '../common/components/Details';
 
-function Create() {
+export default function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -45,21 +46,22 @@ function Create() {
     },
   ];
 
-  const colors = useColorScheme();
+  const tabs: Tab[] = [
+    {
+      name: t('user_details'),
+      href: '/documents/users/create',
+    },
+    {
+      name: t('permissions'),
+      href: '/documents/users/create/permissions',
+    },
+  ];
 
   const [user, setUser] = useState<User>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const { data: blankUser, isLoading } = useBlankDocuNinjaUserQuery();
-
-  const handleChange = (key: keyof User, value: string) => {
-    const updatedUser = cloneDeep(user) as User;
-
-    set(updatedUser, key, value);
-
-    setUser(updatedUser);
-  };
 
   const handleCreate = () => {
     if (!isFormBusy) {
@@ -113,49 +115,23 @@ function Create() {
 
   return (
     <Default title={t('new_user')} breadcrumbs={pages}>
-      <div className="flex justify-center">
-        <Card
-          title={t('new_user')}
-          className="shadow-sm w-full lg:w-2/3"
-          childrenClassName="pb-8"
-          style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-        >
-          {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <Spinner />
+      {!isLoading && user ? (
+        <div className="space-y-4">
+          <TabGroup tabs={[t('user_details'), t('permissions')]}>
+            <div>
+              <Details user={user} setUser={setUser} errors={errors} />
             </div>
-          ) : (
-            <>
-              <Element leftSide={t('first_name')}>
-                <InputField
-                  value={user?.first_name}
-                  onValueChange={(value) => handleChange('first_name', value)}
-                  errorMessage={errors?.errors.first_name}
-                />
-              </Element>
 
-              <Element leftSide={t('last_name')}>
-                <InputField
-                  value={user?.last_name}
-                  onValueChange={(value) => handleChange('last_name', value)}
-                  errorMessage={errors?.errors.last_name}
-                />
-              </Element>
-
-              <Element leftSide={t('email')}>
-                <InputField
-                  value={user?.email}
-                  onValueChange={(value) => handleChange('email', value)}
-                  errorMessage={errors?.errors.email}
-                />
-              </Element>
-            </>
-          )}
-        </Card>
-      </div>
+            <div>
+              <Permissions user={user} setUser={setUser} errors={errors} />
+            </div>
+          </TabGroup>
+        </div>
+      ) : (
+        <div className="flex justify-center items-center py-8">
+          <Spinner />
+        </div>
+      )}
     </Default>
   );
 }
-
-export default Create;

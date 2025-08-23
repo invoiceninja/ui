@@ -275,6 +275,13 @@ export interface DocumentSignature {
   file?: DocumentFile;
 }
 
+export interface Permission {
+  model: string;
+  id: string;
+  permission_id: number;
+  permissionable_id: number | null;
+}
+
 export interface User {
   id: string;
   account_id: string | null;
@@ -299,7 +306,7 @@ export interface User {
   email_verified_at: string | null; // ISO date string
   companies?: Company[]; // Related companies
   account: Account | null;
-  permissions: string[];
+  permissions: Permission[];
   company_user?: CompanyUser;
 }
 
