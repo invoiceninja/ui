@@ -28,6 +28,10 @@ export interface DocuninjaUserProps {
   setIsAdmin: Dispatch<SetStateAction<boolean>>;
   permissions: PermissionType[];
   setPermissions: Dispatch<SetStateAction<PermissionType[]>>;
+  notifications: Record<string, string>;
+  setNotifications: Dispatch<SetStateAction<Record<string, string>>>;
+  allNotificationsValue: string;
+  setAllNotificationsValue: Dispatch<SetStateAction<string>>;
 }
 
 export default function Details({

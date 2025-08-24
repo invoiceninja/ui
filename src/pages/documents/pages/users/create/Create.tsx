@@ -30,6 +30,7 @@ import Details from '../common/components/Details';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
+import { Notifications } from '../common/components/Notifications';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -58,8 +59,42 @@ export default function Create() {
   const [permissions, setPermissions] = useState<PermissionType[]>(
     user?.permissions ?? []
   );
+  const [notifications, setNotifications] = useState<Record<string, string>>(
+    {}
+  );
+  const [allNotificationsValue, setAllNotificationsValue] =
+    useState<string>('none');
 
   const { data: blankUser, isLoading } = useBlankDocuNinjaUserQuery();
+
+  const adjustNotificationsForPayload = (): string[] => {
+    let notificationArray: string[] = [];
+
+    if (
+      allNotificationsValue === 'all' ||
+      allNotificationsValue === 'all_user'
+    ) {
+      notificationArray = [allNotificationsValue];
+    } else {
+      notificationArray = Object.entries(notifications)
+        .filter(([id, value]) => {
+          if (!value || value === 'none') return false;
+
+          return typeof id === 'string' && id.length > 0;
+        })
+        .map(([id, value]) => {
+          if (value === 'all') {
+            return id;
+          }
+          if (value === 'all_user') {
+            return `${id}_user`;
+          }
+          return id;
+        });
+    }
+
+    return notificationArray;
+  };
 
   const handleCreate = () => {
     if (!isFormBusy) {
@@ -76,6 +111,10 @@ export default function Create() {
           ...user,
           is_admin: isAdmin,
           permissions: isAdmin ? [] : permissions,
+          company_user: {
+            ...user?.company_user,
+            notifications: adjustNotificationsForPayload(),
+          },
         },
         {
           headers: {
@@ -114,6 +153,18 @@ export default function Create() {
     }
   }, [blankUser]);
 
+  useEffect(() => {
+    if (user?.company_user?.notifications) {
+      setAllNotificationsValue(
+        user.company_user.notifications.includes('all')
+          ? 'all'
+          : user.company_user.notifications.includes('all_user')
+          ? 'all_user'
+          : 'none'
+      );
+    }
+  }, [user]);
+
   return (
     <Default
       title={t('new_user')}
@@ -131,9 +182,10 @@ export default function Create() {
             withoutHeaderBorder
           >
             <TabGroup
-              tabs={[t('user_details'), t('permissions')]}
+              tabs={[t('user_details'), t('notifications'), t('permissions')]}
               withHorizontalPadding
               horizontalPaddingWidth="1.5rem"
+              fullRightPadding
             >
               <div className="pb-4">
                 <Details
@@ -145,6 +197,27 @@ export default function Create() {
                   setIsAdmin={setIsAdmin}
                   permissions={permissions}
                   setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
+                />
+              </div>
+
+              <div className="pb-4">
+                <Notifications
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
                 />
               </div>
 
@@ -158,6 +231,10 @@ export default function Create() {
                   setIsAdmin={setIsAdmin}
                   permissions={permissions}
                   setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
                 />
               </div>
             </TabGroup>

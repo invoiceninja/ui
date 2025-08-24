@@ -12,7 +12,6 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { User } from '$app/common/interfaces/docuninja/api';
 import { Card } from '$app/components/cards';
-import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -32,6 +31,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import Permissions from '../common/components/Permissions';
 import Details from '../common/components/Details';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
+import { Notifications } from '../common/components/Notifications';
 
 function Create() {
   const [t] = useTranslation();
@@ -57,17 +57,43 @@ function Create() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
+  const [notifications, setNotifications] = useState<Record<string, string>>(
+    {}
+  );
+  const [allNotificationsValue, setAllNotificationsValue] =
+    useState<string>('none');
 
   const { data: userResponse, isLoading } = useDocuNinjaUserQuery({
     id,
   });
 
-  const handleChange = (key: keyof User, value: string) => {
-    const updatedUser = cloneDeep(user) as User;
+  const adjustNotificationsForPayload = (): string[] => {
+    let notificationArray: string[] = [];
 
-    set(updatedUser, key, value);
+    if (
+      allNotificationsValue === 'all' ||
+      allNotificationsValue === 'all_user'
+    ) {
+      notificationArray = [allNotificationsValue];
+    } else {
+      notificationArray = Object.entries(notifications)
+        .filter(([id, value]) => {
+          if (!value || value === 'none') return false;
 
-    setUser(updatedUser);
+          return typeof id === 'string' && id.length > 0;
+        })
+        .map(([id, value]) => {
+          if (value === 'all') {
+            return id;
+          }
+          if (value === 'all_user') {
+            return `${id}_user`;
+          }
+          return id;
+        });
+    }
+
+    return notificationArray;
   };
 
   const handleUpdate = () => {
@@ -87,6 +113,10 @@ function Create() {
           ...user,
           is_admin: isAdmin,
           permissions: isAdmin ? [] : permissions,
+          company_user: {
+            ...user?.company_user,
+            notifications: adjustNotificationsForPayload(),
+          },
         },
         {
           headers: {
@@ -117,6 +147,18 @@ function Create() {
     }
   }, [userResponse]);
 
+  useEffect(() => {
+    if (user?.company_user?.notifications) {
+      setAllNotificationsValue(
+        user.company_user.notifications.includes('all')
+          ? 'all'
+          : user.company_user.notifications.includes('all_user')
+          ? 'all_user'
+          : 'none'
+      );
+    }
+  }, [user]);
+
   useSocketEvent({
     on: ['App\\Events\\User\\UserWasVerified'],
     callback: () => $refetch(['docuninja_users']),
@@ -146,11 +188,12 @@ function Create() {
             withoutHeaderBorder
           >
             <TabGroup
-              tabs={[t('user_details'), t('permissions')]}
+              tabs={[t('user_details'), t('notifications'), t('permissions')]}
               withHorizontalPadding
               horizontalPaddingWidth="1.5rem"
+              fullRightPadding
             >
-              <div className="pb-4">
+              <div className="py-4">
                 <Details
                   user={user}
                   setUser={setUser}
@@ -160,10 +203,31 @@ function Create() {
                   setIsAdmin={setIsAdmin}
                   permissions={permissions}
                   setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
                 />
               </div>
 
-              <div className="pb-4">
+              <div className="py-4">
+                <Notifications
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
+                />
+              </div>
+
+              <div className="py-4">
                 <Permissions
                   user={user}
                   setUser={setUser}
@@ -173,6 +237,10 @@ function Create() {
                   setIsAdmin={setIsAdmin}
                   permissions={permissions}
                   setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
                 />
               </div>
             </TabGroup>
