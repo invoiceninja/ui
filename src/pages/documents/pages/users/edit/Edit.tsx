@@ -11,8 +11,7 @@
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { User } from '$app/common/interfaces/docuninja/api';
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { Card } from '$app/components/cards';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +28,10 @@ import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { useSocketEvent } from '$app/common/queries/sockets';
+import { TabGroup } from '$app/components/TabGroup';
+import Permissions from '../common/components/Permissions';
+import Details from '../common/components/Details';
+import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 
 function Create() {
   const [t] = useTranslation();
@@ -52,6 +55,8 @@ function Create() {
   const [user, setUser] = useState<User>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [permissions, setPermissions] = useState<PermissionType[]>([]);
 
   const { data: userResponse, isLoading } = useDocuNinjaUserQuery({
     id,
@@ -65,7 +70,7 @@ function Create() {
     setUser(updatedUser);
   };
 
-  const handleCreate = () => {
+  const handleUpdate = () => {
     if (!isFormBusy) {
       toast.processing();
 
@@ -78,7 +83,11 @@ function Create() {
         docuNinjaEndpoint('/api/users/:id', {
           id,
         }),
-        user,
+        {
+          ...user,
+          is_admin: isAdmin,
+          permissions: isAdmin ? [] : permissions,
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem(
@@ -123,51 +132,57 @@ function Create() {
           actions={actions}
           disableSaveButton={isFormBusy || !user}
           saveButtonLabel={t('save')}
-          onSaveClick={handleCreate}
+          onSaveClick={handleUpdate}
         />
       }
     >
-      <div className="flex justify-center">
-        <Card
-          title={t('edit_user')}
-          className="shadow-sm w-full lg:w-2/3"
-          childrenClassName="pb-8"
-          style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-        >
-          {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <Spinner />
-            </div>
-          ) : (
-            <>
-              <Element leftSide={t('first_name')}>
-                <InputField
-                  value={user?.first_name}
-                  onValueChange={(value) => handleChange('first_name', value)}
-                  errorMessage={errors?.errors.first_name}
+      {!isLoading && user ? (
+        <div className="space-y-4">
+          <Card
+            title={t('edit_user')}
+            className="shadow-sm"
+            style={{ borderColor: colors.$24 }}
+            withoutBodyPadding
+            withoutHeaderBorder
+          >
+            <TabGroup
+              tabs={[t('user_details'), t('permissions')]}
+              withHorizontalPadding
+              horizontalPaddingWidth="1.5rem"
+            >
+              <div className="pb-4">
+                <Details
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
                 />
-              </Element>
+              </div>
 
-              <Element leftSide={t('last_name')}>
-                <InputField
-                  value={user?.last_name}
-                  onValueChange={(value) => handleChange('last_name', value)}
-                  errorMessage={errors?.errors.last_name}
+              <div className="pb-4">
+                <Permissions
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
                 />
-              </Element>
-
-              <Element leftSide={t('email')}>
-                <InputField
-                  value={user?.email}
-                  onValueChange={(value) => handleChange('email', value)}
-                  errorMessage={errors?.errors.email}
-                />
-              </Element>
-            </>
-          )}
-        </Card>
-      </div>
+              </div>
+            </TabGroup>
+          </Card>
+        </div>
+      ) : (
+        <div className="flex justify-center items-center py-8">
+          <Spinner />
+        </div>
+      )}
     </Default>
   );
 }

@@ -21,17 +21,20 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { route } from '$app/common/helpers/route';
 import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
 import { useBlankDocuNinjaUserQuery } from '$app/common/queries/docuninja/users';
 import { Default } from '$app/components/layouts/Default';
-import { Tab } from '$app/components/Tabs';
 import { TabGroup } from '$app/components/TabGroup';
 import Permissions from '../common/components/Permissions';
 import Details from '../common/components/Details';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
+import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 
 export default function Create() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const navigate = useNavigate();
 
@@ -46,20 +49,15 @@ export default function Create() {
     },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('user_details'),
-      href: '/documents/users/create',
-    },
-    {
-      name: t('permissions'),
-      href: '/documents/users/create/permissions',
-    },
-  ];
-
   const [user, setUser] = useState<User>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(
+    user?.company_user?.is_admin ?? false
+  );
+  const [permissions, setPermissions] = useState<PermissionType[]>(
+    user?.permissions ?? []
+  );
 
   const { data: blankUser, isLoading } = useBlankDocuNinjaUserQuery();
 
@@ -71,11 +69,22 @@ export default function Create() {
 
       setIsFormBusy(true);
 
-      request('POST', docuNinjaEndpoint('/api/users'), user, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+      request(
+        'POST',
+        docuNinjaEndpoint('/api/users'),
+        {
+          ...user,
+          is_admin: isAdmin,
+          permissions: isAdmin ? [] : permissions,
         },
-      })
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
+      )
         .then((response: GenericSingleResourceResponse<User>) => {
           toast.success('created_user');
 
@@ -105,27 +114,54 @@ export default function Create() {
     }
   }, [blankUser]);
 
-  useSaveBtn(
-    {
-      onClick: handleCreate,
-      disableSaveButton: isFormBusy || !user,
-    },
-    [user]
-  );
-
   return (
-    <Default title={t('new_user')} breadcrumbs={pages}>
+    <Default
+      title={t('new_user')}
+      breadcrumbs={pages}
+      onSaveClick={handleCreate}
+      disableSaveButton={isFormBusy || !user}
+    >
       {!isLoading && user ? (
         <div className="space-y-4">
-          <TabGroup tabs={[t('user_details'), t('permissions')]}>
-            <div>
-              <Details user={user} setUser={setUser} errors={errors} />
-            </div>
+          <Card
+            title={t('new_user')}
+            className="shadow-sm"
+            style={{ borderColor: colors.$24 }}
+            withoutBodyPadding
+            withoutHeaderBorder
+          >
+            <TabGroup
+              tabs={[t('user_details'), t('permissions')]}
+              withHorizontalPadding
+              horizontalPaddingWidth="1.5rem"
+            >
+              <div className="pb-4">
+                <Details
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
+                />
+              </div>
 
-            <div>
-              <Permissions user={user} setUser={setUser} errors={errors} />
-            </div>
-          </TabGroup>
+              <div className="pb-4">
+                <Permissions
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
+                />
+              </div>
+            </TabGroup>
+          </Card>
         </div>
       ) : (
         <div className="flex justify-center items-center py-8">

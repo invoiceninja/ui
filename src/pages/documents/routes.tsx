@@ -38,12 +38,6 @@ const Users = lazy(() => import('$app/pages/documents/pages/users/Users'));
 const CreateUser = lazy(
   () => import('$app/pages/documents/pages/users/create/Create')
 );
-const UserDetails = lazy(
-  () => import('$app/pages/documents/pages/users/common/components/Details')
-);
-const UserPermissions = lazy(
-  () => import('$app/pages/documents/pages/users/common/components/Permissions')
-);
 const EditUser = lazy(
   () => import('$app/pages/documents/pages/users/edit/Edit')
 );
@@ -98,6 +92,8 @@ export const documentsRoutes = (
       path="blueprints/:id/edit"
       element={<Guard guards={[]} component={<EditBlueprint />} />}
     />
+
+    <Route path="users" element={<Guard guards={[]} component={<Users />} />} />
 
     <Route
       path="users/create"

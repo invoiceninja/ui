@@ -8,25 +8,36 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { cloneDeep, set } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User } from '$app/common/interfaces/docuninja/api';
+import {
+  User,
+  Permission as PermissionType,
+} from '$app/common/interfaces/docuninja/api';
 
 export interface DocuninjaUserProps {
   user: User;
   setUser: Dispatch<SetStateAction<User | undefined>>;
   errors: ValidationBag | undefined;
+  isFormBusy: boolean;
+  isAdmin: boolean;
+  setIsAdmin: Dispatch<SetStateAction<boolean>>;
+  permissions: PermissionType[];
+  setPermissions: Dispatch<SetStateAction<PermissionType[]>>;
 }
 
-export default function Details({ user, setUser, errors }: DocuninjaUserProps) {
+export default function Details({
+  user,
+  setUser,
+  errors,
+  isAdmin,
+  setIsAdmin,
+}: DocuninjaUserProps) {
   const [t] = useTranslation();
-
-  const colors = useColorScheme();
 
   const handleChange = (key: keyof User, value: string) => {
     const updatedUser = cloneDeep(user) as User;
@@ -37,13 +48,7 @@ export default function Details({ user, setUser, errors }: DocuninjaUserProps) {
   };
 
   return (
-    <Card
-      title={t('user_details')}
-      className="shadow-sm w-full lg:w-2/3"
-      childrenClassName="pb-8"
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
-    >
+    <>
       <Element leftSide={t('first_name')}>
         <InputField
           value={user?.first_name}
@@ -67,6 +72,6 @@ export default function Details({ user, setUser, errors }: DocuninjaUserProps) {
           errorMessage={errors?.errors.email}
         />
       </Element>
-    </Card>
+    </>
   );
 }
