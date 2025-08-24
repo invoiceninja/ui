@@ -16,6 +16,9 @@ import { useUserColumns } from './common/hooks/useUserColumns';
 import { Default } from '$app/components/layouts/Default';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
+import { useAtomValue } from 'jotai';
+import { docuCompanyAccountDetailsAtom } from '../../Document';
 
 export default function Users() {
   useTitle('users');
@@ -23,6 +26,8 @@ export default function Users() {
   const [t] = useTranslation();
 
   const columns = useUserColumns();
+
+  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   const pages = [
     {
@@ -38,6 +43,8 @@ export default function Users() {
 
   return (
     <Default title={t('users')} breadcrumbs={pages}>
+      <NumberOfUsersAlert />
+
       <DataTable<User>
         queryIdentificator="/api/users/docuninja"
         resource="user"
@@ -53,6 +60,10 @@ export default function Users() {
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
+        disabledCreateButton={
+          (docuCompanyAccountDetails?.account?.num_users || 0) ===
+          (docuCompanyAccountDetails?.account?.users || [])?.length
+        }
       />
     </Default>
   );

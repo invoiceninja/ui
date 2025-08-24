@@ -176,6 +176,7 @@ interface Props<T> extends CommonProps {
   useDeleteMethod?: boolean;
   deleteBulkRoute?: string;
   useRestoreForDeletedResources?: boolean;
+  disabledCreateButton?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -255,6 +256,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     useDeleteMethod = false,
     deleteBulkRoute,
     useRestoreForDeletedResources = false,
+    disabledCreateButton = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -688,7 +690,12 @@ export function DataTable<T extends object>(props: Props<T>) {
                   type="component"
                   guards={props.linkToCreateGuards || []}
                   component={
-                    <Button to={props.linkToCreate} className="shadow-sm">
+                    <Button
+                      to={props.linkToCreate}
+                      className="shadow-sm"
+                      disabled={disabledCreateButton}
+                      disableWithoutIcon
+                    >
                       {t(`new_${props.resource}`)}
                     </Button>
                   }
