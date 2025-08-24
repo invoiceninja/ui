@@ -150,7 +150,7 @@ export default function HistoryAndActivities() {
                     className="border-transparent focus:border-transparent focus:ring-0 border-0 w-full px-0"
                     value={filter}
                     onValueChange={(value) => setFilter(value)}
-                    placeholder={t('search_emails')}
+                    placeholder={t('search')}
                     changeOverride
                     style={{ backgroundColor: colors.$1, color: colors.$3 }}
                   />
