@@ -15,7 +15,8 @@ export function useSettingsTabs() {
   const [t] = useTranslation();
 
   const tabs: Tab[] = [
-    { name: t('email_templates'), href: '/documents/settings' },
+    { name: t('company_details'), href: '/documents/settings' },
+    { name: t('email_templates'), href: '/documents/settings/email_templates' },
   ];
 
   return tabs;

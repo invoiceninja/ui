@@ -43,6 +43,12 @@ const EditUser = lazy(
 );
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
+const CompanyDetails = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/company-details/CompanyDetails'
+    )
+);
 
 export const documentsRoutes = (
   <Route
@@ -62,6 +68,13 @@ export const documentsRoutes = (
     >
       <Route
         path=""
+        element={
+          <Guard guards={[]} type="subPage" component={<CompanyDetails />} />
+        }
+      />
+
+      <Route
+        path="email_templates"
         element={
           <Guard guards={[]} type="subPage" component={<EmailSettings />} />
         }
