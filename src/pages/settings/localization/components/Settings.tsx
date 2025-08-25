@@ -163,7 +163,7 @@ export function Settings() {
         leftSide={
           <PropertyCheckbox
             propertyKey="timezone_id"
-            labelElement={<SettingsLabel label={t('timezone')} />}
+            labelElement={<SettingsLabel label={t('time_zone')} />}
             defaultValue="1"
           />
         }

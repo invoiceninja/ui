@@ -34,6 +34,23 @@ export interface Parameters {
   report_keys: string[];
   include_deleted?: boolean;
   pdf_email_attachment?: boolean;
+  auto_bill?: boolean;
+  include_project_tasks?: boolean;
+  auto_send?: boolean;
+  invoice_id?: string;
+  schedule?: ScheduleParams[]
+}
+export interface ScheduleParams {
+  id: number;
+  date: string;
+  amount: number;
+  is_amount: boolean;
+}
+
+export interface ScheduleItem {
+  date: string;
+  amount: string;
+  auto_bill: boolean;
 }
 
 export interface Schedule {
@@ -50,3 +67,4 @@ export interface Schedule {
   archived_at: number;
   remaining_cycles: number;
 }
+

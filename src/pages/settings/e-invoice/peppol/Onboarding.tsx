@@ -18,9 +18,9 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useIsWhitelabelled } from '$app/common/hooks/usePaidOrSelfhost';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Alert } from '$app/components/Alert';
 import { Element } from '$app/components/cards';
 import { CountrySelector } from '$app/components/CountrySelector';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
@@ -429,7 +429,11 @@ function Form({ onContinue, businessType }: FormProps) {
       <p>{t('details_update_info')}</p>
 
       <div className="my-4">
-        {errors ? <Alert type="danger">{errors.message ?? get(errors, 'errors.0.details')}</Alert> : null}
+        {errors ? (
+          <ErrorMessage>
+            {errors.message ?? get(errors, 'errors.0.details')}
+          </ErrorMessage>
+        ) : null}
       </div>
 
       <form onSubmit={form.handleSubmit} className="space-y-5">

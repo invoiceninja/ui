@@ -106,6 +106,7 @@ export function Edit() {
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
+          setErrors={setErrors}
           page="edit"
         />
       ) : (

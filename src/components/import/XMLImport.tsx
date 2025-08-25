@@ -19,11 +19,11 @@ import { MdClose } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import { Alert } from '../Alert';
 import { Button } from '../forms';
 import { Icon } from '../icons/Icon';
 import styled from 'styled-components';
 import { CloudUpload } from '../icons/CloudUpload';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props {
   entity: 'expense';
@@ -213,9 +213,7 @@ export function XMLImport(props: Props) {
 
             {errors &&
               Object.keys(errors.errors).map((key, index) => (
-                <Alert key={index} type="danger">
-                  {errors.errors[key]}
-                </Alert>
+                <ErrorMessage key={index}>{errors.errors[key]}</ErrorMessage>
               ))}
           </div>
         ) : (

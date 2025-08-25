@@ -12,7 +12,17 @@ export interface SearchResponse {
   client_contacts: SearchRecord[];
   clients: SearchRecord[];
   invoices: SearchRecord[];
+  projects: SearchRecord[];
   settings: SearchRecord[];
+  tasks: SearchRecord[];
+  products: SearchRecord[];
+  expenses: SearchRecord[];
+  payments: SearchRecord[];
+  quotes: SearchRecord[];
+  credits: SearchRecord[];
+  recurrings: SearchRecord[];
+  vendors: SearchRecord[];
+  vendor_contacts: SearchRecord[];
 }
 
 export interface SearchRecord {

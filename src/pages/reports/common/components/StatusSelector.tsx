@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Alert } from '$app/components/Alert';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import { useEffect, useState } from 'react';
@@ -23,6 +22,7 @@ import { useRecurringInvoiceFilters } from '$app/pages/recurring-invoices/common
 import { usePaymentFilters } from '$app/pages/payments/common/hooks/usePaymentFilters';
 import { useTaskFilters } from '$app/pages/tasks/common/hooks';
 import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Props {
   report: Identifier;
@@ -102,11 +102,7 @@ export function StatusSelector(props: Props) {
         options={options}
       />
 
-      {errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>
     </>
   );
 }

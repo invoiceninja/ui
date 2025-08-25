@@ -14,7 +14,6 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { Alert } from '$app/components/Alert';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Button, Radio } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -26,6 +25,7 @@ import { useQuery } from 'react-query';
 import { Plan } from './Popup';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface ChangePlanProps {
   plan: Plan;
@@ -135,7 +135,7 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
 
   return (
     <div>
-      {errors && <Alert type="danger">{errors}</Alert>}
+      <ErrorMessage>{errors}</ErrorMessage>
 
       {planDescription ? (
         <NonClickableElement

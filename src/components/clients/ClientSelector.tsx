@@ -15,9 +15,9 @@ import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
-import { Alert } from '../Alert';
 import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { ErrorMessage } from '../ErrorMessage';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -65,7 +65,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || Infinity}
-        sortBy={null}
+        sortBy="display_name|asc"
         exclude={props.exclude}
         action={{
           label: t('new_client'),
@@ -79,11 +79,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         clearInputAfterSelection={props.clearInputAfterSelection}
       />
 
-      {props.errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </>
   );
 }

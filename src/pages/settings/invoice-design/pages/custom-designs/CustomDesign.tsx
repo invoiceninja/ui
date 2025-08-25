@@ -29,7 +29,7 @@ import { PanelResizeHandle } from './pages/edit/components/PanelResizeHandle';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './pages/edit/common/hooks/useTabs';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Alert } from '$app/components/Alert';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -120,10 +120,10 @@ export default function CustomDesign() {
         <Panel>
           <div className="space-y-4 h-full max-h-[80vh] overflow-y-auto">
             {errors?.errors['design.design.body'] ? (
-              <Alert type="danger">
+              <ErrorMessage>
                 <p>{errors.message}</p>
                 <small>{errors.errors['design.design.body']}</small>
-              </Alert>
+              </ErrorMessage>
             ) : null}
 
             <Outlet
