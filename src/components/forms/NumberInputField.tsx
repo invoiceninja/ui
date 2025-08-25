@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import classNames from 'classnames';
-import { Alert } from '$app/components/Alert';
 import currency from 'currency.js';
 import { useEffect, useState } from 'react';
 
@@ -20,6 +19,7 @@ import { useDebounce } from 'react-use';
 import { InputLabel } from './InputLabel';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { InputField } from './InputField';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props extends CommonProps {
   id?: string;
@@ -219,11 +219,7 @@ export function NumberInputField(props: Props) {
         />
       </div>
 
-      {props.errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </section>
   );
 }

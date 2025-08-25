@@ -247,7 +247,7 @@ export default function Create() {
       {type === 'template' ? (
         <Card title={t('import')} withContainer collapsed>
           <Editor
-            height="15rem"
+            height=""
             defaultLanguage="html"
             value={design?.design.body}
             options={{

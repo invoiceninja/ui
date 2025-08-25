@@ -16,7 +16,6 @@ import { request } from '$app/common/helpers/request';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
-import { Alert } from '$app/components/Alert';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useFormik } from 'formik';
@@ -33,6 +32,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 export default function Refund() {
   const [t] = useTranslation();
@@ -228,7 +228,7 @@ export default function Refund() {
 
         {errors?.errors.invoices && (
           <div className="py-2">
-            <Alert type="danger">{errors.errors.invoices}</Alert>
+            <ErrorMessage>{errors.errors.invoices}</ErrorMessage>
           </div>
         )}
       </Element>
@@ -288,10 +288,10 @@ export default function Refund() {
                   {(errors?.errors[`invoices.${[index]}.invoice_id`] ||
                     errors?.errors[`invoices.${[index]}.amount`]) && (
                     <div className="px-6">
-                      <Alert className="mt-2 break-all" type="danger">
+                      <ErrorMessage className="mt-2 break-all">
                         {errors?.errors[`invoices.${[index]}.invoice_id`] ||
                           errors?.errors[`invoices.${[index]}.amount`]}
-                      </Alert>
+                      </ErrorMessage>
                     </div>
                   )}
                 </div>
@@ -326,7 +326,7 @@ export default function Refund() {
         </Element>
       )}
 
-      {errors?.errors.id && <Alert type="danger">{errors.errors.id}</Alert>}
+      {errors?.errors.id && <ErrorMessage>{errors.errors.id}</ErrorMessage>}
     </Card>
   );
 }

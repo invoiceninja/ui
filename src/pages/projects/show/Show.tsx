@@ -250,7 +250,7 @@ export default function Show() {
           <div className="flex space-x-2">
             <span className="font-medium">{t('total_hours')}:</span>
 
-            <span>{Math.floor(project.current_hours)}</span>
+            <span>{parseFloat((project?.current_hours || 0).toFixed(4))}</span>
           </div>
         </InfoCard>
       </div>

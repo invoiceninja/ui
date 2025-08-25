@@ -24,7 +24,6 @@ import { BankAccountSelector } from '$app/pages/transactions/components/BankAcco
 import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import { Alert } from '../Alert';
 import { ImportTemplateModal } from './ImportTemplateModal';
 import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplates';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -34,6 +33,7 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { parse as papaParse, ParseResult } from 'papaparse';
 import { CloudUpload } from '../icons/CloudUpload';
 import styled from 'styled-components';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props {
   entity: string;
@@ -303,7 +303,7 @@ export function UploadImport(props: Props) {
   const validateCSVWithPapaParse = (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
       papaParse<CSVRow>(file, {
-        header: true,
+        header: false,
         skipEmptyLines: true,
         dynamicTyping: true,
         complete: (results: ParseResult<CSVRow>) => {
@@ -485,9 +485,7 @@ export function UploadImport(props: Props) {
 
               {errors &&
                 Object.keys(errors.errors).map((key, index) => (
-                  <Alert key={index} type="danger">
-                    {errors.errors[key]}
-                  </Alert>
+                  <ErrorMessage key={index}>{errors.errors[key]}</ErrorMessage>
                 ))}
             </div>
           ) : (

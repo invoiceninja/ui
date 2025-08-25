@@ -16,7 +16,6 @@ import { ForgotPasswordForm } from '../../common/dtos/authentication';
 import { endpoint, isHosted } from '../../common/helpers';
 import { ForgotPasswordValidation } from './common/ValidationInterface';
 import { InputField } from '../../components/forms/InputField';
-import { Alert } from '../../components/Alert';
 import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
@@ -24,6 +23,7 @@ import { Header } from './components/Header';
 import { request } from '$app/common/helpers/request';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useColorScheme } from '$app/common/colors';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Response {
   message: string;
@@ -83,20 +83,11 @@ export function RecoverPassword() {
               onChange={form.handleChange}
             />
 
-            {errors?.errors?.email && (
-              <Alert className="mt-2" type="danger">
-                {errors.errors?.email}
-              </Alert>
-            )}
+            <ErrorMessage className="mt-2">
+              {errors?.errors?.email}
+            </ErrorMessage>
 
-            {message && (
-              <Alert
-                className="mt-4"
-                type={message.status ? 'success' : 'danger'}
-              >
-                {message.message}
-              </Alert>
-            )}
+            <ErrorMessage className="mt-4">{message?.message}</ErrorMessage>
 
             <Button disabled={isFormBusy} className="mt-4" variant="block">
               {t('send_email')}
