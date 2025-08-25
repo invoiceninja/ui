@@ -13,12 +13,12 @@ import { ProductCreate } from '$app/pages/invoices/common/components/ProductCrea
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
-import { Alert } from '../Alert';
 import { endpoint, trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import classNames from 'classnames';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useColorScheme } from '$app/common/colors';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -108,11 +108,7 @@ export function ProductSelector(props: Props) {
         withShadow={props.withShadow}
       />
 
-      {props.errorMessage && (
-        <Alert type="danger" className="mt-2">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </>
   );
 }

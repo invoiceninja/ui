@@ -18,11 +18,11 @@ import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Alert } from '$app/components/Alert';
 import { useSearchParams } from 'react-router-dom';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useTaxCategories } from '$app/components/tax-rates/TaxCategorySelector';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -123,11 +123,7 @@ export function ProductForm(props: Props) {
           ))}
         </SelectField>
 
-        {errors?.errors.tax_id ? (
-          <Alert className="mt-2" type="danger">
-            {errors.errors.tax_id}
-          </Alert>
-        ) : null}
+        <ErrorMessage className="mt-2">{errors?.errors.tax_id}</ErrorMessage>
       </Element>
 
       <Element leftSide={t('image_url')}>

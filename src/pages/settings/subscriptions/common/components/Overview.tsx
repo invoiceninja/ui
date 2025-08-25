@@ -69,7 +69,7 @@ export function Overview(props: OverviewSubscriptionProps) {
         />
       </Element>
 
-      <Element leftSide={t('user')}>
+      <Element leftSide={t('assigned_user')}>
         <UserSelector
           value={subscription.assigned_user_id}
           onChange={(user) => handleChange('assigned_user_id', user.id)}

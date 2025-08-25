@@ -23,6 +23,8 @@ import {
 } from '../hooks/useDisplayTemplateField';
 import { EmailReport } from './EmailReport';
 import { useColorScheme } from '$app/common/colors';
+import { InvoiceOutstandingTasks } from './InvoiceOutstandingTasks';
+import { PaymentSchedule } from './PaymentSchedule';
 
 interface Props {
   schedule: Schedule;
@@ -31,6 +33,7 @@ interface Props {
     value: Schedule[keyof Schedule]
   ) => void;
   errors: ValidationBag | undefined;
+  setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>;
   page?: 'create' | 'edit';
 }
 
@@ -38,6 +41,8 @@ export enum Templates {
   EMAIL_STATEMENT = 'email_statement',
   EMAIL_RECORD = 'email_record',
   EMAIL_REPORT = 'email_report',
+  INVOICE_OUTSTANDING_TASKS = 'invoice_outstanding_tasks',
+  PAYMENT_SCHEDULE = 'payment_schedule',
 }
 
 export function ScheduleForm(props: Props) {
@@ -45,7 +50,7 @@ export function ScheduleForm(props: Props) {
 
   const colors = useColorScheme();
 
-  const { schedule, handleChange, errors, page } = props;
+  const { schedule, handleChange, errors, setErrors, page } = props;
 
   const displayTemplateField = useDisplayTemplateField({
     template: schedule.template as Template,
@@ -68,10 +73,13 @@ export function ScheduleForm(props: Props) {
             errorMessage={errors?.errors.template}
             customSelector
             dismissable={false}
+            disabled={page === 'edit'}
           >
             <option value="email_statement">{t('email_statement')}</option>
             <option value="email_record">{t('email_record')}</option>
             <option value="email_report">{t('email_report')}</option>
+            <option value="invoice_outstanding_tasks">{t('invoice_outstanding_tasks')}</option>
+            <option value="payment_schedule">{t('payment_schedule')}</option>
           </SelectField>
         </Element>
       )}
@@ -158,6 +166,24 @@ export function ScheduleForm(props: Props) {
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
+        />
+      )}
+
+      {schedule.template === Templates.INVOICE_OUTSTANDING_TASKS && (
+        <InvoiceOutstandingTasks
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      )}
+
+      {schedule.template === Templates.PAYMENT_SCHEDULE && (
+        <PaymentSchedule
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+          setErrors={setErrors}
+          page={page}
         />
       )}
     </Card>

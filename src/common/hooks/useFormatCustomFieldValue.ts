@@ -30,7 +30,7 @@ export function useFormatCustomFieldValue() {
       }
 
       if (currentField?.split('|')[1] === AvailableTypes.Switch) {
-        return value ? t('yes') : t('no');
+        return (value == 'yes' || value == 'true' || value == '1') ? t('yes') : t('no');
       }
     }
 

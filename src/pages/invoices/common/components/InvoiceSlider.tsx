@@ -231,7 +231,7 @@ export function InvoiceSlider() {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`
+          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true&show_schedule=true`
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data

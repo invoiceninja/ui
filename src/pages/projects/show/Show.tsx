@@ -250,7 +250,7 @@ export default function Show() {
           <div className="flex space-x-2">
             <span className="font-medium">{t('total_hours')}:</span>
 
-            <span>{Math.floor(project.current_hours)}</span>
+            <span>{parseFloat((project?.current_hours || 0).toFixed(4))}</span>
           </div>
         </InfoCard>
       </div>
@@ -261,7 +261,7 @@ export default function Show() {
             resource="task"
             columns={columns}
             customActions={taskActions}
-            endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
+            endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
             bulkRoute="/api/v1/tasks/bulk"
             linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
             linkToEdit="/tasks/:id/edit"

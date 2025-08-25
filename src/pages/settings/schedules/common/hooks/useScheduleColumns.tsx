@@ -34,6 +34,14 @@ export function useScheduleColumns() {
           )} | ${t(schedule.parameters.date_range)}`;
         }
 
+        if(schedule.template === Templates.PAYMENT_SCHEDULE) {
+          return schedule.name;
+        }
+
+        if(schedule.template === Templates.INVOICE_OUTSTANDING_TASKS) {
+          return schedule.name;
+        }
+
         return `${t(schedule.template as string)}: ${t(
           schedule.parameters.date_range
         )}`;

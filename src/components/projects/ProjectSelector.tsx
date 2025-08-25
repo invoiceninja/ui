@@ -16,8 +16,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
-import { Alert } from '../Alert';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props extends GenericSelectorProps<Project> {
   clientId?: string;
@@ -60,11 +60,7 @@ export function ProjectSelector(props: Props) {
         }}
       />
 
-      {props.errorMessage ? (
-        <Alert className="mt-2" type="danger">
-          {props.errorMessage}
-        </Alert>
-      ) : null}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </>
   );
 }

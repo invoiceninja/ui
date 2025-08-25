@@ -15,13 +15,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
-import { Alert } from '$app/components/Alert';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Product } from '$app/common/interfaces/product';
 import { useQuery, useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Props {
   value?: string;
@@ -217,11 +217,7 @@ export function ProductItemsSelector(props: Props) {
         </div>
       )}
 
-      {errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>
     </>
   );
 }
