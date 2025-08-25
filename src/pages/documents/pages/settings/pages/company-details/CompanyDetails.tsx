@@ -219,6 +219,8 @@ export default function CompanyDetails() {
           value={String(currentDetails?.country_id) || ''}
           onChange={(value) => handleChange('country_id', value)}
           errorMessage={errors?.errors.country_id}
+          dismissable={false}
+          withBlank
         />
       </Element>
 
@@ -227,6 +229,8 @@ export default function CompanyDetails() {
           value={String(currentDetails?.currency_id) || ''}
           onChange={(value) => handleChange('currency_id', value)}
           errorMessage={errors?.errors.currency_id}
+          dismissable={false}
+          withBlank
         />
       </Element>
 
@@ -235,6 +239,8 @@ export default function CompanyDetails() {
           value={String(currentDetails?.language_id) || ''}
           onChange={(value) => handleChange('language_id', value)}
           errorMessage={errors?.errors.language_id}
+          dismissable={false}
+          withBlank
         />
       </Element>
 
