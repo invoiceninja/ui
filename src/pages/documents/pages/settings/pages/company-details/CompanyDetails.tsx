@@ -27,20 +27,8 @@ import { useActions } from './common/hooks/useActions';
 import { Company } from '$app/common/interfaces/docuninja/api';
 import { AxiosError } from 'axios';
 import { TimezoneSelector } from '$app/components/TimezoneSelector';
-
-interface CompanyDetails {
-  name: string;
-  address1: string;
-  address2: string;
-  city: string;
-  state: string;
-  website: string;
-  postal_code: string;
-  country_id: string;
-  currency_id: string;
-  timezone_id: string;
-  language_id: string;
-}
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 
 export const AVAILABLE_PROPERTIES = [
   {
@@ -81,12 +69,12 @@ export const AVAILABLE_PROPERTIES = [
     type: 'number',
   },
   {
-    key: 'language_id',
+    key: 'timezone_id',
     type: 'number',
   },
   {
-    key: 'timezone_id',
-    type: 'string',
+    key: 'language_id',
+    type: 'number',
   },
 ];
 
@@ -231,6 +219,22 @@ export default function CompanyDetails() {
           value={String(currentDetails?.country_id) || ''}
           onChange={(value) => handleChange('country_id', value)}
           errorMessage={errors?.errors.country_id}
+        />
+      </Element>
+
+      <Element leftSide={t('currency')}>
+        <CurrencySelector
+          value={String(currentDetails?.currency_id) || ''}
+          onChange={(value) => handleChange('currency_id', value)}
+          errorMessage={errors?.errors.currency_id}
+        />
+      </Element>
+
+      <Element leftSide={t('language')}>
+        <LanguageSelector
+          value={String(currentDetails?.language_id) || ''}
+          onChange={(value) => handleChange('language_id', value)}
+          errorMessage={errors?.errors.language_id}
         />
       </Element>
 
