@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useActions } from './common/hooks/useActions';
 import { Company } from '$app/common/interfaces/docuninja/api';
 import { AxiosError } from 'axios';
+import { TimezoneSelector } from '$app/components/TimezoneSelector';
 
 interface CompanyDetails {
   name: string;
@@ -227,9 +228,19 @@ export default function CompanyDetails() {
 
       <Element leftSide={t('country')}>
         <CountrySelector
-          value={currentDetails?.country_id || ''}
+          value={String(currentDetails?.country_id) || ''}
           onChange={(value) => handleChange('country_id', value)}
           errorMessage={errors?.errors.country_id}
+        />
+      </Element>
+
+      <Element leftSide={t('time_zone')}>
+        <TimezoneSelector
+          value={String(currentDetails?.timezone_id) || ''}
+          onValueChange={(value) => handleChange('timezone_id', value)}
+          errorMessage={errors?.errors.timezone_id}
+          dismissable={false}
+          withBlank
         />
       </Element>
 
