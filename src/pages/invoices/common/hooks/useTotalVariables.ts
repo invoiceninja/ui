@@ -30,7 +30,19 @@ export function useTotalVariables() {
         columns.push('$tax3');
       }
 
-      setColumns(columns);
+      // Replace $line_taxes and $total_taxes with $taxes at their positions
+      columns.forEach((column, index) => {
+        if (column === '$line_taxes' || column === '$total_taxes') {
+          columns[index] = '$taxes';
+        }
+      });
+
+      // Remove duplicates of $taxes that might have been created
+      const uniqueColumns = columns.filter((column, index, arr) =>
+        column !== '$taxes' || arr.indexOf(column) === index
+      );
+
+      setColumns(uniqueColumns);
       return;
     }
 

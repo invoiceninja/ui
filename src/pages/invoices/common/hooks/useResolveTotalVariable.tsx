@@ -112,39 +112,62 @@ export function useResolveTotalVariable(props: Props) {
       );
     }
 
-    if (variable == '$total_taxes' && invoiceSum) {
-      return (
-        <Element
-          leftSide={resolveTranslation(variable, '$')}
-          className="py-5"
-          noVerticalPadding
-          noExternalPadding
-          pushContentToRight
-          withoutWrappingLeftSide
-        >
-          <span className="text-sm font-medium font-mono">
-            {formatMoney(invoiceSum.totalTaxes)}
-          </span>
-        </Element>
-      );
+    // if (variable == '$total_taxes' && invoiceSum) {
+    //   return (
+    //     <Element
+    //       leftSide={resolveTranslation(variable, '$')}
+    //       className="py-5"
+    //       noVerticalPadding
+    //       noExternalPadding
+    //       pushContentToRight
+    //       withoutWrappingLeftSide
+    //     >
+    //       <span className="text-sm font-medium font-mono">
+    //         {formatMoney(invoiceSum.totalTaxes)}
+    //       </span>
+    //     </Element>
+    //   );
+    // }
+
+    // if (variable == '$line_taxes' && invoiceSum) {
+    //   return (
+    //     <Element
+    //       leftSide={resolveTranslation(variable, '$')}
+    //       className="py-5"
+    //       noVerticalPadding
+    //       noExternalPadding
+    //       pushContentToRight
+    //       withoutWrappingLeftSide
+    //     >
+    //       <span className="text-sm font-medium font-mono">
+    //         {formatMoney(invoiceSum.invoiceItems.totalTaxes)}
+    //       </span>
+    //     </Element>
+    //   );
+    // }
+
+    if (variable == '$taxes' && invoiceSum) {
+      return invoiceSum.getTaxMap().count() > 0 ? (
+        <>
+          {invoiceSum.getTaxMap().map((item, index) => (
+            <Element
+              key={index}
+              leftSide={item.name}
+              className="py-5"
+              noVerticalPadding
+              noExternalPadding
+              pushContentToRight
+              withoutWrappingLeftSide
+            >
+              <span className="text-sm font-medium font-mono">
+                {formatMoney(item.total)}
+              </span>
+            </Element>
+          ))}
+        </>
+      ) : null;
     }
 
-    if (variable == '$line_taxes' && invoiceSum) {
-      return (
-        <Element
-          leftSide={resolveTranslation(variable, '$')}
-          className="py-5"
-          noVerticalPadding
-          noExternalPadding
-          pushContentToRight
-          withoutWrappingLeftSide
-        >
-          <span className="text-sm font-medium font-mono">
-            {formatMoney(invoiceSum.invoiceItems.totalTaxes)}
-          </span>
-        </Element>
-      );
-    }
 
     if (variable == '$total' && invoiceSum) {
       return (
@@ -195,28 +218,6 @@ export function useResolveTotalVariable(props: Props) {
           </span>
         </Element>
       );
-    }
-
-    if (variable == '$taxes' && invoiceSum) {
-      return invoiceSum.getTaxMap().count() > 0 ? (
-        <>
-          {invoiceSum.getTaxMap().map((item, index) => (
-            <Element
-              key={index}
-              leftSide={item.name}
-              className="py-5"
-              noVerticalPadding
-              noExternalPadding
-              pushContentToRight
-              withoutWrappingLeftSide
-            >
-              <span className="text-sm font-medium font-mono">
-                {formatMoney(item.total)}
-              </span>
-            </Element>
-          ))}
-        </>
-      ) : null;
     }
 
     if (variable === '$custom_surcharge1') {

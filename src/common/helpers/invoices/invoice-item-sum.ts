@@ -151,8 +151,20 @@ export class InvoiceItemSum {
     this.taxCollection.push(collect(group));
   }
 
+  // protected calculateAmountLineTax(rate: number, amount: number) {
+  //   return Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
+  // }
+
   protected calculateAmountLineTax(rate: number, amount: number) {
-    return Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
+    const result = (amount * rate) / 100;
+    
+
+    if(result > 0){
+      return Math.round((result * 1000) / 10) / 100; // for positive numbers, we need to round towards zero
+    }else{
+      return Math.floor((result * 1000) / 10) / 100; // for negative numbers, we need to round away from zero
+    }
+
   }
 
   protected push() {
