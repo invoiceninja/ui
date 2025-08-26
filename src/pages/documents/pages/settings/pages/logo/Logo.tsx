@@ -35,25 +35,29 @@ function DeleteLogo() {
 
   const removeLogo = () => {
     if (!isFormBusy) {
-      toast.processing();
+      const currentFormData = new FormData();
+      currentFormData.append('logo', '');
 
+      toast.processing();
       setIsFormBusy(true);
 
       request(
-        'PUT',
-        docuNinjaEndpoint('/api/companies/:id', {
+        'POST',
+        docuNinjaEndpoint('/api/companies/:id/logo', {
           id: docuCompanyAccountDetails?.company?.id,
         }),
-        {},
+        currentFormData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem(
               'X-DOCU-NINJA-TOKEN'
             )}`,
+            'Content-Type': 'multipart/form-data',
           },
         }
       )
         .then(() => {
+          $refetch(['docuninja_login']);
           toast.success('removed_logo');
         })
         .finally(() => setIsFormBusy(false));
@@ -76,35 +80,44 @@ function DeleteLogo() {
 export default function Logo() {
   const [t] = useTranslation();
   const colors = useColorScheme();
+
   const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const uploadLogo = (currentFormData: FormData) => {
-    toast.processing();
+    if (!isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
 
-    request(
-      'POST',
-      docuNinjaEndpoint('/api/companies/:id/logo', {
-        id: docuCompanyAccountDetails?.company?.id,
-      }),
-      currentFormData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    )
-      .then(() => {
-        $refetch(['docuninja_login']);
-        toast.success('uploaded_logo');
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
+      request(
+        'POST',
+        docuNinjaEndpoint('/api/companies/:id/logo', {
+          id: docuCompanyAccountDetails?.company?.id,
+        }),
+        currentFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+            'Content-Type': 'multipart/form-data',
+          },
         }
-      });
+      )
+        .then(() => {
+          $refetch(['docuninja_login']);
+          toast.success('uploaded_logo');
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
