@@ -97,6 +97,8 @@ export function useSyncDocuninjaCompany({
         )
       );
 
+      console.log(currentCompany.settings.company_logo);
+
       const currentLogoData = await convertUrlToFormData(
         currentCompany.settings.company_logo
       );

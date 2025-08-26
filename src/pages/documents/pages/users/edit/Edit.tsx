@@ -207,6 +207,7 @@ function Create() {
                   setNotifications={setNotifications}
                   allNotificationsValue={allNotificationsValue}
                   setAllNotificationsValue={setAllNotificationsValue}
+                  editPage
                 />
               </div>
 
