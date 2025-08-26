@@ -79,127 +79,135 @@ export default function Details({
           onValueChange={(value) => handleChange('email', value)}
           errorMessage={errors?.errors.email}
         />
+      </Element>
 
-        {editPage && (
-          <>
-            <Element
-              leftSide={t('signature')}
-              leftSideHelp={t('signature_description')}
-            >
-              <div>
-                {showStoredSignature ? (
-                  <div>
-                    <img
-                      src={user?.e_signature || ''}
-                      alt="Signature"
-                      className="w-full max-h-32 border rounded p-2 mb-2"
-                    />
+      {editPage && (
+        <>
+          <Element
+            leftSide={t('signature')}
+            leftSideHelp={t('signature_description')}
+          >
+            <div>
+              {showStoredSignature ? (
+                <div>
+                  <img
+                    src={user?.e_signature || ''}
+                    alt="Signature"
+                    className="w-full max-h-32 border rounded p-2 mb-2"
+                  />
 
-                    <div className="flex justify-end gap-2">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="minimal"
+                      behavior="button"
+                      onClick={() => {
+                        setShowStoredSignature(false);
+                      }}
+                    >
+                      {t('edit')}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <DefaultSignature
+                    width={430}
+                    onChange={(signature) => {
+                      setUser(
+                        (user) =>
+                          user && {
+                            ...user,
+                            e_signature: signature,
+                          }
+                      );
+                    }}
+                    defaultValue=""
+                  />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="signature-upload"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              const base64 = event.target?.result as string;
+                              setUser(
+                                (user) =>
+                                  user && {
+                                    ...user,
+                                    e_signature: base64,
+                                  }
+                              );
+                              setShowStoredSignature(true);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
                       <Button
                         type="minimal"
                         behavior="button"
                         onClick={() => {
-                          setShowStoredSignature(false);
+                          document.getElementById('signature-upload')?.click();
                         }}
                       >
-                        {t('edit')}
+                        {t('upload')}
                       </Button>
+                      <SignatureFontSelector
+                        triggerButtonText={t('generate') as string}
+                        onSignatureCreated={(signatureImage) => {
+                          setUser(
+                            (user) =>
+                              user && {
+                                ...user,
+                                e_signature: signatureImage,
+                              }
+                          );
+                          setShowStoredSignature(true);
+                        }}
+                      />
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <DefaultSignature
-                      width={430}
-                      onChange={(signature) => {
-                        setUser(
-                          (user) =>
-                            user && {
-                              ...user,
-                              e_signature: signature,
-                            }
-                        );
-                      }}
-                      defaultValue=""
-                    />
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="file"
-                          id="signature-upload"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                const base64 = event.target?.result as string;
-                                setUser(
-                                  (user) =>
-                                    user && {
-                                      ...user,
-                                      e_signature: base64,
-                                    }
-                                );
-                                setShowStoredSignature(true);
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                        />
-                        <Button
-                          type="minimal"
-                          behavior="button"
-                          onClick={() => {
-                            document
-                              .getElementById('signature-upload')
-                              ?.click();
-                          }}
-                        >
-                          {t('upload')}
-                        </Button>
-                        <SignatureFontSelector
-                          triggerButtonText={t('generate') as string}
-                          onSignatureCreated={(signatureImage) => {
-                            setUser(
-                              (user) =>
-                                user && {
-                                  ...user,
-                                  e_signature: signatureImage,
-                                }
+                    <div className="flex gap-2">
+                      <Button
+                        type="minimal"
+                        behavior="button"
+                        onClick={() => {
+                          setUser(
+                            (user) =>
+                              user && {
+                                ...user,
+                                e_signature: '',
+                              }
+                          );
+                          const signaturePad = document.querySelector('canvas');
+                          if (signaturePad) {
+                            const context = signaturePad.getContext('2d');
+                            context?.clearRect(
+                              0,
+                              0,
+                              signaturePad.width,
+                              signaturePad.height
                             );
-                            setShowStoredSignature(true);
-                          }}
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          type="minimal"
-                          behavior="button"
-                          onClick={() => {
-                            setUser(
-                              (user) =>
-                                user && {
-                                  ...user,
-                                  e_signature: '',
-                                }
-                            );
-                            const signaturePad =
-                              document.querySelector('canvas');
-                            if (signaturePad) {
-                              const context = signaturePad.getContext('2d');
-                              context?.clearRect(
-                                0,
-                                0,
-                                signaturePad.width,
-                                signaturePad.height
-                              );
-                            }
-                          }}
-                        >
-                          {t('clear')}
-                        </Button>
+                          }
+                        }}
+                      >
+                        {t('clear')}
+                      </Button>
+                      <Button
+                        type="minimal"
+                        behavior="button"
+                        onClick={() => {
+                          setShowStoredSignature(true);
+                        }}
+                      >
+                        {t('cancel')}
+                      </Button>
+                      {user?.e_signature && (
                         <Button
                           type="minimal"
                           behavior="button"
@@ -207,28 +215,17 @@ export default function Details({
                             setShowStoredSignature(true);
                           }}
                         >
-                          {t('cancel')}
+                          {t('done')}
                         </Button>
-                        {user?.e_signature && (
-                          <Button
-                            type="minimal"
-                            behavior="button"
-                            onClick={() => {
-                              setShowStoredSignature(true);
-                            }}
-                          >
-                            {t('done')}
-                          </Button>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
-            </Element>
-          </>
-        )}
-      </Element>
+                </div>
+              )}
+            </div>
+          </Element>
+        </>
+      )}
     </>
   );
 }
