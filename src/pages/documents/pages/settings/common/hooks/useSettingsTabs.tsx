@@ -16,6 +16,7 @@ export function useSettingsTabs() {
 
   const tabs: Tab[] = [
     { name: t('company_details'), href: '/documents/settings' },
+    { name: t('logo'), href: '/documents/settings/logo' },
     { name: t('email_templates'), href: '/documents/settings/email_templates' },
   ];
 
