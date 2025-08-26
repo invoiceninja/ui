@@ -15,11 +15,12 @@ import { Timezone } from '$app/common/interfaces/statics';
 
 interface Props {
   value: string;
-  onValueChange: (value: string) => void;
+  onValueChange?: (value: string) => void;
   errorMessage?: string | string[];
   disabled?: boolean;
   dismissable?: boolean;
   withBlank?: boolean;
+  readOnly?: boolean;
 }
 
 export function TimezoneSelector({
@@ -29,6 +30,7 @@ export function TimezoneSelector({
   disabled,
   dismissable,
   withBlank,
+  readOnly,
 }: Props) {
   const { data: statics } = useStaticsQuery();
 
@@ -41,6 +43,7 @@ export function TimezoneSelector({
       errorMessage={errorMessage}
       dismissable={dismissable}
       withBlank={withBlank}
+      readOnly={readOnly}
     >
       {statics?.timezones
         .sort((a, b) => a.name.localeCompare(b.name))

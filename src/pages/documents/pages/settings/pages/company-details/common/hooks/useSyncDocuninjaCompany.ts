@@ -15,7 +15,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
-import { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
 import { useAtomValue } from 'jotai';
 import { get, set } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
@@ -36,7 +36,24 @@ export function useSyncDocuninjaCompany({
 
   const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
-  const handleSync = () => {
+  const convertUrlToFormData = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+
+      console.log(response);
+
+      const formData = new FormData();
+
+      formData.append('logo', blob);
+
+      return formData;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSync = async () => {
     if (!isFormBusy) {
       setIsFormBusy(true);
       toast.processing();
@@ -44,7 +61,11 @@ export function useSyncDocuninjaCompany({
       const docuninjaCompanyPayload = {};
 
       for (const property of AVAILABLE_PROPERTIES) {
-        const value = get(currentCompany.settings, property.key);
+        let value = get(currentCompany.settings, property.key);
+
+        if (!value) {
+          value = get(docuCompanyAccountDetails?.company, property.key);
+        }
 
         if (value) {
           set(docuninjaCompanyPayload, property.key, value);
@@ -57,21 +78,51 @@ export function useSyncDocuninjaCompany({
         }
       }
 
-      request(
-        'PUT',
-        docuNinjaEndpoint('/api/companies/:id', {
-          id: docuCompanyAccountDetails?.company?.id,
-        }),
-        docuninjaCompanyPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      )
-        .then(() => {
+      const requests: AxiosPromise[] = [];
+
+      requests.push(
+        request(
+          'PUT',
+          docuNinjaEndpoint('/api/companies/:id', {
+            id: docuCompanyAccountDetails?.company?.id,
+          }),
+          docuninjaCompanyPayload,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem(
+                'X-DOCU-NINJA-TOKEN'
+              )}`,
+            },
+          }
+        )
+      );
+
+      const currentLogoData = await convertUrlToFormData(
+        currentCompany.settings.company_logo
+      );
+
+      requests.push(
+        request(
+          'POST',
+          docuNinjaEndpoint('/api/companies/:id/logo', {
+            id: docuCompanyAccountDetails?.company?.id,
+          }),
+          { logo: currentLogoData },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem(
+                'X-DOCU-NINJA-TOKEN'
+              )}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        )
+      );
+
+      axios
+        .all(requests)
+        .then((responses: AxiosResponse[]) => {
+          console.log(responses);
           toast.success('updated_company');
 
           $refetch(['docuninja_login']);
