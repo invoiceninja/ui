@@ -624,6 +624,7 @@ function Builder() {
                   {t('select_signatory')}
                 </span>
               ),
+              createBlueprintSignatory: () => null,
             },
             styles: {
               frame: {
@@ -677,6 +678,11 @@ function Builder() {
               },
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
+            events: {
+              onMessage: (message) => toast.success(message),
+              onMessageDismiss: () => toast.dismiss(),
+            },
+            invoiceninja: true,
           }}
         >
           <Builder$ />
