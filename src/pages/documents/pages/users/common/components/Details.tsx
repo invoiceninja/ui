@@ -89,25 +89,31 @@ export default function Details({
           >
             <div>
               {showStoredSignature ? (
-                <div>
-                  <img
-                    src={user?.e_signature || ''}
-                    alt="Signature"
-                    className="w-full max-h-32 border rounded p-2 mb-2"
-                  />
+                <>
+                  {user?.e_signature ? (
+                    <div>
+                      <img
+                        src={user.e_signature}
+                        alt="Signature"
+                        className="w-full max-h-32 border rounded p-2 mb-2"
+                      />
 
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      type="minimal"
-                      behavior="button"
-                      onClick={() => {
-                        setShowStoredSignature(false);
-                      }}
-                    >
-                      {t('edit')}
-                    </Button>
-                  </div>
-                </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="minimal"
+                          behavior="button"
+                          onClick={() => {
+                            setShowStoredSignature(false);
+                          }}
+                        >
+                          {t('edit')}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </>
               ) : (
                 <div className="space-y-4">
                   <DefaultSignature

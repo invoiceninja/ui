@@ -15,7 +15,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
-import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
 import { get, set } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
@@ -35,23 +35,6 @@ export function useSyncDocuninjaCompany({
   const currentCompany = useCurrentCompany();
 
   const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
-
-  const convertUrlToFormData = async (imageUrl: string) => {
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-
-      console.log(response);
-
-      const formData = new FormData();
-
-      formData.append('logo', blob);
-
-      return formData;
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleSync = async () => {
     if (!isFormBusy) {
@@ -78,53 +61,24 @@ export function useSyncDocuninjaCompany({
         }
       }
 
-      const requests: AxiosPromise[] = [];
-
-      requests.push(
-        request(
-          'PUT',
-          docuNinjaEndpoint('/api/companies/:id', {
-            id: docuCompanyAccountDetails?.company?.id,
-          }),
-          docuninjaCompanyPayload,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem(
-                'X-DOCU-NINJA-TOKEN'
-              )}`,
-            },
-          }
-        )
-      );
-
-      console.log(currentCompany.settings.company_logo);
-
-      const currentLogoData = await convertUrlToFormData(
-        currentCompany.settings.company_logo
-      );
-
-      requests.push(
-        request(
-          'POST',
-          docuNinjaEndpoint('/api/companies/:id/logo', {
-            id: docuCompanyAccountDetails?.company?.id,
-          }),
-          { logo: currentLogoData },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem(
-                'X-DOCU-NINJA-TOKEN'
-              )}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        )
-      );
-
-      axios
-        .all(requests)
-        .then((responses: AxiosResponse[]) => {
-          console.log(responses);
+      request(
+        'PUT',
+        docuNinjaEndpoint('/api/companies/:id', {
+          id: docuCompanyAccountDetails?.company?.id,
+        }),
+        {
+          ...docuninjaCompanyPayload,
+          logo: currentCompany.settings.company_logo,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
+      )
+        .then(() => {
           toast.success('updated_company');
 
           $refetch(['docuninja_login']);

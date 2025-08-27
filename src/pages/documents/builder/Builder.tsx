@@ -414,7 +414,7 @@ function ToolboxContext({ options }: ToolboxContextProps) {
         </span>
       }
     >
-      {options.map((option, i) =>
+      {options?.map((option, i) =>
         option.children.length > 0 ? (
           <>
             {option.children.map((child, j) => (
@@ -579,8 +579,13 @@ function Builder() {
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
+            events: {
+              onMessage: () => null,
+              onMessageDismiss: () => null,
+            },
             components: {
               skeleton: Loading,
+              createBlueprintSignatory: () => null,
               save: () => null,
               send: {
                 trigger: () => null,
