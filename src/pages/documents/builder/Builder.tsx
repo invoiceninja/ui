@@ -4,8 +4,10 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Client } from '$app/common/interfaces/client';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { User } from '$app/common/interfaces/user';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
@@ -327,6 +329,7 @@ function SignatorySelector({
     }
 
     const [type, value] = v.split('|');
+
     let entity = clients?.find(
       (client) => client.contacts?.[0]?.contact_key === value
     );
@@ -339,7 +342,13 @@ function SignatorySelector({
       return;
     }
 
-    onSelect(value, type as 'user', entity as any);
+    const contact = transformToContact(entity as Client);
+
+    if (!contact) {
+      return;
+    }
+
+    onSelect(contact.id, 'contact', contact as any);
   };
 
   return (
@@ -365,12 +374,6 @@ function SignatorySelector({
             {client.name}
           </option>
         ))}
-
-      {results.map((result: any) => (
-        <option value={`${result.type}|${result.value}`} key={result.id}>
-          {result.label}
-        </option>
-      ))}
     </SelectField>
   );
 }
@@ -690,6 +693,65 @@ function Builder() {
       </Card>
     </Default>
   );
+}
+
+function transformToContact(client: Client) {
+  if (client.contacts.length === 0) {
+    toast.error('Error: Client has no contacts. Please add a contact first.');
+
+    return null;
+  }
+
+  const contact = client.contacts[0];
+
+  return {
+    id: contact.id,
+    user_id: client.user_id ?? null,
+    company_id: null,
+    client_id: client.id,
+    first_name: contact.first_name ?? null,
+    last_name: contact.last_name ?? null,
+    phone: contact.phone ?? null,
+    email: contact.email ?? null,
+    signature_base64: null,
+    initials_base64: null,
+    email_verified_at: null,
+    is_primary: Boolean(contact.is_primary),
+    last_login: null,
+    created_at: '',
+    updated_at: '',
+    deleted_at: null,
+    e_signature: null,
+    e_initials: null,
+    client: {
+      id: client.id,
+      user_id: client.user_id,
+      company_id: null,
+      name: client.name ?? null,
+      website: client.website ?? null,
+      private_notes: client.private_notes ?? null,
+      public_notes: client.public_notes ?? null,
+      logo: null,
+      phone: client.phone ?? null,
+      balance: client.balance ?? 0,
+      paid_to_date: client.paid_to_date ?? 0,
+      currency_id: client.settings?.currency_id
+        ? Number(client.settings.currency_id)
+        : null,
+      address1: client.address1 ?? null,
+      address2: client.address2 ?? null,
+      city: client.city ?? null,
+      state: client.state ?? null,
+      postal_code: client.postal_code ?? null,
+      country_id: client.country_id ? Number(client.country_id) : null,
+      is_deleted: Boolean(client.is_deleted),
+      vat_number: client.vat_number ?? null,
+      id_number: client.id_number ?? null,
+      created_at: '',
+      updated_at: '',
+      deleted_at: null,
+    },
+  };
 }
 
 export default Builder;
