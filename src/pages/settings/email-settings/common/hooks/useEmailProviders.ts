@@ -40,6 +40,11 @@ export function useEmailProviders() {
       enabled: true,
     },
     {
+      value: 'ses',
+      label: 'Amazon SES (Hosted)',
+      enabled: true,
+    },
+    {
       value: 'gmail',
       label: 'Gmail (OAuth)',
       enabled: true,
