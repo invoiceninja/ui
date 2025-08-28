@@ -34,7 +34,7 @@ import {
   MdPaid,
   MdPictureAsPdf,
   MdPrint,
-  // MdRefresh,
+  MdRefresh,
   MdRestore,
   MdSchedule,
 } from 'react-icons/md';
@@ -46,7 +46,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
-// import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
+import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import {
   useAdmin,
@@ -98,7 +98,7 @@ export function useActions(params?: Params) {
   const bulk = useBulk();
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
-  // const reverseInvoice = useReverseInvoice();
+  const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
@@ -361,26 +361,26 @@ export function useActions(params?: Params) {
       </EntityActionElement>
     ),
 
-    // (invoice: Invoice) =>
-    //   (invoice.status_id === InvoiceStatus.Paid ||
-    //     invoice.status_id === InvoiceStatus.Partial) &&
-    //   !invoice.is_deleted &&
-    //   !invoice.archived_at &&
-    //   hasPermission('create_credit') && (
-    //     <EntityActionElement
-    //       {...(!dropdown && {
-    //         key: 'reverse',
-    //       })}
-    //       entity="invoice"
-    //       actionKey="reverse"
-    //       isCommonActionSection={!dropdown}
-    //       tooltipText={t('reverse')}
-    //       onClick={() => reverseInvoice(invoice)}
-    //       icon={MdRefresh}
-    //     >
-    //       {t('reverse')}
-    //     </EntityActionElement>
-    //   ),
+    (invoice: Invoice) =>
+      (invoice.status_id === InvoiceStatus.Paid ||
+        invoice.status_id === InvoiceStatus.Partial) &&
+      !invoice.is_deleted &&
+      !invoice.archived_at &&
+      hasPermission('create_credit') && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'reverse',
+          })}
+          entity="invoice"
+          actionKey="reverse"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('reverse')}
+          onClick={() => reverseInvoice(invoice)}
+          icon={MdRefresh}
+        >
+          {t('reverse')}
+        </EntityActionElement>
+      ),
     (invoice: Invoice) => (
       <EntityActionElement
         {...(!dropdown && {

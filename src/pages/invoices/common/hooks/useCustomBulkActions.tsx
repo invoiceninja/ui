@@ -32,7 +32,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import collect from 'collect.js';
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
-// import { useReverseInvoice } from './useReverseInvoice';
+import { useReverseInvoice } from './useReverseInvoice';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -52,7 +52,7 @@ export const useCustomBulkActions = () => {
 
   const bulk = useBulk();
 
-  // const reverseInvoice = useReverseInvoice();
+  const reverseInvoice = useReverseInvoice();
 
   const getDocumentsIds = (invoices: Invoice[]) => {
     return invoices.flatMap(({ documents }) => documents.map(({ id }) => id));
@@ -223,19 +223,19 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
-    // ({ selectedResources, setSelected }) =>
-    //   showReverseOption(selectedResources) &&
-    //   hasPermission('create_credit') && (
-    //     <DropdownElement
-    //       onClick={() => {
-    //         reverseInvoice(selectedResources[0]);
-    //         setSelected([]);
-    //       }}
-    //       icon={<Icon element={MdRefresh} />}
-    //     >
-    //       {t('reverse')}
-    //     </DropdownElement>
-    //   ),
+    ({ selectedResources, setSelected }) =>
+      showReverseOption(selectedResources) &&
+      hasPermission('create_credit') && (
+        <DropdownElement
+          onClick={() => {
+            reverseInvoice(selectedResources[0]);
+            setSelected([]);
+          }}
+          icon={<Icon element={MdRefresh} />}
+        >
+          {t('reverse')}
+        </DropdownElement>
+      ),
     ({ selectedIds, selectedResources, setSelected }) =>
       showCancelOption(selectedResources) && (
         <DropdownElement
