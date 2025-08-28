@@ -33,6 +33,7 @@ export function CurrencySelector(props: CurrencySelectorProps) {
       label={props.label}
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
+      withBlank={props.withBlank}
       customSelector
     >
       {additionalCurrencies.map((currency, index) => (

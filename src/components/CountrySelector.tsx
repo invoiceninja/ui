@@ -18,6 +18,7 @@ export interface GenericSelectorProps<T = string> {
   errorMessage?: string | string[];
   dismissable?: boolean;
   disabled?: boolean;
+  withBlank?: boolean;
 }
 
 export function CountrySelector(props: GenericSelectorProps) {
@@ -31,6 +32,7 @@ export function CountrySelector(props: GenericSelectorProps) {
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
       disabled={props.disabled}
+      withBlank={props.withBlank}
       customSelector
     >
       {countries.map((country, index) => (

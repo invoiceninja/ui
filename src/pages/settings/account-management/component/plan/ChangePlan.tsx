@@ -26,6 +26,7 @@ import { Plan } from './Popup';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface ChangePlanProps {
   plan: Plan;
@@ -114,6 +115,8 @@ export function ChangePlan({ plan, cycle, onSuccess }: ChangePlanProps) {
         })
           .then(() => {
             toast.success();
+
+            $refetch(['docuninja_login']);
 
             onSuccess();
           })

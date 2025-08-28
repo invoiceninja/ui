@@ -22,6 +22,7 @@ export function LanguageSelector(props: GenericSelectorProps) {
       label={props.label}
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
+      withBlank={props.withBlank}
       customSelector
     >
       {languages.map((language, index) => (

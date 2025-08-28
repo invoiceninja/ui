@@ -11,14 +11,83 @@
 import { Guard } from '$app/common/guards/Guard';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
-import { Builder } from './builder/Builder';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
+const Create = lazy(() => import('$app/pages/documents/create/Create'));
+const Blueprints = lazy(
+  () => import('$app/pages/documents/pages/blueprints/Blueprints')
+);
+const CreateBlueprint = lazy(
+  () => import('$app/pages/documents/pages/blueprints/create/Create')
+);
+const EditBlueprint = lazy(
+  () => import('$app/pages/documents/pages/blueprints/edit/Edit')
+);
+const Settings = lazy(
+  () => import('$app/pages/documents/pages/settings/Settings')
+);
+const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
+const EmailSettings = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/email-settings/EmailSettings'
+    )
+);
+const Logo = lazy(
+  () => import('$app/pages/documents/pages/settings/pages/logo/Logo')
+);
+const Users = lazy(() => import('$app/pages/documents/pages/users/Users'));
+const CreateUser = lazy(
+  () => import('$app/pages/documents/pages/users/create/Create')
+);
+const EditUser = lazy(
+  () => import('$app/pages/documents/pages/users/edit/Edit')
+);
+const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
+const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
+const CompanyDetails = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/company-details/CompanyDetails'
+    )
+);
 
 export const documentsRoutes = (
-  <Route path="documents">
-    <Route path="" element={<Guard guards={[]} component={<Document />} />} />
+  <Route
+    path="documents"
+    element={<Guard guards={[]} component={<Document />} />}
+  >
+    <Route
+      path="create"
+      element={<Guard guards={[]} component={<Create />} />}
+    />
+
+    <Route path="" element={<Guard guards={[]} component={<Documents />} />} />
+
+    <Route
+      path="settings"
+      element={<Guard guards={[]} component={<Settings />} />}
+    >
+      <Route
+        path=""
+        element={
+          <Guard guards={[]} type="subPage" component={<CompanyDetails />} />
+        }
+      />
+
+      <Route
+        path="logo"
+        element={<Guard guards={[]} type="subPage" component={<Logo />} />}
+      />
+
+      <Route
+        path="email_templates"
+        element={
+          <Guard guards={[]} type="subPage" component={<EmailSettings />} />
+        }
+      />
+    </Route>
 
     <Route
       path=":id"
@@ -28,6 +97,38 @@ export const documentsRoutes = (
     <Route
       path=":id/builder"
       element={<Guard guards={[]} component={<Builder />} />}
+    />
+
+    <Route
+      path="blueprints"
+      element={<Guard guards={[]} component={<Blueprints />} />}
+    />
+
+    <Route
+      path="blueprints/create"
+      element={<Guard guards={[]} component={<CreateBlueprint />} />}
+    />
+
+    <Route
+      path="blueprints/:id/edit"
+      element={<Guard guards={[]} component={<EditBlueprint />} />}
+    />
+
+    <Route path="users" element={<Guard guards={[]} component={<Users />} />} />
+
+    <Route
+      path="users/create"
+      element={<Guard guards={[]} component={<CreateUser />} />}
+    />
+
+    <Route
+      path="users/:id/edit"
+      element={<Guard guards={[]} component={<EditUser />} />}
+    />
+
+    <Route
+      path="sign/:document/:invitation"
+      element={<Guard guards={[]} component={<Sign />} />}
     />
   </Route>
 );

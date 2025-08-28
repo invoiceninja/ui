@@ -38,7 +38,7 @@ export function BuilderDemo() {
   return (
     <Default breadcrumbs={[]}>
       <div className="max-w-7xl mx-auto">
-        {/* @ts-expect-error TODO: Fix type error with BuilderContext.Provider value prop */}
+        {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
           value={{
             token: import.meta.env.VITE_DOCUNINJA_TOKEN as string,
@@ -75,11 +75,11 @@ export function BuilderDemo() {
                 },
               },
               signatorySelector: SignatorySelector,
+              signatorySwap: () => null,
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,
               },
-              signatorySwap: () => null,
               validationErrors: ValidationErrors,
               sign: () => null,
               toolboxContext: ToolboxContext,

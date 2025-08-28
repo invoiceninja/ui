@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
+import {
+  docuNinjaEndpoint,
+  endpoint,
+  getEntityState,
+  isProduction,
+} from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
   CSSProperties,
@@ -61,7 +66,7 @@ import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
-import { isEqual } from 'lodash';
+import { get, isEqual } from 'lodash';
 
 export interface DateRangeColumn {
   column: string;
@@ -162,6 +167,16 @@ interface Props<T> extends CommonProps {
   enableSavingFilterPreference?: boolean;
   applyManualHeight?: boolean;
   onDeleteBulkAction?: (selectedIds: string[]) => void;
+  useDocuNinjaApi?: boolean;
+  endpointHeaders?: Record<string, string>;
+  totalPagesPropPath?: string;
+  totalRecordsPropPath?: string;
+  withoutActionBulkPayloadPropertyForDeleteAction?: boolean;
+  withoutIdsBulkPayloadPropertyForDeleteAction?: boolean;
+  useDeleteMethod?: boolean;
+  deleteBulkRoute?: string;
+  useRestoreForDeletedResources?: boolean;
+  disabledCreateButton?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -208,7 +223,11 @@ export function DataTable<T extends object>(props: Props<T>) {
   const reactSettings = useReactSettings();
 
   const [apiEndpoint, setApiEndpoint] = useState(
-    new URL(endpoint(props.endpoint))
+    new URL(
+      props.useDocuNinjaApi
+        ? docuNinjaEndpoint(props.endpoint)
+        : endpoint(props.endpoint)
+    )
   );
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
@@ -229,7 +248,15 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutSortQueryParameter = false,
     showRestoreBulk,
     enableSavingFilterPreference = false,
+    totalPagesPropPath,
+    totalRecordsPropPath,
     onDeleteBulkAction,
+    withoutActionBulkPayloadPropertyForDeleteAction = false,
+    withoutIdsBulkPayloadPropertyForDeleteAction = false,
+    useDeleteMethod = false,
+    deleteBulkRoute,
+    useRestoreForDeletedResources = false,
+    disabledCreateButton = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -398,7 +425,13 @@ export function DataTable<T extends object>(props: Props<T>) {
       dateRange,
       dateRangeQueryParameter,
     ],
-    () => request(methodType, apiEndpoint.href),
+    () =>
+      request(
+        methodType,
+        apiEndpoint.href,
+        {},
+        { headers: props.endpointHeaders }
+      ),
     {
       staleTime: props.staleTime ?? Infinity,
       enabled: !disableQuery && arePreferencesApplied,
@@ -424,10 +457,34 @@ export function DataTable<T extends object>(props: Props<T>) {
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
-    request('POST', endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`), {
-      action,
-      ids: id ? [id] : Array.from(selected),
-    })
+    const method = useDeleteMethod && action === 'delete' ? 'DELETE' : 'POST';
+
+    const route =
+      useDeleteMethod && action === 'delete'
+        ? deleteBulkRoute
+        : props.bulkRoute ?? `${props.endpoint}/bulk`;
+
+    const updatedAction =
+      withoutActionBulkPayloadPropertyForDeleteAction && action === 'delete'
+        ? {}
+        : { action };
+
+    const updatedIds =
+      withoutIdsBulkPayloadPropertyForDeleteAction && action === 'delete'
+        ? []
+        : { ids: id ? [id] : Array.from(selected) };
+
+    request(
+      method,
+      props.useDocuNinjaApi
+        ? docuNinjaEndpoint(route as string, { id })
+        : endpoint(route as string),
+      {
+        ...updatedAction,
+        ...updatedIds,
+      },
+      { headers: props.endpointHeaders }
+    )
       .then((response: GenericSingleResourceResponse<T[]>) => {
         toast.success(`${action}d_${props.resource}`);
 
@@ -436,7 +493,9 @@ export function DataTable<T extends object>(props: Props<T>) {
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
             detail: {
-              url: endpoint(props.endpoint),
+              url: props.useDocuNinjaApi
+                ? docuNinjaEndpoint(props.endpoint)
+                : endpoint(props.endpoint),
             },
           })
         );
@@ -631,7 +690,12 @@ export function DataTable<T extends object>(props: Props<T>) {
                   type="component"
                   guards={props.linkToCreateGuards || []}
                   component={
-                    <Button to={props.linkToCreate} className="shadow-sm">
+                    <Button
+                      to={props.linkToCreate}
+                      className="shadow-sm"
+                      disabled={disabledCreateButton}
+                      disableWithoutIcon
+                    >
                       {t(`new_${props.resource}`)}
                     </Button>
                   }
@@ -800,18 +864,19 @@ export function DataTable<T extends object>(props: Props<T>) {
               areRowsRendered || !currentData.length ? 'default' : 'progress',
           }}
         >
-          {(isLoading || !isEqual(currentData, data?.data?.data)) && (
-            <MemoizedTr
-              className="border-b"
-              style={{
-                borderColor: colors.$20,
-              }}
-            >
-              <Td colSpan={100}>
-                <Spinner />
-              </Td>
-            </MemoizedTr>
-          )}
+          {(isLoading || !isEqual(currentData, data?.data?.data)) &&
+            !isError && (
+              <MemoizedTr
+                className="border-b"
+                style={{
+                  borderColor: colors.$20,
+                }}
+              >
+                <Td colSpan={100}>
+                  <Spinner />
+                </Td>
+              </MemoizedTr>
+            )}
 
           {isError && !isLoading && (
             <MemoizedTr
@@ -935,7 +1000,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         (props.showRestore?.(resource) ||
                           !props.showRestore) && <Divider withoutPadding />}
 
-                      {resource?.archived_at === 0 &&
+                      {!resource?.archived_at &&
                         (props.showArchive?.(resource) ||
                           !props.showArchive) && (
                           <DropdownElement
@@ -946,16 +1011,19 @@ export function DataTable<T extends object>(props: Props<T>) {
                           </DropdownElement>
                         )}
 
-                      {resource?.archived_at > 0 &&
-                        (props.showRestore?.(resource) ||
-                          !props.showRestore) && (
-                          <DropdownElement
-                            onClick={() => bulk('restore', resource.id)}
-                            icon={<Icon element={MdRestore} />}
-                          >
-                            {t('restore')}
-                          </DropdownElement>
-                        )}
+                      {Boolean(
+                        (resource?.archived_at ||
+                          (useRestoreForDeletedResources &&
+                            resource?.is_deleted)) &&
+                          (props.showRestore?.(resource) || !props.showRestore)
+                      ) && (
+                        <DropdownElement
+                          onClick={() => bulk('restore', resource.id)}
+                          icon={<Icon element={MdRestore} />}
+                        >
+                          {t('restore')}
+                        </DropdownElement>
+                      )}
 
                       {!resource?.is_deleted &&
                         (props.showDelete?.(resource) || !props.showDelete) && (
@@ -1025,8 +1093,16 @@ export function DataTable<T extends object>(props: Props<T>) {
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
-          totalPages={data.data.meta.pagination.total_pages}
-          totalRecords={data.data.meta.pagination.total}
+          totalPages={
+            totalPagesPropPath
+              ? get(data, totalPagesPropPath)
+              : data.data.meta.pagination.total_pages
+          }
+          totalRecords={
+            totalRecordsPropPath
+              ? get(data, totalRecordsPropPath)
+              : data.data.meta.pagination.total
+          }
         />
       )}
     </div>
