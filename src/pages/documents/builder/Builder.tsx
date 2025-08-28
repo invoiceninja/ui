@@ -348,7 +348,9 @@ function SignatorySelector({
       return;
     }
 
-    onSelect(contact.id, 'contact', contact as any);
+    const transformed = transformToPayload(entity, value);
+
+    onSelect(`contact|${transformed.contact_key}`, 'contact', contact as any, transformed);
   };
 
   return (
@@ -564,7 +566,7 @@ function Builder() {
           <Button
             behavior="button"
             onClick={handleSave}
-            disabled={isDocumentSaving || isDocumentSending}
+            // disabled={isDocumentSaving || isDocumentSending}
             disableWithoutIcon
           >
             {t('save')}
@@ -705,7 +707,7 @@ function transformToContact(client: Client) {
   const contact = client.contacts[0];
 
   return {
-    id: contact.id,
+    id: `contact|${contact.contact_key}`,
     user_id: client.user_id ?? null,
     company_id: null,
     client_id: client.id,
@@ -751,6 +753,13 @@ function transformToContact(client: Client) {
       updated_at: '',
       deleted_at: null,
     },
+  };
+}
+
+function transformToPayload(client: Client, contact: string) {
+  return {
+    ...client,
+    contact_key: contact,
   };
 }
 
