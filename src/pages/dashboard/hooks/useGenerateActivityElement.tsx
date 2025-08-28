@@ -190,8 +190,15 @@ export function useGenerateActivityElement() {
       ),
       adjustment: activity?.adjustment?.label,
       notes: Boolean(
+        activity?.notes &&
+        [151, 152, 153].includes(activity.activity_type_id)
+      ) ? (
+        <>
+          {activity?.notes ?? ''}
+        </>
+      ) : Boolean(
         activityEntity && activity[activityEntity as keyof typeof activity]
-      ) && (
+      ) ? (
         <>
           <br />
 
@@ -209,7 +216,7 @@ export function useGenerateActivityElement() {
             {activity?.notes}
           </Link>
         </>
-      ),
+      ) : null,
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
