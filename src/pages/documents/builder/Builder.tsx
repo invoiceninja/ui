@@ -7,7 +7,6 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { User } from '$app/common/interfaces/user';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
