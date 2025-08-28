@@ -189,16 +189,16 @@ export function useGenerateActivityElement() {
         </Link>
       ),
       adjustment: activity?.adjustment?.label,
-      notes: Boolean(
-        activity?.notes &&
-        [151, 152, 153].includes(activity.activity_type_id)
-      ) ? (
-        <>
-          {activity?.notes ?? ''}
-        </>
-      ) : Boolean(
-        activityEntity && activity[activityEntity as keyof typeof activity]
-      ) ? (
+      notes: (
+          activity?.notes &&
+          [151, 152, 153].includes(activity.activity_type_id)
+        ) ? (
+          <>
+            {activity?.notes ?? ''}
+          </>
+        ) : (
+          activityEntity && activity[activityEntity as keyof typeof activity]
+        ) ? (
         <>
           <br />
 
