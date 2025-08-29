@@ -81,7 +81,7 @@ export default function Create() {
 
         request('POST', endpoint('/api/v1/designs'), design)
           .then((response: GenericSingleResourceResponse<Design>) => {
-            toast.success('design_created');
+            toast.success('saved_design');
 
             $refetch(['designs']);
 
@@ -247,7 +247,7 @@ export default function Create() {
       {type === 'template' ? (
         <Card title={t('import')} withContainer collapsed>
           <Editor
-            height=""
+            height="400px"
             defaultLanguage="html"
             value={design?.design.body}
             options={{
