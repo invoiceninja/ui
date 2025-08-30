@@ -46,24 +46,36 @@ export function useTableColumns() {
     8: t('voided'),
   };
 
+  const getName = (document: Document) => {
+    const firstInvitation = document.invitations?.[0];
+
+    if (firstInvitation) {
+      if (firstInvitation.contact) {
+        return `${firstInvitation.contact.first_name} ${firstInvitation.contact.last_name}`;
+      }
+
+      if (firstInvitation.user) {
+        return `${firstInvitation.user.first_name} ${firstInvitation.user.last_name}`;
+      }
+    }
+
+    return '';
+  };
+
   const columns: DataTableColumns<Document> = [
     {
       id: 'id',
-      label: t('id'),
-      format: (_, document) => (
-        <Link
-          to={route('/documents/:id', {
-            id: document.id,
-          })}
-        >
-          {document.id.slice(-8)}
-        </Link>
-      ),
+      label: t('contact_name'),
+      format: (_, document) => getName(document),
     },
     {
       id: 'description',
       label: t('description'),
-      format: (_, document) => document.description || t('untitled_document'),
+      format: (_, document) => (
+        <Link to={route('/documents/:id', { id: document.id })}>
+          {document.description || t('untitled_document')}
+        </Link>
+      ),
     },
     {
       id: 'files',

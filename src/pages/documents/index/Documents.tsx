@@ -15,11 +15,16 @@ import { useTableColumns } from '../common/hooks/useTableColumns';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { Default } from '$app/components/layouts/Default';
 import { Page } from '$app/components/Breadcrumbs';
+import { Button } from '$app/components/forms';
+import { useNavigate } from 'react-router-dom';
+import { Gear } from '$app/components/icons/Gear';
 
 export default function Blueprints() {
   useTitle('documents');
 
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
 
   const columns = useTableColumns();
 
@@ -33,7 +38,7 @@ export default function Blueprints() {
   return (
     <Default title={t('documents')} breadcrumbs={pages}>
       <DataTable<Document>
-        queryIdentificator="/api/documents/docuninja"
+        queryIdentificator="/api/documents/docuninja?include=client"
         resource="document"
         endpoint="/api/documents?sort=id|desc"
         columns={columns}
@@ -51,6 +56,21 @@ export default function Blueprints() {
         withoutIdsBulkPayloadPropertyForDeleteAction
         useDeleteMethod
         deleteBulkRoute="/api/documents/:id"
+        rightSide={
+          <Button
+            behavior="button"
+            type="secondary"
+            onClick={() => navigate('/documents/settings')}
+          >
+            <div className="flex items-center space-x-2">
+              <div>
+                <Gear />
+              </div>
+
+              <span>{t('settings')}</span>
+            </div>
+          </Button>
+        }
       />
     </Default>
   );
