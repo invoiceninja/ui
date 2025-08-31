@@ -11,7 +11,6 @@
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { MdInfoOutline } from 'react-icons/md';
-import { route } from '$app/common/helpers/route';
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -36,12 +35,10 @@ export function ReportsPlanAlert(props?: CommonProps) {
 
               {user?.company_user && (
                 <Link
-                  to={
-                    
-                    route('/settings/account_management')
-                  }
+                  to="/settings/account_management"
                   className="ml-10"
                   external
+                  withoutAdjustedHref
                 >
                   {t('plan_change')}
                 </Link>
