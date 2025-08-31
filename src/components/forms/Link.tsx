@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import React, { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -26,11 +25,10 @@ interface Props extends CommonProps {
   setBaseFont?: boolean;
   disableHoverUnderline?: boolean;
   withoutExternalIcon?: boolean;
+  withoutAdjustedHref?: boolean;
 }
 
 export function Link(props: Props) {
-  const accentColor = useAccentColor();
-
   const { prevent: preventLeavingPage } = useAtomValue(preventLeavingPageAtom);
 
   const preventNavigation = usePreventNavigation();
@@ -66,7 +64,7 @@ export function Link(props: Props) {
 
         <a
           target="_blank"
-          href={getAdjustedHref()}
+          href={props.withoutAdjustedHref ? props.to : getAdjustedHref()}
           className={classNames('text-center', {
             'text-sm': !setBaseFont,
             'text-base': setBaseFont,
