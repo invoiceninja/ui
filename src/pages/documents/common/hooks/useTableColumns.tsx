@@ -51,10 +51,24 @@ export function useTableColumns() {
 
     if (firstInvitation) {
       if (firstInvitation.contact) {
+        if (
+          !firstInvitation.contact.first_name &&
+          !firstInvitation.contact.last_name
+        ) {
+          return firstInvitation.contact.email;
+        }
+
         return `${firstInvitation.contact.first_name} ${firstInvitation.contact.last_name}`;
       }
 
       if (firstInvitation.user) {
+        if (
+          !firstInvitation.user.first_name &&
+          !firstInvitation.user.last_name
+        ) {
+          return firstInvitation.user.email;
+        }
+
         return `${firstInvitation.user.first_name} ${firstInvitation.user.last_name}`;
       }
     }
@@ -65,7 +79,7 @@ export function useTableColumns() {
   const columns: DataTableColumns<Document> = [
     {
       id: 'id',
-      label: t('contact_name'),
+      label: t('signatory'),
       format: (_, document) => getName(document),
     },
     {
