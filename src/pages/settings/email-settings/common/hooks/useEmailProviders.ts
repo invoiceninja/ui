@@ -69,11 +69,11 @@ export function useEmailProviders() {
       label: 'Brevo',
       enabled: true,
     },
-    {
-      value: 'client_ses',
-      label: 'Amazon SES',
-      enabled: true,
-    },
+    // {
+    //   value: 'client_ses',
+    //   label: 'Amazon SES',
+    //   enabled: true,
+    // },
     {
       value: 'smtp',
       label: 'SMTP',
