@@ -18,6 +18,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Card } from '$app/components/cards';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { cloneDeep } from 'lodash';
 
 export const isPaidDocuninjaUserAtom = atom<boolean>(false);
 
@@ -123,12 +124,12 @@ export default function Document() {
       (c: Company) => c.ninja_company_key === company?.company_key
     );
 
-    if (docuData && docuCompany) {
-      setDocuCompanyAccountDetails({
+    setDocuCompanyAccountDetails(
+      cloneDeep({
         account: docuAccount,
         company: docuCompany,
-      });
-    }
+      })
+    );
   }, [docuData]);
 
   useSocketEvent({
@@ -187,6 +188,7 @@ export default function Document() {
                   <span style={{ color: colors.$3 }}>
                     {t('welcome_to_docuninja')}
                   </span>
+
                   <span className="text-center" style={{ color: colors.$17 }}>
                     {t('create_docuninja_account')}
                   </span>

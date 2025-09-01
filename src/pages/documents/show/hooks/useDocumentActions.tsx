@@ -35,6 +35,7 @@ import { route } from '$app/common/helpers/route';
 import { FaFileSignature } from 'react-icons/fa';
 import { useAtomValue } from 'jotai';
 import { docuCompanyAccountDetailsAtom } from '../../Document';
+import { useDownloadAuditLog } from './useDownloadAuditLog';
 
 interface DocumentAction {
   label: string;
@@ -59,6 +60,11 @@ export function useDocumentActions({ document }: Params) {
 
   const { downloadDocument, isFormBusy: isDownloadingDoc } =
     useDownloadDocument({
+      doc: document,
+    });
+
+  const { downloadAuditLog, isFormBusy: isDownloadingAuditLog } =
+    useDownloadAuditLog({
       doc: document,
     });
 
@@ -104,6 +110,12 @@ export function useDocumentActions({ document }: Params) {
         ),
       visible:
         (document?.status_id ?? 0) <= 2 && userInvitation && hasRectangles(),
+    },
+    {
+      label: t('audit_log'),
+      icon: <Icon element={MdDownload} />,
+      onClick: () => downloadAuditLog(),
+      visible: document?.status_id === DocumentStatus.Completed,
     },
     {
       label: t('download'),
@@ -161,7 +173,8 @@ export function useDocumentActions({ document }: Params) {
               isDownloadingDoc ||
               isCloningDocumentBusy ||
               isMakingBluePrintBusy ||
-              isVoidingDocumentBusy
+              isVoidingDocumentBusy ||
+              isDownloadingAuditLog
             }
             onClick={option.onClick}
           >
