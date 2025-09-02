@@ -80,6 +80,7 @@ export default function Blueprints() {
             document?.status_id !== DocumentStatus.Completed &&
             document?.status_id !== DocumentStatus.Voided
           }
+          filterParameterKey="search"
         />
       </div>
     </Default>

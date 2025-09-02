@@ -64,6 +64,7 @@ export default function Users() {
           (docuCompanyAccountDetails?.account?.num_users || 0) ===
           (docuCompanyAccountDetails?.account?.users || [])?.length
         }
+        filterParameterKey="search"
       />
     </Default>
   );
