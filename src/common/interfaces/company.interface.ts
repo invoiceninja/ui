@@ -344,6 +344,7 @@ export interface Settings {
   ses_access_key: string;
   ses_region: string;
   ses_topic_arn: string;
+  ses_from_address: string;
 }
 
 export interface TaxData {
