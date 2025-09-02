@@ -330,6 +330,25 @@ export function EmailSettings() {
                 />
             </Element>
 
+              <Element
+                leftSide={
+                  <PropertyCheckbox
+                    propertyKey="ses_from_address"
+                    labelElement={<SettingsLabel label={t('ses_from_address')} />}
+                  />
+                }
+                leftSideHelp={t('ses_from_address_help')}
+              >
+                <InputField
+                  value={company?.settings.ses_from_address || ''}
+                  onValueChange={(value) =>
+                    handleChange('settings.ses_from_address', value)
+                  }
+                  disabled={disableSettingsField('ses_from_address')}
+                  errorMessage={errors?.errors['settings.ses_from_address']}
+                />
+              </Element>
+
             <Element
               leftSide={
                 <PropertyCheckbox
