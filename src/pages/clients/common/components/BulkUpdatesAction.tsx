@@ -371,6 +371,7 @@ export function BulkUpdatesAction(props: Props) {
               <TaskStatusSelector
                 value={newColumnValue as string}
                 onChange={(status) => setNewColumnValue(status.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
                 withoutAction
               />
             )}
@@ -379,6 +380,7 @@ export function BulkUpdatesAction(props: Props) {
               <UserSelector
                 value={newColumnValue as string}
                 onChange={(user) => setNewColumnValue(user.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
                 withoutAction
               />
             )}
@@ -387,6 +389,7 @@ export function BulkUpdatesAction(props: Props) {
               <ProjectSelector
                 value={newColumnValue as string}
                 onChange={(project) => setNewColumnValue(project.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
                 withoutAction
               />
             )}
@@ -395,6 +398,7 @@ export function BulkUpdatesAction(props: Props) {
               <ClientSelector
                 value={newColumnValue as string}
                 onChange={(client) => setNewColumnValue(client.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
                 withoutAction
               />
             )}

@@ -16,14 +16,9 @@ export function useBulkUpdatesColumns() {
 
   const [bulkUpdates, setBulkUpdates] = useState<Record<string, string[]>>();
 
-  console.log(statics?.bulk_updates);
-
   useEffect(() => {
     if (statics?.bulk_updates) {
-      setBulkUpdates({
-        ...statics.bulk_updates,
-        task: ['status_id', 'client_id', 'project_id', 'assigned_user_id'],
-      });
+      setBulkUpdates(statics.bulk_updates);
     }
   }, [statics]);
 
