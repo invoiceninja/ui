@@ -226,10 +226,10 @@ export function SearchGroups({
       })}
 
       <SearchGroupTitle
-        title="purchase_orders"
-        hasResults={groups.purchase_orders.length > 0}
+        title="vendor_contacts"
+        hasResults={groups.vendor_contacts.length > 0}
       />
-      {groups.purchase_orders.map((entry) => {
+      {groups.vendor_contacts.map((entry) => {
         const index = currentIndex++;
 
         return (
@@ -246,10 +246,10 @@ export function SearchGroups({
       })}
 
       <SearchGroupTitle
-        title="vendor_contacts"
-        hasResults={groups.vendor_contacts.length > 0}
+        title="purchase_orders"
+        hasResults={groups.purchase_orders.length > 0}
       />
-      {groups.vendor_contacts.map((entry) => {
+      {groups.purchase_orders.map((entry) => {
         const index = currentIndex++;
 
         return (
