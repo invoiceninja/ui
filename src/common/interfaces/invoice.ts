@@ -87,7 +87,14 @@ export interface Invoice {
   is_locked?: boolean;
   backup?: Backup;
   location_id: string;
-  schedule?: ScheduleItem[]
+  schedule?: ScheduleItem[];
+  sync?: Sync;
+}
+
+export interface Sync {
+  qb_id: string;
+  dn_completed: boolean;
+  dn_id: string;
 }
 
 export interface Backup {
