@@ -481,6 +481,8 @@ function PaymentSchedule() {
             {/* Remove Schedule Button */}
             <div className="flex justify-end">
               <Button 
+                behavior='button'
+                disableWithoutIcon
                 onClick={handleRemoveSchedule}
                 disabled={isRemovingSchedule}
                 className="text-red-600 border-red-600 hover:bg-red-50 border"
@@ -707,13 +709,15 @@ function PaymentSchedule() {
           {!localInvoice?.schedule?.length && (
             <>
               {currentStep !== 'initial-choice' && (
-                <Button onClick={handleBack}>
+                <Button behavior='button' onClick={handleBack}>
                   {t('back')}
                 </Button>
               )}
               
               {currentStep === 'auto-bill' && (
                 <Button 
+                  behavior='button'
+                  disableWithoutIcon
                   onClick={handleCreateNumberPaymentsSchedule}
                   disabled={!canProceed() || isCreatingSchedule}
                   className="ml-auto"
@@ -724,6 +728,8 @@ function PaymentSchedule() {
               
               {currentStep === 'custom-schedule' && (
                 <Button 
+                  behavior='button'
+                  disableWithoutIcon
                   onClick={handleCreateCustomSchedule}
                   disabled={isCreatingSchedule || !isComplete}
                   className="ml-auto"
@@ -734,6 +740,8 @@ function PaymentSchedule() {
               
               {currentStep !== 'auto-bill' && currentStep !== 'custom-schedule' && (
                 <Button 
+                  behavior='button'
+                  disableWithoutIcon
                   onClick={handleNext}
                   disabled={!canProceed()}
                   className="ml-auto"
