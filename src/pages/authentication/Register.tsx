@@ -36,6 +36,7 @@ import { useSearchParams } from 'react-router-dom';
 import { TurnstileWidget } from './components/TurnstileWidget';
 import { useTurnstile } from 'react-turnstile';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { CloudflareChallenge } from '$app/components/CloudflareChallenge';
 
 export function Register() {
   useTitle('register');
@@ -146,7 +147,7 @@ export function Register() {
   }, [turnstileToken]);
 
   return (
-    <>
+    <CloudflareChallenge>
       <div className="h-screen">
         <Header />
 
@@ -223,6 +224,6 @@ export function Register() {
           }
         </div>
       </div>
-    </>
+    </CloudflareChallenge>
   );
 }
