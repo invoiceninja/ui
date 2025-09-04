@@ -21,7 +21,7 @@ export function CloudflareChallenge({ children }: Props) {
   const { isLoading, isError } = useQuery({
     queryKey: ['/api/v1/signup/protect'],
     queryFn: () =>
-      request('GET', endpoint('/api/v1/signup/protect'), null, {
+      request('GET', endpoint('/api/v1/signup/protect'), {
         withCredentials: true,
       }),
     enabled: isHosted(),
