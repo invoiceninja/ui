@@ -53,6 +53,7 @@ export interface Company {
   users?: User[];
   pivot?: CompanyUser | null;
   documents?: Document[];
+  settings: Settings;
 }
 
 export interface Template {
@@ -201,6 +202,11 @@ export interface Document {
   invitations?: DocumentInvitation[];
   files?: DocumentFile[];
   signatures?: DocumentSignature[];
+  settings: Settings;
+}
+
+export interface Settings {
+  email_client_when_completed: boolean;
 }
 
 export interface DocumentFile {
