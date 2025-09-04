@@ -11,7 +11,7 @@
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { Spinner } from './Spinner';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 
 interface Props {
   children: React.ReactNode;
@@ -24,7 +24,12 @@ export function CloudflareChallenge({ children }: Props) {
       request('GET', endpoint('/api/v1/signup/protect'), null, {
         withCredentials: true,
       }),
+    enabled: isHosted(),
   });
+
+  if (isSelfHosted()) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
