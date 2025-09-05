@@ -44,7 +44,7 @@ import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
-import { InputLabel } from '$app/components/forms';
+import { InputLabel, Link } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 
 export interface Context {
@@ -115,6 +115,21 @@ export default function Edit() {
                 <div>
                   <InvoiceStatusBadge entity={invoice} />
                 </div>
+              </div>
+            )}
+
+            {invoice && invoice.sync?.dn_id && (
+              <div className="flex items-center space-x-9">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('docuninja_document')}
+                </span>
+
+                <Link to={`/documents/${invoice.sync?.dn_id}`}>
+                  {t('link')}
+                </Link>
               </div>
             )}
 
