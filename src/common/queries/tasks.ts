@@ -30,9 +30,10 @@ export function useTaskQuery(params: TaskParams) {
   return useQuery<Task>(
     ['/api/v1/tasks', params.id],
     () =>
-      request('GET', endpoint('/api/v1/tasks/:id?include=status', { id: params.id })).then(
-        (response) => response.data.data
-      ),
+      request(
+        'GET',
+        endpoint('/api/v1/tasks/:id?include=status', { id: params.id })
+      ).then((response) => response.data.data),
     { staleTime: Infinity, enabled: params.enabled ?? true }
   );
 }
@@ -72,19 +73,29 @@ export function useTasksQuery(params: TasksParams) {
   );
 }
 
+interface Details {
+  column?: string;
+  new_value?: string | number | boolean;
+}
+
 export const useBulk = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'start' | 'stop'
+    action: 'archive' | 'restore' | 'delete' | 'start' | 'stop' | 'bulk_update',
+    details?: Details
   ) => {
+    const { column, new_value } = details || {};
+
     toast.processing();
 
-    request('POST', endpoint('/api/v1/tasks/bulk'), {
+    return request('POST', endpoint('/api/v1/tasks/bulk'), {
       action,
       ids,
+      ...(column && { column }),
+      ...(action === 'bulk_update' && { new_value }),
     }).then(() => {
       if (action !== 'start' && action !== 'stop') {
         toast.success(`${action}d_task`);

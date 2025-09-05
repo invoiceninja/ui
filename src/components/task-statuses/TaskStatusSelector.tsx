@@ -27,7 +27,11 @@ import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
-export function TaskStatusSelector(props: GenericSelectorProps<TaskStatus>) {
+interface Props extends GenericSelectorProps<TaskStatus> {
+  withoutAction?: boolean;
+}
+
+export function TaskStatusSelector(props: Props) {
   const [t] = useTranslation();
   const accentColor = useAccentColor();
 
@@ -134,7 +138,7 @@ export function TaskStatusSelector(props: GenericSelectorProps<TaskStatus>) {
         action={{
           label: t('new_task_status'),
           onClick: () => setIsModalVisible(true),
-          visible: isAdmin || isOwner,
+          visible: (isAdmin || isOwner) && !props.withoutAction,
         }}
         onDismiss={props.onClearButtonClick}
         readonly={props.readonly}

@@ -31,9 +31,14 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCached } from 'react-icons/md';
 import Toggle from '$app/components/forms/Toggle';
+import { useBulk as useBulkTasks } from '$app/common/queries/tasks';
+import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 
 interface Props {
-  entity: 'client' | 'expense' | 'recurring_invoice';
+  entity: 'client' | 'expense' | 'recurring_invoice' | 'task';
   resourceIds: string[];
   setSelected: Dispatch<SetStateAction<string[]>>;
 }
@@ -49,7 +54,11 @@ interface BulkUpdateField {
     | 'taxSelector'
     | 'toggle'
     | 'remainingCyclesSelector'
-    | 'textarea';
+    | 'textarea'
+    | 'statusSelector'
+    | 'userSelector'
+    | 'projectSelector'
+    | 'clientSelector';
 }
 
 const bulkUpdateFieldsTypes: BulkUpdateField[] = [
@@ -70,6 +79,10 @@ const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'should_be_invoiced', type: 'toggle' },
   { key: 'uses_inclusive_taxes', type: 'toggle' },
   { key: 'remaining_cycles', type: 'remainingCyclesSelector' },
+  { key: 'status_id', type: 'statusSelector' },
+  { key: 'assigned_user_id', type: 'userSelector' },
+  { key: 'project_id', type: 'projectSelector' },
+  { key: 'client_id', type: 'clientSelector' },
 ];
 
 export function BulkUpdatesAction(props: Props) {
@@ -77,6 +90,7 @@ export function BulkUpdatesAction(props: Props) {
 
   const { setSelected, resourceIds } = props;
 
+  const bulkTasks = useBulkTasks();
   const bulkClients = useBulkClients();
   const bulkExpenses = useBulkExpenses();
   const bulkRecurringInvoices = useBulkRecurringInvoices();
@@ -107,12 +121,10 @@ export function BulkUpdatesAction(props: Props) {
 
   useEffect(() => {
     if (column === 'remaining_cycles') {
-      setNewColumnValue("-1");
-    }
-    else if (column === 'uses_inclusive_taxes') {
+      setNewColumnValue('-1');
+    } else if (column === 'uses_inclusive_taxes') {
       setNewColumnValue(false);
-    }
-    else{
+    } else {
       setNewColumnValue('');
     }
   }, [column]);
@@ -157,6 +169,22 @@ export function BulkUpdatesAction(props: Props) {
       ].split('|')[0];
     }
 
+    if (currentColumn === 'status_id') {
+      return t('status');
+    }
+
+    if (currentColumn === 'assigned_user_id') {
+      return t('assigned_user');
+    }
+
+    if (currentColumn === 'client_id') {
+      return t('client');
+    }
+
+    if (currentColumn === 'project_id') {
+      return t('project');
+    }
+
     return t(currentColumn);
   };
 
@@ -181,6 +209,13 @@ export function BulkUpdatesAction(props: Props) {
 
     if (props.entity === 'recurring_invoice') {
       bulkRecurringInvoices(resourceIds, 'bulk_update', {
+        column,
+        new_value: newColumnValue,
+      }).then(() => handleOnClose());
+    }
+
+    if (props.entity === 'task') {
+      bulkTasks(resourceIds, 'bulk_update', {
         column,
         new_value: newColumnValue,
       }).then(() => handleOnClose());
@@ -211,7 +246,6 @@ export function BulkUpdatesAction(props: Props) {
             value={column}
             onValueChange={(value) => {
               setColumn(value);
-              
             }}
             withBlank
             customSelector
@@ -286,19 +320,19 @@ export function BulkUpdatesAction(props: Props) {
             )}
 
             {getFieldType() === 'remainingCyclesSelector' && (
-                <SelectField
-                  value={newColumnValue}
-                  onValueChange={(value) => setNewColumnValue(value)}
-                >
-                  <option value="-1">{t('endless')}</option>
-                  {[...Array(37).keys()].map((number, index) => (
-                    <option value={number} key={index}>
-                      {number}
-                    </option>
-                  ))}
-                </SelectField>
+              <SelectField
+                value={newColumnValue}
+                onValueChange={(value) => setNewColumnValue(value)}
+              >
+                <option value="-1">{t('endless')}</option>
+                {[...Array(37).keys()].map((number, index) => (
+                  <option value={number} key={index}>
+                    {number}
+                  </option>
+                ))}
+              </SelectField>
             )}
-            
+
             {getFieldType() === 'countrySelector' && (
               <CountrySelector
                 value={newColumnValue as string}
@@ -330,6 +364,42 @@ export function BulkUpdatesAction(props: Props) {
                 element="textarea"
                 value={newColumnValue as string}
                 onValueChange={(value) => setNewColumnValue(value)}
+              />
+            )}
+
+            {getFieldType() === 'statusSelector' && (
+              <TaskStatusSelector
+                value={newColumnValue as string}
+                onChange={(status) => setNewColumnValue(status.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
+                withoutAction
+              />
+            )}
+
+            {getFieldType() === 'userSelector' && (
+              <UserSelector
+                value={newColumnValue as string}
+                onChange={(user) => setNewColumnValue(user.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
+                withoutAction
+              />
+            )}
+
+            {getFieldType() === 'projectSelector' && (
+              <ProjectSelector
+                value={newColumnValue as string}
+                onChange={(project) => setNewColumnValue(project.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
+                withoutAction
+              />
+            )}
+
+            {getFieldType() === 'clientSelector' && (
+              <ClientSelector
+                value={newColumnValue as string}
+                onChange={(client) => setNewColumnValue(client.id)}
+                onClearButtonClick={() => setNewColumnValue('')}
+                withoutAction
               />
             )}
           </div>
