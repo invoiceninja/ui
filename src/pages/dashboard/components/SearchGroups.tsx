@@ -22,10 +22,13 @@ interface Groups {
   payments: Entry<SearchRecord>[];
   quotes: Entry<SearchRecord>[];
   credits: Entry<SearchRecord>[];
+  expenses: Entry<SearchRecord>[];
   projects: Entry<SearchRecord>[];
   tasks: Entry<SearchRecord>[];
   purchase_orders: Entry<SearchRecord>[];
   settings: Entry<SearchRecord>[];
+  vendors: Entry<SearchRecord>[];
+  vendor_contacts: Entry<SearchRecord>[];
   other: Entry<SearchRecord>[];
 }
 
@@ -203,10 +206,70 @@ export function SearchGroups({
       })}
 
       <SearchGroupTitle
+        title="vendors"
+        hasResults={groups.vendors.length > 0}
+      />
+      {groups.vendors.map((entry) => {
+        const index = currentIndex++;
+
+        return (
+          <SearchItem
+            key={entry.id}
+            entry={entry}
+            index={index}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            isContainerScrolling={isContainerScrolling}
+            setIsModalOpen={setIsModalOpen}
+          />
+        );
+      })}
+
+      <SearchGroupTitle
+        title="vendor_contacts"
+        hasResults={groups.vendor_contacts.length > 0}
+      />
+      {groups.vendor_contacts.map((entry) => {
+        const index = currentIndex++;
+
+        return (
+          <SearchItem
+            key={entry.id}
+            entry={entry}
+            index={index}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            isContainerScrolling={isContainerScrolling}
+            setIsModalOpen={setIsModalOpen}
+          />
+        );
+      })}
+
+      <SearchGroupTitle
         title="purchase_orders"
         hasResults={groups.purchase_orders.length > 0}
       />
       {groups.purchase_orders.map((entry) => {
+        const index = currentIndex++;
+
+        return (
+          <SearchItem
+            key={entry.id}
+            entry={entry}
+            index={index}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            isContainerScrolling={isContainerScrolling}
+            setIsModalOpen={setIsModalOpen}
+          />
+        );
+      })}
+
+      <SearchGroupTitle
+        title="expenses"
+        hasResults={groups.expenses.length > 0}
+      />
+      {groups.expenses.map((entry) => {
         const index = currentIndex++;
 
         return (
