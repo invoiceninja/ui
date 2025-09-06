@@ -42,7 +42,11 @@ export type CustomFields =
   | 'surcharge1'
   | 'surcharge2'
   | 'surcharge3'
-  | 'surcharge4';
+  | 'surcharge4'
+  | 'location1'
+  | 'location2'
+  | 'location3'
+  | 'location4';
 
 export function useCustomField() {
   const company = useCurrentCompany();
