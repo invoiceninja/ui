@@ -79,16 +79,21 @@ export function Button(props: Props) {
           hoverColor: props.type === 'primary' ? colors.$18 : colors.$4,
         }}
         className={classNames(
-          `border inline-flex items-center space-x-2 px-4 shadow-sm justify-center rounded-md text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
+          `border inline-flex items-center space-x-2 px-4 shadow-sm justify-center rounded-md text-sm ${props.className}`,
           {
             'py-2 px-4': props.type !== 'minimal',
             'w-full': props.variant === 'block',
             'p-0 m-0': props.type === 'minimal',
+            'opacity-75 pointer-events-none': props.disabled,
           }
         )}
         style={css}
       >
-        {props.disabled ? <Spinner variant="light" /> : props.children}
+        {props.disabled && !props.disableWithoutIcon ? (
+          <Spinner variant="light" />
+        ) : (
+          props.children
+        )}
       </StyledLink>
     );
   }

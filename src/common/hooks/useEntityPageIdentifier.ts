@@ -25,7 +25,8 @@ interface Params {
     | 'client'
     | 'vendor'
     | 'product'
-    | 'transaction';
+    | 'transaction'
+    | 'blueprint';
   editPageTabs?: string[];
 }
 

@@ -9,7 +9,7 @@
  */
 
 import { FormEvent, ReactElement, ReactNode, useState } from 'react';
-import { Menu as MenuIcon, Info } from 'react-feather';
+import { Menu as MenuIcon, Info, File } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -64,6 +64,7 @@ import { CurrencyExchange } from '../icons/CurrencyExchange';
 import { ChartLine } from '../icons/ChartLine';
 import { ArrowsTransaction } from '../icons/ArrowsTransaction';
 import { Gear } from '../icons/Gear';
+
 export interface SaveOption {
   label: string;
   onClick: (event: FormEvent<HTMLFormElement>) => unknown;
@@ -362,14 +363,43 @@ export function Default(props: Props) {
       href: '/documents',
       icon: ArrowsTransaction,
       current: location.pathname.startsWith('/documents'),
-      visible: true, //isHosted(), //@TODO: switch back @ release @docuninja
       rightButton: {
         icon: Plus,
         to: '/documents/create',
         label: t('new_document'),
-        visible: hasPermission('create_bank_transaction'),
+        visible: true,
       },
+      visible: true, //isHosted(), //@TODO: switch back @ release @docuninja
+      subOptions: [
+        {
+          name: t('blueprints'),
+          href: '/documents/blueprints',
+          icon: File,
+          visible: true,
+          current: location.pathname.startsWith('/documents/blueprints'),
+          rightButton: {
+            icon: Plus,
+            to: '/documents/blueprints/create',
+            label: t('new_blueprint'),
+            visible: true,
+          },
+        },
+        {
+          name: t('users'),
+          href: '/documents/users',
+          icon: Users,
+          current: location.pathname.startsWith('/documents/users'),
+          visible: true,
+          rightButton: {
+            icon: Plus,
+            to: '/documents/users/create',
+            label: t('new_user'),
+            visible: true,
+          },
+        },
+      ],
     },
+
     {
       name: t('settings'),
       href:
