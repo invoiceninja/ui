@@ -34,6 +34,8 @@ import {
   confirmActionModalAtom,
 } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { useSetAtom } from 'jotai';
+import { useCustomField } from '$app/components/CustomField';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 const StyledIconBox = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -62,7 +64,9 @@ export default function Locations() {
 
   const colors = useColorScheme();
 
+  const customField = useCustomField();
   const resolveCountry = useResolveCountry();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const context: ClientContext = useOutletContext();
   const { client, setErrors } = context;
@@ -141,7 +145,7 @@ export default function Locations() {
         <div className="px-4 sm:px-6 py-2">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <NewLocationCard
-              className="flex flex-col space-y-2 items-center justify-center border-dashed border p-6 rounded-md cursor-pointer h-48"
+              className="flex flex-col space-y-2 items-center justify-center border-dashed border p-6 rounded-md cursor-pointer min-h-48"
               theme={{
                 backgroundColor: colors.$1,
                 hoverBackgroundColor: colors.$20,
@@ -153,17 +157,17 @@ export default function Locations() {
               <span>{t('add_location')}</span>
             </NewLocationCard>
 
-            {currentLocations.map((location, index) => (
+            {currentLocations.map((currentLocation, index) => (
               <LocationCard
                 key={index}
                 theme={{
                   borderColor: colors.$24,
                 }}
-                className="px-3 py-4 flex justify-between space-x-4 border rounded-md h-48"
+                className="px-3 py-4 flex justify-between space-x-4 border rounded-md min-h-48"
               >
                 <div className="flex flex-col flex-1 truncate justify-between">
                   <span className="text-lg font-semibold truncate mb-2 mt-1">
-                    {location.name}
+                    {currentLocation.name}
                   </span>
 
                   <div className="flex flex-col space-y-1 text-sm">
@@ -171,34 +175,92 @@ export default function Locations() {
                       <span style={{ color: colors.$16 }}>
                         {t('address')}:{' '}
                       </span>
-                      {location.address1}
-                      {location.address1 &&
-                        location.address2 &&
-                        `, ${location.address2}`}
+                      {currentLocation.address1}
+                      {currentLocation.address1 &&
+                        currentLocation.address2 &&
+                        `, ${currentLocation.address2}`}
                     </div>
 
                     <div>
                       <span style={{ color: colors.$16 }}>{t('city')}: </span>
-                      {location.city || ''}
-                      {location.state &&
-                        `${location.city ? ', ' : ''}${location.state}`}
-                      {location.postal_code &&
-                        `${location.state ? ' ' : ''}${location.postal_code}`}
+                      {currentLocation.city || ''}
+                      {currentLocation.state &&
+                        `${currentLocation.city ? ', ' : ''}${
+                          currentLocation.state
+                        }`}
+                      {currentLocation.postal_code &&
+                        `${currentLocation.state ? ' ' : ''}${
+                          currentLocation.postal_code
+                        }`}
                     </div>
 
                     <div>
                       <span style={{ color: colors.$16 }}>
                         {t('country')}:{' '}
                       </span>
-                      {resolveCountry(location.country_id)?.name}
+                      {resolveCountry(currentLocation.country_id)?.name}
                     </div>
 
                     <div>
                       <span style={{ color: colors.$16 }}>
                         {t('shipping')}:{' '}
                       </span>
-                      {location.is_shipping_location ? t('yes') : t('no')}
+                      {currentLocation.is_shipping_location
+                        ? t('yes')
+                        : t('no')}
                     </div>
+
+                    {currentLocation.custom_value1 && (
+                      <div>
+                        <span style={{ color: colors.$16 }}>
+                          {customField('location1').label()}:{' '}
+                        </span>
+
+                        {formatCustomFieldValue(
+                          'location1',
+                          currentLocation.custom_value1
+                        )}
+                      </div>
+                    )}
+
+                    {currentLocation.custom_value2 && (
+                      <div>
+                        <span style={{ color: colors.$16 }}>
+                          {customField('location2').label()}:{' '}
+                        </span>
+
+                        {formatCustomFieldValue(
+                          'location2',
+                          currentLocation.custom_value2
+                        )}
+                      </div>
+                    )}
+
+                    {currentLocation.custom_value3 && (
+                      <div>
+                        <span style={{ color: colors.$16 }}>
+                          {customField('location3').label()}:{' '}
+                        </span>
+
+                        {formatCustomFieldValue(
+                          'location3',
+                          currentLocation.custom_value3
+                        )}
+                      </div>
+                    )}
+
+                    {currentLocation.custom_value4 && (
+                      <div>
+                        <span style={{ color: colors.$16 }}>
+                          {customField('location4').label()}:{' '}
+                        </span>
+
+                        {formatCustomFieldValue(
+                          'location4',
+                          currentLocation.custom_value4
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -217,7 +279,7 @@ export default function Locations() {
                       backgroundColor: colors.$1,
                     }}
                     onClick={() =>
-                      !isFormBusy && setCurrentEditingLocation(location)
+                      !isFormBusy && setCurrentEditingLocation(currentLocation)
                     }
                   >
                     <Pencil size="1rem" color="#2176FF" />
@@ -237,7 +299,7 @@ export default function Locations() {
                       backgroundColor: colors.$1,
                     }}
                     onClick={() => {
-                      setDeleteLocationId(location.id);
+                      setDeleteLocationId(currentLocation.id);
                       setTimeout(() => {
                         setIsConfirmationVisible(true);
                       }, 100);

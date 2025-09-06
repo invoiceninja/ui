@@ -61,6 +61,25 @@ export function Clients() {
           withArrowAsSeparator
         />
       ))}
+
+      <div className="py-4">
+        <Divider
+          className="border-dashed"
+          borderColor={colors.$20}
+          withoutPadding
+        />
+      </div>
+
+      {['location1', 'location2', 'location3', 'location4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('location_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+          withArrowAsSeparator
+        />
+      ))}
     </div>
   );
 }

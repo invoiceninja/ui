@@ -16,6 +16,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Location } from '$app/common/interfaces/location';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CountrySelector } from '$app/components/CountrySelector';
+import { CustomField } from '$app/components/CustomField';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms/InputField';
 import Toggle from '$app/components/forms/Toggle';
@@ -115,7 +116,7 @@ export function LocationModal({
     }
   };
 
-  const handleChange = (value: string | boolean, property: string) => {
+  const handleChange = (value: string | boolean | number, property: string) => {
     if (!currentLocation) {
       return;
     }
@@ -143,6 +144,7 @@ export function LocationModal({
       visible={isModalOpen}
       onClose={handleOnClose}
       overflowVisible
+      size="regular"
     >
       <div className="flex flex-col space-y-4">
         <InputField
@@ -193,6 +195,50 @@ export function LocationModal({
           onChange={(value) => handleChange(value, 'country_id')}
           errorMessage={errors?.errors.country_id}
         />
+
+        {company?.custom_fields?.location1 && (
+          <CustomField
+            field="location1"
+            defaultValue={currentLocation?.custom_value1}
+            value={company.custom_fields.location1}
+            onValueChange={(value) => handleChange(value, 'custom_value1')}
+            noExternalPadding
+            labelOnTop
+          />
+        )}
+
+        {company?.custom_fields?.location2 && (
+          <CustomField
+            field="location2"
+            defaultValue={currentLocation?.custom_value2}
+            value={company.custom_fields.location2}
+            onValueChange={(value) => handleChange(value, 'custom_value2')}
+            noExternalPadding
+            labelOnTop
+          />
+        )}
+
+        {company?.custom_fields?.location3 && (
+          <CustomField
+            field="location3"
+            defaultValue={currentLocation?.custom_value3}
+            value={company.custom_fields.location3}
+            onValueChange={(value) => handleChange(value, 'custom_value3')}
+            noExternalPadding
+            labelOnTop
+          />
+        )}
+
+        {company?.custom_fields?.location4 && (
+          <CustomField
+            field="location4"
+            defaultValue={currentLocation?.custom_value4}
+            value={company.custom_fields.location4}
+            onValueChange={(value) => handleChange(value, 'custom_value4')}
+            noExternalPadding
+            labelOnTop
+          />
+        )}
 
         <div className="pt-1">
           <Toggle
