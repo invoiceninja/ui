@@ -173,7 +173,7 @@ export function useClientColumns() {
     },
     {
       column: 'contact_name',
-      id: 'id',
+      id: 'contacts',
       label: t('contact_name'),
       format: (value, resource) =>
         resource.contacts.length > 0 && (
@@ -181,7 +181,15 @@ export function useClientColumns() {
             to={route('/clients/:id', { id: resource.id })}
             renderSpan={disableNavigation('client', resource)}
           >
-            {resource.contacts[0].first_name} {resource.contacts[0].last_name}
+            {(() => {
+              const firstName = resource.contacts[0].first_name || '';
+              const lastName = resource.contacts[0].last_name || '';
+              const email = resource.contacts[0].email || '';
+              
+              const fullName = `${firstName} ${lastName}`.trim();
+              
+              return fullName || email;
+            })()}
           </DynamicLink>
         ),
     },
