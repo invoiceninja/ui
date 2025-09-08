@@ -64,7 +64,7 @@ export function ProductSelector(props: Props) {
           value: 'id',
           searchable: 'notes',
           dropdownLabelFn: (product) => (
-            <div className="flex flex-col flex-1 max-w-64">
+            <div className="flex flex-col flex-1 max-w-[33rem]">
               <div className="flex space-x-1">
                 <p className="font-medium truncate">{product.product_key}</p>
 
