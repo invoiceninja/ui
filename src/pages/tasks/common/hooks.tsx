@@ -78,6 +78,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
+import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 
 export const defaultColumns: string[] = [
   'status',
@@ -652,6 +653,13 @@ export const useCustomBulkActions = () => {
   } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Task>[] = [
+    ({ selectedIds, setSelected }) => (
+      <BulkUpdatesAction
+        entity="task"
+        resourceIds={selectedIds}
+        setSelected={setSelected}
+      />
+    ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
       showStartAction(selectedResources) && (
