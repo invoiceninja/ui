@@ -16,7 +16,7 @@ import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
@@ -26,15 +26,11 @@ import classNames from 'classnames';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import styled from 'styled-components';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import {
-  ConfirmActionModal,
-  confirmActionModalAtom,
-} from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
-import { useSetAtom } from 'jotai';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
 import { InfoCard } from '$app/components/InfoCard';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   client: Client;
@@ -56,12 +52,11 @@ export function Gateways(props: Props) {
 
   const { data: companyGatewaysResponse } = useCompanyGatewaysQuery();
 
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [companyGateways, setCompanyGateways] = useState<CompanyGateway[]>();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [deleteGatewayTokenId, setDeleteGatewayTokenId] = useState<string>('');
-
-  const setIsConfirmationVisible = useSetAtom(confirmActionModalAtom);
 
   const getCompanyGateway = (gatewayId: string) => {
     return companyGateways?.find(({ id }) => id === gatewayId);
@@ -91,7 +86,7 @@ export function Gateways(props: Props) {
           $refetch(['clients']);
 
           setDeleteGatewayTokenId('');
-          setIsConfirmationVisible(false);
+          setIsModalVisible(false);
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -115,17 +110,30 @@ export function Gateways(props: Props) {
 
   useEffect(() => {
     if (deleteGatewayTokenId) {
-      setIsConfirmationVisible(true);
+      setIsModalVisible(true);
     }
   }, [deleteGatewayTokenId]);
 
   return (
     <>
-      <ConfirmActionModal
-        onClick={() => handleDeleteGatewayToken()}
-        onClose={() => setDeleteGatewayTokenId('')}
-        disabledButton={isFormBusy}
-      />
+      <Modal
+        title={t('are_you_sure')}
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+      >
+        <div className="flex flex-col space-y-6">
+          <span className="font-medium text-sm">{t('are_you_sure')}</span>
+
+          <Button
+            behavior="button"
+            onClick={() => handleDeleteGatewayToken()}
+            disabled={false}
+            disableWithoutIcon
+          >
+            {t('continue')}
+          </Button>
+        </div>
+      </Modal>
 
       <InfoCard
         title={t('payment_methods')}
