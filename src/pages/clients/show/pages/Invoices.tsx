@@ -58,6 +58,8 @@ export default function Invoices() {
           setSelectedInvoiceIds(selected);
           setIsConfirmActionModalOpen(true);
         }}
+        withoutApplyingPerPagePreference
+        withoutApplyingPagePreference
       />
 
       <DeleteInvoicesConfirmationModal

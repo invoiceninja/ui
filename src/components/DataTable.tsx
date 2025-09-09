@@ -162,6 +162,8 @@ interface Props<T> extends CommonProps {
   enableSavingFilterPreference?: boolean;
   applyManualHeight?: boolean;
   onDeleteBulkAction?: (selectedIds: string[]) => void;
+  withoutApplyingPerPagePreference?: boolean;
+  withoutApplyingPagePreference?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -230,6 +232,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     showRestoreBulk,
     enableSavingFilterPreference = false,
     onDeleteBulkAction,
+    withoutApplyingPerPagePreference = false,
+    withoutApplyingPagePreference = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -276,6 +280,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
     enableSavingFilterPreference,
+    withoutApplyingPerPagePreference,
+    withoutApplyingPagePreference,
   });
 
   const {
