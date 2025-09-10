@@ -45,8 +45,8 @@ export default function Quotes() {
       excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_quote')]}
       hideEditableOptions={!hasPermission('edit_quote')}
-      withoutApplyingPerPagePreference
-      withoutApplyingPagePreference
+      withoutPerPageAsPreference
+      withoutPageAsPreference
     />
   );
 }

@@ -157,13 +157,12 @@ interface Props<T> extends CommonProps {
   disableQuery?: boolean;
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
+  withoutPageAsPreference?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
   applyManualHeight?: boolean;
   onDeleteBulkAction?: (selectedIds: string[]) => void;
-  withoutApplyingPerPagePreference?: boolean;
-  withoutApplyingPagePreference?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -232,8 +231,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     showRestoreBulk,
     enableSavingFilterPreference = false,
     onDeleteBulkAction,
-    withoutApplyingPerPagePreference = false,
-    withoutApplyingPagePreference = false,
+    withoutPageAsPreference = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -279,9 +277,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
+    withoutStoringPage: withoutPageAsPreference,
     enableSavingFilterPreference,
-    withoutApplyingPerPagePreference,
-    withoutApplyingPagePreference,
   });
 
   const {

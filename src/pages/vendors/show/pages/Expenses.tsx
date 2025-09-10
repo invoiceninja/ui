@@ -50,8 +50,8 @@ export default function Expenses() {
       excludeColumns={['vendor_id']}
       linkToCreateGuards={[permission('create_expense')]}
       hideEditableOptions={!hasPermission('edit_expense')}
-      withoutApplyingPerPagePreference
-      withoutApplyingPagePreference
+      withoutPerPageAsPreference
+      withoutPageAsPreference
     />
   );
 }

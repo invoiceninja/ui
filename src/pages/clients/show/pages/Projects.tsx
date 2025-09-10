@@ -47,8 +47,8 @@ export default function Projects() {
       excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_project')]}
       hideEditableOptions={!hasPermission('edit_project')}
-      withoutApplyingPerPagePreference
-      withoutApplyingPagePreference
+      withoutPerPageAsPreference
+      withoutPageAsPreference
     />
   );
 }
