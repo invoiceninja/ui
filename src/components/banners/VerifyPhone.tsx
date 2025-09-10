@@ -17,7 +17,7 @@ import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import VerificationInput from 'react-verification-input';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -234,21 +234,21 @@ export function VerifyPhone() {
   const account = useCurrentAccount();
   const company = useCurrentCompany();
 
-  // if (!account) {
-  //   return null;
-  // }
+  if (!account) {
+    return null;
+  }
 
-  // if (!isHosted()) {
-  //   return null;
-  // }
+  if (!isHosted()) {
+    return null;
+  }
 
-  // if (
-  //   account.account_sms_verified ||
-  //   !user?.email_verified_at ||
-  //   company?.is_disabled
-  // ) {
-  //   return null;
-  // }
+  if (
+    account.account_sms_verified ||
+    !user?.email_verified_at ||
+    company?.is_disabled
+  ) {
+    return null;
+  }
 
   return (
     <>
