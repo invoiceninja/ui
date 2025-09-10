@@ -118,7 +118,7 @@ export default function Edit() {
               </div>
             )}
 
-            {invoice && invoice.sync?.dn_id && (
+            {invoice && invoice.sync?.dn_completed && invoice.sync?.invitations[0]?.dn_id && (
               <div className="flex items-center space-x-9">
                 <span
                   className="text-sm font-medium"
@@ -127,7 +127,7 @@ export default function Edit() {
                   {t('docuninja_document')}
                 </span>
 
-                <Link to={`/documents/${invoice.sync?.dn_id}`}>
+                <Link to={`/documents/${invoice.sync?.invitations[0]?.dn_id}`}>
                   {t('link')}
                 </Link>
               </div>

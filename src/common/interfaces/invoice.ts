@@ -94,8 +94,16 @@ export interface Invoice {
 export interface Sync {
   qb_id: string;
   dn_completed: boolean;
-  dn_id: string;
+  invitations: SyncInvitation[];
 }
+
+export interface SyncInvitation {
+  invitation_key: string;
+  dn_id: string;
+  dn_invitation_id: string;
+  dn_sig: string;
+}
+
 
 export interface Backup {
   guid?: string;
