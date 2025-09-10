@@ -91,7 +91,7 @@ export function useInvoiceUtilities(props: Props) {
     console.log('Contact found and invited, proceeding with update');
 
     // Update the invitations array with the can_sign property
-    let invitations = [...(invoice.invitations || [])];
+    const invitations = [...(invoice.invitations || [])];
     
     // Find existing invitation for this contact
     const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);

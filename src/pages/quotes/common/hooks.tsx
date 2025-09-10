@@ -160,7 +160,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     if (!isInvited) return;
 
     // Update the invitations array with the can_sign property
-    let invitations = [...(quote.invitations || [])];
+    const invitations = [...(quote.invitations || [])];
     
     // Find existing invitation for this contact
     const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
