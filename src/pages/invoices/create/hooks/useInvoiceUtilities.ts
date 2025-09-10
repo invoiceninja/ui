@@ -64,54 +64,38 @@ export function useInvoiceUtilities(props: Props) {
   };
 
   const handleContactCanSignChange = (id: string, checked: boolean) => {
-    console.log('handleContactCanSignChange called:', { id, checked, hasInvoice: !!invoice, hasClient: !!invoice?.client?.contacts, hasPropsClient: !!props.client?.contacts });
-    
     // Use props.client if invoice.client is not available
     const clientContacts = invoice?.client?.contacts || props.client?.contacts;
     
     if (!clientContacts) {
-      console.log('No client contacts found in either invoice.client or props.client');
       return;
     }
 
     // Find the contact by id
     const contact = clientContacts.find(c => c.id === id);
     if (!contact) {
-      console.log('Contact not found:', id);
       return;
     }
 
     // Check if contact is invited - if not, don't allow can_sign changes
-    const isInvited = invoice.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    const isInvited = invoice?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
     if (!isInvited) {
-      console.log('Contact not invited, cannot change can_sign');
       return;
     }
 
-    console.log('Contact found and invited, proceeding with update');
-
     // Update the invitations array with the can_sign property
-    const invitations = [...(invoice.invitations || [])];
+    const invitations = [...(invoice?.invitations || [])];
     
     // Find existing invitation for this contact
     const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
     
-    console.log('Existing invitation index:', existingInvitationIndex);
-    
     if (existingInvitationIndex >= 0) {
       // Update existing invitation
-      const oldInvitation = invitations[existingInvitationIndex];
       invitations[existingInvitationIndex] = {
         ...invitations[existingInvitationIndex],
         can_sign: checked
       };
-      console.log('Updated invitation:', { 
-        old: oldInvitation, 
-        new: invitations[existingInvitationIndex] 
-      });
     }
-
-    console.log('Final invitations array:', invitations);
 
     // Update the invoice with the modified invitations
     setInvoice((current) => 

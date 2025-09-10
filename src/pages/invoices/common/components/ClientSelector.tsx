@@ -61,7 +61,6 @@ export function ClientSelector(props: Props) {
 
   const isContactInvited = useCallback((contactId: string) => {
     const isInvited = resource?.invitations?.some(inv => inv.client_contact_id === contactId) || false;
-    console.log('isContactInvited:', { contactId, isInvited, invitations: resource?.invitations });
     return isInvited;
   }, [resource?.invitations]);
 
@@ -240,33 +239,35 @@ export function ClientSelector(props: Props) {
                   )}
 
                   <div className="flex flex-col relative left-7">
-                    {Boolean(
-                      resource.invitations.length >= 1 &&
-                        resource.invitations[0].link
-                    ) && (
-                      <div className="flex items-center space-x-2">
-                        <Link
-                          className="font-medium"
-                          to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
-                          external
-                        >
-                          {t('view_in_portal')}
-                        </Link>
+                    {(() => {
+                      const contactInvitation = resource.invitations?.find(inv => inv.client_contact_id === contact.id);
+                      return Boolean(
+                        contactInvitation?.link
+                      ) && (
+                        <div className="flex items-center space-x-2">
+                          <Link
+                            className="font-medium"
+                            to={`${contactInvitation.link}?silent=true&client_hash=${client.client_hash}`}
+                            external
+                          >
+                            {t('view_in_portal')}
+                          </Link>
 
-                        <Tooltip
-                          width="auto"
-                          placement="bottom"
-                          message={t('copy_link') as string}
-                          withoutArrow
-                        >
-                          <div className="mt-1.5">
-                            <CopyToClipboardIconOnly
-                              text={resource.invitations[0].link}
-                            />
-                          </div>
-                        </Tooltip>
-                      </div>
-                    )}
+                          <Tooltip
+                            width="auto"
+                            placement="bottom"
+                            message={t('copy_link') as string}
+                            withoutArrow
+                          >
+                            <div className="mt-1.5">
+                              <CopyToClipboardIconOnly
+                                text={contactInvitation.link}
+                              />
+                            </div>
+                          </Tooltip>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
                   
