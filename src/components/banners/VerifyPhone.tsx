@@ -10,14 +10,14 @@
 
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../Modal';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Button } from '../forms';
+import { Button, SelectField } from '../forms';
 import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint, isHosted } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import VerificationInput from 'react-verification-input';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -36,6 +36,7 @@ import dayjs from 'dayjs';
 import { ErrorMessage } from '../ErrorMessage';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useColorScheme } from '$app/common/colors';
 
 interface VerificationProps {
   visible: boolean;
@@ -114,6 +115,7 @@ function Confirmation({
 function Verification({ visible, onClose }: VerificationProps) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const [errors, setErrors] = useState<ValidationBag>();
@@ -164,10 +166,36 @@ function Verification({ visible, onClose }: VerificationProps) {
             })}
             international
             placeholder={t('phone')}
-            countrySelectProps={{ unicodeFlags: true }}
+            countrySelectProps={{
+              unicodeFlags: true,
+            }}
             defaultCountry="US"
             value={number}
             onChange={setNumber}
+            countrySelectComponent={({ value, options, onChange, ...rest }) => (
+              <div className="PhoneInputCountry">
+                <SelectField
+                  className="PhoneInputCountrySelect"
+                  value={value}
+                  onValueChange={(currentValue) => onChange(currentValue)}
+                >
+                  {options.map((option: { value: string; label: string }) => (
+                    <option key={option.value} value={option.value || ''}>
+                      {option.label}
+                    </option>
+                  ))}
+                </SelectField>
+
+                <div className="PhoneInputCountryIconUnicode">
+                  <rest.iconComponent country={value} />
+                </div>
+
+                <div
+                  className="PhoneInputCountrySelectArrow"
+                  style={{ color: colors.$3 }}
+                ></div>
+              </div>
+            )}
           />
         </div>
 
@@ -206,21 +234,21 @@ export function VerifyPhone() {
   const account = useCurrentAccount();
   const company = useCurrentCompany();
 
-  if (!account) {
-    return null;
-  }
+  // if (!account) {
+  //   return null;
+  // }
 
-  if (!isHosted()) {
-    return null;
-  }
+  // if (!isHosted()) {
+  //   return null;
+  // }
 
-  if (
-    account.account_sms_verified ||
-    !user?.email_verified_at ||
-    company?.is_disabled
-  ) {
-    return null;
-  }
+  // if (
+  //   account.account_sms_verified ||
+  //   !user?.email_verified_at ||
+  //   company?.is_disabled
+  // ) {
+  //   return null;
+  // }
 
   return (
     <>
