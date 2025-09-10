@@ -10,9 +10,9 @@
 
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../Modal';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Button } from '../forms';
+import { Button, SelectField } from '../forms';
 import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -31,10 +31,12 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useColorScheme } from '$app/common/colors';
 import { Popover } from '@headlessui/react';
 import dayjs from 'dayjs';
 import { ErrorMessage } from '../ErrorMessage';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useColorScheme } from '$app/common/colors';
 
 interface VerificationProps {
   visible: boolean;
@@ -112,6 +114,10 @@ function Confirmation({
 
 function Verification({ visible, onClose }: VerificationProps) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+
   const [errors, setErrors] = useState<ValidationBag>();
   const [number, setNumber] = useState<string>();
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
@@ -144,7 +150,6 @@ function Verification({ visible, onClose }: VerificationProps) {
         }
       });
   };
-  const colors = useColorScheme();
 
   return (
     <>
@@ -153,21 +158,44 @@ function Verification({ visible, onClose }: VerificationProps) {
         visible={visible}
         onClose={onClose}
       >
-        <div
-          className="flex flex-col mb-1"
-          style={{
-            backgroundColor: colors.$2,
-            color: colors.$3,
-            colorScheme: colors.$0,
-          }}
-        >
+        <div className="flex flex-col mb-1">
           <PhoneInput
+            className={classNames('phone-input-field', {
+              'phone-input-field-dark': reactSettings?.dark_mode,
+              'phone-input-field-light': !reactSettings?.dark_mode,
+            })}
             international
             placeholder={t('phone')}
-            countrySelectProps={{ unicodeFlags: true }}
+            countrySelectProps={{
+              unicodeFlags: true,
+            }}
             defaultCountry="US"
             value={number}
             onChange={setNumber}
+            countrySelectComponent={({ value, options, onChange, ...rest }) => (
+              <div className="PhoneInputCountry">
+                <SelectField
+                  className="PhoneInputCountrySelect"
+                  value={value}
+                  onValueChange={(currentValue) => onChange(currentValue)}
+                >
+                  {options.map((option: { value: string; label: string }) => (
+                    <option key={option.value} value={option.value || ''}>
+                      {option.label}
+                    </option>
+                  ))}
+                </SelectField>
+
+                <div className="PhoneInputCountryIconUnicode">
+                  <rest.iconComponent country={value} />
+                </div>
+
+                <div
+                  className="PhoneInputCountrySelectArrow"
+                  style={{ color: colors.$3 }}
+                ></div>
+              </div>
+            )}
           />
         </div>
 
