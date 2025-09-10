@@ -86,6 +86,7 @@ export default function Edit() {
   const {
     handleChange,
     handleInvitationChange,
+    handleContactCanSignChange,
     handleLineItemChange,
     handleLineItemPropertyChange,
     handleCreateLineItem,
@@ -175,6 +176,7 @@ export default function Edit() {
                 handleChange('location_id', locationId)
               }
               onContactCheckboxChange={handleInvitationChange}
+              onContactCanSignCheckboxChange={handleContactCanSignChange}
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly

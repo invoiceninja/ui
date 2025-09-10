@@ -75,6 +75,7 @@ export function Contacts(props: Props) {
       password: '',
       phone: '',
       send_email: false,
+      can_sign: false,
     });
 
     props.setContacts(contacts);
@@ -220,6 +221,21 @@ export function Contacts(props: Props) {
                 }
               />
             </Element>
+
+            {company?.enable_modules && (
+            <Element leftSide={t('authorized_to_sign')} noExternalPadding>
+              <Toggle
+                checked={Boolean(contact?.can_sign)}
+                onChange={(value) =>
+                  handleChange(
+                    value,
+                    'can_sign',
+                    contact.contact_key as string
+                  )
+                }
+              />
+            </Element>
+            )}
 
             {company?.custom_fields?.contact1 && (
               <CustomField

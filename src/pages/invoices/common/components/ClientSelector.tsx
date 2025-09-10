@@ -13,7 +13,7 @@ import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
@@ -22,6 +22,7 @@ import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/Us
 import { ClientActionButtons } from './ClientActionButtons';
 import { Tooltip } from '$app/components/Tooltip';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import classNames from 'classnames';
 import { Element } from '$app/components/cards';
 
@@ -31,6 +32,7 @@ interface Props {
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
+  onContactCanSignCheckboxChange?: (contactId: string, value: boolean) => unknown;
   errorMessage?: string | string[];
   disableWithSpinner?: boolean;
   textOnly?: boolean;
@@ -42,6 +44,7 @@ export function ClientSelector(props: Props) {
 
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
+  const company = useCurrentCompany();
   const clientResolver = useClientResolver();
 
   const [client, setClient] = useState<Client>();
@@ -55,6 +58,24 @@ export function ClientSelector(props: Props) {
 
     return Boolean(potential);
   };
+
+  const isContactInvited = useCallback((contactId: string) => {
+    const isInvited = resource?.invitations?.some(inv => inv.client_contact_id === contactId) || false;
+    console.log('isContactInvited:', { contactId, isInvited, invitations: resource?.invitations });
+    return isInvited;
+  }, [resource?.invitations]);
+
+  const getCanSignState = useCallback((contactId: string) => {
+    if (!resource?.invitations || !client?.contacts) {
+      return false;
+    }
+
+    // Find the invitation for this contact
+    const invitation = resource.invitations.find(inv => inv.client_contact_id === contactId);
+    
+    // Return the can_sign property if it exists, otherwise false
+    return invitation?.can_sign || false;
+  }, [resource?.invitations, client?.contacts]);
 
   useEffect(() => {
     resource?.client_id &&
@@ -185,6 +206,39 @@ export function ClientSelector(props: Props) {
                     </div>
                   </div>
 
+                  {company?.enable_modules && (
+                    <div className="flex space-x-2.5 w-full mt-2">
+                      <Checkbox
+                        id={`can-sign-${contact.id}`}
+                        checked={getCanSignState(contact.id)}
+                        disabled={false}
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          console.log('Authorized to sign checkbox clicked:', { 
+                            contactId: contact.id, 
+                            checked: event.target.checked, 
+                            isInvited: isContactInvited(contact.id),
+                            hasHandler: !!props.onContactCanSignCheckboxChange 
+                          });
+                          props.onContactCanSignCheckboxChange?.(
+                            contact.id,
+                            event.target.checked
+                          );
+                        }}
+                      />
+
+                      <div className="flex truncate">
+                        <span
+                          className={`text-sm font-medium ${
+                            !isContactInvited(contact.id) ? 'opacity-50' : ''
+                          }`}
+                          style={{ color: colors.$3 }}
+                        >
+                          {t('authorized_to_sign')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex flex-col relative left-7">
                     {Boolean(
                       resource.invitations.length >= 1 &&
@@ -215,7 +269,7 @@ export function ClientSelector(props: Props) {
                     )}
                   </div>
                 </div>
-
+                  
                 {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
               </div>
             ))}
