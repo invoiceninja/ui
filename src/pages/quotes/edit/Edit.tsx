@@ -27,6 +27,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import { useColorScheme } from '$app/common/colors';
 import { QuoteContext } from '../create/Create';
+import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -104,6 +105,11 @@ export default function Edit() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            formatTabLabel={(index) => {
+              if (index === 1) {
+                return <TasksTabLabel lineItems={quote?.line_items || []} />;
+              }
+            }}
           >
             <div>
               {quote && client ? (

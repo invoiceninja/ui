@@ -46,6 +46,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
 import { InputLabel } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
+import { TasksTabLabel } from '../common/components/TasksTabLabel';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -177,6 +178,11 @@ export default function Edit() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            formatTabLabel={(index) => {
+              if (index === 1) {
+                return <TasksTabLabel lineItems={invoice?.line_items || []} />;
+              }
+            }}
           >
             <div>
               {invoice && client ? (
