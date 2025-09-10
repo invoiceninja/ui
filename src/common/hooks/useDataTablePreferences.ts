@@ -40,6 +40,7 @@ interface Params {
   setArePreferencesApplied: Dispatch<SetStateAction<boolean>>;
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
+  withoutStoringPage?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -64,6 +65,7 @@ export function useDataTablePreferences(params: Params) {
     setArePreferencesApplied,
     withoutStoringPerPage,
     enableSavingFilterPreference,
+    withoutStoringPage,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -103,6 +105,7 @@ export function useDataTablePreferences(params: Params) {
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
+      ...(!withoutStoringPage && { currentPage: 1 }),
     };
 
     const cleanedUpFilters = {
@@ -111,10 +114,15 @@ export function useDataTablePreferences(params: Params) {
       sort,
       status,
       ...(!withoutStoringPerPage && { perPage }),
+      ...(!withoutStoringPage && { currentPage }),
     };
 
     if (currentTableFilters && withoutStoringPerPage) {
       delete currentTableFilters.perPage;
+    }
+
+    if (currentTableFilters && withoutStoringPage) {
+      delete currentTableFilters.currentPage;
     }
 
     storeSessionTableFilters(filter, currentPage);
@@ -162,9 +170,12 @@ export function useDataTablePreferences(params: Params) {
       } else {
         setCustomFilter([]);
       }
-      !withoutStoringPerPage &&
+      if (!withoutStoringPerPage) {
         setPerPage((getPreference('perPage') as PerPage) || '10');
-      setCurrentPage((getPreference('currentPage') as number) || 1);
+      }
+      if (!withoutStoringPage) {
+        setCurrentPage((getPreference('currentPage') as number) || 1);
+      }
       setSort((getPreference('sort') as string) || 'id|asc');
       setSortedBy((getPreference('sortedBy') as string) || undefined);
       if ((getPreference('status') as string[]).length) {

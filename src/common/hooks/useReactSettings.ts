@@ -23,7 +23,7 @@ export type ChartsDefaultView = 'day' | 'week' | 'month';
 export interface TableFiltersPreference {
   filter?: string;
   customFilter?: string[];
-  currentPage: number;
+  currentPage?: number;
   sort?: string;
   status: string[];
   sortedBy?: string;

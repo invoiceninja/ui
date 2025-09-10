@@ -50,6 +50,8 @@ export default function Payments() {
           (payment) => getEntityState(payment) === EntityState.Archived
         )
       }
+      withoutPerPageAsPreference
+      withoutPageAsPreference
     />
   );
 }
