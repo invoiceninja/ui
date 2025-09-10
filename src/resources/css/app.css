@@ -23,3 +23,26 @@
     animation: jiggle 0.8s ease-in-out infinite;
   }
 }
+
+.phone-input-field > input {
+  background-color: transparent !important;
+  border-radius: 0.375rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.phone-input-field-dark > input {
+  border-color: #1f2e41;
+}
+
+.phone-input-field-dark > input:focus {
+  border-color: white;
+}
+
+.phone-input-field-light > input {
+  border-color: #09090b26;
+}
+
+.phone-input-field-light > input:focus {
+  border-color: black;
+}
