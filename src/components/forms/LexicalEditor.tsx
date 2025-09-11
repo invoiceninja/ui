@@ -173,7 +173,6 @@ import {
 } from 'lexical';
 
 import ToolbarPlugin from './ToolbarPlugin';
-import TreeViewPlugin from './TreeViewPlugin';
 
 const MIN_ALLOWED_FONT_SIZE = 8;
 const MAX_ALLOWED_FONT_SIZE = 72;
@@ -353,7 +352,6 @@ export function LexicalEditorComponent() {
           />
           <HistoryPlugin />
           <AutoFocusPlugin />
-          <TreeViewPlugin />
         </div>
       </div>
     </LexicalComposer>
