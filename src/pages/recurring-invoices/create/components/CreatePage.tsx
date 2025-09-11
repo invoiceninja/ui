@@ -25,6 +25,7 @@ import { useRecurringInvoiceUtilities } from '../../common/hooks';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import { useColorScheme } from '$app/common/colors';
+import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
 
 export default function CreatePage() {
   const [t] = useTranslation();
@@ -79,6 +80,15 @@ export default function CreatePage() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            formatTabLabel={(index) => {
+              if (index === 1) {
+                return (
+                  <TasksTabLabel
+                    lineItems={recurringInvoice?.line_items || []}
+                  />
+                );
+              }
+            }}
           >
             <div>
               {recurringInvoice ? (
