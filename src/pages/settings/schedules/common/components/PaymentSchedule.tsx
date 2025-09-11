@@ -441,8 +441,10 @@ export function PaymentSchedule(props: Props) {
                                             <Td>
                                                 <div className="">
                                                     <Button 
+                                                        behavior='button'
                                                         onClick={() => handleRemoveSchedule(index)}
                                                         disabled={isScheduleInPast(schedule.date)}
+                                                        disableWithoutIcon
                                                     >
                                                         {t('remove')}
                                                     </Button>
@@ -454,7 +456,7 @@ export function PaymentSchedule(props: Props) {
                                     {!isComplete && (
                                         <Tr>
                                             <Td colSpan={3} className="text-center py-3">
-                                                <Button onClick={handleAddNewSchedule}>
+                                                <Button behavior='button' onClick={handleAddNewSchedule} disableWithoutIcon>
                                                     {t('add')}
                                                 </Button>
                                                 {errors?.errors['parameters.schedule'][0] && (
@@ -487,7 +489,7 @@ export function PaymentSchedule(props: Props) {
                     {/* Show add schedule button when no schedules exist but invoice is selected */}
                     {schedules.length === 0 && selectedInvoice && (
                         <div className="mb-4 flex justify-center">
-                            <Button onClick={handleAddNewSchedule}>
+                            <Button behavior='button' onClick={handleAddNewSchedule}>
                                 {t('schedule')}
                             </Button>
                         </div>
