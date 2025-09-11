@@ -269,6 +269,7 @@ export function AddScheduleModal(props: Props) {
             </div>
 
             <Button
+                behavior='button'
                 className="self-end"
                 onClick={handleSave}
             >
