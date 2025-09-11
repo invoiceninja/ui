@@ -114,6 +114,51 @@ export function Gateways(props: Props) {
     }
   }, [deleteGatewayTokenId]);
 
+  useEffect(() => {
+    if (client) {
+      client.gateway_tokens = [
+        {
+          id: '1',
+          company_gateway_id: '1',
+          gateway_customer_reference: '1',
+          gateway_type_id: '1',
+          meta: {
+            brand: '1',
+            exp_month: '1',
+            exp_year: '1',
+            last4: '1',
+            type: 1,
+          },
+          is_default: false,
+          is_deleted: false,
+          token: '1',
+          updated_at: 1,
+          created_at: 1,
+          archived_at: 1,
+        },
+        {
+          id: '1',
+          company_gateway_id: '1',
+          gateway_customer_reference: '1',
+          gateway_type_id: '1',
+          meta: {
+            brand: '1',
+            exp_month: '1',
+            exp_year: '1',
+            last4: '1',
+            type: 1,
+          },
+          is_default: true,
+          is_deleted: false,
+          token: '1',
+          updated_at: 1,
+          created_at: 1,
+          archived_at: 1,
+        },
+      ];
+    }
+  }, [client]);
+
   return (
     <>
       <Modal
@@ -293,8 +338,8 @@ export function Gateways(props: Props) {
                             className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
                             style={{
                               borderColor: colors.$5,
-                              paddingTop: '0.21rem',
-                              paddingBottom: '0.21rem',
+                              paddingTop: '0.24rem',
+                              paddingBottom: '0.24rem',
                             }}
                             theme={{ hoverBgColor: colors.$4 }}
                           >
