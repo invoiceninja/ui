@@ -293,8 +293,8 @@ export function Gateways(props: Props) {
                             className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
                             style={{
                               borderColor: colors.$5,
-                              paddingTop: '0.21rem',
-                              paddingBottom: '0.21rem',
+                              paddingTop: '0.24rem',
+                              paddingBottom: '0.24rem',
                             }}
                             theme={{ hoverBgColor: colors.$4 }}
                           >
