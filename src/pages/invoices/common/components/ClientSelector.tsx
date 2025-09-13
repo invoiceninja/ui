@@ -212,12 +212,6 @@ export function ClientSelector(props: Props) {
                         checked={getCanSignState(contact.id)}
                         disabled={false}
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                          console.log('Authorized to sign checkbox clicked:', { 
-                            contactId: contact.id, 
-                            checked: event.target.checked, 
-                            isInvited: isContactInvited(contact.id),
-                            hasHandler: !!props.onContactCanSignCheckboxChange 
-                          });
                           props.onContactCanSignCheckboxChange?.(
                             contact.id,
                             event.target.checked
