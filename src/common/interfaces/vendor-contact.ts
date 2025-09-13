@@ -25,4 +25,5 @@ export interface VendorContact {
   custom_value4: string;
   link: string;
   last_login: number;
+  can_sign: boolean;
 }

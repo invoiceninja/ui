@@ -90,6 +90,7 @@ export interface Company {
   expense_mailbox?: string;
   legal_entity_id: string | null;
   session_timeout?: number;
+  enable_modules?: number;
 }
 
 export interface Settings {
