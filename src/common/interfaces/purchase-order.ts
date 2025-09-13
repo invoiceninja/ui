@@ -99,4 +99,5 @@ export interface Invitation {
   created_at: number;
   email_status: string;
   email_error: string;
+  can_sign?: boolean;
 }

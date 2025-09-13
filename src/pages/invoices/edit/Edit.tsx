@@ -44,7 +44,7 @@ import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
-import { InputLabel } from '$app/components/forms';
+import { InputLabel, Link } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 
 export interface Context {
@@ -86,6 +86,7 @@ export default function Edit() {
   const {
     handleChange,
     handleInvitationChange,
+    handleContactCanSignChange,
     handleLineItemChange,
     handleLineItemPropertyChange,
     handleCreateLineItem,
@@ -115,6 +116,21 @@ export default function Edit() {
                 <div>
                   <InvoiceStatusBadge entity={invoice} />
                 </div>
+              </div>
+            )}
+
+            {invoice && invoice.sync?.dn_completed && invoice.sync?.invitations[0]?.dn_id && (
+              <div className="flex items-center space-x-9">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('docuninja_document')}
+                </span>
+
+                <Link to={`/documents/${invoice.sync?.invitations[0]?.dn_id}`}>
+                  {t('link')}
+                </Link>
               </div>
             )}
 
@@ -160,6 +176,7 @@ export default function Edit() {
                 handleChange('location_id', locationId)
               }
               onContactCheckboxChange={handleInvitationChange}
+              onContactCanSignCheckboxChange={handleContactCanSignChange}
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly

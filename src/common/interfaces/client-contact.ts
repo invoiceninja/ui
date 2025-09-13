@@ -27,4 +27,5 @@ export interface ClientContact {
   last_login: number;
   password: string;
   link: string;
+  can_sign: boolean;
 }

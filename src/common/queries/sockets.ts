@@ -22,6 +22,9 @@ export const events = [
   'App\\Events\\Credit\\CreditWasCreated',
   'App\\Events\\Credit\\CreditWasUpdated',
   'App\\Events\\Socket\\RefreshEntity',
+  'App\\Events\\Document\\DocumentWasSigned',
+  'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated',
+  'App\\Events\\User\\UserWasVerified',
 ] as const;
 
 export type Event = (typeof events)[number];
@@ -39,6 +42,9 @@ export function usePrivateSocketEvents() {
     'App\\Events\\Credit\\CreditWasCreated': () => {},
     'App\\Events\\Credit\\CreditWasUpdated': () => {},
     'App\\Events\\Socket\\RefreshEntity': () => {},
+    'App\\Events\\Document\\DocumentWasSigned': () => {},
+    'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated': () => {},
+    'App\\Events\\User\\UserWasVerified': () => {},
   };
 
   useEffect(() => {

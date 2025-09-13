@@ -197,6 +197,7 @@ export default function Create() {
             ) as unknown as Invitation;
 
             invitation.client_contact_id = contact.id;
+            invitation.can_sign = contact.send_email; // Set can_sign based on send_email
             invitations.push(invitation);
           }
         });

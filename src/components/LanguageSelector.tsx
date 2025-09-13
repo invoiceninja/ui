@@ -22,7 +22,9 @@ export function LanguageSelector(props: GenericSelectorProps) {
       label={props.label}
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
+      withBlank={props.withBlank}
       customSelector
+      readOnly={props.readOnly}
     >
       {languages.map((language, index) => (
         <option key={index} value={language.id}>
