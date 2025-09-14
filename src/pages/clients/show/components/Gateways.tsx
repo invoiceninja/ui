@@ -269,7 +269,7 @@ export function Gateways(props: Props) {
               </div>
 
               {!token.is_default && (
-                <div className="flex items-center justify-start">
+                <div className="flex items-center justify-end">
                   <div
                     className="inline-flex items-center text-xs cursor-pointer self-start"
                     style={{ height: '1.5rem' }}
