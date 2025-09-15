@@ -169,14 +169,14 @@ export function CardsCustomizationModal() {
       </Box>
 
       <Modal
-        title={t('customize_cards')}
+        title={t('edit_columns')}
         visible={isVisible}
         onClose={handleClose}
         overflowVisible
       >
         <div className="flex flex-col space-y-6">
           <SelectField
-            label={t('cards')}
+            label=""
             value=""
             onValueChange={(value) =>
               setCurrentCards((current) => [
