@@ -28,6 +28,14 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { toast } from '$app/common/helpers/toast/toast';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 
 const Box = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -136,6 +144,16 @@ export function CardsCustomizationModal() {
     }
   }, [user?.company_user?.react_settings?.client_show_cards]);
 
+  const onDragEnd = (result: DropResult) => {
+    const filtered = arrayMoveImmutable(
+      currentCards,
+      result.source.index,
+      result.destination?.index as unknown as number
+    );
+
+    setCurrentCards(filtered);
+  };
+
   return (
     <>
       <Box
@@ -179,31 +197,91 @@ export function CardsCustomizationModal() {
           </SelectField>
 
           {currentCards.length ? (
-            <div className="flex flex-col space-y-3">
-              {currentCards.map((card) => (
-                <div key={card} className="flex items-center justify-between">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: colors.$3 }}
-                  >
-                    {t(card)}
-                  </span>
-
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable
+                droppableId="client-show-cards"
+                renderClone={(provided, _, rubric) => (
                   <div
-                    className="cursor-pointer"
-                    onClick={() => handleDelete(card)}
+                    className="flex items-center justify-between text-sm"
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
                   >
-                    <CircleXMark
-                      color={colors.$16}
-                      hoverColor={colors.$3}
-                      borderColor={colors.$5}
-                      hoverBorderColor={colors.$17}
-                      size="1.6rem"
-                    />
+                    <div className="flex items-center space-x-2">
+                      <GridDotsVertical size="1.2rem" color={colors.$17} />
+
+                      <span className="font-medium">
+                        {t((currentCards || [])[rubric.source.index] as string)}
+                      </span>
+                    </div>
+
+                    <div>
+                      <CircleXMark
+                        color={colors.$16}
+                        hoverColor={colors.$3}
+                        borderColor={colors.$5}
+                        hoverBorderColor={colors.$17}
+                        size="1.6rem"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              >
+                {(droppableProvided) => (
+                  <div
+                    className="flex flex-col"
+                    {...droppableProvided.droppableProps}
+                    ref={droppableProvided.innerRef}
+                  >
+                    {(currentCards || []).map((card, index) => (
+                      <Draggable
+                        key={index}
+                        draggableId={index.toString()}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            className="flex items-center justify-between py-1.5"
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            key={index}
+                          >
+                            <div
+                              className="flex flex-1 items-center space-x-2 cursor-pointer"
+                              {...provided.dragHandleProps}
+                            >
+                              <div>
+                                <GridDotsVertical
+                                  size="1.2rem"
+                                  color={colors.$17}
+                                />
+                              </div>
+
+                              <span className="font-medium">{t(card)}</span>
+                            </div>
+
+                            <div
+                              className="cursor-pointer"
+                              onClick={() => handleDelete(card)}
+                            >
+                              <CircleXMark
+                                color={colors.$16}
+                                hoverColor={colors.$3}
+                                borderColor={colors.$5}
+                                hoverBorderColor={colors.$17}
+                                size="1.6rem"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+
+                    {droppableProvided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           ) : (
             <span className="text-sm font-medium" style={{ color: colors.$3 }}>
               {t('no_cards_selected')}.

@@ -89,6 +89,27 @@ export default function Client() {
     return currentCards.includes(card);
   };
 
+  const displayCard = (card: ClientShowCard) => {
+    if (!client) return <></>;
+
+    switch (card) {
+      case 'details':
+        return <Details client={client} />;
+      case 'address':
+        return <Address client={client} />;
+      case 'contacts':
+        return <Contacts client={client} />;
+      case 'standing':
+        return <Standing client={client} />;
+      case 'gateways':
+        return <Gateways client={client} />;
+      case 'public_notes':
+        return <ClientPublicNotes client={client} />;
+      case 'private_notes':
+        return <ClientPrivateNotes client={client} />;
+    }
+  };
+
   useEffect(() => {
     setDocumentTitle(client?.display_name || 'view_client');
 
@@ -151,17 +172,9 @@ export default function Client() {
       {client && (
         <>
           <div className="grid grid-cols-12 lg:space-y-0 gap-4">
-            {isCardVisible('details') && <Details client={client} />}
-            {isCardVisible('address') && <Address client={client} />}
-            {isCardVisible('contacts') && <Contacts client={client} />}
-            {isCardVisible('standing') && <Standing client={client} />}
-            {isCardVisible('gateways') && <Gateways client={client} />}
-            {isCardVisible('public_notes') && (
-              <ClientPublicNotes client={client} />
-            )}
-            {isCardVisible('private_notes') && (
-              <ClientPrivateNotes client={client} />
-            )}
+            {reactSettings.client_show_cards
+              ?.filter((card) => isCardVisible(card))
+              .map((card) => displayCard(card))}
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />
