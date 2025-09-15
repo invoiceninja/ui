@@ -1,0 +1,34 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+.dateTimePill {
+  background: #ddd;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0px 4px 0px 4px;
+}
+.dateTimePill.selected {
+  outline: 2px solid rgb(60, 132, 244);
+}
+.dateTimePill:hover {
+  background: #f2f2f2;
+}
+.dateTimePicker {
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 0px 6px 0px 10px;
+}
+/* https://daypicker.dev/docs/styling#css-variables */
+.rdp-root {
+  --rdp-accent-color: #76b6ff;
+  --rdp-accent-background-color: #f0f0f0;
+}

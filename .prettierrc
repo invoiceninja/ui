@@ -1,5 +1,15 @@
 {
   "semi": true,
-  "trailingComma": "es5",
-  "singleQuote": true
+  "singleQuote": true,
+  "bracketSpacing": false,
+  "bracketSameLine": true,
+  "printWidth": 80,
+  "trailingComma": "all",
+  "htmlWhitespaceSensitivity": "ignore",
+  "attributeGroups": ["^class$", "^(id|name)$", "$DEFAULT", "^aria-", "^data-"],
+  "attributeSort": "ASC",
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-organize-attributes"
+  ]
 }

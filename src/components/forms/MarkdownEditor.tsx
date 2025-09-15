@@ -15,7 +15,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { LexicalEditorComponent } from './LexicalEditor';
 
 interface Props {
   value?: string | undefined;
@@ -188,5 +187,7 @@ export function MarkdownEditor(props: Props) {
     );
   }
 
-  return <LexicalEditorComponent />;
+  return (
+   null
+  );
 }
