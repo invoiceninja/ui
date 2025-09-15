@@ -9,9 +9,8 @@
  */
 
 
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { Context } from '../Edit';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useTranslation } from 'react-i18next';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Card } from '$app/components/cards';
@@ -59,11 +58,9 @@ function PaymentSchedule() {
   const { invoice } = context;
 
   const colors = useColorScheme();
-
-  const navigate = useNavigate();
-  const formatMoney = useFormatMoney();
-  const disableNavigation = useDisableNavigation();
   const queryClient = useQueryClient();
+
+  const formatMoney = useFormatMoney();
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState<WizardStep>('initial-choice');
@@ -576,6 +573,7 @@ function PaymentSchedule() {
                     errorMessage={undefined}
                     customSelector
                     dismissable={false}
+                    menuPosition='fixed'
                 >
                     {Object.keys(frequencies).map((frequency, index) => (
                         <option key={index} value={frequency}>
