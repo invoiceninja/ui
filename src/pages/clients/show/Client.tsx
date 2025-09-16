@@ -86,6 +86,12 @@ export default function Client() {
       'standing',
     ];
 
+    if (card === 'gateways') {
+      return (
+        (client?.gateway_tokens?.length ?? 0) > 0 && currentCards.includes(card)
+      );
+    }
+
     return currentCards.includes(card);
   };
 
