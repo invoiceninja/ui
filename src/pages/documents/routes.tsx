@@ -28,6 +28,9 @@ const Settings = lazy(
   () => import('$app/pages/documents/pages/settings/Settings')
 );
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
+const BlueprintBuilder = lazy(
+  () => import('$app/pages/documents/pages/blueprints/builder/BlueprintBuilder')
+);
 const EmailSettings = lazy(
   () =>
     import(
@@ -111,7 +114,7 @@ export const documentsRoutes = (
 
     <Route
       path="blueprints/:id/edit"
-      element={<Guard guards={[]} component={<EditBlueprint />} />}
+      element={<Guard guards={[]} component={<BlueprintBuilder />} />}
     />
 
     <Route path="users" element={<Guard guards={[]} component={<Users />} />} />
