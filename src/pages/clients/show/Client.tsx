@@ -155,7 +155,9 @@ export default function Client() {
             {isCardVisible('address') && <Address client={client} />}
             {isCardVisible('contacts') && <Contacts client={client} />}
             {isCardVisible('standing') && <Standing client={client} />}
-            {isCardVisible('gateways') && <Gateways client={client} />}
+            {isCardVisible('gateways') && client.gateway_tokens.length > 0 && (
+              <Gateways client={client} />
+            )}
             {isCardVisible('public_notes') && (
               <ClientPublicNotes client={client} />
             )}

@@ -202,7 +202,13 @@ export function Gateways(props: Props) {
                     'justify-between':
                       isStripeGateway(
                         getCompanyGateway(token.company_gateway_id)?.gateway_key
-                      ) && token.is_default,
+                      ) &&
+                      (token.is_default || !token.is_default),
+                    'justify-end':
+                      !token.is_default &&
+                      !isStripeGateway(
+                        getCompanyGateway(token.company_gateway_id)?.gateway_key
+                      ),
                   })}
                 >
                   {isStripeGateway(
@@ -216,12 +222,13 @@ export function Gateways(props: Props) {
                           customerReference: token.gateway_customer_reference,
                         }
                       )}
+                      withoutExternalIcon
                     >
                       <Icon element={MdLaunch} size={18} />
                     </Link>
                   )}
 
-                  {token.is_default && (
+                  {token.is_default ? (
                     <div
                       className="inline-flex items-center text-xs"
                       style={{ height: '1.5rem' }}
@@ -264,60 +271,56 @@ export function Gateways(props: Props) {
                         </Dropdown>
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
-
-              {!token.is_default && (
-                <div className="flex items-center justify-start">
-                  <div
-                    className="inline-flex items-center text-xs cursor-pointer self-start"
-                    style={{ height: '1.5rem' }}
-                  >
-                    <Div
-                      className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
-                      onClick={() => handleSetDefault(token.id)}
-                      style={{
-                        borderColor: colors.$5,
-                      }}
-                      theme={{ hoverBgColor: colors.$5 }}
+                  ) : (
+                    <div
+                      className="inline-flex items-center text-xs cursor-pointer self-end"
+                      style={{ height: '1.5rem' }}
                     >
-                      {t('save_as_default')}
-                    </Div>
-
-                    {isAdmin && (
-                      <Dropdown
-                        className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
-                        customLabel={
-                          <Div
-                            className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
-                            style={{
-                              borderColor: colors.$5,
-                              paddingTop: '0.21rem',
-                              paddingBottom: '0.21rem',
-                            }}
-                            theme={{ hoverBgColor: colors.$4 }}
-                          >
-                            <ChevronDown size="0.9rem" color={colors.$3} />
-                          </Div>
-                        }
-                        minWidth="10rem"
-                        maxWidth="12rem"
+                      <Div
+                        className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
+                        onClick={() => handleSetDefault(token.id)}
                         style={{
                           borderColor: colors.$5,
                         }}
+                        theme={{ hoverBgColor: colors.$5 }}
                       >
-                        <DropdownElement
-                          icon={<Icon element={MdDelete} />}
-                          onClick={() => setDeleteGatewayTokenId(token.id)}
+                        {t('save_as_default')}
+                      </Div>
+
+                      {isAdmin && (
+                        <Dropdown
+                          className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
+                          customLabel={
+                            <Div
+                              className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
+                              style={{
+                                borderColor: colors.$5,
+                                paddingTop: '0.26rem',
+                                paddingBottom: '0.26rem',
+                              }}
+                              theme={{ hoverBgColor: colors.$4 }}
+                            >
+                              <ChevronDown size="0.9rem" color={colors.$3} />
+                            </Div>
+                          }
+                          minWidth="10rem"
+                          maxWidth="12rem"
+                          style={{
+                            borderColor: colors.$5,
+                          }}
                         >
-                          {t('delete')}
-                        </DropdownElement>
-                      </Dropdown>
-                    )}
-                  </div>
+                          <DropdownElement
+                            icon={<Icon element={MdDelete} />}
+                            onClick={() => setDeleteGatewayTokenId(token.id)}
+                          >
+                            {t('delete')}
+                          </DropdownElement>
+                        </Dropdown>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
