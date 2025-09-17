@@ -134,7 +134,9 @@ export function useBulk(params?: Params) {
 
       params?.onSuccess?.();
 
-      $refetch(['invoices']);
+      if (action !== 'auto_bill') {
+        $refetch(['invoices']);
+      }
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
