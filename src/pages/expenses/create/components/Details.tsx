@@ -265,7 +265,7 @@ export function Details(props: Props) {
           </div>
         )}
 
-        {Boolean(getNonExistingTaxes().length) && (
+        {/* {Boolean(getNonExistingTaxes().length) && (
           <Element leftSide={t('taxes')}>
             {getNonExistingTaxes().map((tax) => (
               <div key={tax} className="flex items-center space-x-2">
@@ -275,7 +275,7 @@ export function Details(props: Props) {
               </div>
             ))}
           </Element>
-        )}
+        )} */}
 
         {/* Tax 1 */}
         {expense &&
