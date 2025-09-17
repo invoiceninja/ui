@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Editor as LexicalEditor } from '$app/components/lexical/Editor';
 
 interface Props {
   value?: string | undefined;
@@ -100,77 +101,81 @@ export function MarkdownEditor(props: Props) {
     }
   }, [colors.$0]);
 
-  return (
-    <div className="space-y-4" style={{ zIndex: 0 }}>
-      {props.label && <InputLabel>{props.label}</InputLabel>}
+  if (reactSettings.preferences.use_legacy_editor) {
+    return (
+      <div className="space-y-4" style={{ zIndex: 0 }}>
+        {props.label && <InputLabel>{props.label}</InputLabel>}
 
-      <Editor
-        tinymceScriptSrc="/tinymce_6.4.2/tinymce/js/tinymce/tinymce.min.js"
-        ref={editorRef}
-        value={value}
-        init={{
-          height: 300,
-          entity_encoding: 'raw',
-          menubar: false,
-          plugins: [
-            'advlist',
-            'autolink',
-            'lists',
-            'link',
-            'image',
-            'charmap',
-            'anchor',
-            'searchreplace',
-            'visualblocks',
-            'code',
-            'fullscreen',
-            'insertdatetime',
-            'media',
-            'table',
-            'preview',
-            'help',
-            'wordcount',
-            // 'mceCodeEditor': https://github.com/invoiceninja/invoiceninja/issues/11060
-            'emoticons',
-          ],
-          toolbar: [
-            'blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | emoticons link image media',
-            'alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | table | searchreplace | removeformat | code | help',
-          ],
-          font_family_formats:
-            'Arial=arial,helvetica,sans-serif;' +
-            'Courier New=courier new,courier,monospace;' +
-            'Georgia=georgia,palatino;' +
-            'Helvetica=helvetica;' +
-            'Times New Roman=times new roman,times;' +
-            'Trebuchet MS=trebuchet ms,geneva;' +
-            'Verdana=verdana,geneva',
-          font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
-          content_style:
-            'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-          contextmenu: '',
-          content_css:
-            colors.$0 === 'dark'
-              ? 'dark'
-              : '/tinymce_6.4.2/tinymce/content.css',
-          body_class: 'h-screen',
-          skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
-          paste_data_images: false,
-          newline_behavior: 'invert',
-          browser_spellcheck: true,
-          convert_urls: false,
-        }}
-        onEditorChange={(currentValue) => {
-          if (props.handleChangeOnlyOnUserInput) {
-            if (currentValue !== props.value) {
+        <Editor
+          tinymceScriptSrc="/tinymce_6.4.2/tinymce/js/tinymce/tinymce.min.js"
+          ref={editorRef}
+          value={value}
+          init={{
+            height: 300,
+            entity_encoding: 'raw',
+            menubar: false,
+            plugins: [
+              'advlist',
+              'autolink',
+              'lists',
+              'link',
+              'image',
+              'charmap',
+              'anchor',
+              'searchreplace',
+              'visualblocks',
+              'code',
+              'fullscreen',
+              'insertdatetime',
+              'media',
+              'table',
+              'preview',
+              'help',
+              'wordcount',
+              // 'mceCodeEditor': https://github.com/invoiceninja/invoiceninja/issues/11060
+              'emoticons',
+            ],
+            toolbar: [
+              'blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | emoticons link image media',
+              'alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | table | searchreplace | removeformat | code | help',
+            ],
+            font_family_formats:
+              'Arial=arial,helvetica,sans-serif;' +
+              'Courier New=courier new,courier,monospace;' +
+              'Georgia=georgia,palatino;' +
+              'Helvetica=helvetica;' +
+              'Times New Roman=times new roman,times;' +
+              'Trebuchet MS=trebuchet ms,geneva;' +
+              'Verdana=verdana,geneva',
+            font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
+            content_style:
+              'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+            contextmenu: '',
+            content_css:
+              colors.$0 === 'dark'
+                ? 'dark'
+                : '/tinymce_6.4.2/tinymce/content.css',
+            body_class: 'h-screen',
+            skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
+            paste_data_images: false,
+            newline_behavior: 'invert',
+            browser_spellcheck: true,
+            convert_urls: false,
+          }}
+          onEditorChange={(currentValue) => {
+            if (props.handleChangeOnlyOnUserInput) {
+              if (currentValue !== props.value) {
+                handleChange(currentValue);
+              }
+            } else {
               handleChange(currentValue);
             }
-          } else {
-            handleChange(currentValue);
-          }
-        }}
-        disabled={props.disabled}
-      />
-    </div>
-  );
+          }}
+          disabled={props.disabled}
+        />
+      </div>
+    );
+  }
+
+  return <LexicalEditor value={value || ''} />;
 }

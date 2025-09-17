@@ -207,7 +207,10 @@ export default function ExcalidrawComponent({
               role="button"
               tabIndex={0}
               onMouseDown={(event) => event.preventDefault()}
-              onClick={openModal}
+              onClick={(event) => {
+                event.preventDefault();
+                openModal();
+              }}
             />
           )}
           {(isSelected || isResizing) && isEditable && (

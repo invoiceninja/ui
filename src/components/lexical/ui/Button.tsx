@@ -6,12 +6,12 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from 'react';
 
 import './Button.css';
 
 import * as React from 'react';
-import {ReactNode} from 'react';
+import { ReactNode } from 'react';
 
 import joinClasses from '../utils/joinClasses';
 
@@ -39,12 +39,16 @@ export default function Button({
         'Button__root',
         disabled && 'Button__disabled',
         small && 'Button__small',
-        className,
+        className
       )}
-      onClick={onClick}
+      onClick={(event) => {
+        event.preventDefault();
+        onClick();
+      }}
       title={title}
       aria-label={title}
-      {...(dataTestId && {'data-test-id': dataTestId})}>
+      {...(dataTestId && { 'data-test-id': dataTestId })}
+    >
       {children}
     </button>
   );

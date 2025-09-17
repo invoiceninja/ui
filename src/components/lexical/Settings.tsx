@@ -6,13 +6,13 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from 'react';
 
-import {CAN_USE_BEFORE_INPUT} from '@lexical/utils';
-import {useEffect, useMemo, useState} from 'react';
+import { CAN_USE_BEFORE_INPUT } from '@lexical/utils';
+import { useEffect, useMemo, useState } from 'react';
 
-import {INITIAL_SETTINGS, isDevPlayground} from './appSettings';
-import {useSettings} from './context/SettingsContext';
+import { INITIAL_SETTINGS, isDevPlayground } from './appSettings';
+import { useSettings } from './context/SettingsContext';
 import Switch from './ui/Switch';
 
 export default function Settings(): JSX.Element {
@@ -44,7 +44,7 @@ export default function Settings(): JSX.Element {
   useEffect(() => {
     if (INITIAL_SETTINGS.disableBeforeInput && CAN_USE_BEFORE_INPUT) {
       console.error(
-        `Legacy events are enabled (disableBeforeInput) but CAN_USE_BEFORE_INPUT is true`,
+        `Legacy events are enabled (disableBeforeInput) but CAN_USE_BEFORE_INPUT is true`
       );
     }
   }, []);
@@ -62,7 +62,10 @@ export default function Settings(): JSX.Element {
       <button
         id="options-button"
         className={`editor-dev-button ${showSettings ? 'active' : ''}`}
-        onClick={() => setShowSettings(!showSettings)}
+        onClick={(event) => {
+          event.preventDefault();
+          setShowSettings(!showSettings);
+        }}
       />
       {showSettings ? (
         <div className="switches">
@@ -158,7 +161,7 @@ export default function Settings(): JSX.Element {
             onClick={() => {
               setOption(
                 'shouldUseLexicalContextMenu',
-                !shouldUseLexicalContextMenu,
+                !shouldUseLexicalContextMenu
               );
             }}
             checked={shouldUseLexicalContextMenu}
@@ -168,7 +171,7 @@ export default function Settings(): JSX.Element {
             onClick={() => {
               setOption(
                 'shouldPreserveNewLinesInMarkdown',
-                !shouldPreserveNewLinesInMarkdown,
+                !shouldPreserveNewLinesInMarkdown
               );
             }}
             checked={shouldPreserveNewLinesInMarkdown}
@@ -185,7 +188,7 @@ export default function Settings(): JSX.Element {
             onClick={() => {
               setOption(
                 'shouldAllowHighlightingWithBrackets',
-                !shouldAllowHighlightingWithBrackets,
+                !shouldAllowHighlightingWithBrackets
               );
             }}
             checked={shouldAllowHighlightingWithBrackets}

@@ -200,7 +200,8 @@ export default function ActionsPlugin({
     <div className="actions">
       {SUPPORT_SPEECH_RECOGNITION && (
         <button
-          onClick={() => {
+          onClick={(event) => {
+            event.preventDefault();
             editor.dispatchCommand(SPEECH_TO_TEXT_COMMAND, !isSpeechToText);
             setIsSpeechToText(!isSpeechToText);
           }}
@@ -216,7 +217,10 @@ export default function ActionsPlugin({
       )}
       <button
         className="action-button import"
-        onClick={() => importFile(editor)}
+        onClick={(event) => {
+          event.preventDefault();
+          importFile(editor);
+        }}
         title="Import"
         aria-label="Import editor state from JSON"
       >
@@ -225,12 +229,13 @@ export default function ActionsPlugin({
 
       <button
         className="action-button export"
-        onClick={() =>
+        onClick={(event) => {
+          event.preventDefault();
           exportFile(editor, {
             fileName: `Playground ${new Date().toISOString()}`,
             source: 'Playground',
-          })
-        }
+          });
+        }}
         title="Export"
         aria-label="Export editor state to JSON"
       >
@@ -239,7 +244,8 @@ export default function ActionsPlugin({
       <button
         className="action-button share"
         disabled={isCollabActive || INITIAL_SETTINGS.isCollab}
-        onClick={() =>
+        onClick={(event) => {
+          event.preventDefault();
           shareDoc(
             serializedDocumentFromEditorState(editor.getEditorState(), {
               source: 'Playground',
@@ -247,8 +253,8 @@ export default function ActionsPlugin({
           ).then(
             () => showFlashMessage('URL copied to clipboard'),
             () => showFlashMessage('URL could not be copied to clipboard')
-          )
-        }
+          );
+        }}
         title="Share"
         aria-label="Share Playground link to current editor state"
       >
@@ -257,7 +263,8 @@ export default function ActionsPlugin({
       <button
         className="action-button clear"
         disabled={isEditorEmpty}
-        onClick={() => {
+        onClick={(event) => {
+          event.preventDefault();
           showModal('Clear editor', (onClose) => (
             <ShowClearDialog editor={editor} onClose={onClose} />
           ));
@@ -269,7 +276,8 @@ export default function ActionsPlugin({
       </button>
       <button
         className={`action-button ${!isEditable ? 'unlock' : 'lock'}`}
-        onClick={() => {
+        onClick={(event) => {
+          event.preventDefault();
           // Send latest editor state to commenting validation server
           if (isEditable) {
             sendEditorState(editor);
@@ -283,7 +291,10 @@ export default function ActionsPlugin({
       </button>
       <button
         className="action-button"
-        onClick={handleMarkdownToggle}
+        onClick={(event) => {
+          event.preventDefault();
+          handleMarkdownToggle();
+        }}
         title="Convert From Markdown"
         aria-label="Convert from markdown"
       >
@@ -292,7 +303,8 @@ export default function ActionsPlugin({
       {isCollabActive && (
         <button
           className="action-button connect"
-          onClick={() => {
+          onClick={(event) => {
+            event.preventDefault();
             editor.dispatchCommand(TOGGLE_CONNECT_COMMAND, !connected);
           }}
           title={`${
