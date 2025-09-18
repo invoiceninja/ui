@@ -11,7 +11,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^1.9.7",
-    "@sentry/react": "^7.120.3",
+    "@sentry/react": "^10.0.0",
     "@sentry/tracing": "^7.120.3",
     "@stripe/stripe-js": "^4.10.0",
     "@tinymce/tinymce-react": "^5.1.1",
