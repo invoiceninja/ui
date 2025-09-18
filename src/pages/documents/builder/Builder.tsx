@@ -62,15 +62,7 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
     >
       {content}
 
-      <div
-        onClick={(event) => {
-          event.stopPropagation();
-
-          window.dispatchEvent(new CustomEvent('builder:send.document.submit'));
-        }}
-      >
-        {action}
-      </div>
+      {action}
     </Modal>
   );
 }
@@ -83,6 +75,9 @@ function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
       className="w-full"
       behavior="button"
       disabled={isSubmitting}
+      onClick={() =>
+        window.dispatchEvent(new CustomEvent('builder:send.document.submit'))
+      }
       disableWithoutIcon
     >
       {t('send')}
