@@ -459,7 +459,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
-    const method = useDeleteMethod && action === 'delete' ? 'DELETE' : 'POST';
+    const method = 'POST';
 
     const route =
       useDeleteMethod && action === 'delete'
@@ -471,10 +471,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         ? {}
         : { action };
 
-    const updatedIds =
-      withoutIdsBulkPayloadPropertyForDeleteAction && action === 'delete'
-        ? []
-        : { ids: id ? [id] : Array.from(selected) };
+    const updatedIds = { ids: id ? [id] : Array.from(selected) };
 
     request(
       method,
@@ -482,8 +479,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         ? docuNinjaEndpoint(route as string, { id })
         : endpoint(route as string),
       {
-        ...updatedAction,
-        ...updatedIds,
+        action: action, ...updatedIds,
       },
       { headers: props.endpointHeaders }
     )

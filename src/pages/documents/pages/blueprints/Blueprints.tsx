@@ -52,7 +52,7 @@ export default function Blueprints() {
         withoutActionBulkPayloadPropertyForDeleteAction
         withoutIdsBulkPayloadPropertyForDeleteAction
         useDeleteMethod
-        deleteBulkRoute="/api/blueprints/:id"
+        deleteBulkRoute="/api/blueprints/bulk"
         filterParameterKey="search"
       />
     </Default>

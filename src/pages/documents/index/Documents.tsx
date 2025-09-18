@@ -60,7 +60,7 @@ export default function Blueprints() {
           withoutActionBulkPayloadPropertyForDeleteAction
           withoutIdsBulkPayloadPropertyForDeleteAction
           useDeleteMethod
-          deleteBulkRoute="/api/documents/:id"
+          deleteBulkRoute="/api/documents/bulk"
           rightSide={
             <Button
               behavior="button"
