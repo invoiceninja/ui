@@ -206,6 +206,10 @@ export interface Document {
 }
 
 export interface Settings {
+  ninja_quote_notification: boolean;
+  ninja_invoice_notification: boolean;
+  ninja_credit_notification: boolean;
+  ninja_purchase_order_notification: boolean;
   email_client_when_completed: boolean;
 }
 
