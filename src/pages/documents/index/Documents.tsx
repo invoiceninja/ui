@@ -42,7 +42,7 @@ export default function Blueprints() {
         <DocumentCreationDropZone />
 
         <DataTable<Document>
-          queryIdentificator="/api/documents/docuninja?include=client"
+          queryIdentificator="/api/documents/docuninja"
           resource="document"
           endpoint="/api/documents?sort=id|desc"
           columns={columns}
