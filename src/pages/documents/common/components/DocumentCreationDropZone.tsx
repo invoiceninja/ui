@@ -41,6 +41,7 @@ export function DocumentCreationDropZone() {
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [fileRejectionErrors, setFileRejectionErrors] = useState<string[]>([]);
 
   const handleCreateDocument = (currentFormData: FormData) => {
     if (!isFormBusy) {
@@ -73,25 +74,70 @@ export function DocumentCreationDropZone() {
   };
 
   const onDrop = (acceptedFiles: File[]) => {
+    // Clear any previous file rejection errors
+    setFileRejectionErrors([]);
+    
+    // Only proceed if there are actually accepted files
+    if (acceptedFiles.length === 0) {
+      return;
+    }
+    
     const newFormData = new FormData();
+
+    console.log(acceptedFiles);
 
     acceptedFiles.forEach((file) => {
       newFormData.append('files[]', file);
+      
     });
 
     newFormData.append(
-      'description',
-      acceptedFiles[0].name || 'Untitled document'
+      'description', 'Untitled document'
     );
 
     handleCreateDocument(newFormData);
   };
 
+  const onDropRejected = (fileRejections: any[]) => {
+    const rejectionErrors: string[] = [];
+    
+    fileRejections.forEach((rejection) => {
+      const fileName = rejection.file.name;
+      const errors = rejection.errors.map((error: any) => {
+        switch (error.code) {
+          case 'file-invalid-type':
+            return t('invalid_file', { fileName });
+          case 'file-too-large':
+            return t('logo_warning_too_large', { fileName });
+          case 'too-many-files':
+            return t('too_many_files');
+          default:
+            return t('file_upload_error', { fileName });
+        }
+      });
+      rejectionErrors.push(...errors);
+    });
+    
+    setFileRejectionErrors(rejectionErrors);
+    toast.error(t('invalid_file') as string);
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     multiple: true,
     accept: {
-      'image/*': ['.jpeg', '.png'],
+      "application/pdf": [".pdf"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
+      "image/png": [".png"],
+      "image/jpeg": [".jpg"],
+      "application/vnd.oasis.opendocument.text": [".odt"],
+      "application/vnd.ms-excel": [".xls"],
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+        ".xlsx",
+      ],
     },
     disabled: isFormBusy,
   });
@@ -121,6 +167,16 @@ export function DocumentCreationDropZone() {
           {isDragActive ? t('drop_file_here') : t('dropzone_default_message')}
         </span>
       </Box>
+
+      {fileRejectionErrors.length > 0 && (
+        <div className="w-full">
+          {fileRejectionErrors.map((error, index) => (
+            <ErrorMessage key={index} className="w-full">
+              {error}
+            </ErrorMessage>
+          ))}
+        </div>
+      )}
 
       {errors &&
         Object.keys(errors.errors).map((key, index) => (

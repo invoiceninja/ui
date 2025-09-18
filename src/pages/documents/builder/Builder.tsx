@@ -470,11 +470,7 @@ function Builder() {
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
-      name: t('Document'),
-      href: route('/documents/:id', { id }),
-    },
-    {
-      name: t('builder'),
+      name: t('edit'),
       href: route('/documents/:id/builder', { id }),
     },
   ];
@@ -483,7 +479,6 @@ function Builder() {
     toast.processing();
 
     setIsDocumentSaving(true);
-
     window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
