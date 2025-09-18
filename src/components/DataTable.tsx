@@ -466,11 +466,6 @@ export function DataTable<T extends object>(props: Props<T>) {
         ? deleteBulkRoute
         : props.bulkRoute ?? `${props.endpoint}/bulk`;
 
-    const updatedAction =
-      withoutActionBulkPayloadPropertyForDeleteAction && action === 'delete'
-        ? {}
-        : { action };
-
     const updatedIds = { ids: id ? [id] : Array.from(selected) };
 
     request(

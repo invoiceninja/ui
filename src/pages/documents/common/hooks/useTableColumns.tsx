@@ -76,6 +76,29 @@ export function useTableColumns() {
     return '';
   };
 
+  const documentStatus = (document: Document) => {
+    
+    let variant = STATUS_VARIANTS[document.status_id as keyof typeof STATUS_VARIANTS] as BadgeVariant;
+    let label = STATUS_LABELS[document.status_id as keyof typeof STATUS_LABELS];
+
+    if (document.is_deleted) {
+      variant = 'red';
+      label = t('deleted');
+    }
+    else if (document.archived_at) {
+      variant = 'orange';
+      label = t('archived');
+    }
+
+    return (
+      <Badge
+        variant={variant}
+      >
+        {label}
+      </Badge>
+    );
+  };
+
   const columns: DataTableColumns<Document> = [
     {
       id: 'id',
@@ -128,17 +151,7 @@ export function useTableColumns() {
     {
       id: 'status',
       label: t('status'),
-      format: (_, document) => (
-        <Badge
-          variant={
-            STATUS_VARIANTS[
-              document.status_id as keyof typeof STATUS_VARIANTS
-            ] as BadgeVariant
-          }
-        >
-          {STATUS_LABELS[document.status_id as keyof typeof STATUS_LABELS]}
-        </Badge>
-      ),
+      format: (_, document) => documentStatus(document),
     },
     {
       id: 'created_at',
