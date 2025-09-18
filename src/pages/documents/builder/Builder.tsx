@@ -1,11 +1,7 @@
 import { useColorScheme } from '$app/common/colors';
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Document } from '$app/common/interfaces/docuninja/api';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
@@ -44,7 +40,6 @@ import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 
@@ -83,63 +78,11 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
 function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
   const [t] = useTranslation();
 
-  const params = useParams();
-
-  const { data: document } = useQuery({
-    queryKey: ['/api/documents/docuninja', params.id],
-    queryFn: () =>
-      request(
-        'GET',
-        docuNinjaEndpoint(
-          `/api/documents/${params.id}?includeUrl&includePreviews`
-        ),
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      ).then(
-        (response: GenericSingleResourceResponse<Document>) =>
-          response.data.data
-      ),
-    refetchOnWindowFocus: false,
-    initialData: null,
-  });
-
-  const handleSend = async () => {
-    if (!document) {
-      toast.error('document_not_found');
-      return;
-    }
-
-    toast.processing();
-
-    request(
-      'POST',
-      docuNinjaEndpoint(`/api/documents/${document.id}/send`),
-      {
-        invitations: document.invitations || [],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-        },
-      }
-    ).then(() => {
-      toast.success('document_queued_for_sending');
-      $refetch(['docuninja_documents']);
-    });
-  };
-
   return (
     <Button
       className="w-full"
       behavior="button"
       disabled={isSubmitting}
-      onClick={handleSend}
       disableWithoutIcon
     >
       {t('send')}
