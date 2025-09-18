@@ -40,6 +40,19 @@ export function useTableColumns() {
     )
   }
 
+  const blueprintType = (blueprint: Blueprint) => {
+    let label = '';
+
+    if(blueprint.design_hash?.length && blueprint.design_hash.length > 0){
+      const entity = blueprint.document?.metadata?.entity_type ?? 'ninja';
+      label = `${t(entity)} ${t('design')}`;
+    }
+    else
+      label = t('custom');
+
+    return label;
+  }
+
   const columns: DataTableColumns<Blueprint> = [
     {
       id: 'status',
@@ -66,6 +79,13 @@ export function useTableColumns() {
         <>
         {blueprint.description.slice(-8)}
         </>
+      ),
+    },
+    {
+      id: 'type',
+      label: t('type'),
+      format: (field, blueprint) => (
+        blueprintType(blueprint)
       ),
     },
   ];
