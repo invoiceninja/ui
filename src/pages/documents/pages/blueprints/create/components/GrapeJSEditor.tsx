@@ -121,7 +121,6 @@ const iconStyles = `
 
 import pluginBlocks from "grapesjs-blocks-basic";
 import pluginExport from "grapesjs-plugin-export";
-import pluginTouch from "grapesjs-touch";
 import pluginParserPostcss from "grapesjs-parser-postcss";
 
 import pluginTuiImageEditor from "grapesjs-tui-image-editor";
@@ -467,7 +466,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
         plugins: [
           pluginBlocks,
           pluginExport,
-          pluginTouch,
           pluginParserPostcss,
           pluginTuiImageEditor,
           pluginStyleBg,
