@@ -3,6 +3,7 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -464,13 +465,13 @@ function BlueprintBuilder() {
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
-  
+
   const pages: Page[] = [
     { name: t('blueprints'), href: '/documents/blueprints' },
     {
       name: t('blueprint'),
       href: route('/documents/blueprints/:id/edit', { id }),
-    }
+    },
   ];
 
   const handleSave = () => {
@@ -499,10 +500,7 @@ function BlueprintBuilder() {
       setIsDocumentSaving(false);
     };
 
-    window.addEventListener(
-      'refetch.blueprints',
-      refetchDocuninjaDocument
-    );
+    window.addEventListener('refetch.blueprints', refetchDocuninjaDocument);
 
     window.addEventListener(
       'builder:document.successfully.saved',
@@ -532,13 +530,14 @@ function BlueprintBuilder() {
     };
   }, []);
 
+  const company = useCurrentCompany();
+
   return (
     <Default
       title={t('builder')}
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-         
           <Button
             behavior="button"
             onClick={handleSave}
@@ -610,7 +609,6 @@ function BlueprintBuilder() {
                   {t('select_signatory')}
                 </span>
               ),
-              
             },
             styles: {
               frame: {
@@ -665,7 +663,7 @@ function BlueprintBuilder() {
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
             blueprint: true,
-            
+            company: company.id,
           }}
         >
           <Builder$ />
@@ -675,21 +673,16 @@ function BlueprintBuilder() {
   );
 }
 
-
 export function CreateBlueprintSignatory({
-    onClick,
-  }: CreateBlueprintSignatoryProps) {
-    const [t] = useTranslation();
+  onClick,
+}: CreateBlueprintSignatoryProps) {
+  const [t] = useTranslation();
 
-    return (
-        <Button
-        type="secondary"
-        behavior="button"
-        onClick={onClick}
-        >
-        {t('new_signatory')}
-        </Button>
-    );
-  }
-  
+  return (
+    <Button type="secondary" behavior="button" onClick={onClick}>
+      {t('new_signatory')}
+    </Button>
+  );
+}
+
 export default BlueprintBuilder;
