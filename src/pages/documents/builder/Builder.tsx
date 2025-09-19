@@ -9,7 +9,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField, InputLabel, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/icons/Settings';
@@ -287,33 +287,45 @@ function SignatorySelector({
 
     const transformed = transformToPayload(entity, value);
 
-    onSelect(`contact|${transformed.contact_key}`, 'contact', contact as any, transformed);
+    onSelect(
+      `contact|${transformed.contact_key}`,
+      'contact',
+      contact as any,
+      transformed
+    );
   };
 
   return (
-    <SelectField
-      placeholder={t('select_user_or_client')}
-      value={value}
-      onValueChange={handleSelect}
-      customSelector
-      menuPosition="fixed"
-    >
-      <option value="create">{t('create_client_or_user')}</option>
+    <div className="space-y-3">
+      <InputLabel className='mt-3'>
+        {t('select_user_or_client')}
+      </InputLabel>
 
-      {clients
-        ?.filter(
-          (client) =>
-            client.contacts.length > 0 && client.contacts[0].contact_key
-        )
-        .map((client) => (
-          <option
-            value={`client|${client.contacts[0].contact_key}`}
-            key={client.id}
-          >
-            {client.name}
-          </option>
-        ))}
-    </SelectField>
+      <SelectField
+        placeholder={t('select_user_or_client')}
+        onValueChange={handleSelect}
+        customSelector
+        menuPosition="fixed"
+        clearAfterSelection
+        className='-mt-2'
+      >
+        <option value="create">{t('create_client_or_user')}</option>
+
+        {clients
+          ?.filter(
+            (client) =>
+              client.contacts.length > 0 && client.contacts[0].contact_key
+          )
+          .map((client) => (
+            <option
+              value={`client|${client.contacts[0].contact_key}`}
+              key={client.id}
+            >
+              {client.name}
+            </option>
+          ))}
+      </SelectField>
+    </div>
   );
 }
 
