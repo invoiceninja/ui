@@ -660,6 +660,14 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
 
         // Remove trait view
         pn.removeButton('views', 'open-tm');
+        
+        // Make blocks panel the default active panel
+        const openBlocksBtn = pn.getButton('views', 'open-blocks');
+        if (openBlocksBtn) {
+          openBlocksBtn.set('active', 1);
+          // Trigger the command to open the blocks panel
+          editor.runCommand('open-blocks');
+        }
 
         // Add Settings Sector
         const traitsSector = $('<div class="gjs-sm-sector no-select">'+
@@ -683,9 +691,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
           }
         });
 
-        // Open block manager
-        const openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
-        openBlocksBtn && openBlocksBtn.set('active', 1);
+        // Block manager is already opened above
 
 
         }, 100); // Close setTimeout with 100ms delay
