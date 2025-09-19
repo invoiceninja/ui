@@ -89,16 +89,27 @@ const iconStyles = `
 }
 
 /* Specific styling for custom placeholder blocks - all same color */
-.gjs-block.gjs-one-bg[data-block="signature-placeholder"],
-.gjs-block.gjs-four-color-h[data-block="signature-placeholder"],
-.gjs-block[data-block="signature-placeholder"],
-.gjs-block.gjs-one-bg[data-block="date-placeholder"],
-.gjs-block.gjs-four-color-h[data-block="date-placeholder"],
-.gjs-block[data-block="date-placeholder"] {
+.gjs-block.gjs-one-bg,
+.gjs-block.gjs-four-color-h,
+.gjs-block {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     color: white !important;
     border: none !important;
 }
+
+/* Default GrapeJS block styling 
+.gjs-block.gjs-one-bg {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
+    color: #333 !important;
+    border: none !important;
+}
+
+.gjs-block.gjs-four-color-h {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
+    color: #333 !important;
+    border: none !important;
+}
+*/
 
 /* Category-specific styling for other blocks */
 .gjs-blocks-cs .gjs-block[data-category="Basic"] {
@@ -459,13 +470,13 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
         plugins: [
           pluginBlocks,
           pluginExport,
-          pluginTabs,
-          pluginCustomCode,
+        //   pluginTabs,
+        //   pluginCustomCode,
           pluginTouch,
           pluginParserPostcss,
-          pluginTooltip,
+        //   pluginTooltip,
           pluginTuiImageEditor,
-          pluginTyped,
+        //   pluginTyped,
           pluginStyleBg,
           pluginPresetWebpage,
         ],
@@ -483,23 +494,23 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
               'https://uicdn.toast.com/tui-image-editor/v3.15.2/tui-image-editor.min.css',
             ],
           },
-          [pluginTabs as unknown as string]: {
-            tabsBlock: { category: 'Extra' }
-          },
-          [pluginTyped as unknown as string]: {
-            block: {
-              category: 'Extra',
-              content: {
-                type: 'typed',
-                'type-speed': 40,
-                strings: [
-                  'Text row one',
-                  'Text row two',
-                  'Text row three',
-                ],
-              }
-            }
-          },
+        //   [pluginTabs as unknown as string]: {
+        //     tabsBlock: { category: 'Extra' }
+        //   },
+        //   [pluginTyped as unknown as string]: {
+        //     block: {
+        //       category: 'Extra',
+        //       content: {
+        //         type: 'typed',
+        //         'type-speed': 40,
+        //         strings: [
+        //           'Text row one',
+        //           'Text row two',
+        //           'Text row three',
+        //         ],
+        //       }
+        //     }
+        //   },
           [pluginPresetWebpage as unknown as string]: {
             showStylesOnChange: 0,
             modalImportTitle: 'Import Template',
