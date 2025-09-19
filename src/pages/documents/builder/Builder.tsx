@@ -42,6 +42,7 @@ import {
   UploadProps,
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
+import collect from 'collect.js';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -252,8 +253,8 @@ function CreateDialogTabButton({
 function SignatorySelector({
   results,
   onSelect,
-  value,
   setCreateDialogOpen,
+  signatories,
 }: SignatorySelectorProps) {
   const [t] = useTranslation();
 
@@ -300,6 +301,20 @@ function SignatorySelector({
     );
   };
 
+  const existing = collect(signatories).pluck('id').toArray();
+
+  const list = collect(clients)
+    .filter(
+      (client) =>
+        client.contacts.length > 0 && client.contacts[0].contact_key.length > 0
+    )
+    .map((client) => ({
+      label: client.name,
+      value: `contact|${client.contacts[0].contact_key}`,
+    }))
+    .filter((client) => !existing.includes(client.value))
+    .toArray() as { label: string; value: string }[];
+
   return (
     <div className="space-y-3">
       <InputLabel className="mt-3">{t('select_user_or_client')}</InputLabel>
@@ -314,19 +329,11 @@ function SignatorySelector({
       >
         <option value="create">{t('create_client_or_user')}</option>
 
-        {clients
-          ?.filter(
-            (client) =>
-              client.contacts.length > 0 && client.contacts[0].contact_key
-          )
-          .map((client) => (
-            <option
-              value={`client|${client.contacts[0].contact_key}`}
-              key={client.id}
-            >
-              {client.name}
-            </option>
-          ))}
+        {list.map((client) => (
+          <option key={client.value} value={client.value}>
+            {client.label}
+          </option>
+        ))}
       </SelectField>
     </div>
   );
