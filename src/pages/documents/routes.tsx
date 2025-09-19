@@ -21,6 +21,9 @@ const Blueprints = lazy(
 const CreateBlueprint = lazy(
   () => import('$app/pages/documents/pages/blueprints/create/Create')
 );
+const BlueprintEditor = lazy(
+  () => import('$app/pages/documents/pages/blueprints/editor/Editor')
+);
 
 const Settings = lazy(
   () => import('$app/pages/documents/pages/settings/CompanyDetails')
@@ -101,6 +104,16 @@ export const documentsRoutes = (
     <Route
       path="blueprints/create"
       element={<Guard guards={[]} component={<CreateBlueprint />} />}
+    />
+
+    <Route
+      path="blueprint/:id/editor"
+      element={<Guard guards={[]} component={<BlueprintEditor />} />}
+    />
+
+    <Route
+      path="blueprint/template/editor"
+      element={<Guard guards={[]} component={<BlueprintEditor />} />}
     />
 
     <Route

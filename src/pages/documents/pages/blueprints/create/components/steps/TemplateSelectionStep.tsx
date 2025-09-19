@@ -11,13 +11,12 @@
 import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { Document } from '$app/common/interfaces/docuninja/api';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Button } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { route } from '$app/common/helpers/route';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 
 interface TemplateSelectionStepProps {
@@ -41,13 +40,13 @@ const TEMPLATES = [
     description: 'Non-Disclosure Agreement',
     preview: '📄',
   },
-//   {
-//     id: 'template-2',
-//     name: 'Creative Quote',
-//     category: 'creative',
-//     description: 'Eye-catching quote template with modern design',
-//     preview: '🎨',
-//   },
+  {
+    id: 'blank',
+    name: 'Blank Template',
+    category: 'business',
+    description: 'Start from scratch!',
+    preview: '🎨',
+  },
 //   {
 //     id: 'template-3',
 //     name: 'Minimal Credit',
@@ -67,6 +66,7 @@ const TEMPLATES = [
 export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionStepProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('business');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -92,15 +92,21 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
             )}`,
           },
         }
-      ) as GenericSingleResourceResponse<Document>;
+      ) as any;
 
-      toast.success('created_blueprint');
-      $refetch(['blueprints']);
+      const templateHtml = response.data.html;
+      console.log('Template HTML loaded successfully');
+
+      toast.success('template_loaded');
       
-      onComplete(response.data.data.id);
+      // Navigate to GrapeJS editor with the template HTML
+      console.log('Navigating to editor...');
+      navigate(route('/documents/blueprint/template/editor'), {
+        state: { templateHtml }
+      });
     } catch (error) {
-      console.error('Error creating blueprint:', error);
-      toast.error('error_creating_blueprint');
+      console.error('Error loading template:', error);
+      toast.error('error_loading_template');
     } finally {
       setIsLoading(false);
     }
