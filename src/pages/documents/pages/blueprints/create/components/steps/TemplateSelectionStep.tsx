@@ -18,7 +18,6 @@ import { Button } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
 
 interface TemplateSelectionStepProps {
   onComplete: (blueprintId: string) => void;

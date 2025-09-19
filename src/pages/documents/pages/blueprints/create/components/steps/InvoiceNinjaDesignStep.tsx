@@ -17,9 +17,8 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { useBlueprintsQuery } from '$app/common/queries/docuninja/blueprints';
 import { Button } from '$app/components/forms';
 import { Element } from '$app/components/cards';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { endpoint } from '$app/common/helpers';
 
