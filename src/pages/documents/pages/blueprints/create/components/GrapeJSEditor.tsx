@@ -131,7 +131,7 @@ interface GrapeJSEditorProps {
   initialHtml: string;
   onSave: (html: string) => void;
   onCancel: () => void;
-  blueprintId: string;
+  blueprintName: string;
 }
 
 declare global {
@@ -140,7 +140,7 @@ declare global {
   }
 }
 
-export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: GrapeJSEditorProps) {
+export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: GrapeJSEditorProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const editorRef = useRef<HTMLDivElement>(null);
@@ -1049,159 +1049,158 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
 
   return (
     <div id="gjs" className="h-screen w-full flex flex-col" style={{ backgroundColor: colors.$1 }}>
-              {/* Toolbar */}
-              <div className="flex items-center justify-between p-3 border-b bg-white shadow-sm" style={{ borderColor: colors.$20 }}>
-                <div className="flex items-center space-x-4">
-                  <h2 className="text-lg font-semibold">{t('edit_blueprint')}</h2>
-                  <span className="text-sm text-gray-600">ID: {blueprintId}</span>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Button onClick={onCancel} type="secondary">
-                    {t('cancel')}
-                  </Button>
-                  <Button 
-                    onClick={handleSave} 
-                    disabled={!isEditorReady || isSaving}
-                    disableWithoutIcon
-                  >
-                    {isSaving ? t('saving') : t('save_blueprint')}
-                  </Button>
-                </div>
-              </div>
+        <div className="flex items-center justify-between p-3 border-b bg-white shadow-sm" style={{ borderColor: colors.$20 }}>
+        <div className="flex items-center space-x-4">
+            <h2 className="text-lg font-semibold">{blueprintName}</h2>
+            
+        </div>
+        
+        <div className="flex items-center space-x-2">
+            <Button onClick={onCancel} type="secondary">
+            {t('cancel')}
+            </Button>
+            <Button 
+            onClick={handleSave} 
+            disabled={!isEditorReady || isSaving}
+            disableWithoutIcon
+            >
+            {isSaving ? t('saving') : t('save_blueprint')}
+            </Button>
+        </div>
+        </div>
 
-              {/* GrapeJS Export Toolbar */}
-              <div className="panel__export"></div>
+        {/* GrapeJS Export Toolbar */}
+        <div className="panel__export"></div>
 
-      {/* Editor Container */}
-      <div className="flex-1 flex overflow-hidden">
+        {/* Editor Container */}
+        <div className="flex-1 flex overflow-hidden">
 
-              {/* Main Editor Area */}
-              <div className="flex-1 flex flex-col bg-white min-w-0">
+            {/* Main Editor Area */}
+            <div className="flex-1 flex flex-col bg-white min-w-0">
                 {/* Canvas */}
                 <div className="flex-1 relative min-w-0">
-                  <div ref={editorRef} className="absolute inset-0 gjs-editor w-full h-full"></div>
+                    <div ref={editorRef} className="absolute inset-0 gjs-editor w-full h-full"></div>
                 </div>
-              </div>
-      </div>
-
-      {/* Monaco Editor Modal */}
-      {showMonacoEditor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-xl w-11/12 h-5/6 flex flex-col">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-semibold">Code Editor</h3>
-              <div className="flex space-x-2">
-                <Button onClick={handleApplyMonacoChanges} type="primary">
-                  Apply Changes
-                </Button>
-                <Button onClick={handleCancelMonacoEditor} type="secondary">
-                  Cancel
-                </Button>
-              </div>
             </div>
-            
-            {/* Dual Monaco Editors */}
-            <div className="flex-1 flex p-4 gap-4">
-              {/* HTML Editor */}
-              <div className="flex-1 flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-medium text-gray-700">HTML</h4>
-                </div>
-                <div className="flex-1 border rounded">
-                  <Editor
-                    height="100%"
-                    defaultLanguage="html"
-                    value={monacoHtml}
-                    onChange={handleMonacoHtmlChange}
-                    onMount={handleMonacoHtmlEditorMount}
-                    options={{
-                      wordWrap: "on",
-                      minimap: { enabled: false },
-                      scrollBeyondLastLine: false,
-                      contextmenu: true,
-                      fixedOverflowWidgets: true,
-                      showFoldingControls: 'always',
-                      suggestOnTriggerCharacters: true,
-                      lineDecorationsWidth: 0,
-                      tabSize: 2,
-                      insertSpaces: true,
-                      formatOnType: true,
-                      formatOnPaste: true,
-                      autoIndent: 'full',
-                      autoClosingBrackets: 'always',
-                    //   autoClosingPairs: 'always',
-                      autoClosingQuotes: 'always',
-                      autoSurround: 'languageDefined',
-                      fontSize: 14,
-                      fontFamily: "'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
-                      scrollbar: {
-                        verticalScrollbarSize: 8,
-                        horizontal: 'hidden',
-                      },
-                      theme: 'vs-light',
-                      quickSuggestions: true,
-                    //   suggestOnTriggerCharacters: true,
-                      acceptSuggestionOnEnter: 'on',
-                      tabCompletion: 'on',
-                      wordBasedSuggestions: 'matchingDocuments'
-                    }}
-                  />
-                </div>
-              </div>
-              
-              {/* CSS Editor */}
-              <div className="flex-1 flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-medium text-gray-700">CSS</h4>
-                </div>
-                <div className="flex-1 border rounded">
-                  <Editor
-                    height="100%"
-                    defaultLanguage="css"
-                    value={monacoCss}
-                    onChange={handleMonacoCssChange}
-                    onMount={handleMonacoCssEditorMount}
-                    options={{
-                      wordWrap: "on",
-                      minimap: { enabled: false },
-                      scrollBeyondLastLine: false,
-                      contextmenu: true,
-                      fixedOverflowWidgets: true,
-                      showFoldingControls: 'always',
-                      suggestOnTriggerCharacters: true,
-                      lineDecorationsWidth: 0,
-                      tabSize: 2,
-                      insertSpaces: true,
-                      formatOnType: true,
-                      formatOnPaste: true,
-                      autoIndent: 'full',
-                      autoClosingBrackets: 'always',
-                    //   autoClosingPairs: 'always',
-                      autoClosingQuotes: 'always',
-                      autoSurround: 'languageDefined',
-                      fontSize: 14,
-                      fontFamily: "'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
-                      scrollbar: {
-                        verticalScrollbarSize: 8,
-                        horizontal: 'hidden',
-                      },
-                      theme: 'vs-light',
-                      quickSuggestions: true,
-                    //   suggestOnTriggerCharacters: true,
-                      acceptSuggestionOnEnter: 'on',
-                      tabCompletion: 'on',
-                      wordBasedSuggestions: 'matchingDocuments'
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      )}
-    </div>
+
+        {/* Monaco Editor Modal */}
+        {showMonacoEditor && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-xl w-11/12 h-5/6 flex flex-col">
+                {/* Modal Header */}
+                <div className="flex items-center justify-between p-4 border-b">
+                <h3 className="text-lg font-semibold">Code Editor</h3>
+                <div className="flex space-x-2">
+                    <Button onClick={handleApplyMonacoChanges} type="primary">
+                    Apply Changes
+                    </Button>
+                    <Button onClick={handleCancelMonacoEditor} type="secondary">
+                    Cancel
+                    </Button>
+                </div>
+                </div>
+                
+                {/* Dual Monaco Editors */}
+                <div className="flex-1 flex p-4 gap-4">
+                {/* HTML Editor */}
+                <div className="flex-1 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-gray-700">HTML</h4>
+                    </div>
+                    <div className="flex-1 border rounded">
+                    <Editor
+                        height="100%"
+                        defaultLanguage="html"
+                        value={monacoHtml}
+                        onChange={handleMonacoHtmlChange}
+                        onMount={handleMonacoHtmlEditorMount}
+                        options={{
+                        wordWrap: "on",
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        contextmenu: true,
+                        fixedOverflowWidgets: true,
+                        showFoldingControls: 'always',
+                        suggestOnTriggerCharacters: true,
+                        lineDecorationsWidth: 0,
+                        tabSize: 2,
+                        insertSpaces: true,
+                        formatOnType: true,
+                        formatOnPaste: true,
+                        autoIndent: 'full',
+                        autoClosingBrackets: 'always',
+                        //   autoClosingPairs: 'always',
+                        autoClosingQuotes: 'always',
+                        autoSurround: 'languageDefined',
+                        fontSize: 14,
+                        fontFamily: "'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
+                        scrollbar: {
+                            verticalScrollbarSize: 8,
+                            horizontal: 'hidden',
+                        },
+                        theme: 'vs-light',
+                        quickSuggestions: true,
+                        //   suggestOnTriggerCharacters: true,
+                        acceptSuggestionOnEnter: 'on',
+                        tabCompletion: 'on',
+                        wordBasedSuggestions: 'matchingDocuments'
+                        }}
+                    />
+                    </div>
+                </div>
+                
+                {/* CSS Editor */}
+                <div className="flex-1 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-gray-700">CSS</h4>
+                    </div>
+                    <div className="flex-1 border rounded">
+                    <Editor
+                        height="100%"
+                        defaultLanguage="css"
+                        value={monacoCss}
+                        onChange={handleMonacoCssChange}
+                        onMount={handleMonacoCssEditorMount}
+                        options={{
+                        wordWrap: "on",
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        contextmenu: true,
+                        fixedOverflowWidgets: true,
+                        showFoldingControls: 'always',
+                        suggestOnTriggerCharacters: true,
+                        lineDecorationsWidth: 0,
+                        tabSize: 2,
+                        insertSpaces: true,
+                        formatOnType: true,
+                        formatOnPaste: true,
+                        autoIndent: 'full',
+                        autoClosingBrackets: 'always',
+                        //   autoClosingPairs: 'always',
+                        autoClosingQuotes: 'always',
+                        autoSurround: 'languageDefined',
+                        fontSize: 14,
+                        fontFamily: "'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
+                        scrollbar: {
+                            verticalScrollbarSize: 8,
+                            horizontal: 'hidden',
+                        },
+                        theme: 'vs-light',
+                        quickSuggestions: true,
+                        //   suggestOnTriggerCharacters: true,
+                        acceptSuggestionOnEnter: 'on',
+                        tabCompletion: 'on',
+                        wordBasedSuggestions: 'matchingDocuments'
+                        }}
+                    />
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+        )}
+        </div>
   );
 }
 

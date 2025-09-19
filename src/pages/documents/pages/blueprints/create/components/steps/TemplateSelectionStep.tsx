@@ -95,14 +95,16 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       ) as any;
 
       const templateHtml = response.data.html;
+      const templateName = response.data.name;
+
       console.log('Template HTML loaded successfully');
 
       toast.success('template_loaded');
       
       // Navigate to GrapeJS editor with the template HTML
       console.log('Navigating to editor...');
-      navigate(route('/documents/blueprint/template/editor'), {
-        state: { templateHtml }
+      navigate(route('/documents/blueprint/create/editor'), {
+        state: { templateHtml, templateName }
       });
     } catch (error) {
       console.error('Error loading template:', error);

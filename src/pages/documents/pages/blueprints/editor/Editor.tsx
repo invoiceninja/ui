@@ -1,19 +1,56 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Default } from '$app/components/layouts/Default';
 import { GrapeJSEditor } from '../create/components/GrapeJSEditor';
+import { useCreateBlueprint, useUpdateBlueprint } from '$app/common/queries/docuninja/blueprints';
+import { route } from '$app/common/helpers/route';
 
 export default function BlueprintEditor() {
   const location = useLocation();
-  const { templateHtml } = location.state || {};
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const { templateHtml, blueprintName } = location.state || {};
+  
+  const createBlueprint = useCreateBlueprint();
+  const updateBlueprint = useUpdateBlueprint();
 
-  const handleSave = (html: string) => {
-    console.log('Saving blueprint:', html);
-    // TODO: Implement save functionality
+  // Determine if this is a new template or editing existing
+  const isNewTemplate = id === 'create';
+
+  const handleSave = async (html: string) => {
+    try {
+      // Base64 encode the HTML content
+      const base64Html = btoa(html);
+      
+      if (isNewTemplate) {
+        // Create new blueprint
+        const response = await createBlueprint({
+          name: blueprintName || 'New Blueprint',
+          base64_file: base64Html,
+          is_template: true
+        });
+        
+        // Navigate to the editor for the newly created blueprint
+        navigate(route('/documents/blueprint/:id/editor', { id: response.data.data.id }));
+      } else if (id) {
+        // Update existing blueprint
+        await updateBlueprint({
+          id: id,
+          base64_file: base64Html,
+          name: blueprintName || 'Updated Blueprint',
+          is_template: true
+        });
+        
+      }
+
+      
+    } catch (error) {
+      console.error('Error saving blueprint:', error);
+    }
   };
 
   const handleCancel = () => {
-    console.log('Canceling blueprint edit');
-    // TODO: Implement cancel functionality
+    // Navigate back to blueprints list
+    navigate('/documents/blueprints');
   };
 
   return (
@@ -23,7 +60,7 @@ export default function BlueprintEditor() {
           initialHtml={templateHtml || ''} 
           onSave={handleSave}
           onCancel={handleCancel}
-          blueprintId="template"
+          blueprintName={blueprintName || 'New Blueprint'}
         />
       </div>
     </Default>

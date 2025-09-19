@@ -112,11 +112,6 @@ export const documentsRoutes = (
     />
 
     <Route
-      path="blueprint/template/editor"
-      element={<Guard guards={[]} component={<BlueprintEditor />} />}
-    />
-
-    <Route
       path="blueprints/:id/edit"
       element={<Guard guards={[]} component={<BlueprintBuilder />} />}
     />
