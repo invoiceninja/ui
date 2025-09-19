@@ -17,7 +17,6 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
-import { InputLabel } from '$app/components/forms';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -33,9 +32,15 @@ export function Defaults() {
     <>
       {companyChanges?.settings && (
         <>
-          <div className="flex flex-col gap-y-1 px-4 md:px-6">
-            <InputLabel>{t('invoice_terms')}</InputLabel>
-
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="invoice_terms"
+                labelElement={<SettingsLabel label={t('invoice_terms')} />}
+              />
+            }
+          >
             <MarkdownEditor
               value={companyChanges?.settings?.invoice_terms || ''}
               onChange={(value) =>
@@ -49,7 +54,7 @@ export function Defaults() {
               }
               disabled={disableSettingsField('invoice_terms')}
             />
-          </div>
+          </Element>
 
           <Element
             className="mt-4"

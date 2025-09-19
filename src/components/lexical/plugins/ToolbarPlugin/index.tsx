@@ -101,6 +101,7 @@ import {
   formatParagraph,
   formatQuote,
 } from './utils';
+import { useColorScheme } from '$app/common/colors';
 
 const rootTypeToRootName = {
   root: 'Root',
@@ -581,6 +582,8 @@ export default function ToolbarPlugin({
   setActiveEditor: Dispatch<LexicalEditor>;
   setIsLinkEditMode: Dispatch<boolean>;
 }): JSX.Element {
+  const colors = useColorScheme();
+
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
     null
   );
@@ -901,7 +904,10 @@ export default function ToolbarPlugin({
   const canViewerSeeInsertCodeButton = !toolbarState.isImageCaption;
 
   return (
-    <div className="toolbar">
+    <div
+      className="toolbar"
+      style={{ borderBottom: `1px solid ${colors.$24}` }}
+    >
       <button
         disabled={!toolbarState.canUndo || !isEditable}
         onClick={() => {

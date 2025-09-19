@@ -8,19 +8,20 @@
 
 import './fontSize.css';
 
-import {LexicalEditor} from 'lexical';
-import * as React from 'react';
+import { LexicalEditor } from 'lexical';
 
 import {
   MAX_ALLOWED_FONT_SIZE,
   MIN_ALLOWED_FONT_SIZE,
 } from '../../context/ToolbarContext';
-import {SHORTCUTS} from '../ShortcutsPlugin/shortcuts';
+import { SHORTCUTS } from '../ShortcutsPlugin/shortcuts';
 import {
   updateFontSize,
   updateFontSizeInSelection,
   UpdateFontSizeType,
 } from './utils';
+import { KeyboardEvent, useEffect, useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 function parseFontSize(input: string): [number, string] | null {
   const match = input.match(/^(\d+(?:\.\d+)?)(px|pt)$/);
@@ -68,10 +69,12 @@ export default function FontSize({
   disabled: boolean;
   editor: LexicalEditor;
 }) {
-  const [inputValue, setInputValue] = React.useState<string>(selectionFontSize);
-  const [inputChangeFlag, setInputChangeFlag] = React.useState<boolean>(false);
+  const colors = useColorScheme();
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const [inputValue, setInputValue] = useState<string>(selectionFontSize);
+  const [inputChangeFlag, setInputChangeFlag] = useState<boolean>(false);
+
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     const inputValueNumber = Number(inputValue);
 
     if (e.key === 'Tab') {
@@ -110,7 +113,7 @@ export default function FontSize({
     setInputChangeFlag(false);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setInputValue(selectionFontSize);
   }, [selectionFontSize]);
 
@@ -128,7 +131,8 @@ export default function FontSize({
         }
         className="toolbar-item font-decrement"
         aria-label="Decrease font size"
-        title={`Decrease font size (${SHORTCUTS.DECREASE_FONT_SIZE})`}>
+        title={`Decrease font size (${SHORTCUTS.DECREASE_FONT_SIZE})`}
+      >
         <i className="format minus-icon" />
       </button>
 
@@ -143,6 +147,10 @@ export default function FontSize({
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyPress}
         onBlur={handleInputBlur}
+        style={{
+          color: colors.$3,
+          borderColor: colors.$24,
+        }}
       />
 
       <button
@@ -157,7 +165,8 @@ export default function FontSize({
         }
         className="toolbar-item font-increment"
         aria-label="Increase font size"
-        title={`Increase font size (${SHORTCUTS.INCREASE_FONT_SIZE})`}>
+        title={`Increase font size (${SHORTCUTS.INCREASE_FONT_SIZE})`}
+      >
         <i className="format add-icon" />
       </button>
     </>

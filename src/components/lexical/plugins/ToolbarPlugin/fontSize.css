@@ -8,20 +8,14 @@
 
 .font-size-input {
   font-weight: bold;
-  font-size: 14px;
-  color: #777;
   border-radius: 5px;
-  border-color: grey;
-  height: 15px;
+  font-size: 12px;
+  height: 25px;
   padding: 2px 4px;
   text-align: center;
-  width: 20px;
+  width: 3rem;
   align-self: center;
-}
-
-.font-size-input:disabled {
-  opacity: 0.2;
-  cursor: not-allowed;
+  background-color: transparent;
 }
 
 input[type='number']::-webkit-outer-spin-button,

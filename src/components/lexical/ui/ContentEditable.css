@@ -12,7 +12,10 @@
   display: block;
   position: relative;
   outline: 0;
-  padding: 8px 46px 40px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1rem;
   min-height: 150px;
 }
 @media (max-width: 1025px) {

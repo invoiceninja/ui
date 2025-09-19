@@ -68,12 +68,14 @@ import TwitterPlugin from './plugins/TwitterPlugin';
 import YouTubePlugin from './plugins/YouTubePlugin';
 import ContentEditable from './ui/ContentEditable';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   value: string;
 }
 
 export function Editor({ value }: Props): JSX.Element {
+  const colors = useColorScheme();
   // const {
   //   settings: {
   //     isCodeHighlighted,
@@ -136,7 +138,7 @@ export function Editor({ value }: Props): JSX.Element {
   }, [isSmallWidthViewport]);
 
   return (
-    <>
+    <div className="border rounded-md" style={{ borderColor: colors.$24 }}>
       <ToolbarPlugin
         editor={editor}
         activeEditor={activeEditor}
@@ -254,6 +256,6 @@ export function Editor({ value }: Props): JSX.Element {
         />
       </div>
       {/* {showTreeView && <TreeViewPlugin />} */}
-    </>
+    </div>
   );
 }
