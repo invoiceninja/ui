@@ -9,158 +9,171 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { useDocumentQuery, useDocumentTimelineQuery } from '$app/common/queries/docuninja/documents';
+import {
+  useDocumentQuery,
+  useDocumentTimelineQuery,
+} from '$app/common/queries/docuninja/documents';
 import { Page } from '$app/components/Breadcrumbs';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Default } from '$app/components/layouts/Default';
 import { Alert } from '$app/components/Alert';
-import { useState } from 'react';
-import { Badge } from '$app/components/Badge';
+import { useMemo } from 'react';
+import { Badge, BadgeVariant } from '$app/components/Badge';
 import { Spinner } from '$app/components/Spinner';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Button } from '$app/components/forms';
-import type { Document as DocumentType, DocumentFile } from '$app/common/interfaces/docuninja/api';
-import { TimelineLayout } from './components/timeline-layout';
-import { Invitations } from './components/invitations';
-
-const STATUS_LABELS = {
-    1: 'Draft',
-    2: 'Sent',
-    3: 'Viewed',
-    4: 'Completed',
-    5: 'Cancelled'
-};
+import { TimelineLayout } from './components/TimelineLayout';
+import { Invitations } from './components/Invitations';
+import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { useDocumentActions } from './hooks/useDocumentActions';
+import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
+import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 
 export default function Document() {
-    const { documentTitle, setDocumentTitle } = useTitle('view_document');
-    const [t] = useTranslation();
-    const { dateFormat } = useCurrentCompanyDateFormats();
+  const { documentTitle } = useTitle('view_document');
+  const [t] = useTranslation();
 
-    const [error, setError] = useState<string | null>(null);
-    const { id } = useParams();
+  const { id } = useParams();
+  const colors = useColorScheme();
 
-    const { data: document, isLoading } = useDocumentQuery({
-        id,
-        enabled: true,
-    }) as { data: DocumentType | undefined, isLoading: boolean };
+  const {
+    data: document,
+    isLoading,
+    error,
+    isFetching: isDocumentFetching,
+  } = useDocumentQuery({
+    id,
+    enabled: Boolean(id),
+  });
 
-    const pages: Page[] = [
-        { name: t('documents'), href: '/documents' },
-        {
-            name: document?.description || documentTitle,
-            href: route('/documents/:id', { id }),
-        },
-    ];
+  const pages: Page[] = [
+    { name: t('documents'), href: '/documents' },
+    {
+      name: document?.description || documentTitle,
+      href: route('/documents/:id', { id }),
+    },
+  ];
 
-    const { data: timelineData, isLoading: isTimelineLoading } = useDocumentTimelineQuery({
-        id,
-        enabled: true,
-    });
-    
-    const getStatusBadge = (statusId: number) => {
-        const label = STATUS_LABELS[statusId as keyof typeof STATUS_LABELS] || 'Unknown';
-        
-        let variant: 'primary' | 'dark-blue' | 'yellow' | 'green' | 'red' | 'orange' = 'primary';
-        
-        switch (statusId) {
-            case 1:
-                variant = 'primary';
-                break;
-            case 2:
-                variant = 'dark-blue';
-                break;
-            case 3:
-                variant = 'yellow';
-                break;
-            case 4:
-                variant = 'green';
-                break;
-            case 5:
-                variant = 'red';
-                break;
-            default:
-                variant = 'primary';
-        }
-        
-        return <Badge variant={variant}>{label}</Badge>;
-    };
+  const STATUS_LABELS = useMemo(
+    () => ({
+      1: t('draft'),
+      2: t('pending_approval'),
+      3: t('approved'),
+      4: t('rejected'),
+      5: t('sent'),
+      6: t('completed'),
+      7: t('expired'),
+      8: t('voided'),
+    }),
+    []
+  );
 
-    const handleDownload = (file: DocumentFile) => {
-        console.log('Download file:', file.id);
-        // Implement download logic here
-    };
+  const actions = useDocumentActions({ document });
 
-    const handlePreview = (file: DocumentFile) => {
-        console.log('Preview file:', file.id);
-        // Implement preview logic here
-    };
+  const {
+    data: timelineData,
+    isLoading: isTimelineLoading,
+    isFetching: isTimelineFetching,
+  } = useDocumentTimelineQuery({
+    id,
+    enabled: Boolean(id),
+  });
 
-    if (isLoading) {
-        return (
-            <Default title={documentTitle} breadcrumbs={pages} docsLink="en/documents">
-                <div className="flex justify-center items-center py-16">
-                    <Spinner />
-                </div>
-            </Default>
-        );
-    }
+  return (
+    <Default
+      title={document?.description || documentTitle}
+      breadcrumbs={pages}
+      docsLink="en/documents"
+      navigationTopRight={
+        <div className="flex">
+          <Button
+            className="rounded-br-none rounded-tr-none px-3"
+            to={route('/documents/:id/builder', { id: document?.id })}
+            disabled={
+              document?.status_id === DocumentStatus.Completed ||
+              document?.status_id === DocumentStatus.Voided
+            }
+            disableWithoutIcon
+          >
+            {t('edit')}
+          </Button>
 
-    if (error) {
-        return (
-            <Default title={documentTitle} breadcrumbs={pages} docsLink="en/documents">
-                <Alert type="danger" className="mb-4">
-                    {error}
-                </Alert>
-            </Default>
-        );
-    }
+          <Dropdown
+            className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
+            cardActions
+            labelButtonBorderColor={colors.$1}
+          >
+            {actions}
+          </Dropdown>
+        </div>
+      }
+    >
+      {!document && !isLoading && !error && (
+        <Alert type="danger" className="mb-4">
+          {t('document_not_found')}
+        </Alert>
+      )}
 
-    if (!document) {
-        return (
-            <Default title={documentTitle} breadcrumbs={pages} docsLink="en/documents">
-                <Alert type="danger" className="mb-4">
-                    {t('document_not_found')}
-                </Alert>
-            </Default>
-        );
-    }
-    
-    return (
-        <Default title={document.description || documentTitle} breadcrumbs={pages} docsLink="en/documents">
-            {error && (
-                <Alert type="danger" className="mb-4">
-                    {error}
-                </Alert>
-            )}
+      {(isLoading ||
+        isTimelineLoading ||
+        isDocumentFetching ||
+        isTimelineFetching) && (
+        <Card
+          title={documentTitle}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
+          <div className="flex justify-center py-4 sm:py-6 px-4 sm:px-6">
+            <Spinner />
+          </div>
+        </Card>
+      )}
 
-            <div className="flex flex-row justify-between items-center mb-4">
+      {document &&
+        !isLoading &&
+        !isTimelineLoading &&
+        !isTimelineFetching &&
+        !isDocumentFetching && (
+          <Card
+            title={
+              <div className="flex space-x-4 items-center">
+                <span>{document.description || documentTitle}</span>
 
-                <div className="flex flex-row items-center gap-2">
-                    <h1 className="text-2xl font-bold">{document.description}</h1>
-                    <span className="text-sm text-gray-500">{getStatusBadge(document.status_id)}</span>
-                </div>
-                <Link to={`/documents/${document.id}/builder`}>
-                    <Button type="primary" behavior="button">
-                        {t('edit')}
-                    </Button>
-                </Link>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
+                {document && !isLoading && (
+                  <Badge
+                    variant={
+                      (STATUS_VARIANTS[
+                        document.status_id as keyof typeof STATUS_VARIANTS
+                      ] || 'primary') as BadgeVariant
+                    }
+                  >
+                    {STATUS_LABELS[
+                      document.status_id as keyof typeof STATUS_LABELS
+                    ] || 'Unknown'}
+                  </Badge>
+                )}
+              </div>
+            }
+            className="shadow-sm"
+            childrenClassName="px-4 sm:px-6"
+            style={{ borderColor: colors.$24 }}
+            headerStyle={{ borderColor: colors.$20 }}
+          >
+            <div className="flex flex-col xl:flex-row justify-between gap-4 pt-3 pb-4 w-full">
+              <div className="flex">
                 <Invitations document={document} />
-                
-                <div className="col-span-2 lg:col-span-2">
-                    {isTimelineLoading ? (
-                        <div className="flex justify-center py-8">
-                            <Spinner />
-                        </div>
-                    ) : (
-                        <TimelineLayout items={timelineData || []} />
-                    )}
-                </div>
-            </div>
+              </div>
 
-        </Default>
-    );
+              <div className="flex-1">
+                <TimelineLayout items={timelineData || []} />
+              </div>
+            </div>
+          </Card>
+        )}
+    </Default>
+  );
 }
