@@ -99,7 +99,7 @@ export function Login() {
           >
             <InputField
               type="email"
-              autoComplete="on"
+              autoComplete="username"
               label={t('email_address')}
               errorMessage={errors?.email}
               name="email"
@@ -107,7 +107,7 @@ export function Login() {
 
             <InputField
               type="password"
-              autoComplete="on"
+              autoComplete="current-password"
               label={t('password')}
               id="password"
               errorMessage={errors?.password}
@@ -123,7 +123,7 @@ export function Login() {
 
             <InputField
               type="text"
-              autoComplete="on"
+              autoComplete="one-time-code"
               id="one_time_password"
               placeholder={t('plaid_optional')}
               errorMessage={errors?.one_time_password}
