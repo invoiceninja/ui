@@ -1,0 +1,1153 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
+import Editor from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
+import * as beautify from 'js-beautify';
+
+import grapesjs from "grapesjs";
+import "grapesjs/dist/css/grapes.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
+// Custom CSS for larger icons in GrapeJS
+const iconStyles = `
+  .gjs-block i {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .gjs-block i.fas {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .gjs-sm-sector-title i.fas {
+    font-size: 16px !important;
+  }
+  .gjs-pn-btn i.fas {
+    font-size: 16px !important;
+  }
+    .gjs-blocks .gjs-block i {
+  font-size: 20px;       /* size of font-awesome icon */
+  width: 24px;            /* optional if using img icons */
+  height: 24px;           /* optional if using img icons */
+  display: inline-block;
+  text-align: center;
+}
+`;
+
+import pluginBlocks from "grapesjs-blocks-basic";
+import pluginExport from "grapesjs-plugin-export";
+// @ts-expect-error - No type definitions available
+import pluginTabs from "grapesjs-tabs";
+// @ts-expect-error - No type definitions available
+import pluginTouch from "grapesjs-touch";
+import pluginCustomCode from "grapesjs-custom-code";
+import pluginParserPostcss from "grapesjs-parser-postcss";
+import pluginTooltip from "grapesjs-tooltip";
+import pluginTuiImageEditor from "grapesjs-tui-image-editor";
+import pluginTyped from "grapesjs-typed";
+import pluginStyleBg from "grapesjs-style-bg";
+import pluginPresetWebpage from "grapesjs-preset-webpage";
+
+// Load FontAwesome for icons - using CDN since font-awesome package might not be available
+
+interface GrapeJSEditorProps {
+  initialHtml: string;
+  onSave: (html: string) => void;
+  onCancel: () => void;
+  blueprintId: string;
+}
+
+declare global {
+  interface Window {
+    grapesjs: any;
+  }
+}
+
+export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: GrapeJSEditorProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const isInitialized = useRef(false);
+  
+  // Monaco editor state
+  const [showMonacoEditor, setShowMonacoEditor] = useState(false);
+  const [monacoHtml, setMonacoHtml] = useState('');
+  const [monacoCss, setMonacoCss] = useState('');
+  const [monacoHtmlEditor, setMonacoHtmlEditor] = useState<any>(null);
+  const [monacoCssEditor, setMonacoCssEditor] = useState<any>(null);
+
+  useEffect(() => {
+    // Prevent multiple initializations
+    if (isInitialized.current || (window as any).grapesEditor) {
+
+        return;
+    }
+
+    isInitialized.current = true;
+
+    // Inject custom icon styles
+    const styleElement = document.createElement('style');
+    styleElement.textContent = iconStyles;
+    document.head.appendChild(styleElement);
+
+    const initializeEditor = () => {
+      if (!editorRef.current) {
+        return;
+      }
+
+      // Check if the container is properly mounted
+      if (!editorRef.current.parentNode) {
+        return;
+      }
+
+      // Prevent multiple initializations
+      if ((window as any).grapesEditor) {
+        return;
+      }
+      
+
+        try {
+        const editor = grapesjs.init({
+          container: editorRef.current,
+          height: "100%",
+          width: "100%",
+          storageManager: false, // Disable storage manager to avoid conflicts
+          fromElement: false, // Set to false to avoid initialization issues
+          showOffsets: true,
+          assetManager: {
+            embedAsBase64: true,
+          },
+          selectorManager: { componentFirst: true },
+          canvas: {
+            styles: [],
+            scripts: []
+          },
+        styleManager: {
+          sectors: [{
+              name: 'General',
+              properties:[
+                {
+                  extend: 'float',
+                  type: 'radio',
+                  default: 'none',
+                  options: [
+                    { id: 'none', value: 'none', className: 'fas fa-times'},
+                    { id: 'left', value: 'left', className: 'fas fa-align-left'},
+                    { id: 'right', value: 'right', className: 'fas fa-align-right'}
+                  ],
+                },
+                'display',
+                { extend: 'position', type: 'select' },
+                'top',
+                'right',
+                'left',
+                'bottom',
+              ],
+            }, {
+                name: 'Dimension',
+                open: false,
+                properties: [
+                  'width',
+                  {
+                    id: 'flex-width',
+                    type: 'integer',
+                    name: 'Width',
+                    units: ['px', '%'],
+                    property: 'flex-basis',
+                    toRequire: true,
+                  },
+                  'height',
+                  'max-width',
+                  'min-height',
+                  'margin',
+                  'padding'
+                ],
+              },{
+                name: 'Typography',
+                open: false,
+                properties: [
+                    'font-family',
+                    'font-size',
+                    'font-weight',
+                    'letter-spacing',
+                    'color',
+                    'line-height',
+                    {
+                      extend: 'text-align',
+                      options: [
+                        { id : 'left',  label : 'Left',    className: 'fas fa-align-left'},
+                        { id : 'center',  label : 'Center',  className: 'fas fa-align-center' },
+                        { id : 'right',   label : 'Right',   className: 'fas fa-align-right'},
+                        { id : 'justify', label : 'Justify',   className: 'fas fa-align-justify'}
+                      ],
+                    },
+                    {
+                      property: 'text-decoration',
+                      type: 'radio',
+                      default: 'none',
+                      options: [
+                        { id: 'none', label: 'None', className: 'fas fa-times'},
+                        { id: 'underline', label: 'underline', className: 'fas fa-underline' },
+                        { id: 'line-through', label: 'Line-through', className: 'fas fa-strikethrough'}
+                      ],
+                    },
+                    'text-shadow'
+                ],
+              },{
+                name: 'Decorations',
+                open: false,
+                properties: [
+                  'opacity',
+                  'border-radius',
+                  'border',
+                  'box-shadow',
+                  'background', // { id: 'background-bg', property: 'background', type: 'bg' }
+                ],
+              },{
+                name: 'Extra',
+                open: false,
+                buildProps: [
+                  'transition',
+                  'perspective',
+                  'transform'
+                ],
+              },{
+                name: 'Flex',
+                open: false,
+                properties: [{
+                  name: 'Flex Container',
+                  property: 'display',
+                  type: 'select',
+                  defaults: 'block',
+                  list: [
+                    { id: 'block', value: 'block', name: 'Disable'},
+                    { id: 'flex', value: 'flex', name: 'Enable'}
+                  ],
+                },{
+                  name: 'Flex Parent',
+                  property: 'label-parent-flex',
+                  type: 'integer',
+                },{
+                  name: 'Direction',
+                  property: 'flex-direction',
+                  type: 'radio',
+                  defaults: 'row',
+                  list: [{
+                    id: 'row',
+                    value: 'row',
+                    name: 'Row',
+                    className: 'icons-flex icon-dir-row',
+                    title: 'Row',
+                  },{
+                    id: 'row-reverse',
+                    value: 'row-reverse',
+                    name: 'Row reverse',
+                    className: 'icons-flex icon-dir-row-rev',
+                    title: 'Row reverse',
+                  },{
+                    id: 'column',
+                    value: 'column',
+                    name: 'Column',
+                    title: 'Column',
+                    className: 'icons-flex icon-dir-col',
+                  },{
+                    id: 'column-reverse',
+                    value: 'column-reverse',
+                    name: 'Column reverse',
+                    title: 'Column reverse',
+                    className: 'icons-flex icon-dir-col-rev',
+                  }],
+                },{
+                  name: 'Justify',
+                  property: 'justify-content',
+                  type: 'radio',
+                  defaults: 'flex-start',
+                  list: [{
+                    id: 'flex-start',
+                    value: 'flex-start',
+                    className: 'icons-flex icon-just-start',
+                    title: 'Start',
+                  },{
+                    id: 'flex-end',
+                    value: 'flex-end',
+                    title: 'End',
+                    className: 'icons-flex icon-just-end',
+                  },{
+                    id: 'space-between',
+                    value: 'space-between',
+                    title: 'Space between',
+                    className: 'icons-flex icon-just-sp-bet',
+                  },{
+                    id: 'space-around',
+                    value: 'space-around',
+                    title: 'Space around',
+                    className: 'icons-flex icon-just-sp-ar',
+                  },{
+                    id: 'center',
+                    value: 'center',
+                    title: 'Center',
+                    className: 'icons-flex icon-just-sp-cent',
+                  }],
+                },{
+                  name: 'Align',
+                  property: 'align-items',
+                  type: 'radio',
+                  defaults: 'center',
+                  list: [{
+                    id: 'flex-start',                    
+                    value: 'flex-start',
+                    title: 'Start',
+                    className: 'icons-flex icon-al-start',
+                  },{
+                    id: 'flex-end',
+                    value: 'flex-end',
+                    title: 'End',
+                    className: 'icons-flex icon-al-end',
+                  },{
+                    id: 'stretch',
+                    value: 'stretch',
+                    title: 'Stretch',
+                    className: 'icons-flex icon-al-str',
+                  },{
+                    id: 'center',
+                    value: 'center',
+                    title: 'Center',
+                    className: 'icons-flex icon-al-center',
+                  }],
+                },{
+                  name: 'Flex Children',
+                  property: 'label-parent-flex',
+                  type: 'integer',
+                },{
+                  name: 'Order',
+                  property: 'order',
+                  type: 'integer',
+                  defaults: '0',
+                  min: 0
+                },{
+                  name: 'Flex',
+                  property: 'flex',
+                  type: 'composite',
+                  properties  : [{
+                  name: 'Grow',
+                  property: 'flex-grow',
+                  type: 'integer',
+                  defaults: '0',
+                  min: 0
+                  },{
+                    name: 'Shrink',
+                    property: 'flex-shrink',
+                    type: 'integer',
+                    defaults: '0',
+                    min: 0
+                  },{
+                    name: 'Basis',
+                    property: 'flex-basis',
+                    type: 'integer',
+                    units: ['px','%',''],
+                    unit: '',
+                    defaults: 'auto',
+                  }],
+                },{
+                  name: 'Align',
+                  property: 'align-self',
+                  type: 'radio',
+                  defaults: 'auto',
+                  list: [{
+                    id: 'auto',
+                    value: 'auto',
+                    name: 'Auto',
+                  },{
+                    id: 'flex-start',
+                    value: 'flex-start',
+                    title: 'Start',
+                    className: 'icons-flex icon-al-start',
+                  },{
+                    id: 'flex-end',
+                    value   : 'flex-end',
+                    title: 'End',
+                    className: 'icons-flex icon-al-end',
+                  },{
+                    id: 'stretch',
+                    value   : 'stretch',
+                    title: 'Stretch',
+                    className: 'icons-flex icon-al-str',
+                  },{
+                    id: 'center',
+                    value   : 'center',
+                    title: 'Center',
+                    className: 'icons-flex icon-al-center',
+                  }],
+                }]
+              }
+            ],
+        },
+        plugins: [
+          pluginBlocks,
+          pluginExport,
+          pluginTabs,
+          pluginCustomCode,
+          pluginTouch,
+          pluginParserPostcss,
+          pluginTooltip,
+          pluginTuiImageEditor,
+          pluginTyped,
+          pluginStyleBg,
+          pluginPresetWebpage,
+        ],
+        pluginsOpts: {
+          [pluginBlocks as unknown as string]: { flexGrid: true },
+          [pluginTuiImageEditor as unknown as string]: {
+            script: [
+              // 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.6.7/fabric.min.js',
+              'https://uicdn.toast.com/tui.code-snippet/v1.5.2/tui-code-snippet.min.js',
+              'https://uicdn.toast.com/tui-color-picker/v2.2.7/tui-color-picker.min.js',
+              'https://uicdn.toast.com/tui-image-editor/v3.15.2/tui-image-editor.min.js'
+            ],
+            style: [
+              'https://uicdn.toast.com/tui-color-picker/v2.2.7/tui-color-picker.min.css',
+              'https://uicdn.toast.com/tui-image-editor/v3.15.2/tui-image-editor.min.css',
+            ],
+          },
+          [pluginTabs as unknown as string]: {
+            tabsBlock: { category: 'Extra' }
+          },
+          [pluginTyped as unknown as string]: {
+            block: {
+              category: 'Extra',
+              content: {
+                type: 'typed',
+                'type-speed': 40,
+                strings: [
+                  'Text row one',
+                  'Text row two',
+                  'Text row three',
+                ],
+              }
+            }
+          },
+          [pluginPresetWebpage as unknown as string]: {
+            showStylesOnChange: 0,
+            modalImportTitle: 'Import Template',
+            modalImportLabel: '<div style="margin-bottom: 10px; font-size: 13px;">Paste here your HTML/CSS and click Import</div>',
+            modalImportContent: function(editor: any) {
+              return editor.getHtml() + '<style>'+editor.getCss()+'</style>'
+            },
+          },
+          
+        },
+      });
+
+      editor.I18n.addMessages({
+        en: {
+          styleManager: {
+            properties: {
+              'background-repeat': 'Repeat',
+              'background-position': 'Position',
+              'background-attachment': 'Attachment',
+              'background-size': 'Size',
+            }
+          },
+        }
+      });
+
+      const pn = editor.Panels;
+      const modal = editor.Modal;
+      const cmdm = editor.Commands;
+
+      // Update canvas-clear command
+      cmdm.add('canvas-clear', function() {
+        if(confirm('Are you sure to clean the canvas?')) {
+          editor.runCommand('core:canvas-clear')
+          setTimeout(function(){ localStorage.clear()}, 0)
+        }
+      });
+
+      // Add info command
+      const mdlClass = 'gjs-mdl-dialog-sm';
+      const infoContainer = document.getElementById('info-panel');
+
+      cmdm.add('open-info', function() {
+        const mdlDialog = document.querySelector('.gjs-mdl-dialog');
+        if (mdlDialog) mdlDialog.className += ' ' + mdlClass;
+        if (infoContainer) infoContainer.style.display = 'block';
+        modal.setTitle('About this demo');
+        if (infoContainer) modal.setContent(infoContainer);
+        modal.open();
+        modal.getModel().once('change:open', function() {
+        if (mdlDialog) mdlDialog.className = mdlDialog.className.replace(mdlClass, '');
+        })
+      });
+
+      pn.addButton('options', {
+        id: 'open-info',
+        className: 'fas fa-question-circle',
+        command: function() { editor.runCommand('open-info') },
+        attributes: {
+          'title': 'About',
+          'data-tooltip-pos': 'bottom',
+        },
+      });
+
+
+
+      // Add and beautify tooltips
+      [['sw-visibility', 'Show Borders'], ['preview', 'Preview'], ['fullscreen', 'Fullscreen'],
+       ['export-template', 'Export'], ['undo', 'Undo'], ['redo', 'Redo'],
+       ['gjs-open-import-webpage', 'Import'], ['canvas-clear', 'Clear canvas']]
+      .forEach(function(item) {
+        pn.getButton('options', item[0])?.set('attributes', {title: item[1], 'data-tooltip-pos': 'bottom'});
+      });
+      [['open-sm', 'Style Manager'], ['open-layers', 'Layers'], ['open-blocks', 'Blocks']]
+      .forEach(function(item) {
+        pn.getButton('views', item[0])?.set('attributes', {title: item[1], 'data-tooltip-pos': 'bottom'});
+      });
+
+      
+
+
+
+        // Do stuff on load
+        editor.on('load', function() {
+          const $ = grapesjs.$;
+        
+        // Add a small delay to ensure DOM is fully ready
+        setTimeout(function() {
+
+
+        // Add Monaco editor button
+        pn.addButton('views', {
+          attributes: {
+            title: 'Monaco Code Editor'
+          },
+          className: 'fas fa-code',
+          command: function(editor: any) {
+            // Get current content
+            const html = editor.getHtml();
+            const css = editor.getCss();
+            
+            // Format the HTML and CSS separately
+            // Remove any body tags and head elements from the HTML since GrapeJS expects only body content
+            let cleanHtml = html;
+            if (cleanHtml.includes('<body')) {
+              const bodyMatch = cleanHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+              if (bodyMatch && bodyMatch[1]) {
+                cleanHtml = bodyMatch[1].trim();
+              }
+            }
+            
+            // Remove head elements (meta, title, etc.) that shouldn't be in body content
+            cleanHtml = cleanHtml
+              .replace(/<meta[^>]*>/gi, '')
+              .replace(/<title[^>]*>.*?<\/title>/gi, '')
+              .replace(/<link[^>]*>/gi, '')
+              .replace(/<script[^>]*>.*?<\/script>/gi, '')
+              .replace(/<style[^>]*>.*?<\/style>/gi, '')
+              .replace(/<head[^>]*>.*?<\/head>/gi, '')
+              .trim();
+            
+            const formattedHtml = beautify.html(cleanHtml, {
+              indent_size: 2,
+              indent_char: ' ',
+              max_preserve_newlines: 2,
+              preserve_newlines: true,
+              indent_scripts: 'normal',
+            //   space_before_conditional: true,
+            //   unescape_strings: false,
+            //   jslint_happy: false,
+              end_with_newline: true,
+              wrap_line_length: 120,
+              indent_inner_html: true,
+            //   comma_first: false,
+            //   e4x: false,
+              indent_empty_lines: false
+            });
+            
+            const formattedCss = beautify.css(css || '', {
+              indent_size: 2,
+              indent_char: ' ',
+              max_preserve_newlines: 2,
+              preserve_newlines: true,
+            //   break_chained_methods: false,
+            //   brace_style: 'collapse',
+            //   space_before_conditional: true,
+            //   unescape_strings: false,
+            //   jslint_happy: false,
+              end_with_newline: true,
+              wrap_line_length: 120,
+            //   comma_first: false,
+            //   e4x: false,
+              indent_empty_lines: false
+            });
+            
+            // Set the formatted code and show Monaco editor
+            setMonacoHtml(formattedHtml);
+            setMonacoCss(formattedCss);
+            setShowMonacoEditor(true);
+          },
+          togglable: false,
+          id: 'monaco-editor'
+        });
+
+        // Show borders by default
+        pn.getButton('options', 'sw-visibility')?.set('active', 1);
+
+        // Show logo with the version
+
+        // Load and show settings and style manager
+        const openTmBtn = pn.getButton('views', 'open-tm');
+        openTmBtn && openTmBtn.set('active', 1);
+        const openSm = pn.getButton('views', 'open-sm');
+        openSm && openSm.set('active', 1);
+
+        // Remove trait view
+        pn.removeButton('views', 'open-tm');
+
+        // Add Settings Sector
+        const traitsSector = $('<div class="gjs-sm-sector no-select">'+
+          '<div class="gjs-sm-sector-title"><span class="icon-settings fas fa-cog"></span> <span class="gjs-sm-sector-label">Settings</span></div>' +
+          '<div class="gjs-sm-properties" style="display: none;"></div></div>');
+        const traitsProps = traitsSector.find('.gjs-sm-properties');
+        
+        // Check if traits container exists before appending
+        const traitsContainer = $('.gjs-trt-traits');
+        if (traitsContainer.length > 0) {
+          traitsProps.append(traitsContainer);
+        }
+        $('.gjs-sm-sectors').before(traitsSector);
+        traitsSector.find('.gjs-sm-sector-title').on('click', function(){
+          const traitStyle = traitsProps.get(0).style;
+          const hidden = traitStyle.display == 'none';
+          if (hidden) {
+            traitStyle.display = 'block';
+          } else {
+            traitStyle.display = 'none';
+          }
+        });
+
+        // Open block manager
+        const openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
+        openBlocksBtn && openBlocksBtn.set('active', 1);
+
+
+        }, 100); // Close setTimeout with 100ms delay
+
+      });
+        // Add only custom placeholder blocks - let GrapeJS handle default blocks
+        const blockManager = editor.BlockManager;
+        
+        
+        // Register custom component types first
+        const domc = editor.DomComponents;
+        
+        // Register signature placeholder component type
+        domc.addType('signature-placeholder', {
+          model: {
+            defaults: {
+              tagName: 'div',
+              classes: ['signature-placeholder'],
+              style: {
+                border: '2px dashed #007bff',
+                padding: '10px',
+                'text-align': 'center',
+                background: '#f8f9fa',
+                color: '#007bff',
+                'font-weight': 'bold',
+                'min-height': '60px',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'center',
+                width: '280px',
+                height: '60px',
+                cursor: 'pointer'
+              },
+              content: '{{ signatory.signature}}',
+              traits: [
+                {
+                  type: 'text',
+                  name: 'placeholder-text',
+                  label: '{{ signatory.signature}}',
+                  default: '{{ signatory.signature}}'
+                }
+              ]
+            }
+          }
+        });
+
+        // Register date placeholder component type
+        domc.addType('date-placeholder', {
+          model: {
+            defaults: {
+              tagName: 'div',
+              classes: ['date-placeholder'],
+              style: {
+                border: '2px dashed #28a745',
+                padding: '10px',
+                'text-align': 'center',
+                background: '#f8f9fa',
+                color: '#28a745',
+                'font-weight': 'bold',
+                'min-height': '40px',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'center',
+                width: '250px',
+                height: '40px',
+                cursor: 'pointer'
+              },
+              content: '{{ signatory.date }}',
+              traits: [
+                {
+                  type: 'text',
+                  name: 'placeholder-text',
+                  label: '{{ signatory.date }}',
+                  default: '{{ signatory.date }}'
+                }
+              ]
+            }
+          }
+        });
+
+        // Check if blocks already exist to prevent duplicates
+        if (!blockManager.get('signature-placeholder')) {
+          // Add signature placeholder block
+          blockManager.add('signature-placeholder', {
+            label: '<i class="fas fa-signature "></i><div class="gjs-block-label">Signature</div>',
+            content: {
+              type: 'signature-placeholder'
+            },
+            category: 'Signatory Placeholders',
+          });
+
+          // Add date placeholder block
+          blockManager.add('date-placeholder', {
+            label: '<i class="fas fa-calendar"></i><div class="gjs-block-label">Date</div>',
+            content: {
+              type: 'date-placeholder'
+            },
+            category: 'Signatory Placeholders',
+          });
+        }
+
+        // Set initial HTML content
+        if (initialHtml) {
+            editor.setComponents(initialHtml);
+        }
+
+
+        // Real-time two-way binding for Monaco editor
+        editor.on('component:update', function() {
+          if (showMonacoEditor && monacoHtmlEditor && monacoCssEditor) {
+            const html = editor.getHtml();
+            const css = editor.getCss();
+            
+            // Clean the HTML to remove any body tags and head elements
+            let cleanHtml = html;
+            if (cleanHtml.includes('<body')) {
+              const bodyMatch = cleanHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+              if (bodyMatch && bodyMatch[1]) {
+                cleanHtml = bodyMatch[1].trim();
+              }
+            }
+            
+            // Remove head elements (meta, title, etc.) that shouldn't be in body content
+            cleanHtml = cleanHtml
+              .replace(/<meta[^>]*>/gi, '')
+              .replace(/<title[^>]*>.*?<\/title>/gi, '')
+              .replace(/<link[^>]*>/gi, '')
+              .replace(/<script[^>]*>.*?<\/script>/gi, '')
+              .replace(/<style[^>]*>.*?<\/style>/gi, '')
+              .replace(/<head[^>]*>.*?<\/head>/gi, '')
+              .trim();
+            
+            const formattedHtml = beautify.html(cleanHtml, {
+              indent_size: 2,
+              indent_char: ' ',
+              max_preserve_newlines: 2,
+              preserve_newlines: true,
+            //   break_chained_methods: false,
+              indent_scripts: 'normal',
+            //   brace_style: 'collapse',
+            //   space_before_conditional: true,
+            //   unescape_strings: false,
+            //   jslint_happy: false,
+              end_with_newline: true,
+              wrap_line_length: 120,
+              indent_inner_html: true,
+            //   comma_first: false,
+            //   e4x: false,
+              indent_empty_lines: false
+            });
+            
+            const formattedCss = beautify.css(css || '', {
+              indent_size: 2,
+              indent_char: ' ',
+              max_preserve_newlines: 2,
+              preserve_newlines: true,
+            //   break_chained_methods: false,
+            //   brace_style: 'collapse',
+            //   space_before_conditional: true,
+            //   unescape_strings: false,
+            //   jslint_happy: false,
+              end_with_newline: true,
+              wrap_line_length: 120,
+            //   comma_first: false,
+            //   e4x: false,
+              indent_empty_lines: false
+            });
+            
+            setMonacoHtml(formattedHtml);
+            setMonacoCss(formattedCss);
+            monacoHtmlEditor.setValue(formattedHtml);
+            monacoCssEditor.setValue(formattedCss);
+          }
+        });
+
+
+
+        // Mark editor as ready
+        setIsEditorReady(true);
+
+        // Store editor reference for cleanup
+        (window as any).grapesEditor = editor;
+      } catch (error) {
+        // If canvas error, try to reinitialize after a delay
+        if (error instanceof Error && error.message.includes('getFrames')) {
+          setTimeout(() => {
+            try {
+              if ((window as any).grapesEditor) {
+                (window as any).grapesEditor.destroy();
+                (window as any).grapesEditor = null;
+              }
+              initializeEditor();
+            } catch (retryError) {
+              // Silent retry failure
+            }
+          }, 1000);
+        }
+      }
+    };
+
+
+    // Add a longer delay to ensure DOM is fully ready
+    setTimeout(() => {
+      initializeEditor();
+    }, 500);
+    
+    // Cleanup function
+    return () => {
+      if ((window as any).grapesEditor) {
+        (window as any).grapesEditor.destroy();
+        (window as any).grapesEditor = null;
+      }
+    };
+  }, []); // Empty dependency array to run only once
+
+  const handleSave = async () => {
+    if (!isEditorReady || !(window as any).grapesEditor) return;
+
+    setIsSaving(true);
+    
+    try {
+      const editor = (window as any).grapesEditor;
+      const html = editor.getHtml();
+      const css = editor.getCss();
+      
+      // Combine HTML and CSS into a complete document
+      const fullHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>${css}</style>
+</head>
+<body>${html}</body>
+</html>`;
+
+      await onSave(fullHtml);
+    } catch (error) {
+      // Silent error handling
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleMonacoHtmlEditorMount = (editor: any) => {
+    setMonacoHtmlEditor(editor);
+    
+    // Add format on save and other formatting features
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      editor.getAction('editor.action.formatDocument').run();
+    });
+  };
+
+  const handleMonacoCssEditorMount = (editor: any) => {
+    setMonacoCssEditor(editor);
+    
+    // Add format on save and other formatting features
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      editor.getAction('editor.action.formatDocument').run();
+    });
+  };
+
+  const handleMonacoHtmlChange = (value: string | undefined) => {
+    if (value !== undefined) {
+      setMonacoHtml(value);
+    }
+  };
+
+  const handleMonacoCssChange = (value: string | undefined) => {
+    if (value !== undefined) {
+      setMonacoCss(value);
+    }
+  };
+
+
+  const handleApplyMonacoChanges = () => {
+    if (!(window as any).grapesEditor) {
+      return;
+    }
+
+    try {
+      const editor = (window as any).grapesEditor;
+      
+      // Clean the HTML to remove any body tags and head elements
+      let cleanHtml = monacoHtml;
+      if (cleanHtml.includes('<body')) {
+        const bodyMatch = cleanHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        if (bodyMatch && bodyMatch[1]) {
+          cleanHtml = bodyMatch[1].trim();
+        }
+      }
+      
+      // Remove head elements (meta, title, etc.) that shouldn't be in body content
+      cleanHtml = cleanHtml
+        .replace(/<meta[^>]*>/gi, '')
+        .replace(/<title[^>]*>.*?<\/title>/gi, '')
+        .replace(/<link[^>]*>/gi, '')
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/<style[^>]*>.*?<\/style>/gi, '')
+        .replace(/<head[^>]*>.*?<\/head>/gi, '')
+        .trim();
+      
+      try {
+        // Use a simpler approach - just set components and style directly
+        
+        // Clear the editor first
+        editor.setComponents('');
+        editor.setStyle('');
+        
+        // Wait a moment for the clear to complete
+        setTimeout(() => {
+          try {
+            // Set the new content
+            editor.setComponents(cleanHtml);
+            editor.setStyle(monacoCss);
+            editor.refresh();
+            
+            // Check what's actually in the editor after applying
+            setTimeout(() => {
+              const currentHtml = editor.getHtml();
+              const currentCss = editor.getCss();
+              
+              if (currentHtml.length > 0) {
+                setShowMonacoEditor(false);
+              } else {
+                alert('Failed to apply changes. Please try again.');
+              }
+            }, 100);
+            
+          } catch (setError) {
+            alert('Error applying changes. Please try again.');
+          }
+        }, 100);
+        
+      } catch (error) {
+        alert('Error applying changes. Please try again.');
+      }
+      
+    } catch (error) {
+      alert('Error applying changes. Please check the HTML/CSS format.');
+    }
+  };
+
+  const handleCancelMonacoEditor = () => {
+    setShowMonacoEditor(false);
+  };
+
+  return (
+    <div id="gjs" className="h-screen w-full flex flex-col" style={{ backgroundColor: colors.$1 }}>
+              {/* Toolbar */}
+              <div className="flex items-center justify-between p-3 border-b bg-white shadow-sm" style={{ borderColor: colors.$20 }}>
+                <div className="flex items-center space-x-4">
+                  <h2 className="text-lg font-semibold">{t('edit_blueprint')}</h2>
+                  <span className="text-sm text-gray-600">ID: {blueprintId}</span>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Button onClick={onCancel} type="secondary">
+                    {t('cancel')}
+                  </Button>
+                  <Button 
+                    onClick={handleSave} 
+                    disabled={!isEditorReady || isSaving}
+                    disableWithoutIcon
+                  >
+                    {isSaving ? t('saving') : t('save_blueprint')}
+                  </Button>
+                </div>
+              </div>
+
+              {/* GrapeJS Export Toolbar */}
+              <div className="panel__export"></div>
+
+      {/* Editor Container */}
+      <div className="flex-1 flex overflow-hidden">
+
+              {/* Main Editor Area */}
+              <div className="flex-1 flex flex-col bg-white min-w-0">
+                {/* Canvas */}
+                <div className="flex-1 relative min-w-0">
+                  <div ref={editorRef} className="absolute inset-0 gjs-editor w-full h-full"></div>
+                </div>
+              </div>
+      </div>
+
+      {/* Monaco Editor Modal */}
+      {showMonacoEditor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-11/12 h-5/6 flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Code Editor</h3>
+              <div className="flex space-x-2">
+                <Button onClick={handleApplyMonacoChanges} type="primary">
+                  Apply Changes
+                </Button>
+                <Button onClick={handleCancelMonacoEditor} type="secondary">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+            
+            {/* Dual Monaco Editors */}
+            <div className="flex-1 flex p-4 gap-4">
+              {/* HTML Editor */}
+              <div className="flex-1 flex flex-col">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium text-gray-700">HTML</h4>
+                </div>
+                <div className="flex-1 border rounded">
+                  <Editor
+                    height="100%"
+                    defaultLanguage="html"
+                    value={monacoHtml}
+                    onChange={handleMonacoHtmlChange}
+                    onMount={handleMonacoHtmlEditorMount}
+                    options={{
+                      wordWrap: "on",
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                      contextmenu: true,
+                      fixedOverflowWidgets: true,
+                      showFoldingControls: 'always',
+                      suggestOnTriggerCharacters: true,
+                      lineDecorationsWidth: 0,
+                      tabSize: 2,
+                      insertSpaces: true,
+                      formatOnType: true,
+                      formatOnPaste: true,
+                      autoIndent: 'full',
+                      autoClosingBrackets: 'always',
+                    //   autoClosingPairs: 'always',
+                      autoClosingQuotes: 'always',
+                      autoSurround: 'languageDefined',
+                      fontSize: 14,
+                      fontFamily: "'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
+                      scrollbar: {
+                        verticalScrollbarSize: 8,
+                        horizontal: 'hidden',
+                      },
+                      theme: 'vs-light',
+                      quickSuggestions: true,
+                    //   suggestOnTriggerCharacters: true,
+                      acceptSuggestionOnEnter: 'on',
+                      tabCompletion: 'on',
+                      wordBasedSuggestions: 'matchingDocuments'
+                    }}
+                  />
+                </div>
+              </div>
+              
+              {/* CSS Editor */}
+              <div className="flex-1 flex flex-col">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium text-gray-700">CSS</h4>
+                </div>
+                <div className="flex-1 border rounded">
+                  <Editor
+                    height="100%"
+                    defaultLanguage="css"
+                    value={monacoCss}
+                    onChange={handleMonacoCssChange}
+                    onMount={handleMonacoCssEditorMount}
+                    options={{
+                      wordWrap: "on",
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                      contextmenu: true,
+                      fixedOverflowWidgets: true,
+                      showFoldingControls: 'always',
+                      suggestOnTriggerCharacters: true,
+                      lineDecorationsWidth: 0,
+                      tabSize: 2,
+                      insertSpaces: true,
+                      formatOnType: true,
+                      formatOnPaste: true,
+                      autoIndent: 'full',
+                      autoClosingBrackets: 'always',
+                    //   autoClosingPairs: 'always',
+                      autoClosingQuotes: 'always',
+                      autoSurround: 'languageDefined',
+                      fontSize: 14,
+                      fontFamily: "'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
+                      scrollbar: {
+                        verticalScrollbarSize: 8,
+                        horizontal: 'hidden',
+                      },
+                      theme: 'vs-light',
+                      quickSuggestions: true,
+                    //   suggestOnTriggerCharacters: true,
+                      acceptSuggestionOnEnter: 'on',
+                      tabCompletion: 'on',
+                      wordBasedSuggestions: 'matchingDocuments'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
