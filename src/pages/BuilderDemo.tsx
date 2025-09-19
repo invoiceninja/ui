@@ -43,8 +43,13 @@ export function BuilderDemo() {
           value={{
             token: import.meta.env.VITE_DOCUNINJA_TOKEN as string,
             document: import.meta.env.VITE_DOCUNINJA_DOCUMENT as string,
+            events: {
+              onMessage: () => null,
+              onMessageDismiss: () => null,
+            },
             components: {
               skeleton: Loading,
+              createBlueprintSignatory: () => null,
               save: Save,
               send: {
                 trigger: Send,
@@ -352,7 +357,7 @@ function ToolboxContext({ options }: ToolboxContextProps) {
         </span>
       }
     >
-      {options.map((option, i) =>
+      {options?.map((option, i) =>
         option.children.length > 0 ? (
           <>
             {option.children.map((child, j) => (

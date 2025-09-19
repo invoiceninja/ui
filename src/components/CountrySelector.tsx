@@ -14,11 +14,12 @@ import { SelectField } from './forms';
 export interface GenericSelectorProps<T = string> {
   value: T;
   label?: string | null;
-  onChange: (id: string) => unknown;
+  onChange?: (id: string) => unknown;
   errorMessage?: string | string[];
   dismissable?: boolean;
   disabled?: boolean;
   withBlank?: boolean;
+  readOnly?: boolean;
 }
 
 export function CountrySelector(props: GenericSelectorProps) {
@@ -34,6 +35,7 @@ export function CountrySelector(props: GenericSelectorProps) {
       disabled={props.disabled}
       withBlank={props.withBlank}
       customSelector
+      readOnly={props.readOnly}
     >
       {countries.map((country, index) => (
         <option key={index} value={country.id}>

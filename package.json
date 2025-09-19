@@ -4,8 +4,13 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "^0.0.4",
+    "@docuninja/builder2.0": "file:../builder2.0",
     "@emotion/styled": "^11.14.0",
+    "@fontsource/alex-brush": "^5.2.6",
+    "@fontsource/dancing-script": "^5.2.6",
+    "@fontsource/great-vibes": "^5.2.6",
+    "@fontsource/pacifico": "^5.2.6",
+    "@fontsource/satisfy": "^5.2.6",
     "@headlessui/react": "^1.7.19",
     "@headlessui/tailwindcss": "^0.2.2",
     "@hello-pangea/dnd": "^16.6.0",
@@ -71,10 +76,12 @@
     "rehype-raw": "^7.0.0",
     "remove": "^0.1.5",
     "sha256": "^0.2.0",
+    "signature_pad": "^5.0.10",
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.15",
     "tailwind-scrollbar": "^3.1.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zustand": "^5.0.8"
   },
   "scripts": {
     "dev": "vite",

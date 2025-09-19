@@ -397,13 +397,6 @@ export function Default(props: Props) {
             visible: true,
           },
         },
-        {
-          name: t('settings'),
-          href: '/documents/settings',
-          icon: Gear,
-          visible: true,
-          current: location.pathname.startsWith('/documents/settings'),
-        },
       ],
     },
 

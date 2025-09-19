@@ -177,6 +177,7 @@ interface Props<T> extends CommonProps {
   deleteBulkRoute?: string;
   useRestoreForDeletedResources?: boolean;
   disabledCreateButton?: boolean;
+  filterParameterKey?: 'filter' | 'search';
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -257,6 +258,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     deleteBulkRoute,
     useRestoreForDeletedResources = false,
     disabledCreateButton = false,
+    filterParameterKey = 'filter',
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -339,7 +341,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
-    apiEndpoint.searchParams.set('filter', filter);
+    apiEndpoint.searchParams.set(filterParameterKey, filter);
 
     handleChangingCustomFilters();
 
@@ -457,22 +459,14 @@ export function DataTable<T extends object>(props: Props<T>) {
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
-    const method = useDeleteMethod && action === 'delete' ? 'DELETE' : 'POST';
+    const method = 'POST';
 
     const route =
       useDeleteMethod && action === 'delete'
         ? deleteBulkRoute
         : props.bulkRoute ?? `${props.endpoint}/bulk`;
 
-    const updatedAction =
-      withoutActionBulkPayloadPropertyForDeleteAction && action === 'delete'
-        ? {}
-        : { action };
-
-    const updatedIds =
-      withoutIdsBulkPayloadPropertyForDeleteAction && action === 'delete'
-        ? []
-        : { ids: id ? [id] : Array.from(selected) };
+    const updatedIds = { ids: id ? [id] : Array.from(selected) };
 
     request(
       method,
@@ -480,8 +474,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         ? docuNinjaEndpoint(route as string, { id })
         : endpoint(route as string),
       {
-        ...updatedAction,
-        ...updatedIds,
+        action: action, ...updatedIds,
       },
       { headers: props.endpointHeaders }
     )

@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import { useSettingsTabs } from './common/hooks/useSettingsTabs';
 
-function Settings() {
+function CompanyDetails() {
   const [t] = useTranslation();
 
   const tabs = useSettingsTabs();
@@ -60,4 +60,4 @@ function Settings() {
   );
 }
 
-export default Settings;
+export default CompanyDetails;

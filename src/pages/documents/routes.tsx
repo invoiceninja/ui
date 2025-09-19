@@ -21,22 +21,26 @@ const Blueprints = lazy(
 const CreateBlueprint = lazy(
   () => import('$app/pages/documents/pages/blueprints/create/Create')
 );
-const EditBlueprint = lazy(
-  () => import('$app/pages/documents/pages/blueprints/edit/Edit')
-);
+
 const Settings = lazy(
-  () => import('$app/pages/documents/pages/settings/Settings')
+  () => import('$app/pages/documents/pages/settings/CompanyDetails')
 );
+
+const Notifications = lazy(
+  () => import('$app/pages/documents/pages/settings/pages/notifications/Notifications')
+);
+
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
+const BlueprintBuilder = lazy(
+  () => import('$app/pages/documents/pages/blueprints/builder/BlueprintBuilder')
+);
 const EmailSettings = lazy(
   () =>
     import(
       '$app/pages/documents/pages/settings/pages/email-settings/EmailSettings'
     )
 );
-const Logo = lazy(
-  () => import('$app/pages/documents/pages/settings/pages/logo/Logo')
-);
+
 const Users = lazy(() => import('$app/pages/documents/pages/users/Users'));
 const CreateUser = lazy(
   () => import('$app/pages/documents/pages/users/create/Create')
@@ -46,12 +50,7 @@ const EditUser = lazy(
 );
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
-const CompanyDetails = lazy(
-  () =>
-    import(
-      '$app/pages/documents/pages/settings/pages/company-details/CompanyDetails'
-    )
-);
+
 
 export const documentsRoutes = (
   <Route
@@ -69,17 +68,6 @@ export const documentsRoutes = (
       path="settings"
       element={<Guard guards={[]} component={<Settings />} />}
     >
-      <Route
-        path=""
-        element={
-          <Guard guards={[]} type="subPage" component={<CompanyDetails />} />
-        }
-      />
-
-      <Route
-        path="logo"
-        element={<Guard guards={[]} type="subPage" component={<Logo />} />}
-      />
 
       <Route
         path="email_templates"
@@ -87,6 +75,12 @@ export const documentsRoutes = (
           <Guard guards={[]} type="subPage" component={<EmailSettings />} />
         }
       />
+
+      <Route
+        path="notifications"
+        element={<Guard guards={[]} type="subPage" component={<Notifications />} />}
+      />
+
     </Route>
 
     <Route
@@ -111,7 +105,7 @@ export const documentsRoutes = (
 
     <Route
       path="blueprints/:id/edit"
-      element={<Guard guards={[]} component={<EditBlueprint />} />}
+      element={<Guard guards={[]} component={<BlueprintBuilder />} />}
     />
 
     <Route path="users" element={<Guard guards={[]} component={<Users />} />} />

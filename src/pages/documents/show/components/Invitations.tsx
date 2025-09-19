@@ -15,9 +15,10 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Badge } from '$app/components/Badge';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date, docuNinjaEndpoint } from '$app/common/helpers';
-import type {
-  Document as DocumentType,
-  DocumentInvitation,
+import {
+  type Document as DocumentType,
+  type DocumentInvitation,
+  DocumentStatus,
 } from '$app/common/interfaces/docuninja/api';
 import { route } from '$app/common/helpers/route';
 import styled from 'styled-components';
@@ -29,6 +30,7 @@ import { MdSend } from 'react-icons/md';
 import { Icon } from '$app/components/icons/Icon';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import classNames from 'classnames';
 
 type InvitationsProps = {
   document: DocumentType;
@@ -118,24 +120,29 @@ function Invitation({ invitation, document }: InvitationProps) {
 
     if (invitation.signed_date) {
       dateString = invitation.signed_date;
-      label = t('signed_on') || 'Signed on';
+      label = t('signed_on');
     } else if (invitation.viewed_date) {
       dateString = invitation.viewed_date;
-      label = t('viewed_on') || 'Viewed on';
+      label = t('viewed_on');
     } else if (invitation.sent_date) {
       dateString = invitation.sent_date;
-      label = t('sent_on') || 'Sent on';
+      label = t('sent_on');
     } else {
       dateString = invitation.created_at;
-      label = t('created_on') || 'Created on';
+      label = t('created_on');
     }
 
     return (
-      <div className="flex items-center space-x-2 text-sm text-gray-500">
-        <Calendar size={14} />
-        <span>
-          {label}: {date(dateString, dateFormat)}
-        </span>
+      <div className="flex items-center gap-x-4 text-sm">
+        <div className="flex items-center gap-x-2">
+          <div>
+            <Icon className="w-5 h-5" element={Calendar} />
+          </div>
+
+          <span>{label}:</span>
+        </div>
+
+        <span>{date(dateString, dateFormat)}</span>
       </div>
     );
   };
@@ -202,7 +209,16 @@ function Invitation({ invitation, document }: InvitationProps) {
       className="flex flex-col space-y-4 border border-dashed rounded-md px-4 pt-4 md:w-full md:max-w-[25rem]"
       style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
     >
-      <div className="flex flex-col space-y-2.5 w-full">
+      <div
+        className={classNames('flex flex-col space-y-2.5 w-full', {
+          'pb-4 px-1': Boolean(
+            !(
+              document?.status_id !== DocumentStatus.Completed &&
+              document?.status_id !== DocumentStatus.Voided
+            )
+          ),
+        })}
+      >
         <div className="flex items-center justify-between md:space-x-4">
           <div
             className="text-sm font-medium truncate w-3/4"
@@ -233,36 +249,41 @@ function Invitation({ invitation, document }: InvitationProps) {
         </div>
       </div>
 
-      <div className="flex justify-between space-x-4 pb-4">
-        {getEntityLink() && (
+      {Boolean(
+        document?.status_id !== DocumentStatus.Completed &&
+          document?.status_id !== DocumentStatus.Voided
+      ) && (
+        <div className="flex justify-between space-x-4 pb-4">
+          {getEntityLink() && (
+            <Button
+              className="py-1"
+              type="minimal"
+              behavior="button"
+              onClick={handleCopyLink}
+              disabled={isSendingInvitation}
+              disableWithoutIcon
+            >
+              {t('copy_link')}
+            </Button>
+          )}
+
           <Button
-            className="py-1"
             type="minimal"
             behavior="button"
-            onClick={handleCopyLink}
+            onClick={handleSendInvitation}
             disabled={isSendingInvitation}
             disableWithoutIcon
           >
-            {t('copy_link')}
-          </Button>
-        )}
+            <div className="flex items-center space-x-2">
+              <div>
+                <Icon element={MdSend} size={17} />
+              </div>
 
-        <Button
-          type="minimal"
-          behavior="button"
-          onClick={handleSendInvitation}
-          disabled={isSendingInvitation}
-          disableWithoutIcon
-        >
-          <div className="flex items-center space-x-2">
-            <div>
-              <Icon element={MdSend} size={17} />
+              <span>{t('send_email')}</span>
             </div>
-
-            <span>{t('send_email')}</span>
-          </div>
-        </Button>
-      </div>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

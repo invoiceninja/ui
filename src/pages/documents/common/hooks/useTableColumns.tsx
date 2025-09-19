@@ -46,24 +46,73 @@ export function useTableColumns() {
     8: t('voided'),
   };
 
+  const getName = (document: Document) => {
+    const firstInvitation = document.invitations?.[0];
+
+    if (firstInvitation) {
+      if (firstInvitation.contact) {
+        if (
+          !firstInvitation.contact.first_name &&
+          !firstInvitation.contact.last_name
+        ) {
+          return firstInvitation.contact.email;
+        }
+
+        return `${firstInvitation.contact.first_name} ${firstInvitation.contact.last_name}`;
+      }
+
+      if (firstInvitation.user) {
+        if (
+          !firstInvitation.user.first_name &&
+          !firstInvitation.user.last_name
+        ) {
+          return firstInvitation.user.email;
+        }
+
+        return `${firstInvitation.user.first_name} ${firstInvitation.user.last_name}`;
+      }
+    }
+
+    return '';
+  };
+
+  const documentStatus = (document: Document) => {
+    
+    let variant = STATUS_VARIANTS[document.status_id as keyof typeof STATUS_VARIANTS] as BadgeVariant;
+    let label = STATUS_LABELS[document.status_id as keyof typeof STATUS_LABELS];
+
+    if (document.is_deleted) {
+      variant = 'red';
+      label = t('deleted');
+    }
+    else if (document.archived_at) {
+      variant = 'orange';
+      label = t('archived');
+    }
+
+    return (
+      <Badge
+        variant={variant}
+      >
+        {label}
+      </Badge>
+    );
+  };
+
   const columns: DataTableColumns<Document> = [
     {
       id: 'id',
-      label: t('id'),
-      format: (_, document) => (
-        <Link
-          to={route('/documents/:id', {
-            id: document.id,
-          })}
-        >
-          {document.id.slice(-8)}
-        </Link>
-      ),
+      label: t('signatory'),
+      format: (_, document) => getName(document),
     },
     {
       id: 'description',
       label: t('description'),
-      format: (_, document) => document.description || t('untitled_document'),
+      format: (_, document) => (
+        <Link to={route('/documents/:id', { id: document.id })}>
+          {document.description || t('untitled_document')}
+        </Link>
+      ),
     },
     {
       id: 'files',
@@ -102,17 +151,7 @@ export function useTableColumns() {
     {
       id: 'status',
       label: t('status'),
-      format: (_, document) => (
-        <Badge
-          variant={
-            STATUS_VARIANTS[
-              document.status_id as keyof typeof STATUS_VARIANTS
-            ] as BadgeVariant
-          }
-        >
-          {STATUS_LABELS[document.status_id as keyof typeof STATUS_LABELS]}
-        </Badge>
-      ),
+      format: (_, document) => documentStatus(document),
     },
     {
       id: 'created_at',

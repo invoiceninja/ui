@@ -37,6 +37,7 @@ export interface SelectProps extends CommonProps {
   applyCustomDropdownIndicator?: boolean;
   dropdownIndicatorClassName?: string;
   placeholder?: string | null;
+  readOnly?: boolean;
 }
 
 export function SelectField(props: SelectProps) {
@@ -59,6 +60,7 @@ export function SelectField(props: SelectProps) {
     controlIcon,
     controlStyle,
     dropdownIndicatorClassName,
+    readOnly,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -106,7 +108,7 @@ export function SelectField(props: SelectProps) {
         color: colors.$3,
         borderColor: isFocused ? colors.$3 : colors.$24,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
-        pointerEvents: isDisabled ? 'auto' : 'unset',
+        pointerEvents: readOnly ? 'none' : isDisabled ? 'auto' : 'unset',
         boxShadow: 'none',
         '&:hover': {
           borderColor: isFocused ? colors.$3 : colors.$24,
@@ -171,7 +173,7 @@ export function SelectField(props: SelectProps) {
         </select>
       ) : (
         <Select
-          className={className}
+          className={classNames(className, { 'pointer-events-none': readOnly })}
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           options={$entries}
@@ -207,6 +209,7 @@ export function SelectField(props: SelectProps) {
                     {
                       'pl-2': controlIcon,
                       'pl-1': !controlIcon,
+                      'pointer-events-none': readOnly,
                     }
                   )}
                   style={{

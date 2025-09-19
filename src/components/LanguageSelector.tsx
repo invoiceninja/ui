@@ -24,6 +24,7 @@ export function LanguageSelector(props: GenericSelectorProps) {
       dismissable={props.dismissable}
       withBlank={props.withBlank}
       customSelector
+      readOnly={props.readOnly}
     >
       {languages.map((language, index) => (
         <option key={index} value={language.id}>

@@ -1,8 +1,11 @@
 import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Client } from '$app/common/interfaces/client';
+import { Document } from '$app/common/interfaces/docuninja/api';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
@@ -11,7 +14,6 @@ import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
@@ -36,11 +38,12 @@ import {
   UploadDialogProps,
   UploadProps,
   ValidationErrorsProps,
+  CreateBlueprintSignatoryProps,
 } from '@docuninja/builder2.0';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { MdSend } from 'react-icons/md';
+import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 
@@ -63,7 +66,15 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
     >
       {content}
 
-      {action}
+      <div
+        onClick={(event) => {
+          event.stopPropagation();
+
+          window.dispatchEvent(new CustomEvent('builder:send.document.submit'));
+        }}
+      >
+        {action}
+      </div>
     </Modal>
   );
 }
@@ -71,14 +82,63 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
 function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
   const [t] = useTranslation();
 
+  const params = useParams();
+
+  const { data: document } = useQuery({
+    queryKey: ['/api/blueprints', params.id],
+    queryFn: () =>
+      request(
+        'GET',
+        docuNinjaEndpoint(
+          `/api/blueprints/${params.id}?includeUrl&includePreviews`
+        ),
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
+      ).then(
+        (response: GenericSingleResourceResponse<Document>) =>
+          response.data.data
+      ),
+    refetchOnWindowFocus: false,
+    initialData: null,
+  });
+
+  const handleSend = async () => {
+    if (!document) {
+      toast.error('document_not_found');
+      return;
+    }
+
+    toast.processing();
+
+    request(
+      'POST',
+      docuNinjaEndpoint(`/api/blueprints/${document.id}/send`),
+      {
+        invitations: document.invitations || [],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
+      }
+    ).then(() => {
+      toast.success('document_queued_for_sending');
+      $refetch(['blueprints']);
+    });
+  };
+
   return (
     <Button
       className="w-full"
       behavior="button"
       disabled={isSubmitting}
-      onClick={() =>
-        window.dispatchEvent(new CustomEvent('builder:send.document.submit'))
-      }
+      onClick={handleSend}
       disableWithoutIcon
     >
       {t('send')}
@@ -266,7 +326,6 @@ function SignatorySelector({
     }
 
     const [type, value] = v.split('|');
-
     let entity = clients?.find(
       (client) => client.contacts?.[0]?.contact_key === value
     );
@@ -279,15 +338,7 @@ function SignatorySelector({
       return;
     }
 
-    const contact = transformToContact(entity as Client);
-
-    if (!contact) {
-      return;
-    }
-
-    const transformed = transformToPayload(entity, value);
-
-    onSelect(`contact|${transformed.contact_key}`, 'contact', contact as any, transformed);
+    onSelect(value, type as 'user', entity as any);
   };
 
   return (
@@ -313,6 +364,12 @@ function SignatorySelector({
             {client.name}
           </option>
         ))}
+
+      {results.map((result: any) => (
+        <option value={`${result.type}|${result.value}`} key={result.id}>
+          {result.label}
+        </option>
+      ))}
     </SelectField>
   );
 }
@@ -339,7 +396,7 @@ function UninviteDialog({
 
 function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
   return (
-    <Button form={form} disabled={isSubmitting}>
+    <Button form={form} behavior="button" disabled={isSubmitting}>
       Continue
     </Button>
   );
@@ -398,29 +455,29 @@ function ToolboxContext({ options }: ToolboxContextProps) {
   );
 }
 
-function Builder() {
+function BlueprintBuilder() {
   const [t] = useTranslation();
 
   const { id } = useParams();
   const colors = useColorScheme();
 
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
-
+  
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
+    { name: t('blueprints'), href: '/documents/blueprints' },
     {
-      name: t('edit'),
-      href: route('/documents/:id/builder', { id }),
-    },
+      name: t('blueprint'),
+      href: route('/documents/blueprints/:id/edit', { id }),
+    }
   ];
 
   const handleSave = () => {
     toast.processing();
 
     setIsDocumentSaving(true);
+
     window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
@@ -430,12 +487,12 @@ function Builder() {
 
   useEffect(() => {
     const refetchDocuninjaDocument = () => {
-      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
+      $refetch(['blueprints']);
     };
 
     const handleSuccessfullySavedDocument = () => {
-      toast.success('updated_document');
-      $refetch(['docuninja_documents', 'docuninja_document_timeline']);
+      toast.success('updated_blueprint');
+      $refetch(['blueprints']);
     };
 
     const handleFinalizeDocumentSave = () => {
@@ -443,7 +500,7 @@ function Builder() {
     };
 
     window.addEventListener(
-      'refetch.docuninja.document',
+      'refetch.blueprints',
       refetchDocuninjaDocument
     );
 
@@ -459,7 +516,7 @@ function Builder() {
 
     return () => {
       window.removeEventListener(
-        'refetch.docuninja.document',
+        'refetch.blueprints',
         refetchDocuninjaDocument
       );
 
@@ -481,24 +538,11 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-          <Button
-            type="secondary"
-            behavior="button"
-            onClick={handleSend}
-            disabled={isDocumentSaving || isDocumentSending}
-            disableWithoutIcon
-          >
-            <div>
-              <Icon element={MdSend} />
-            </div>
-
-            <span>{t('send')}</span>
-          </Button>
-
+         
           <Button
             behavior="button"
             onClick={handleSave}
-            // disabled={isDocumentSaving || isDocumentSending}
+            disabled={isDocumentSaving}
             disableWithoutIcon
           >
             {t('save')}
@@ -516,9 +560,13 @@ function Builder() {
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
+            events: {
+              onMessage: () => null,
+              onMessageDismiss: () => null,
+            },
             components: {
               skeleton: Loading,
-              createBlueprintSignatory: () => null,
+              createBlueprintSignatory: CreateBlueprintSignatory,
               save: () => null,
               send: {
                 trigger: () => null,
@@ -562,6 +610,7 @@ function Builder() {
                   {t('select_signatory')}
                 </span>
               ),
+              
             },
             styles: {
               frame: {
@@ -615,11 +664,8 @@ function Builder() {
               },
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
-            events: {
-              onMessage: (message) => toast.success(message),
-              onMessageDismiss: () => toast.dismiss(),
-            },
-            invoiceninja: true,
+            blueprint: true,
+            
           }}
         >
           <Builder$ />
@@ -629,70 +675,21 @@ function Builder() {
   );
 }
 
-function transformToContact(client: Client) {
-  if (client.contacts.length === 0) {
-    toast.error('Error: Client has no contacts. Please add a contact first.');
 
-    return null;
+export function CreateBlueprintSignatory({
+    onClick,
+  }: CreateBlueprintSignatoryProps) {
+    const [t] = useTranslation();
+
+    return (
+        <Button
+        type="secondary"
+        behavior="button"
+        onClick={onClick}
+        >
+        {t('new_signatory')}
+        </Button>
+    );
   }
-
-  const contact = client.contacts[0];
-
-  return {
-    id: `contact|${contact.contact_key}`,
-    user_id: client.user_id ?? null,
-    company_id: null,
-    client_id: client.id,
-    first_name: contact.first_name ?? null,
-    last_name: contact.last_name ?? null,
-    phone: contact.phone ?? null,
-    email: contact.email ?? null,
-    signature_base64: null,
-    initials_base64: null,
-    email_verified_at: null,
-    is_primary: Boolean(contact.is_primary),
-    last_login: null,
-    created_at: '',
-    updated_at: '',
-    deleted_at: null,
-    e_signature: null,
-    e_initials: null,
-    client: {
-      id: client.id,
-      user_id: client.user_id,
-      company_id: null,
-      name: client.name ?? null,
-      website: client.website ?? null,
-      private_notes: client.private_notes ?? null,
-      public_notes: client.public_notes ?? null,
-      logo: null,
-      phone: client.phone ?? null,
-      balance: client.balance ?? 0,
-      paid_to_date: client.paid_to_date ?? 0,
-      currency_id: client.settings?.currency_id
-        ? Number(client.settings.currency_id)
-        : null,
-      address1: client.address1 ?? null,
-      address2: client.address2 ?? null,
-      city: client.city ?? null,
-      state: client.state ?? null,
-      postal_code: client.postal_code ?? null,
-      country_id: client.country_id ? Number(client.country_id) : null,
-      is_deleted: Boolean(client.is_deleted),
-      vat_number: client.vat_number ?? null,
-      id_number: client.id_number ?? null,
-      created_at: '',
-      updated_at: '',
-      deleted_at: null,
-    },
-  };
-}
-
-function transformToPayload(client: Client, contact: string) {
-  return {
-    ...client,
-    contact_key: contact,
-  };
-}
-
-export default Builder;
+  
+export default BlueprintBuilder;

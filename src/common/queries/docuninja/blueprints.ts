@@ -78,11 +78,11 @@ export function useBulk() {
     toast.processing();
 
     return request(
-      action === 'delete' ? 'DELETE' : 'POST',
+      'POST',
       docuNinjaEndpoint(
-        action === 'delete' ? '/api/blueprints/:id' : '/api/blueprints/bulk',
+        '/api/blueprints/bulk',
         {
-          id: ids[0],
+          ids: ids,
         }
       ),
       {

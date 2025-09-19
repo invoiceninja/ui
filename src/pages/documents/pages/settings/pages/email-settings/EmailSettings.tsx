@@ -17,6 +17,8 @@ import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
+import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
+import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -116,6 +118,57 @@ function EmailSettings() {
   );
 
   return (
+    <>
+    
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
+            
+      <div className="flex flex-col items-center">
+        <h3 className="px-2 py-1 rounded m-1 font-bold">
+          {t('company')}
+        </h3>
+        {variables.docu_company.map((variable, index) => (
+          <Variable key={index}>{variable}</Variable>
+        ))}
+      </div>
+      
+      <div className="flex flex-col items-center">
+        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+          {t('document')}
+        </h3>
+        {variables.docu_document.map((variable, index) => (
+          <Variable key={index}>{variable}</Variable>
+        ))}
+      </div>
+      
+      <div className="flex flex-col items-center">
+        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+          {t('sender')}
+        </h3>
+        {variables.docu_sender.map((variable, index) => (
+          <Variable key={index}>{variable}</Variable>
+        ))}
+      </div>
+      
+      <div className="flex flex-col items-center">
+        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+          {t('user')}
+        </h3>
+        {variables.docu_user.map((variable, index) => (
+          <Variable key={index}>{variable}</Variable>
+        ))}
+      </div>
+  
+      <div className="flex flex-col items-center">
+        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+          {t('contact')}
+        </h3>
+        {variables.docu_contact.map((variable, index) => (
+          <Variable key={index}>{variable}</Variable>
+        ))}
+      </div>
+
+    </div>
+
     <div className="flex flex-col pt-2 pb-2">
       {isLoading && (
         <div className="flex justify-center items-center py-8">
@@ -132,24 +185,25 @@ function EmailSettings() {
       {templates &&
         !isLoading &&
         templates.map((template: Template, index: number) => (
-          <Element leftSide={template.name} key={template.id}>
-            <div className="flex flex-col gap-4">
-              <InputField
-                label={t('subject')}
-                value={template.subject}
-                onValueChange={(value) => handleChangeSubject(index, value)}
-              />
+        <Element leftSide={template.name} key={template.id}>
+          <div className="flex flex-col gap-4">
+            <InputField
+              label={t('subject')}
+              value={template.subject}
+              onValueChange={(value) => handleChangeSubject(index, value)}
+            />
 
-              <InputField
-                label={t('body')}
-                element="textarea"
-                value={template.body}
-                onValueChange={(value) => handleChangeBody(index, value)}
-              />
-            </div>
-          </Element>
-        ))}
+            <InputField
+              label={t('body')}
+              element="textarea"
+              value={template.body}
+              onValueChange={(value) => handleChangeBody(index, value)}
+            />
+          </div>
+        </Element>
+      ))}
     </div>
+  </>
   );
 }
 

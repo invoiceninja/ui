@@ -30,6 +30,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { useDocumentActions } from './hooks/useDocumentActions';
 import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
+import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 
 export default function Document() {
   const { documentTitle } = useTitle('view_document');
@@ -91,6 +92,11 @@ export default function Document() {
           <Button
             className="rounded-br-none rounded-tr-none px-3"
             to={route('/documents/:id/builder', { id: document?.id })}
+            disabled={
+              document?.status_id === DocumentStatus.Completed ||
+              document?.status_id === DocumentStatus.Voided
+            }
+            disableWithoutIcon
           >
             {t('edit')}
           </Button>

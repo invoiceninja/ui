@@ -53,6 +53,7 @@ export interface Company {
   users?: User[];
   pivot?: CompanyUser | null;
   documents?: Document[];
+  settings: Settings;
 }
 
 export interface Template {
@@ -181,6 +182,17 @@ export interface CompanyUser {
   notifications: string[] | null;
 }
 
+export interface Metadata {
+  type: string;
+  entity_id: string;
+  entity_type: string;
+  invitation_key: string;
+  company_key: string;
+  is_ninja: boolean; 
+  is_sent: boolean; 
+  design_id: string;
+}
+
 export interface Document {
   id: string;
   description: string;
@@ -188,6 +200,7 @@ export interface Document {
   is_deleted: boolean;
   user_id: string;
   company_id: string;
+  metadata?: Metadata;
   completed_at: string | null; // ISO date string
   voided_at: string | null; // ISO date string
   created_at: string | null; // ISO date string
@@ -201,6 +214,15 @@ export interface Document {
   invitations?: DocumentInvitation[];
   files?: DocumentFile[];
   signatures?: DocumentSignature[];
+  settings: Settings;
+}
+
+export interface Settings {
+  ninja_quote_notification: boolean;
+  ninja_invoice_notification: boolean;
+  ninja_credit_notification: boolean;
+  ninja_purchase_order_notification: boolean;
+  email_client_when_completed: boolean;
 }
 
 export interface DocumentFile {
