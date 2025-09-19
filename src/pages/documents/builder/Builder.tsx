@@ -1,6 +1,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { Alert } from '$app/components/Alert';
@@ -471,6 +472,8 @@ function Builder() {
     };
   }, []);
 
+  const company = useCurrentCompany();
+
   return (
     <Default
       title={t('builder')}
@@ -615,6 +618,7 @@ function Builder() {
               },
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
+            company: company.id,
           }}
         >
           <Builder$ />
