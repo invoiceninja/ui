@@ -35,7 +35,7 @@ const TEMPLATE_CATEGORIES = [
 
 const TEMPLATES = [
   {
-    id: 'template-1',
+    id: 'nda-template',
     name: 'NDA',
     category: 'business',
     description: 'Non-Disclosure Agreement',
@@ -83,9 +83,15 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
 
     try {
       const response = await request(
-        'POST',
-        docuNinjaEndpoint('/api/docuninja/stub_blueprint'),
-        { template: { template_id: selectedTemplate } }
+        'GET',
+        docuNinjaEndpoint('/api/galleries/:id', { id: selectedTemplate }),{},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
+          },
+        }
       ) as GenericSingleResourceResponse<Document>;
 
       toast.success('created_blueprint');
