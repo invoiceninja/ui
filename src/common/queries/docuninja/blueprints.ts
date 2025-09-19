@@ -22,7 +22,6 @@ import { AxiosError } from 'axios';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useNavigate } from 'react-router-dom';
-import { route } from '$app/common/helpers/route';
 
 export function useBlueprintsQuery(params: Params) {
   return useQuery(
