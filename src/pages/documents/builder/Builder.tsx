@@ -9,7 +9,12 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField, InputLabel, SelectField } from '$app/components/forms';
+import {
+  Button,
+  InputField,
+  InputLabel,
+  SelectField,
+} from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/icons/Settings';
@@ -297,9 +302,7 @@ function SignatorySelector({
 
   return (
     <div className="space-y-3">
-      <InputLabel className='mt-3'>
-        {t('select_user_or_client')}
-      </InputLabel>
+      <InputLabel className="mt-3">{t('select_user_or_client')}</InputLabel>
 
       <SelectField
         placeholder={t('select_user_or_client')}
@@ -307,7 +310,7 @@ function SignatorySelector({
         customSelector
         menuPosition="fixed"
         clearAfterSelection
-        className='-mt-2'
+        className="-mt-2"
       >
         <option value="create">{t('create_client_or_user')}</option>
 
