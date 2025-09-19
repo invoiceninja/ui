@@ -53,7 +53,6 @@ export default function Index() {
       <SignContext.Provider
         value={{
           endpoint: import.meta.env.VITE_DOCUNINJA_API_URL,
-          token: localStorage.getItem('TOKEN') as string,
           document: params.document as string,
           invitation: params.invitation as string,
           components: {
