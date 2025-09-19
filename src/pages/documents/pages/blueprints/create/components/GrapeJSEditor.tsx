@@ -15,8 +15,6 @@ import { useColorScheme } from '$app/common/colors';
 import Editor from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import * as beautify from 'js-beautify';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
@@ -187,7 +185,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
       }
       
 
-        try {
+    try {
         const editor = grapesjs.init({
           container: editorRef.current,
           height: "100%",
@@ -485,23 +483,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
               'https://uicdn.toast.com/tui-image-editor/v3.15.2/tui-image-editor.min.css',
             ],
           },
-        //   [pluginTabs as unknown as string]: {
-        //     tabsBlock: { category: 'Extra' }
-        //   },
-        //   [pluginTyped as unknown as string]: {
-        //     block: {
-        //       category: 'Extra',
-        //       content: {
-        //         type: 'typed',
-        //         'type-speed': 40,
-        //         strings: [
-        //           'Text row one',
-        //           'Text row two',
-        //           'Text row three',
-        //         ],
-        //       }
-        //     }
-        //   },
+       
           [pluginPresetWebpage as unknown as string]: {
             showStylesOnChange: 0,
             modalImportTitle: 'Import Template',
@@ -955,87 +937,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
     }
   };
 
-  const handleExportPDF = async () => {
-    if (!isEditorReady || !(window as any).grapesEditor) return;
-
-    try {
-      const editor = (window as any).grapesEditor;
-      const canvas = editor.Canvas.getElement();
-      
-      if (!canvas) {
-        alert('Canvas not found. Please try again.');
-        return;
-      }
-
-      // Create a temporary container for the PDF content
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '-9999px';
-      tempContainer.style.width = '210mm'; // A4 width
-      tempContainer.style.backgroundColor = 'white';
-      tempContainer.style.padding = '20px';
-      tempContainer.style.fontFamily = 'Arial, sans-serif';
-      
-      // Get the HTML and CSS from the editor
-      const html = editor.getHtml();
-      const css = editor.getCss();
-      
-      // Create a complete HTML document for PDF
-      tempContainer.innerHTML = `
-        <div style="${css}">
-          ${html}
-        </div>
-      `;
-      
-      document.body.appendChild(tempContainer);
-
-      // Convert to canvas and then to PDF
-      const canvasElement = await html2canvas(tempContainer, {
-        scale: 2, // Higher quality
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      });
-
-      // Remove temporary container
-      document.body.removeChild(tempContainer);
-
-      // Create PDF
-      const imgData = canvasElement.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
-      const imgHeight = (canvasElement.height * imgWidth) / canvasElement.width;
-      
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Add additional pages if needed
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      // Download the PDF
-      pdf.save(`blueprint-${blueprintId}-${new Date().toISOString().split('T')[0]}.pdf`);
-
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
-    }
-  };
 
   const handleMonacoHtmlEditorMount = (editor: any) => {
     setMonacoHtmlEditor(editor);
@@ -1150,10 +1051,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Button onClick={handleExportPDF} type="secondary" disabled={!isEditorReady}>
-                    <i className="fas fa-file-pdf mr-2"></i>
-                    Export PDF
-                  </Button>
                   <Button onClick={onCancel} type="secondary">
                     {t('cancel')}
                   </Button>
