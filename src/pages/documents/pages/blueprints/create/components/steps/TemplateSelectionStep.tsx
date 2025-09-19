@@ -18,6 +18,7 @@ import { Button } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { docuNinjaEndpoint } from '$app/common/helpers';
 
 interface TemplateSelectionStepProps {
   onComplete: (blueprintId: string) => void;
@@ -27,40 +28,40 @@ interface TemplateSelectionStepProps {
 // Mock data - replace with actual API call
 const TEMPLATE_CATEGORIES = [
   { id: 'business', name: 'Business', icon: '🏢' },
-  { id: 'creative', name: 'Creative', icon: '🎨' },
-  { id: 'minimal', name: 'Minimal', icon: '⚪' },
-  { id: 'modern', name: 'Modern', icon: '✨' },
+//   { id: 'creative', name: 'Creative', icon: '🎨' },
+//   { id: 'minimal', name: 'Minimal', icon: '⚪' },
+//   { id: 'modern', name: 'Modern', icon: '✨' },
 ];
 
 const TEMPLATES = [
   {
     id: 'template-1',
-    name: 'Professional Invoice',
+    name: 'NDA',
     category: 'business',
-    description: 'Clean and professional invoice template',
+    description: 'Non-Disclosure Agreement',
     preview: '📄',
   },
-  {
-    id: 'template-2',
-    name: 'Creative Quote',
-    category: 'creative',
-    description: 'Eye-catching quote template with modern design',
-    preview: '🎨',
-  },
-  {
-    id: 'template-3',
-    name: 'Minimal Credit',
-    category: 'minimal',
-    description: 'Simple and clean credit note template',
-    preview: '⚪',
-  },
-  {
-    id: 'template-4',
-    name: 'Modern Purchase Order',
-    category: 'modern',
-    description: 'Contemporary purchase order design',
-    preview: '✨',
-  },
+//   {
+//     id: 'template-2',
+//     name: 'Creative Quote',
+//     category: 'creative',
+//     description: 'Eye-catching quote template with modern design',
+//     preview: '🎨',
+//   },
+//   {
+//     id: 'template-3',
+//     name: 'Minimal Credit',
+//     category: 'minimal',
+//     description: 'Simple and clean credit note template',
+//     preview: '⚪',
+//   },
+//   {
+//     id: 'template-4',
+//     name: 'Modern Purchase Order',
+//     category: 'modern',
+//     description: 'Contemporary purchase order design',
+//     preview: '✨',
+//   },
 ];
 
 export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionStepProps) {
@@ -83,7 +84,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
     try {
       const response = await request(
         'POST',
-        '/api/v1/docuninja/stub_blueprint',
+        docuNinjaEndpoint('/api/docuninja/stub_blueprint'),
         { template: { template_id: selectedTemplate } }
       ) as GenericSingleResourceResponse<Document>;
 
