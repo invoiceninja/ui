@@ -178,9 +178,7 @@ function PlainTextEditor({
     <LexicalComposer initialConfig={initialConfig}>
       <div className="CommentPlugin_CommentInputBox_EditorContainer">
         <PlainTextPlugin
-          contentEditable={
-            <ContentEditable placeholder={placeholder} className={className} />
-          }
+          contentEditable={<ContentEditable className={className} />}
           ErrorBoundary={LexicalErrorBoundary}
         />
         <OnChangePlugin onChange={onChange} />

@@ -15,6 +15,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Editor as LexicalEditor } from '$app/components/lexical/Editor';
+import EditorProvider from '../lexical/EditorProvider';
 
 interface Props {
   value?: string | undefined;
@@ -22,6 +23,7 @@ interface Props {
   label?: string;
   disabled?: boolean;
   handleChangeOnlyOnUserInput?: boolean;
+  editorId?: string;
 }
 
 export function MarkdownEditor(props: Props) {
@@ -177,5 +179,14 @@ export function MarkdownEditor(props: Props) {
     );
   }
 
-  return <LexicalEditor value={value || ''} />;
+  return (
+    <EditorProvider>
+      <LexicalEditor
+        value={value || ''}
+        editorId={props.editorId || 'main'}
+        disabled={Boolean(props.disabled)}
+        onChange={props.onChange}
+      />
+    </EditorProvider>
+  );
 }

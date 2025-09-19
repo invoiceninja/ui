@@ -42,6 +42,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="invoice_terms"
               value={companyChanges?.settings?.invoice_terms || ''}
               onChange={(value) =>
                 dispatch(
@@ -66,6 +67,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="invoice_footer"
               value={companyChanges?.settings?.invoice_footer || ''}
               onChange={(value) =>
                 dispatch(
@@ -90,6 +92,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="quote_terms"
               value={companyChanges?.settings?.quote_terms || ''}
               onChange={(value) =>
                 dispatch(
@@ -114,6 +117,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="quote_footer"
               value={companyChanges?.settings?.quote_footer || ''}
               onChange={(value) =>
                 dispatch(
@@ -138,6 +142,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="credit_terms"
               value={companyChanges?.settings?.credit_terms || ''}
               onChange={(value) =>
                 dispatch(
@@ -162,6 +167,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="credit_footer"
               value={companyChanges?.settings?.credit_footer || ''}
               onChange={(value) =>
                 dispatch(
@@ -188,6 +194,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="purchase_order_terms"
               value={companyChanges?.settings?.purchase_order_terms || ''}
               onChange={(value) =>
                 dispatch(
@@ -214,6 +221,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
+              editorId="purchase_order_footer"
               value={companyChanges?.settings?.purchase_order_footer || ''}
               onChange={(value) =>
                 dispatch(

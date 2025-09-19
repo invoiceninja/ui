@@ -28,7 +28,6 @@ import { CAN_USE_DOM } from '@lexical/utils';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import ActionsPlugin from './plugins/ActionsPlugin';
 import AutocompletePlugin from './plugins/AutocompletePlugin';
 import AutoEmbedPlugin from './plugins/AutoEmbedPlugin';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
@@ -69,36 +68,50 @@ import YouTubePlugin from './plugins/YouTubePlugin';
 import ContentEditable from './ui/ContentEditable';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import { useColorScheme } from '$app/common/colors';
+import { useSettings } from './context/SettingsContext';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { useSharedHistoryContext } from './context/SharedHistoryContext';
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import CodeHighlightPrismPlugin from './plugins/CodeHighlightPrismPlugin';
+import TableOfContentsPlugin from './plugins/TableOfContentsPlugin';
 
 interface Props {
   value: string;
+  disabled: boolean;
+  onChange: (value: string) => void;
+  editorId: string;
 }
 
-export function Editor({ value }: Props): JSX.Element {
+export function Editor({
+  value,
+  disabled,
+  onChange,
+  editorId,
+}: Props): JSX.Element {
   const colors = useColorScheme();
-  // const {
-  //   settings: {
-  //     isCodeHighlighted,
-  //     isCodeShiki,
-  //     isCollab,
-  //     isAutocomplete,
-  //     isMaxLength,
-  //     isCharLimit,
-  //     hasLinkAttributes,
-  //     isCharLimitUtf8,
-  //     isRichText,
-  //     showTreeView,
-  //     showTableOfContents,
-  //     shouldUseLexicalContextMenu,
-  //     shouldPreserveNewLinesInMarkdown,
-  //     tableCellMerge,
-  //     tableCellBackgroundColor,
-  //     tableHorizontalScroll,
-  //     shouldAllowHighlightingWithBrackets,
-  //     selectionAlwaysOnDisplay,
-  //     listStrictIndent,
-  //   },
-  // } = useSettings();
+  const {
+    settings: {
+      isCodeHighlighted,
+      isCodeShiki,
+      isAutocomplete,
+      isMaxLength,
+      isCharLimit,
+      hasLinkAttributes,
+      isCharLimitUtf8,
+      isRichText,
+      showTreeView,
+      showTableOfContents,
+      shouldUseLexicalContextMenu,
+      shouldPreserveNewLinesInMarkdown,
+      tableCellMerge,
+      tableCellBackgroundColor,
+      tableHorizontalScroll,
+      shouldAllowHighlightingWithBrackets,
+      selectionAlwaysOnDisplay,
+      listStrictIndent,
+    },
+  } = useSettings();
+  const { historyState } = useSharedHistoryContext();
   const isEditable = useLexicalEditable();
   // const placeholder = isCollab
   //   ? 'Enter some collaborative rich text...'
@@ -139,21 +152,29 @@ export function Editor({ value }: Props): JSX.Element {
 
   return (
     <div className="border rounded-md" style={{ borderColor: colors.$24 }}>
-      <ToolbarPlugin
-        editor={editor}
-        activeEditor={activeEditor}
-        setActiveEditor={setActiveEditor}
-        setIsLinkEditMode={setIsLinkEditMode}
-      />
-      <ShortcutsPlugin
-        editor={activeEditor}
-        setIsLinkEditMode={setIsLinkEditMode}
-      />
-      <div className={`editor-container 'tree-view'`}>
-        <MaxLengthPlugin maxLength={30} />
+      {isRichText && (
+        <ToolbarPlugin
+          editor={editor}
+          activeEditor={activeEditor}
+          setActiveEditor={setActiveEditor}
+          setIsLinkEditMode={setIsLinkEditMode}
+        />
+      )}
+      {isRichText && (
+        <ShortcutsPlugin
+          editor={activeEditor}
+          setIsLinkEditMode={setIsLinkEditMode}
+        />
+      )}
+      <div
+        className={`editor-container ${showTreeView ? 'tree-view' : ''} ${
+          !isRichText ? 'plain-text' : ''
+        }`}
+      >
+        {isMaxLength && <MaxLengthPlugin maxLength={30} />}
         <DragDropPaste />
         <AutoFocusPlugin />
-        <SelectionAlwaysOnDisplay />
+        {selectionAlwaysOnDisplay && <SelectionAlwaysOnDisplay />}
         <ClearEditorPlugin />
         <ComponentPickerPlugin />
         <EmojiPickerPlugin />
@@ -165,45 +186,37 @@ export function Editor({ value }: Props): JSX.Element {
         <SpeechToTextPlugin />
         <AutoLinkPlugin />
         <DateTimePlugin />
-        {/* {isCollab ? (
-            <CollaborationPlugin
-              id="main"
-              providerFactory={createWebsocketProvider}
-              shouldBootstrap={!skipCollaborationInit}
-            />
-          ) : (
-            <HistoryPlugin externalHistoryState={historyState} />
-          )} */}
+
+        <HistoryPlugin externalHistoryState={historyState} />
 
         <RichTextPlugin
           contentEditable={
             <div className="editor-scroller">
               <div className="editor" ref={onRef}>
-                <ContentEditable placeholder={value ? '' : placeholder} />
+                <ContentEditable />
               </div>
             </div>
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
         <MarkdownShortcutPlugin />
-        {/* {isCodeHighlighted &&
+        {isCodeHighlighted &&
           (isCodeShiki ? (
             <CodeHighlightShikiPlugin />
           ) : (
             <CodeHighlightPrismPlugin />
-          ))} */}
-        <CodeHighlightShikiPlugin />
-        <ListPlugin hasStrictIndent={false} />
+          ))}
+        <ListPlugin hasStrictIndent={listStrictIndent} />
         <CheckListPlugin />
-        {/* <TablePlugin
-          hasCellMerge={false}
-          hasCellBackgroundColor={false}
-          hasHorizontalScroll={false}
-        /> */}
+        <TablePlugin
+          hasCellMerge={tableCellMerge}
+          hasCellBackgroundColor={tableCellBackgroundColor}
+          hasHorizontalScroll={tableHorizontalScroll}
+        />
         <TableCellResizer />
         <ImagesPlugin />
         <InlineImagePlugin />
-        <LinkPlugin hasLinkAttributes={false} />
+        <LinkPlugin hasLinkAttributes={hasLinkAttributes} />
         <PollPlugin />
         <TwitterPlugin />
         <YouTubePlugin />
@@ -242,20 +255,21 @@ export function Editor({ value }: Props): JSX.Element {
           </>
         )}
 
-        <CharacterLimitPlugin
-          //charset={isCharLimit ? 'UTF-16' : 'UTF-8'}
-          charset="UTF-8"
-          maxLength={5}
-        />
-        <AutocompletePlugin />
-        <ContextMenuPlugin />
-        <SpecialTextPlugin />
-        <ActionsPlugin
-          isRichText={true}
-          shouldPreserveNewLinesInMarkdown={true}
-        />
+        {(isCharLimit || isCharLimitUtf8) && (
+          <CharacterLimitPlugin
+            charset={isCharLimit ? 'UTF-16' : 'UTF-8'}
+            maxLength={5}
+          />
+        )}
+        {isAutocomplete && <AutocompletePlugin />}
+        <div>{showTableOfContents && <TableOfContentsPlugin />}</div>
+        {shouldUseLexicalContextMenu && <ContextMenuPlugin />}
+        {shouldAllowHighlightingWithBrackets && <SpecialTextPlugin />}
+        {/* <ActionsPlugin
+          isRichText={isRichText}
+          shouldPreserveNewLinesInMarkdown={shouldPreserveNewLinesInMarkdown}
+        /> */}
       </div>
-      {/* {showTreeView && <TreeViewPlugin />} */}
     </div>
   );
 }
