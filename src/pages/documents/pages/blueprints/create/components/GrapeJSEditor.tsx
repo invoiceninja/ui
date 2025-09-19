@@ -22,31 +22,87 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 // Custom CSS for larger icons in GrapeJS
 const iconStyles = `
-  .gjs-block i {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
+.gjs-block {
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 50px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Override default GrapeJS block styling - remove these generic rules */
+
+/* Hover effects */
+.gjs-block:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* Icon styling */
+.gjs-block i {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-  }
-  .gjs-block i.fas {
+    margin-bottom: 4px !important;
+}
+
+.gjs-block i.fas {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.gjs-sm-sector-title i.fas {
     font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-  }
-  .gjs-sm-sector-title i.fas {
-    font-size: 16px !important;
-  }
-  .gjs-pn-btn i.fas {
-    font-size: 16px !important;
-  }
-    .gjs-blocks .gjs-block i {
-  font-size: 20px;       /* size of font-awesome icon */
-  width: 24px;            /* optional if using img icons */
-  height: 24px;           /* optional if using img icons */
-  display: inline-block;
-  text-align: center;
+}
+
+.gjs-pn-btn i.fas {
+    font-size: 18px !important;
+}
+
+.gjs-block__media {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 4px !important;
+}
+
+.gjs-block-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Specific styling for custom placeholder blocks - all same color */
+.gjs-block.gjs-one-bg[data-block="signature-placeholder"],
+.gjs-block.gjs-four-color-h[data-block="signature-placeholder"],
+.gjs-block[data-block="signature-placeholder"],
+.gjs-block.gjs-one-bg[data-block="date-placeholder"],
+.gjs-block.gjs-four-color-h[data-block="date-placeholder"],
+.gjs-block[data-block="date-placeholder"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Category-specific styling for other blocks */
+.gjs-blocks-cs .gjs-block[data-category="Basic"] {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
 }
 `;
 
@@ -672,20 +728,21 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
                 color: '#007bff',
                 'font-weight': 'bold',
                 'min-height': '60px',
-                display: 'flex',
-                'align-items': 'center',
-                'justify-content': 'center',
+                display: 'flex !important',
+                'align-items': 'center !important',
+                'justify-content': 'center !important',
                 width: '280px',
                 height: '60px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '20px'
               },
-              content: '{{ signatory.signature}}',
+              content: '{{ signatory.signature }}',
               traits: [
                 {
                   type: 'text',
                   name: 'placeholder-text',
-                  label: '{{ signatory.signature}}',
-                  default: '{{ signatory.signature}}'
+                  label: '{{ signatory.signature }}',
+                  default: '{{ signatory.signature }}'
                 }
               ]
             }
@@ -730,20 +787,26 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintId }: Gr
         if (!blockManager.get('signature-placeholder')) {
           // Add signature placeholder block
           blockManager.add('signature-placeholder', {
-            label: '<i class="fas fa-signature "></i><div class="gjs-block-label">Signature</div>',
+            label: '<div class="gjs-block-label"><i class="fas fa-signature gjs-block__media"></i><div class="gjs-block-label">Signature</div></div>',
             content: {
               type: 'signature-placeholder'
             },
             category: 'Signatory Placeholders',
+            attributes: {
+              'data-block': 'signature-placeholder'
+            }
           });
 
           // Add date placeholder block
           blockManager.add('date-placeholder', {
-            label: '<i class="fas fa-calendar"></i><div class="gjs-block-label">Date</div>',
+            label: '<div class="gjs-block-label"><i class="fas fa-calendar gjs-block__media"></i><div class="gjs-block-label">Date</div></div>',
             content: {
               type: 'date-placeholder'
             },
             category: 'Signatory Placeholders',
+            attributes: {
+              'data-block': 'date-placeholder'
+            }
           });
         }
 
