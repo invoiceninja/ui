@@ -5,11 +5,13 @@ import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
+import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useClientsQuery } from '$app/common/queries/clients';
+import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField, SelectField } from '$app/components/forms';
@@ -45,7 +47,7 @@ import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function Loading() {
   return (
@@ -462,13 +464,22 @@ function BlueprintBuilder() {
   const colors = useColorScheme();
 
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
+  const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
 
+  const [blueprint, setBlueprint] = useState<Blueprint>();
+
+  useEffect(() => {
+    if (blueprintResponse) {
+      setBlueprint(blueprintResponse.data.data);
+    }
+  }, [blueprintResponse]);
+  
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
   
   const pages: Page[] = [
     { name: t('blueprints'), href: '/documents/blueprints' },
     {
-      name: t('blueprint'),
+      name: blueprint?.name || t('blueprint'),
       href: route('/documents/blueprints/:id/edit', { id }),
     }
   ];
@@ -532,13 +543,41 @@ function BlueprintBuilder() {
     };
   }, []);
 
+  const navigate = useNavigate();
+
+  
   return (
     <Default
       title={t('builder')}
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-         
+
+          {blueprint?.is_template && blueprint?.template && (
+          <Button
+            type="secondary"  
+            behavior="button"
+            onClick={() => {
+              console.log('BlueprintBuilder - Navigating to template editor');
+              console.log('BlueprintBuilder - blueprint.template:', blueprint.template);
+              console.log('BlueprintBuilder - blueprint.template type:', typeof blueprint.template);
+              console.log('BlueprintBuilder - blueprint.template length:', blueprint.template?.length);
+              console.log('BlueprintBuilder - blueprint.name:', blueprint.name);
+              
+              navigate(route('/documents/blueprints/:id/template_editor', { 
+                id, 
+                state: { 
+                  templateHtml: blueprint.template, 
+                  blueprintName: blueprint.name 
+                } 
+              }));
+            }}
+            disabled={isDocumentSaving}
+            disableWithoutIcon
+          >
+            {t('edit_template')}
+          </Button>
+          )}
           <Button
             behavior="button"
             onClick={handleSave}

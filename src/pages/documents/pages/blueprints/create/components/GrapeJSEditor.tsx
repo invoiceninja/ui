@@ -141,6 +141,12 @@ declare global {
 }
 
 export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: GrapeJSEditorProps) {
+  console.log('GrapeJSEditor - Component loaded');
+  console.log('GrapeJSEditor - initialHtml:', initialHtml);
+  console.log('GrapeJSEditor - initialHtml type:', typeof initialHtml);
+  console.log('GrapeJSEditor - initialHtml length:', initialHtml?.length);
+  console.log('GrapeJSEditor - blueprintName:', blueprintName);
+  
   const [t] = useTranslation();
   const colors = useColorScheme();
   const editorRef = useRef<HTMLDivElement>(null);
@@ -156,13 +162,15 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
   const [monacoCssEditor, setMonacoCssEditor] = useState<any>(null);
 
   useEffect(() => {
-    // Prevent multiple initializations
-    if (isInitialized.current || (window as any).grapesEditor) {
-
-        return;
+    // Clean up any existing editor first
+    if ((window as any).grapesEditor) {
+      console.log('GrapeJSEditor - Cleaning up existing editor');
+      (window as any).grapesEditor.destroy();
+      (window as any).grapesEditor = null;
     }
 
-    isInitialized.current = true;
+    // Reset initialization flag
+    isInitialized.current = false;
 
     // Inject custom icon styles
     const styleElement = document.createElement('style');
@@ -800,10 +808,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
           });
         }
 
-        // Set initial HTML content
-        if (initialHtml) {
-            editor.setComponents(initialHtml);
-        }
+        // Initial HTML content will be set by the separate useEffect
 
 
         // Real-time two-way binding for Monaco editor
@@ -913,6 +918,30 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
       }
     };
   }, []); // Empty dependency array to run only once
+
+  // Separate useEffect to handle initialHtml updates
+  useEffect(() => {
+    if (initialHtml && (window as any).grapesEditor && isEditorReady) {
+      console.log('GrapeJSEditor - Setting initial HTML content:', initialHtml.length, 'characters');
+      try {
+        (window as any).grapesEditor.setComponents(initialHtml);
+        console.log('GrapeJSEditor - HTML content set successfully');
+      } catch (error) {
+        console.error('GrapeJSEditor - Error setting HTML content:', error);
+      }
+    }
+  }, [initialHtml, isEditorReady]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      console.log('GrapeJSEditor - Component unmounting, cleaning up editor');
+      if ((window as any).grapesEditor) {
+        (window as any).grapesEditor.destroy();
+        (window as any).grapesEditor = null;
+      }
+    };
+  }, []);
 
   const handleSave = async () => {
     if (!isEditorReady || !(window as any).grapesEditor) return;

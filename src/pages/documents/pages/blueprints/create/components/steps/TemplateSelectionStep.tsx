@@ -103,7 +103,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       
       // Navigate to GrapeJS editor with the template HTML
       console.log('Navigating to editor...');
-      navigate(route('/documents/blueprint/create/editor'), {
+      navigate(route('/documents/blueprints/create/template_editor'), {
         state: { templateHtml, templateName }
       });
     } catch (error) {

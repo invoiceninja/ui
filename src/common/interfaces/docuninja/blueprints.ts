@@ -19,7 +19,7 @@ export interface Blueprint {
   archived_at: string;
   is_deleted: boolean;
   is_template: boolean;
-  content?: string;
+  template?: string;
   document?: Document;
 }
 

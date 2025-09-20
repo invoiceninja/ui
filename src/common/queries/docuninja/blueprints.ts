@@ -60,7 +60,7 @@ export function useBlueprintQuery(params: BlueprintParams) {
     () =>
       request(
         'GET',
-        docuNinjaEndpoint('/api/blueprints/:id', {
+        docuNinjaEndpoint('/api/blueprints/:id?template=true', {
           id: params.id,
         }),
         {},
