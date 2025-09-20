@@ -11,13 +11,6 @@ export default function BlueprintEditor() {
   const { id } = useParams<{ id: string }>();
   const { templateHtml: stateTemplateHtml, blueprintName: stateBlueprintName } = location.state || {};
   
-  console.log('BlueprintEditor - Component loaded');
-  console.log('BlueprintEditor - location.state:', location.state);
-  console.log('BlueprintEditor - stateTemplateHtml:', stateTemplateHtml);
-  console.log('BlueprintEditor - stateTemplateHtml type:', typeof stateTemplateHtml);
-  console.log('BlueprintEditor - stateTemplateHtml length:', stateTemplateHtml?.length);
-  console.log('BlueprintEditor - stateBlueprintName:', stateBlueprintName);
-  console.log('BlueprintEditor - id:', id);
   
   const createBlueprint = useCreateBlueprint();
   const updateBlueprint = useUpdateBlueprint();
@@ -28,33 +21,19 @@ export default function BlueprintEditor() {
   const [blueprintName, setBlueprintName] = useState<string>('');
   
   useEffect(() => {
-    console.log('BlueprintEditor - useEffect triggered');
-    console.log('BlueprintEditor - stateTemplateHtml:', stateTemplateHtml);
-    console.log('BlueprintEditor - blueprintResponse:', blueprintResponse);
-    
     // Use state data if available, otherwise use fetched data
     if (stateTemplateHtml) {
-      console.log('BlueprintEditor - Using state template HTML');
       setTemplateHtml(stateTemplateHtml);
     } else if (blueprintResponse?.data?.data?.template) {
-      console.log('BlueprintEditor - Using fetched template HTML');
-      console.log('BlueprintEditor - Fetched template type:', typeof blueprintResponse.data.data.template);
-      console.log('BlueprintEditor - Fetched template length:', blueprintResponse.data.data.template.length);
       setTemplateHtml(blueprintResponse.data.data.template);
     }
     
     if (stateBlueprintName) {
-      console.log('BlueprintEditor - Using state blueprint name');
       setBlueprintName(stateBlueprintName);
     } else if (blueprintResponse?.data?.data?.name) {
-      console.log('BlueprintEditor - Using fetched blueprint name');
       setBlueprintName(blueprintResponse.data.data.name);
     }
   }, [stateTemplateHtml, stateBlueprintName, blueprintResponse]);
-  
-  console.log('BlueprintEditor - Final templateHtml:', templateHtml);
-  console.log('BlueprintEditor - Final templateHtml length:', templateHtml.length);
-  console.log('BlueprintEditor - Final blueprintName:', blueprintName);
 
   // Determine if this is a new template or editing existing
   const isNewTemplate = id === 'create';

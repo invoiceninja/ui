@@ -11,7 +11,7 @@ import { useClientsQuery } from '$app/common/queries/clients';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
-import { Card, Element } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField, SelectField } from '$app/components/forms';
@@ -558,12 +558,6 @@ function BlueprintBuilder() {
             type="secondary"  
             behavior="button"
             onClick={() => {
-              console.log('BlueprintBuilder - Navigating to template editor');
-              console.log('BlueprintBuilder - blueprint.template:', blueprint.template);
-              console.log('BlueprintBuilder - blueprint.template type:', typeof blueprint.template);
-              console.log('BlueprintBuilder - blueprint.template length:', blueprint.template?.length);
-              console.log('BlueprintBuilder - blueprint.name:', blueprint.name);
-              
               navigate(route('/documents/blueprints/:id/template_editor', { 
                 id, 
                 state: { 

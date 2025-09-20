@@ -141,11 +141,6 @@ declare global {
 }
 
 export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: GrapeJSEditorProps) {
-  console.log('GrapeJSEditor - Component loaded');
-  console.log('GrapeJSEditor - initialHtml:', initialHtml);
-  console.log('GrapeJSEditor - initialHtml type:', typeof initialHtml);
-  console.log('GrapeJSEditor - initialHtml length:', initialHtml?.length);
-  console.log('GrapeJSEditor - blueprintName:', blueprintName);
   
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -164,7 +159,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
   useEffect(() => {
     // Clean up any existing editor first
     if ((window as any).grapesEditor) {
-      console.log('GrapeJSEditor - Cleaning up existing editor');
       (window as any).grapesEditor.destroy();
       (window as any).grapesEditor = null;
     }
@@ -922,10 +916,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
   // Separate useEffect to handle initialHtml updates
   useEffect(() => {
     if (initialHtml && (window as any).grapesEditor && isEditorReady) {
-      console.log('GrapeJSEditor - Setting initial HTML content:', initialHtml.length, 'characters');
       try {
         (window as any).grapesEditor.setComponents(initialHtml);
-        console.log('GrapeJSEditor - HTML content set successfully');
       } catch (error) {
         console.error('GrapeJSEditor - Error setting HTML content:', error);
       }
