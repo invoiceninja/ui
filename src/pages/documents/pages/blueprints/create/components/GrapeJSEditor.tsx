@@ -16,7 +16,8 @@ import Editor from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import * as beautify from 'js-beautify';
 
-import grapesjs from "grapesjs";
+
+import grapesjs, { Page } from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
@@ -156,6 +157,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
   const [monacoHtmlEditor, setMonacoHtmlEditor] = useState<any>(null);
   const [monacoCssEditor, setMonacoCssEditor] = useState<any>(null);
 
+  
   useEffect(() => {
     // Clean up any existing editor first
     if ((window as any).grapesEditor) {
@@ -171,6 +173,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
     styleElement.textContent = iconStyles;
     document.head.appendChild(styleElement);
 
+
+
     const initializeEditor = () => {
       if (!editorRef.current) {
         return;
@@ -185,8 +189,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
       if ((window as any).grapesEditor) {
         return;
       }
-      
-
     try {
         const editor = grapesjs.init({
           container: editorRef.current,
@@ -775,6 +777,38 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
           }
         });
 
+        // Register page break component type
+        domc.addType('page-break', {
+          model: {
+            defaults: {
+              tagName: 'div',
+              classes: ['page-break', 'gjs-page-break'],
+              style: {
+                width: '100%',
+                height: '20px',
+                margin: '20px 0',
+                padding: '0',
+                border: '2px dashed #dc3545',
+                background: '#fff5f5',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'center',
+                position: 'relative',
+                'box-sizing': 'border-box'
+              },
+              content: '<div style="background: #dc3545; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: bold;">PAGE BREAK</div>',
+              traits: [
+                {
+                  type: 'checkbox',
+                  name: 'page-break-before',
+                  label: 'Page Break Before',
+                  default: true
+                }
+              ]
+            }
+          }
+        });
+
         // Check if blocks already exist to prevent duplicates
         if (!blockManager.get('signature-placeholder')) {
           // Add signature placeholder block
@@ -798,6 +832,18 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
             category: 'Signatory Placeholders',
             attributes: {
               'data-block': 'date-placeholder'
+            }
+          });
+
+          // Add page break block
+          blockManager.add('page-break', {
+            label: '<div class="gjs-block-label"><i class="fas fa-file-alt gjs-block__media"></i><div class="gjs-block-label">Page Break</div></div>',
+            content: {
+              type: 'page-break'
+            },
+            category: 'Layout',
+            attributes: {
+              'data-block': 'page-break'
             }
           });
         }
@@ -927,7 +973,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
   // Cleanup effect
   useEffect(() => {
     return () => {
-      console.log('GrapeJSEditor - Component unmounting, cleaning up editor');
       if ((window as any).grapesEditor) {
         (window as any).grapesEditor.destroy();
         (window as any).grapesEditor = null;
@@ -944,6 +989,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
       const editor = (window as any).grapesEditor;
       const html = editor.getHtml();
       const css = editor.getCss();
+      
       
       // Combine HTML and CSS into a complete document
       const fullHtml = `<!DOCTYPE html>
@@ -963,6 +1009,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
       setIsSaving(false);
     }
   };
+
 
 
   const handleMonacoHtmlEditorMount = (editor: any) => {
@@ -1069,27 +1116,28 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
   };
 
   return (
-    <div id="gjs" className="h-screen w-full flex flex-col" style={{ backgroundColor: colors.$1 }}>
-        <div className="flex items-center justify-between p-3 border-b bg-white shadow-sm" style={{ borderColor: colors.$20 }}>
+    <div className="h-full w-full flex flex-col">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between p-3 border-b bg-white shadow-sm" style={{ borderColor: colors.$20 }}>
         <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-semibold">{blueprintName}</h2>
-            
+          <h2 className="text-lg font-semibold">{blueprintName}</h2>
         </div>
-        
         <div className="flex items-center space-x-2">
-            <Button onClick={onCancel} type="secondary">
+          <Button onClick={onCancel} type="secondary">
             {t('cancel')}
-            </Button>
-            <Button 
+          </Button>
+          <Button 
             onClick={handleSave} 
             disabled={!isEditorReady || isSaving}
             disableWithoutIcon
-            >
+          >
             {isSaving ? t('saving') : t('save_blueprint')}
-            </Button>
+          </Button>
         </div>
-        </div>
+      </div>
 
+      <div id="gjs" className="flex-1 flex flex-col" style={{ backgroundColor: colors.$1 }}>
+        
         {/* GrapeJS Export Toolbar */}
         <div className="panel__export"></div>
 
@@ -1221,7 +1269,11 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
             </div>
             </div>
         )}
-        </div>
+      </div>
+    </div>
   );
 }
+
+
+
 

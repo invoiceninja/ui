@@ -90,14 +90,21 @@ export default function BlueprintEditor() {
   }
 
   return (
-    <Default breadcrumbs={[]}>
+    <Default 
+      title="Template Editor"
+      breadcrumbs={[
+        { name: 'Blueprints', href: '/documents/blueprints' },
+        { name: blueprintName || 'Blueprint', href: `/documents/blueprints/${id}/edit` },
+        { name: 'Template Editor', href: '#' }
+      ]}
+    >
       <div className="h-[calc(100vh-200px)]">
         <GrapeJSEditor 
           key={`${id}-${templateHtml.length}`}
           initialHtml={templateHtml} 
           onSave={handleSave}
           onCancel={handleCancel}
-          blueprintName={blueprintName || 'New Blueprint'}
+          blueprintName={''}
         />
       </div>
     </Default>
