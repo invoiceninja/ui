@@ -725,7 +725,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         // Simple event listener for draggable rectangles
         editor.on('component:add', function(component) {
           if (component.get('type') === 'draggable-rectangle') {
-            console.log('New draggable rectangle added to canvas');
 
             // Generate unique ID for this rectangle (stored in HTML for persistence)
             const uniqueId = 'draggable-rect-' + (++rectangleCounter);
@@ -735,30 +734,22 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             if (view && view.el) {
               view.el.setAttribute('data-draggable-rect-id', uniqueId);
               view.el.setAttribute('data-draggable-rect-type', 'draggable-rectangle');
-              console.log('Set data attributes on element:', view.el.outerHTML.substring(0, 200));
-            } else {
-              console.log('View or element not available yet when setting attributes');
             }
 
             // Add unique identifier to the component
             component.set('draggableRectId', uniqueId);
             component.addAttributes({ 'data-draggable-rect-id': uniqueId });
 
-            console.log('Draggable rectangle setup complete with ID:', uniqueId);
           }
         });
 
         // Function to reinitialize draggable rectangles after reload using HTML data attributes
         function reinitializeDraggableRectangles() {
-          console.log('Reinitializing draggable rectangles after reload');
-
           if (!editor) {
-            console.log('Editor not available yet, retrying...');
             return false;
           }
 
           if (!editor.DomComponents) {
-            console.log('DomComponents not available yet, retrying...');
             return false;
           }
 
@@ -766,51 +757,29 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           try {
             const components = editor.DomComponents.getComponents();
             if (!components) {
-              console.log('Components collection not available yet, retrying...');
               return false;
             }
           } catch (error) {
-            console.log('Error accessing components, editor not ready yet:', error);
             return false;
           }
-
-          console.log('Editor and DomComponents are available, proceeding with reinitialization...');
 
           // Find all draggable rectangles by data attribute in HTML
           const canvasFrame = editor.Canvas.getFrameEl();
           if (canvasFrame) {
-            console.log('Canvas frame found, searching for rectangles...');
-            console.log('Canvas frame HTML:', canvasFrame.outerHTML.substring(0, 500));
-
             // Access the iframe's content document
             const iframeDoc = canvasFrame.contentDocument || canvasFrame.contentWindow?.document;
             if (!iframeDoc) {
-              console.log('Cannot access iframe content document');
               return false;
             }
 
-            console.log('Iframe document accessed, searching for rectangles...');
-
-            // Debug: Look for all elements with data attributes (using valid selector)
-            const allDataElements = iframeDoc.querySelectorAll('[data-draggable-rect-id], [data-draggable-rect-type]');
-            console.log('Found elements with draggable-rect data attributes:', allDataElements.length);
-
-            allDataElements.forEach((el, idx) => {
-              console.log(`Data element ${idx}:`, el.outerHTML.substring(0, 100));
-            });
-
             const draggableRects = iframeDoc.querySelectorAll('[data-draggable-rect-type="draggable-rectangle"]');
-            console.log('Found draggable rectangles in HTML:', draggableRects.length);
 
             draggableRects.forEach((rectElement: Element, index: number) => {
               const element = rectElement as HTMLElement;
               const draggableRectId = element.getAttribute('data-draggable-rect-id');
 
-              console.log('Processing rectangle element', index, 'with ID:', draggableRectId);
-
               // Skip if already has drag functionality
               if ((element as any).isDraggableInitialized) {
-                console.log('Rectangle', index, 'already initialized, skipping');
                 return;
               }
 
@@ -826,7 +795,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
               });
 
               if (foundComponent) {
-                console.log('Found GrapeJS component for rectangle', index, 'with ID:', draggableRectId);
 
                 // Ensure proper styling
                 element.style.position = 'absolute';
@@ -840,7 +808,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
 
                 // Add drag functionality
                 const handleMouseDown = function(this: HTMLElement, e: MouseEvent) {
-                  console.log('Mouse down on reinitialized rectangle', index);
                   e.preventDefault();
                   e.stopPropagation();
 
@@ -898,7 +865,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                 (element as any).handleMouseDown = handleMouseDown.bind(element);
                 element.addEventListener('mousedown', (element as any).handleMouseDown);
 
-                console.log('Rectangle', index, 'reinitialized successfully');
 
                 // Restore position from stored data attributes if available
                 const storedTop = element.getAttribute('data-top');
@@ -907,9 +873,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                 const storedHeight = element.getAttribute('data-height');
 
                 if (storedTop && storedLeft && storedWidth && storedHeight) {
-                  console.log('Restoring rectangle position from stored data:', {
-                    top: storedTop, left: storedLeft, width: storedWidth, height: storedHeight
-                  });
 
                   // Update both DOM and GrapeJS model with stored coordinates
                   element.style.top = storedTop;
@@ -927,37 +890,22 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                     height: storedHeight
                   });
                 }
-              } else {
-                console.log('Could not find GrapeJS component for rectangle', index, 'with ID:', draggableRectId);
               }
             });
-          } else {
-            console.log('Canvas frame not found during reinitialization');
           }
         }
 
         // Reinitialize rectangles when canvas frame loads (document reload)
         editor.on('canvas:frame:load', function() {
-          console.log('Canvas frame loaded, scheduling rectangle reinitialization...');
           setTimeout(() => {
-            const success = reinitializeDraggableRectangles();
-            if (!success) {
-              console.log('Canvas frame reinitialization failed, periodic retries will continue');
-            }
+            reinitializeDraggableRectangles();
           }, 2000);
         });
 
         // Also reinitialize on editor load
         editor.on('load', function() {
-          console.log('Editor loaded, scheduling rectangle reinitialization...');
           setTimeout(() => {
-            console.log('Starting editor load reinitialization...');
-            const success = reinitializeDraggableRectangles();
-            if (!success) {
-              console.log('Editor load reinitialization failed, periodic retries will continue');
-            } else {
-              console.log('Editor load reinitialization successful!');
-            }
+            reinitializeDraggableRectangles();
           }, 3000);
         });
 
@@ -966,16 +914,13 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         const maxRetries = 10;
         const retryInterval = setInterval(() => {
           if (retryCount >= maxRetries) {
-            console.log('Max retries reached, stopping rectangle reinitialization attempts');
             clearInterval(retryInterval);
             return;
           }
           retryCount++;
-          console.log('Attempting rectangle reinitialization, try:', retryCount);
 
           const success = reinitializeDraggableRectangles();
           if (success) {
-            console.log('Rectangle reinitialization successful, stopping retries');
             clearInterval(retryInterval);
           }
         }, 5000);
@@ -1000,7 +945,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                   });
                 });
                 if (shouldReinitialize) {
-                  console.log('Detected new draggable rectangle, reinitializing');
                   reinitializeDraggableRectangles();
                 }
               });
@@ -1184,7 +1128,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           },
           view: {
             init() {
-              console.log('Custom view init called for draggable rectangle');
 
               // Ensure data attribute is applied
               const draggableRectId = this.model.get('draggableRectId');
@@ -1201,7 +1144,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
 
 
             handleMouseDown(e: MouseEvent) {
-              console.log('Custom view handleMouseDown called');
               e.preventDefault();
               e.stopPropagation();
 
@@ -1585,10 +1527,9 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         // Load project data if provided
         if (initialProjectData) {
           try {
-            console.log('Loading project data:', initialProjectData);
             editor.loadProjectData(initialProjectData);
           } catch (error) {
-            console.error('Error loading project data:', error);
+            // Silent error handling
           }
         }
       } catch (error) {
@@ -1630,7 +1571,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       try {
         (window as any).grapesEditor.setComponents(initialHtml);
       } catch (error) {
-        console.error('GrapeJSEditor - Error setting HTML content:', error);
+        // Silent error handling
       }
     }
   }, [initialHtml, isEditorReady]);
@@ -1639,10 +1580,9 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
   useEffect(() => {
     if (initialProjectData && (window as any).grapesEditor && isEditorReady) {
       try {
-        console.log('Loading project data on update:', initialProjectData);
         (window as any).grapesEditor.loadProjectData(initialProjectData);
       } catch (error) {
-        console.error('GrapeJSEditor - Error loading project data:', error);
+        // Silent error handling
       }
     }
   }, [initialProjectData, isEditorReady]);
