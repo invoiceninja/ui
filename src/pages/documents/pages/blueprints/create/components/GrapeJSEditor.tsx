@@ -15,9 +15,7 @@ import { useColorScheme } from '$app/common/colors';
 import Editor from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import * as beautify from 'js-beautify';
-
-
-import grapesjs, { Page } from "grapesjs";
+import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
