@@ -117,6 +117,7 @@ interface CreateBlueprintParams {
   name?: string;
   base64_file?: string;
   is_template?: boolean;
+  grapesjs?: string;
 }
 
 export function useCreateBlueprint() {
@@ -155,6 +156,7 @@ interface UpdateBlueprintParams {
   name?: string;
   base64_file?: string;
   is_template?: boolean;
+  grapesjs?: string;
 }
 
 export function useUpdateBlueprint() {

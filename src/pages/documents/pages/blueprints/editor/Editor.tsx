@@ -9,7 +9,7 @@ export default function BlueprintEditor() {
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { templateHtml: stateTemplateHtml, blueprintName: stateBlueprintName } = location.state || {};
+  const { templateHtml: stateTemplateHtml, blueprintName: stateBlueprintName, projectData: stateProjectData } = location.state || {};
   
   
   const createBlueprint = useCreateBlueprint();
@@ -19,6 +19,7 @@ export default function BlueprintEditor() {
   const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id: id || '' });
   const [templateHtml, setTemplateHtml] = useState<string>('');
   const [blueprintName, setBlueprintName] = useState<string>('');
+  const [projectData, setProjectData] = useState<string>('');
   
   useEffect(() => {
     // Use state data if available, otherwise use fetched data
@@ -33,12 +34,18 @@ export default function BlueprintEditor() {
     } else if (blueprintResponse?.data?.data?.name) {
       setBlueprintName(blueprintResponse.data.data.name);
     }
-  }, [stateTemplateHtml, stateBlueprintName, blueprintResponse]);
+
+    if(blueprintResponse?.data?.data?.grapesjs) {
+      setProjectData(blueprintResponse.data.data.grapesjs);
+    }
+
+
+  }, [stateTemplateHtml, stateBlueprintName, blueprintResponse, stateProjectData]);
 
   // Determine if this is a new template or editing existing
   const isNewTemplate = id === 'create';
 
-  const handleSave = async (html: string) => {
+  const handleSave = async (html: string, projectData: string) => {
     try {
       // Base64 encode the HTML content
       const base64Html = btoa(html);
@@ -48,7 +55,8 @@ export default function BlueprintEditor() {
         const response = await createBlueprint({
           name: blueprintName || 'New Blueprint',
           base64_file: base64Html,
-          is_template: true
+          is_template: true,
+          grapesjs: projectData
         });
         
         // Navigate to the editor for the newly created blueprint
@@ -59,7 +67,8 @@ export default function BlueprintEditor() {
           id: id,
           base64_file: base64Html,
           name: blueprintName || 'Updated Blueprint',
-          is_template: true
+          is_template: true,
+          grapesjs: projectData
         });
         
       }
@@ -102,6 +111,7 @@ export default function BlueprintEditor() {
         <GrapeJSEditor 
           key={`${id}-${templateHtml.length}`}
           initialHtml={templateHtml} 
+          initialProjectData={projectData}
           onSave={handleSave}
           onCancel={handleCancel}
           blueprintName={''}

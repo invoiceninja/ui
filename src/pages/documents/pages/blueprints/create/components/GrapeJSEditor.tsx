@@ -114,6 +114,94 @@ const iconStyles = `
 .gjs-blocks-cs .gjs-block[data-category="Basic"] {
     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
 }
+
+/* Draggable rectangle specific styles */
+.draggable-rectangle, .gjs-draggable-rectangle {
+    position: absolute !important;
+    cursor: move !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+    z-index: 10 !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+}
+
+/* Ensure proper selection and interaction */
+.gjs-selected .draggable-rectangle,
+.gjs-selected .gjs-draggable-rectangle {
+    outline: 2px solid #007bff !important;
+    outline-offset: 2px !important;
+}
+
+/* Resize handles for draggable rectangle */
+.gjs-resizer {
+    z-index: 11 !important;
+}
+
+/* Ensure the rectangle content doesn't interfere with dragging */
+.draggable-rectangle > div,
+.gjs-draggable-rectangle > div {
+    pointer-events: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Prevent text selection on the rectangle */
+.draggable-rectangle,
+.gjs-draggable-rectangle {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Ensure proper layering and interaction */
+.gjs-frame .draggable-rectangle,
+.gjs-frame .gjs-draggable-rectangle {
+    position: absolute !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure the rectangle doesn't interfere with other draggable elements */
+.gjs-frame .draggable-rectangle:hover,
+.gjs-frame .gjs-draggable-rectangle:hover {
+    z-index: 11 !important;
+}
+
+/* Ensure proper selection state */
+.gjs-selected .draggable-rectangle,
+.gjs-selected .gjs-draggable-rectangle {
+    z-index: 12 !important;
+}
+
+/* Ensure resize handles are above the rectangle */
+.gjs-resizer {
+    z-index: 13 !important;
+}
+
+/* Prevent interference with other components */
+.draggable-rectangle *,
+.gjs-draggable-rectangle * {
+    pointer-events: none !important;
+}
+
+/* Allow the rectangle itself to be interactive */
+.draggable-rectangle,
+.gjs-draggable-rectangle {
+    pointer-events: auto !important;
+    cursor: move !important;
+}
+
+/* Ensure the rectangle is above all other elements when dragging */
+.draggable-rectangle.dragging,
+.gjs-draggable-rectangle.dragging {
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+}
 `;
 
 import pluginBlocks from "grapesjs-blocks-basic";
@@ -128,9 +216,10 @@ import pluginPresetWebpage from "grapesjs-preset-webpage";
 
 interface GrapeJSEditorProps {
   initialHtml: string;
-  onSave: (html: string) => void;
+  onSave: (html: string, projectData: string) => void;
   onCancel: () => void;
   blueprintName: string;
+  initialProjectData?: any; // GrapeJS project data object
 }
 
 declare global {
@@ -139,7 +228,7 @@ declare global {
   }
 }
 
-export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: GrapeJSEditorProps) {
+export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, initialProjectData }: GrapeJSEditorProps) {
   
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -539,6 +628,48 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
         })
       });
 
+      // Add command to force absolute positioning for draggable rectangles
+      cmdm.add('force-absolute-positioning', function() {
+        const selected = editor.getSelected();
+        if (selected && selected.get('type') === 'draggable-rectangle') {
+          // Force absolute positioning mode by updating style
+          const currentStyle = selected.getStyle();
+          selected.setStyle({
+            ...currentStyle,
+            position: 'absolute'
+          });
+          
+          // Force the view to update
+          const view = selected.getView();
+          if (view && view.el) {
+            view.el.style.position = 'absolute';
+            view.el.style.cursor = 'move';
+          }
+        }
+      });
+
+      // Add command to enable dragging for draggable rectangles
+      cmdm.add('enable-dragging', function() {
+        const selected = editor.getSelected();
+        if (selected && selected.get('type') === 'draggable-rectangle') {
+          // Force the view to be draggable
+          const view = selected.getView();
+          if (view && view.el) {
+            view.el.setAttribute('draggable', 'true');
+            view.el.style.cursor = 'move';
+            view.el.style.position = 'absolute';
+          }
+        }
+      });
+
+      // Simple component selection handler
+      editor.on('component:selected', function(component) {
+        if (component.get('type') === 'draggable-rectangle') {
+          component.set('position', 'absolute');
+          component.set('draggable', true);
+        }
+      });
+
       pn.addButton('options', {
         id: 'open-info',
         className: 'fas fa-question-circle',
@@ -571,9 +702,320 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
         editor.on('load', function() {
           const $ = grapesjs.$;
         
+        // Configure GrapeJS to handle absolutely positioned elements properly
+        editor.on('load', function() {
+          // Enable dragging for absolutely positioned elements
+          const canvas = editor.Canvas;
+          if (canvas) {
+            // Set the canvas to handle absolute positioning
+            const canvasView = canvas.getCanvasView();
+            if (canvasView) {
+              // Enable dragging for positioned elements
+              // Note: GrapeJS should handle this automatically for absolutely positioned elements
+            }
+          }
+        });
+        
         // Add a small delay to ensure DOM is fully ready
         setTimeout(function() {
 
+        // Store draggable rectangle metadata for later reinitialization
+        let rectangleCounter = 0;
+
+        // Simple event listener for draggable rectangles
+        editor.on('component:add', function(component) {
+          if (component.get('type') === 'draggable-rectangle') {
+            console.log('New draggable rectangle added to canvas');
+
+            // Generate unique ID for this rectangle (stored in HTML for persistence)
+            const uniqueId = 'draggable-rect-' + (++rectangleCounter);
+
+            // Add unique identifier directly to the HTML element for persistence
+            const view = component.getView();
+            if (view && view.el) {
+              view.el.setAttribute('data-draggable-rect-id', uniqueId);
+              view.el.setAttribute('data-draggable-rect-type', 'draggable-rectangle');
+              console.log('Set data attributes on element:', view.el.outerHTML.substring(0, 200));
+            } else {
+              console.log('View or element not available yet when setting attributes');
+            }
+
+            // Add unique identifier to the component
+            component.set('draggableRectId', uniqueId);
+            component.addAttributes({ 'data-draggable-rect-id': uniqueId });
+
+            console.log('Draggable rectangle setup complete with ID:', uniqueId);
+          }
+        });
+
+        // Function to reinitialize draggable rectangles after reload using HTML data attributes
+        function reinitializeDraggableRectangles() {
+          console.log('Reinitializing draggable rectangles after reload');
+
+          if (!editor) {
+            console.log('Editor not available yet, retrying...');
+            return false;
+          }
+
+          if (!editor.DomComponents) {
+            console.log('DomComponents not available yet, retrying...');
+            return false;
+          }
+
+          // Additional check to ensure editor is fully ready
+          try {
+            const components = editor.DomComponents.getComponents();
+            if (!components) {
+              console.log('Components collection not available yet, retrying...');
+              return false;
+            }
+          } catch (error) {
+            console.log('Error accessing components, editor not ready yet:', error);
+            return false;
+          }
+
+          console.log('Editor and DomComponents are available, proceeding with reinitialization...');
+
+          // Find all draggable rectangles by data attribute in HTML
+          const canvasFrame = editor.Canvas.getFrameEl();
+          if (canvasFrame) {
+            console.log('Canvas frame found, searching for rectangles...');
+            console.log('Canvas frame HTML:', canvasFrame.outerHTML.substring(0, 500));
+
+            // Access the iframe's content document
+            const iframeDoc = canvasFrame.contentDocument || canvasFrame.contentWindow?.document;
+            if (!iframeDoc) {
+              console.log('Cannot access iframe content document');
+              return false;
+            }
+
+            console.log('Iframe document accessed, searching for rectangles...');
+
+            // Debug: Look for all elements with data attributes (using valid selector)
+            const allDataElements = iframeDoc.querySelectorAll('[data-draggable-rect-id], [data-draggable-rect-type]');
+            console.log('Found elements with draggable-rect data attributes:', allDataElements.length);
+
+            allDataElements.forEach((el, idx) => {
+              console.log(`Data element ${idx}:`, el.outerHTML.substring(0, 100));
+            });
+
+            const draggableRects = iframeDoc.querySelectorAll('[data-draggable-rect-type="draggable-rectangle"]');
+            console.log('Found draggable rectangles in HTML:', draggableRects.length);
+
+            draggableRects.forEach((rectElement: Element, index: number) => {
+              const element = rectElement as HTMLElement;
+              const draggableRectId = element.getAttribute('data-draggable-rect-id');
+
+              console.log('Processing rectangle element', index, 'with ID:', draggableRectId);
+
+              // Skip if already has drag functionality
+              if ((element as any).isDraggableInitialized) {
+                console.log('Rectangle', index, 'already initialized, skipping');
+                return;
+              }
+
+              // Find the corresponding GrapeJS component
+              const components = editor.DomComponents.getComponents();
+              let foundComponent = null;
+
+              components.forEach((comp: any) => {
+                const compDraggableRectId = comp.get('draggableRectId');
+                if (compDraggableRectId === draggableRectId) {
+                  foundComponent = comp;
+                }
+              });
+
+              if (foundComponent) {
+                console.log('Found GrapeJS component for rectangle', index, 'with ID:', draggableRectId);
+
+                // Ensure proper styling
+                element.style.position = 'absolute';
+                element.style.cursor = 'move';
+                element.style.userSelect = 'none';
+                element.style.boxSizing = 'border-box';
+                element.style.zIndex = '10';
+
+                // Remove any existing event listeners
+                element.removeEventListener('mousedown', (element as any).handleMouseDown);
+
+                // Add drag functionality
+                const handleMouseDown = function(this: HTMLElement, e: MouseEvent) {
+                  console.log('Mouse down on reinitialized rectangle', index);
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  // Start dragging
+                  this.style.cursor = 'grabbing';
+                  this.style.zIndex = '9999';
+                  this.classList.add('dragging');
+
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const startLeft = parseInt(this.style.left) || 0;
+                  const startTop = parseInt(this.style.top) || 0;
+
+                  const handleMouseMove = (e: MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+
+                    const newLeft = startLeft + deltaX;
+                    const newTop = startTop + deltaY;
+
+                    // Update the GrapeJS component style first (this will handle children)
+                    const currentStyle = foundComponent.getStyle();
+                    foundComponent.setStyle({
+                      ...currentStyle,
+                      left: newLeft + 'px',
+                      top: newTop + 'px'
+                    });
+
+                    // Force GrapeJS to update the view and all child components
+                    foundComponent.trigger('change:style');
+                    
+                    // Also update DOM directly as backup
+                    this.style.left = newLeft + 'px';
+                    this.style.top = newTop + 'px';
+                  };
+
+                  const handleMouseUp = (e: MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.style.cursor = 'move';
+                    this.style.zIndex = '10';
+                    this.classList.remove('dragging');
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  };
+
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                };
+
+                // Mark as initialized and add the event listener
+                (element as any).isDraggableInitialized = true;
+                (element as any).handleMouseDown = handleMouseDown.bind(element);
+                element.addEventListener('mousedown', (element as any).handleMouseDown);
+
+                console.log('Rectangle', index, 'reinitialized successfully');
+
+                // Restore position from stored data attributes if available
+                const storedTop = element.getAttribute('data-top');
+                const storedLeft = element.getAttribute('data-left');
+                const storedWidth = element.getAttribute('data-width');
+                const storedHeight = element.getAttribute('data-height');
+
+                if (storedTop && storedLeft && storedWidth && storedHeight) {
+                  console.log('Restoring rectangle position from stored data:', {
+                    top: storedTop, left: storedLeft, width: storedWidth, height: storedHeight
+                  });
+
+                  // Update both DOM and GrapeJS model with stored coordinates
+                  element.style.top = storedTop;
+                  element.style.left = storedLeft;
+                  element.style.width = storedWidth;
+                  element.style.height = storedHeight;
+
+                  // Update GrapeJS component style
+                  const currentStyle = component.getStyle();
+                  component.setStyle({
+                    ...currentStyle,
+                    top: storedTop,
+                    left: storedLeft,
+                    width: storedWidth,
+                    height: storedHeight
+                  });
+                }
+              } else {
+                console.log('Could not find GrapeJS component for rectangle', index, 'with ID:', draggableRectId);
+              }
+            });
+          } else {
+            console.log('Canvas frame not found during reinitialization');
+          }
+        }
+
+        // Reinitialize rectangles when canvas frame loads (document reload)
+        editor.on('canvas:frame:load', function() {
+          console.log('Canvas frame loaded, scheduling rectangle reinitialization...');
+          setTimeout(() => {
+            const success = reinitializeDraggableRectangles();
+            if (!success) {
+              console.log('Canvas frame reinitialization failed, periodic retries will continue');
+            }
+          }, 2000);
+        });
+
+        // Also reinitialize on editor load
+        editor.on('load', function() {
+          console.log('Editor loaded, scheduling rectangle reinitialization...');
+          setTimeout(() => {
+            console.log('Starting editor load reinitialization...');
+            const success = reinitializeDraggableRectangles();
+            if (!success) {
+              console.log('Editor load reinitialization failed, periodic retries will continue');
+            } else {
+              console.log('Editor load reinitialization successful!');
+            }
+          }, 3000);
+        });
+
+        // Run periodically to catch any missed rectangles (with limit)
+        let retryCount = 0;
+        const maxRetries = 10;
+        const retryInterval = setInterval(() => {
+          if (retryCount >= maxRetries) {
+            console.log('Max retries reached, stopping rectangle reinitialization attempts');
+            clearInterval(retryInterval);
+            return;
+          }
+          retryCount++;
+          console.log('Attempting rectangle reinitialization, try:', retryCount);
+
+          const success = reinitializeDraggableRectangles();
+          if (success) {
+            console.log('Rectangle reinitialization successful, stopping retries');
+            clearInterval(retryInterval);
+          }
+        }, 5000);
+
+        // Add MutationObserver to catch rectangles added later
+        let observer: MutationObserver | null = null;
+
+        editor.on('load', function() {
+          setTimeout(() => {
+            const canvasFrame = editor.Canvas.getFrameEl();
+            if (canvasFrame && !observer) {
+              observer = new MutationObserver((mutations) => {
+                let shouldReinitialize = false;
+                mutations.forEach((mutation) => {
+                  mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                      const element = node as Element;
+                      if (element.classList && element.classList.contains('draggable-rectangle')) {
+                        shouldReinitialize = true;
+                      }
+                    }
+                  });
+                });
+                if (shouldReinitialize) {
+                  console.log('Detected new draggable rectangle, reinitializing');
+                  reinitializeDraggableRectangles();
+                }
+              });
+
+              // Access the iframe's content document for the observer
+              const iframeDoc = canvasFrame.contentDocument || canvasFrame.contentWindow?.document;
+              if (iframeDoc) {
+                observer.observe(iframeDoc.body, {
+                  childList: true,
+                  subtree: true
+                });
+              }
+            }
+          }, 1500);
+        });
 
         // Add Monaco editor button
         pn.addButton('views', {
@@ -702,10 +1144,108 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
         // Add only custom placeholder blocks - let GrapeJS handle default blocks
         const blockManager = editor.BlockManager;
         
-        
-        // Register custom component types first
+        // Register custom component types BEFORE loading any project data
         const domc = editor.DomComponents;
-        
+
+        // Register draggable rectangle component type FIRST
+        domc.addType('draggable-rectangle', {
+          model: {
+            defaults: {
+              tagName: 'div',
+              classes: ['draggable-rectangle'],
+              style: {
+                position: 'absolute',
+                width: '200px',
+                height: '150px',
+                top: '50px',
+                left: '50px',
+                border: '2px solid #28a745',
+                background: 'rgba(40, 167, 69, 0.1)',
+                cursor: 'move',
+                'box-sizing': 'border-box',
+                'z-index': '10',
+                'min-width': '50px',
+                'min-height': '50px',
+                'user-select': 'none'
+              },
+              content: '<div style="padding: 10px; text-align: center; color: #28a745; font-weight: bold;">Drag Rectangle</div>',
+              resizable: true,
+              draggable: true,
+              droppable: false,
+            selectable: true,
+            highlightable: true,
+              traits: [
+                { type: 'number', name: 'width', label: 'Width' },
+                { type: 'number', name: 'height', label: 'Height' },
+                { type: 'number', name: 'top', label: 'Top' },
+                { type: 'number', name: 'left', label: 'Left' }
+              ]
+            }
+          },
+          view: {
+            init() {
+              console.log('Custom view init called for draggable rectangle');
+
+              // Ensure data attribute is applied
+              const draggableRectId = this.model.get('draggableRectId');
+              if (draggableRectId && this.el) {
+                this.el.setAttribute('data-draggable-rect-id', draggableRectId);
+              }
+
+              // Add drag functionality
+              this.el.addEventListener('mousedown', this.handleMouseDown.bind(this));
+
+              // Mark as initialized to prevent double-initialization
+              (this.el as any).isDraggableInitialized = true;
+            },
+
+
+            handleMouseDown(e: MouseEvent) {
+              console.log('Custom view handleMouseDown called');
+              e.preventDefault();
+              e.stopPropagation();
+
+              const startX = e.clientX;
+              const startY = e.clientY;
+              const startLeft = parseInt(this.el.style.left) || 0;
+              const startTop = parseInt(this.el.style.top) || 0;
+
+              const handleMouseMove = (e: MouseEvent) => {
+                e.preventDefault();
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                const newLeft = startLeft + deltaX;
+                const newTop = startTop + deltaY;
+
+                // Update the GrapeJS component style first (this will handle children)
+                const component = this.model;
+                const currentStyle = component.getStyle();
+                component.setStyle({
+                  ...currentStyle,
+                  left: newLeft + 'px',
+                  top: newTop + 'px'
+                });
+
+                // Force GrapeJS to update the view and all child components
+                component.trigger('change:style');
+                
+                // Also update DOM directly as backup
+                this.el.style.left = newLeft + 'px';
+                this.el.style.top = newTop + 'px';
+              };
+
+              const handleMouseUp = () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+              };
+
+              document.addEventListener('mousemove', handleMouseMove);
+              document.addEventListener('mouseup', handleMouseUp);
+            }
+          }
+        });
+
         // Register signature placeholder component type
         domc.addType('signature-placeholder', {
           model: {
@@ -807,6 +1347,106 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
           }
         });
 
+        // Simple draggable rectangle component
+        domc.addType('draggable-rectangle', {
+          model: {
+            defaults: {
+              tagName: 'div',
+              classes: ['draggable-rectangle'],
+              style: {
+                position: 'absolute',
+                width: '200px',
+                height: '150px',
+                top: '50px',
+                left: '50px',
+                border: '2px solid #28a745',
+                background: 'rgba(40, 167, 69, 0.1)',
+                cursor: 'move',
+                'box-sizing': 'border-box',
+                'z-index': '10',
+                'min-width': '50px',
+                'min-height': '50px',
+                'user-select': 'none'
+              },
+              content: '<div style="padding: 10px; text-align: center; color: #28a745; font-weight: bold;">Drag Rectangle</div>',
+              resizable: true,
+              draggable: true,
+              traits: [
+                { type: 'number', name: 'width', label: 'Width' },
+                { type: 'number', name: 'height', label: 'Height' },
+                { type: 'number', name: 'top', label: 'Top' },
+                { type: 'number', name: 'left', label: 'Left' }
+              ]
+            },
+            init() {
+              // Store coordinates in HTML data attributes whenever style changes
+              this.on('change:style', () => {
+                const style = this.getStyle();
+                const view = this.getView();
+                if (view && view.el) {
+                  view.el.setAttribute('data-top', style.top || '50px');
+                  view.el.setAttribute('data-left', style.left || '50px');
+                  view.el.setAttribute('data-width', style.width || '200px');
+                  view.el.setAttribute('data-height', style.height || '150px');
+                }
+              });
+            }
+          },
+          view: {
+            init() {
+              // Add drag functionality
+              this.el.addEventListener('mousedown', this.handleMouseDown.bind(this));
+
+              // Mark as initialized to prevent double-initialization
+              (this.el as any).isDraggableInitialized = true;
+            },
+
+
+            handleMouseDown(e: MouseEvent) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              const startX = e.clientX;
+              const startY = e.clientY;
+              const startLeft = parseInt(this.el.style.left) || 0;
+              const startTop = parseInt(this.el.style.top) || 0;
+              
+              const handleMouseMove = (e: MouseEvent) => {
+                e.preventDefault();
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                const newLeft = startLeft + deltaX;
+                const newTop = startTop + deltaY;
+                
+                // Update the GrapeJS component style first (this will handle children)
+                const component = this.model;
+                const currentStyle = component.getStyle();
+                component.setStyle({
+                  ...currentStyle,
+                  left: newLeft + 'px',
+                  top: newTop + 'px'
+                });
+
+                // Force GrapeJS to update the view and all child components
+                component.trigger('change:style');
+                
+                // Also update DOM directly as backup
+                this.el.style.left = newLeft + 'px';
+                this.el.style.top = newTop + 'px';
+              };
+              
+              const handleMouseUp = () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+              };
+              
+              document.addEventListener('mousemove', handleMouseMove);
+              document.addEventListener('mouseup', handleMouseUp);
+            }
+          }
+        });
+
         // Check if blocks already exist to prevent duplicates
         if (!blockManager.get('signature-placeholder')) {
           // Add signature placeholder block
@@ -844,6 +1484,23 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
               'data-block': 'page-break'
             }
           });
+
+          // Add draggable rectangle block
+          blockManager.add('draggable-rectangle', {
+            label: '<div class="gjs-block-label"><i class="fas fa-square gjs-block__media"></i><div class="gjs-block-label">Draggable Rectangle</div></div>',
+            content: {
+              type: 'draggable-rectangle'
+            },
+            category: 'Layout',
+            attributes: {
+              'data-block': 'draggable-rectangle'
+            }
+          });
+
+
+
+
+
         }
 
         // Initial HTML content will be set by the separate useEffect
@@ -924,6 +1581,16 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
 
         // Store editor reference for cleanup
         (window as any).grapesEditor = editor;
+
+        // Load project data if provided
+        if (initialProjectData) {
+          try {
+            console.log('Loading project data:', initialProjectData);
+            editor.loadProjectData(initialProjectData);
+          } catch (error) {
+            console.error('Error loading project data:', error);
+          }
+        }
       } catch (error) {
         // If canvas error, try to reinitialize after a delay
         if (error instanceof Error && error.message.includes('getFrames')) {
@@ -968,6 +1635,18 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
     }
   }, [initialHtml, isEditorReady]);
 
+  // Separate useEffect to handle initialProjectData updates
+  useEffect(() => {
+    if (initialProjectData && (window as any).grapesEditor && isEditorReady) {
+      try {
+        console.log('Loading project data on update:', initialProjectData);
+        (window as any).grapesEditor.loadProjectData(initialProjectData);
+      } catch (error) {
+        console.error('GrapeJSEditor - Error loading project data:', error);
+      }
+    }
+  }, [initialProjectData, isEditorReady]);
+
   // Cleanup effect
   useEffect(() => {
     return () => {
@@ -987,7 +1666,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
       const editor = (window as any).grapesEditor;
       const html = editor.getHtml();
       const css = editor.getCss();
-      
+      const projectData = editor.getProjectData();
       
       // Combine HTML and CSS into a complete document
       const fullHtml = `<!DOCTYPE html>
@@ -1000,7 +1679,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName }: 
 <body>${html}</body>
 </html>`;
 
-      await onSave(fullHtml);
+      await onSave(fullHtml, projectData);
     } catch (error) {
       // Silent error handling
     } finally {

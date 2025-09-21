@@ -21,5 +21,6 @@ export interface Blueprint {
   is_template: boolean;
   template?: string;
   document?: Document;
+  grapesjs?: string;
 }
 
