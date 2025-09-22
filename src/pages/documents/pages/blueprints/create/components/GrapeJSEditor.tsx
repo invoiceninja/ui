@@ -680,7 +680,211 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         },
       });
 
+      // Step 1: Add Pages button to the Views toolbar (no behavior yet)
+      if (!pn.getButton('views', 'open-pages')) {
+        pn.addButton('views', {
+          id: 'open-pages',
+          className: 'fas fa-copy',
+          command: 'open-pages-panel',
+          attributes: {
+            title: 'Pages',
+            'data-tooltip-pos': 'bottom',
+          },
+          togglable: false,
+        });
+      }
 
+      // Step 2: Add a simple placeholder panel and toggle it with the Pages button
+      const viewsPanel = pn.getPanel('views-container');
+      let viewsEl: HTMLElement | null = null;
+      const containerEl = (editor.getContainer && (editor.getContainer() as HTMLElement)) || null;
+      const candidates: Array<HTMLElement | null> = [];
+      if (viewsPanel && (viewsPanel as any).get) {
+        const maybeEl = (viewsPanel as any).get('el');
+        if (maybeEl && typeof maybeEl !== 'string') {
+          candidates.push(maybeEl as HTMLElement);
+        }
+      }
+      if (containerEl) {
+        candidates.push(
+          containerEl.querySelector('.gjs-pn-views-container') as HTMLElement,
+          containerEl.querySelector('.gjs-pn-views') as HTMLElement,
+          containerEl.querySelector('.gjs-pn-panel.gjs-pn-views-container') as HTMLElement,
+        );
+      }
+      if ((editor as any).StyleManager && (editor as any).StyleManager.getContainer) {
+        const smEl = (editor as any).StyleManager.getContainer();
+        if (smEl && smEl.parentElement) {
+          candidates.push(smEl.parentElement as HTMLElement);
+        }
+      }
+      for (const el of candidates) {
+        if (el && el instanceof HTMLElement) {
+          viewsEl = el;
+          break;
+        }
+      }
+
+      const pagesPanel = document.createElement('div');
+      pagesPanel.style.display = 'none';
+      pagesPanel.style.padding = '8px';
+      pagesPanel.setAttribute('data-panel', 'pages');
+      pagesPanel.className = 'gjs-pn-panel';
+      pagesPanel.style.background = '#ffffff';
+      pagesPanel.style.border = '1px solid #e5e7eb';
+      pagesPanel.style.borderRadius = '6px';
+      pagesPanel.style.marginTop = '6px';
+      pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin-bottom:6px">Pages</div>';
+      if (viewsEl) {
+        viewsEl.appendChild(pagesPanel);
+      }
+
+      // Helpers for Pages API with graceful fallbacks across GrapesJS versions
+      const getPagesApi = () => (editor as any).Pages;
+      const setActivePage = (pageOrId: any) => {
+        const api = getPagesApi();
+        if (!api) return;
+        if (typeof api.setActive === 'function') return api.setActive(pageOrId);
+        if (typeof api.select === 'function') return api.select(pageOrId);
+      };
+      const getActivePage = () => {
+        const api = getPagesApi();
+        if (!api) return null;
+        if (typeof api.getActive === 'function') return api.getActive();
+        if (typeof api.getSelected === 'function') return api.getSelected();
+        return null;
+      };
+
+      // Helper to render the current pages list with active selection
+      const renderPagesList = () => {
+        // Clear previous content except header
+        pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin-bottom:6px">Pages</div>';
+        const pagesApi = getPagesApi();
+        // Ensure at least one page exists
+        if (pagesApi && pagesApi.getAll && pagesApi.getAll().length === 0) {
+          const first = pagesApi.add({ id: 'page-1' });
+          setActivePage(first);
+        }
+        const listWrap = document.createElement('div');
+        listWrap.style.display = 'flex';
+        listWrap.style.flexDirection = 'column';
+        listWrap.style.gap = '6px';
+
+        if (!pagesApi || !pagesApi.getAll) {
+          const empty = document.createElement('div');
+          empty.textContent = 'Pages API not available';
+          empty.style.fontSize = '12px';
+          empty.style.color = '#6b7280';
+          listWrap.appendChild(empty);
+          pagesPanel.appendChild(listWrap);
+          return;
+        }
+
+        const controls = document.createElement('div');
+        controls.style.display = 'flex';
+        controls.style.justifyContent = 'flex-end';
+        controls.style.marginBottom = '8px';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.textContent = 'Add Page';
+        addBtn.className = 'gjs-btn-prim';
+        addBtn.style.padding = '4px 8px';
+        addBtn.style.borderRadius = '4px';
+        addBtn.addEventListener('click', () => {
+          const base = 'page-';
+          let idx = (pagesApi.getAll() || []).length + 1;
+          const existingIds = new Set((pagesApi.getAll() || []).map((p: any) => p.getId()));
+          let newId = base + idx;
+          while (existingIds.has(newId)) {
+            idx += 1;
+            newId = base + idx;
+          }
+          const newPage = pagesApi.add({ id: newId });
+          pagesApi.setActive(newPage);
+          renderPagesList();
+        });
+        controls.appendChild(addBtn);
+        pagesPanel.appendChild(controls);
+
+        const all = pagesApi.getAll();
+        const active = getActivePage();
+
+        if (!all || all.length === 0) {
+          const empty = document.createElement('div');
+          empty.textContent = 'No pages yet';
+          empty.style.fontSize = '12px';
+          empty.style.color = '#6b7280';
+          listWrap.appendChild(empty);
+          pagesPanel.appendChild(listWrap);
+          return;
+        }
+
+        all.forEach((pg: any) => {
+          const row = document.createElement('button');
+          row.type = 'button';
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          row.style.justifyContent = 'space-between';
+          row.style.border = '1px solid #e5e7eb';
+          row.style.padding = '6px 8px';
+          row.style.borderRadius = '6px';
+          row.style.fontSize = '12px';
+          row.style.color = '#111827';
+          row.style.textAlign = 'left';
+          row.style.background = '#ffffff';
+
+          const label = document.createElement('span');
+          label.textContent = (pg.getId && pg.getId()) || 'page';
+          const status = document.createElement('span');
+          status.textContent = (active && active.getId && active.getId() === pg.getId()) ? 'Active' : '';
+          status.style.color = '#059669';
+          status.style.fontWeight = '600';
+          status.style.fontSize = '11px';
+
+          row.appendChild(label);
+          row.appendChild(status);
+          row.addEventListener('click', () => {
+            setActivePage(pg);
+            renderPagesList();
+          });
+          listWrap.appendChild(row);
+        });
+
+        pagesPanel.appendChild(listWrap);
+      };
+
+      // Command to toggle the simple placeholder panel
+      if (!cmdm.has('open-pages-panel')) {
+        cmdm.add('open-pages-panel', {
+          run() {
+            if (!pagesPanel.parentElement && viewsEl) {
+              viewsEl.appendChild(pagesPanel);
+            }
+            renderPagesList();
+            pagesPanel.style.display = '';
+          },
+          stop() {
+            pagesPanel.style.display = 'none';
+          }
+        });
+      }
+
+      // Ensure attachment after editor is fully loaded
+      editor.on('load', () => {
+        // Re-resolve container on load in case structure changed
+        if (!pagesPanel.parentElement) {
+          let target = viewsEl;
+          if (!target && containerEl) {
+            target = (containerEl.querySelector('.gjs-pn-views-container') as HTMLElement)
+              || (containerEl.querySelector('.gjs-pn-views') as HTMLElement)
+              || (containerEl.querySelector('.gjs-pn-panel.gjs-pn-views-container') as HTMLElement)
+              || null;
+          }
+          if (target) {
+            target.appendChild(pagesPanel);
+          }
+        }
+      });
 
       // Add and beautify tooltips
       [['sw-visibility', 'Show Borders'], ['preview', 'Preview'], ['fullscreen', 'Fullscreen'],
@@ -693,10 +897,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       .forEach(function(item) {
         pn.getButton('views', item[0])?.set('attributes', {title: item[1], 'data-tooltip-pos': 'bottom'});
       });
-
-      
-
-
 
         // Do stuff on load
         editor.on('load', function() {
@@ -785,7 +985,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
 
               // Find the corresponding GrapeJS component
               const components = editor.DomComponents.getComponents();
-              let foundComponent = null;
+              let foundComponent: any = null;
 
               components.forEach((comp: any) => {
                 const compDraggableRectId = comp.get('draggableRectId');
@@ -881,8 +1081,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                   element.style.height = storedHeight;
 
                   // Update GrapeJS component style
-                  const currentStyle = component.getStyle();
-                  component.setStyle({
+                  const currentStyle = foundComponent.getStyle();
+                  foundComponent.setStyle({
                     ...currentStyle,
                     top: storedTop,
                     left: storedLeft,
@@ -1323,13 +1523,13 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             init() {
               // Store coordinates in HTML data attributes whenever style changes
               this.on('change:style', () => {
-                const style = this.getStyle();
+                const style: any = this.getStyle();
                 const view = this.getView();
                 if (view && view.el) {
-                  view.el.setAttribute('data-top', style.top || '50px');
-                  view.el.setAttribute('data-left', style.left || '50px');
-                  view.el.setAttribute('data-width', style.width || '200px');
-                  view.el.setAttribute('data-height', style.height || '150px');
+                  view.el.setAttribute('data-top', String(style.top || '50px'));
+                  view.el.setAttribute('data-left', String(style.left || '50px'));
+                  view.el.setAttribute('data-width', String(style.width || '200px'));
+                  view.el.setAttribute('data-height', String(style.height || '150px'));
                 }
               });
             }
@@ -1890,7 +2090,3 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
     </div>
   );
 }
-
-
-
-
