@@ -129,6 +129,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
             <div className="space-y-2">
               {TEMPLATE_CATEGORIES.map((category) => (
                 <button
+                  type="button"
                   key={category.id}
                   onClick={() => {
                     setSelectedCategory(category.id);
@@ -167,6 +168,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredTemplates.map((template) => (
                 <button
+                  type="button"
                   key={template.id}
                   onClick={() => setSelectedTemplate(template.id)}
                   className={`p-4 border-2 rounded-lg text-left transition-all duration-200 ${
