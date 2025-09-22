@@ -734,21 +734,26 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       pagesPanel.style.border = '1px solid #e5e7eb';
       pagesPanel.style.borderRadius = '6px';
       pagesPanel.style.marginTop = '6px';
+      pagesPanel.style.alignSelf = 'stretch';
+      pagesPanel.style.width = '100%';
       pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin-bottom:6px">Pages</div>';
       if (viewsEl) {
         viewsEl.appendChild(pagesPanel);
       }
 
       // Simple custom pages store fallback for vanilla GrapesJS
-      const customPages: { data: Record<string, { html: string; css: string }>; activeId: string } = {
+      const customPages: { data: Record<string, { html: string; css: string }>; activeId: string; order: string[] } = {
         data: {},
-        activeId: ''
+        activeId: '',
+        order: []
       };
+      (editor as any).__customPagesStore = customPages;
       const getPagesApi = () => (editor as any).Pages;
       const ensureDefaultCustomPage = () => {
         if (!customPages.activeId && Object.keys(customPages.data).length === 0) {
           customPages.data['page-1'] = { html: String(editor.getHtml()), css: String(editor.getCss()) };
           customPages.activeId = 'page-1';
+          customPages.order = ['page-1'];
         }
       };
       const setActivePage = (pageOrId: any) => {
@@ -855,7 +860,12 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         if (pagesApi && pagesApi.getAll) {
           all = pagesApi.getAll();
         } else {
-          all = Object.keys(customPages.data).map((id) => ({ getId: () => id }));
+          // Ensure order list is kept in sync with data
+          customPages.order = customPages.order.filter((id) => customPages.data[id]);
+          Object.keys(customPages.data).forEach((id) => {
+            if (!customPages.order.includes(id)) customPages.order.push(id);
+          });
+          all = customPages.order.map((id) => ({ getId: () => id }));
         }
         const active = getActivePage();
 
@@ -869,9 +879,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           return;
         }
 
-        all.forEach((pg: any) => {
-          const row = document.createElement('button');
-          row.type = 'button';
+        all.forEach((pg: any, index: number) => {
+          const row = document.createElement('div');
           row.style.display = 'flex';
           row.style.alignItems = 'center';
           row.style.justifyContent = 'space-between';
@@ -880,8 +889,17 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           row.style.borderRadius = '6px';
           row.style.fontSize = '12px';
           row.style.color = '#111827';
-          row.style.textAlign = 'left';
           row.style.background = '#ffffff';
+
+          const left = document.createElement('button');
+          left.type = 'button';
+          left.style.display = 'flex';
+          left.style.alignItems = 'center';
+          left.style.gap = '8px';
+          left.style.background = 'transparent';
+          left.style.border = 'none';
+          left.style.padding = '0';
+          left.style.cursor = 'pointer';
 
           const label = document.createElement('span');
           label.textContent = ((pg.getId && (pg.getId() as string)) || 'page');
@@ -893,12 +911,94 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           status.style.fontWeight = '600';
           status.style.fontSize = '11px';
 
-          row.appendChild(label);
-          row.appendChild(status);
-          row.addEventListener('click', () => {
+          left.appendChild(label);
+          left.appendChild(status);
+          left.addEventListener('click', () => {
             setActivePage(pg);
             renderPagesList();
           });
+
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.gap = '6px';
+
+          if (!pagesApi || !pagesApi.getAll) {
+            const upBtn = document.createElement('button');
+            upBtn.type = 'button';
+            upBtn.textContent = '↑';
+            upBtn.className = 'gjs-btn';
+            upBtn.style.padding = '2px 6px';
+            upBtn.disabled = index === 0;
+            upBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const idx = customPages.order.indexOf(rowId);
+              if (idx > 0) {
+                const tmp = customPages.order[idx - 1];
+                customPages.order[idx - 1] = customPages.order[idx];
+                customPages.order[idx] = tmp;
+                renderPagesList();
+              }
+            });
+
+            const downBtn = document.createElement('button');
+            downBtn.type = 'button';
+            downBtn.textContent = '↓';
+            downBtn.className = 'gjs-btn';
+            downBtn.style.padding = '2px 6px';
+            downBtn.disabled = index === all.length - 1;
+            downBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const idx = customPages.order.indexOf(rowId);
+              if (idx > -1 && idx < customPages.order.length - 1) {
+                const tmp = customPages.order[idx + 1];
+                customPages.order[idx + 1] = customPages.order[idx];
+                customPages.order[idx] = tmp;
+                renderPagesList();
+              }
+            });
+
+            right.appendChild(upBtn);
+            right.appendChild(downBtn);
+          }
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.textContent = 'Delete';
+          delBtn.className = 'gjs-btn';
+          delBtn.style.padding = '2px 6px';
+          delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!pagesApi) {
+              const wasActive = customPages.activeId === rowId;
+              delete customPages.data[rowId];
+              customPages.order = customPages.order.filter((id) => id !== rowId);
+              if (customPages.order.length === 0) {
+                customPages.data['page-1'] = { html: '', css: '' };
+                customPages.order = ['page-1'];
+                customPages.activeId = 'page-1';
+                editor.setComponents('');
+                editor.setStyle('');
+              } else if (wasActive) {
+                // Select first page explicitly after deletion
+                const firstId = customPages.order[0];
+                setActivePage(firstId);
+              }
+              renderPagesList();
+            } else {
+              const removeFn = (pagesApi as any).remove || (pagesApi as any).delete || (pagesApi as any).removePage;
+              if (typeof removeFn === 'function') {
+                try { removeFn.call(pagesApi, pg); } catch {}
+                renderPagesList();
+              } else {
+                alert('Remove not supported in this GrapesJS build.');
+              }
+            }
+          });
+
+          right.appendChild(delBtn);
+
+          row.appendChild(left);
+          row.appendChild(right);
           listWrap.appendChild(row);
         });
 
@@ -909,9 +1009,14 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       if (!cmdm.has('open-pages-panel')) {
         cmdm.add('open-pages-panel', {
           run() {
-            if (!pagesPanel.parentElement && viewsEl) {
-              viewsEl.appendChild(pagesPanel);
-            }
+        if (!pagesPanel.parentElement && viewsEl) {
+          viewsEl.appendChild(pagesPanel);
+          // Force layout to start at top-left
+          (viewsEl as HTMLElement).style.display = 'flex';
+          (viewsEl as HTMLElement).style.flexDirection = 'column';
+          (viewsEl as HTMLElement).style.alignItems = 'stretch';
+          (viewsEl as HTMLElement).style.justifyContent = 'flex-start';
+        }
             renderPagesList();
             pagesPanel.style.display = '';
           },
@@ -970,6 +1075,20 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         
         // Add a small delay to ensure DOM is fully ready
         setTimeout(function() {
+        // Inject A4 page styling into the canvas frame for WYSIWYG sizing
+        try {
+          const frame = editor.Canvas.getFrameEl();
+          const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+          if (doc) {
+            const styleEl = doc.createElement('style');
+            styleEl.setAttribute('data-a4-style', 'true');
+            styleEl.textContent = `@page { size: A4; margin: 0; }
+html, body { margin: 0; padding: 0; }
+body { width: 210mm; min-height: 297mm; box-sizing: border-box; }
+`; 
+            doc.head && doc.head.appendChild(styleEl);
+          }
+        } catch {}
 
         // Store draggable rectangle metadata for later reinitialization
         let rectangleCounter = 0;
@@ -1856,22 +1975,52 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
     
     try {
       const editor = (window as any).grapesEditor;
-      const html = editor.getHtml();
-      const css = editor.getCss();
       const projectData = editor.getProjectData();
-      
-      // Combine HTML and CSS into a complete document
-      const fullHtml = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>${css}</style>
-</head>
-<body>${html}</body>
-</html>`;
 
-      await onSave(fullHtml, projectData);
+      // Build per-page HTML documents for server-side rendering
+      const pagesApi = (editor as any).Pages;
+      const customStore = (editor as any).__customPagesStore as
+        | { data: Record<string, { html: string; css: string }>; order: string[]; activeId: string }
+        | undefined;
+
+      const a4Css = '@page{size:A4;margin:0} html,body{margin:0;padding:0} body{width:210mm;min-height:297mm;box-sizing:border-box}';
+
+      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${a4Css}</style><style>${css||''}</style></head><body>${html||''}</body></html>`;
+
+      const pagesPayload: Record<string, string> = {};
+      if (pagesApi && pagesApi.getAll) {
+        // Iterate all pages using API
+        const current = (typeof pagesApi.getActive === 'function' ? pagesApi.getActive() : (pagesApi as any).getSelected?.());
+        const all = pagesApi.getAll();
+        for (const pg of all) {
+          // Activate each page and capture
+          if (typeof (pagesApi as any).select === 'function') (pagesApi as any).select(pg);
+          else if (typeof (pagesApi as any).setActive === 'function') (pagesApi as any).setActive(pg);
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          const id = pg.getId ? pg.getId() : undefined;
+          if (id) pagesPayload[id] = buildDoc(String(html), String(css));
+        }
+        // Restore current
+        if (current) {
+          if (typeof (pagesApi as any).select === 'function') (pagesApi as any).select(current);
+          else if (typeof (pagesApi as any).setActive === 'function') (pagesApi as any).setActive(current);
+        }
+      } else if (customStore) {
+        // Use the custom pages store and its order
+        customStore.order.forEach((id) => {
+          const entry = customStore.data[id];
+          pagesPayload[id] = buildDoc(entry?.html || '', entry?.css || '');
+        });
+      } else {
+        // Single-page fallback
+        pagesPayload['page-1'] = buildDoc(String(editor.getHtml()), String(editor.getCss()));
+      }
+
+      // Also keep current page as fullHtml for backward compatibility
+      const fullHtml = pagesPayload[Object.keys(pagesPayload)[0]];
+
+      await onSave(fullHtml, { ...projectData, __pages_html__: pagesPayload });
     } catch (error) {
       // Silent error handling
     } finally {
