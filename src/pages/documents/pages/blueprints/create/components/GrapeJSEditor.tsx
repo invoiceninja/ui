@@ -260,20 +260,37 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
     styleElement.textContent = iconStyles;
     document.head.appendChild(styleElement);
 
+    try { console.log('[pagedjs] GrapeJSEditor mounted - preparing to initialize editor'); } catch {}
+
 
 
     const initializeEditor = () => {
+      try { console.log('[pagedjs] initializeEditor()'); } catch {}
       if (!editorRef.current) {
+        try { console.warn('[pagedjs] initializeEditor: editorRef.current missing'); } catch {}
         return;
       }
 
       // Check if the container is properly mounted
       if (!editorRef.current.parentNode) {
+        try { console.warn('[pagedjs] initializeEditor: editorRef has no parentNode yet'); } catch {}
         return;
       }
 
       // Prevent multiple initializations
       if ((window as any).grapesEditor) {
+        try { console.log('[pagedjs] initializeEditor: grapesEditor already exists, skipping editor init'); } catch {}
+        // Still run paged.js even if editor exists (DISABLED FOR NOW)
+        try {
+          console.log('[pagedjs] Running paged.js setup for existing editor - DISABLED');
+          // const frame = (window as any).grapesEditor.Canvas.getFrameEl();
+          // if (frame) {
+          //   injectPagedJsIntoFrame();
+          //   startPagedWatchdog();
+          // }
+        } catch (e) {
+          console.warn('[pagedjs] Error running paged.js for existing editor', e);
+        }
         return;
       }
     try {
@@ -587,6 +604,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         },
       });
 
+      try { console.log('[pagedjs] GrapesJS initialized'); } catch {}
+
       editor.I18n.addMessages({
         en: {
           styleManager: {
@@ -781,7 +800,233 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           document.head.appendChild(style);
         }
       };
-      ensurePagesPanelGlobalStyles();
+      // ensurePagesPanelGlobalStyles();
+
+      // --------- paged.js integration helpers ---------
+      const debounce = (fn: Function, wait = 150) => {
+        let t: any;
+        return (...args: any[]) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...args), wait);
+        };
+      };
+
+      const getPxPerMm = (doc: Document) => {
+        try {
+          const probe = doc.createElement('div');
+          probe.style.width = '100mm';
+          probe.style.position = 'absolute';
+          probe.style.visibility = 'hidden';
+          doc.body.appendChild(probe);
+          const pxPerMm = probe.getBoundingClientRect().width / 100;
+          probe.remove();
+          console.log('[pagedjs] pxPerMm measured:', pxPerMm);
+          return pxPerMm || 3.78;
+        } catch {
+          console.warn('[pagedjs] pxPerMm measurement failed, using fallback 3.78');
+          return 3.78;
+        }
+      };
+
+      const buildPageMapFromPaged = (doc: Document) => {
+        const pages = Array.from(doc.querySelectorAll('.pagedjs_page')) as HTMLElement[];
+        if (!pages.length) {
+          console.warn('[pagedjs] No .pagedjs_page elements found');
+          return { boundaries: null as number[] | null, pageHeightPx: 0 };
+        }
+        const boundaries = pages
+          .map((p) => p.getBoundingClientRect().top + (doc.defaultView?.scrollY || doc.documentElement.scrollTop || doc.body.scrollTop || 0))
+          .sort((a, b) => a - b);
+        console.log('[pagedjs] Page boundaries built from paged.js:', boundaries);
+        return { boundaries, pageHeightPx: 0 };
+      };
+
+      const buildFixedA4PageMap = (doc: Document) => {
+        const pxPerMm = getPxPerMm(doc);
+        const pageHeightPx = 297 * pxPerMm;
+        console.log('[pagedjs] Using fixed A4 page map. pageHeightPx=', pageHeightPx);
+        return { boundaries: null as number[] | null, pageHeightPx };
+      };
+
+      const yToPage = (yDocPx: number, pageMap: { boundaries: number[] | null, pageHeightPx: number }) => {
+        if (!pageMap.boundaries || !pageMap.boundaries.length) {
+          const pageIndex = Math.floor(yDocPx / pageMap.pageHeightPx);
+          const yWithinPage = yDocPx - pageIndex * pageMap.pageHeightPx;
+          return { pageIndex, yWithinPage };
+        }
+        let pageIndex = 0;
+        for (let i = 0; i < pageMap.boundaries.length; i++) {
+          if (yDocPx >= pageMap.boundaries[i]) pageIndex = i + 1; else break;
+        }
+        const start = pageIndex === 0 ? 0 : pageMap.boundaries[pageIndex - 1];
+        return { pageIndex, yWithinPage: yDocPx - start };
+      };
+
+      const pageToYDoc = (pageIndex: number, yWithinPage: number, pageMap: { boundaries: number[] | null, pageHeightPx: number }) => {
+        if (!pageMap.boundaries || !pageMap.boundaries.length) return pageIndex * pageMap.pageHeightPx + yWithinPage;
+        const start = pageIndex === 0 ? 0 : pageMap.boundaries[pageIndex - 1];
+        return start + yWithinPage;
+      };
+
+      const repositionRectsFromPageData = (doc: Document, pageMap: { boundaries: number[] | null, pageHeightPx: number }) => {
+        const rects = doc.querySelectorAll('[data-draggable-rect-type="draggable-rectangle"]');
+        let repositioned = 0;
+        let initialized = 0;
+        rects.forEach((el) => {
+          const node = el as HTMLElement;
+          const pageAttr = node.getAttribute('data-page');
+          const yInPageAttr = node.getAttribute('data-y-in-page');
+          if (pageAttr != null && yInPageAttr != null) {
+            const pageIndex = Math.max(0, parseInt(pageAttr));
+            const yWithinPage = parseFloat(yInPageAttr) || 0;
+            const yDoc = pageToYDoc(pageIndex, yWithinPage, pageMap);
+            node.style.top = `${Math.max(0, Math.round(yDoc))}px`;
+            repositioned++;
+          } else {
+            // Initialize page-aware attributes from existing absolute top
+            const currentTop = parseFloat(node.style.top || '0');
+            const from = yToPage(currentTop, pageMap);
+            node.setAttribute('data-page', String(from.pageIndex));
+            node.setAttribute('data-y-in-page', String(Math.round(from.yWithinPage)));
+            initialized++;
+          }
+        });
+        if (repositioned || initialized) {
+          console.log(`[pagedjs] Rects processed — repositioned: ${repositioned}, initialized: ${initialized}`);
+        } else {
+          console.log('[pagedjs] No draggable rectangles found to reposition');
+        }
+      };
+
+      const ensureRectPageDataOnDrop = (doc: Document, pageMap: { boundaries: number[] | null, pageHeightPx: number }) => {
+        const rects = doc.querySelectorAll('[data-draggable-rect-type="draggable-rectangle"]');
+        console.log('[pagedjs] Binding mouseup (drop) handlers to', rects.length, 'rectangles');
+        rects.forEach((el) => {
+          const node = el as HTMLElement;
+          const onMouseUp = () => {
+            const currentTop = parseFloat(node.style.top || '0');
+            const from = yToPage(currentTop, pageMap);
+            node.setAttribute('data-page', String(from.pageIndex));
+            node.setAttribute('data-y-in-page', String(Math.round(from.yWithinPage)));
+            console.log('[pagedjs] Drop -> set data-page/data-y-in-page', from, 'for', node.getAttribute('data-draggable-rect-id'));
+          };
+          node.removeEventListener('mouseup', onMouseUp);
+          node.addEventListener('mouseup', onMouseUp);
+        });
+      };
+
+      const runPagedPreview = async (frame: HTMLIFrameElement) => {
+        try {
+          const win = frame.contentWindow as any;
+          if (!win) return;
+          if (win.PagedPolyfill && typeof win.PagedPolyfill.preview === 'function') {
+            console.log('[pagedjs] Running PagedPolyfill.preview()');
+            await win.PagedPolyfill.preview();
+          } else if (win.Paged && win.Paged.Previewer) {
+            const previewer = new win.Paged.Previewer();
+            console.log('[pagedjs] Running new Paged.Previewer().preview()');
+            await previewer.preview();
+          } else {
+            console.warn('[pagedjs] No paged.js preview method found in iframe window');
+          }
+        } catch {}
+      };
+
+      const injectPagedJsIntoFrame = async () => {
+        try {
+          const frame = editor.Canvas.getFrameEl();
+          const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+          if (!doc || !frame) return;
+          const head = doc.head || doc.getElementsByTagName('head')[0];
+          if (!head) return;
+          if (!doc.querySelector('script[data-pagedjs="true"]')) {
+            console.log('[pagedjs] Injecting paged.polyfill.js into canvas iframe');
+            const script = doc.createElement('script');
+            script.setAttribute('data-pagedjs', 'true');
+            script.src = 'https://unpkg.com/pagedjs/dist/paged.polyfill.js';
+            const ready = new Promise<void>((resolve) => {
+              script.addEventListener('load', () => resolve());
+              script.addEventListener('error', () => resolve());
+            });
+            head.appendChild(script);
+            await ready;
+            console.log('[pagedjs] paged.polyfill.js loaded');
+          } else {
+            console.log('[pagedjs] paged.polyfill.js already present');
+          }
+
+          // Attach paged events once
+          if (!(doc as any).__pagedHandlersAttached) {
+            (doc as any).__pagedHandlersAttached = true;
+            doc.addEventListener('paged:rendered', () => {
+              const count = doc.querySelectorAll('.pagedjs_page').length;
+              console.log('[pagedjs] Event paged:rendered — pages:', count);
+              const pageMap = buildPageMapFromPaged(doc);
+              repositionRectsFromPageData(doc, pageMap);
+              ensureRectPageDataOnDrop(doc, pageMap);
+            });
+          }
+
+          // First run and initial positioning
+          await runPagedPreview(frame);
+          const hasPages = !!doc.querySelector('.pagedjs_page');
+          console.log('[pagedjs] Initial pagination complete. hasPages=', hasPages);
+          const pageMap = (hasPages ? buildPageMapFromPaged(doc) : buildFixedA4PageMap(doc));
+          repositionRectsFromPageData(doc, pageMap);
+          ensureRectPageDataOnDrop(doc, pageMap);
+
+          // Debounced hook on editor changes
+          const triggerRepaginate = debounce(async () => {
+            console.log('[pagedjs] triggerRepaginate');
+            await runPagedPreview(frame);
+            const pm = (doc.querySelector('.pagedjs_page') ? buildPageMapFromPaged(doc) : buildFixedA4PageMap(doc));
+            repositionRectsFromPageData(doc, pm);
+          }, 200);
+
+          // Bind Grapes events once
+          if (!(editor as any).__pagedEditorEventsBound) {
+            (editor as any).__pagedEditorEventsBound = true;
+            editor.on('component:add', triggerRepaginate);
+            editor.on('component:remove', triggerRepaginate);
+            editor.on('component:update', triggerRepaginate);
+            editor.on('style:property:update', triggerRepaginate);
+          }
+        } catch {}
+      };
+
+      // Watchdog to retry paged.js injection and pagination until detected
+      const startPagedWatchdog = () => {
+        try {
+          if ((editor as any).__pagedWatchdogStarted) {
+            console.log('[pagedjs] watchdog already started');
+            return;
+          }
+          (editor as any).__pagedWatchdogStarted = true;
+          let tries = 0;
+          const maxTries = 20;
+          const timer = setInterval(async () => {
+            tries++;
+            try {
+              const frame = editor.Canvas.getFrameEl();
+              const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+              console.log(`[pagedjs] watchdog tick ${tries}/${maxTries}`, !!doc);
+              await injectPagedJsIntoFrame();
+              if (doc && (doc.querySelector('.pagedjs_page') || doc.querySelector('script[data-pagedjs="true"]'))) {
+                console.log('[pagedjs] watchdog: pagination/script present, stopping');
+                clearInterval(timer);
+              }
+            } catch (e) {
+              console.warn('[pagedjs] watchdog error', e);
+            }
+            if (tries >= maxTries) {
+              console.log('[pagedjs] watchdog: max tries reached');
+              clearInterval(timer);
+            }
+          }, 1000);
+        } catch (e) {
+          console.warn('[pagedjs] startPagedWatchdog error', e);
+        }
+      };
 
       // A4 frame styles toggle/shared function
       let isA4Scrollable = true;
@@ -1420,6 +1665,9 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         editor.on('canvas:frame:load', function() {
           setTimeout(() => {
             reinitializeDraggableRectangles();
+            console.log('[pagedjs] canvas:frame:load -> initializing paged.js');
+            injectPagedJsIntoFrame();
+            startPagedWatchdog();
           }, 2000);
         });
 
@@ -1427,6 +1675,9 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         editor.on('load', function() {
           setTimeout(() => {
             reinitializeDraggableRectangles();
+            console.log('[pagedjs] editor load -> initializing paged.js');
+            injectPagedJsIntoFrame();
+            startPagedWatchdog();
           }, 3000);
         });
 
@@ -1519,14 +1770,9 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
               max_preserve_newlines: 2,
               preserve_newlines: true,
               indent_scripts: 'normal',
-            //   space_before_conditional: true,
-            //   unescape_strings: false,
-            //   jslint_happy: false,
               end_with_newline: true,
               wrap_line_length: 120,
               indent_inner_html: true,
-            //   comma_first: false,
-            //   e4x: false,
               indent_empty_lines: false
             });
             
@@ -1535,15 +1781,8 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
               indent_char: ' ',
               max_preserve_newlines: 2,
               preserve_newlines: true,
-            //   break_chained_methods: false,
-            //   brace_style: 'collapse',
-            //   space_before_conditional: true,
-            //   unescape_strings: false,
-            //   jslint_happy: false,
               end_with_newline: true,
               wrap_line_length: 120,
-            //   comma_first: false,
-            //   e4x: false,
               indent_empty_lines: false
             });
             
@@ -1600,19 +1839,14 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
           }
         });
 
-        // Block manager is already opened above
-
-
         }, 100); // Close setTimeout with 100ms delay
 
       });
         // Add only custom placeholder blocks - let GrapeJS handle default blocks
         const blockManager = editor.BlockManager;
         
-        // Register custom component types BEFORE loading any project data
         const domc = editor.DomComponents;
 
-        // Register draggable rectangle component type FIRST
         domc.addType('draggable-rectangle', {
           model: {
             defaults: {
@@ -2045,6 +2279,16 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         // Store editor reference for cleanup
         (window as any).grapesEditor = editor;
 
+        // Add simple A4 page guides without interfering with GrapeJS
+        try {
+          console.log('[pagedjs] Editor ready, adding A4 page guides');
+          setTimeout(() => {
+            addA4PageGuides();
+          }, 1000);
+        } catch (e) {
+          console.warn('[pagedjs] Error adding page guides', e);
+        }
+
         // Load project data if provided
         if (initialProjectData) {
           try {
@@ -2071,11 +2315,40 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
       }
     };
 
+    const startInitWatchdog = () => {
+      try {
+        if (isInitialized.current) {
+          console.log('[pagedjs] init watchdog: already initialized, skipping');
+          return;
+        }
+        let tries = 0;
+        const maxTries = 40; // ~10s at 250ms
+        const id = setInterval(() => {
+          tries++;
+          const el = editorRef.current as HTMLElement | null;
+          const ready = !!(el && el.isConnected && el.parentNode);
+          if (ready) {
+            clearInterval(id);
+            console.log('[pagedjs] init watchdog: editorRef ready, initializing');
+            initializeEditor();
+            return;
+          }
+          if (tries % 8 === 0) {
+            console.log(`[pagedjs] init watchdog: waiting for editorRef (${tries}/${maxTries})`);
+          }
+          if (tries >= maxTries) {
+            clearInterval(id);
+            console.warn('[pagedjs] init watchdog: max tries reached without editorRef');
+          }
+        }, 250);
+      } catch (e) {
+        console.warn('[pagedjs] startInitWatchdog error', e);
+      }
+    };
 
-    // Add a longer delay to ensure DOM is fully ready
-    setTimeout(() => {
-      initializeEditor();
-    }, 500);
+
+    // Wait for the canvas ref to mount before initializing
+    startInitWatchdog();
     
     // Cleanup function
     return () => {
