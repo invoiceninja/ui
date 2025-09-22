@@ -102,6 +102,9 @@ import {
   formatQuote,
 } from './utils';
 import { useColorScheme } from '$app/common/colors';
+import { useTranslation } from 'react-i18next';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
 
 const rootTypeToRootName = {
   root: 'Root',
@@ -582,7 +585,11 @@ export default function ToolbarPlugin({
   setActiveEditor: Dispatch<LexicalEditor>;
   setIsLinkEditMode: Dispatch<boolean>;
 }): JSX.Element {
+  const [t] = useTranslation();
+
   const colors = useColorScheme();
+
+  const reactSettings = useReactSettings();
 
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
     null
@@ -905,7 +912,10 @@ export default function ToolbarPlugin({
 
   return (
     <div
-      className="toolbar"
+      className={classNames('toolbar', {
+        'toolbar-light': !reactSettings.dark_mode,
+        'toolbar-dark': reactSettings.dark_mode,
+      })}
       style={{ borderBottom: `1px solid ${colors.$24}` }}
     >
       <button
@@ -913,12 +923,14 @@ export default function ToolbarPlugin({
         onClick={() => {
           activeEditor.dispatchCommand(UNDO_COMMAND, undefined);
         }}
-        title={IS_APPLE ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
+        title={
+          IS_APPLE ? (t('undo_apple') as string) : (t('undo_windows') as string)
+        }
         type="button"
         className="toolbar-item spaced"
         aria-label="Undo"
       >
-        <i className="format undo" />
+        <i className="format undo" style={{ color: 'white' }} />
       </button>
       <button
         disabled={!toolbarState.canRedo || !isEditable}
@@ -932,6 +944,7 @@ export default function ToolbarPlugin({
       >
         <i className="format redo" />
       </button>
+
       <Divider />
       {toolbarState.blockType in blockTypeToBlockName &&
         activeEditor === editor && (

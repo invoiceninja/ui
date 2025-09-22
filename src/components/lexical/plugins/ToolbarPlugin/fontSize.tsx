@@ -150,6 +150,7 @@ export default function FontSize({
         style={{
           color: colors.$3,
           borderColor: colors.$24,
+          backgroundColor: 'transparent',
         }}
       />
 

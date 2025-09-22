@@ -74,6 +74,7 @@ import { useSharedHistoryContext } from './context/SharedHistoryContext';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import CodeHighlightPrismPlugin from './plugins/CodeHighlightPrismPlugin';
 import TableOfContentsPlugin from './plugins/TableOfContentsPlugin';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 
 interface Props {
   value: string;
@@ -186,6 +187,9 @@ export function Editor({
         <SpeechToTextPlugin />
         <AutoLinkPlugin />
         <DateTimePlugin />
+        <OnChangePlugin
+          onChange={(editor, editorr) => console.log(JSON.stringify(editor))}
+        />
 
         <HistoryPlugin externalHistoryState={historyState} />
 

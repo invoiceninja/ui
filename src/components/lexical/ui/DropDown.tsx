@@ -6,9 +6,9 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from 'react';
 
-import {isDOMNode} from 'lexical';
+import { isDOMNode } from 'lexical';
 import * as React from 'react';
 import {
   ReactNode,
@@ -18,7 +18,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import {createPortal} from 'react-dom';
+import { createPortal } from 'react-dom';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 type DropDownContextType = {
   registerItem: (ref: React.RefObject<HTMLButtonElement>) => void;
@@ -47,7 +49,7 @@ export function DropDownItem({
     throw new Error('DropDownItem must be used within a DropDown');
   }
 
-  const {registerItem} = dropDownContext;
+  const { registerItem } = dropDownContext;
 
   useEffect(() => {
     if (ref && ref.current) {
@@ -61,7 +63,8 @@ export function DropDownItem({
       onClick={onClick}
       ref={ref}
       title={title}
-      type="button">
+      type="button"
+    >
       {children}
     </button>
   );
@@ -76,6 +79,8 @@ function DropDownItems({
   dropDownRef: React.Ref<HTMLDivElement>;
   onClose: () => void;
 }) {
+  const reactSettings = useReactSettings();
+
   const [items, setItems] = useState<React.RefObject<HTMLButtonElement>[]>();
   const [highlightedItem, setHighlightedItem] =
     useState<React.RefObject<HTMLButtonElement>>();
@@ -84,7 +89,7 @@ function DropDownItems({
     (itemRef: React.RefObject<HTMLButtonElement>) => {
       setItems((prev) => (prev ? [...prev, itemRef] : [itemRef]));
     },
-    [setItems],
+    [setItems]
   );
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -122,7 +127,7 @@ function DropDownItems({
     () => ({
       registerItem,
     }),
-    [registerItem],
+    [registerItem]
   );
 
   useEffect(() => {
@@ -137,7 +142,14 @@ function DropDownItems({
 
   return (
     <DropDownContext.Provider value={contextValue}>
-      <div className="dropdown" ref={dropDownRef} onKeyDown={handleKeyDown}>
+      <div
+        className={classNames('dropdown shadow-lg', {
+          'dropdown-light': !reactSettings.dark_mode,
+          'dropdown-dark': reactSettings.dark_mode,
+        })}
+        ref={dropDownRef}
+        onKeyDown={handleKeyDown}
+      >
         {children}
       </div>
     </DropDownContext.Provider>
@@ -177,11 +189,11 @@ export default function DropDown({
     const dropDown = dropDownRef.current;
 
     if (showDropDown && button !== null && dropDown !== null) {
-      const {top, left} = button.getBoundingClientRect();
+      const { top, left } = button.getBoundingClientRect();
       dropDown.style.top = `${top + button.offsetHeight + dropDownPadding}px`;
       dropDown.style.left = `${Math.min(
         left,
-        window.innerWidth - dropDown.offsetWidth - 20,
+        window.innerWidth - dropDown.offsetWidth - 20
       )}px`;
     }
   }, [dropDownRef, buttonRef, showDropDown]);
@@ -218,7 +230,7 @@ export default function DropDown({
         const button = buttonRef.current;
         const dropDown = dropDownRef.current;
         if (button !== null && dropDown !== null) {
-          const {top} = button.getBoundingClientRect();
+          const { top } = button.getBoundingClientRect();
           const newPosition = top + button.offsetHeight + dropDownPadding;
           if (newPosition !== dropDown.getBoundingClientRect().top) {
             dropDown.style.top = `${newPosition}px`;
@@ -242,7 +254,8 @@ export default function DropDown({
         aria-label={buttonAriaLabel || buttonLabel}
         className={buttonClassName}
         onClick={() => setShowDropDown(!showDropDown)}
-        ref={buttonRef}>
+        ref={buttonRef}
+      >
         {buttonIconClassName && <span className={buttonIconClassName} />}
         {buttonLabel && (
           <span className="text dropdown-button-text">{buttonLabel}</span>
@@ -255,7 +268,7 @@ export default function DropDown({
           <DropDownItems dropDownRef={dropDownRef} onClose={handleClose}>
             {children}
           </DropDownItems>,
-          document.body,
+          document.body
         )}
     </>
   );

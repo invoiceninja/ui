@@ -612,6 +612,22 @@ i.page-break,
   background-color: rgb(223, 232, 250);
 }
 
+.toolbar-light > button {
+  background-color: transparent !important;
+}
+
+.toolbar-dark > button {
+  background-color: rgb(18, 18, 18) !important;
+}
+
+.toolbar-dark .dropdown {
+  background-color: rgb(18, 18, 18) !important;
+}
+
+.toolbar-dark > button > i {
+  filter: invert(1) !important;
+}
+
 .link-editor .link-input {
   display: block;
   width: calc(100% - 75px);
@@ -755,17 +771,36 @@ i.page-break,
   z-index: 100;
   display: block;
   position: fixed;
-  box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
   border-radius: 8px;
   min-height: 40px;
-  background-color: #fff;
+}
+
+.dropdown-dark {
+  background-color: rgb(18, 18, 18) !important;
+  border: 1px solid #323236 !important;
+}
+
+.dropdown-dark .item {
+  background-color: rgb(18, 18, 18) !important;
+  color: #fff;
+}
+
+.dropdown-dark .icon {
+  filter: invert(1) !important;
+}
+
+.dropdown-light {
+  background-color: #fff !important;
+  border: 1px solid #f4f4f5 !important;
+}
+
+.dropdown-light .item {
+  background-color: #fff !important;
 }
 
 .dropdown .item {
   margin: 0 8px 0 8px;
   padding: 8px;
-  color: #050505;
   cursor: pointer;
   line-height: 16px;
   font-size: 15px;
@@ -774,7 +809,6 @@ i.page-break,
   flex-direction: row;
   flex-shrink: 0;
   justify-content: space-between;
-  background-color: #fff;
   border-radius: 8px;
   border: 0;
   max-width: 264px;
@@ -1560,7 +1594,6 @@ button.toolbar-item.active i {
   line-height: 20px;
   vertical-align: middle;
   font-size: 14px;
-  color: #777;
   text-overflow: ellipsis;
   overflow: hidden;
   height: 20px;
@@ -1576,6 +1609,14 @@ button.toolbar-item.active i {
   margin-right: 8px;
   line-height: 16px;
   background-size: contain;
+}
+
+.toolbar-dark .toolbar-item .icon {
+  filter: invert(1);
+}
+
+.toolbar-light .toolbar-item .icon {
+  filter: invert(0);
 }
 
 .toolbar i.chevron-down,
@@ -1599,8 +1640,27 @@ button.toolbar-item.active i {
 
 .toolbar .divider {
   width: 1px;
-  background-color: #eee;
   margin: 0 4px;
+}
+
+.toolbar-dark .divider {
+  background-color: #323236;
+}
+
+.dropdown-dark .divider {
+  background-color: #323236;
+}
+
+.toolbar-light .divider {
+  background-color: #eee;
+}
+
+.dropdown-light .divider {
+  background-color: #eee;
+}
+
+.floating-text-format-popup-dark .divider {
+  background-color: #323236;
 }
 
 .sticky-note-container {
