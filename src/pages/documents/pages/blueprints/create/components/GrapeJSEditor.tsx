@@ -739,20 +739,52 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         viewsEl.appendChild(pagesPanel);
       }
 
-      // Helpers for Pages API with graceful fallbacks across GrapesJS versions
+      // Simple custom pages store fallback for vanilla GrapesJS
+      const customPages: { data: Record<string, { html: string; css: string }>; activeId: string } = {
+        data: {},
+        activeId: ''
+      };
       const getPagesApi = () => (editor as any).Pages;
+      const ensureDefaultCustomPage = () => {
+        if (!customPages.activeId && Object.keys(customPages.data).length === 0) {
+          customPages.data['page-1'] = { html: String(editor.getHtml()), css: String(editor.getCss()) };
+          customPages.activeId = 'page-1';
+        }
+      };
       const setActivePage = (pageOrId: any) => {
         const api = getPagesApi();
-        if (!api) return;
-        if (typeof api.setActive === 'function') return api.setActive(pageOrId);
-        if (typeof api.select === 'function') return api.select(pageOrId);
+        // Use GrapesJS Pages API if available
+        if (api) {
+          if (typeof api.setActive === 'function') return api.setActive(pageOrId);
+          if (typeof api.select === 'function') return api.select(pageOrId);
+        }
+        // Fallback to custom pages: save current then load target
+        ensureDefaultCustomPage();
+        if (customPages.activeId) {
+          customPages.data[customPages.activeId] = { html: String(editor.getHtml()), css: String(editor.getCss()) };
+        }
+        const targetId: string = typeof pageOrId === 'string'
+          ? pageOrId
+          : ((pageOrId && (pageOrId.id as string))
+            || ((pageOrId && typeof pageOrId.getId === 'function' && (pageOrId.getId() as string)) || ''));
+        if (!targetId) return;
+        customPages.activeId = targetId;
+        const target = customPages.data[targetId];
+        if (target) {
+          editor.setComponents(target.html || '');
+          editor.setStyle(target.css || '');
+          editor.refresh();
+        }
       };
       const getActivePage = () => {
         const api = getPagesApi();
-        if (!api) return null;
-        if (typeof api.getActive === 'function') return api.getActive();
-        if (typeof api.getSelected === 'function') return api.getSelected();
-        return null;
+        if (api) {
+          if (typeof api.getActive === 'function') return api.getActive();
+          if (typeof api.getSelected === 'function') return api.getSelected();
+        }
+        // Fallback
+        ensureDefaultCustomPage();
+        return { getId: () => customPages.activeId } as any;
       };
 
       // Helper to render the current pages list with active selection
@@ -765,20 +797,13 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           const first = pagesApi.add({ id: 'page-1' });
           setActivePage(first);
         }
+        if (!pagesApi) {
+          ensureDefaultCustomPage();
+        }
         const listWrap = document.createElement('div');
         listWrap.style.display = 'flex';
         listWrap.style.flexDirection = 'column';
         listWrap.style.gap = '6px';
-
-        if (!pagesApi || !pagesApi.getAll) {
-          const empty = document.createElement('div');
-          empty.textContent = 'Pages API not available';
-          empty.style.fontSize = '12px';
-          empty.style.color = '#6b7280';
-          listWrap.appendChild(empty);
-          pagesPanel.appendChild(listWrap);
-          return;
-        }
 
         const controls = document.createElement('div');
         controls.style.display = 'flex';
@@ -792,21 +817,46 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         addBtn.style.borderRadius = '4px';
         addBtn.addEventListener('click', () => {
           const base = 'page-';
-          let idx = (pagesApi.getAll() || []).length + 1;
-          const existingIds = new Set((pagesApi.getAll() || []).map((p: any) => p.getId()));
-          let newId = base + idx;
-          while (existingIds.has(newId)) {
-            idx += 1;
-            newId = base + idx;
+          let existingIds: Set<string>;
+          let nextIndex: number;
+          if (pagesApi && pagesApi.getAll) {
+            nextIndex = (pagesApi.getAll() || []).length + 1;
+            existingIds = new Set((pagesApi.getAll() || []).map((p: any) => p.getId()));
+          } else {
+            existingIds = new Set(Object.keys(customPages.data));
+            nextIndex = existingIds.size + 1;
           }
-          const newPage = pagesApi.add({ id: newId });
-          pagesApi.setActive(newPage);
+          let newId = base + nextIndex;
+          while (existingIds.has(newId)) {
+            nextIndex += 1;
+            newId = base + nextIndex;
+          }
+          if (pagesApi && pagesApi.add) {
+            const newPage = pagesApi.add({ id: newId });
+            setActivePage(newPage);
+          } else {
+            // Save current page content before switching
+            ensureDefaultCustomPage();
+            if (customPages.activeId) {
+              customPages.data[customPages.activeId] = { html: String(editor.getHtml()), css: String(editor.getCss()) };
+            }
+            customPages.data[newId] = { html: '', css: '' };
+            customPages.activeId = newId;
+            editor.setComponents('');
+            editor.setStyle('');
+            editor.refresh();
+          }
           renderPagesList();
         });
         controls.appendChild(addBtn);
         pagesPanel.appendChild(controls);
 
-        const all = pagesApi.getAll();
+        let all: any[] = [];
+        if (pagesApi && pagesApi.getAll) {
+          all = pagesApi.getAll();
+        } else {
+          all = Object.keys(customPages.data).map((id) => ({ getId: () => id }));
+        }
         const active = getActivePage();
 
         if (!all || all.length === 0) {
@@ -834,9 +884,11 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           row.style.background = '#ffffff';
 
           const label = document.createElement('span');
-          label.textContent = (pg.getId && pg.getId()) || 'page';
+          label.textContent = ((pg.getId && (pg.getId() as string)) || 'page');
           const status = document.createElement('span');
-          status.textContent = (active && active.getId && active.getId() === pg.getId()) ? 'Active' : '';
+          const activeId = (active && typeof active.getId === 'function') ? (active.getId() as string) : (customPages.activeId || '');
+          const rowId = (pg.getId && (pg.getId() as string)) || '';
+          status.textContent = activeId === rowId ? 'Active' : '';
           status.style.color = '#059669';
           status.style.fontWeight = '600';
           status.style.fontSize = '11px';
