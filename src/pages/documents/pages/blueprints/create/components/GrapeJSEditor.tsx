@@ -21,6 +21,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 // Custom CSS for larger icons in GrapeJS
 const iconStyles = `
+
 .gjs-block {
     align-items: center !important;
     justify-content: center !important;
@@ -166,6 +167,35 @@ const iconStyles = `
     pointer-events: auto !important;
 }
 
+/* Anchor signature styles */
+.anchor-signature {
+    display: inline-block !important;
+    padding: 8px 16px !important;
+    border: 2px dashed #007bff !important;
+    border-radius: 6px !important;
+    background: rgba(0, 123, 255, 0.1) !important;
+    font-size: 14px !important;
+    color: #007bff !important;
+    min-width: 120px !important;
+    min-height: 40px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    position: relative !important;
+    z-index: 5 !important;
+}
+
+.anchor-signature:hover {
+    background: rgba(0, 123, 255, 0.2) !important;
+    border-color: #0056b3 !important;
+}
+
+.gjs-selected .anchor-signature {
+    outline: 2px solid #007bff !important;
+    outline-offset: 2px !important;
+}
+
 /* Ensure the rectangle doesn't interfere with other draggable elements */
 .gjs-frame .draggable-rectangle:hover,
 .gjs-frame .gjs-draggable-rectangle:hover {
@@ -262,7 +292,545 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
 
     try { console.log('[pagedjs] GrapeJSEditor mounted - preparing to initialize editor'); } catch {}
 
+    // Debounce utility function
+    const debounce = (func: Function, wait: number) => {
+      let timeout: NodeJS.Timeout;
+      return function executedFunction(...args: any[]) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    };
 
+    // Accurate A4 page guides using CSS Paged Media + custom calculation
+    const addA4PageGuides = () => {
+      try {
+        const editor = (window as any).grapesEditor;
+        if (!editor) return;
+        
+        const frame = editor.Canvas.getFrameEl();
+        const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+        if (!doc) return;
+        
+        // More accurate pixel calculation using multiple methods
+        const getAccuratePxPerMm = (doc: Document) => {
+          try {
+            // Method 1: Use a larger probe for better accuracy
+            const probe = doc.createElement('div');
+            probe.style.width = '1000mm';
+            probe.style.height = '1000mm';
+            probe.style.position = 'absolute';
+            probe.style.visibility = 'hidden';
+            probe.style.top = '-9999px';
+            probe.style.left = '-9999px';
+            doc.body.appendChild(probe);
+            
+            const rect = probe.getBoundingClientRect();
+            const pxPerMm = rect.width / 1000;
+            probe.remove();
+            
+            console.log('[pagedjs] Calculated pxPerMm:', pxPerMm);
+            return pxPerMm || 3.78;
+          } catch (e) {
+            console.warn('[pagedjs] pxPerMm calculation failed, using fallback');
+            return 3.78; // Fallback: 96 DPI = 3.78 px/mm
+          }
+        };
+        
+        const pxPerMm = getAccuratePxPerMm(doc);
+        const pageWidthPx = 210 * pxPerMm;
+        const pageHeightPx = 297 * pxPerMm;
+        
+        console.log('[pagedjs] A4 dimensions:', { 
+          pageWidthPx: Math.round(pageWidthPx), 
+          pageHeightPx: Math.round(pageHeightPx),
+          pxPerMm: pxPerMm.toFixed(3)
+        });
+        
+        // Add CSS for page guides with better styling
+        const style = doc.createElement('style');
+        style.setAttribute('data-page-guides', 'true');
+        style.textContent = `
+          .a4-page-guide {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+              #ff4444 0%, 
+              #ff4444 20%, 
+              transparent 20%, 
+              transparent 40%, 
+              #ff4444 40%, 
+              #ff4444 60%, 
+              transparent 60%, 
+              transparent 80%, 
+              #ff4444 80%, 
+              #ff4444 100%
+            );
+            background-size: 20px 3px;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(255, 68, 68, 0.3);
+          }
+          .a4-page-guide::before {
+            content: "Page " attr(data-page);
+            position: absolute;
+            right: 15px;
+            top: -25px;
+            background: #ff4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid #cc3333;
+          }
+          .a4-page-guide::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 1px;
+            background: #ff4444;
+            box-shadow: 0 1px 2px rgba(255, 68, 68, 0.5);
+          }
+          .a4-page-guide.page-1::before {
+            background: #28a745;
+            border-color: #1e7e34;
+          }
+          .a4-page-guide.page-1 {
+            background: linear-gradient(90deg, 
+              #28a745 0%, 
+              #28a745 20%, 
+              transparent 20%, 
+              transparent 40%, 
+              #28a745 40%, 
+              #28a745 60%, 
+              transparent 60%, 
+              transparent 80%, 
+              #28a745 80%, 
+              #28a745 100%
+            );
+          }
+        `;
+        
+        // Remove existing guides
+        const existing = doc.querySelectorAll('.a4-page-guide');
+        existing.forEach((el: Element) => el.remove());
+        
+        if (!doc.querySelector('style[data-page-guides="true"]')) {
+          doc.head.appendChild(style);
+        }
+        
+        // Calculate content height more accurately
+        const bodyHeight = Math.max(
+          doc.body.scrollHeight, 
+          doc.body.offsetHeight,
+          doc.documentElement.scrollHeight,
+          doc.documentElement.offsetHeight
+        );
+        
+        const numPages = Math.ceil(bodyHeight / pageHeightPx) || 1;
+        
+        console.log('[pagedjs] Content height:', bodyHeight, 'Pages needed:', numPages);
+        
+        // Add page guides with more accurate positioning
+        for (let i = 0; i < numPages; i++) {
+          const guide = doc.createElement('div');
+          guide.className = `a4-page-guide ${i === 0 ? 'page-1' : ''}`;
+          guide.setAttribute('data-page', (i + 1).toString());
+          guide.style.top = `${Math.round(i * pageHeightPx)}px`;
+          doc.body.appendChild(guide);
+        }
+        
+        console.log(`[pagedjs] Added ${numPages} accurate page guides`);
+        
+      } catch (e) {
+        console.warn('[pagedjs] Error adding A4 page guides', e);
+      }
+    };
+
+    // Add content change listener for dynamic page guide updates
+    const addContentChangeListener = () => {
+      try {
+        const editor = (window as any).grapesEditor;
+        if (!editor) return;
+
+        // Debounced update function
+        const debouncedUpdate = debounce(() => {
+          console.log('[pagedjs] Content changed, updating page guides');
+          addPageBreakAwareGuides();
+        }, 500);
+
+        // Listen to GrapeJS events that affect content height
+        editor.on('component:add', debouncedUpdate);
+        editor.on('component:remove', debouncedUpdate);
+        editor.on('component:update', debouncedUpdate);
+        editor.on('style:property:update', debouncedUpdate);
+        editor.on('component:styleUpdate', debouncedUpdate);
+
+        // Also listen to DOM changes in the iframe
+        const frame = editor.Canvas.getFrameEl();
+        const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+        if (doc) {
+          const observer = new MutationObserver(debouncedUpdate);
+          observer.observe(doc.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+          });
+        }
+
+        console.log('[pagedjs] Content change listener added');
+      } catch (e) {
+        console.warn('[pagedjs] Error adding content change listener', e);
+      }
+    };
+
+    // Update page guides based on paged.js results
+    const updatePageGuidesFromPaged = (doc: Document) => {
+      try {
+        const pages = doc.querySelectorAll('.pagedjs_page');
+        if (pages.length === 0) {
+          console.log('[pagedjs] No paged.js pages found, using A4 guides');
+          addA4PageGuides();
+          return;
+        }
+
+        console.log(`[pagedjs] Updating page guides from ${pages.length} paged.js pages`);
+        
+        // Remove existing guides
+        const existing = doc.querySelectorAll('.a4-page-guide');
+        existing.forEach((el: Element) => el.remove());
+        
+        // Add guides at each page boundary
+        pages.forEach((page, index) => {
+          const rect = page.getBoundingClientRect();
+          const scrollTop = doc.defaultView?.scrollY || doc.documentElement.scrollTop || doc.body.scrollTop || 0;
+          const pageTop = rect.top + scrollTop;
+          
+          const guide = doc.createElement('div');
+          guide.className = 'a4-page-guide';
+          guide.setAttribute('data-page', (index + 1).toString());
+          guide.style.top = `${pageTop}px`;
+          doc.body.appendChild(guide);
+        });
+        
+        console.log(`[pagedjs] Updated page guides for ${pages.length} pages`);
+        
+      } catch (e) {
+        console.warn('[pagedjs] Error updating page guides from paged.js', e);
+        // Fallback to A4 guides
+        addA4PageGuides();
+      }
+    };
+
+    // Page break aware calculation using CSS Paged Media
+    const addPageBreakAwareGuides = () => {
+      try {
+        const editor = (window as any).grapesEditor;
+        if (!editor) return;
+        
+        const frame = editor.Canvas.getFrameEl();
+        const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+        if (!doc) return;
+
+        // A4 dimensions in mm
+        const A4_WIDTH_MM = 210;
+        const A4_HEIGHT_MM = 297;
+        
+        // Calculate pixels per mm
+        const getDevicePxPerMm = () => {
+          const devicePixelRatio = window.devicePixelRatio || 1;
+          const dpi = 96 * devicePixelRatio;
+          return dpi / 25.4;
+        };
+        
+        const pxPerMm = getDevicePxPerMm();
+        const pageWidthPx = A4_WIDTH_MM * pxPerMm;
+        const pageHeightPx = A4_HEIGHT_MM * pxPerMm;
+        
+        console.log('[PageBreak] A4 dimensions:', { 
+          pageWidthPx: Math.round(pageWidthPx), 
+          pageHeightPx: Math.round(pageHeightPx),
+          pxPerMm: pxPerMm.toFixed(3)
+        });
+
+        // Add CSS for page break detection
+        const style = doc.createElement('style');
+        style.setAttribute('data-page-break-guides', 'true');
+        style.textContent = `
+          @page {
+            size: A4;
+            margin: 0;
+          }
+          
+          .page-break-guide {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, 
+              #ff6b35 0%, 
+              #ff6b35 10%, 
+              transparent 10%, 
+              transparent 20%, 
+              #ff6b35 20%, 
+              #ff6b35 30%, 
+              transparent 30%, 
+              transparent 40%, 
+              #ff6b35 40%, 
+              #ff6b35 50%, 
+              transparent 50%, 
+              transparent 60%, 
+              #ff6b35 60%, 
+              #ff6b35 70%, 
+              transparent 70%, 
+              transparent 80%, 
+              #ff6b35 80%, 
+              #ff6b35 90%, 
+              transparent 90%, 
+              #ff6b35 100%
+            );
+            background-size: 10px 5px;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 3px 8px rgba(255, 107, 53, 0.5);
+          }
+          
+          .page-break-guide::before {
+            content: "Page " attr(data-page) " (Break: " attr(data-break-type) ")";
+            position: absolute;
+            right: 15px;
+            top: -35px;
+            background: #ff6b35;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 2px solid #e55a2b;
+            white-space: nowrap;
+            max-width: 200px;
+            text-align: center;
+          }
+          
+          .page-break-guide::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 2px;
+            background: #ff6b35;
+            box-shadow: 0 2px 4px rgba(255, 107, 53, 0.7);
+          }
+          
+          .page-break-guide.page-1::before {
+            background: #28a745;
+            border-color: #1e7e34;
+          }
+          
+          .page-break-guide.page-1 {
+            background: linear-gradient(90deg, 
+              #28a745 0%, 
+              #28a745 10%, 
+              transparent 10%, 
+              transparent 20%, 
+              #28a745 20%, 
+              #28a745 30%, 
+              transparent 30%, 
+              transparent 40%, 
+              #28a745 40%, 
+              #28a745 50%, 
+              transparent 50%, 
+              transparent 60%, 
+              #28a745 60%, 
+              #28a745 70%, 
+              transparent 70%, 
+              transparent 80%, 
+              #28a745 80%, 
+              #28a745 90%, 
+              transparent 90%, 
+              #28a745 100%
+            );
+          }
+          
+          /* Page break detection styles */
+          .page-break-before {
+            page-break-before: always;
+          }
+          
+          .page-break-after {
+            page-break-after: always;
+          }
+          
+          .page-break-inside-avoid {
+            page-break-inside: avoid;
+          }
+        `;
+        
+        // Remove existing guides
+        const existing = doc.querySelectorAll('.page-break-guide');
+        existing.forEach((el: Element) => el.remove());
+        
+        if (!doc.querySelector('style[data-page-break-guides="true"]')) {
+          doc.head.appendChild(style);
+        }
+
+        // Function to detect page breaks in content
+        const detectPageBreaks = () => {
+          const pageBreaks: Array<{top: number, type: string, element: Element}> = [];
+          
+          // Find elements with page-break CSS properties
+          const allElements = doc.querySelectorAll('*');
+          allElements.forEach((element: Element) => {
+            const computedStyle = doc.defaultView?.getComputedStyle(element);
+            if (!computedStyle) return;
+            
+            const rect = element.getBoundingClientRect();
+            const scrollTop = doc.defaultView?.scrollY || doc.documentElement.scrollTop || doc.body.scrollTop || 0;
+            const elementTop = rect.top + scrollTop;
+            
+            // Check for page-break-before: always
+            if (computedStyle.pageBreakBefore === 'always' || 
+                computedStyle.breakBefore === 'page' ||
+                element.classList.contains('page-break-before')) {
+              pageBreaks.push({
+                top: elementTop,
+                type: 'before',
+                element: element
+              });
+            }
+            
+            // Check for page-break-after: always
+            if (computedStyle.pageBreakAfter === 'always' || 
+                computedStyle.breakAfter === 'page' ||
+                element.classList.contains('page-break-after')) {
+              pageBreaks.push({
+                top: elementTop + rect.height,
+                type: 'after',
+                element: element
+              });
+            }
+          });
+          
+          // Sort by position
+          pageBreaks.sort((a, b) => a.top - b.top);
+          
+          console.log('[PageBreak] Found page breaks:', pageBreaks);
+          return pageBreaks;
+        };
+
+        // Function to calculate page boundaries considering breaks
+        const calculatePageBoundaries = () => {
+          const pageBreaks = detectPageBreaks();
+          const boundaries: number[] = [0]; // Start with page 1
+          
+          let currentPageTop = 0;
+          let currentPage = 1;
+          
+          // Process content in chunks, respecting page breaks
+          const processContent = (startY: number, endY: number) => {
+            const contentHeight = endY - startY;
+            
+            // Check if content fits in current page
+            const remainingPageHeight = pageHeightPx - (startY - currentPageTop);
+            
+            if (contentHeight <= remainingPageHeight) {
+              // Content fits in current page
+              return;
+            } else {
+              // Content doesn't fit, need new page
+              currentPageTop = startY;
+              currentPage++;
+              boundaries.push(startY);
+            }
+          };
+          
+          // Get all block-level elements
+          const blockElements = Array.from(doc.querySelectorAll('div, p, h1, h2, h3, h4, h5, h6, section, article, header, footer, main, aside, nav, ul, ol, li, table, tr, td, th, form, fieldset, legend, details, summary, figure, figcaption, blockquote, pre, address, dl, dt, dd, hr, br')) as Element[];
+          
+          let lastElementBottom = 0;
+          
+          blockElements.forEach((element: Element) => {
+            const rect = element.getBoundingClientRect();
+            const scrollTop = doc.defaultView?.scrollY || doc.documentElement.scrollTop || doc.body.scrollTop || 0;
+            const elementTop = rect.top + scrollTop;
+            const elementBottom = elementTop + rect.height;
+            
+            // Check if there's a page break before this element
+            const breakBefore = pageBreaks.find(b => 
+              b.type === 'before' && 
+              Math.abs(b.top - elementTop) < 10
+            );
+            
+            if (breakBefore) {
+              // Force page break before this element
+              if (elementTop > currentPageTop + pageHeightPx) {
+                currentPageTop = elementTop;
+                currentPage++;
+                boundaries.push(elementTop);
+              }
+            }
+            
+            // Check if element fits in current page
+            const remainingHeight = pageHeightPx - (elementTop - currentPageTop);
+            if (rect.height > remainingHeight && elementTop > currentPageTop) {
+              // Element doesn't fit, start new page
+              currentPageTop = elementTop;
+              currentPage++;
+              boundaries.push(elementTop);
+            }
+            
+            lastElementBottom = Math.max(lastElementBottom, elementBottom);
+          });
+          
+          // Add final boundary if content extends beyond last page
+          const totalContentHeight = Math.max(
+            doc.body.scrollHeight,
+            doc.body.offsetHeight,
+            doc.documentElement.scrollHeight,
+            doc.documentElement.offsetHeight,
+            lastElementBottom
+          );
+          
+          const lastPageTop = boundaries[boundaries.length - 1];
+          if (totalContentHeight > lastPageTop + pageHeightPx) {
+            boundaries.push(totalContentHeight);
+          }
+          
+          console.log('[PageBreak] Calculated boundaries:', boundaries);
+          return boundaries;
+        };
+
+        // Calculate page boundaries
+        const boundaries = calculatePageBoundaries();
+        
+        // Add page guides at boundaries
+        boundaries.forEach((boundary, index) => {
+          const guide = doc.createElement('div');
+          guide.className = `page-break-guide ${index === 0 ? 'page-1' : ''}`;
+          guide.setAttribute('data-page', (index + 1).toString());
+          guide.setAttribute('data-break-type', index === 0 ? 'start' : 'natural');
+          guide.style.top = `${Math.round(boundary)}px`;
+          doc.body.appendChild(guide);
+        });
+        
+        console.log(`[PageBreak] Added ${boundaries.length} page break aware guides`);
+        
+      } catch (e) {
+        console.warn('[PageBreak] Error adding page break aware guides', e);
+      }
+    };
 
     const initializeEditor = () => {
       try { console.log('[pagedjs] initializeEditor()'); } catch {}
@@ -961,9 +1529,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             doc.addEventListener('paged:rendered', () => {
               const count = doc.querySelectorAll('.pagedjs_page').length;
               console.log('[pagedjs] Event paged:rendered — pages:', count);
-              const pageMap = buildPageMapFromPaged(doc);
-              repositionRectsFromPageData(doc, pageMap);
-              ensureRectPageDataOnDrop(doc, pageMap);
+              // Update page guides instead of interfering with GrapeJS
+              updatePageGuidesFromPaged(doc);
             });
           }
 
@@ -971,16 +1538,15 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           await runPagedPreview(frame);
           const hasPages = !!doc.querySelector('.pagedjs_page');
           console.log('[pagedjs] Initial pagination complete. hasPages=', hasPages);
-          const pageMap = (hasPages ? buildPageMapFromPaged(doc) : buildFixedA4PageMap(doc));
-          repositionRectsFromPageData(doc, pageMap);
-          ensureRectPageDataOnDrop(doc, pageMap);
+          // Update page guides based on pagination results
+          updatePageGuidesFromPaged(doc);
 
           // Debounced hook on editor changes
           const triggerRepaginate = debounce(async () => {
             console.log('[pagedjs] triggerRepaginate');
             await runPagedPreview(frame);
-            const pm = (doc.querySelector('.pagedjs_page') ? buildPageMapFromPaged(doc) : buildFixedA4PageMap(doc));
-            repositionRectsFromPageData(doc, pm);
+            // Update page guides when content changes
+            updatePageGuidesFromPaged(doc);
           }, 200);
 
           // Bind Grapes events once
@@ -1028,38 +1594,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         }
       };
 
-      // A4 frame styles toggle/shared function
-      let isA4Scrollable = true;
-      const injectA4FrameStyles = (scrollable: boolean) => {
-        try {
-          const frame = editor.Canvas.getFrameEl();
-          const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
-          if (!doc) return;
-          let styleEl = doc.querySelector('style[data-a4-style="true"]') as HTMLStyleElement | null;
-          if (!styleEl) {
-            styleEl = doc.createElement('style');
-            styleEl.setAttribute('data-a4-style', 'true');
-            doc.head && doc.head.appendChild(styleEl);
-          }
-          if (scrollable) {
-            styleEl!.textContent = `
-@page { size: A4; margin: 0; }
-html, body { margin: 0; padding: 0; box-sizing: border-box; }
-html { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; }
-body { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; box-sizing: border-box; }
-#wrapper { width: 210mm !important; min-height: 297mm !important; overflow: visible !important; box-sizing: border-box; }
-`;
-          } else {
-            styleEl!.textContent = `
-@page { size: A4; margin: 0; }
-html, body { margin: 0; padding: 0; box-sizing: border-box; }
-html { width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
-body { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
-#wrapper { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
-`;
-          }
-        } catch {}
-      };
+      // A4 frame styles removed to fix drag/drop issues
 
       // Simple custom pages store fallback for vanilla GrapesJS
       const customPages: { data: Record<string, { html: string; css: string }>; activeId: string; order: string[] } = {
@@ -1142,24 +1677,7 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         hint.style.fontSize = '10px';
         hint.style.color = '#6b7280';
         hint.style.textAlign = 'left';
-        hint.textContent = 'A4 canvas: 210mm × 297mm';
-
-        const toggleWrap = document.createElement('label');
-        toggleWrap.style.display = 'flex';
-        toggleWrap.style.alignItems = 'center';
-        toggleWrap.style.gap = '6px';
-        toggleWrap.style.marginLeft = 'auto';
-        const toggle = document.createElement('input');
-        toggle.type = 'checkbox';
-        toggle.checked = isA4Scrollable;
-        const toggleText = document.createElement('span');
-        toggleText.textContent = 'Scrollable';
-        toggle.addEventListener('change', () => {
-          isA4Scrollable = !!toggle.checked;
-          injectA4FrameStyles(isA4Scrollable);
-        });
-        toggleWrap.appendChild(toggle);
-        toggleWrap.appendChild(toggleText);
+        hint.textContent = 'Canvas ready for editing';
 
         const addBtn = document.createElement('button');
         addBtn.type = 'button';
@@ -1201,7 +1719,6 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
           renderPagesList();
         });
         controls.appendChild(hint);
-        controls.appendChild(toggleWrap);
         controls.appendChild(addBtn);
         pagesPanel.appendChild(controls);
 
@@ -1450,40 +1967,7 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         
         // Add a small delay to ensure DOM is fully ready
         setTimeout(function() {
-        // Inject A4 page styling into the canvas frame for WYSIWYG sizing
-        let isA4Scrollable = true;
-        const injectA4FrameStyles = (scrollable: boolean) => {
-          try {
-            const frame = editor.Canvas.getFrameEl();
-            const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
-            if (!doc) return;
-            let styleEl = doc.querySelector('style[data-a4-style="true"]') as HTMLStyleElement | null;
-            if (!styleEl) {
-              styleEl = doc.createElement('style');
-              styleEl.setAttribute('data-a4-style', 'true');
-              doc.head && doc.head.appendChild(styleEl);
-            }
-            if (scrollable) {
-              styleEl!.textContent = `
-@page { size: A4; margin: 0; }
-html, body { margin: 0; padding: 0; box-sizing: border-box; }
-html { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; }
-body { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; box-sizing: border-box; }
-#wrapper { width: 210mm !important; min-height: 297mm !important; overflow: visible !important; box-sizing: border-box; }
-`;
-            } else {
-              styleEl!.textContent = `
-@page { size: A4; margin: 0; }
-html, body { margin: 0; padding: 0; box-sizing: border-box; }
-html { width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
-body { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
-#wrapper { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
-`;
-            }
-          } catch {}
-        };
-
-        injectA4FrameStyles(isA4Scrollable);
+        // A4 canvas sizing removed to fix drag/drop issues
 
         // Store draggable rectangle metadata for later reinitialization
         let rectangleCounter = 0;
@@ -1665,9 +2149,10 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         editor.on('canvas:frame:load', function() {
           setTimeout(() => {
             reinitializeDraggableRectangles();
-            console.log('[pagedjs] canvas:frame:load -> initializing paged.js');
-            injectPagedJsIntoFrame();
-            startPagedWatchdog();
+            console.log('[pagedjs] canvas:frame:load -> paged.js disabled for testing');
+            // injectPagedJsIntoFrame();
+            // Don't start watchdog to avoid interference
+            // startPagedWatchdog();
           }, 2000);
         });
 
@@ -1675,9 +2160,10 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         editor.on('load', function() {
           setTimeout(() => {
             reinitializeDraggableRectangles();
-            console.log('[pagedjs] editor load -> initializing paged.js');
-            injectPagedJsIntoFrame();
-            startPagedWatchdog();
+            console.log('[pagedjs] editor load -> paged.js disabled for testing');
+            // injectPagedJsIntoFrame();
+            // Don't start watchdog to avoid interference
+            // startPagedWatchdog();
           }, 3000);
         });
 
@@ -1943,6 +2429,91 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
           }
         });
 
+        domc.addType('anchor-signature', {
+          model: {
+            defaults: {
+              tagName: 'div',
+              classes: ['anchor-signature'],
+              style: {
+                'display': 'inline-block',
+                'padding': '8px 16px',
+                'border': '2px dashed #007bff',
+                'border-radius': '6px',
+                'background': 'rgba(0, 123, 255, 0.1)',
+                'font-size': '14px',
+                'color': '#007bff',
+                'min-width': '120px',
+                'min-height': '40px',
+                'text-align': 'center',
+                'vertical-align': 'middle',
+                'cursor': 'pointer',
+                'user-select': 'none'
+              },
+              content: '<div style="text-align: center; color: #007bff; font-size: 12px; font-weight: bold; padding: 5px;">[Anchor Signature]</div>',
+              resizable: true,
+              draggable: true,
+              droppable: false,
+              selectable: true,
+              highlightable: true,
+              traits: [
+                { type: 'text', name: 'anchor-id', label: 'Anchor ID' },
+                { type: 'text', name: 'placeholder-text', label: 'Placeholder Text' }
+              ]
+            }
+          },
+          view: {
+            init() {
+              // Add click handler for anchor binding
+              this.el.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Anchor signature clicked:', this.model.get('anchor-id'));
+                // You can add anchor binding logic here
+              });
+            }
+          }
+        });
+
+        // Register page break component type
+        domc.addType('page-break', {
+          model: {
+            defaults: {
+              tagName: 'div',
+              classes: ['page-break'],
+              style: {
+                width: '100%',
+                height: '20px',
+                'page-break-before': 'always',
+                'break-before': 'page',
+                background: 'linear-gradient(90deg, #ff6b35 0%, #ff6b35 50%, transparent 50%, transparent 100%)',
+                'background-size': '20px 2px',
+                'border-top': '2px dashed #ff6b35',
+                'border-bottom': '2px dashed #ff6b35',
+                'margin-top': '10px',
+                'margin-bottom': '10px',
+                'box-sizing': 'border-box',
+                'position': 'relative'
+              },
+              content: '<div style="text-align: center; color: #ff6b35; font-size: 12px; font-weight: bold; padding: 5px;">PAGE BREAK</div>',
+              resizable: false,
+              draggable: false,
+              droppable: false,
+              selectable: true,
+              highlightable: true,
+              traits: []
+            }
+          },
+          view: {
+            init() {
+              // Ensure page break CSS is applied
+              if (this.el) {
+                this.el.style.pageBreakBefore = 'always';
+                this.el.style.breakBefore = 'page';
+              }
+            }
+          }
+        });
+
         // Register signature placeholder component type
         domc.addType('signature-placeholder', {
           model: {
@@ -2044,105 +2615,20 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
           }
         });
 
-        // Simple draggable rectangle component
-        domc.addType('draggable-rectangle', {
-          model: {
-            defaults: {
-              tagName: 'div',
-              classes: ['draggable-rectangle'],
-              style: {
-                position: 'absolute',
-                width: '200px',
-                height: '150px',
-                top: '50px',
-                left: '50px',
-                border: '2px solid #28a745',
-                background: 'rgba(40, 167, 69, 0.1)',
-                cursor: 'move',
-                'box-sizing': 'border-box',
-                'z-index': '10',
-                'min-width': '50px',
-                'min-height': '50px',
-                'user-select': 'none'
-              },
-              content: '<div style="padding: 10px; text-align: center; color: #28a745; font-weight: bold;">Drag Rectangle</div>',
-              resizable: true,
-              draggable: true,
-              traits: [
-                { type: 'number', name: 'width', label: 'Width' },
-                { type: 'number', name: 'height', label: 'Height' },
-                { type: 'number', name: 'top', label: 'Top' },
-                { type: 'number', name: 'left', label: 'Left' }
-              ]
+        if(!blockManager.get('anchor-signature-placeholder')){
+          blockManager.add('anchor-signature-placeholder', {
+            label: 'Anchor Signature',
+            // content: '<span class="signature-placeholder">[Sign Here]</span>',
+            category: 'Signatory Placeholders',
+            content: {
+              type: 'anchor-signature'
             },
-            init() {
-              // Store coordinates in HTML data attributes whenever style changes
-              this.on('change:style', () => {
-                const style: any = this.getStyle();
-                const view = this.getView();
-                if (view && view.el) {
-                  view.el.setAttribute('data-top', String(style.top || '50px'));
-                  view.el.setAttribute('data-left', String(style.left || '50px'));
-                  view.el.setAttribute('data-width', String(style.width || '200px'));
-                  view.el.setAttribute('data-height', String(style.height || '150px'));
-                }
-              });
+            attributes: {
+              'data-block': 'anchor-signature'
             }
-          },
-          view: {
-            init() {
-              // Add drag functionality
-              this.el.addEventListener('mousedown', this.handleMouseDown.bind(this));
-
-              // Mark as initialized to prevent double-initialization
-              (this.el as any).isDraggableInitialized = true;
-            },
-
-
-            handleMouseDown(e: MouseEvent) {
-              e.preventDefault();
-              e.stopPropagation();
-              
-              const startX = e.clientX;
-              const startY = e.clientY;
-              const startLeft = parseInt(this.el.style.left) || 0;
-              const startTop = parseInt(this.el.style.top) || 0;
-              
-              const handleMouseMove = (e: MouseEvent) => {
-                e.preventDefault();
-                const deltaX = e.clientX - startX;
-                const deltaY = e.clientY - startY;
-                
-                const newLeft = startLeft + deltaX;
-                const newTop = startTop + deltaY;
-                
-                // Update the GrapeJS component style first (this will handle children)
-                const component = this.model;
-                const currentStyle = component.getStyle();
-                component.setStyle({
-                  ...currentStyle,
-                  left: newLeft + 'px',
-                  top: newTop + 'px'
-                });
-
-                // Force GrapeJS to update the view and all child components
-                component.trigger('change:style');
-                
-                // Also update DOM directly as backup
-                this.el.style.left = newLeft + 'px';
-                this.el.style.top = newTop + 'px';
-              };
-              
-              const handleMouseUp = () => {
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-              };
-              
-              document.addEventListener('mousemove', handleMouseMove);
-              document.addEventListener('mouseup', handleMouseUp);
-            }
-          }
-        });
+          });
+          
+        }
 
         // Check if blocks already exist to prevent duplicates
         if (!blockManager.get('signature-placeholder')) {
@@ -2279,11 +2765,14 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         // Store editor reference for cleanup
         (window as any).grapesEditor = editor;
 
-        // Add simple A4 page guides without interfering with GrapeJS
+        // Add page break aware guides that respect CSS page break rules
         try {
-          console.log('[pagedjs] Editor ready, adding A4 page guides');
+          console.log('[pagedjs] Editor ready, adding page break aware guides');
           setTimeout(() => {
-            addA4PageGuides();
+            // Use page break aware calculation
+            addPageBreakAwareGuides();
+            // Add content change listener for dynamic updates
+            addContentChangeListener();
           }, 1000);
         } catch (e) {
           console.warn('[pagedjs] Error adding page guides', e);
@@ -2406,9 +2895,7 @@ body { width: 210mm !important; height: 297mm !important; overflow: hidden !impo
         | { data: Record<string, { html: string; css: string }>; order: string[]; activeId: string }
         | undefined;
 
-      const a4Css = '@page{size:A4;margin:0} html,body{margin:0;padding:0} body{width:210mm;min-height:297mm;box-sizing:border-box}';
-
-      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${a4Css}</style><style>${css||''}</style></head><body>${html||''}</body></html>`;
+      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css||''}</style></head><body>${html||''}</body></html>`;
 
       const pagesPayload: Record<string, string> = {};
       if (pagesApi && pagesApi.getAll) {
