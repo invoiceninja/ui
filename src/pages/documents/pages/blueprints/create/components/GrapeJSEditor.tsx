@@ -8,6 +8,15 @@ import * as beautify from 'js-beautify';
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+
+import pluginBlocks from "grapesjs-blocks-basic";
+import pluginExport from "grapesjs-plugin-export";
+import pluginParserPostcss from "grapesjs-parser-postcss";
+
+import pluginTuiImageEditor from "grapesjs-tui-image-editor";
+import pluginStyleBg from "grapesjs-style-bg";
+import pluginPresetWebpage from "grapesjs-preset-webpage";
+
 const iconStyles = `
 
 .gjs-block {
@@ -202,13 +211,6 @@ const iconStyles = `
 }
 `;
 
-import pluginBlocks from "grapesjs-blocks-basic";
-import pluginExport from "grapesjs-plugin-export";
-import pluginParserPostcss from "grapesjs-parser-postcss";
-
-import pluginTuiImageEditor from "grapesjs-tui-image-editor";
-import pluginStyleBg from "grapesjs-style-bg";
-import pluginPresetWebpage from "grapesjs-preset-webpage";
 
 // Load FontAwesome for icons - using CDN since font-awesome package might not be available
 
@@ -253,30 +255,23 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
     // Reset initialization flag
     isInitialized.current = false;
 
-    // Inject custom icon styles
     const styleElement = document.createElement('style');
     styleElement.textContent = iconStyles;
     document.head.appendChild(styleElement);
 
-    try { console.log('[GrapeJS] GrapeJSEditor mounted - preparing to initialize editor'); } catch {}
-
 
     const initializeEditor = () => {
-      try { console.log('[GrapeJS] initializeEditor()'); } catch {}
       if (!editorRef.current) {
-        try { console.warn('[GrapeJS] initializeEditor: editorRef.current missing'); } catch {}
         return;
       }
 
       // Check if the container is properly mounted
       if (!editorRef.current.parentNode) {
-        try { console.warn('[GrapeJS] initializeEditor: editorRef has no parentNode yet'); } catch {}
         return;
       }
 
       // Prevent multiple initializations
       if ((window as any).grapesEditor) {
-        try { console.log('[GrapeJS] initializeEditor: grapesEditor already exists, skipping editor init'); } catch {}
         return;
       }
     try {
@@ -335,7 +330,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                   'margin',
                   'padding'
                 ],
-              },{
+              },
+              {
                 name: 'Typography',
                 open: false,
                 properties: [
@@ -366,7 +362,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                     },
                     'text-shadow'
                 ],
-              },{
+              },
+              {
                 name: 'Decorations',
                 open: false,
                 properties: [
@@ -567,7 +564,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           [pluginBlocks as unknown as string]: { flexGrid: true },
           [pluginTuiImageEditor as unknown as string]: {
             script: [
-              // 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.6.7/fabric.min.js',
               'https://uicdn.toast.com/tui.code-snippet/v1.5.2/tui-code-snippet.min.js',
               'https://uicdn.toast.com/tui-color-picker/v2.2.7/tui-color-picker.min.js',
               'https://uicdn.toast.com/tui-image-editor/v3.15.2/tui-image-editor.min.js'
@@ -1375,6 +1371,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                 .replace(/\n\s*\n/g, '\n') : '';
             };
 
+            console.log(css);
+            
             // Format the HTML and CSS separately
             // Remove any body tags and head elements from the HTML since GrapeJS expects only body content
             let cleanHtml = html;
@@ -1612,7 +1610,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
               this.el.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Anchor signature clicked:', this.model.get('anchor-id'));
                 // You can add anchor binding logic here
               });
             }
@@ -1827,65 +1824,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
 
         }
 
-        // Real-time two-way binding for Monaco editor
-        // editor.on('component:update', function() {
-        //   console.log('component:update');
-        //   if (showMonacoEditor && monacoHtmlEditor && monacoCssEditor) {
-        //     const html = editor.getHtml();
-        //     const css = editor.getCss();
-            
-        //     console.log(css);
-            
-        //     // Clean the HTML to remove any body tags and head elements
-        //     let cleanHtml = html;
-        //     if (cleanHtml.includes('<body')) {
-        //       const bodyMatch = cleanHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-        //       if (bodyMatch && bodyMatch[1]) {
-        //         cleanHtml = bodyMatch[1].trim();
-        //       }
-        //     }
-            
-        //     // Remove head elements (meta, title, etc.) that shouldn't be in body content
-        //     cleanHtml = cleanHtml
-        //       .replace(/<meta[^>]*>/gi, '')
-        //       .replace(/<title[^>]*>.*?<\/title>/gi, '')
-        //       .replace(/<link[^>]*>/gi, '')
-        //       .replace(/<script[^>]*>.*?<\/script>/gi, '')
-        //       .replace(/<style[^>]*>.*?<\/style>/gi, '')
-        //       .replace(/<head[^>]*>.*?<\/head>/gi, '')
-        //       .trim();
-            
-        //     const formattedHtml = beautify.html(cleanHtml, {
-        //       indent_size: 2,
-        //       indent_char: ' ',
-        //       max_preserve_newlines: 2,
-        //       preserve_newlines: true,
-        //       indent_scripts: 'normal',
-        //       end_with_newline: true,
-        //       wrap_line_length: 120,
-        //       indent_inner_html: true,
-        //       indent_empty_lines: false
-        //     });
-            
-        //     const formattedCss = beautify.css(css || '', {
-        //       indent_size: 2,
-        //       indent_char: ' ',
-        //       max_preserve_newlines: 2,
-        //       preserve_newlines: true,
-        //       end_with_newline: true,
-        //       wrap_line_length: 120,
-        //       indent_empty_lines: false
-        //     });
-            
-        //     setMonacoHtml(formattedHtml);
-        //     setMonacoCss(formattedCss);
-        //     monacoHtmlEditor.setValue(formattedHtml);
-        //     monacoCssEditor.setValue(formattedCss);
-        //   }
-        // });
-
-
-
         // Mark editor as ready
         setIsEditorReady(true);
 
@@ -1922,7 +1860,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
     const startInitWatchdog = () => {
       try {
         if (isInitialized.current) {
-          console.log('[pagedjs] init watchdog: already initialized, skipping');
           return;
         }
         let tries = 0;
@@ -1933,20 +1870,16 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           const ready = !!(el && el.isConnected && el.parentNode);
           if (ready) {
             clearInterval(id);
-            console.log('[pagedjs] init watchdog: editorRef ready, initializing');
             initializeEditor();
             return;
           }
           if (tries % 8 === 0) {
-            console.log(`[pagedjs] init watchdog: waiting for editorRef (${tries}/${maxTries})`);
           }
           if (tries >= maxTries) {
             clearInterval(id);
-            console.warn('[pagedjs] init watchdog: max tries reached without editorRef');
           }
         }, 250);
       } catch (e) {
-        console.warn('[pagedjs] startInitWatchdog error', e);
       }
     };
 
