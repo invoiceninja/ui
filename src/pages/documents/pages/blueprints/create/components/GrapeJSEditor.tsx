@@ -1,13 +1,3 @@
-/**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
-
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '$app/components/forms';
@@ -18,9 +8,19 @@ import * as beautify from 'js-beautify';
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-
-// Custom CSS for larger icons in GrapeJS
 const iconStyles = `
+
+.gjs-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px;
+}
+
+.gjs-cell {
+  flex: 1;
+  padding: 0 15px;
+  min-width: 0; /* prevents overflow */
+}
 
 .gjs-block {
     align-items: center !important;
@@ -34,15 +34,11 @@ const iconStyles = `
     overflow: hidden !important;
 }
 
-/* Override default GrapeJS block styling - remove these generic rules */
-
-/* Hover effects */
 .gjs-block:hover {
     transform: translateY(-3px) !important;
     box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
 }
 
-/* Icon styling */
 .gjs-block i {
     font-size: 24px !important;
     width: 24px !important;
@@ -88,7 +84,6 @@ const iconStyles = `
     justify-content: center !important;
 }
 
-/* Specific styling for custom placeholder blocks - all same color */
 .gjs-block.gjs-one-bg,
 .gjs-block.gjs-four-color-h,
 .gjs-block {
@@ -111,12 +106,10 @@ const iconStyles = `
 }
 */
 
-/* Category-specific styling for other blocks */
 .gjs-blocks-cs .gjs-block[data-category="Basic"] {
     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
 }
 
-/* Draggable rectangle specific styles */
 .draggable-rectangle, .gjs-draggable-rectangle {
     position: absolute !important;
     cursor: move !important;
@@ -127,19 +120,15 @@ const iconStyles = `
     min-height: 50px !important;
 }
 
-/* Ensure proper selection and interaction */
 .gjs-selected .draggable-rectangle,
 .gjs-selected .gjs-draggable-rectangle {
     outline: 2px solid #007bff !important;
     outline-offset: 2px !important;
 }
 
-/* Resize handles for draggable rectangle */
 .gjs-resizer {
     z-index: 11 !important;
 }
-
-/* Ensure the rectangle content doesn't interfere with dragging */
 .draggable-rectangle > div,
 .gjs-draggable-rectangle > div {
     pointer-events: none !important;
@@ -150,7 +139,6 @@ const iconStyles = `
     justify-content: center !important;
 }
 
-/* Prevent text selection on the rectangle */
 .draggable-rectangle,
 .gjs-draggable-rectangle {
     -webkit-user-select: none !important;
@@ -158,8 +146,6 @@ const iconStyles = `
     -ms-user-select: none !important;
     user-select: none !important;
 }
-
-/* Ensure proper layering and interaction */
 .gjs-frame .draggable-rectangle,
 .gjs-frame .gjs-draggable-rectangle {
     position: absolute !important;
@@ -196,37 +182,31 @@ const iconStyles = `
     outline-offset: 2px !important;
 }
 
-/* Ensure the rectangle doesn't interfere with other draggable elements */
 .gjs-frame .draggable-rectangle:hover,
 .gjs-frame .gjs-draggable-rectangle:hover {
     z-index: 11 !important;
 }
 
-/* Ensure proper selection state */
 .gjs-selected .draggable-rectangle,
 .gjs-selected .gjs-draggable-rectangle {
     z-index: 12 !important;
 }
 
-/* Ensure resize handles are above the rectangle */
 .gjs-resizer {
     z-index: 13 !important;
 }
 
-/* Prevent interference with other components */
 .draggable-rectangle *,
 .gjs-draggable-rectangle * {
     pointer-events: none !important;
 }
 
-/* Allow the rectangle itself to be interactive */
 .draggable-rectangle,
 .gjs-draggable-rectangle {
     pointer-events: auto !important;
     cursor: move !important;
 }
 
-/* Ensure the rectangle is above all other elements when dragging */
 .draggable-rectangle.dragging,
 .gjs-draggable-rectangle.dragging {
     z-index: 9999 !important;
@@ -324,7 +304,9 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           },
           selectorManager: { componentFirst: true },
           canvas: {
-            styles: [],
+            styles: [
+              'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css'
+            ],
             scripts: []
           },
         styleManager: {
@@ -794,13 +776,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       // ensurePagesPanelGlobalStyles();
 
       // --------- paged.js integration helpers ---------
-      const debounce = (fn: Function, wait = 150) => {
-        let t: any;
-        return (...args: any[]) => {
-          clearTimeout(t);
-          t = setTimeout(() => fn(...args), wait);
-        };
-      };
 
 
 
