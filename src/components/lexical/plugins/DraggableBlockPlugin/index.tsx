@@ -13,6 +13,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { DraggableBlockPlugin_EXPERIMENTAL } from '@lexical/react/LexicalDraggableBlockPlugin';
 import { $createParagraphNode, $getNearestNodeFromDOMNode } from 'lexical';
 import { useRef, useState } from 'react';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 const DRAGGABLE_BLOCK_MENU_CLASSNAME = 'draggable-block-menu';
 
@@ -25,6 +27,8 @@ export default function DraggableBlockPlugin({
 }: {
   anchorElem?: HTMLElement;
 }): JSX.Element {
+  const reactSettings = useReactSettings();
+
   const [editor] = useLexicalComposerContext();
   const menuRef = useRef<HTMLDivElement>(null);
   const targetLineRef = useRef<HTMLDivElement>(null);
@@ -59,7 +63,13 @@ export default function DraggableBlockPlugin({
       menuRef={menuRef}
       targetLineRef={targetLineRef}
       menuComponent={
-        <div ref={menuRef} className="icon draggable-block-menu">
+        <div
+          ref={menuRef}
+          className={classNames('icon draggable-block-menu', {
+            'draggable-block-menu-light': !reactSettings.dark_mode,
+            'draggable-block-menu-dark': reactSettings.dark_mode,
+          })}
+        >
           <button
             type="button"
             title="Click to add below"

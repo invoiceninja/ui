@@ -21,6 +21,7 @@ import {
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTranslation } from 'react-i18next';
 
 type DropDownContextType = {
   registerItem: (ref: React.RefObject<HTMLButtonElement>) => void;
@@ -173,6 +174,8 @@ export default function DropDown({
   children: ReactNode;
   stopCloseOnClickSelf?: boolean;
 }): JSX.Element {
+  const [t] = useTranslation();
+
   const dropDownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [showDropDown, setShowDropDown] = useState(false);
@@ -258,7 +261,7 @@ export default function DropDown({
       >
         {buttonIconClassName && <span className={buttonIconClassName} />}
         {buttonLabel && (
-          <span className="text dropdown-button-text">{buttonLabel}</span>
+          <span className="text dropdown-button-text">{t(buttonLabel)}</span>
         )}
         <i className="chevron-down" />
       </button>

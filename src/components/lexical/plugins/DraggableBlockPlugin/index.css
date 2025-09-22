@@ -26,6 +26,24 @@
   background-image: url(../../images/icons/plus.svg);
 }
 
+.draggable-block-menu-dark .icon-plus:hover {
+  background-color: rgba(18, 18, 18, 0.7) !important;
+  filter: invert(1);
+}
+
+.draggable-block-menu-dark .icon-plus:not(:hover) {
+  filter: invert(1);
+}
+
+.draggable-block-menu-dark .icon:hover {
+  background-color: rgba(18, 18, 18, 0.7) !important;
+  filter: invert(1);
+}
+
+.draggable-block-menu-dark .icon:not(:hover) {
+  filter: invert(1);
+}
+
 .draggable-block-menu:active {
   cursor: grabbing;
 }
