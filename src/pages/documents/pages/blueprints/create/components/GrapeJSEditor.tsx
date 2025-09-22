@@ -681,16 +681,25 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       });
 
       // Step 1: Add Pages button to the Views toolbar (no behavior yet)
+      // if (!pn.getButton('views', 'open-pages')) {
+      //   pn.addButton('views', {
+      //     id: 'open-pages',
+      //     className: 'fas fa-copy',
+      //     command: 'open-pages-panel',
+      //     attributes: {
+      //       title: 'Pages',
+      //       'data-tooltip-pos': 'bottom',
+      //     },
+      //     togglable: false,
+      //   });
+      // }
+
       if (!pn.getButton('views', 'open-pages')) {
         pn.addButton('views', {
           id: 'open-pages',
           className: 'fas fa-copy',
           command: 'open-pages-panel',
-          attributes: {
-            title: 'Pages',
-            'data-tooltip-pos': 'bottom',
-          },
-          togglable: false,
+          attributes: { title: 'Pages' },
         });
       }
 
@@ -727,19 +736,85 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
 
       const pagesPanel = document.createElement('div');
       pagesPanel.style.display = 'none';
-      pagesPanel.style.padding = '8px';
+      pagesPanel.style.padding = '0';
       pagesPanel.setAttribute('data-panel', 'pages');
       pagesPanel.className = 'gjs-pn-panel';
-      pagesPanel.style.background = '#ffffff';
-      pagesPanel.style.border = '1px solid #e5e7eb';
-      pagesPanel.style.borderRadius = '6px';
-      pagesPanel.style.marginTop = '6px';
-      pagesPanel.style.alignSelf = 'stretch';
+      pagesPanel.style.background = '#ffff';
+      pagesPanel.style.border = 'none';
+      pagesPanel.style.borderRadius = '0';
+      pagesPanel.style.marginTop = '0';
+      pagesPanel.style.marginLeft = '0';
+      pagesPanel.style.alignSelf = '';
       pagesPanel.style.width = '100%';
-      pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin-bottom:6px">Pages</div>';
-      if (viewsEl) {
-        viewsEl.appendChild(pagesPanel);
-      }
+      pagesPanel.style.boxSizing = 'border-box';
+      // pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin:8px 8px 6px 8px;text-align:left">Pages</div>';
+      // if (viewsEl) {
+      //   viewsEl.appendChild(pagesPanel);
+      // }
+
+      // Hard-align the Pages panel to the left within the views sidebar
+      const ensurePagesPanelGlobalStyles = () => {
+        if (!document.querySelector('style[data-pages-panel-style="true"]')) {
+          const style = document.createElement('style');
+          style.setAttribute('data-pages-panel-style', 'true');
+          style.textContent = `
+.gjs-pn-views, .gjs-pn-views-container, .gjs-pn-panel.gjs-pn-views-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+/* Do not affect the Views tabs bar (.gjs-pn-panel.gjs-pn-views) */
+.gjs-pn-panel.gjs-pn-views { display: block !important; }
+/* Keep our Pages panel only in the views-container area */
+.gjs-pn-panel.gjs-pn-views-container > .gjs-pn-panel[data-panel="pages"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  align-self: flex-start !important;
+  box-sizing: border-box !important;
+}
+/* Force left-top alignment inside our Pages panel */
+.gjs-pn-panel[data-panel="pages"] { display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: flex-start !important; }
+`;
+          document.head.appendChild(style);
+        }
+      };
+      ensurePagesPanelGlobalStyles();
+
+      // A4 frame styles toggle/shared function
+      let isA4Scrollable = true;
+      const injectA4FrameStyles = (scrollable: boolean) => {
+        try {
+          const frame = editor.Canvas.getFrameEl();
+          const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+          if (!doc) return;
+          let styleEl = doc.querySelector('style[data-a4-style="true"]') as HTMLStyleElement | null;
+          if (!styleEl) {
+            styleEl = doc.createElement('style');
+            styleEl.setAttribute('data-a4-style', 'true');
+            doc.head && doc.head.appendChild(styleEl);
+          }
+          if (scrollable) {
+            styleEl!.textContent = `
+@page { size: A4; margin: 0; }
+html, body { margin: 0; padding: 0; box-sizing: border-box; }
+html { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; }
+body { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; box-sizing: border-box; }
+#wrapper { width: 210mm !important; min-height: 297mm !important; overflow: visible !important; box-sizing: border-box; }
+`;
+          } else {
+            styleEl!.textContent = `
+@page { size: A4; margin: 0; }
+html, body { margin: 0; padding: 0; box-sizing: border-box; }
+html { width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
+body { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
+#wrapper { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
+`;
+          }
+        } catch {}
+      };
 
       // Simple custom pages store fallback for vanilla GrapesJS
       const customPages: { data: Record<string, { html: string; css: string }>; activeId: string; order: string[] } = {
@@ -795,7 +870,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       // Helper to render the current pages list with active selection
       const renderPagesList = () => {
         // Clear previous content except header
-        pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin-bottom:6px">Pages</div>';
+      pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin-bottom:6px">Pages</div>';
         const pagesApi = getPagesApi();
         // Ensure at least one page exists
         if (pagesApi && pagesApi.getAll && pagesApi.getAll().length === 0) {
@@ -809,11 +884,38 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         listWrap.style.display = 'flex';
         listWrap.style.flexDirection = 'column';
         listWrap.style.gap = '6px';
+        listWrap.style.padding = '0 8px 8px 8px';
+        listWrap.style.margin = '0';
+        listWrap.style.textAlign = 'left';
 
         const controls = document.createElement('div');
         controls.style.display = 'flex';
-        controls.style.justifyContent = 'flex-end';
-        controls.style.marginBottom = '8px';
+        controls.style.justifyContent = 'space-between';
+        controls.style.alignItems = 'center';
+        controls.style.margin = '0 8px 8px 8px';
+        const hint = document.createElement('div');
+        hint.style.fontSize = '10px';
+        hint.style.color = '#6b7280';
+        hint.style.textAlign = 'left';
+        hint.textContent = 'A4 canvas: 210mm × 297mm';
+
+        const toggleWrap = document.createElement('label');
+        toggleWrap.style.display = 'flex';
+        toggleWrap.style.alignItems = 'center';
+        toggleWrap.style.gap = '6px';
+        toggleWrap.style.marginLeft = 'auto';
+        const toggle = document.createElement('input');
+        toggle.type = 'checkbox';
+        toggle.checked = isA4Scrollable;
+        const toggleText = document.createElement('span');
+        toggleText.textContent = 'Scrollable';
+        toggle.addEventListener('change', () => {
+          isA4Scrollable = !!toggle.checked;
+          injectA4FrameStyles(isA4Scrollable);
+        });
+        toggleWrap.appendChild(toggle);
+        toggleWrap.appendChild(toggleText);
+
         const addBtn = document.createElement('button');
         addBtn.type = 'button';
         addBtn.textContent = 'Add Page';
@@ -853,6 +955,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           }
           renderPagesList();
         });
+        controls.appendChild(hint);
+        controls.appendChild(toggleWrap);
         controls.appendChild(addBtn);
         pagesPanel.appendChild(controls);
 
@@ -1009,15 +1113,40 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       if (!cmdm.has('open-pages-panel')) {
         cmdm.add('open-pages-panel', {
           run() {
-        if (!pagesPanel.parentElement && viewsEl) {
-          viewsEl.appendChild(pagesPanel);
-          // Force layout to start at top-left
-          (viewsEl as HTMLElement).style.display = 'flex';
-          (viewsEl as HTMLElement).style.flexDirection = 'column';
-          (viewsEl as HTMLElement).style.alignItems = 'stretch';
-          (viewsEl as HTMLElement).style.justifyContent = 'flex-start';
-        }
+            if (!pagesPanel.parentElement && viewsEl) {
+              viewsEl.appendChild(pagesPanel);
+      
+              // Sidebar container
+              const v = viewsEl as HTMLElement;
+              v.style.display = 'flex';
+              v.style.flexDirection = 'column';
+              v.style.alignItems = 'stretch';
+              v.style.justifyContent = 'flex-start';
+              v.style.padding = '0';
+              v.style.margin = '0';
+            }
+      
             renderPagesList();
+      
+            // Pages panel itself
+            pagesPanel.style.display = 'flex';
+            pagesPanel.style.flexDirection = 'column';
+            pagesPanel.style.alignItems = 'flex-start';
+            pagesPanel.style.justifyContent = 'flex-start';
+            pagesPanel.style.width = '100%';
+            pagesPanel.style.margin = '0';
+            pagesPanel.style.padding = '0';
+            pagesPanel.style.textAlign = 'left';
+      
+            // Force all children to align left
+            Array.from(pagesPanel.children).forEach(child => {
+              const el = child as HTMLElement;
+              el.style.margin = '0';
+              el.style.padding = '0';
+              el.style.textAlign = 'left';
+              el.style.width = '100%';
+            });
+      
             pagesPanel.style.display = '';
           },
           stop() {
@@ -1025,6 +1154,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           }
         });
       }
+      
 
       // Ensure attachment after editor is fully loaded
       editor.on('load', () => {
@@ -1076,19 +1206,39 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         // Add a small delay to ensure DOM is fully ready
         setTimeout(function() {
         // Inject A4 page styling into the canvas frame for WYSIWYG sizing
-        try {
-          const frame = editor.Canvas.getFrameEl();
-          const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
-          if (doc) {
-            const styleEl = doc.createElement('style');
-            styleEl.setAttribute('data-a4-style', 'true');
-            styleEl.textContent = `@page { size: A4; margin: 0; }
-html, body { margin: 0; padding: 0; }
-body { width: 210mm; min-height: 297mm; box-sizing: border-box; }
-`; 
-            doc.head && doc.head.appendChild(styleEl);
-          }
-        } catch {}
+        let isA4Scrollable = true;
+        const injectA4FrameStyles = (scrollable: boolean) => {
+          try {
+            const frame = editor.Canvas.getFrameEl();
+            const doc = frame && (frame.contentDocument || frame.contentWindow?.document);
+            if (!doc) return;
+            let styleEl = doc.querySelector('style[data-a4-style="true"]') as HTMLStyleElement | null;
+            if (!styleEl) {
+              styleEl = doc.createElement('style');
+              styleEl.setAttribute('data-a4-style', 'true');
+              doc.head && doc.head.appendChild(styleEl);
+            }
+            if (scrollable) {
+              styleEl!.textContent = `
+@page { size: A4; margin: 0; }
+html, body { margin: 0; padding: 0; box-sizing: border-box; }
+html { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; }
+body { width: 210mm !important; min-height: 297mm !important; overflow: auto !important; box-sizing: border-box; }
+#wrapper { width: 210mm !important; min-height: 297mm !important; overflow: visible !important; box-sizing: border-box; }
+`;
+            } else {
+              styleEl!.textContent = `
+@page { size: A4; margin: 0; }
+html, body { margin: 0; padding: 0; box-sizing: border-box; }
+html { width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
+body { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
+#wrapper { width: 210mm !important; height: 297mm !important; overflow: hidden !important; box-sizing: border-box; }
+`;
+            }
+          } catch {}
+        };
+
+        injectA4FrameStyles(isA4Scrollable);
 
         // Store draggable rectangle metadata for later reinitialization
         let rectangleCounter = 0;

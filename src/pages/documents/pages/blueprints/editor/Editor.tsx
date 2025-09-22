@@ -107,7 +107,7 @@ export default function BlueprintEditor() {
         { name: 'Template Editor', href: '#' }
       ]}
     >
-      <div className="h-[calc(100vh-200px)]">
+      <div className="h-screen overflow-hidden">
         <GrapeJSEditor 
           key={`${id}-${templateHtml.length}`}
           initialHtml={templateHtml} 
