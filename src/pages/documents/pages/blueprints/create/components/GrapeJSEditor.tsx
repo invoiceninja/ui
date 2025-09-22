@@ -775,7 +775,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       pagesPanel.style.display = 'none';
       pagesPanel.style.padding = '0';
       pagesPanel.setAttribute('data-panel', 'pages');
-      pagesPanel.className = 'gjs-pn-panel';
+      pagesPanel.className = 'gjs-pn-panelx';
       pagesPanel.style.background = '#ffff';
       pagesPanel.style.border = 'none';
       pagesPanel.style.borderRadius = '0';
@@ -790,34 +790,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       // }
 
       // Hard-align the Pages panel to the left within the views sidebar
-      const ensurePagesPanelGlobalStyles = () => {
-        if (!document.querySelector('style[data-pages-panel-style="true"]')) {
-          const style = document.createElement('style');
-          style.setAttribute('data-pages-panel-style', 'true');
-          style.textContent = `
-.gjs-pn-views, .gjs-pn-views-container, .gjs-pn-panel.gjs-pn-views-container {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-/* Do not affect the Views tabs bar (.gjs-pn-panel.gjs-pn-views) */
-.gjs-pn-panel.gjs-pn-views { display: block !important; }
-/* Keep our Pages panel only in the views-container area */
-.gjs-pn-panel.gjs-pn-views-container > .gjs-pn-panel[data-panel="pages"] {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  align-self: flex-start !important;
-  box-sizing: border-box !important;
-}
-/* Force left-top alignment inside our Pages panel */
-.gjs-pn-panel[data-panel="pages"] { display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: flex-start !important; }
-`;
-          document.head.appendChild(style);
-        }
-      };
+     
       // ensurePagesPanelGlobalStyles();
 
       // --------- paged.js integration helpers ---------
