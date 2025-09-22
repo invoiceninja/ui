@@ -1999,7 +1999,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         | { data: Record<string, { html: string; css: string }>; order: string[]; activeId: string }
         | undefined;
 
-      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css||''}</style></head><body>${html||''}</body></html>`;
+      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css||''}</style><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></head><body>${html||''}</body></html>`;
 
       const pagesPayload: Record<string, string> = {};
       if (pagesApi && pagesApi.getAll) {
