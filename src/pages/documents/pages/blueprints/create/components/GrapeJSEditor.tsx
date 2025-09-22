@@ -292,9 +292,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           },
           selectorManager: { componentFirst: true },
           canvas: {
-            styles: [
-              'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css'
-            ],
+            styles: [],
             scripts: []
           },
         styleManager: {
@@ -591,8 +589,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           
         },
       });
-
-      try { console.log('[pagedjs] GrapesJS initialized'); } catch {}
 
       editor.I18n.addMessages({
         en: {
@@ -1367,6 +1363,18 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             const html = editor.getHtml();
             const css = editor.getCss();
             
+            const originalGetCss = editor.getCss;
+            
+            editor.getCss = function() {
+              const css = originalGetCss.call(this);
+              // Remove *{} rules and specific CSS rules
+              return css ? css
+                .replace(/\*\s*\{\s*\}/g, '')
+                .replace(/\*\s*\{\s*box-sizing:\s*border-box;\s*\}/g, '')
+                .replace(/body\s*\{\s*margin:\s*0;\s*\}/g, '')
+                .replace(/\n\s*\n/g, '\n') : '';
+            };
+
             // Format the HTML and CSS separately
             // Remove any body tags and head elements from the HTML since GrapeJS expects only body content
             let cleanHtml = html;
@@ -1820,58 +1828,61 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         }
 
         // Real-time two-way binding for Monaco editor
-        editor.on('component:update', function() {
-          if (showMonacoEditor && monacoHtmlEditor && monacoCssEditor) {
-            const html = editor.getHtml();
-            const css = editor.getCss();
+        // editor.on('component:update', function() {
+        //   console.log('component:update');
+        //   if (showMonacoEditor && monacoHtmlEditor && monacoCssEditor) {
+        //     const html = editor.getHtml();
+        //     const css = editor.getCss();
             
-            // Clean the HTML to remove any body tags and head elements
-            let cleanHtml = html;
-            if (cleanHtml.includes('<body')) {
-              const bodyMatch = cleanHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-              if (bodyMatch && bodyMatch[1]) {
-                cleanHtml = bodyMatch[1].trim();
-              }
-            }
+        //     console.log(css);
             
-            // Remove head elements (meta, title, etc.) that shouldn't be in body content
-            cleanHtml = cleanHtml
-              .replace(/<meta[^>]*>/gi, '')
-              .replace(/<title[^>]*>.*?<\/title>/gi, '')
-              .replace(/<link[^>]*>/gi, '')
-              .replace(/<script[^>]*>.*?<\/script>/gi, '')
-              .replace(/<style[^>]*>.*?<\/style>/gi, '')
-              .replace(/<head[^>]*>.*?<\/head>/gi, '')
-              .trim();
+        //     // Clean the HTML to remove any body tags and head elements
+        //     let cleanHtml = html;
+        //     if (cleanHtml.includes('<body')) {
+        //       const bodyMatch = cleanHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        //       if (bodyMatch && bodyMatch[1]) {
+        //         cleanHtml = bodyMatch[1].trim();
+        //       }
+        //     }
             
-            const formattedHtml = beautify.html(cleanHtml, {
-              indent_size: 2,
-              indent_char: ' ',
-              max_preserve_newlines: 2,
-              preserve_newlines: true,
-              indent_scripts: 'normal',
-              end_with_newline: true,
-              wrap_line_length: 120,
-              indent_inner_html: true,
-              indent_empty_lines: false
-            });
+        //     // Remove head elements (meta, title, etc.) that shouldn't be in body content
+        //     cleanHtml = cleanHtml
+        //       .replace(/<meta[^>]*>/gi, '')
+        //       .replace(/<title[^>]*>.*?<\/title>/gi, '')
+        //       .replace(/<link[^>]*>/gi, '')
+        //       .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        //       .replace(/<style[^>]*>.*?<\/style>/gi, '')
+        //       .replace(/<head[^>]*>.*?<\/head>/gi, '')
+        //       .trim();
             
-            const formattedCss = beautify.css(css || '', {
-              indent_size: 2,
-              indent_char: ' ',
-              max_preserve_newlines: 2,
-              preserve_newlines: true,
-              end_with_newline: true,
-              wrap_line_length: 120,
-              indent_empty_lines: false
-            });
+        //     const formattedHtml = beautify.html(cleanHtml, {
+        //       indent_size: 2,
+        //       indent_char: ' ',
+        //       max_preserve_newlines: 2,
+        //       preserve_newlines: true,
+        //       indent_scripts: 'normal',
+        //       end_with_newline: true,
+        //       wrap_line_length: 120,
+        //       indent_inner_html: true,
+        //       indent_empty_lines: false
+        //     });
             
-            setMonacoHtml(formattedHtml);
-            setMonacoCss(formattedCss);
-            monacoHtmlEditor.setValue(formattedHtml);
-            monacoCssEditor.setValue(formattedCss);
-          }
-        });
+        //     const formattedCss = beautify.css(css || '', {
+        //       indent_size: 2,
+        //       indent_char: ' ',
+        //       max_preserve_newlines: 2,
+        //       preserve_newlines: true,
+        //       end_with_newline: true,
+        //       wrap_line_length: 120,
+        //       indent_empty_lines: false
+        //     });
+            
+        //     setMonacoHtml(formattedHtml);
+        //     setMonacoCss(formattedCss);
+        //     monacoHtmlEditor.setValue(formattedHtml);
+        //     monacoCssEditor.setValue(formattedCss);
+        //   }
+        // });
 
 
 
@@ -1999,7 +2010,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         | { data: Record<string, { html: string; css: string }>; order: string[]; activeId: string }
         | undefined;
 
-      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css||''}</style><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></head><body>${html||''}</body></html>`;
+      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css||''}</style></head><body>${html||''}</body></html>`;
 
       const pagesPayload: Record<string, string> = {};
       if (pagesApi && pagesApi.getAll) {
@@ -2012,6 +2023,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           else if (typeof (pagesApi as any).setActive === 'function') (pagesApi as any).setActive(pg);
           const html = editor.getHtml();
           const css = editor.getCss();
+
           const id = pg.getId ? pg.getId() : undefined;
           if (id) pagesPayload[id] = buildDoc(String(html), String(css));
         }
@@ -2028,7 +2040,20 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         });
       } else {
         // Single-page fallback
-        pagesPayload['page-1'] = buildDoc(String(editor.getHtml()), String(editor.getCss()));
+
+        const originalGetCss = editor.getCss;
+            
+        editor.getCss = function() {
+          const css = originalGetCss.call(this);
+          // Remove *{} rules and specific CSS rules
+          return css ? css
+            .replace(/\*\s*\{\s*\}/g, '')
+            .replace(/\*\s*\{\s*box-sizing:\s*border-box;\s*\}/g, '')
+            .replace(/body\s*\{\s*margin:\s*0;\s*\}/g, '')
+            .replace(/\n\s*\n/g, '\n') : '';
+        };
+
+        pagesPayload['page-1'] = buildDoc(String(editor.getHtml()), String(originalGetCss));
       }
 
       // Also keep current page as fullHtml for backward compatibility
@@ -2102,45 +2127,18 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         .replace(/<head[^>]*>.*?<\/head>/gi, '')
         .trim();
       
-      try {
-        // Use a simpler approach - just set components and style directly
+        // editor.setComponents('');
+        // editor.setStyle('');
         
-        // Clear the editor first
-        editor.setComponents('');
-        editor.setStyle('');
-        
-        // Wait a moment for the clear to complete
-        setTimeout(() => {
-          try {
-            // Set the new content
-            editor.setComponents(cleanHtml);
-            editor.setStyle(monacoCss);
-            editor.refresh();
-            
-            // Check what's actually in the editor after applying
-            setTimeout(() => {
-              const currentHtml = editor.getHtml();
-              const currentCss = editor.getCss();
-              
-              if (currentHtml.length > 0) {
-                setShowMonacoEditor(false);
-              } else {
-                alert('Failed to apply changes. Please try again.');
-              }
-            }, 100);
-            
-          } catch (setError) {
-            alert('Error applying changes. Please try again.');
-          }
-        }, 100);
-        
+        editor.setComponents(cleanHtml);
+        editor.setStyle(monacoCss);
+        editor.refresh();
+        setShowMonacoEditor(false);
+
       } catch (error) {
         alert('Error applying changes. Please try again.');
       }
       
-    } catch (error) {
-      alert('Error applying changes. Please check the HTML/CSS format.');
-    }
   };
 
   const handleCancelMonacoEditor = () => {
