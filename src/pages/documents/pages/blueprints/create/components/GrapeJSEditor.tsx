@@ -10,18 +10,6 @@ import "grapesjs/dist/css/grapes.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 const iconStyles = `
 
-.gjs-row {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 -15px;
-}
-
-.gjs-cell {
-  flex: 1;
-  padding: 0 15px;
-  min-width: 0; /* prevents overflow */
-}
-
 .gjs-block {
     align-items: center !important;
     justify-content: center !important;
@@ -699,20 +687,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         },
       });
 
-      // Step 1: Add Pages button to the Views toolbar (no behavior yet)
-      // if (!pn.getButton('views', 'open-pages')) {
-      //   pn.addButton('views', {
-      //     id: 'open-pages',
-      //     className: 'fas fa-copy',
-      //     command: 'open-pages-panel',
-      //     attributes: {
-      //       title: 'Pages',
-      //       'data-tooltip-pos': 'bottom',
-      //     },
-      //     togglable: false,
-      //   });
-      // }
-
       if (!pn.getButton('views', 'open-pages')) {
         pn.addButton('views', {
           id: 'open-pages',
@@ -766,20 +740,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       pagesPanel.style.alignSelf = '';
       pagesPanel.style.width = '100%';
       pagesPanel.style.boxSizing = 'border-box';
-      // pagesPanel.innerHTML = '<div style="font-size:12px;color:#111827;font-weight:600;margin:8px 8px 6px 8px;text-align:left">Pages</div>';
-      // if (viewsEl) {
-      //   viewsEl.appendChild(pagesPanel);
-      // }
-
-      // Hard-align the Pages panel to the left within the views sidebar
-     
-      // ensurePagesPanelGlobalStyles();
-
-      // --------- paged.js integration helpers ---------
-
-
-
-      // A4 frame styles removed to fix drag/drop issues
 
       // Simple custom pages store fallback for vanilla GrapesJS
       const customPages: { data: Record<string, { html: string; css: string }>; activeId: string; order: string[] } = {
@@ -1857,14 +1817,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             }
           });
 
-
-
-
-
         }
-
-        // Initial HTML content will be set by the separate useEffect
-
 
         // Real-time two-way binding for Monaco editor
         editor.on('component:update', function() {
@@ -1896,17 +1849,10 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
               indent_char: ' ',
               max_preserve_newlines: 2,
               preserve_newlines: true,
-            //   break_chained_methods: false,
               indent_scripts: 'normal',
-            //   brace_style: 'collapse',
-            //   space_before_conditional: true,
-            //   unescape_strings: false,
-            //   jslint_happy: false,
               end_with_newline: true,
               wrap_line_length: 120,
               indent_inner_html: true,
-            //   comma_first: false,
-            //   e4x: false,
               indent_empty_lines: false
             });
             
@@ -1915,15 +1861,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
               indent_char: ' ',
               max_preserve_newlines: 2,
               preserve_newlines: true,
-            //   break_chained_methods: false,
-            //   brace_style: 'collapse',
-            //   space_before_conditional: true,
-            //   unescape_strings: false,
-            //   jslint_happy: false,
               end_with_newline: true,
               wrap_line_length: 120,
-            //   comma_first: false,
-            //   e4x: false,
               indent_empty_lines: false
             });
             
@@ -2292,7 +2231,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                         formatOnPaste: true,
                         autoIndent: 'full',
                         autoClosingBrackets: 'always',
-                        //   autoClosingPairs: 'always',
                         autoClosingQuotes: 'always',
                         autoSurround: 'languageDefined',
                         fontSize: 14,
@@ -2303,7 +2241,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                         },
                         theme: 'vs-light',
                         quickSuggestions: true,
-                        //   suggestOnTriggerCharacters: true,
                         acceptSuggestionOnEnter: 'on',
                         tabCompletion: 'on',
                         wordBasedSuggestions: 'matchingDocuments'
@@ -2339,7 +2276,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                         formatOnPaste: true,
                         autoIndent: 'full',
                         autoClosingBrackets: 'always',
-                        //   autoClosingPairs: 'always',
                         autoClosingQuotes: 'always',
                         autoSurround: 'languageDefined',
                         fontSize: 14,
@@ -2350,7 +2286,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
                         },
                         theme: 'vs-light',
                         quickSuggestions: true,
-                        //   suggestOnTriggerCharacters: true,
                         acceptSuggestionOnEnter: 'on',
                         tabCompletion: 'on',
                         wordBasedSuggestions: 'matchingDocuments'
