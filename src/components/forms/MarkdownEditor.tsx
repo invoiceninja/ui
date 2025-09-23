@@ -180,13 +180,15 @@ export function MarkdownEditor(props: Props) {
   }
 
   return (
-    <EditorProvider>
-      <LexicalEditor
-        value={value || ''}
-        editorId={props.editorId || 'main'}
-        disabled={Boolean(props.disabled)}
-        onChange={props.onChange}
-      />
-    </EditorProvider>
+    <div className="mt-4">
+      <EditorProvider>
+        <LexicalEditor
+          value={value || ''}
+          editorId={props.editorId || 'main'}
+          disabled={Boolean(props.disabled)}
+          onChange={props.onChange}
+        />
+      </EditorProvider>
+    </div>
   );
 }

@@ -35,6 +35,7 @@ import { setFloatingElemPosition } from '../../utils/setFloatingElemPosition';
 import { INSERT_INLINE_COMMAND } from '../CommentPlugin';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 
 function TextFormatFloatingToolbar({
   editor,
@@ -67,6 +68,7 @@ function TextFormatFloatingToolbar({
   isUnderline: boolean;
   setIsLinkEditMode: Dispatch<boolean>;
 }): JSX.Element {
+  const [t] = useTranslation();
   const reactSettings = useReactSettings();
 
   const popupCharStylesEditorRef = useRef<HTMLDivElement | null>(null);
@@ -288,7 +290,7 @@ function TextFormatFloatingToolbar({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'lowercase');
             }}
             className={'popup-item spaced ' + (isLowercase ? 'active' : '')}
-            title="Lowercase"
+            title={t('lowercase') as string}
             aria-label="Format text to lowercase"
           >
             <i className="format lowercase" />
@@ -299,7 +301,7 @@ function TextFormatFloatingToolbar({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'capitalize');
             }}
             className={'popup-item spaced ' + (isCapitalize ? 'active' : '')}
-            title="Capitalize"
+            title={t('capitalize') as string}
             aria-label="Format text to capitalize"
           >
             <i className="format capitalize" />
@@ -310,7 +312,7 @@ function TextFormatFloatingToolbar({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
             }}
             className={'popup-item spaced ' + (isCode ? 'active' : '')}
-            title="Insert code block"
+            title={t('insert_code_block') as string}
             aria-label="Insert code block"
           >
             <i className="format code" />
@@ -319,7 +321,7 @@ function TextFormatFloatingToolbar({
             type="button"
             onClick={insertLink}
             className={'popup-item spaced ' + (isLink ? 'active' : '')}
-            title="Insert link"
+            title={t('insert_link') as string}
             aria-label="Insert link"
           >
             <i className="format link" />
@@ -330,7 +332,7 @@ function TextFormatFloatingToolbar({
         type="button"
         onClick={insertComment}
         className={'popup-item spaced insert-comment'}
-        title="Insert comment"
+        title={t('insert_comment') as string}
         aria-label="Insert comment"
       >
         <i className="format add-comment" />

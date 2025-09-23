@@ -1148,12 +1148,12 @@ export default function ToolbarPlugin({
               className={
                 'item wide ' + dropDownActiveClass(toolbarState.isLowercase)
               }
-              title="Lowercase"
+              title={t('lowercase') as string}
               aria-label="Format text to lowercase"
             >
               <div className="icon-text-container">
                 <i className="icon lowercase" />
-                <span className="text">Lowercase</span>
+                <span className="text">{t('lowercase')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.LOWERCASE}</span>
             </DropDownItem>
@@ -1164,12 +1164,12 @@ export default function ToolbarPlugin({
               className={
                 'item wide ' + dropDownActiveClass(toolbarState.isUppercase)
               }
-              title="Uppercase"
+              title={t('uppercase') as string}
               aria-label="Format text to uppercase"
             >
               <div className="icon-text-container">
                 <i className="icon uppercase" />
-                <span className="text">Uppercase</span>
+                <span className="text">{t('uppercase')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.UPPERCASE}</span>
             </DropDownItem>
@@ -1180,12 +1180,12 @@ export default function ToolbarPlugin({
               className={
                 'item wide ' + dropDownActiveClass(toolbarState.isCapitalize)
               }
-              title="Capitalize"
+              title={t('capitalize') as string}
               aria-label="Format text to capitalize"
             >
               <div className="icon-text-container">
                 <i className="icon capitalize" />
-                <span className="text">Capitalize</span>
+                <span className="text">{t('capitalize')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.CAPITALIZE}</span>
             </DropDownItem>
@@ -1199,12 +1199,12 @@ export default function ToolbarPlugin({
               className={
                 'item wide ' + dropDownActiveClass(toolbarState.isStrikethrough)
               }
-              title="Strikethrough"
+              title={t('strikethrough') as string}
               aria-label="Format text with a strikethrough"
             >
               <div className="icon-text-container">
                 <i className="icon strikethrough" />
-                <span className="text">Strikethrough</span>
+                <span className="text">{t('strikethrough')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.STRIKETHROUGH}</span>
             </DropDownItem>
@@ -1215,12 +1215,12 @@ export default function ToolbarPlugin({
               className={
                 'item wide ' + dropDownActiveClass(toolbarState.isSubscript)
               }
-              title="Subscript"
+              title={t('subscript') as string}
               aria-label="Format text with a subscript"
             >
               <div className="icon-text-container">
                 <i className="icon subscript" />
-                <span className="text">Subscript</span>
+                <span className="text">{t('subscript')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.SUBSCRIPT}</span>
             </DropDownItem>
@@ -1234,12 +1234,12 @@ export default function ToolbarPlugin({
               className={
                 'item wide ' + dropDownActiveClass(toolbarState.isSuperscript)
               }
-              title="Superscript"
+              title={t('superscript') as string}
               aria-label="Format text with a superscript"
             >
               <div className="icon-text-container">
                 <i className="icon superscript" />
-                <span className="text">Superscript</span>
+                <span className="text">{t('superscript')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.SUPERSCRIPT}</span>
             </DropDownItem>
@@ -1250,23 +1250,23 @@ export default function ToolbarPlugin({
               className={
                 'item wide ' + dropDownActiveClass(toolbarState.isHighlight)
               }
-              title="Highlight"
+              title={t('highlight') as string}
               aria-label="Format text with a highlight"
             >
               <div className="icon-text-container">
                 <i className="icon highlight" />
-                <span className="text">Highlight</span>
+                <span className="text">{t('highlight')}</span>
               </div>
             </DropDownItem>
             <DropDownItem
               onClick={() => clearFormatting(activeEditor)}
               className="item wide"
-              title="Clear text formatting"
+              title={t('clear_text_formatting') as string}
               aria-label="Clear all text formatting"
             >
               <div className="icon-text-container">
                 <i className="icon clear" />
-                <span className="text">Clear Formatting</span>
+                <span className="text">{t('clear_text_formatting')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.CLEAR_FORMATTING}</span>
             </DropDownItem>

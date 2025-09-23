@@ -111,7 +111,6 @@ export function Editor({
       showTreeView,
       showTableOfContents,
       shouldUseLexicalContextMenu,
-      shouldPreserveNewLinesInMarkdown,
       tableCellMerge,
       tableCellBackgroundColor,
       tableHorizontalScroll,
@@ -120,14 +119,10 @@ export function Editor({
       listStrictIndent,
     },
   } = useSettings();
-  const { historyState } = useSharedHistoryContext();
+
   const isEditable = useLexicalEditable();
-  // const placeholder = isCollab
-  //   ? 'Enter some collaborative rich text...'
-  //   : isRichText
-  //   ? 'Enter some rich text...'
-  //     : 'Enter some plain text...';
-  const placeholder = 'Enter some rich text...';
+  const { historyState } = useSharedHistoryContext();
+
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const [isSmallWidthViewport, setIsSmallWidthViewport] =
@@ -167,7 +162,6 @@ export function Editor({
         const parser = new DOMParser();
         const dom = parser.parseFromString(value, 'text/html');
         const nodes = $generateNodesFromDOM(editor, dom);
-        console.log(nodes);
         $insertNodes(nodes);
       });
     }

@@ -1569,7 +1569,7 @@ button.toolbar-item:disabled .chevron-down {
 }
 
 button.toolbar-item.active {
-  background-color: rgba(223, 232, 250, 0.3);
+  background-color: rgba(223, 232, 250, 0.3) !important;
 }
 
 button.toolbar-item.active i {
@@ -1577,7 +1577,7 @@ button.toolbar-item.active i {
 }
 
 .toolbar-item:hover:not([disabled]) {
-  background-color: #eee;
+  background-color: #eee !important;
 }
 
 .toolbar-item.font-family .text {
