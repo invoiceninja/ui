@@ -109,7 +109,7 @@ function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
   const [t] = useTranslation();
 
   return (
-    <Button behavior="button" disabled={isSubmitting} className="w-full">
+    <Button disabled={isSubmitting} className="w-full">
       {t('delete')}
     </Button>
   );
