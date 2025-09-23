@@ -21,7 +21,6 @@
 .Input__input {
   display: flex;
   flex: 2;
-  border: 1px solid #999;
   padding-top: 7px;
   padding-bottom: 7px;
   padding-left: 10px;

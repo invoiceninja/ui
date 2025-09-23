@@ -6,12 +6,15 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from 'react';
 
 import './Input.css';
 
 import * as React from 'react';
-import {HTMLInputTypeAttribute} from 'react';
+import { HTMLInputTypeAttribute } from 'react';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useColorScheme } from '$app/common/colors';
 
 type Props = Readonly<{
   'data-test-id'?: string;
@@ -30,18 +33,31 @@ export default function TextInput({
   'data-test-id': dataTestId,
   type = 'text',
 }: Props): JSX.Element {
+  const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+
   return (
     <div className="Input__wrapper">
       <label className="Input__label">{label}</label>
       <input
         type={type}
-        className="Input__input"
         placeholder={placeholder}
         value={value}
         onChange={(e) => {
           onChange(e.target.value);
         }}
         data-test-id={dataTestId}
+        className={classNames(
+          'Input__input w-full py-2 px-3 rounded-md text-sm disabled:opacity-75 disabled:cursor-not-allowed focus:outline-none focus:ring-0 border',
+          {
+            'border-[#09090B26] focus:border-black': !reactSettings.dark_mode,
+            'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
+          }
+        )}
+        style={{
+          backgroundColor: colors.$1,
+          color: colors.$3,
+        }}
       />
     </div>
   );

@@ -27,7 +27,7 @@
 }
 
 .floating-text-format-popup-dark {
-  background: #323236 !important;
+  background: #7d7d7f !important;
 }
 
 .floating-text-format-popup button.popup-item {
@@ -71,7 +71,7 @@
 }
 
 .floating-text-format-popup-dark .popup-item:hover:not([disabled]) {
-  background-color: rgb(18, 18, 18);
+  background-color: #dfe8fa4d;
 }
 
 .floating-text-format-popup-light .popup-item:hover:not([disabled]) {
