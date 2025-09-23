@@ -26,7 +26,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { useLexicalEditable } from '@lexical/react/useLexicalEditable';
 import { CAN_USE_DOM } from '@lexical/utils';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import AutocompletePlugin from './plugins/AutocompletePlugin';
 import AutoEmbedPlugin from './plugins/AutoEmbedPlugin';
@@ -75,12 +75,33 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import CodeHighlightPrismPlugin from './plugins/CodeHighlightPrismPlugin';
 import TableOfContentsPlugin from './plugins/TableOfContentsPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $getRoot, $insertNodes } from 'lexical';
+
 
 interface Props {
   value: string;
   disabled: boolean;
   onChange: (value: string) => void;
   editorId: string;
+}
+
+function InitialContentPlugin({ value }: { value: string }) {
+  const [editor] = useLexicalComposerContext();
+  const hasLoaded = useRef(false);
+
+  if (editor && value && !hasLoaded.current) {
+    editor.update(() => {
+      const parser = new DOMParser();
+      const dom = parser.parseFromString(value, 'text/html');
+      const nodes = $generateNodesFromDOM(editor, dom);
+      $getRoot().select();
+      $insertNodes(nodes);
+    });
+    hasLoaded.current = true;
+  }
+
+  return null;
 }
 
 export function Editor({
@@ -151,6 +172,7 @@ export function Editor({
     };
   }, [isSmallWidthViewport]);
 
+
   return (
     <div className="border rounded-md" style={{ borderColor: colors.$24 }}>
       {isRichText && (
@@ -188,8 +210,16 @@ export function Editor({
         <AutoLinkPlugin />
         <DateTimePlugin />
         <OnChangePlugin
-          onChange={(editor, editorr) => console.log(JSON.stringify(editor))}
+          onChange={(editorState) => {
+            editorState.read(() => {
+              const htmlString = $generateHtmlFromNodes(editor, null);
+              onChange(htmlString);
+            });
+          }}
         />
+        
+        {/* Load initial content plugin */}
+        <InitialContentPlugin value={value} />
 
         <HistoryPlugin externalHistoryState={historyState} />
 
