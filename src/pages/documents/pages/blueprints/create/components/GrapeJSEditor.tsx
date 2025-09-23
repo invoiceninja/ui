@@ -18,7 +18,6 @@ import pluginStyleBg from "grapesjs-style-bg";
 import pluginPresetWebpage from "grapesjs-preset-webpage";
 
 const iconStyles = `
-
 .gjs-block {
     align-items: center !important;
     justify-content: center !important;
@@ -30,6 +29,44 @@ const iconStyles = `
     position: relative !important;
     overflow: hidden !important;
 }
+
+        .gjs-row {
+          display: flex !important;
+          flex-wrap: wrap !important;
+          margin: 0 -15px !important;
+          width: 100% !important;
+        }
+        
+        .gjs-cell {
+          flex: 1 !important;
+          padding: 0 15px !important;
+          box-sizing: border-box !important;
+          min-width: 0 !important;
+        }
+        
+        /* Let GrapeJS handle the specific column widths via data attributes */
+        .gjs-cell[data-gjs-type="column"] {
+          flex: 1 !important;
+        }
+        
+        /* Override any conflicting styles */
+        .gjs-frame .gjs-row {
+          display: flex !important;
+          flex-direction: row !important;
+          width: 100% !important;
+        }
+        
+        .gjs-frame .gjs-cell {
+          display: block !important;
+          flex: 1 !important;
+        }
+        
+        /* Ensure content doesn't overflow */
+        .gjs-cell * {
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        
 
 .gjs-block:hover {
     transform: translateY(-3px) !important;
@@ -291,7 +328,79 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             scripts: []
           },
         styleManager: {
-          sectors: [{
+          sectors: [
+            {
+              name: 'Image',
+              open: false,
+              properties: [
+                {
+                  name: 'Object Fit',
+                  property: 'object-fit',
+                  type: 'select',
+                  defaults: 'fill',
+                  list: [
+                    { id: 'fill', value: 'fill', name: 'Fill' },
+                    { id: 'contain', value: 'contain', name: 'Contain' },
+                    { id: 'cover', value: 'cover', name: 'Cover' },
+                    { id: 'scale-down', value: 'scale-down', name: 'Scale Down' },
+                    { id: 'none', value: 'none', name: 'None' }
+                  ]
+                },
+                {
+                  name: 'Object Position',
+                  property: 'object-position',
+                  type: 'select',
+                  defaults: 'center',
+                  list: [
+                    { id: 'center', value: 'center', name: 'Center' },
+                    { id: 'top', value: 'top', name: 'Top' },
+                    { id: 'bottom', value: 'bottom', name: 'Bottom' },
+                    { id: 'left', value: 'left', name: 'Left' },
+                    { id: 'right', value: 'right', name: 'Right' },
+                    { id: 'top left', value: 'top left', name: 'Top Left' },
+                    { id: 'top right', value: 'top right', name: 'Top Right' },
+                    { id: 'bottom left', value: 'bottom left', name: 'Bottom Left' },
+                    { id: 'bottom right', value: 'bottom right', name: 'Bottom Right' }
+                  ]
+                },
+                {
+                  name: 'Image Width',
+                  property: 'width',
+                  type: 'integer',
+                  units: ['px', '%', 'em', 'rem'],
+                  defaults: 'auto'
+                },
+                {
+                  name: 'Image Height',
+                  property: 'height',
+                  type: 'integer',
+                  units: ['px', '%', 'em', 'rem'],
+                  defaults: 'auto'
+                },
+                {
+                  name: 'Max Width',
+                  property: 'max-width',
+                  type: 'integer',
+                  units: ['px', '%', 'em', 'rem'],
+                  defaults: 'none'
+                },
+                {
+                  name: 'Max Height',
+                  property: 'max-height',
+                  type: 'integer',
+                  units: ['px', '%', 'em', 'rem'],
+                  defaults: 'none'
+                },
+                {
+                  name: 'Border Radius',
+                  property: 'border-radius',
+                  type: 'integer',
+                  units: ['px', '%'],
+                  defaults: '0'
+                }
+              ]
+            },
+            {
               name: 'General',
               properties:[
                 {
@@ -585,6 +694,18 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
           
         },
       });
+
+      const originalGetCss = editor.getCss;
+            
+      editor.getCss = function() {
+        const css = originalGetCss.call(this);
+        // Remove *{} rules and specific CSS rules
+        return css ? css
+          .replace(/\*\s*\{\s*\}/g, '')
+          .replace(/\*\s*\{\s*box-sizing:\s*border-box;\s*\}/g, '')
+          .replace(/body\s*\{\s*margin:\s*0;\s*\}/g, '')
+          .replace(/\n\s*\n/g, '\n') : '';
+      };
 
       editor.I18n.addMessages({
         en: {
@@ -1359,20 +1480,10 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             const html = editor.getHtml();
             const css = editor.getCss();
             
-            const originalGetCss = editor.getCss;
-            
-            editor.getCss = function() {
-              const css = originalGetCss.call(this);
-              // Remove *{} rules and specific CSS rules
-              return css ? css
-                .replace(/\*\s*\{\s*\}/g, '')
-                .replace(/\*\s*\{\s*box-sizing:\s*border-box;\s*\}/g, '')
-                .replace(/body\s*\{\s*margin:\s*0;\s*\}/g, '')
-                .replace(/\n\s*\n/g, '\n') : '';
-            };
+           
 
             console.log(css);
-            
+
             // Format the HTML and CSS separately
             // Remove any body tags and head elements from the HTML since GrapeJS expects only body content
             let cleanHtml = html;
@@ -1834,6 +1945,8 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         // Load project data if provided
         if (initialProjectData) {
           try {
+
+            console.log(initialProjectData);
             editor.loadProjectData(initialProjectData);
           } catch (error) {
             // Silent error handling
@@ -1943,7 +2056,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         | { data: Record<string, { html: string; css: string }>; order: string[]; activeId: string }
         | undefined;
 
-      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css||''}</style></head><body>${html||''}</body></html>`;
+      const buildDoc = (html: string, css: string) => `<!DOCTYPE html><html><style>${css||''}</style></head><body>${html||''}</body></html>`;
 
       const pagesPayload: Record<string, string> = {};
       if (pagesApi && pagesApi.getAll) {
@@ -2065,6 +2178,15 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         
         editor.setComponents(cleanHtml);
         editor.setStyle(monacoCss);
+
+        editor.trigger('change:style');
+        editor.trigger('change:components');
+        
+        // Update the project data directly
+        const projectData = editor.getProjectData();
+        editor.loadProjectData(projectData);
+    
+        console.log(projectData);
         editor.refresh();
         setShowMonacoEditor(false);
 

@@ -50,6 +50,7 @@ export default function BlueprintEditor() {
       // Base64 encode the HTML content
       const base64Html = btoa(html);
       
+      console.log(projectData);
       if (isNewTemplate) {
         // Create new blueprint
         const response = await createBlueprint({
