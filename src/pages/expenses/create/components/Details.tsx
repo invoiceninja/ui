@@ -23,7 +23,7 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import { ExpenseStatus } from '../../common/components/ExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
-import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from '../../common/hooks/useCalculateExpenseAmount';
+import { useCalculateExpenseExclusiveAmount } from '../../common/hooks/useCalculateExpenseAmount';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
@@ -66,7 +66,6 @@ export function Details(props: Props) {
   const { data: taxes } = useTaxRatesQuery({ status: ['active'] });
 
   const formatMoney = useFormatMoney();
-  const calculateExpenseAmount = useCalculateExpenseAmount();
   const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
   const isAnyTaxHidden = () => {
     if (
@@ -105,7 +104,6 @@ export function Details(props: Props) {
 
     return [];
   };
-
 
   return (
     <div className="flex flex-col space-y-4">
@@ -267,7 +265,7 @@ export function Details(props: Props) {
           </div>
         )}
 
-        {Boolean(getNonExistingTaxes().length) && (
+        {/* {Boolean(getNonExistingTaxes().length) && (
           <Element leftSide={t('taxes')}>
             {getNonExistingTaxes().map((tax) => (
               <div key={tax} className="flex items-center space-x-2">
@@ -277,7 +275,7 @@ export function Details(props: Props) {
               </div>
             ))}
           </Element>
-        )}
+        )} */}
 
         {/* Tax 1 */}
         {expense &&
