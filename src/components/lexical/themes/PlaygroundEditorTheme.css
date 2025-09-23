@@ -49,6 +49,7 @@
 .PlaygroundEditorTheme__paragraph mark {
   background-color: unset;
 }
+
 .PlaygroundEditorTheme__textHighlight {
   background: rgba(255, 212, 0, 0.14);
   border-bottom: 2px solid rgba(255, 212, 0, 0.3);
@@ -118,11 +119,18 @@
   vertical-align: super;
 }
 .PlaygroundEditorTheme__textCode {
-  background-color: rgb(240, 242, 245);
   padding: 1px 0.25rem;
   font-family: Menlo, Consolas, Monaco, monospace;
   font-size: 94%;
 }
+.editor-dark .PlaygroundEditorTheme__textCode {
+  background-color: #333;
+}
+
+.editor-light .PlaygroundEditorTheme__textCode {
+  background-color: rgb(240, 242, 245);
+}
+
 .PlaygroundEditorTheme__textLowercase {
   text-transform: lowercase;
 }

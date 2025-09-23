@@ -77,6 +77,8 @@ import TableOfContentsPlugin from './plugins/TableOfContentsPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $insertNodes } from 'lexical';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   value: string;
@@ -94,6 +96,8 @@ export function Editor({
   const isFirstRender = React.useRef(true);
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+
   const {
     settings: {
       isCodeHighlighted,
@@ -219,7 +223,13 @@ export function Editor({
         <RichTextPlugin
           contentEditable={
             <div className="editor-scroller">
-              <div className="editor" ref={onRef}>
+              <div
+                className={classNames('editor', {
+                  'editor-dark': reactSettings.dark_mode,
+                  'editor-light': !reactSettings.dark_mode,
+                })}
+                ref={onRef}
+              >
                 <ContentEditable />
               </div>
             </div>

@@ -38,7 +38,9 @@ export default function TextInput({
 
   return (
     <div className="Input__wrapper">
-      <label className="Input__label">{label}</label>
+      <label className="Input__label" style={{ color: colors.$3 }}>
+        {label}
+      </label>
       <input
         type={type}
         placeholder={placeholder}
@@ -55,8 +57,9 @@ export default function TextInput({
           }
         )}
         style={{
-          backgroundColor: colors.$1,
           color: colors.$3,
+          borderColor: colors.$24,
+          backgroundColor: 'transparent',
         }}
       />
     </div>

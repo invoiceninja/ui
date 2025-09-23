@@ -22,6 +22,8 @@ import {
 } from './utils';
 import { KeyboardEvent, useEffect, useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 function parseFontSize(input: string): [number, string] | null {
   const match = input.match(/^(\d+(?:\.\d+)?)(px|pt)$/);
@@ -70,6 +72,7 @@ export default function FontSize({
   editor: LexicalEditor;
 }) {
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const [inputValue, setInputValue] = useState<string>(selectionFontSize);
   const [inputChangeFlag, setInputChangeFlag] = useState<boolean>(false);
@@ -141,7 +144,13 @@ export default function FontSize({
         title="Font size"
         value={inputValue}
         disabled={disabled}
-        className="toolbar-item font-size-input"
+        className={classNames(
+          'toolbar-item font-size-input border rounded-md text-sm disabled:opacity-75 disabled:cursor-not-allowed focus:outline-none focus:ring-0',
+          {
+            'border-[#09090B26] focus:border-black': !reactSettings.dark_mode,
+            'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
+          }
+        )}
         min={MIN_ALLOWED_FONT_SIZE}
         max={MAX_ALLOWED_FONT_SIZE}
         onChange={(e) => setInputValue(e.target.value)}

@@ -6,14 +6,15 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from 'react';
 
 import './Modal.css';
 
-import {isDOMNode} from 'lexical';
+import { isDOMNode } from 'lexical';
 import * as React from 'react';
-import {ReactNode, useEffect, useRef} from 'react';
-import {createPortal} from 'react-dom';
+import { ReactNode, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { useColorScheme } from '$app/common/colors';
 
 function PortalImpl({
   onClose,
@@ -26,6 +27,8 @@ function PortalImpl({
   onClose: () => void;
   title: string;
 }) {
+  const colors = useColorScheme();
+
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,13 +75,33 @@ function PortalImpl({
 
   return (
     <div className="Modal__overlay" role="dialog">
-      <div className="Modal__modal" tabIndex={-1} ref={modalRef}>
-        <h2 className="Modal__title">{title}</h2>
+      <div
+        className="Modal__modal"
+        tabIndex={-1}
+        ref={modalRef}
+        style={{
+          backgroundColor: colors.$1,
+        }}
+      >
+        <h2
+          className="Modal__title border-b"
+          style={{
+            color: colors.$3,
+            borderColor: colors.$24,
+          }}
+        >
+          {title}
+        </h2>
         <button
           className="Modal__closeButton"
           aria-label="Close modal"
           type="button"
-          onClick={onClose}>
+          onClick={onClose}
+          style={{
+            backgroundColor: colors.$4,
+            color: colors.$3,
+          }}
+        >
           X
         </button>
         <div className="Modal__content">{children}</div>
@@ -102,9 +125,10 @@ export default function Modal({
     <PortalImpl
       onClose={onClose}
       title={title}
-      closeOnClickOutside={closeOnClickOutside}>
+      closeOnClickOutside={closeOnClickOutside}
+    >
       {children}
     </PortalImpl>,
-    document.body,
+    document.body
   );
 }
