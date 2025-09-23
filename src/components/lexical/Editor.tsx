@@ -26,7 +26,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { useLexicalEditable } from '@lexical/react/useLexicalEditable';
 import { CAN_USE_DOM } from '@lexical/utils';
 import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 import AutocompletePlugin from './plugins/AutocompletePlugin';
 import AutoEmbedPlugin from './plugins/AutoEmbedPlugin';
@@ -76,8 +76,7 @@ import CodeHighlightPrismPlugin from './plugins/CodeHighlightPrismPlugin';
 import TableOfContentsPlugin from './plugins/TableOfContentsPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
-import { $getRoot, $insertNodes } from 'lexical';
-
+import { $insertNodes } from 'lexical';
 
 interface Props {
   value: string;
@@ -86,30 +85,14 @@ interface Props {
   editorId: string;
 }
 
-function InitialContentPlugin({ value }: { value: string }) {
-  const [editor] = useLexicalComposerContext();
-  const hasLoaded = useRef(false);
-
-  if (editor && value && !hasLoaded.current) {
-    editor.update(() => {
-      const parser = new DOMParser();
-      const dom = parser.parseFromString(value, 'text/html');
-      const nodes = $generateNodesFromDOM(editor, dom);
-      $getRoot().select();
-      $insertNodes(nodes);
-    });
-    hasLoaded.current = true;
-  }
-
-  return null;
-}
-
 export function Editor({
   value,
   disabled,
   onChange,
   editorId,
 }: Props): JSX.Element {
+  const isFirstRender = React.useRef(true);
+
   const colors = useColorScheme();
   const {
     settings: {
@@ -172,6 +155,19 @@ export function Editor({
     };
   }, [isSmallWidthViewport]);
 
+  useEffect(() => {
+    if (isFirstRender.current && value) {
+      isFirstRender.current = false;
+
+      editor.update(() => {
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(value, 'text/html');
+        const nodes = $generateNodesFromDOM(editor, dom);
+        console.log(nodes);
+        $insertNodes(nodes);
+      });
+    }
+  }, [isFirstRender, value, editor]);
 
   return (
     <div className="border rounded-md" style={{ borderColor: colors.$24 }}>
@@ -217,9 +213,6 @@ export function Editor({
             });
           }}
         />
-        
-        {/* Load initial content plugin */}
-        <InitialContentPlugin value={value} />
 
         <HistoryPlugin externalHistoryState={historyState} />
 
