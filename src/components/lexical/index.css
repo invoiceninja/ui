@@ -1576,8 +1576,12 @@ button.toolbar-item.active i {
   opacity: 1;
 }
 
-.toolbar-item:hover:not([disabled]) {
+.toolbar-light .toolbar-item:hover:not([disabled]) {
   background-color: #eee !important;
+}
+
+.toolbar-dark .toolbar-item:hover:not([disabled]):not(.active) {
+  background-color: #323236 !important;
 }
 
 .toolbar-item.font-family .text {
