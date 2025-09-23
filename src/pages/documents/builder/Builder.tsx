@@ -1,7 +1,6 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { useClientsQuery } from '$app/common/queries/clients';
@@ -498,8 +497,6 @@ function Builder() {
     };
   }, []);
 
-  const company = useCurrentCompany();
-
   return (
     <Default
       title={t('builder')}
@@ -645,7 +642,9 @@ function Builder() {
               onMessageDismiss: () => toast.dismiss(),
             },
             invoiceninja: true,
-            company: company.id,
+            company:
+              (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
+              undefined,
           }}
         >
           <Builder$ />

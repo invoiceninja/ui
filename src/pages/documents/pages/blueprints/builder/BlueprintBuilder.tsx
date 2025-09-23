@@ -3,7 +3,6 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -530,8 +529,6 @@ function BlueprintBuilder() {
     };
   }, []);
 
-  const company = useCurrentCompany();
-
   return (
     <Default
       title={t('builder')}
@@ -663,7 +660,9 @@ function BlueprintBuilder() {
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
             blueprint: true,
-            company: company.id,
+            company:
+              (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
+              undefined,
           }}
         >
           <Builder$ />
