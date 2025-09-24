@@ -670,12 +670,6 @@ function BlueprintBuilder() {
                 fontWeight: 500,
                 lineHeight: '1.5rem',
               },
-              filesWrapper: {
-                height: 'auto',
-              },
-              signatoriesWrapper: {
-                height: 'auto',
-              },
               signatories: {
                 title: {
                   fontSize: '0.875rem',
