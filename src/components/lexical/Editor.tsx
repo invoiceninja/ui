@@ -81,13 +81,14 @@ import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
-  value: string;
+  value: string | undefined;
   disabled: boolean;
   onChange: (value: string) => void;
 }
 
 export function Editor({ value, disabled, onChange }: Props): JSX.Element {
   const isFirstRender = React.useRef(true);
+  const isManualChange = React.useRef(false);
 
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
@@ -149,7 +150,7 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
   }, [isSmallWidthViewport]);
 
   useEffect(() => {
-    if (isFirstRender.current && value) {
+    if (isFirstRender.current && !isManualChange.current && value) {
       isFirstRender.current = false;
 
       editor.update(() => {
@@ -207,6 +208,8 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
         <DateTimePlugin />
         <OnChangePlugin
           onChange={(editorState) => {
+            isManualChange.current = true;
+
             editorState.read(() => {
               const htmlString = $generateHtmlFromNodes(editor, null);
               onChange(htmlString);

@@ -182,7 +182,7 @@ export function MarkdownEditor(props: Props) {
     <div className="mt-4">
       <EditorProvider>
         <LexicalEditor
-          value={value || ''}
+          value={value}
           disabled={Boolean(props.disabled)}
           onChange={props.onChange}
         />
