@@ -79,7 +79,6 @@ import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $insertNodes } from 'lexical';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { debounce } from 'lodash';
 
 interface Props {
   value: string;
@@ -208,14 +207,10 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
         <DateTimePlugin />
         <OnChangePlugin
           onChange={(editorState) => {
-            debounce(
-              () =>
-                editorState.read(() => {
-                  const htmlString = $generateHtmlFromNodes(editor, null);
-                  onChange(htmlString);
-                }),
-              300
-            );
+            editorState.read(() => {
+              const htmlString = $generateHtmlFromNodes(editor, null);
+              onChange(htmlString);
+            });
           }}
         />
 
