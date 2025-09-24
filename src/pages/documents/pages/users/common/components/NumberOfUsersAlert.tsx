@@ -32,9 +32,9 @@ export function NumberOfUsersAlert() {
   return (
     <Alert type="warning" className="mb-4" disableClosing>
       <div className="flex items-center gap-x-2 py-1.5">
-        <span>{t('users_limit_reached')}</span>
+        <span>{t('user_limit_reached')}</span>
 
-        <Link to="/settings/account_management">{t('add_users')}</Link>
+        <Link to="/settings/account_management">{t('upgrade')}</Link>
       </div>
     </Alert>
   );
