@@ -79,20 +79,15 @@ import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $insertNodes } from 'lexical';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { debounce } from 'lodash';
 
 interface Props {
   value: string;
   disabled: boolean;
   onChange: (value: string) => void;
-  editorId: string;
 }
 
-export function Editor({
-  value,
-  disabled,
-  onChange,
-  editorId,
-}: Props): JSX.Element {
+export function Editor({ value, disabled, onChange }: Props): JSX.Element {
   const isFirstRender = React.useRef(true);
 
   const colors = useColorScheme();
@@ -167,6 +162,14 @@ export function Editor({
     }
   }, [isFirstRender, value, editor]);
 
+  useEffect(() => {
+    if (disabled) {
+      editor.setEditable(false);
+    } else {
+      editor.setEditable(true);
+    }
+  }, [disabled]);
+
   return (
     <div className="border rounded-md" style={{ borderColor: colors.$24 }}>
       {isRichText && (
@@ -205,10 +208,14 @@ export function Editor({
         <DateTimePlugin />
         <OnChangePlugin
           onChange={(editorState) => {
-            editorState.read(() => {
-              const htmlString = $generateHtmlFromNodes(editor, null);
-              onChange(htmlString);
-            });
+            debounce(
+              () =>
+                editorState.read(() => {
+                  const htmlString = $generateHtmlFromNodes(editor, null);
+                  onChange(htmlString);
+                }),
+              300
+            );
           }}
         />
 

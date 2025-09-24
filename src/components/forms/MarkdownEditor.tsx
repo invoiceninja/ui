@@ -23,7 +23,6 @@ interface Props {
   label?: string;
   disabled?: boolean;
   handleChangeOnlyOnUserInput?: boolean;
-  editorId?: string;
 }
 
 export function MarkdownEditor(props: Props) {
@@ -184,7 +183,6 @@ export function MarkdownEditor(props: Props) {
       <EditorProvider>
         <LexicalEditor
           value={value || ''}
-          editorId={props.editorId || 'main'}
           disabled={Boolean(props.disabled)}
           onChange={props.onChange}
         />
