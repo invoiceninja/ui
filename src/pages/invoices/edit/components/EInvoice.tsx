@@ -146,6 +146,19 @@ export default function EInvoice() {
     setInvoice(updatedInvoice);
   };
 
+  const isInvoiceEditable = (invoice?: Invoice): boolean => {
+    const editableStatuses = [
+      InvoiceStatus.Sent,
+      InvoiceStatus.Draft,
+      InvoiceStatus.Paid,
+      InvoiceStatus.Partial,
+    ];
+
+    const status = (invoice?.status_id?.toString() ??
+      InvoiceStatus.Draft) as InvoiceStatus;
+    return editableStatuses.includes(status);
+  };
+
   return (
     <>
       <Card
@@ -246,7 +259,7 @@ export default function EInvoice() {
         )}
       </Card>
 
-      {Boolean(invoice?.status_id === InvoiceStatus.Sent) && (
+      {isInvoiceEditable(invoice) && (
         <Card title={t('status')}>
           <div className="flex px-6 text-sm">
             <div

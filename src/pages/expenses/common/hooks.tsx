@@ -52,7 +52,7 @@ import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
+import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from './hooks/useCalculateExpenseAmount';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import {
   extractTextFromHTML,
@@ -256,7 +256,7 @@ export function useExpenseColumns() {
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
   const calculateExpenseAmount = useCalculateExpenseAmount();
-
+  const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
   const expenseColumns = useAllExpenseColumns();
   type ExpenseColumns = (typeof expenseColumns)[number];
 
@@ -461,7 +461,7 @@ export function useExpenseColumns() {
       label: t('net_amount'),
       format: (value, expense) =>
         formatMoney(
-          value,
+          calculateExpenseExclusiveAmount(expense),
           expense.client?.country_id,
           expense.currency_id || expense.client?.settings.currency_id
         ),

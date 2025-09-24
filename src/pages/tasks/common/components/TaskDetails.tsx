@@ -272,7 +272,7 @@ export function TaskDetails(props: Props) {
           </div>
 
           <UserSelector
-            inputLabel={t('user')}
+            inputLabel={t('assigned_user')}
             value={task?.assigned_user_id}
             onChange={(user) => handleChange('assigned_user_id', user.id)}
             onClearButtonClick={() => handleChange('assigned_user_id', '')}

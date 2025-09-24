@@ -112,6 +112,14 @@ export function useGenerateActivityElement() {
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
+    if (activity.activity_type_id === 10 && activity.client) {
+      text = trans(`activity_10_online`, {}).replace(':contact', ':client');
+    }
+
+    if (activity.activity_type_id === 54 && activity.client) {
+      text = text.replace(':user', ':client');
+    }
+
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
@@ -223,7 +231,7 @@ export function InvoiceSlider() {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`
+          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true&show_schedule=true`
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data

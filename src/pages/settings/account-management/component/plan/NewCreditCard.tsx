@@ -15,7 +15,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { wait } from '$app/common/helpers/wait';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Alert } from '$app/components/Alert';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { loadStripe } from '@stripe/stripe-js/pure';
@@ -24,6 +23,7 @@ import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 export interface PopupProps {
   visible: boolean;
@@ -155,7 +155,7 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
       title={t('add_payment_method')}
       disableClosing={isSubmitting}
     >
-      {errors && <Alert type="danger">{errors}</Alert>}
+      <ErrorMessage>{errors}</ErrorMessage>
 
       <div
         id="card-element"

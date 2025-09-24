@@ -53,7 +53,10 @@ client.interceptors.response.use(
       return;
     }
 
-    if (url?.endsWith('/api/v1/einvoice/token/update') && error.response?.status === 500) {
+    if (
+      url?.endsWith('/api/v1/einvoice/token/update') &&
+      error.response?.status === 500
+    ) {
       return Promise.reject(error);
     }
 
@@ -107,7 +110,7 @@ export function request(
   config?: AxiosRequestConfig & { skipIntercept?: boolean }
 ) {
   const axiosClient = config?.skipIntercept ? noInterceptClient : client;
-  
+
   return axiosClient({
     method,
     url,

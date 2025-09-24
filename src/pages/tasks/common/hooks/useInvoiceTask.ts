@@ -71,13 +71,14 @@ export function useInvoiceTask(params?: Params) {
           const unixStart = dayjs.unix(start);
           const unixStop = dayjs.unix(stop);
 
-          hoursSum += unixStop.diff(unixStart, 'seconds') / 3600;
-          hoursSum = Number(hoursSum.toFixed(precision || userNumberPrecision));
+          hoursSum += unixStop.diff(unixStart, 'seconds');
+          
         }
       });
     }
 
-    return hoursSum;
+    return Number((hoursSum / 3600).toFixed(3));
+
   };
 
   return async (tasks: Task[]) => {

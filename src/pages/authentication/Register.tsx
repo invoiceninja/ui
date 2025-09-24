@@ -19,7 +19,6 @@ import { register } from '../../common/stores/slices/user';
 import { RegisterValidation } from './common/ValidationInterface';
 import { Header } from './components/Header';
 import { InputField } from '../../components/forms/InputField';
-import { Alert } from '../../components/Alert';
 import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
@@ -36,6 +35,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useSearchParams } from 'react-router-dom';
 import { TurnstileWidget } from './components/TurnstileWidget';
 import { useTurnstile } from 'react-turnstile';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 export function Register() {
   useTitle('register');
@@ -187,11 +187,7 @@ export function Register() {
                 errorMessage={errors?.password_confirmation}
               />
 
-              {message && (
-                <Alert className="mt-4" type="danger">
-                  {message}
-                </Alert>
-              )}
+              <ErrorMessage className="mt-4">{message}</ErrorMessage>
 
               {isTurnstileVisible && (
                 <div className="flex justify-center">

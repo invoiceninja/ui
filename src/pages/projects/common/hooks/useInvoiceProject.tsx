@@ -30,14 +30,12 @@ export const calculateTaskHours = (timeLog: string, precision?: number) => {
         const unixStart = dayjs.unix(start);
         const unixStop = dayjs.unix(stop);
 
-        hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(precision)
-        );
+        hoursSum += unixStop.diff(unixStart, 'seconds');
       }
     });
   }
 
-  return hoursSum;
+  return Number((hoursSum / 3600).toFixed(3));
 };
 
 export function useInvoiceProject() {

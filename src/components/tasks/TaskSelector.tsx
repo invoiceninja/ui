@@ -9,10 +9,10 @@
  */
 
 import { ComboboxAsync, Entry } from '../forms/Combobox';
-import { Alert } from '../Alert';
 import { date, endpoint } from '$app/common/helpers';
 import { Task } from '$app/common/interfaces/task';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -65,11 +65,7 @@ export function TaskSelector(props: Props) {
         withShadow={props.withShadow}
       />
 
-      {props.errorMessage && (
-        <Alert type="danger" className="mt-2">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </>
   );
 }

@@ -22,6 +22,7 @@ interface Props {
   disabledButton?: boolean;
   title?: string | null;
   message?: string | null;
+  disableButtonWithoutLoadingIcon?: boolean;
 }
 
 export function ConfirmActionModal({
@@ -30,6 +31,7 @@ export function ConfirmActionModal({
   disabledButton,
   title,
   message,
+  disableButtonWithoutLoadingIcon,
 }: Props) {
   const [t] = useTranslation();
   const [isModalVisible, setIsModalVisible] = useAtom(confirmActionModalAtom);
@@ -58,6 +60,7 @@ export function ConfirmActionModal({
           behavior="button"
           onClick={() => onClick()}
           disabled={disabledButton}
+          disableWithoutIcon={disableButtonWithoutLoadingIcon}
         >
           {t('continue')}
         </Button>

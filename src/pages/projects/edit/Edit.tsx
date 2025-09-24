@@ -89,13 +89,12 @@ export default function Edit() {
         </Element>
       )}
 
-      <Element leftSide={t('user')}>
+      <Element leftSide={t('assigned_user')}>
         <UserSelector
           value={project?.assigned_user_id}
           onChange={(user) => handleChange('assigned_user_id', user.id)}
           onClearButtonClick={() => handleChange('assigned_user_id', '')}
           errorMessage={errors?.errors.assigned_user_id}
-          readonly
         />
       </Element>
 

@@ -43,7 +43,7 @@ export function useInvoiceQuery(params: InvoiceQueryParams) {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/:id?include=payments,client.group_settings${isLockedParam}`,
+          `/api/v1/invoices/:id?include=payments,client.group_settings&show_schedule=true${isLockedParam}`,
           {
             id: params.id,
           }
@@ -115,7 +115,8 @@ export function useBulk(params?: Params) {
       | 'mark_paid'
       | 'download'
       | 'cancel'
-      | 'auto_bill',
+      | 'auto_bill'
+      | 'delete',
     emailType?: EmailType
   ) => {
     toast.processing();

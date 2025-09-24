@@ -9,7 +9,6 @@
  */
 
 import classNames from 'classnames';
-import { Alert } from '$app/components/Alert';
 import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
@@ -18,6 +17,7 @@ import { SelectOption } from '../datatables/Actions';
 import Select, { StylesConfig } from 'react-select';
 import { ChevronDown } from '../icons/ChevronDown';
 import { merge } from 'lodash';
+import { ErrorMessage } from '../ErrorMessage';
 
 export interface SelectProps extends CommonProps {
   defaultValue?: any;
@@ -36,6 +36,8 @@ export interface SelectProps extends CommonProps {
   controlStyle?: CSSProperties;
   applyCustomDropdownIndicator?: boolean;
   dropdownIndicatorClassName?: string;
+  placeholder?: string | null;
+  readOnly?: boolean;
 }
 
 export function SelectField(props: SelectProps) {
@@ -58,6 +60,7 @@ export function SelectField(props: SelectProps) {
     controlIcon,
     controlStyle,
     dropdownIndicatorClassName,
+    readOnly,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -105,7 +108,7 @@ export function SelectField(props: SelectProps) {
         color: colors.$3,
         borderColor: isFocused ? colors.$3 : colors.$24,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
-        pointerEvents: isDisabled ? 'auto' : 'unset',
+        pointerEvents: readOnly ? 'none' : isDisabled ? 'auto' : 'unset',
         boxShadow: 'none',
         '&:hover': {
           borderColor: isFocused ? colors.$3 : colors.$24,
@@ -170,10 +173,11 @@ export function SelectField(props: SelectProps) {
         </select>
       ) : (
         <Select
-          className={className}
+          className={classNames(className, { 'pointer-events-none': readOnly })}
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           options={$entries}
+          placeholder={props.placeholder}
           defaultValue={defaultEntry}
           value={clearAfterSelection ? { label: '', value: '' } : selectedEntry}
           onChange={(v) => {
@@ -205,6 +209,7 @@ export function SelectField(props: SelectProps) {
                     {
                       'pl-2': controlIcon,
                       'pl-1': !controlIcon,
+                      'pointer-events-none': readOnly,
                     }
                   )}
                   style={{
@@ -236,11 +241,7 @@ export function SelectField(props: SelectProps) {
         />
       )}
 
-      {props.errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </div>
   );
 }

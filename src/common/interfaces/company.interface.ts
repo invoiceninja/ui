@@ -90,6 +90,7 @@ export interface Company {
   expense_mailbox?: string;
   legal_entity_id: string | null;
   session_timeout?: number;
+  enable_modules?: number;
 }
 
 export interface Settings {
@@ -340,7 +341,10 @@ export interface Settings {
   enable_client_profile_update: boolean;
   preference_product_notes_for_html_view: boolean;
   unlock_invoice_documents_after_payment: boolean;
-
+  ses_secret_key: string;
+  ses_access_key: string;
+  ses_region: string;
+  ses_topic_arn: string;
 }
 
 export interface TaxData {

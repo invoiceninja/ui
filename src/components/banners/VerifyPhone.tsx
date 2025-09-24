@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '../Modal';
 import { useEffect, useState } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Alert } from '../Alert';
 import { Button } from '../forms';
 import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -34,6 +33,8 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
 import { Popover } from '@headlessui/react';
+import dayjs from 'dayjs';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface VerificationProps {
   visible: boolean;
@@ -66,13 +67,16 @@ function Confirmation({
 
       $refetch(['users', 'company_users']);
 
-      request('POST', endpoint('/api/v1/refresh')).then(
-        (response: GenericSingleResourceResponse<CompanyUser>) => {
-          dispatch(updateCompanyUsers(response.data.data));
-          dispatch(resetChanges('company'));
-          onComplete();
-        }
-      );
+      request(
+        'POST',
+        endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+          updatedAt: dayjs().unix(),
+        })
+      ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+        dispatch(updateCompanyUsers(response.data.data));
+        dispatch(resetChanges('company'));
+        onComplete();
+      });
     });
   };
 
@@ -167,9 +171,7 @@ function Verification({ visible, onClose }: VerificationProps) {
           />
         </div>
 
-        {errors?.errors.phone && (
-          <Alert type="danger">{errors.errors.phone}</Alert>
-        )}
+        <ErrorMessage>{errors?.errors.phone}</ErrorMessage>
 
         <Button
           className="self-end"

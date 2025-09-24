@@ -9,7 +9,6 @@
  */
 
 import classNames from 'classnames';
-import { Alert } from '$app/components/Alert';
 import { useMemo, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
@@ -17,6 +16,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -188,11 +188,7 @@ export function InputField(props: Props) {
         )}
       </div>
 
-      {props.errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {props.errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </section>
   );
 }

@@ -14,7 +14,7 @@ import { Settings } from '$app/components/layouts/Settings';
 import { InputField } from '$app/components/forms';
 import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, isHosted } from '$app/common/helpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useApiTokenQuery } from '$app/common/queries/api-tokens';
@@ -170,6 +170,15 @@ export function Edit() {
             <Element leftSide={t('created_on')}>
               {date(apiToken.created_at, dateFormat)}
             </Element>
+
+            {isHosted() && (
+              <Element leftSide={t('endpoint')}>
+                <CopyToClipboard
+                  className="break-all"
+                  text="https://invoicing.co"
+                />
+              </Element>
+            )}
           </Card>
         )}
       </Settings>

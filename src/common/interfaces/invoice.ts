@@ -12,6 +12,7 @@ import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
 import { Invitation } from './purchase-order';
+import { ScheduleItem } from './schedule';
 import { TaxInfo } from './tax-info';
 
 export interface Invoice {
@@ -86,7 +87,23 @@ export interface Invoice {
   is_locked?: boolean;
   backup?: Backup;
   location_id: string;
+  schedule?: ScheduleItem[];
+  sync?: Sync;
 }
+
+export interface Sync {
+  qb_id: string;
+  dn_completed: boolean;
+  invitations: SyncInvitation[];
+}
+
+export interface SyncInvitation {
+  invitation_key: string;
+  dn_id: string;
+  dn_invitation_id: string;
+  dn_sig: string;
+}
+
 
 export interface Backup {
   guid?: string;

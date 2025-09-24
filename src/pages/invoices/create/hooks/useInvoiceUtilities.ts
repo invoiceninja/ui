@@ -48,6 +48,7 @@ export function useInvoiceUtilities(props: Props) {
       -1;
 
     if (potential !== -1 && checked === false) {
+      // When unchecking invitation, also remove can_sign property
       invitations = invitations.filter((i) => i.client_contact_id !== id);
     }
 
@@ -60,6 +61,49 @@ export function useInvoiceUtilities(props: Props) {
     }
 
     handleChange('invitations', invitations);
+  };
+
+  const handleContactCanSignChange = (id: string, checked: boolean) => {
+    // Use props.client if invoice.client is not available
+    const clientContacts = invoice?.client?.contacts || props.client?.contacts;
+    
+    if (!clientContacts) {
+      return;
+    }
+
+    // Find the contact by id
+    const contact = clientContacts.find(c => c.id === id);
+    if (!contact) {
+      return;
+    }
+
+    // Check if contact is invited - if not, don't allow can_sign changes
+    const isInvited = invoice?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    if (!isInvited) {
+      return;
+    }
+
+    // Update the invitations array with the can_sign property
+    const invitations = [...(invoice?.invitations || [])];
+    
+    // Find existing invitation for this contact
+    const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
+    
+    if (existingInvitationIndex >= 0) {
+      // Update existing invitation
+      invitations[existingInvitationIndex] = {
+        ...invitations[existingInvitationIndex],
+        can_sign: checked
+      };
+    }
+
+    // Update the invoice with the modified invitations
+    setInvoice((current) => 
+      current && {
+        ...current,
+        invitations: invitations,
+      }
+    );
   };
 
   const calculateInvoiceSum = (invoice: Invoice) => {
@@ -126,6 +170,7 @@ export function useInvoiceUtilities(props: Props) {
   return {
     handleChange,
     handleInvitationChange,
+    handleContactCanSignChange,
     calculateInvoiceSum,
     handleLineItemChange,
     handleLineItemPropertyChange,

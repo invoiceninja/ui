@@ -38,13 +38,18 @@ export function BuilderDemo() {
   return (
     <Default breadcrumbs={[]}>
       <div className="max-w-7xl mx-auto">
-        
+        {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
           value={{
             token: import.meta.env.VITE_DOCUNINJA_TOKEN as string,
             document: import.meta.env.VITE_DOCUNINJA_DOCUMENT as string,
+            events: {
+              onMessage: () => null,
+              onMessageDismiss: () => null,
+            },
             components: {
               skeleton: Loading,
+              createBlueprintSignatory: () => null,
               save: Save,
               send: {
                 trigger: Send,
@@ -75,6 +80,7 @@ export function BuilderDemo() {
                 },
               },
               signatorySelector: SignatorySelector,
+              signatorySwap: () => null,
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,
@@ -351,7 +357,7 @@ function ToolboxContext({ options }: ToolboxContextProps) {
         </span>
       }
     >
-      {options.map((option, i) =>
+      {options?.map((option, i) =>
         option.children.length > 0 ? (
           <>
             {option.children.map((child, j) => (

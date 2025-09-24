@@ -19,6 +19,7 @@ interface Props extends CommonProps {
   checked?: boolean;
   onValueChange?: (value: string, checked?: boolean) => unknown;
   cypressRef?: string;
+  disabled?: boolean;
 }
 
 const Input = styled.input`
@@ -58,7 +59,7 @@ export function Checkbox(props: Props) {
           aria-describedby="comments-description"
           type="checkbox"
           className={classNames(
-            'rounded border cursor-pointer disabled:opacity-50',
+            'rounded border disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed',
             props.className
           )}
           style={{

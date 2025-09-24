@@ -17,7 +17,6 @@ import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useClickAway, useDebounce } from 'react-use';
-import { Alert } from '../Alert';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import { Spinner } from '../Spinner';
@@ -26,6 +25,7 @@ import { ChevronDown } from '../icons/ChevronDown';
 import { XMark } from '../icons/XMark';
 import { Plus } from '../icons/Plus';
 import { Check } from '../icons/Check';
+import { ErrorMessage } from '../ErrorMessage';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -480,11 +480,8 @@ export function Combobox<T = any>({
           )}
         </ul>
       )}
-      {errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {errorMessage}
-        </Alert>
-      )}
+
+      <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>
     </div>
   );
 }
@@ -823,11 +820,7 @@ export function ComboboxStatic<T = any>({
         )}
       </HeadlessCombobox>
 
-      {errorMessage && (
-        <Alert className="mt-2" type="danger">
-          {errorMessage}
-        </Alert>
-      )}
+      <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>
     </div>
   );
 }

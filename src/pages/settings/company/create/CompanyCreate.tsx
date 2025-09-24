@@ -26,6 +26,7 @@ import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 interface Props {
   isModalOpen: boolean;
@@ -83,7 +84,12 @@ export function CompanyCreate(props: Props) {
 
       request('POST', endpoint('/api/v1/companies'))
         .then(() => {
-          request('POST', endpoint('/api/v1/refresh'))
+          request(
+            'POST',
+            endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+              updatedAt: dayjs().unix(),
+            })
+          )
             .then((response: AxiosResponse) => {
               const companyUsers = response.data.data;
 
