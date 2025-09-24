@@ -2,13 +2,19 @@ import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Client } from '$app/common/interfaces/client';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import {
+  Button,
+  InputField,
+  InputLabel,
+  SelectField,
+} from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/icons/Settings';
@@ -36,6 +42,7 @@ import {
   UploadProps,
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
+import collect from 'collect.js';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -101,7 +108,7 @@ function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
   const [t] = useTranslation();
 
   return (
-    <Button behavior="button" disabled={isSubmitting} className="w-full">
+    <Button disabled={isSubmitting} className="w-full">
       {t('delete')}
     </Button>
   );
@@ -246,8 +253,8 @@ function CreateDialogTabButton({
 function SignatorySelector({
   results,
   onSelect,
-  value,
   setCreateDialogOpen,
+  signatories,
 }: SignatorySelectorProps) {
   const [t] = useTranslation();
 
@@ -265,6 +272,7 @@ function SignatorySelector({
     }
 
     const [type, value] = v.split('|');
+
     let entity = clients?.find(
       (client) => client.contacts?.[0]?.contact_key === value
     );
@@ -277,39 +285,57 @@ function SignatorySelector({
       return;
     }
 
-    onSelect(value, type as 'user', entity as any);
+    const contact = transformToContact(entity as Client);
+
+    if (!contact) {
+      return;
+    }
+
+    const transformed = transformToPayload(entity, value);
+
+    onSelect(
+      `contact|${transformed.contact_key}`,
+      'contact',
+      contact as any,
+      transformed
+    );
   };
 
-  return (
-    <SelectField
-      placeholder={t('select_user_or_client')}
-      value={value}
-      onValueChange={handleSelect}
-      customSelector
-      menuPosition="fixed"
-    >
-      <option value="create">{t('create_client_or_user')}</option>
+  const existing = collect(signatories).pluck('id').toArray();
 
-      {clients
-        ?.filter(
-          (client) =>
-            client.contacts.length > 0 && client.contacts[0].contact_key
-        )
-        .map((client) => (
-          <option
-            value={`client|${client.contacts[0].contact_key}`}
-            key={client.id}
-          >
-            {client.name}
+  const list = collect(clients)
+    .filter(
+      (client) =>
+        client.contacts.length > 0 && client.contacts[0].contact_key.length > 0
+    )
+    .map((client) => ({
+      label: client.name,
+      value: `contact|${client.contacts[0].contact_key}`,
+    }))
+    .filter((client) => !existing.includes(client.value))
+    .toArray() as { label: string; value: string }[];
+
+  return (
+    <div className="space-y-3">
+      <InputLabel className="mt-3">{t('select_user_or_client')}</InputLabel>
+
+      <SelectField
+        placeholder={t('select_user_or_client')}
+        onValueChange={handleSelect}
+        customSelector
+        menuPosition="fixed"
+        clearAfterSelection
+        className="-mt-2"
+      >
+        <option value="create">{t('create_client_or_user')}</option>
+
+        {list.map((client) => (
+          <option key={client.value} value={client.value}>
+            {client.label}
           </option>
         ))}
-
-      {results.map((result: any) => (
-        <option value={`${result.type}|${result.value}`} key={result.id}>
-          {result.label}
-        </option>
-      ))}
-    </SelectField>
+      </SelectField>
+    </div>
   );
 }
 
@@ -335,7 +361,7 @@ function UninviteDialog({
 
 function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
   return (
-    <Button form={form} behavior="button" disabled={isSubmitting}>
+    <Button form={form} disabled={isSubmitting}>
       Continue
     </Button>
   );
@@ -494,7 +520,7 @@ function Builder() {
           <Button
             behavior="button"
             onClick={handleSave}
-            disabled={isDocumentSaving || isDocumentSending}
+            // disabled={isDocumentSaving || isDocumentSending}
             disableWithoutIcon
           >
             {t('save')}
@@ -512,10 +538,6 @@ function Builder() {
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
-            events: {
-              onMessage: () => null,
-              onMessageDismiss: () => null,
-            },
             components: {
               skeleton: Loading,
               createBlueprintSignatory: () => null,
@@ -615,6 +637,14 @@ function Builder() {
               },
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
+            events: {
+              onMessage: (message) => toast.success(message),
+              onMessageDismiss: () => toast.dismiss(),
+            },
+            invoiceninja: true,
+            company:
+              (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
+              undefined,
           }}
         >
           <Builder$ />
@@ -622,6 +652,72 @@ function Builder() {
       </Card>
     </Default>
   );
+}
+
+function transformToContact(client: Client) {
+  if (client.contacts.length === 0) {
+    toast.error('Error: Client has no contacts. Please add a contact first.');
+
+    return null;
+  }
+
+  const contact = client.contacts[0];
+
+  return {
+    id: `contact|${contact.contact_key}`,
+    user_id: client.user_id ?? null,
+    company_id: null,
+    client_id: client.id,
+    first_name: contact.first_name ?? null,
+    last_name: contact.last_name ?? null,
+    phone: contact.phone ?? null,
+    email: contact.email ?? null,
+    signature_base64: null,
+    initials_base64: null,
+    email_verified_at: null,
+    is_primary: Boolean(contact.is_primary),
+    last_login: null,
+    created_at: '',
+    updated_at: '',
+    deleted_at: null,
+    e_signature: null,
+    e_initials: null,
+    client: {
+      id: client.id,
+      user_id: client.user_id,
+      company_id: null,
+      name: client.name ?? null,
+      website: client.website ?? null,
+      private_notes: client.private_notes ?? null,
+      public_notes: client.public_notes ?? null,
+      logo: null,
+      phone: client.phone ?? null,
+      balance: client.balance ?? 0,
+      paid_to_date: client.paid_to_date ?? 0,
+      currency_id: client.settings?.currency_id
+        ? Number(client.settings.currency_id)
+        : null,
+      address1: client.address1 ?? null,
+      address2: client.address2 ?? null,
+      city: client.city ?? null,
+      state: client.state ?? null,
+      postal_code: client.postal_code ?? null,
+      country_id: client.country_id ? Number(client.country_id) : null,
+      is_deleted: Boolean(client.is_deleted),
+      vat_number: client.vat_number ?? null,
+      id_number: client.id_number ?? null,
+      created_at: '',
+      updated_at: '',
+      deleted_at: null,
+    },
+  };
+}
+
+function transformToPayload(client: Client, contact: string) {
+  return {
+    ...client,
+    contact_key: contact,
+  };
 }
 
 export default Builder;

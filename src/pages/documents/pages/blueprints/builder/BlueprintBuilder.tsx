@@ -475,13 +475,13 @@ function BlueprintBuilder() {
   }, [blueprintResponse]);
   
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
-  
+
   const pages: Page[] = [
     { name: t('blueprints'), href: '/documents/blueprints' },
     {
       name: blueprint?.name || t('blueprint'),
       href: route('/documents/blueprints/:id/edit', { id }),
-    }
+    },
   ];
 
   const handleSave = () => {
@@ -510,10 +510,7 @@ function BlueprintBuilder() {
       setIsDocumentSaving(false);
     };
 
-    window.addEventListener(
-      'refetch.blueprints',
-      refetchDocuninjaDocument
-    );
+    window.addEventListener('refetch.blueprints', refetchDocuninjaDocument);
 
     window.addEventListener(
       'builder:document.successfully.saved',
@@ -552,7 +549,6 @@ function BlueprintBuilder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-
           {blueprint?.is_template && blueprint?.template && (
           <Button
             type="secondary"  
@@ -572,6 +568,7 @@ function BlueprintBuilder() {
             {t('edit_template')}
           </Button>
           )}
+
           <Button
             behavior="button"
             onClick={handleSave}
@@ -643,7 +640,6 @@ function BlueprintBuilder() {
                   {t('select_signatory')}
                 </span>
               ),
-              
             },
             styles: {
               frame: {
@@ -698,7 +694,9 @@ function BlueprintBuilder() {
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
             blueprint: true,
-            
+            company:
+              (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
+              undefined,
           }}
         >
           <Builder$ />
@@ -708,21 +706,16 @@ function BlueprintBuilder() {
   );
 }
 
-
 export function CreateBlueprintSignatory({
-    onClick,
-  }: CreateBlueprintSignatoryProps) {
-    const [t] = useTranslation();
+  onClick,
+}: CreateBlueprintSignatoryProps) {
+  const [t] = useTranslation();
 
-    return (
-        <Button
-        type="secondary"
-        behavior="button"
-        onClick={onClick}
-        >
-        {t('new_signatory')}
-        </Button>
-    );
-  }
-  
+  return (
+    <Button type="secondary" behavior="button" onClick={onClick}>
+      {t('new_signatory')}
+    </Button>
+  );
+}
+
 export default BlueprintBuilder;
