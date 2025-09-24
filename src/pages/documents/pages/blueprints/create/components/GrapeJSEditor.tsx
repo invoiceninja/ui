@@ -1584,7 +1584,9 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
       });
         // Add only custom placeholder blocks - let GrapeJS handle default blocks
         const blockManager = editor.BlockManager;
-        
+        blockManager.remove('script');
+        blockManager.remove('iframe');
+
         const domc = editor.DomComponents;
 
         domc.addType('draggable-rectangle', {

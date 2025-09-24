@@ -30,10 +30,11 @@ export function useBlueprintsQuery(params: Params) {
       request(
         'GET',
         docuNinjaEndpoint(
-          '/api/blueprints?per_page=:per_page&page=:page&filter=:filter',
+          '/api/blueprints?per_page=:per_page&page=:page&filter=:filter&status=:status',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
+            status: params.status?.join(',') ?? 'active',
             filter: params.filter ?? '',
           }
         ),
@@ -178,7 +179,7 @@ export function useUpdateBlueprint() {
       }
     )
       .then((response: GenericSingleResourceResponse<Blueprint>) => {
-        toast.success('updated_blueprint');
+        toast.success('blueprint_updated');
 
         $refetch(['blueprints']);
    

@@ -44,7 +44,7 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
   const { data: blueprintsData, isLoading: isLoadingBlueprints } = useBlueprintsQuery({
     perPage: '100',
     currentPage: '1',
-    filter: '',
+    status: ['active'],
   });
 
   // Create a map of existing entity types from blueprints
@@ -110,8 +110,8 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">{t('invoice_ninja_design')}</h2>
-        <p className="text-gray-600">{t('select_entity_type_description')}</p>
+        <h2 className="text-xl font-semibold mb-2">{t('document_type')}</h2>
+        <p className="text-gray-600">{t('document_type_description')}</p>
       </div>
 
       <Element>
@@ -142,17 +142,15 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
                 className="mr-3"
               />
               <div>
-                <div className="font-semibold">{entityType.label}</div>
-                <div className="text-sm text-gray-600">
-                  {t('create_blueprint_for', { type: entityType.label })}
-                </div>
+                <div className="font-semibold">{t(entityType.value)}</div>
+                
               </div>
             </label>
           ))}
         </div>
       </Element>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between p-6">
         <Button onClick={onBack}>
           {t('back')}
         </Button>

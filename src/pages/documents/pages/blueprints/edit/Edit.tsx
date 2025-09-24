@@ -76,7 +76,7 @@ export default function Edit() {
         }
       )
         .then((response: GenericSingleResourceResponse<Blueprint>) => {
-          toast.success('updated_blueprint');
+          toast.success('blueprint_updated');
 
           $refetch(['blueprints']);
         })

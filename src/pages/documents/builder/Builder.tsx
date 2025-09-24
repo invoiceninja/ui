@@ -579,11 +579,7 @@ function Builder() {
               validationErrors: ValidationErrors,
               sign: () => null,
               toolboxContext: ToolboxContext,
-              helper: () => (
-                <span className="text-sm" style={{ color: colors.$17 }}>
-                  {t('select_signatory')}
-                </span>
-              ),
+              helper: () => null,
             },
             styles: {
               frame: {

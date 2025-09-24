@@ -117,8 +117,8 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">{t('select_from_template')}</h2>
-        <p className="text-gray-600">{t('choose_template_description')}</p>
+        <h2 className="text-xl font-semibold mb-2">{t('templates')}</h2>
+        <p className="text-gray-600">{t('blueprint_template_description')}</p>
       </div>
 
       <div className="flex gap-6">
@@ -195,7 +195,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
         </div>
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between p-6">
         <Button onClick={onBack}>
           {t('back')}
         </Button>
