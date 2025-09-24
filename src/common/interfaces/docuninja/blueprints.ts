@@ -18,5 +18,9 @@ export interface Blueprint {
   updated_at: string;
   archived_at: string;
   is_deleted: boolean;
+  is_template: boolean;
+  template?: string;
   document?: Document;
+  grapesjs?: string;
 }
+

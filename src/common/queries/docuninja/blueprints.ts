@@ -16,6 +16,12 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useState } from 'react';
+import { AxiosError } from 'axios';
+import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useNavigate } from 'react-router-dom';
 
 export function useBlueprintsQuery(params: Params) {
   return useQuery(
@@ -54,7 +60,7 @@ export function useBlueprintQuery(params: BlueprintParams) {
     () =>
       request(
         'GET',
-        docuNinjaEndpoint('/api/blueprints/:id', {
+        docuNinjaEndpoint('/api/blueprints/:id?template=true', {
           id: params.id,
         }),
         {},
@@ -104,5 +110,88 @@ export function useBulk() {
 
       $refetch(['blueprints']);
     });
+  };
+}
+
+interface CreateBlueprintParams {
+  name?: string;
+  base64_file?: string;
+  is_template?: boolean;
+  grapesjs?: string;
+}
+
+export function useCreateBlueprint() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
+  const navigate = useNavigate();
+  return async (params: CreateBlueprintParams) => {
+    toast.processing();
+
+    return request(
+      'POST',
+      docuNinjaEndpoint('/api/blueprints'),
+      params,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
+      }
+    ).then((response) => {
+      toast.success('created_blueprint');
+
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+
+      $refetch(['blueprints']);
+
+      return response;
+
+    });
+  };
+}
+
+interface UpdateBlueprintParams {
+  id: string;
+  name?: string;
+  base64_file?: string;
+  is_template?: boolean;
+  grapesjs?: string;
+}
+
+export function useUpdateBlueprint() {
+  const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
+
+  return async (params: UpdateBlueprintParams) => {
+    toast.processing();
+
+    request(
+      'PUT',
+      docuNinjaEndpoint('/api/blueprints/:id', { id: params.id }),
+      params,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            'X-DOCU-NINJA-TOKEN'
+          )}`,
+        },
+      }
+    )
+      .then((response: GenericSingleResourceResponse<Blueprint>) => {
+        toast.success('updated_blueprint');
+
+        $refetch(['blueprints']);
+   
+        return response;
+   
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
+      })
+      .finally();
+
   };
 }
