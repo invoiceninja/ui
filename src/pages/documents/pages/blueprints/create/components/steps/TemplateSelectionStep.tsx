@@ -41,6 +41,13 @@ const TEMPLATES = [
     preview: '📄',
   },
   {
+    id: 'mutual-nda-template',
+    name: 'Mutual NDA',
+    category: 'business',
+    description: 'Mutual Non-Disclosure Agreement',
+    preview: '📄',
+  },
+  {
     id: 'blank',
     name: 'Blank Template',
     category: 'business',
