@@ -1111,7 +1111,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             } else {
               const removeFn = (pagesApi as any).remove || (pagesApi as any).delete || (pagesApi as any).removePage;
               if (typeof removeFn === 'function') {
-                try { removeFn.call(pagesApi, pg); } catch {}
+                removeFn.call(pagesApi, pg); 
                 renderPagesList();
               } else {
                 alert('Remove not supported in this GrapesJS build.');
@@ -1971,7 +1971,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
     };
 
     const startInitWatchdog = () => {
-      try {
         if (isInitialized.current) {
           return;
         }
@@ -1986,14 +1985,12 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             initializeEditor();
             return;
           }
-          if (tries % 8 === 0) {
-          }
+          
           if (tries >= maxTries) {
             clearInterval(id);
           }
         }, 250);
-      } catch (e) {
-      }
+      
     };
 
 
