@@ -133,34 +133,29 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
         <div className="w-1/4">
           <Element>
             <h3 className="font-semibold mb-4">{t('categories')}</h3>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {TEMPLATE_CATEGORIES.map((category) => (
-                <Button
-                  type="secondary"
+                <div
                   key={category.id}
                   onClick={() => {
                     setSelectedCategory(category.id);
                     setSelectedTemplate('');
                   }}
-                  className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                    selectedCategory === category.id
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'hover:bg-gray-50'
-                  }`}
+                  className={`px-3 py-2 rounded-md cursor-pointer transition-colors duration-150 font-medium`}
                   style={{
+                    borderColor: selectedCategory === category.id 
+                      ? colors.$3 
+                      : colors.$20,
                     backgroundColor: selectedCategory === category.id 
                       ? colors.$3 + '10' 
                       : 'transparent',
-                    color: selectedCategory === category.id 
-                      ? colors.$3 
-                      : 'inherit',
                   }}
                 >
                   <div className="flex items-center">
-                    <span className="mr-2">{category.icon}</span>
-                    <span className="font-medium">{category.name}</span>
+                    <span className="mr-2 text-sm">{category.icon}</span>
+                    <span className="text-sm">{category.name}</span>
                   </div>
-                </Button>
+                </div>
               ))}
             </div>
           </Element>
