@@ -95,8 +95,6 @@ export function EditBlueprintModal({ blueprint, isOpen, onClose }: Props) {
       visible={isOpen}
       onClose={handleClose}
       size="regular"
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
     >
       <div className="space-y-4">
         <div>

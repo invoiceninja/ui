@@ -27,7 +27,7 @@ interface TemplateSelectionStepProps {
 // Mock data - replace with actual API call
 const TEMPLATE_CATEGORIES = [
   { id: 'business', name: 'Business', icon: '🏢' },
-//   { id: 'creative', name: 'Creative', icon: '🎨' },
+  { id: 'generic', name: 'Generic', icon: '🎨' },
 //   { id: 'minimal', name: 'Minimal', icon: '⚪' },
 //   { id: 'modern', name: 'Modern', icon: '✨' },
 ];
@@ -50,7 +50,7 @@ const TEMPLATES = [
   {
     id: 'blank',
     name: 'Blank Template',
-    category: 'business',
+    category: 'generic',
     description: 'Start from scratch!',
     preview: '🎨',
   },
@@ -128,15 +128,15 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
         <p className="text-gray-600">{t('blueprint_template_description')}</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex">
         {/* Categories Sidebar */}
         <div className="w-1/4">
           <Element>
             <h3 className="font-semibold mb-4">{t('categories')}</h3>
             <div className="space-y-2">
               {TEMPLATE_CATEGORIES.map((category) => (
-                <button
-                  type="button"
+                <Button
+                  type="secondary"
                   key={category.id}
                   onClick={() => {
                     setSelectedCategory(category.id);
@@ -160,19 +160,19 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
                     <span className="mr-2">{category.icon}</span>
                     <span className="font-medium">{category.name}</span>
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
           </Element>
         </div>
 
         {/* Templates Grid */}
-        <div className="flex-1">
+        <div className="w-3/4">
           <Element>
             <h3 className="font-semibold mb-4">
               {TEMPLATE_CATEGORIES.find(c => c.id === selectedCategory)?.name} {t('templates')}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {filteredTemplates.map((template) => (
                 <button
                   type="button"
