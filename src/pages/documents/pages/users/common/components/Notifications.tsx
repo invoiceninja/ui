@@ -85,7 +85,7 @@ export function Notifications({
 
   return (
     <div className="flex flex-col">
-      <Element leftSide={t('all_notifications')}>
+      <Element leftSide={t('receive_all_notifications')}>
         <SelectField
           value={allNotificationsValue}
           onValueChange={(value) => {
