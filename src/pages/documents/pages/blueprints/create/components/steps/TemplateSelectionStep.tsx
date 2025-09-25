@@ -143,12 +143,20 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
                   }}
                   className={`px-3 py-2 rounded-md cursor-pointer transition-colors duration-150 font-medium`}
                   style={{
-                    borderColor: selectedCategory === category.id 
-                      ? colors.$3 
-                      : colors.$20,
                     backgroundColor: selectedCategory === category.id 
-                      ? colors.$3 + '10' 
+                      ? colors.$20 
                       : 'transparent',
+                    color: colors.$3,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedCategory !== category.id) {
+                      e.currentTarget.style.backgroundColor = colors.$20;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedCategory !== category.id) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
                   }}
                 >
                   <div className="flex items-center">
