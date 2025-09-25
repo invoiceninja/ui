@@ -337,6 +337,44 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             }
           });
 
+
+          blockManager.add('signatory-name-placeholder', {
+            label: '<div class="gjs-block-label"><div class="gjs-block-label">Name</div></div>',
+            content: {
+              type: 'text',
+              content: '{{signatory.name}}'
+            },
+            category: 'Signatory Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+            }
+          });
+
+          blockManager.add('user-name-placeholder', {
+            label: '<div class="gjs-block-label"><div class="gjs-block-label">Name</div></div>',
+            content: {
+              type: 'text',
+              content: '{{user.name}}'
+            },
+            category: 'User Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+            }
+          });
+
+
+          blockManager.add('company-name-placeholder', {
+            label: '<div class="gjs-block-label"><div class="gjs-block-label">Company Name</div></div>',
+            content: {
+              type: 'text',
+              content: '{{company.name}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+            }
+          });
+          
         }
 
         // Mark editor as ready
