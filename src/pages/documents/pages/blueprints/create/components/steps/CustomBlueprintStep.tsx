@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -29,14 +28,15 @@ interface CustomBlueprintStepProps {
 
 interface Payload {
   name: string;
+  description: string;
 }
 
 export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepProps) {
   const [t] = useTranslation();
-  const colors = useColorScheme();
   const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
   const [payload, setPayload] = useState<Payload>({
     name: '',
+    description: '',
   });
 
   const handleCreateBlueprint = async () => {
@@ -86,6 +86,16 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
           onValueChange={(value) => setPayload({ ...payload, name: value })}
           errorMessage={errors?.errors.name}
           placeholder={t('blueprint_name')}
+        />
+      </Element>
+
+      <Element leftSide={t('description')}>
+        <InputField
+          element="textarea"
+          value={payload.description}
+          onValueChange={(value) => setPayload({ ...payload, description: value })}
+          errorMessage={errors?.errors.description}
+          placeholder={t('description')}
         />
       </Element>
 
