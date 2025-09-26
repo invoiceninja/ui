@@ -139,7 +139,7 @@ export function useCreateBlueprint() {
         },
       }
     ).then((response) => {
-      toast.success('created_blueprint');
+      toast.success('blueprint_created');
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

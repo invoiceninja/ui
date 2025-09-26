@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { MdSettings } from 'react-icons/md';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Blueprints() {
   useTitle('blueprints');
@@ -71,6 +72,9 @@ export default function Blueprints() {
         useDeleteMethod
         deleteBulkRoute="/api/blueprints/bulk"
         filterParameterKey="search"
+        onBulkActionSuccess={() => {
+          $refetch(['blueprints']);
+        }}
         customActions={[
           (blueprint: Blueprint) => (
             <DropdownElement

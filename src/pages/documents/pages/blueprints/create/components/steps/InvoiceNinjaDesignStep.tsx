@@ -76,7 +76,7 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
         { entity: selectedEntityType }, { skipIntercept: true }
       ) as GenericSingleResourceResponse<Document>;
 
-      toast.success('created_blueprint');
+      toast.success('blueprint_created');
       $refetch(['blueprints']);
       
       onComplete(response.data.data.id);
