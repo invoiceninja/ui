@@ -218,7 +218,7 @@ export default function Document() {
                 disabled={isCreating || isLoading}
                 behavior="button"
               >
-                {t('setup_company')}
+                {t('setup')}
               </Button>
             </div>
           )}

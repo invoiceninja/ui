@@ -27,8 +27,8 @@ interface TemplateSelectionStepProps {
 // Mock data - replace with actual API call
 const TEMPLATE_CATEGORIES = [
   { id: 'business', name: 'Business', icon: '🏢' },
+    { id: 'sales', name: 'Sales', icon: '💰' },
   { id: 'generic', name: 'Generic', icon: '🎨' },
-//   { id: 'minimal', name: 'Minimal', icon: '⚪' },
 //   { id: 'modern', name: 'Modern', icon: '✨' },
 ];
 
@@ -54,20 +54,55 @@ const TEMPLATES = [
     description: 'Start from scratch!',
     preview: '🎨',
   },
-//   {
-//     id: 'template-3',
-//     name: 'Minimal Credit',
-//     category: 'minimal',
-//     description: 'Simple and clean credit note template',
-//     preview: '⚪',
-//   },
-//   {
-//     id: 'template-4',
-//     name: 'Modern Purchase Order',
-//     category: 'modern',
-//     description: 'Contemporary purchase order design',
-//     preview: '✨',
-//   },
+  {
+    id: 'sales-contract',
+    name: 'Sales Contract',
+    category: 'sales',
+    description: 'Simple and clean sales contract template',
+    preview: '⚪',
+  },
+  {
+    id: 'service-agreement',
+    name: 'Service Agreement',
+    category: 'business',
+    description: 'Contemporary service agreement design',
+    preview: '✨',
+  },
+  {
+    id: 'scope-of-work',
+    name: 'Scope of Work',
+    category: 'business',
+    description: 'Contemporary scope of work design',
+    preview: '✨',
+  },
+  {
+    id: 'non-solicitation-agreement',
+    name: 'Non-Solicitation Agreement',
+    category: 'business',
+    description: 'Contemporary non-solicitation agreement design',
+    preview: '✨',
+  },
+  {
+    id: 'power-of-attorney',
+    name: 'Power of Attorney',
+    category: 'business',
+    description: 'Contemporary power of attorney design',
+    preview: '✨',
+  },
+  {
+    id: 'partnership-agreement',
+    name: 'Partnership Agreement',
+    category: 'business',
+    description: 'Contemporary partnership agreement design',
+    preview: '✨',
+  },
+  {
+    id: 'independent-contractor-agreement',
+    name: 'Independent Contractor Agreement',
+    category: 'business',
+    description: 'Contemporary independent contractor agreement design',
+    preview: '✨',
+  },
 ];
 
 export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionStepProps) {
