@@ -76,7 +76,8 @@ client.interceptors.response.use(
     }
 
     if (error.response?.status === 404) {
-      window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
+      window.dispatchEvent(new CustomEvent('display.not.found.toaster'));
+      return;
     }
 
     if (

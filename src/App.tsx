@@ -163,8 +163,8 @@ export function App() {
   }, [darkMode, resolvedLanguage]);
 
   useEffect(() => {
-    window.addEventListener('navigate.invalid.page', () =>
-      navigate('/not_found')
+    window.addEventListener('display.not.found.toaster', () =>
+      toast.error('not_found')
     );
 
     window.addEventListener('reset.password.required', () => {
