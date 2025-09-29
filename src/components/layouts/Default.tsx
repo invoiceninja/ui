@@ -64,6 +64,7 @@ import { CurrencyExchange } from '../icons/CurrencyExchange';
 import { ChartLine } from '../icons/ChartLine';
 import { ArrowsTransaction } from '../icons/ArrowsTransaction';
 import { Gear } from '../icons/Gear';
+import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
 
 export interface SaveOption {
   label: string;
@@ -99,6 +100,7 @@ export function Default(props: Props) {
   const user = useInjectUserChanges();
   const company = useCurrentCompany();
   const companyUser = useCurrentCompanyUser();
+  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
@@ -394,7 +396,9 @@ export function Default(props: Props) {
             icon: Plus,
             to: '/documents/users/create',
             label: t('new_user'),
-            visible: true,
+            visible:
+              (docuCompanyAccountDetails?.account?.num_users || 0) !==
+              (docuCompanyAccountDetails?.account?.users || [])?.length,
           },
         },
       ],

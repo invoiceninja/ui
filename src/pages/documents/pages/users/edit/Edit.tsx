@@ -43,6 +43,10 @@ function Create() {
 
   const pages = [
     {
+      name: t('documents'),
+      href: '/documents',
+    },
+    {
       name: t('users'),
       href: '/documents/users',
     },
