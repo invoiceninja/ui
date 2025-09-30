@@ -104,18 +104,21 @@ function FontPreviewCard({
     font.fontFamily
   );
 
+  if (font.value === 'dancing-script') {
+    console.log(isSelected);
+  }
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <div
       className={classNames(
         'p-6 border rounded-lg transition-all hover:border-primary/50',
-        'flex items-center justify-center w-full min-h-[140px]',
+        'flex items-center justify-center w-full min-h-[140px] cursor-pointer',
         {
-          'border-primary bg-primary/5': isSelected,
+          'border-blue-500': isSelected,
           'border-border': !isSelected,
         }
       )}
+      onClick={onClick}
     >
       <div
         ref={containerRef}
@@ -134,7 +137,7 @@ function FontPreviewCard({
           {previewText || 'Preview'}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -294,18 +297,21 @@ export function SignatureFontSelector({
 
   return (
     <>
-      <Button behavior="button">{triggerButtonText || t('customize')}</Button>
+      <Button behavior="button" onClick={() => setIsOpen(true)}>
+        {triggerButtonText || t('customize')}
+      </Button>
 
       <Modal
         title={t('create_signature')}
         visible={isOpen}
         onClose={() => setIsOpen(false)}
       >
-        <div className="grid gap-6 py-6">
+        <div className="grid gap-6 pb-2">
           <InputField
             value={text}
             onValueChange={(value) => setText(value)}
             placeholder={t('type_signature')}
+            changeOverride
           />
 
           <div className="grid grid-cols-2 gap-4">
@@ -324,6 +330,7 @@ export function SignatureFontSelector({
             behavior="button"
             onClick={handleSubmit}
             disabled={text.length <= 1}
+            disableWithoutIcon
           >
             {t('use_signature')}
           </Button>
