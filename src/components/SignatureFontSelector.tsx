@@ -109,10 +109,11 @@ function FontPreviewCard({
   }
 
   return (
-    <div
+    <button
+      type="button"
       className={classNames(
         'p-6 border rounded-lg transition-all hover:border-primary/50',
-        'flex items-center justify-center w-full min-h-[140px] cursor-pointer',
+        'flex items-center justify-center w-full min-h-[140px]',
         {
           'border-blue-500': isSelected,
           'border-border': !isSelected,
@@ -137,7 +138,7 @@ function FontPreviewCard({
           {previewText || 'Preview'}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
