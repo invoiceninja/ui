@@ -40,13 +40,9 @@ import FloatingTextFormatToolbarPlugin from './plugins/FloatingTextFormatToolbar
 import KeywordsPlugin from './plugins/KeywordsPlugin';
 import { LayoutPlugin } from './plugins/LayoutPlugin/LayoutPlugin';
 import LinkPlugin from './plugins/LinkPlugin';
-import MarkdownShortcutPlugin from './plugins/MarkdownShortcutPlugin';
 import PageBreakPlugin from './plugins/PageBreakPlugin';
 import ShortcutsPlugin from './plugins/ShortcutsPlugin';
 import TabFocusPlugin from './plugins/TabFocusPlugin';
-import TableCellActionMenuPlugin from './plugins/TableActionMenuPlugin';
-import TableCellResizer from './plugins/TableCellResizer';
-import TableHoverActionsPlugin from './plugins/TableHoverActionsPlugin';
 import ContentEditable from './ui/ContentEditable';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import { useColorScheme } from '$app/common/colors';
@@ -193,7 +189,6 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <MarkdownShortcutPlugin />
         <ListPlugin hasStrictIndent={false} />
         <CheckListPlugin />
         <TablePlugin
@@ -201,7 +196,6 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
           hasCellBackgroundColor={true}
           hasHorizontalScroll={true}
         />
-        <TableCellResizer />
         <LinkPlugin hasLinkAttributes={false} />
         <ClickableLinkPlugin disabled={isEditable} />
         <HorizontalRulePlugin />
@@ -219,17 +213,12 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
               isLinkEditMode={isLinkEditMode}
               setIsLinkEditMode={setIsLinkEditMode}
             />
-            <TableCellActionMenuPlugin
-              anchorElem={floatingAnchorElem}
-              cellMerge={true}
-            />
           </>
         )}
         {floatingAnchorElem && !isSmallWidthViewport && (
           <>
             <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
             <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
-            <TableHoverActionsPlugin anchorElem={floatingAnchorElem} />
             <FloatingTextFormatToolbarPlugin
               anchorElem={floatingAnchorElem}
               setIsLinkEditMode={setIsLinkEditMode}

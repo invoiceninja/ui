@@ -29,7 +29,6 @@ import { KeywordNode } from './KeywordNode';
 import { LayoutContainerNode } from './LayoutContainerNode';
 import { LayoutItemNode } from './LayoutItemNode';
 import { PageBreakNode } from './PageBreakNode';
-import { StickyNode } from './StickyNode';
 
 const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   HeadingNode,
@@ -45,7 +44,6 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   AutoLinkNode,
   LinkNode,
   OverflowNode,
-  StickyNode,
   EmojiNode,
   ExcalidrawNode,
   EquationNode,
