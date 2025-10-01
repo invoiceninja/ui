@@ -69,7 +69,6 @@ import DropDown, { DropDownItem } from '../../ui/DropDown';
 import DropdownColorPicker from '../../ui/DropdownColorPicker';
 import { getSelectedNode } from '../../utils/getSelectedNode';
 import { sanitizeUrl } from '../../utils/url';
-import { INSERT_IMAGE_COMMAND, InsertImagePayload } from '../ImagesPlugin';
 import { SHORTCUTS } from '../ShortcutsPlugin/shortcuts';
 import FontSize, { parseFontSizeForToolbar } from './fontSize';
 import {
@@ -888,9 +887,6 @@ export default function ToolbarPlugin({
     },
     [activeEditor, selectedElementKey]
   );
-  const insertGifOnClick = (payload: InsertImagePayload) => {
-    activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, payload);
-  };
 
   const canViewerSeeInsertDropdown = !toolbarState.isImageCaption;
   const canViewerSeeInsertCodeButton = !toolbarState.isImageCaption;

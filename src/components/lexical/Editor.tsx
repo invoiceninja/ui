@@ -11,7 +11,6 @@ import type { JSX } from 'react';
 import './index.css';
 
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
-import { CharacterLimitPlugin } from '@lexical/react/LexicalCharacterLimitPlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { ClearEditorPlugin } from '@lexical/react/LexicalClearEditorPlugin';
 import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin';
@@ -21,50 +20,33 @@ import { HashtagPlugin } from '@lexical/react/LexicalHashtagPlugin';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import { SelectionAlwaysOnDisplay } from '@lexical/react/LexicalSelectionAlwaysOnDisplay';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { useLexicalEditable } from '@lexical/react/useLexicalEditable';
 import { CAN_USE_DOM } from '@lexical/utils';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import AutocompletePlugin from './plugins/AutocompletePlugin';
-import AutoEmbedPlugin from './plugins/AutoEmbedPlugin';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
 import CodeActionMenuPlugin from './plugins/CodeActionMenuPlugin';
-import CodeHighlightShikiPlugin from './plugins/CodeHighlightShikiPlugin';
 import CollapsiblePlugin from './plugins/CollapsiblePlugin';
-import ComponentPickerPlugin from './plugins/ComponentPickerPlugin';
-import ContextMenuPlugin from './plugins/ContextMenuPlugin';
 import DateTimePlugin from './plugins/DateTimePlugin';
-import DragDropPaste from './plugins/DragDropPastePlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import EmojiPickerPlugin from './plugins/EmojiPickerPlugin';
 import EmojisPlugin from './plugins/EmojisPlugin';
 import EquationsPlugin from './plugins/EquationsPlugin';
 import ExcalidrawPlugin from './plugins/ExcalidrawPlugin';
-import FigmaPlugin from './plugins/FigmaPlugin';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
 import FloatingTextFormatToolbarPlugin from './plugins/FloatingTextFormatToolbarPlugin';
-import ImagesPlugin from './plugins/ImagesPlugin';
-import InlineImagePlugin from './plugins/InlineImagePlugin';
 import KeywordsPlugin from './plugins/KeywordsPlugin';
 import { LayoutPlugin } from './plugins/LayoutPlugin/LayoutPlugin';
 import LinkPlugin from './plugins/LinkPlugin';
 import MarkdownShortcutPlugin from './plugins/MarkdownShortcutPlugin';
-import { MaxLengthPlugin } from './plugins/MaxLengthPlugin';
-import MentionsPlugin from './plugins/MentionsPlugin';
 import PageBreakPlugin from './plugins/PageBreakPlugin';
-import PollPlugin from './plugins/PollPlugin';
 import ShortcutsPlugin from './plugins/ShortcutsPlugin';
-import SpecialTextPlugin from './plugins/SpecialTextPlugin';
-import SpeechToTextPlugin from './plugins/SpeechToTextPlugin';
 import TabFocusPlugin from './plugins/TabFocusPlugin';
 import TableCellActionMenuPlugin from './plugins/TableActionMenuPlugin';
 import TableCellResizer from './plugins/TableCellResizer';
 import TableHoverActionsPlugin from './plugins/TableHoverActionsPlugin';
-import TwitterPlugin from './plugins/TwitterPlugin';
-import YouTubePlugin from './plugins/YouTubePlugin';
 import ContentEditable from './ui/ContentEditable';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import { useColorScheme } from '$app/common/colors';
@@ -72,8 +54,6 @@ import { useSettings } from './context/SettingsContext';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { useSharedHistoryContext } from './context/SharedHistoryContext';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import CodeHighlightPrismPlugin from './plugins/CodeHighlightPrismPlugin';
-import TableOfContentsPlugin from './plugins/TableOfContentsPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $insertNodes } from 'lexical';
@@ -96,22 +76,11 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
   const {
     settings: {
       isCodeHighlighted,
-      isCodeShiki,
-      isAutocomplete,
-      isMaxLength,
-      isCharLimit,
-      hasLinkAttributes,
-      isCharLimitUtf8,
       isRichText,
       showTreeView,
-      showTableOfContents,
-      shouldUseLexicalContextMenu,
       tableCellMerge,
       tableCellBackgroundColor,
       tableHorizontalScroll,
-      shouldAllowHighlightingWithBrackets,
-      selectionAlwaysOnDisplay,
-      listStrictIndent,
     },
   } = useSettings();
 
@@ -172,38 +141,27 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
 
   return (
     <div className="border rounded-md" style={{ borderColor: colors.$24 }}>
-      {isRichText && (
-        <ToolbarPlugin
-          editor={editor}
-          activeEditor={activeEditor}
-          setActiveEditor={setActiveEditor}
-          setIsLinkEditMode={setIsLinkEditMode}
-        />
-      )}
-      {isRichText && (
-        <ShortcutsPlugin
-          editor={activeEditor}
-          setIsLinkEditMode={setIsLinkEditMode}
-        />
-      )}
+      <ToolbarPlugin
+        editor={editor}
+        activeEditor={activeEditor}
+        setActiveEditor={setActiveEditor}
+        setIsLinkEditMode={setIsLinkEditMode}
+      />
+      <ShortcutsPlugin
+        editor={activeEditor}
+        setIsLinkEditMode={setIsLinkEditMode}
+      />
       <div
         className={`editor-container ${showTreeView ? 'tree-view' : ''} ${
           !isRichText ? 'plain-text' : ''
         }`}
       >
-        {isMaxLength && <MaxLengthPlugin maxLength={30} />}
-        <DragDropPaste />
         <AutoFocusPlugin />
-        {selectionAlwaysOnDisplay && <SelectionAlwaysOnDisplay />}
         <ClearEditorPlugin />
-        <ComponentPickerPlugin />
         <EmojiPickerPlugin />
-        <AutoEmbedPlugin />
-        <MentionsPlugin />
         <EmojisPlugin />
         <HashtagPlugin />
         <KeywordsPlugin />
-        <SpeechToTextPlugin />
         <AutoLinkPlugin />
         <DateTimePlugin />
         <OnChangePlugin
@@ -236,27 +194,15 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
           ErrorBoundary={LexicalErrorBoundary}
         />
         <MarkdownShortcutPlugin />
-        {isCodeHighlighted &&
-          (isCodeShiki ? (
-            <CodeHighlightShikiPlugin />
-          ) : (
-            <CodeHighlightPrismPlugin />
-          ))}
-        <ListPlugin hasStrictIndent={listStrictIndent} />
+        <ListPlugin hasStrictIndent={false} />
         <CheckListPlugin />
         <TablePlugin
-          hasCellMerge={tableCellMerge}
-          hasCellBackgroundColor={tableCellBackgroundColor}
-          hasHorizontalScroll={tableHorizontalScroll}
+          hasCellMerge={true}
+          hasCellBackgroundColor={true}
+          hasHorizontalScroll={true}
         />
         <TableCellResizer />
-        <ImagesPlugin />
-        <InlineImagePlugin />
-        <LinkPlugin hasLinkAttributes={hasLinkAttributes} />
-        <PollPlugin />
-        <TwitterPlugin />
-        <YouTubePlugin />
-        <FigmaPlugin />
+        <LinkPlugin hasLinkAttributes={false} />
         <ClickableLinkPlugin disabled={isEditable} />
         <HorizontalRulePlugin />
         <EquationsPlugin />
@@ -290,21 +236,6 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
             />
           </>
         )}
-
-        {(isCharLimit || isCharLimitUtf8) && (
-          <CharacterLimitPlugin
-            charset={isCharLimit ? 'UTF-16' : 'UTF-8'}
-            maxLength={5}
-          />
-        )}
-        {isAutocomplete && <AutocompletePlugin />}
-        <div>{showTableOfContents && <TableOfContentsPlugin />}</div>
-        {shouldUseLexicalContextMenu && <ContextMenuPlugin />}
-        {shouldAllowHighlightingWithBrackets && <SpecialTextPlugin />}
-        {/* <ActionsPlugin
-          isRichText={isRichText}
-          shouldPreserveNewLinesInMarkdown={shouldPreserveNewLinesInMarkdown}
-        /> */}
       </div>
     </div>
   );
