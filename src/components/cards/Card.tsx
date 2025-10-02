@@ -175,7 +175,6 @@ export function Card(props: Props) {
 
                 {props.withSaveButton && !props.additionalSaveOptions && (
                   <Button
-                    behavior="button"
                     onClick={props.onSaveClick}
                     disabled={props.disableSubmitButton}
                     disableWithoutIcon={props.disableWithoutIcon}
