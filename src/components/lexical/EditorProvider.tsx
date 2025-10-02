@@ -16,9 +16,7 @@ import { $isTextNode, DOMConversionMap, TextNode } from 'lexical';
 import { parseAllowedColor } from './ui/ColorPicker';
 import { parseAllowedFontSize } from './plugins/ToolbarPlugin/fontSize';
 import { SharedHistoryContext } from './context/SharedHistoryContext';
-import { TableContext } from './plugins/TablePlugin';
 import { ToolbarContext } from './context/ToolbarContext';
-import { FlashMessageContext } from './context/FlashMessageContext';
 import { ReactNode } from 'react';
 
 function getExtraStyles(element: HTMLElement): string {
@@ -88,26 +86,22 @@ function buildImportMap(): DOMConversionMap {
 
 const EditorProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <FlashMessageContext>
-      <LexicalComposer
-        initialConfig={{
-          editorState: null,
-          html: { import: buildImportMap() },
-          namespace: 'Invoice Ninja',
-          nodes: [...PlaygroundNodes],
-          onError: (error: Error) => {
-            throw error;
-          },
-          theme: PlaygroundEditorTheme,
-        }}
-      >
-        <SharedHistoryContext>
-          <TableContext>
-            <ToolbarContext>{children}</ToolbarContext>
-          </TableContext>
-        </SharedHistoryContext>
-      </LexicalComposer>
-    </FlashMessageContext>
+    <LexicalComposer
+      initialConfig={{
+        editorState: null,
+        html: { import: buildImportMap() },
+        namespace: 'Invoice Ninja',
+        nodes: [...PlaygroundNodes],
+        onError: (error: Error) => {
+          throw error;
+        },
+        theme: PlaygroundEditorTheme,
+      }}
+    >
+      <SharedHistoryContext>
+        <ToolbarContext>{children}</ToolbarContext>
+      </SharedHistoryContext>
+    </LexicalComposer>
   );
 };
 

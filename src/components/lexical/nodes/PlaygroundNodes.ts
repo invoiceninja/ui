@@ -21,10 +21,7 @@ import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { CollapsibleContainerNode } from '../plugins/CollapsiblePlugin/CollapsibleContainerNode';
 import { CollapsibleContentNode } from '../plugins/CollapsiblePlugin/CollapsibleContentNode';
 import { CollapsibleTitleNode } from '../plugins/CollapsiblePlugin/CollapsibleTitleNode';
-import { DateTimeNode } from './DateTimeNode/DateTimeNode';
 import { EmojiNode } from './EmojiNode';
-import { EquationNode } from './EquationNode';
-import { ExcalidrawNode } from './ExcalidrawNode';
 import { KeywordNode } from './KeywordNode';
 import { LayoutContainerNode } from './LayoutContainerNode';
 import { LayoutItemNode } from './LayoutItemNode';
@@ -45,8 +42,6 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   LinkNode,
   OverflowNode,
   EmojiNode,
-  ExcalidrawNode,
-  EquationNode,
   KeywordNode,
   HorizontalRuleNode,
   MarkNode,
@@ -56,7 +51,6 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   PageBreakNode,
   LayoutContainerNode,
   LayoutItemNode,
-  DateTimeNode,
 ];
 
 export default PlaygroundNodes;

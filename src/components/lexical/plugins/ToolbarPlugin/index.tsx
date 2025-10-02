@@ -59,7 +59,6 @@ import {
 } from 'lexical';
 import { Dispatch, useCallback, useEffect, useState } from 'react';
 
-import { useSettings } from '../../context/SettingsContext';
 import {
   blockTypeToBlockName,
   useToolbarState,
@@ -598,9 +597,8 @@ export default function ToolbarPlugin({
     [updateToolbarState]
   );
 
-  const {
-    settings: { isCodeHighlighted, isCodeShiki },
-  } = useSettings();
+  const isCodeHighlighted = true;
+  const isCodeShiki = false;
 
   const $handleCodeNode = useCallback(
     (element: LexicalNode) => {

@@ -29,12 +29,8 @@ import { useEffect, useState } from 'react';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
 import CodeActionMenuPlugin from './plugins/CodeActionMenuPlugin';
 import CollapsiblePlugin from './plugins/CollapsiblePlugin';
-import DateTimePlugin from './plugins/DateTimePlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
-import EmojiPickerPlugin from './plugins/EmojiPickerPlugin';
 import EmojisPlugin from './plugins/EmojisPlugin';
-import EquationsPlugin from './plugins/EquationsPlugin';
-import ExcalidrawPlugin from './plugins/ExcalidrawPlugin';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
 import FloatingTextFormatToolbarPlugin from './plugins/FloatingTextFormatToolbarPlugin';
 import KeywordsPlugin from './plugins/KeywordsPlugin';
@@ -46,10 +42,8 @@ import TabFocusPlugin from './plugins/TabFocusPlugin';
 import ContentEditable from './ui/ContentEditable';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import { useColorScheme } from '$app/common/colors';
-import { useSettings } from './context/SettingsContext';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { useSharedHistoryContext } from './context/SharedHistoryContext';
-import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $insertNodes } from 'lexical';
@@ -68,17 +62,6 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
 
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
-
-  const {
-    settings: {
-      isCodeHighlighted,
-      isRichText,
-      showTreeView,
-      tableCellMerge,
-      tableCellBackgroundColor,
-      tableHorizontalScroll,
-    },
-  } = useSettings();
 
   const isEditable = useLexicalEditable();
   const { historyState } = useSharedHistoryContext();
@@ -147,19 +130,13 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
         editor={activeEditor}
         setIsLinkEditMode={setIsLinkEditMode}
       />
-      <div
-        className={`editor-container ${showTreeView ? 'tree-view' : ''} ${
-          !isRichText ? 'plain-text' : ''
-        }`}
-      >
+      <div className="editor-container">
         <AutoFocusPlugin />
         <ClearEditorPlugin />
-        <EmojiPickerPlugin />
         <EmojisPlugin />
         <HashtagPlugin />
         <KeywordsPlugin />
         <AutoLinkPlugin />
-        <DateTimePlugin />
         <OnChangePlugin
           onChange={(editorState) => {
             isManualChange.current = true;
@@ -191,16 +168,9 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
         />
         <ListPlugin hasStrictIndent={false} />
         <CheckListPlugin />
-        <TablePlugin
-          hasCellMerge={true}
-          hasCellBackgroundColor={true}
-          hasHorizontalScroll={true}
-        />
         <LinkPlugin hasLinkAttributes={false} />
         <ClickableLinkPlugin disabled={isEditable} />
         <HorizontalRulePlugin />
-        <EquationsPlugin />
-        <ExcalidrawPlugin />
         <TabFocusPlugin />
         <TabIndentationPlugin maxIndent={7} />
         <CollapsiblePlugin />
