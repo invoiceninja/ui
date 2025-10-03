@@ -9,7 +9,7 @@ export default function BlueprintEditor() {
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { templateHtml: stateTemplateHtml, blueprintName: stateBlueprintName, projectData: stateProjectData } = location.state || {};
+  const { templateHtml: stateTemplateHtml, templateName: stateBlueprintName, projectData: stateProjectData } = location.state || {};
   
   
   const createBlueprint = useCreateBlueprint();
@@ -18,10 +18,14 @@ export default function BlueprintEditor() {
   // Fallback: fetch blueprint data if state is not available
   const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id: id || '' });
   const [templateHtml, setTemplateHtml] = useState<string>('');
-  const [blueprintName, setBlueprintName] = useState<string>('');
+  const [templateName, setTemplateName] = useState<string>('');
   const [projectData, setProjectData] = useState<string>('');
   
   useEffect(() => {
+
+    console.log(stateTemplateHtml);
+    console.log(stateBlueprintName);
+
     // Use state data if available, otherwise use fetched data
     if (stateTemplateHtml) {
       setTemplateHtml(stateTemplateHtml);
@@ -30,9 +34,9 @@ export default function BlueprintEditor() {
     }
     
     if (stateBlueprintName) {
-      setBlueprintName(stateBlueprintName);
+      setTemplateName(stateBlueprintName);
     } else if (blueprintResponse?.data?.data?.name) {
-      setBlueprintName(blueprintResponse.data.data.name);
+      setTemplateName(blueprintResponse.data.data.name);
     }
 
     if(blueprintResponse?.data?.data?.grapesjs) {
@@ -54,7 +58,7 @@ export default function BlueprintEditor() {
       if (isNewTemplate) {
         // Create new blueprint
         const response = await createBlueprint({
-          name: blueprintName || 'New Blueprint',
+          name: templateName || 'New Blueprint',
           base64_file: base64Html,
           is_template: true,
           grapesjs: projectData
@@ -67,7 +71,7 @@ export default function BlueprintEditor() {
         await updateBlueprint({
           id: id,
           base64_file: base64Html,
-          name: blueprintName || 'Updated Blueprint',
+          name: templateName || 'Updated Blueprint',
           is_template: true,
           grapesjs: projectData
         });
@@ -104,7 +108,7 @@ export default function BlueprintEditor() {
       title="Template Editor"
       breadcrumbs={[
         { name: 'Blueprints', href: '/documents/blueprints' },
-        { name: blueprintName || 'Blueprint', href: `/documents/blueprints/${id}/edit` },
+        { name: templateName || 'Blueprint', href: `/documents/blueprints/${id}/edit` },
         { name: 'Template Editor', href: '#' }
       ]}
     >
@@ -115,7 +119,7 @@ export default function BlueprintEditor() {
           initialProjectData={projectData}
           onSave={handleSave}
           onCancel={handleCancel}
-          blueprintName={''}
+          blueprintName={templateName}
         />
       </div>
     </Default>

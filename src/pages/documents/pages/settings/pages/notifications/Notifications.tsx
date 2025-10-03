@@ -35,6 +35,7 @@ function Notifications() {
     ninja_invoice_notification: false,
     ninja_credit_notification: false,
     ninja_purchase_order_notification: false,
+    force_des_signature: false,
   });
   const isInitialized = useRef(false);
   const settingsRef = useRef<Settings>(settings);

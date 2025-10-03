@@ -14,13 +14,31 @@ import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { useTableColumns } from './common/hooks/useTableColumns';
+import { EditBlueprintModal } from './edit/components/EditBlueprintModal';
+import { useState } from 'react';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { MdSettings } from 'react-icons/md';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Blueprints() {
   useTitle('blueprints');
 
   const [t] = useTranslation();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);
 
   const columns = useTableColumns();
+
+  const handleSettingsClick = (blueprint: Blueprint) => {
+    setSelectedBlueprint(blueprint);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedBlueprint(null);
+  };
 
   const pages = [
     {
@@ -54,7 +72,28 @@ export default function Blueprints() {
         useDeleteMethod
         deleteBulkRoute="/api/blueprints/bulk"
         filterParameterKey="search"
+        onBulkActionSuccess={() => {
+          $refetch(['blueprints']);
+        }}
+        customActions={[
+          (blueprint: Blueprint) => (
+            <DropdownElement
+              onClick={() => handleSettingsClick(blueprint)}
+              icon={<Icon element={MdSettings} />}
+            >
+              {t('settings')}
+            </DropdownElement>
+          ),
+        ]}
       />
+
+      {selectedBlueprint && (
+        <EditBlueprintModal
+          blueprint={selectedBlueprint}
+          isOpen={isEditModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </Default>
   );
 }

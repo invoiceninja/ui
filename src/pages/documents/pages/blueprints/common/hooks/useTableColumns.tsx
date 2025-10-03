@@ -77,7 +77,7 @@ export function useTableColumns() {
       label: t('description'),
       format: (field, blueprint) => (
         <>
-        {blueprint.description.slice(-8)}
+        {blueprint.description}
         </>
       ),
     },

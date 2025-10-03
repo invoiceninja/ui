@@ -29,6 +29,8 @@ interface PricingResponse {
     pro_rata: string;
     pro_rata_raw: number;
     hash: string;
+    credit: string;
+    credit_raw: number;
 }
 
 enum ModalStep {
@@ -608,8 +610,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                 <div className="bg-gray-50 p-4 rounded">
                                     {pricing ? (
                                         <>
-                                            
-
+                                        
                                             <div className="mt-2 space-y-2">
                                                 <div className="flex justify-between">
                                                     <span><h3 className="font-medium">{pricing.description}</h3></span>
@@ -638,8 +639,21 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                         )}
                                                     </div>
                                                 </div>
+
+                                                {pricing.credit_raw > 0 && pricing.pro_rata_raw > 0 &&(
                                                 <div className="flex justify-between">
-                                                    <span>{t('pro_rata')} - {t('total_amount')}:</span>
+                                                    <span>{t('credit')}:</span>
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="font-medium">-{pricing.credit}</span>
+                                                        {isLoading && (
+                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                )}
+                                                {pricing.pro_rata_raw >= 0 && (
+                                                <div className="flex justify-between">
+                                                    <span>{t('balance')}:</span>
                                                     <div className="flex items-center space-x-2">
                                                         <span className="font-medium">{pricing.pro_rata}</span>
                                                         {isLoading && (
@@ -647,6 +661,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                         )}
                                                     </div>
                                                 </div>
+                                                )}
                                             </div>
                                         </>
                                     ) : (

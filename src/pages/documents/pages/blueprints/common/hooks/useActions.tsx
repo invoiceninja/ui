@@ -12,16 +12,29 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
+import { MdArchive, MdDelete, MdRestore, MdEdit } from 'react-icons/md';
 import { useBulk } from '$app/common/queries/docuninja/blueprints';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 
-export function useActions() {
+interface UseActionsProps {
+  onEdit?: (blueprint: Blueprint) => void;
+}
+
+export function useActions({ onEdit }: UseActionsProps = {}) {
   const [t] = useTranslation();
 
   const bulk = useBulk();
 
   const actions: Action<Blueprint>[] = [
+    (blueprint) =>
+      onEdit && (
+        <DropdownElement
+          onClick={() => onEdit(blueprint)}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
     (blueprint) =>
       !blueprint?.archived_at && (
         <DropdownElement

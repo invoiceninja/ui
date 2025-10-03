@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -29,14 +28,15 @@ interface CustomBlueprintStepProps {
 
 interface Payload {
   name: string;
+  description: string;
 }
 
 export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepProps) {
   const [t] = useTranslation();
-  const colors = useColorScheme();
   const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
   const [payload, setPayload] = useState<Payload>({
     name: '',
+    description: '',
   });
 
   const handleCreateBlueprint = async () => {
@@ -58,7 +58,7 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
         }
       ) as GenericSingleResourceResponse<Document>;
 
-      toast.success('created_blueprint');
+      toast.success('blueprint_created');
       $refetch(['blueprints']);
       
       onComplete(response.data.data.id);
@@ -68,7 +68,7 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
       if (error instanceof AxiosError && error.response?.status === 422) {
         setErrors(error.response.data);
       } else {
-        toast.error('error_creating_blueprint');
+        toast.error('Error creating blueprint:');
       }
     }
   };
@@ -77,7 +77,7 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('create_your_own')}</h2>
-        <p className="text-gray-600">{t('create_custom_blueprint_description')}</p>
+        <p className="text-gray-600">{t('create_your_own_description')}</p>
       </div>
 
       <Element leftSide={t('name')}>
@@ -85,15 +85,28 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
           value={payload.name}
           onValueChange={(value) => setPayload({ ...payload, name: value })}
           errorMessage={errors?.errors.name}
-          placeholder={t('enter_blueprint_name')}
+          placeholder={t('blueprint_name')}
         />
       </Element>
 
-      <div className="flex justify-between pt-4">
-        <Button onClick={onBack}>
+      <Element leftSide={t('description')}>
+        <InputField
+          element="textarea"
+          value={payload.description}
+          onValueChange={(value) => setPayload({ ...payload, description: value })}
+          errorMessage={errors?.errors.description}
+          placeholder={t('description')}
+        />
+      </Element>
+
+      <div className="flex justify-between p-6">
+        <Button 
+          type="primary"
+          onClick={onBack}>
           {t('back')}
         </Button>
         <Button
+          type="primary"
           onClick={handleCreateBlueprint}
         >
           {t('create_blueprint')}

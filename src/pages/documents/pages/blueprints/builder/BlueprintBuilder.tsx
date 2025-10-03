@@ -502,7 +502,7 @@ function BlueprintBuilder() {
     };
 
     const handleSuccessfullySavedDocument = () => {
-      toast.success('updated_blueprint');
+      toast.success('blueprint_updated');
       $refetch(['blueprints']);
     };
 
@@ -635,11 +635,7 @@ function BlueprintBuilder() {
               validationErrors: ValidationErrors,
               sign: () => null,
               toolboxContext: ToolboxContext,
-              helper: () => (
-                <span className="text-sm" style={{ color: colors.$17 }}>
-                  {t('select_signatory')}
-                </span>
-              ),
+              helper: () => null,
             },
             styles: {
               frame: {

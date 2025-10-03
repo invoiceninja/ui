@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceNinjaDesignStep } from './steps/InvoiceNinjaDesignStep';
 import { CustomBlueprintStep } from './steps/CustomBlueprintStep';
 import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
+import { Button } from '$app/components/forms';
 
 export type WizardStep = 'selection' | 'invoice-ninja' | 'custom' | 'template';
 
@@ -106,8 +107,8 @@ function SelectionStep({
   const options = [
     {
       id: 'invoice-ninja',
-      title: t('invoice_ninja_design'),
-      description: t('invoice_ninja_design_description'),
+      title: 'Invoice Ninja',
+      description: t('invoice_ninja_blueprint_description'),
       icon: '📄',
       onClick: onSelectInvoiceNinja,
     },
@@ -120,8 +121,8 @@ function SelectionStep({
     },
     {
       id: 'template',
-      title: t('select_from_template'),
-      description: t('select_from_template_description'),
+      title: t('templates'),
+      description: t('blueprint_template_description'),
       icon: '📋',
       onClick: onSelectTemplate,
     },
@@ -131,10 +132,9 @@ function SelectionStep({
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('choose_blueprint_type')}</h2>
-        <p className="text-gray-600">{t('choose_blueprint_type_description')}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
         {options.map((option) => (
           <button
             key={option.id}
@@ -153,13 +153,10 @@ function SelectionStep({
         ))}
       </div>
 
-      <div className="flex justify-end pt-4">
-        <button
-          onClick={onCancel}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-        >
-          {t('cancel')}
-        </button>
+      <div className="flex justify-end p-6">
+        <Button onClick={onCancel}>
+          {t('back')}
+        </Button>
       </div>
     </div>
   );

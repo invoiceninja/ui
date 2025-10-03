@@ -203,7 +203,6 @@ export default function Permissions({
     <>
       <Element
         leftSide={t('administrator')}
-        leftSideHelp={t('administrator_description')}
       >
         <Toggle
           id="admin-toggle"

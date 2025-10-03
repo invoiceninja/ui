@@ -223,6 +223,7 @@ export interface Settings {
   ninja_credit_notification: boolean;
   ninja_purchase_order_notification: boolean;
   email_client_when_completed: boolean;
+  force_des_signature: boolean;
 }
 
 export interface DocumentFile {

@@ -27,8 +27,8 @@ interface TemplateSelectionStepProps {
 // Mock data - replace with actual API call
 const TEMPLATE_CATEGORIES = [
   { id: 'business', name: 'Business', icon: '🏢' },
-//   { id: 'creative', name: 'Creative', icon: '🎨' },
-//   { id: 'minimal', name: 'Minimal', icon: '⚪' },
+  { id: 'sales', name: 'Sales', icon: '💰' },
+  { id: 'generic', name: 'Generic', icon: '🎨' },
 //   { id: 'modern', name: 'Modern', icon: '✨' },
 ];
 
@@ -38,29 +38,71 @@ const TEMPLATES = [
     name: 'NDA',
     category: 'business',
     description: 'Non-Disclosure Agreement',
-    preview: '📄',
+    preview: '🔒',
+  },
+  {
+    id: 'mutual-nda-template',
+    name: 'Mutual NDA',
+    category: 'business',
+    description: 'Mutual Non-Disclosure Agreement',
+    preview: '🤝',
   },
   {
     id: 'blank',
     name: 'Blank Template',
-    category: 'business',
+    category: 'generic',
     description: 'Start from scratch!',
-    preview: '🎨',
+    preview: '📝',
   },
-//   {
-//     id: 'template-3',
-//     name: 'Minimal Credit',
-//     category: 'minimal',
-//     description: 'Simple and clean credit note template',
-//     preview: '⚪',
-//   },
-//   {
-//     id: 'template-4',
-//     name: 'Modern Purchase Order',
-//     category: 'modern',
-//     description: 'Contemporary purchase order design',
-//     preview: '✨',
-//   },
+  {
+    id: 'sales-contract',
+    name: 'Sales Contract',
+    category: 'sales',
+    description: 'Simple and clean sales contract template',
+    preview: '💼',
+  },
+  {
+    id: 'service-agreement',
+    name: 'Service Agreement',
+    category: 'business',
+    description: 'Contemporary service agreement design',
+    preview: '⚙️',
+  },
+  {
+    id: 'scope-of-work',
+    name: 'Scope of Work',
+    category: 'business',
+    description: 'Contemporary scope of work design',
+    preview: '📋',
+  },
+  {
+    id: 'non-solicitation-agreement',
+    name: 'Non-Solicitation Agreement',
+    category: 'business',
+    description: 'Contemporary non-solicitation agreement design',
+    preview: '🚫',
+  },
+  {
+    id: 'power-of-attorney',
+    name: 'Power of Attorney',
+    category: 'business',
+    description: 'Contemporary power of attorney design',
+    preview: '⚖️',
+  },
+  {
+    id: 'partnership-agreement',
+    name: 'Partnership Agreement',
+    category: 'business',
+    description: 'Contemporary partnership agreement design',
+    preview: '🤝',
+  },
+  {
+    id: 'independent-contractor-agreement',
+    name: 'Independent Contractor Agreement',
+    category: 'business',
+    description: 'Contemporary independent contractor agreement design',
+    preview: '👷',
+  },
 ];
 
 export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionStepProps) {
@@ -97,17 +139,15 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       const templateHtml = response.data.html;
       const templateName = response.data.name;
 
-      console.log('Template HTML loaded successfully');
+      console.log(templateName);
 
       toast.success('template_loaded');
       
       // Navigate to GrapeJS editor with the template HTML
-      console.log('Navigating to editor...');
       navigate(route('/documents/blueprints/create/template_editor'), {
         state: { templateHtml, templateName }
       });
     } catch (error) {
-      console.error('Error loading template:', error);
       toast.error('error_loading_template');
     } finally {
       setIsLoading(false);
@@ -117,55 +157,58 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">{t('select_from_template')}</h2>
-        <p className="text-gray-600">{t('choose_template_description')}</p>
+        <h2 className="text-xl font-semibold mb-2">{t('templates')}</h2>
+        <p className="text-gray-600">{t('blueprint_template_description')}</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex">
         {/* Categories Sidebar */}
         <div className="w-1/4">
           <Element>
             <h3 className="font-semibold mb-4">{t('categories')}</h3>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {TEMPLATE_CATEGORIES.map((category) => (
-                <button
-                  type="button"
+                <div
                   key={category.id}
                   onClick={() => {
                     setSelectedCategory(category.id);
                     setSelectedTemplate('');
                   }}
-                  className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                    selectedCategory === category.id
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'hover:bg-gray-50'
-                  }`}
+                  className={`px-3 py-2 rounded-md cursor-pointer transition-colors duration-150 font-medium`}
                   style={{
                     backgroundColor: selectedCategory === category.id 
-                      ? colors.$3 + '10' 
+                      ? colors.$20 
                       : 'transparent',
-                    color: selectedCategory === category.id 
-                      ? colors.$3 
-                      : 'inherit',
+                    color: colors.$3,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedCategory !== category.id) {
+                      e.currentTarget.style.backgroundColor = colors.$20;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedCategory !== category.id) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
                   }}
                 >
                   <div className="flex items-center">
-                    <span className="mr-2">{category.icon}</span>
-                    <span className="font-medium">{category.name}</span>
+                    <span className="mr-2 text-sm">{category.icon}</span>
+                    <span className="text-sm">{category.name}</span>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </Element>
         </div>
 
         {/* Templates Grid */}
-        <div className="flex-1">
+        <div className="w-3/4">
           <Element>
             <h3 className="font-semibold mb-4">
               {TEMPLATE_CATEGORIES.find(c => c.id === selectedCategory)?.name} {t('templates')}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {filteredTemplates.map((template) => (
                 <button
                   type="button"
@@ -195,7 +238,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
         </div>
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between p-6">
         <Button onClick={onBack}>
           {t('back')}
         </Button>
