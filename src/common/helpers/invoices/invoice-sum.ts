@@ -242,7 +242,6 @@ export class InvoiceSum {
       });
     });
 
-    console.log(this.taxMap);
     this.totalTaxes += this.invoiceItems.totalTaxes;
 
     return this;
