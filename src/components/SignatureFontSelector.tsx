@@ -104,10 +104,6 @@ function FontPreviewCard({
     font.fontFamily
   );
 
-  if (font.value === 'dancing-script') {
-    console.log(isSelected);
-  }
-
   return (
     <button
       type="button"
