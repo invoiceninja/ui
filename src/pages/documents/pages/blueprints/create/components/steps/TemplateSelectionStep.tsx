@@ -27,7 +27,7 @@ interface TemplateSelectionStepProps {
 // Mock data - replace with actual API call
 const TEMPLATE_CATEGORIES = [
   { id: 'business', name: 'Business', icon: '🏢' },
-    { id: 'sales', name: 'Sales', icon: '💰' },
+  { id: 'sales', name: 'Sales', icon: '💰' },
   { id: 'generic', name: 'Generic', icon: '🎨' },
 //   { id: 'modern', name: 'Modern', icon: '✨' },
 ];
@@ -38,70 +38,70 @@ const TEMPLATES = [
     name: 'NDA',
     category: 'business',
     description: 'Non-Disclosure Agreement',
-    preview: '📄',
+    preview: '🔒',
   },
   {
     id: 'mutual-nda-template',
     name: 'Mutual NDA',
     category: 'business',
     description: 'Mutual Non-Disclosure Agreement',
-    preview: '📄',
+    preview: '🤝',
   },
   {
     id: 'blank',
     name: 'Blank Template',
     category: 'generic',
     description: 'Start from scratch!',
-    preview: '🎨',
+    preview: '📝',
   },
   {
     id: 'sales-contract',
     name: 'Sales Contract',
     category: 'sales',
     description: 'Simple and clean sales contract template',
-    preview: '⚪',
+    preview: '💼',
   },
   {
     id: 'service-agreement',
     name: 'Service Agreement',
     category: 'business',
     description: 'Contemporary service agreement design',
-    preview: '✨',
+    preview: '⚙️',
   },
   {
     id: 'scope-of-work',
     name: 'Scope of Work',
     category: 'business',
     description: 'Contemporary scope of work design',
-    preview: '✨',
+    preview: '📋',
   },
   {
     id: 'non-solicitation-agreement',
     name: 'Non-Solicitation Agreement',
     category: 'business',
     description: 'Contemporary non-solicitation agreement design',
-    preview: '✨',
+    preview: '🚫',
   },
   {
     id: 'power-of-attorney',
     name: 'Power of Attorney',
     category: 'business',
     description: 'Contemporary power of attorney design',
-    preview: '✨',
+    preview: '⚖️',
   },
   {
     id: 'partnership-agreement',
     name: 'Partnership Agreement',
     category: 'business',
     description: 'Contemporary partnership agreement design',
-    preview: '✨',
+    preview: '🤝',
   },
   {
     id: 'independent-contractor-agreement',
     name: 'Independent Contractor Agreement',
     category: 'business',
     description: 'Contemporary independent contractor agreement design',
-    preview: '✨',
+    preview: '👷',
   },
 ];
 
@@ -139,17 +139,15 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       const templateHtml = response.data.html;
       const templateName = response.data.name;
 
-      console.log('Template HTML loaded successfully');
+      console.log(templateName);
 
       toast.success('template_loaded');
       
       // Navigate to GrapeJS editor with the template HTML
-      console.log('Navigating to editor...');
       navigate(route('/documents/blueprints/create/template_editor'), {
         state: { templateHtml, templateName }
       });
     } catch (error) {
-      console.error('Error loading template:', error);
       toast.error('error_loading_template');
     } finally {
       setIsLoading(false);
