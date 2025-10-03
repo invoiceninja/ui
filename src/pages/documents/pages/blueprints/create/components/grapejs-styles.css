@@ -1,8 +1,8 @@
 .gjs-block {
     align-items: center !important;
     justify-content: center !important;
-    min-height: 50px !important;
-    font-size: 14px !important;
+    min-height: 40px !important;
+    font-size: 15px !important;
     border-radius: 8px !important;
     transition: all 0.3s ease !important;
     cursor: pointer !important;
@@ -10,43 +10,43 @@
     overflow: hidden !important;
 }
 
-        .gjs-row {
-          display: flex !important;
-          flex-wrap: wrap !important;
-          margin: 0 -15px !important;
-          width: 100% !important;
-        }
-        
-        .gjs-cell {
-          flex: 1 !important;
-          padding: 0 15px !important;
-          box-sizing: border-box !important;
-          min-width: 0 !important;
-        }
-        
-        /* Let GrapeJS handle the specific column widths via data attributes */
-        .gjs-cell[data-gjs-type="column"] {
-          flex: 1 !important;
-        }
-        
-        /* Override any conflicting styles */
-        .gjs-frame .gjs-row {
-          display: flex !important;
-          flex-direction: row !important;
-          width: 100% !important;
-        }
-        
-        .gjs-frame .gjs-cell {
-          display: block !important;
-          flex: 1 !important;
-        }
-        
-        /* Ensure content doesn't overflow */
-        .gjs-cell * {
-          max-width: 100% !important;
-          box-sizing: border-box !important;
-        }
-        
+
+.gjs-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin: 0 -15px !important;
+    width: 100% !important;
+}
+
+.gjs-cell {
+    flex: 1 !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+}
+
+/* Let GrapeJS handle the specific column widths via data attributes */
+.gjs-cell[data-gjs-type="column"] {
+    flex: 1 !important;
+}
+
+/* Override any conflicting styles */
+.gjs-frame .gjs-row {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+}
+
+.gjs-frame .gjs-cell {
+    display: block !important;
+    flex: 1 !important;
+}
+
+/* Ensure content doesn't overflow */
+.gjs-cell * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
 
 .gjs-block:hover {
     transform: translateY(-3px) !important;
@@ -105,20 +105,6 @@
     color: white !important;
     border: none !important;
 }
-
-/* Default GrapeJS block styling 
-.gjs-block.gjs-one-bg {
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
-    color: #333 !important;
-    border: none !important;
-}
-
-.gjs-block.gjs-four-color-h {
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
-    color: #333 !important;
-    border: none !important;
-}
-*/
 
 .gjs-blocks-cs .gjs-block[data-category="Basic"] {
     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
@@ -227,4 +213,22 @@
     pointer-events: auto !important;
 }
 
+.gjs-block.client-block {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    color: white !important;
+}
 
+.gjs-block.user-block {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    color: white !important;
+}
+
+.gjs-block.company-block {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+    color: white !important;
+}
+
+.gjs-block.signatory-block {
+    background: linear-gradient(135deg, #830647 0%, #a43b49 100%) !important;
+    color: white !important;
+}

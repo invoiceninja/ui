@@ -215,7 +215,7 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         // Add Settings Sector
         const traitsSector = $('<div class="gjs-sm-sector no-select">'+
           '<div class="gjs-sm-sector-title"><span class="icon-settings fas fa-cog"></span> <span class="gjs-sm-sector-label">Settings</span></div>' +
-          '<div class="gjs-sm-properties" style="display: none;"></div></div>');
+          '<div class="gjs-sm-properties" style="display: none;"></div>');
         const traitsProps = traitsSector.find('.gjs-sm-properties');
         
         // Check if traits container exists before appending
@@ -315,43 +315,184 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         if (!blockManager.get('signature-placeholder')) {
           // Add signature placeholder block
           blockManager.add('signature-placeholder', {
-            label: '<div class="gjs-block-label"><i class="fas fa-signature gjs-block__media"></i><div class="gjs-block-label">Signature</div></div>',
+            label: '<div class="gjs-block-label"><i class="fas fa-signature gjs-block__media"></i><div class="gjs-block-label">Signature</div>',
             content: {
               type: 'signature-placeholder'
             },
             category: 'Signatory Placeholders',
             attributes: {
-              'data-block': 'signature-placeholder'
+              'data-block': 'signature-placeholder',
+              'class': 'signatory-block',
             }
           });
 
           // Add date placeholder block
           blockManager.add('date-placeholder', {
-            label: '<div class="gjs-block-label"><i class="fas fa-calendar gjs-block__media"></i><div class="gjs-block-label">Date</div></div>',
+            label: '<div class="gjs-block-label"><i class="fas fa-calendar gjs-block__media"></i><div class="gjs-block-label">Date</div>',
             content: {
               type: 'date-placeholder'
             },
             category: 'Signatory Placeholders',
             attributes: {
-              'data-block': 'date-placeholder'
+              'data-block': 'date-placeholder',
+              'class': 'signatory-block',
             }
           });
 
 
-          blockManager.add('signatory-name-placeholder', {
-            label: '<div class="gjs-block-label"><div class="gjs-block-label">Name</div></div>',
+          blockManager.add('client-name-placeholder', {
+            label: '<div class="gjs-block-label">Name</div>',
             content: {
               type: 'text',
-              content: '{{signatory.name}}'
+              content: '{{client.name}}'
             },
-            category: 'Signatory Variables',
+            category: 'Client Variables',
             attributes: {
               'data-block': 'dynamic-text',
+              'class': 'client-block',
             }
           });
 
+          blockManager.add('client-first-name-placeholder', {
+            label: '<div class="gjs-block-label">First Name</div>',
+            content: {
+              type: 'text',
+              content: '{{client.first_name}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+          blockManager.add('client-last-name-placeholder', {
+            label: '<div class="gjs-block-label">Last Name</div>',
+            content: {
+              type: 'text',
+              content: '{{client.last_name}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+
+          blockManager.add('client-email-placeholder', {
+            label: '<div class="gjs-block-label">Email</div>',
+            content: {
+              type: 'text',
+              content: '{{client.email}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+
+          blockManager.add('client-phone-placeholder', {
+            label: '<div class="gjs-block-label">Phone</div>',
+            content: {
+              type: 'text',
+              content: '{{client.phone}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+
+          blockManager.add('client-address-placeholder', {
+            label: '<div class="gjs-block-label">Address</div>',
+            content: {
+              type: 'text',
+              content: '{{client.address}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+          blockManager.add('client-city-placeholder', {
+            label: '<div class="gjs-block-label">City</div>',
+            content: {
+              type: 'text',
+              content: '{{client.city}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+          blockManager.add('client-state-placeholder', {
+            label: '<div class="gjs-block-label">State</div>',
+            content: {
+              type: 'text',
+              content: '{{client.state}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+
+          blockManager.add('client-postal-code-placeholder', {
+            label: '<div class="gjs-block-label">Postal Code</div>',
+            content: {
+              type: 'text',
+              content: '{{client.postal_code}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+          
+
+
+          blockManager.add('client-country-placeholder', {
+            label: '<div class="gjs-block-label">Country</div>',
+            content: {
+              type: 'text',
+              content: '{{client.country}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+          
+
+          blockManager.add('client-vat-number-placeholder', {
+            label: '<div class="gjs-block-label">VAT/TAX Number</div>',
+            content: {
+              type: 'text',
+              content: '{{client.vat_number}}'
+            },
+            category: 'Client Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'client-block',
+            }
+          });
+
+///////////////////////////////////////////////////////////
           blockManager.add('user-name-placeholder', {
-            label: '<div class="gjs-block-label"><div class="gjs-block-label">Name</div></div>',
+            label: '<div class="gjs-block-label">Name</div>',
             content: {
               type: 'text',
               content: '{{user.name}}'
@@ -359,12 +500,67 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             category: 'User Variables',
             attributes: {
               'data-block': 'dynamic-text',
+              'class': 'user-block',
+            }
+          });
+
+          blockManager.add('user-first-name-placeholder', {
+            label: '<div class="gjs-block-label">First Name</div>',
+            content: {
+              type: 'text',
+              content: '{{user.first_name}}'
+            },
+            category: 'User Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'user-block',
             }
           });
 
 
+          blockManager.add('user-last-name-placeholder', {
+            label: '<div class="gjs-block-label">Last Name</div>',
+            content: {
+              type: 'text',
+              content: '{{user.last_name}}'
+            },
+            category: 'User Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'user-block',
+            }
+          });
+
+
+          blockManager.add('user-email-placeholder', {
+            label: '<div class="gjs-block-label">Email</div>',
+            content: {
+              type: 'text',
+              content: '{{user.email}}'
+            },
+            category: 'User Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'user-block',
+            }
+          });
+
+
+          blockManager.add('user-phone-placeholder', {
+            label: '<div class="gjs-block-label">Phone</div>',
+            content: {
+              type: 'text',
+              content: '{{user.phone}}'
+            },
+            category: 'User Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'user-block',
+            }
+          });
+
           blockManager.add('company-name-placeholder', {
-            label: '<div class="gjs-block-label"><div class="gjs-block-label">Company Name</div></div>',
+            label: '<div class="gjs-block-label">Name</div>',
             content: {
               type: 'text',
               content: '{{company.name}}'
@@ -372,9 +568,127 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
             category: 'Company Variables',
             attributes: {
               'data-block': 'dynamic-text',
+              'class': 'company-block',
             }
           });
           
+          blockManager.add('company-address-placeholder', {
+            label: '<div class="gjs-block-label">Address</div>',
+            content: {
+              type: 'text',
+              content: '{{company.address}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-city-placeholder', {
+            label: '<div class="gjs-block-label">City</div>',
+            content: {
+              type: 'text',
+              content: '{{company.city}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-state-placeholder', {
+            label: '<div class="gjs-block-label">State</div>',
+            content: {
+              type: 'text',
+              content: '{{company.state}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-postal-code-placeholder', {
+            label: '<div class="gjs-block-label">Postal Code</div>',
+            content: {
+              type: 'text',
+              content: '{{company.postal_code}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-country-placeholder', {
+            label: '<div class="gjs-block-label">Country</div>',
+            content: {
+              type: 'text',
+              content: '{{company.country}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-email-placeholder', {
+            label: '<div class="gjs-block-label">Email</div>',
+            content: {
+              type: 'text',
+              content: '{{company.email}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-phone-placeholder', {
+            label: '<div class="gjs-block-label">Phone</div>',
+            content: {
+              type: 'text',
+              content: '{{company.phone}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-vat-number-placeholder', {
+            label: '<div class="gjs-block-label">VAT/TAX Number</div>',
+            content: {
+              type: 'text',
+              content: '{{company.vat_number}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
+          blockManager.add('company-website-placeholder', {
+            label: '<div class="gjs-block-label">Website</div>',
+            content: {
+              type: 'text',
+              content: '{{company.website}}'
+            },
+            category: 'Company Variables',
+            attributes: {
+              'data-block': 'dynamic-text',
+              'class': 'company-block',
+            }
+          });
+
         }
 
         // Mark editor as ready
@@ -382,6 +696,41 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
 
         // Store editor reference for cleanup
         (window as any).grapesEditor = editor;
+
+        // Listen for block render events to apply category-specific styling
+        editor.on('block:render', (blockView: any) => {
+          const category = blockView.model.get('category');
+          const blockElement = blockView.el;
+          
+          if (category && blockElement) {
+            switch (category) {
+              case 'Client Variables':
+                blockElement.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+                blockElement.style.color = 'white';
+                blockElement.style.borderLeft = '4px solid #2196f3';
+                blockElement.style.borderRadius = '8px';
+                break;
+              case 'User Variables':
+                blockElement.style.background = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
+                blockElement.style.color = 'white';
+                blockElement.style.borderLeft = '4px solid #4caf50';
+                blockElement.style.borderRadius = '8px';
+                break;
+              case 'Company Variables':
+                blockElement.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                blockElement.style.color = 'white';
+                blockElement.style.borderLeft = '4px solid #9c27b0';
+                blockElement.style.borderRadius = '8px';
+                break;
+              case 'Signatory Placeholders':
+                blockElement.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+                blockElement.style.color = 'white';
+                blockElement.style.borderLeft = '4px solid #ff9800';
+                blockElement.style.borderRadius = '8px';
+                break;
+            }
+          }
+        });
 
 
         // Load project data if provided
