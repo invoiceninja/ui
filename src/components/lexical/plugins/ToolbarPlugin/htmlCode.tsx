@@ -35,11 +35,9 @@ export default function HtmlCode({ disabled }: Props) {
       const dom = parser.parseFromString(sourceCode, 'text/html');
       const nodes = $generateNodesFromDOM(editor, dom);
 
-      // Clear existing content
       const root = $getRoot();
       root.clear();
 
-      // Insert new nodes
       root.select();
       $insertNodes(nodes);
     });
