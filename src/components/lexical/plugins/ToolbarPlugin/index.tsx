@@ -84,6 +84,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useTranslation } from 'react-i18next';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
+import HtmlCode from './htmlCode';
 
 const rootTypeToRootName = {
   root: 'Root',
@@ -886,9 +887,6 @@ export default function ToolbarPlugin({
     [activeEditor, selectedElementKey]
   );
 
-  const canViewerSeeInsertDropdown = !toolbarState.isImageCaption;
-  const canViewerSeeInsertCodeButton = !toolbarState.isImageCaption;
-
   return (
     <div
       className={classNames('toolbar', {
@@ -1082,22 +1080,21 @@ export default function ToolbarPlugin({
           >
             <i className="format underline" />
           </button>
-          {canViewerSeeInsertCodeButton && (
-            <button
-              disabled={!isEditable}
-              onClick={() => {
-                activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
-              }}
-              className={
-                'toolbar-item spaced ' + (toolbarState.isCode ? 'active' : '')
-              }
-              title={`Insert code block (${SHORTCUTS.INSERT_CODE_BLOCK})`}
-              type="button"
-              aria-label="Insert code block"
-            >
-              <i className="format code" />
-            </button>
-          )}
+          <button
+            disabled={!isEditable}
+            onClick={() => {
+              activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
+            }}
+            className={
+              'toolbar-item spaced ' + (toolbarState.isCode ? 'active' : '')
+            }
+            title={`Insert code block (${SHORTCUTS.INSERT_CODE_BLOCK})`}
+            type="button"
+            aria-label="Insert code block"
+          >
+            <i className="format code" />
+          </button>
+          <HtmlCode disabled={!isEditable} />
           <button
             disabled={!isEditable}
             onClick={insertLink}
