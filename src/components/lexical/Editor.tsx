@@ -39,6 +39,7 @@ import LinkPlugin from './plugins/LinkPlugin';
 import PageBreakPlugin from './plugins/PageBreakPlugin';
 import ShortcutsPlugin from './plugins/ShortcutsPlugin';
 import TabFocusPlugin from './plugins/TabFocusPlugin';
+import MarkdownShortcutPlugin from './plugins/MarkdownShortcutPlugin';
 import ContentEditable from './ui/ContentEditable';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import { useColorScheme } from '$app/common/colors';
@@ -134,6 +135,7 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
         <AutoFocusPlugin />
         <ClearEditorPlugin />
         <EmojisPlugin />
+        <MarkdownShortcutPlugin />
         <HashtagPlugin />
         <KeywordsPlugin />
         <AutoLinkPlugin />
