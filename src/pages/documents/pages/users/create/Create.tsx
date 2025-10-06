@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { docuNinjaEndpoint } from '$app/common/helpers';
+import { docuNinjaEndpoint, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { User } from '$app/common/interfaces/docuninja/api';
 import { cloneDeep } from 'lodash';
@@ -31,6 +31,8 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
+import { setUser } from '@sentry/react';
+import user from 'pusher-js/types/src/core/user';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -108,9 +110,10 @@ export default function Create() {
 
       setIsFormBusy(true);
 
+
       request(
         'POST',
-        docuNinjaEndpoint('/api/users'),
+        endpoint('/api/docuninja/create_user'),
         {
           ...user,
           is_admin: isAdmin,
@@ -118,16 +121,33 @@ export default function Create() {
           company_user: {
             ...user?.company_user,
             notifications: adjustNotificationsForPayload(),
-          },
+          }
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
+        { skipIntercept: true }
       )
+
+      
+
+      // request(
+      //   'POST',
+      //   docuNinjaEndpoint('/api/users'),
+      //   {
+      //     ...user,
+      //     is_admin: isAdmin,
+      //     permissions: isAdmin ? [] : permissions,
+      //     company_user: {
+      //       ...user?.company_user,
+      //       notifications: adjustNotificationsForPayload(),
+      //     }
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem(
+      //         'X-DOCU-NINJA-TOKEN'
+      //       )}`,
+      //     },
+      //   }
+      // )
         .then((response: GenericSingleResourceResponse<User>) => {
           toast.success('created_user');
 

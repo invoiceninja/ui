@@ -11,6 +11,7 @@
 import { Guard } from '$app/common/guards/Guard';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
+import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
@@ -116,7 +117,7 @@ export const documentsRoutes = (
       element={<Guard guards={[]} component={<BlueprintBuilder />} />}
     />
 
-    <Route path="users" element={<Guard guards={[]} component={<Users />} />} />
+    <Route path="users" element={<DocuNinjaGuard guards={[]} component={<Users />} />} />
 
     <Route
       path="users/create"
