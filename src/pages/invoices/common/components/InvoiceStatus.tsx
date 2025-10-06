@@ -14,9 +14,12 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 import dayjs from 'dayjs';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { CSSProperties } from 'react';
 
 interface Props {
   entity: Invoice;
+  style?: CSSProperties;
+  onClick?: () => void;
 }
 
 export function InvoiceStatus(props: Props) {
@@ -89,7 +92,11 @@ export function InvoiceStatus(props: Props) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColors.$1 }}
+        style={{
+          backgroundColor: statusThemeColors.$1,
+          ...props.style,
+        }}
+        onClick={props.onClick}
       >
         {t('sent')}
       </Badge>

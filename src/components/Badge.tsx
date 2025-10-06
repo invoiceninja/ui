@@ -98,6 +98,10 @@ export function Badge(props: Props) {
         },
         props.className
       )}
+      onClick={(event) => {
+        event.stopPropagation();
+        props.onClick?.();
+      }}
     >
       {props.children}
     </span>
