@@ -48,6 +48,7 @@ export interface Preferences {
   enable_public_notifications: boolean | null;
   use_system_fonts: boolean;
   use_legacy_editor: boolean;
+  feedback_slider_displayed_at: number;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
@@ -107,6 +108,7 @@ export const preferencesDefaults: Preferences = {
   enable_public_notifications: null,
   use_system_fonts: false,
   use_legacy_editor: false,
+  feedback_slider_displayed_at: 0,
 };
 
 interface Options {
