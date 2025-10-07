@@ -31,8 +31,8 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
-import { setUser } from '@sentry/react';
-import user from 'pusher-js/types/src/core/user';
+import { useNotifications } from '../common/hooks/useNotifications';
+import { NOTIFICATION_VALUES } from '../common/constants/notifications';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -65,42 +65,17 @@ export default function Create() {
   const [permissions, setPermissions] = useState<PermissionType[]>(
     user?.permissions ?? []
   );
-  const [notifications, setNotifications] = useState<Record<string, string>>(
-    {}
-  );
-  const [allNotificationsValue, setAllNotificationsValue] =
-    useState<string>('none');
+
+  const {
+    notifications,
+    setNotifications,
+    allNotificationsValue,
+    setAllNotificationsValue,
+    adjustNotificationsForPayload,
+    initializeNotifications,
+  } = useNotifications();
 
   const { data: blankUser, isLoading } = useBlankDocuNinjaUserQuery();
-
-  const adjustNotificationsForPayload = (): string[] => {
-    let notificationArray: string[] = [];
-
-    if (
-      allNotificationsValue === 'all' ||
-      allNotificationsValue === 'all_user'
-    ) {
-      notificationArray = [allNotificationsValue];
-    } else {
-      notificationArray = Object.entries(notifications)
-        .filter(([id, value]) => {
-          if (!value || value === 'none') return false;
-
-          return typeof id === 'string' && id.length > 0;
-        })
-        .map(([id, value]) => {
-          if (value === 'all') {
-            return id;
-          }
-          if (value === 'all_user') {
-            return `${id}_user`;
-          }
-          return id;
-        });
-    }
-
-    return notificationArray;
-  };
 
   const handleCreate = () => {
     if (!isFormBusy) {
@@ -178,16 +153,10 @@ export default function Create() {
   }, [blankUser]);
 
   useEffect(() => {
-    if (user?.company_user?.notifications) {
-      setAllNotificationsValue(
-        user.company_user.notifications.includes('all')
-          ? 'all'
-          : user.company_user.notifications.includes('all_user')
-          ? 'all_user'
-          : 'none'
-      );
+    if (user) {
+      initializeNotifications(user);
     }
-  }, [user]);
+  }, [user, initializeNotifications]);
 
   return (
     <Default

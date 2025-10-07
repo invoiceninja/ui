@@ -12,38 +12,52 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import { cloneDeep, set } from 'lodash';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  User,
-  Permission as PermissionType,
-} from '$app/common/interfaces/docuninja/api';
+import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { DefaultSignature } from './DefaultSignature';
 import { SignatureFontSelector } from '$app/components/SignatureFontSelector';
+import { useUserEditContext } from '../contexts/UserEditContext';
+import { NotificationValue } from '../constants/notifications';
 
+// Legacy props interface for backward compatibility
 export interface DocuninjaUserProps {
   user: User;
-  setUser: Dispatch<SetStateAction<User | undefined>>;
+  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
   errors: ValidationBag | undefined;
   isFormBusy: boolean;
   isAdmin: boolean;
-  setIsAdmin: Dispatch<SetStateAction<boolean>>;
+  setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
   permissions: PermissionType[];
-  setPermissions: Dispatch<SetStateAction<PermissionType[]>>;
+  setPermissions: React.Dispatch<React.SetStateAction<PermissionType[]>>;
   notifications: Record<string, string>;
-  setNotifications: Dispatch<SetStateAction<Record<string, string>>>;
-  allNotificationsValue: string;
-  setAllNotificationsValue: Dispatch<SetStateAction<string>>;
+  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  allNotificationsValue: NotificationValue;
+  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
   editPage?: boolean;
 }
 
-export default function Details({
-  user,
-  setUser,
-  errors,
-  editPage,
-}: DocuninjaUserProps) {
+// Overloaded function signatures for better TypeScript support
+export default function Details(): JSX.Element;
+export default function Details(props: DocuninjaUserProps): JSX.Element;
+export default function Details(props?: DocuninjaUserProps) {
   const [t] = useTranslation();
+  
+  // Try to use context first, fall back to props for backward compatibility
+  let contextData;
+  try {
+    contextData = useUserEditContext();
+  } catch {
+    contextData = null;
+  }
+
+  const data = contextData || props;
+  
+  if (!data) {
+    return null; // Early return if no data available
+  }
+
+  const { user, setUser, errors, editPage } = data;
 
   const [showStoredInitials, setShowStoredInitials] = useState<boolean>(true);
   const [showStoredSignature, setShowStoredSignature] = useState<boolean>(true);

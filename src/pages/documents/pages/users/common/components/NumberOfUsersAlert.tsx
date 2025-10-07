@@ -18,8 +18,6 @@ import { useNavigate } from 'react-router-dom';
 export function NumberOfUsersAlert() {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
-
   const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   if (

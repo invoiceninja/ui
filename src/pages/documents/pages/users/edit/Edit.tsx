@@ -32,6 +32,8 @@ import Permissions from '../common/components/Permissions';
 import Details from '../common/components/Details';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
+import { useNotifications } from '../common/hooks/useNotifications';
+import { UserEditProvider } from '../common/contexts/UserEditContext';
 
 function Edit() {
   const [t] = useTranslation();
@@ -61,48 +63,19 @@ function Edit() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
-  const [notifications, setNotifications] = useState<Record<string, string>>(
-    {}
-  );
-  const [allNotificationsValue, setAllNotificationsValue] =
-    useState<string>('none');
+
+  const {
+    notifications,
+    setNotifications,
+    allNotificationsValue,
+    setAllNotificationsValue,
+    adjustNotificationsForPayload,
+    initializeNotifications,
+  } = useNotifications();
 
   const { data: userResponse, isLoading } = useDocuNinjaUserQuery({
     id,
   });
-
-  const adjustNotificationsForPayload = (): string[] => {
-    let notificationArray: string[] = [];
-console.log("adjusting " + allNotificationsValue);
-    if (
-      allNotificationsValue === 'all' ||
-      allNotificationsValue === 'all_user'
-    ) {
-      notificationArray = [allNotificationsValue];
-    } 
-    else if(allNotificationsValue === 'none'){
-      notificationArray = [];
-    }
-    else {
-      notificationArray = Object.entries(notifications)
-        .filter(([id, value]) => {
-          if (!value || value === 'none') return false;
-
-          return typeof id === 'string' && id.length > 0;
-        })
-        .map(([id, value]) => {
-          if (value === 'all') {
-            return id;
-          }
-          if (value === 'all_user') {
-            return `${id}_user`;
-          }
-          return id;
-        });
-    }
-
-    return notificationArray;
-  };
 
   const handleUpdate = () => {
     if (!isFormBusy) {
@@ -153,46 +126,37 @@ console.log("adjusting " + allNotificationsValue);
   }, [userResponse]);
 
   useEffect(() => {
-    if (user?.company_user?.notifications) {
-      setAllNotificationsValue(
-        user.company_user.notifications.includes('all')
-          ? 'all'
-          : user.company_user.notifications.includes('all_user')
-          ? 'all_user'
-          : user.company_user.notifications.length >= 1
-          ? 'custom'
-          : 'none'
-      );
-    }
-
-    if (user?.permissions) {
-      setPermissions(user.permissions);
-    }
-
-    setIsAdmin(user?.company_user?.is_admin ?? false);
-
-    if (user?.company_user?.notifications) {
-    
-    // Initialize individual notifications
-    const initialNotifications: Record<string, string> = {};
-    for (const id of user.company_user.notifications) {
-      const notificationId = String(id);
-      if (notificationId.endsWith("_user")) {
-        const baseId = notificationId.replace("_user", "");
-        initialNotifications[baseId] = "all_user";
-      } else {
-        initialNotifications[notificationId] = "all";
+    if (user) {
+      initializeNotifications(user);
+      
+      if (user.permissions) {
+        setPermissions(user.permissions);
       }
+
+      setIsAdmin(user.company_user?.is_admin ?? false);
     }
-    setNotifications(initialNotifications);
-  
-    }
-  }, [user]);
+  }, [user, initializeNotifications]);
 
   useSocketEvent({
     on: ['App\\Events\\User\\UserWasVerified'],
     callback: () => $refetch(['docuninja_users']),
   });
+
+  const contextValue = {
+    user,
+    setUser,
+    errors,
+    isFormBusy,
+    isAdmin,
+    setIsAdmin,
+    permissions,
+    setPermissions,
+    notifications,
+    setNotifications,
+    allNotificationsValue,
+    setAllNotificationsValue,
+    editPage: true,
+  };
 
   return (
     <Default
@@ -209,74 +173,36 @@ console.log("adjusting " + allNotificationsValue);
       }
     >
       {!isLoading && user ? (
-        <div className="space-y-4">
-          <Card
-            title={t('edit_user')}
-            className="shadow-sm"
-            style={{ borderColor: colors.$24 }}
-            withoutBodyPadding
-            withoutHeaderBorder
-          >
-            <TabGroup
-              tabs={[t('user_details'), t('notifications'), t('permissions')]}
-              withHorizontalPadding
-              horizontalPaddingWidth="1.5rem"
-              fullRightPadding
+        <UserEditProvider value={contextValue}>
+          <div className="space-y-4">
+            <Card
+              title={t('edit_user')}
+              className="shadow-sm"
+              style={{ borderColor: colors.$24 }}
+              withoutBodyPadding
+              withoutHeaderBorder
             >
-              <div className="py-4">
-                <Details
-                  user={user}
-                  setUser={setUser}
-                  errors={errors}
-                  isFormBusy={isFormBusy}
-                  isAdmin={isAdmin}
-                  setIsAdmin={setIsAdmin}
-                  permissions={permissions}
-                  setPermissions={setPermissions}
-                  notifications={notifications}
-                  setNotifications={setNotifications}
-                  allNotificationsValue={allNotificationsValue}
-                  setAllNotificationsValue={setAllNotificationsValue}
-                  editPage
-                />
-              </div>
+              <TabGroup
+                tabs={[t('user_details'), t('notifications'), t('permissions')]}
+                withHorizontalPadding
+                horizontalPaddingWidth="1.5rem"
+                fullRightPadding
+              >
+                <div className="py-4">
+                  <Details />
+                </div>
 
-              <div className="py-4">
-                <Notifications
-                  user={user}
-                  setUser={setUser}
-                  errors={errors}
-                  isFormBusy={isFormBusy}
-                  isAdmin={isAdmin}
-                  setIsAdmin={setIsAdmin}
-                  permissions={permissions}
-                  setPermissions={setPermissions}
-                  notifications={notifications}
-                  setNotifications={setNotifications}
-                  allNotificationsValue={allNotificationsValue}
-                  setAllNotificationsValue={setAllNotificationsValue}
-                />
-              </div>
+                <div className="py-4">
+                  <Notifications />
+                </div>
 
-              <div className="py-4">
-                <Permissions
-                  user={user}
-                  setUser={setUser}
-                  errors={errors}
-                  isFormBusy={isFormBusy}
-                  isAdmin={isAdmin}
-                  setIsAdmin={setIsAdmin}
-                  permissions={permissions}
-                  setPermissions={setPermissions}
-                  notifications={notifications}
-                  setNotifications={setNotifications}
-                  allNotificationsValue={allNotificationsValue}
-                  setAllNotificationsValue={setAllNotificationsValue}
-                />
-              </div>
-            </TabGroup>
-          </Card>
-        </div>
+                <div className="py-4">
+                  <Permissions />
+                </div>
+              </TabGroup>
+            </Card>
+          </div>
+        </UserEditProvider>
       ) : (
         <div className="flex justify-center items-center py-8">
           <Spinner />

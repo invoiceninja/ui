@@ -10,6 +10,7 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { DataTable } from '$app/components/DataTable';
 import { User } from '$app/common/interfaces/docuninja/api';
 import { useUserColumns } from './common/hooks/useUserColumns';
@@ -19,15 +20,13 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
 import { useAtomValue } from 'jotai';
 import { docuCompanyAccountDetailsAtom } from '../../Document';
-import { useState } from 'react';
 import { Button } from '$app/components/forms';
-import { UserSelectionModal } from './common/components/UserSelectionModal';
 
 export default function Users() {
   useTitle('users');
 
   const [t] = useTranslation();
-  const [isUserSelectionModalOpen, setIsUserSelectionModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const columns = useUserColumns();
 
@@ -53,18 +52,6 @@ export default function Users() {
     <Default title={t('users')} breadcrumbs={pages}>
       <NumberOfUsersAlert />
 
-      <div className="mb-4">
-        <Button
-          onClick={() => setIsUserSelectionModalOpen(true)}
-          disabled={
-            (docuCompanyAccountDetails?.account?.num_users || 0) ===
-            (docuCompanyAccountDetails?.account?.users || [])?.length
-          }
-        >
-          {t('grant_docuninja_access')}
-        </Button>
-      </div>
-
       <DataTable<User>
         queryIdentificator="/api/users/docuninja"
         resource="user"
@@ -72,6 +59,7 @@ export default function Users() {
         columns={columns}
         withResourcefulActions
         bulkRoute="/api/users/bulk"
+        linkToCreate="/documents/users/selection"
         linkToEdit="/documents/users/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
@@ -79,12 +67,11 @@ export default function Users() {
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
+        disabledCreateButton={
+          (docuCompanyAccountDetails?.account?.num_users || 0) ===
+          (docuCompanyAccountDetails?.account?.users || [])?.length
+        }
         filterParameterKey="search"
-      />
-
-      <UserSelectionModal
-        visible={isUserSelectionModalOpen}
-        onClose={() => setIsUserSelectionModalOpen(false)}
       />
     </Default>
   );

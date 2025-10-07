@@ -12,6 +12,7 @@ import { Guard } from '$app/common/guards/Guard';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
+import { docuNinjaHasCreateOrViewPermission, docuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
@@ -52,6 +53,9 @@ const CreateUser = lazy(
 const EditUser = lazy(
   () => import('$app/pages/documents/pages/users/edit/Edit')
 );
+const UserSelection = lazy(
+  () => import('$app/pages/documents/pages/users/UserSelection')
+);
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 
@@ -59,14 +63,29 @@ const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 export const documentsRoutes = (
   <Route
     path="documents"
-    element={<Guard guards={[]} component={<Document />} />}
+    element={<DocuNinjaGuard guards={[]} component={<Document />} />}
   >
     <Route
       path="create"
-      element={<Guard guards={[]} component={<Create />} />}
+      element={
+        <DocuNinjaGuard 
+          guards={[docuNinjaPermission({ model: 'documents', action: 'create' })]} 
+          component={<Create />} 
+        />
+      }
     />
 
-    <Route path="" element={<Guard guards={[]} component={<Documents />} />} />
+    <Route 
+      path=""
+      element={<Guard guards={[]} component={<Documents />} />}
+ 
+      // element={
+        // <DocuNinjaGuard 
+        //   guards={[docuNinjaPermission({ model: 'documents', action: 'view' })]} 
+        //   component={<Documents />} 
+        // />
+      // } 
+    />
 
     <Route
       path="settings"
@@ -127,6 +146,11 @@ export const documentsRoutes = (
     <Route
       path="users/:id/edit"
       element={<Guard guards={[]} component={<EditUser />} />}
+    />
+
+    <Route
+      path="users/selection"
+      element={<DocuNinjaGuard guards={[]} component={<UserSelection />} />}
     />
 
     <Route
