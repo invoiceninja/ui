@@ -61,16 +61,28 @@ export function InvoiceStatus(props: Props) {
   };
 
   if (isDeleted) {
-    return <Badge variant="red">{t('deleted')}</Badge>;
+    return (
+      <Badge variant="red" onClick={props.onClick} style={props.style}>
+        {t('deleted')}
+      </Badge>
+    );
   }
 
   if (props.entity.archived_at) {
-    return <Badge variant="orange">{t('archived')}</Badge>;
+    return (
+      <Badge variant="orange" onClick={props.onClick} style={props.style}>
+        {t('archived')}
+      </Badge>
+    );
   }
 
   if (isPastDue() && !isCancelledOrReversed) {
     return (
-      <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
+      <Badge
+        variant="red"
+        onClick={props.onClick}
+        style={{ backgroundColor: statusThemeColors.$5, ...props.style }}
+      >
         {t('past_due')}
       </Badge>
     );
@@ -78,14 +90,22 @@ export function InvoiceStatus(props: Props) {
 
   if (isViewed && isUnpaid && !isPartial && !isCancelledOrReversed) {
     return (
-      <Badge variant="yellow" style={{ backgroundColor: statusThemeColors.$4 }}>
+      <Badge
+        variant="yellow"
+        onClick={props.onClick}
+        style={{ backgroundColor: statusThemeColors.$4, ...props.style }}
+      >
         {t('viewed')}
       </Badge>
     );
   }
 
   if (status_id === InvoiceStatusEnum.Draft) {
-    return <Badge variant="generic">{t('draft')}</Badge>;
+    return (
+      <Badge variant="generic" onClick={props.onClick} style={props.style}>
+        {t('draft')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Sent) {
@@ -107,7 +127,8 @@ export function InvoiceStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColors.$2 }}
+        onClick={props.onClick}
+        style={{ backgroundColor: statusThemeColors.$2, ...props.style }}
       >
         {t('partial')}
       </Badge>
@@ -116,19 +137,35 @@ export function InvoiceStatus(props: Props) {
 
   if (status_id === InvoiceStatusEnum.Paid) {
     return (
-      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+      <Badge
+        variant="green"
+        onClick={props.onClick}
+        style={{ backgroundColor: statusThemeColors.$3, ...props.style }}
+      >
         {t('paid')}
       </Badge>
     );
   }
 
   if (status_id === InvoiceStatusEnum.Cancelled) {
-    return <Badge variant="black">{t('cancelled')}</Badge>;
+    return (
+      <Badge variant="black" onClick={props.onClick} style={props.style}>
+        {t('cancelled')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Reversed) {
-    return <Badge variant="purple">{t('reversed')}</Badge>;
+    return (
+      <Badge variant="purple" onClick={props.onClick} style={props.style}>
+        {t('reversed')}
+      </Badge>
+    );
   }
 
-  return <Badge variant="purple">{t('reversed')}</Badge>;
+  return (
+    <Badge variant="purple" onClick={props.onClick} style={props.style}>
+      {t('reversed')}
+    </Badge>
+  );
 }

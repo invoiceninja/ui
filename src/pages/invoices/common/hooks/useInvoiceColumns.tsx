@@ -154,16 +154,17 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const isPeppolEnabled = () => {
     return (
       currentCompany.settings.e_invoice_type === 'PEPPOL' &&
-      currentCompany.settings.enable_e_invoice &&
-      currentCompany.tax_data?.acts_as_sender
+      currentCompany.settings.enable_e_invoice
     );
   };
 
   const isEInvoiceSuccessfullySent = (currentInvoice: Invoice) => {
     return (
       isPeppolEnabled() &&
-      currentInvoice.status_id === InvoiceStatusEnum.Sent &&
-      currentInvoice.backup?.guid
+      currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
+      !currentInvoice.backup?.guid &&
+      !currentInvoice.is_deleted &&
+      !currentInvoice.archived_at
     );
   };
 
