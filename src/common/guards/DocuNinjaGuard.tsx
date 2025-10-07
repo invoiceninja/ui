@@ -89,7 +89,7 @@ export function DocuNinjaGuard({ guards, component, type = 'page', docuData }: D
 
   useEffect(() => {
     const promises = guards.map((guard) =>
-      guard({ companyUser, queryClient, params, user, settingsLevel, docuData: contextDocuData })
+      guard({ companyUser, queryClient, params, user, settingsLevel, docuData: contextDocuData || undefined })
     );
 
     Promise.all(promises)

@@ -11,24 +11,6 @@
 import { DocuNinjaGuard, DocuNinjaData } from '../../DocuNinjaGuard';
 import { docuNinjaService } from '$app/common/services/DocuNinjaService';
 
-export function docuNinjaAdmin(): DocuNinjaGuard {
-  return ({ docuData }: { docuData?: DocuNinjaData }) => {
-    // Use global service data if no docuData provided
-    const data = docuData || docuNinjaService.getDocuData();
-    
-    if (!data) {
-      return Promise.resolve(false);
-    }
-
-    const companyUser = data.company_user;
-    if (!companyUser) {
-      return Promise.resolve(false);
-    }
-
-    return Promise.resolve(Boolean(companyUser.is_admin));
-  };
-}
-
 export function docuNinjaOwner(): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData }) => {
     // Use global service data if no docuData provided

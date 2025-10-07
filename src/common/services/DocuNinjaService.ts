@@ -15,6 +15,7 @@ import collect from 'collect.js';
 import { store } from '$app/common/stores/store';
 import { Company } from '$app/common/interfaces/company.interface';
 import { QueryClient } from 'react-query';
+import { Settings } from '$app/common/interfaces/docuninja/api';
 
 export interface DocuNinjaAccount {
   id: string;
@@ -29,6 +30,7 @@ export interface DocuNinjaCompany {
   ninja_company_key: string;
   name: string;
   token: string;
+  settings?: Settings;
 }
 
 export interface DocuNinjaUser {
@@ -37,6 +39,14 @@ export interface DocuNinjaUser {
   is_admin: boolean;
   is_owner: boolean;
   permissions?: DocuNinjaPermission[];
+  company_user?: {
+    id: string;
+    user_id: string;
+    company_id: string;
+    is_admin: boolean;
+    is_owner: boolean;
+    [key: string]: any;
+  };
 }
 
 export interface DocuNinjaPermission {
