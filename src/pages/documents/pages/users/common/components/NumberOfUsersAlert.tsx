@@ -10,7 +10,7 @@
 
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
+import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
@@ -20,8 +20,7 @@ export function NumberOfUsersAlert() {
   const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   if (
-    (docuCompanyAccountDetails?.account?.num_users || 0) <
-    (docuCompanyAccountDetails?.account?.users || [])?.length
+    (docuCompanyAccountDetails?.account?.num_users || 0) <= 0
   ) {
     return null;
   }

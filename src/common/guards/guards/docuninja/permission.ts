@@ -41,6 +41,22 @@ function getDocuDataFromCache(queryClient: any): Promise<DocuNinjaData | null> {
   return queryClient.fetchQuery(['/api/docuninja/login']).catch(() => null);
 }
 
+function isAdmin(data: DocuNinjaData | null){
+
+  if (!data?.company_user) {
+    return false;
+  }
+
+  const { company_user } = data;
+  
+  // Admin/owner has all permissions
+  if (company_user.is_admin || company_user.is_owner) {
+    return true;
+  }
+
+  return false;
+}
+
 // Core permission checking logic
 function checkPermission(
   data: DocuNinjaData | null,
@@ -98,12 +114,32 @@ function checkPermission(
 
 export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaGuard {
   return ({ docuData, queryClient }: { docuData?: DocuNinjaData; queryClient: any }) => {
+
+    
     if (docuData) {
-      return Promise.resolve(checkPermission(docuData, permission.model, permission.action));
+      const result = checkPermission(docuData, permission.model, permission.action);
+      return Promise.resolve(result);
     }
     
-    return getDocuDataFromCache(queryClient).then(data => 
-      checkPermission(data, permission.model, permission.action)
-    );
+    return getDocuDataFromCache(queryClient).then(data => {
+      const result = checkPermission(data, permission.model, permission.action);
+      return result;
+    });
+  };
+}
+
+
+export function docuNinjaAdmin(): DocuNinjaGuard {
+  return ({ docuData, queryClient }: { docuData?: DocuNinjaData; queryClient: any }) => {
+    
+    if (docuData) {
+      const result = isAdmin(docuData);
+      return Promise.resolve(result);
+    }
+    
+    return getDocuDataFromCache(queryClient).then(data => {
+      const result = isAdmin(data);
+      return result;
+    });
   };
 }

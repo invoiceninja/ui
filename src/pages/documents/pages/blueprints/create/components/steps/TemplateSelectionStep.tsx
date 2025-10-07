@@ -139,8 +139,6 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       const templateHtml = response.data.html;
       const templateName = response.data.name;
 
-      console.log(templateName);
-
       toast.success('template_loaded');
       
       // Navigate to GrapeJS editor with the template HTML

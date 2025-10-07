@@ -16,7 +16,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import Toggle from '$app/components/forms/Toggle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
+import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
 import { useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useRef, useState } from 'react';

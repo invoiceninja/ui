@@ -84,12 +84,12 @@ enum DocuNinjaState {
 
 export function DocuNinjaGuard({ guards, component, type = 'page', docuData }: DocuNinjaGuardProps) {
   const [state, setState] = useState<DocuNinjaState>(DocuNinjaState.Loading);
-  const { companyUser, queryClient, params, user, settingsLevel } =
+  const { companyUser, queryClient, params, user, settingsLevel, docuData: contextDocuData } =
     useDocuNinjaGuardContext(docuData);
 
   useEffect(() => {
     const promises = guards.map((guard) =>
-      guard({ companyUser, queryClient, params, user, settingsLevel, docuData })
+      guard({ companyUser, queryClient, params, user, settingsLevel, docuData: contextDocuData })
     );
 
     Promise.all(promises)
@@ -98,8 +98,10 @@ export function DocuNinjaGuard({ guards, component, type = 'page', docuData }: D
           ? setState(DocuNinjaState.Unauthorized)
           : setState(DocuNinjaState.Authorized);
       })
-      .catch(() => setState(DocuNinjaState.Loading));
-  }, [guards, companyUser, queryClient, params, user, settingsLevel, docuData]);
+      .catch((error) => {
+        setState(DocuNinjaState.Unauthorized);
+      });
+  }, [guards, companyUser, queryClient, params, user, settingsLevel, contextDocuData]);
 
   if (state === DocuNinjaState.Loading) {
     return type === 'page' ? (

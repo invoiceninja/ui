@@ -19,7 +19,7 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
 import { useAtomValue } from 'jotai';
-import { docuCompanyAccountDetailsAtom } from '../../Document';
+import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
 
 export default function Users() {
   useTitle('users');
@@ -67,7 +67,7 @@ export default function Users() {
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
         disabledCreateButton={
-          (docuCompanyAccountDetails?.account?.num_users || 0) ===
+          (docuCompanyAccountDetails?.account?.num_users || 0) >=
           (docuCompanyAccountDetails?.account?.users || [])?.length
         }
         filterParameterKey="search"

@@ -10,9 +10,11 @@
 
 import { useEffect, useState } from 'react';
 import { docuNinjaService, DocuNinjaState, DocuNinjaData } from '$app/common/services/DocuNinjaService';
+import { useQueryClient } from 'react-query';
 
 export function useDocuNinja(): DocuNinjaState {
-  const [state, setState] = useState<DocuNinjaState>(docuNinjaService.getState());
+  const initialState = docuNinjaService.getState();
+  const [state, setState] = useState<DocuNinjaState>(initialState);
 
   useEffect(() => {
     const unsubscribe = docuNinjaService.subscribe(setState);
@@ -42,13 +44,23 @@ export function useDocuNinjaInitialized(): boolean {
   return isInitialized;
 }
 
+export function useDocuNinjaTokenReady(): boolean {
+  const { isTokenReady } = useDocuNinja();
+  return isTokenReady;
+}
+
 export function useDocuNinjaActions() {
+  const queryClient = useQueryClient();
+  
   return {
     refresh: () => docuNinjaService.refresh(),
     createAccount: () => docuNinjaService.createAccount(),
     hasPermission: (model: string, action: string) => 
       docuNinjaService.hasPermission(model, action),
     isPaidUser: () => docuNinjaService.isPaidUser(),
+    getToken: () => docuNinjaService.getToken(),
+    flushData: () => docuNinjaService.flushData(),
+    flushDataWithQueryClient: () => docuNinjaService.flushDataWithQueryClient(queryClient),
   };
 }
 

@@ -14,18 +14,21 @@ import { get } from 'lodash';
 import collect from 'collect.js';
 import { store } from '$app/common/stores/store';
 import { Company } from '$app/common/interfaces/company.interface';
+import { QueryClient } from 'react-query';
 
 export interface DocuNinjaAccount {
   id: string;
   plan: string;
   plan_expires: string;
   num_users: number;
+  users?: DocuNinjaUser[];
 }
 
 export interface DocuNinjaCompany {
   id: string;
   ninja_company_key: string;
   name: string;
+  token: string;
 }
 
 export interface DocuNinjaUser {
@@ -54,6 +57,7 @@ export interface DocuNinjaState {
   isLoading: boolean;
   error: Error | null;
   isInitialized: boolean;
+  isTokenReady: boolean;
 }
 
 class DocuNinjaService {
@@ -62,13 +66,57 @@ class DocuNinjaService {
     isLoading: false,
     error: null,
     isInitialized: false,
+    isTokenReady: false,
   };
 
   private listeners: Set<(state: DocuNinjaState) => void> = new Set();
+  private currentCompanyKey: string | null = null;
+  private storeUnsubscribe: (() => void) | null = null;
 
   constructor() {
-    // Initialize on service creation
-    this.initialize();
+    // Don't initialize immediately - wait for company data to be available
+    this.waitForCompanyData();
+    this.setupCompanyChangeListener();
+  }
+
+  private setupCompanyChangeListener() {
+    // Listen for company changes to flush DocuNinja data
+    this.storeUnsubscribe = store.subscribe(() => {
+      const company = this.getCurrentCompany();
+      const newCompanyKey = company?.company_key || null;
+      
+      // If company key changed, flush all DocuNinja data
+      if (this.currentCompanyKey !== null && this.currentCompanyKey !== newCompanyKey) {
+        this.flushData();
+        this.currentCompanyKey = newCompanyKey;
+        
+        // Re-initialize for the new company if it has a key
+        if (newCompanyKey) {
+          this.waitForCompanyData();
+        }
+      } else if (this.currentCompanyKey === null && newCompanyKey) {
+        // First time setting company key
+        this.currentCompanyKey = newCompanyKey;
+      }
+    });
+  }
+
+  private async waitForCompanyData() {
+    // Subscribe to store changes to detect when company data is loaded
+    const unsubscribe = store.subscribe(() => {
+      const company = this.getCurrentCompany();
+      if (company?.company_key) {
+        unsubscribe(); // Stop listening
+        this.initialize();
+      }
+    });
+    
+    // Also check immediately in case data is already loaded
+    const company = this.getCurrentCompany();
+    if (company?.company_key) {
+      unsubscribe();
+      await this.initialize();
+    }
   }
 
   private async initialize() {
@@ -85,7 +133,8 @@ class DocuNinjaService {
         this.setState({ 
           isLoading: false, 
           isInitialized: true,
-          data: null 
+          data: null,
+          isTokenReady: false
         });
         return;
       }
@@ -99,13 +148,15 @@ class DocuNinjaService {
 
       const docuData = response.data.data;
       
-      // Store company ID in localStorage
-      const c = collect(get(docuData, 'companies', []))
+      // Find the matching company by ninja_company_key
+      const matchingCompany = collect(get(docuData, 'companies', []))
         .where('ninja_company_key', company.company_key)
-        .first() as { id: string } | undefined;
+        .first() as { id: string; token: string } | undefined;
 
-      if (c) {
-        localStorage.setItem('DOCUNINJA_COMPANY_ID', c.id);
+      if (matchingCompany) {
+        // Store the company-specific token
+        localStorage.setItem('X-DOCU-NINJA-TOKEN', matchingCompany.token);
+        localStorage.setItem('DOCUNINJA_COMPANY_ID', matchingCompany.id);
       }
 
       this.setState({
@@ -113,6 +164,7 @@ class DocuNinjaService {
         isLoading: false,
         error: null,
         isInitialized: true,
+        isTokenReady: !!matchingCompany,
       });
 
     } catch (error) {
@@ -123,6 +175,7 @@ class DocuNinjaService {
           isLoading: false,
           error: null,
           isInitialized: true,
+          isTokenReady: false,
         });
       } else {
         this.setState({
@@ -130,6 +183,7 @@ class DocuNinjaService {
           isLoading: false,
           error: error as Error,
           isInitialized: true,
+          isTokenReady: false,
         });
       }
     }
@@ -190,6 +244,52 @@ class DocuNinjaService {
     
     return account.plan !== 'free' && 
            new Date(account.plan_expires ?? '') > new Date();
+  }
+
+  public getToken(): string | null {
+    return localStorage.getItem('X-DOCU-NINJA-TOKEN');
+  }
+
+  public flushData(): void {
+    // Clear all DocuNinja data
+    this.setState({
+      data: null,
+      isLoading: false,
+      error: null,
+      isInitialized: false,
+      isTokenReady: false,
+    });
+
+    // Clear localStorage tokens
+    localStorage.removeItem('X-DOCU-NINJA-TOKEN');
+    localStorage.removeItem('DOCUNINJA_COMPANY_ID');
+    
+    // Reset company key tracking
+    this.currentCompanyKey = null;
+  }
+
+  public flushDataWithQueryClient(queryClient: QueryClient): void {
+    // Clear DocuNinja data
+    this.flushData();
+    
+    // Clear React Query cache for DocuNinja endpoints
+    queryClient.removeQueries({ queryKey: ['/api/docuninja/login'] });
+    queryClient.removeQueries({ queryKey: ['docuninja_users'] });
+    queryClient.removeQueries({ queryKey: ['docuninja_account'] });
+  }
+
+  public destroy(): void {
+    // Clean up store subscription
+    if (this.storeUnsubscribe) {
+      this.storeUnsubscribe();
+      this.storeUnsubscribe = null;
+    }
+    
+    // Clear listeners
+    this.listeners.clear();
+    
+    // Flush data
+    this.flushData();
   }
 
   public hasPermission(model: string, action: string): boolean {

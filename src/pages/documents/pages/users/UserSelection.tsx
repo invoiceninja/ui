@@ -61,8 +61,6 @@ export default function UserSelection() {
       const invoiceUsers = invoiceNinjaUsers.data.data;
       const docuUsers = docuNinjaUsers.data.data;
       
-      console.log('Invoice Ninja users:', invoiceUsers);
-      console.log('DocuNinja users:', docuUsers);
       
       const usersWithStatus: UserWithDocuNinjaStatus[] = invoiceUsers
         .map((user: InvoiceNinjaUser) => {
@@ -71,7 +69,6 @@ export default function UserSelection() {
             du.email === user.email
           );
           
-          console.log(`User ${user.email} (${user.first_name} ${user.last_name}) - DocuNinja match:`, docuUser ? 'FOUND' : 'NOT FOUND');
           
           return {
             ...user,
@@ -80,13 +77,11 @@ export default function UserSelection() {
           };
         });
       
-      console.log('Users with status:', usersWithStatus);
       setUsersWithStatus(usersWithStatus);
     }
   }, [invoiceNinjaUsers, docuNinjaUsers]);
 
   const handleUserSelection = (userId: string, checked: boolean) => {
-    console.log('handleUserSelection called:', { userId, checked, currentSelectedIds: selectedUserIds });
     
     setSelectedUserIds(prev => {
       const isCurrentlySelected = prev.includes(userId);
@@ -94,31 +89,25 @@ export default function UserSelection() {
       if (checked && !isCurrentlySelected) {
         // Add user if checked and not already selected
         const newIds = [...prev, userId];
-        console.log('Adding user, new IDs:', newIds);
         return newIds;
       } else if (!checked && isCurrentlySelected) {
         // Remove user if unchecked and currently selected
         const newIds = prev.filter(id => id !== userId);
-        console.log('Removing user, new IDs:', newIds);
         return newIds;
       } else {
         // No change needed
-        console.log('No change needed');
         return prev;
       }
     });
   };
 
   const handleSelectAll = (checked: boolean) => {
-    console.log('handleSelectAll called:', { checked, availableUsersCount: availableUsers.length });
     if (checked) {
       const availableUserIds = usersWithStatus
         .filter(user => !user.hasDocuNinjaAccess)
         .map(user => user.id);
-      console.log('Selecting all users:', availableUserIds);
       setSelectedUserIds(availableUserIds);
     } else {
-      console.log('Deselecting all users');
       setSelectedUserIds([]);
     }
   };
@@ -138,17 +127,12 @@ export default function UserSelection() {
         selectedUserIds.includes(user.id) && !user.hasDocuNinjaAccess
       );
 
-      console.log('Selected user IDs:', selectedUserIds);
-      console.log('Selected users:', selectedUsers);
 
       // Remove duplicates by using a Set
       const uniqueSelectedUsers = selectedUsers.filter((user, index, self) => 
         index === self.findIndex(u => u.id === user.id)
       );
 
-      console.log('Unique selected users:', uniqueSelectedUsers);
-      console.log('Permissions being sent:', permissions);
-      console.log('Is admin:', isAdmin);
 
       // Create DocuNinja users for selected Invoice Ninja users
       const promises = uniqueSelectedUsers.map(user => {
@@ -162,7 +146,6 @@ export default function UserSelection() {
           notifications: [],
         };
         
-        console.log(`Creating user ${user.email} with payload:`, payload);
         
         return request(
           'POST',
@@ -177,7 +160,6 @@ export default function UserSelection() {
       toast.success('DocuNinja access granted successfully');
       
       // Refetch both DocuNinja users and Invoice Ninja users to update status
-      console.log('Refetching data...');
       $refetch(['docuninja_users']);
       $refetch(['users']);
       
@@ -197,7 +179,6 @@ export default function UserSelection() {
   const allAvailableSelected = availableUsers.length > 0 && 
     availableUsers.every(user => selectedUserIds.includes(user.id));
 
-  console.log('Current state:', { selectedUserIds, availableUsers: availableUsers.map(u => u.id) });
 
 
   const pages = [
@@ -263,7 +244,6 @@ export default function UserSelection() {
                     onValueChange={() => {
                       // Toggle the select all state
                       const newCheckedState = !allAvailableSelected;
-                      console.log('Select All clicked:', { currentState: allAvailableSelected, newState: newCheckedState });
                       handleSelectAll(newCheckedState);
                     }}
                     disabled={availableUsers.length === 0 || isFormBusy}

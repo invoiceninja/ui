@@ -34,7 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { FaFileSignature } from 'react-icons/fa';
 import { useAtomValue } from 'jotai';
-import { docuCompanyAccountDetailsAtom } from '../../Document';
+import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
 import { useDownloadAuditLog } from './useDownloadAuditLog';
 
 interface DocumentAction {
