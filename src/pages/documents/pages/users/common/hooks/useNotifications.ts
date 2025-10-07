@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { User } from '$app/common/interfaces/docuninja/api';
 import { NOTIFICATION_VALUES, NotificationValue } from '../constants/notifications';
 

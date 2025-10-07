@@ -13,7 +13,6 @@ import { Link } from '$app/components/forms';
 import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 export function NumberOfUsersAlert() {
   const [t] = useTranslation();

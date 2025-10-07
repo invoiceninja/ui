@@ -20,7 +20,6 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
 import { useAtomValue } from 'jotai';
 import { docuCompanyAccountDetailsAtom } from '../../Document';
-import { Button } from '$app/components/forms';
 
 export default function Users() {
   useTitle('users');

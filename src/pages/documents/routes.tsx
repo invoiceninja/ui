@@ -12,7 +12,7 @@ import { Guard } from '$app/common/guards/Guard';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
-import { docuNinjaHasCreateOrViewPermission, docuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
+import { docuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
 
 const Document = lazy(() => import('$app/pages/documents/Document'));
 const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));

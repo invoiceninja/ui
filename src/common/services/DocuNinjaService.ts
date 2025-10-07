@@ -10,11 +10,10 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { AxiosResponse } from 'axios';
 import { get } from 'lodash';
 import collect from 'collect.js';
 import { store } from '$app/common/stores/store';
-import { Company } from '$app/common/interfaces/company';
+import { Company } from '$app/common/interfaces/company.interface';
 
 export interface DocuNinjaAccount {
   id: string;
@@ -170,19 +169,15 @@ class DocuNinjaService {
   }
 
   public async createAccount(): Promise<void> {
-    try {
-      await request(
-        'POST',
-        endpoint('/api/docuninja/create'),
-        {},
-        { skipIntercept: true }
-      );
-      
-      // Refresh data after creation
-      await this.refresh();
-    } catch (error) {
-      throw error;
-    }
+    await request(
+      'POST',
+      endpoint('/api/docuninja/create'),
+      {},
+      { skipIntercept: true }
+    );
+    
+    // Refresh data after creation
+    await this.refresh();
   }
 
   public getDocuData(): DocuNinjaData | null {

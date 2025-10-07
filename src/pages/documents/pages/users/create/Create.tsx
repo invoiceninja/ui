@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { docuNinjaEndpoint, endpoint } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { User } from '$app/common/interfaces/docuninja/api';
 import { cloneDeep } from 'lodash';
@@ -32,7 +32,6 @@ import { useColorScheme } from '$app/common/colors';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
 import { useNotifications } from '../common/hooks/useNotifications';
-import { NOTIFICATION_VALUES } from '../common/constants/notifications';
 
 export default function Create() {
   const [t] = useTranslation();
