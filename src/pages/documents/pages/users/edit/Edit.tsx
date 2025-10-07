@@ -33,7 +33,7 @@ import Details from '../common/components/Details';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
 
-function Create() {
+function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();
@@ -73,13 +73,17 @@ function Create() {
 
   const adjustNotificationsForPayload = (): string[] => {
     let notificationArray: string[] = [];
-
+console.log("adjusting " + allNotificationsValue);
     if (
       allNotificationsValue === 'all' ||
       allNotificationsValue === 'all_user'
     ) {
       notificationArray = [allNotificationsValue];
-    } else {
+    } 
+    else if(allNotificationsValue === 'none'){
+      notificationArray = [];
+    }
+    else {
       notificationArray = Object.entries(notifications)
         .filter(([id, value]) => {
           if (!value || value === 'none') return false;
@@ -117,10 +121,7 @@ function Create() {
           ...user,
           is_admin: isAdmin,
           permissions: isAdmin ? [] : permissions,
-          company_user: {
-            ...user?.company_user,
-            notifications: adjustNotificationsForPayload(),
-          },
+          notifications: adjustNotificationsForPayload(),
         },
         {
           headers: {
@@ -158,8 +159,33 @@ function Create() {
           ? 'all'
           : user.company_user.notifications.includes('all_user')
           ? 'all_user'
+          : user.company_user.notifications.length >= 1
+          ? 'custom'
           : 'none'
       );
+    }
+
+    if (user?.permissions) {
+      setPermissions(user.permissions);
+    }
+
+    setIsAdmin(user?.company_user?.is_admin ?? false);
+
+    if (user?.company_user?.notifications) {
+    
+    // Initialize individual notifications
+    const initialNotifications: Record<string, string> = {};
+    for (const id of user.company_user.notifications) {
+      const notificationId = String(id);
+      if (notificationId.endsWith("_user")) {
+        const baseId = notificationId.replace("_user", "");
+        initialNotifications[baseId] = "all_user";
+      } else {
+        initialNotifications[notificationId] = "all";
+      }
+    }
+    setNotifications(initialNotifications);
+  
     }
   }, [user]);
 
@@ -260,4 +286,4 @@ function Create() {
   );
 }
 
-export default Create;
+export default Edit;

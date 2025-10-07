@@ -10,7 +10,7 @@
 
 import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DocuninjaUserProps } from './Details';
 
@@ -75,12 +75,15 @@ export function Notifications({
     const newNotifications = { ...notifications };
 
     if (value === 'none') {
+      console.log('none', id);
       delete newNotifications[id];
     } else {
+      console.log('value', id, value);
       newNotifications[id] = value;
     }
 
     setNotifications(newNotifications);
+
   };
 
   return (
@@ -89,20 +92,29 @@ export function Notifications({
         <SelectField
           value={allNotificationsValue}
           onValueChange={(value) => {
-            setAllNotificationsValue(value);
 
             if (value === 'all' || value === 'all_user') {
               const newNotifications: Record<string, string> = {};
 
               for (const type of notificationTypes) {
-                newNotifications[type.id] = 'none';
+                delete newNotifications[type.id];
               }
+              setAllNotificationsValue(value);
               setNotifications(newNotifications);
             }
+            else if(value === 'none'){
+              
+              const newNotifications: Record<string, string> = {};
+              setNotifications(newNotifications);
+              setAllNotificationsValue(value);
+            }
+            
           }}
           customSelector
+          dismissable={false}
           disabled={isFormBusy}
         >
+          <option value="custom">{t('custom')}</option>
           <option value="none">{t('none')}</option>
           <option value="all">{t('all')}</option>
           <option value="all_user">{t('owned_by_user')}</option>
@@ -115,8 +127,7 @@ export function Notifications({
             value={notifications[notification.id] ?? 'none'}
             onValueChange={(value) => {
               handlePreferenceChange(notification.id, value);
-
-              setAllNotificationsValue('none');
+              setAllNotificationsValue('custom');
             }}
             disabled={
               allNotificationsValue === 'all' ||
@@ -124,6 +135,7 @@ export function Notifications({
               isFormBusy
             }
             customSelector
+            dismissable={false}
           >
             <option value="none">{t('none')}</option>
             <option value="all">{t('all')}</option>

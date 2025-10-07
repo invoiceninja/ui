@@ -19,11 +19,15 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
 import { useAtomValue } from 'jotai';
 import { docuCompanyAccountDetailsAtom } from '../../Document';
+import { useState } from 'react';
+import { Button } from '$app/components/forms';
+import { UserSelectionModal } from './common/components/UserSelectionModal';
 
 export default function Users() {
   useTitle('users');
 
   const [t] = useTranslation();
+  const [isUserSelectionModalOpen, setIsUserSelectionModalOpen] = useState(false);
 
   const columns = useUserColumns();
 
@@ -49,6 +53,18 @@ export default function Users() {
     <Default title={t('users')} breadcrumbs={pages}>
       <NumberOfUsersAlert />
 
+      <div className="mb-4">
+        <Button
+          onClick={() => setIsUserSelectionModalOpen(true)}
+          disabled={
+            (docuCompanyAccountDetails?.account?.num_users || 0) ===
+            (docuCompanyAccountDetails?.account?.users || [])?.length
+          }
+        >
+          {t('grant_docuninja_access')}
+        </Button>
+      </div>
+
       <DataTable<User>
         queryIdentificator="/api/users/docuninja"
         resource="user"
@@ -56,7 +72,6 @@ export default function Users() {
         columns={columns}
         withResourcefulActions
         bulkRoute="/api/users/bulk"
-        linkToCreate="/documents/users/create"
         linkToEdit="/documents/users/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
@@ -64,11 +79,12 @@ export default function Users() {
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
-        disabledCreateButton={
-          (docuCompanyAccountDetails?.account?.num_users || 0) ===
-          (docuCompanyAccountDetails?.account?.users || [])?.length
-        }
         filterParameterKey="search"
+      />
+
+      <UserSelectionModal
+        visible={isUserSelectionModalOpen}
+        onClose={() => setIsUserSelectionModalOpen(false)}
       />
     </Default>
   );

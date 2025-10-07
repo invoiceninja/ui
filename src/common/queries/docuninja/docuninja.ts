@@ -10,6 +10,10 @@ interface Params {
   enabled?: boolean;
 }
 
+/**
+ * @deprecated Use useDocuNinja from '$app/common/hooks/useDocuNinja' instead.
+ * This hook is maintained for backward compatibility only.
+ */
 export function useLogin({ enabled = true }: Params) {
   const company = useCurrentCompany();
 
@@ -47,6 +51,10 @@ export function useLogin({ enabled = true }: Params) {
   );
 }
 
+/**
+ * @deprecated Use docuNinjaService.createAccount() from '$app/common/services/DocuNinjaService' instead.
+ * This function is maintained for backward compatibility only.
+ */
 export function useCreate(): Promise<AxiosResponse> {
   return request('POST', endpoint('/api/docuninja/create'));
 }
