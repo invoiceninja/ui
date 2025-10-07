@@ -111,12 +111,12 @@ export function SortableVariableList(props: Props) {
       <Element leftSide={t('fields')}>
         <SelectField
           value=""
-          onValueChange={(value) => handleSelectChange(value)}
+          onValueChange={(value) => value && handleSelectChange(value)}
           disabled={disabled}
           customSelector
           clearAfterSelection
         >
-          <option></option>
+          <option value=""></option>
 
           {defaultVariablesFiltered.map((option, index) => (
             <option key={index} value={option.value}>
