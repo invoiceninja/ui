@@ -21,7 +21,11 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { User } from '$app/common/interfaces/user';
 import { SettingsLevel } from '../stores/slices/settings';
 import { useActiveSettingsDetails } from '../hooks/useActiveSettingsDetails';
-import { docuNinjaService } from '$app/common/services/DocuNinjaService';
+import { DocuNinjaData } from '$app/common/atoms/docuninja';
+import { useDocuNinjaData } from '$app/common/hooks/useDocuNinjaData';
+
+// Re-export DocuNinjaData for backward compatibility
+export type { DocuNinjaData };
 
 export type DocuNinjaGuard = (ctx: DocuNinjaContext) => Promise<boolean>;
 
@@ -34,14 +38,7 @@ export interface DocuNinjaContext {
   docuData?: DocuNinjaData;
 }
 
-export interface DocuNinjaData {
-  company_user: {
-    is_admin: boolean;
-    is_owner: boolean;
-    permissions?: DocuNinjaPermission[];
-  };
-  permissions?: DocuNinjaPermission[];
-}
+// DocuNinjaData is now imported from atoms
 
 export interface DocuNinjaPermission {
   model: string;
@@ -62,9 +59,12 @@ export function useDocuNinjaGuardContext(docuData?: DocuNinjaData) {
   const user = useCurrentUser();
   const companyUser = useCurrentCompanyUser();
   const activeSettings = useActiveSettingsDetails();
+  
+  // Get DocuNinja data from unified atoms (NO QUERY!)
+  const unifiedDocuData = useDocuNinjaData();
 
-  // Use global service data if no docuData provided
-  const globalDocuData = docuData || docuNinjaService.getDocuData();
+  // Use provided docuData, unified data, or null if not available
+  const globalDocuData = docuData || unifiedDocuData || null;
 
   return {
     queryClient,

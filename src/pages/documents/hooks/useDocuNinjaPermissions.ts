@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useDocuNinjaData, useDocuNinjaInitialized } from '$app/common/hooks/useDocuNinja';
-import { DocuNinjaData } from '$app/common/services/DocuNinjaService';
+import { useDocuNinjaData } from '$app/common/hooks/useDocuNinjaData';
+import { DocuNinjaData } from '$app/common/atoms/docuninja';
 
 // Helper function to get permission ID
 function getPermissionId(action: string): number {
@@ -82,40 +82,27 @@ function checkPermissionSync(
 // Hook to check if user has specific permission
 export function useDocuNinjaPermission(model: string, action: string): boolean {
   const docuData = useDocuNinjaData();
-  const isInitialized = useDocuNinjaInitialized();
   
-  // Return false if not initialized yet (prevents flash of wrong state)
-  if (!isInitialized) {
-    return false;
-  }
-  
+  // Use the permission checking logic directly
   return checkPermissionSync(docuData, model, action);
 }
 
 // Hook to check if user is admin
 export function useDocuNinjaAdmin(): boolean {
   const docuData = useDocuNinjaData();
-  const isInitialized = useDocuNinjaInitialized();
   
-  // Return false if not initialized yet (prevents flash of wrong state)
-  if (!isInitialized) {
-    return false;
+  if (docuData?.company_user) {
+    return docuData.company_user.is_admin || docuData.company_user.is_owner;
   }
   
-  if (!docuData?.company_user) {
-    return false;
-  }
-
-  return docuData.company_user.is_admin || docuData.company_user.is_owner;
+  return false;
 }
 
 // Hook to check if user has any of the specified permissions
 export function useDocuNinjaHasAnyPermission(permissions: Array<{model: string, action: string}>): boolean {
   const docuData = useDocuNinjaData();
-  const isInitialized = useDocuNinjaInitialized();
   
-  // Return false if not initialized yet (prevents flash of wrong state)
-  if (!isInitialized) {
+  if (!docuData) {
     return false;
   }
   

@@ -9,12 +9,11 @@
  */
 
 import { DocuNinjaGuard, DocuNinjaData } from '../../DocuNinjaGuard';
-import { docuNinjaService } from '$app/common/services/DocuNinjaService';
 
 export function docuNinjaOwner(): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData }) => {
-    // Use global service data if no docuData provided
-    const data = docuData || docuNinjaService.getDocuData();
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
     
     if (!data) {
       return Promise.resolve(false);
@@ -31,8 +30,8 @@ export function docuNinjaOwner(): DocuNinjaGuard {
 
 export function docuNinjaAdminOrOwner(): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData }) => {
-    // Use global service data if no docuData provided
-    const data = docuData || docuNinjaService.getDocuData();
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
     
     if (!data) {
       return Promise.resolve(false);
@@ -49,16 +48,16 @@ export function docuNinjaAdminOrOwner(): DocuNinjaGuard {
 
 export function docuNinjaHasData(): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData }) => {
-    // Use global service data if no docuData provided
-    const data = docuData || docuNinjaService.getDocuData();
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
     return Promise.resolve(Boolean(data));
   };
 }
 
 export function docuNinjaHasCompanyUser(): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData }) => {
-    // Use global service data if no docuData provided
-    const data = docuData || docuNinjaService.getDocuData();
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
     
     if (!data) {
       return Promise.resolve(false);
@@ -70,8 +69,8 @@ export function docuNinjaHasCompanyUser(): DocuNinjaGuard {
 
 export function docuNinjaHasPermissions(): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData }) => {
-    // Use global service data if no docuData provided
-    const data = docuData || docuNinjaService.getDocuData();
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
     
     if (!data) {
       return Promise.resolve(false);

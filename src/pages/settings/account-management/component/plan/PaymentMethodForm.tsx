@@ -21,7 +21,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "$app/common/helpers/toast/toast";
 import { useQueryClient } from "react-query";
-import { useDocuNinjaActions } from "$app/common/hooks/useDocuNinja";
+import { useDocuNinjaActions } from "$app/common/hooks/useDocuNinjaActions";
 
 export interface ResponsePaymentIntent {
     id: string;
@@ -81,7 +81,7 @@ export function PaymentMethodForm({
     const isDestroyed = useRef(false);
 
     const queryClient = useQueryClient();
-    const { reinitialize } = useDocuNinjaActions();
+    const { refresh } = useDocuNinjaActions();
 
     const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("new_card");
     const [errors, setErrors] = useState<string | null>(null);
@@ -238,7 +238,7 @@ export function PaymentMethodForm({
                                 // Invalidate DocuNinja login query to refresh account data
                                 queryClient.invalidateQueries('/api/docuninja/login');
                                 // Force DocuNinja service to reinitialize
-                                reinitialize();
+                                refresh();
                             })
                             .catch((error: AxiosError<ApiError>) => {
                                 setErrors(
@@ -272,7 +272,7 @@ export function PaymentMethodForm({
                     // Invalidate DocuNinja login query to refresh account data
                     queryClient.invalidateQueries('/api/docuninja/login');
                     // Force DocuNinja service to reinitialize
-                    reinitialize();
+                    refresh();
                 })
                 .catch((error: AxiosError<ApiError>) => {
                     setErrors(

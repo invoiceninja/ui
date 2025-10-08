@@ -16,8 +16,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import Toggle from '$app/components/forms/Toggle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
-import { useAtomValue } from 'jotai';
+import { useDocuNinjaData, useDocuNinjaCompanies } from '$app/common/hooks/useDocuNinjaData';
 import { cloneDeep } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,17 +39,19 @@ function Notifications() {
   const isInitialized = useRef(false);
   const settingsRef = useRef<Settings>(settings);
 
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
-  const id = docuCompanyAccountDetails?.company?.id;
+  // Get DocuNinja data from unified atoms (NO QUERY!)
+  const docuData = useDocuNinjaData();
+  const docuCompanies = useDocuNinjaCompanies();
+  const id = docuCompanies?.[0]?.id;
 
   // Initialize settings from company data only once
   useEffect(() => {
-    if (docuCompanyAccountDetails?.company?.settings && !isInitialized.current) {
-      setSettings(docuCompanyAccountDetails.company.settings);
-      settingsRef.current = docuCompanyAccountDetails.company.settings;
+    if (docuCompanies?.[0]?.settings && !isInitialized.current) {
+      setSettings(docuCompanies[0].settings as any);
+      settingsRef.current = docuCompanies[0].settings as any;
       isInitialized.current = true;
     }
-  }, [docuCompanyAccountDetails?.company?.settings]);
+  }, [docuCompanies?.[0]?.settings]);
 
   // Keep ref in sync with settings state
   useEffect(() => {
@@ -64,7 +65,7 @@ function Notifications() {
       toast.processing();
 
       // Create updated company object with new settings
-      const updatedCompany = cloneDeep(docuCompanyAccountDetails?.company);
+      const updatedCompany = cloneDeep(docuCompanies?.[0]);
       if (updatedCompany) {
         updatedCompany.settings = settingsRef.current;
       }
@@ -72,7 +73,7 @@ function Notifications() {
       request(
         'PUT',
         docuNinjaEndpoint('/api/companies/:id', {
-          id: docuCompanyAccountDetails?.company?.id,
+          id: id,
         }),
         updatedCompany,
         {

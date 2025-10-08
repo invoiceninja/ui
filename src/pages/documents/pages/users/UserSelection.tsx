@@ -27,8 +27,7 @@ import { Permission as PermissionType } from '$app/common/interfaces/docuninja/a
 import { Default } from '$app/components/layouts/Default';
 import { useTitle } from '$app/common/hooks/useTitle';
 import Permissions from './common/components/Permissions';
-import { useAtomValue } from 'jotai';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
+import { useDocuNinjaData, useDocuNinjaAccount } from '$app/common/hooks/useDocuNinjaData';
 
 interface UserWithDocuNinjaStatus extends InvoiceNinjaUser {
   hasDocuNinjaAccess: boolean;
@@ -57,8 +56,9 @@ export default function UserSelection() {
     filter: '' 
   });
 
-  // Get DocuNinja account details for quota checking
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+  // Get DocuNinja account details for quota checking (NO QUERY!)
+  const docuData = useDocuNinjaData();
+  const docuAccount = useDocuNinjaAccount();
 
   // Combine users with DocuNinja status
   useEffect(() => {
@@ -186,7 +186,7 @@ export default function UserSelection() {
 
   // Check DocuNinja quotas and available users
   const currentDocuNinjaUserCount = docuNinjaUsers?.data?.meta?.total || 0;
-  const maxDocuNinjaUsers = docuCompanyAccountDetails?.account?.num_users || 0;
+  const maxDocuNinjaUsers = docuAccount?.num_users || 0;
   const hasAvailableQuota = currentDocuNinjaUserCount < maxDocuNinjaUsers;
   const hasNoAvailableUsers = availableUsers.length === 0;
   const hasQuotaButNoUsers = hasAvailableQuota && hasNoAvailableUsers;

@@ -9,14 +9,13 @@
  */
 
 import { DocuNinjaGuard, DocuNinjaData } from '../../DocuNinjaGuard';
-import { docuNinjaService } from '$app/common/services/DocuNinjaService';
 
 export type DocuNinjaRole = 'admin' | 'owner' | 'editor' | 'viewer' | 'user';
 
 export function docuNinjaRole(role: DocuNinjaRole): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData }) => {
-    // Use global service data if no docuData provided
-    const data = docuData || docuNinjaService.getDocuData();
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
     
     if (!data) {
       return Promise.resolve(false);

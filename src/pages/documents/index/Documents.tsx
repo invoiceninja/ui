@@ -20,15 +20,13 @@ import { useNavigate } from 'react-router-dom';
 import { Gear } from '$app/components/icons/Gear';
 import { DocumentCreationDropZone } from '../common/components/DocumentCreationDropZone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useAtom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { cloneDeep } from 'lodash';
-import { useDocuNinjaData, useDocuNinjaActions, useDocuNinjaTokenReady, useDocuNinjaLoading } from '$app/common/hooks/useDocuNinja';
-import { isPaidDocuninjaUserAtom, docuCompanyAccountDetailsAtom } from '../atoms';
-import { useColorScheme } from '$app/common/colors';
-import { useDocuNinjaAdmin, useDocuNinjaPermission } from '$app/pages/documents/hooks/useDocuNinjaPermissions';
+import { useDocuNinjaData, useDocuNinjaTokenReady, useDocuNinjaLoading, useDocuNinjaIsAdmin, useDocuNinjaIsPaidUser, useDocuNinjaPermission } from '$app/common/hooks/useDocuNinjaData';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
+import { isPaidDocuninjaUserAtom } from '../atoms';
 import { 
   LoadingState, 
   UpgradePlan, 
@@ -44,23 +42,20 @@ export default function Documents() {
   const company = useCurrentCompany();
 
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
-  const [docuCompanyAccountDetails, setDocuCompanyAccountDetails] = useAtom(
-    docuCompanyAccountDetailsAtom
-  );
 
-  // Get DocuNinja data from the service (already loaded by guard)
+  // Get DocuNinja data from atoms (NO QUERY!)
   const docuData = useDocuNinjaData();
-  const { getToken, createAccount } = useDocuNinjaActions();
   const isTokenReady = useDocuNinjaTokenReady();
   const isLoading = useDocuNinjaLoading();
-  const colors = useColorScheme();
-  const isAdmin = useDocuNinjaAdmin();
+  const isAdmin = useDocuNinjaIsAdmin();
+  const isPaidUser = useDocuNinjaIsPaidUser();
   const canCreateDocumentPermission = useDocuNinjaPermission('documents', 'create');
+  
+  // Get actions from the actions hook (NO QUERY!)
+  const { createAccount, getToken } = useDocuNinjaActions();
 
-  const isPaidUser =
-    docuData?.account?.plan !== 'free' &&
-    new Date(docuData?.account?.plan_expires ?? '') > new Date();
-
+  console.log(docuData);
+  console.log(canCreateDocumentPermission);
   // Determine account states
   const hasAccount = !!docuData?.account;
   
@@ -92,23 +87,7 @@ export default function Documents() {
     setIsPaidDocuninjaUser(isPaidUser);
   }, [isPaidUser, setIsPaidDocuninjaUser]);
 
-  useEffect(() => {
-    const docuAccount = docuData?.account;
-    const docuCompany = docuData?.companies?.find(
-      (c) => c.ninja_company_key === company?.company_key
-    );
-
-    if (docuAccount && docuCompany) {
-      setDocuCompanyAccountDetails(
-        cloneDeep({
-          account: docuAccount,
-          company: docuCompany,
-        })
-      );
-    } else {
-      setDocuCompanyAccountDetails(null);
-    }
-  }, [docuData, company, setDocuCompanyAccountDetails]);
+  // No need for separate atom - using unified data directly
 
   useSocketEvent({
     on: [

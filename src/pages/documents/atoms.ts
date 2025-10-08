@@ -9,14 +9,5 @@
  */
 
 import { atom } from 'jotai';
-import { DocuNinjaAccount, DocuNinjaCompany } from '$app/common/services/DocuNinjaService';
 
 export const isPaidDocuninjaUserAtom = atom<boolean>(false);
-
-type DocuCompanyAccountDetails = {
-  account: DocuNinjaAccount;
-  company: DocuNinjaCompany;
-};
-
-export const docuCompanyAccountDetailsAtom =
-  atom<DocuCompanyAccountDetails | null>(null);

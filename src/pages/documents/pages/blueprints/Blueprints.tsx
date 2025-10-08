@@ -20,6 +20,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { MdSettings } from 'react-icons/md';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 
 export default function Blueprints() {
   useTitle('blueprints');
@@ -29,6 +30,9 @@ export default function Blueprints() {
   const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);
 
   const columns = useTableColumns();
+  
+  // Get token from unified actions (NO QUERY!)
+  const { getToken } = useDocuNinjaActions();
 
   const handleSettingsClick = (blueprint: Blueprint) => {
     setSelectedBlueprint(blueprint);
@@ -63,7 +67,7 @@ export default function Blueprints() {
         linkToEdit="/documents/blueprints/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          Authorization: `Bearer ${getToken()}`,
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"

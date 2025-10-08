@@ -1,5 +1,4 @@
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { Plan } from './Plan';
@@ -9,7 +8,8 @@ import { useState } from 'react';
 import { Check } from 'react-feather';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useColorScheme } from '$app/common/colors';
-import { useDocuNinjaData, useDocuNinjaLoading, useDocuNinjaActions } from '$app/common/hooks/useDocuNinja';
+import { useDocuNinjaData, useDocuNinjaLoading } from '$app/common/hooks/useDocuNinjaData';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { Alert } from '$app/components/Alert';
 
 export function DocuNinja() {
@@ -21,10 +21,12 @@ export function DocuNinja() {
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Get DocuNinja data using the new hooks
+  // Get DocuNinja data from atoms (NO QUERY!)
   const docuData = useDocuNinjaData();
   const isLoading = useDocuNinjaLoading();
-  const { createAccount: createDocuNinjaAccountAction, flushDataWithQueryClient } = useDocuNinjaActions();
+  
+  // Get actions from the actions hook (NO QUERY!)
+  const { createAccount: createDocuNinjaAccountAction, flushData } = useDocuNinjaActions();
 
   async function createDocuNinjaAccount() {
     setError(null);
@@ -67,12 +69,12 @@ export function DocuNinja() {
             <Plan
               title={
                 <p>
-                  {t('enterprise')} ({docuAccount.num_users}{' '}
+                  {t('enterprise')} ({docuAccount.num_users || 0}{' '}
                   <span className="lowercase">{t('users')}</span>)
                 </p>
               }
               color={'#000000'}
-              price={`${6 * docuAccount.num_users}`}
+              price={`${6 * (docuAccount.num_users || 0)}`} //@todo - this has been hardcoded.
               trial={false}
               custom={false}
               term="month"
@@ -88,12 +90,12 @@ export function DocuNinja() {
             <Plan
               title={
                 <p>
-                  {t('free_trial')} ({docuAccount.num_users}{' '}
+                  {t('free_trial')} ({docuAccount.num_users || 0}{' '}
                   <span className="lowercase">{t('users')}</span>)
                 </p>
               }
               color={'#000000'}
-              price={`${0 * docuAccount.num_users}`}
+              price={`${0 * (docuAccount.num_users || 0)}`}
               trial={false}
               custom={false}
               term="month"
@@ -152,7 +154,7 @@ export function DocuNinja() {
             </div>
           )}
 
-          {docuAccount && docuAccount.num_users < account.num_users && (
+          {docuAccount && (docuAccount.num_users || 0) < account.num_users && (
             <div className="flex flex-col space-y-2">
               <Button
                 onClick={() => setShowUpgradeModal(true)}
@@ -165,7 +167,7 @@ export function DocuNinja() {
                 visible={showUpgradeModal}
                 onClose={() => setShowUpgradeModal(false)}
                 onPaymentComplete={() => {
-                  flushDataWithQueryClient();
+                  flushData();
                   setShowUpgradeModal(false);
                 }}
               />

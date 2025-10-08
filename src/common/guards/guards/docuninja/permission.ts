@@ -9,8 +9,6 @@
  */
 
 import { DocuNinjaGuard, DocuNinjaData } from '../../DocuNinjaGuard';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
 
 export type DocuNinjaPermission = {
   model: 'documents' | 'templates' | 'blueprints' | 'clients' | 'users' | 'settings';
@@ -30,34 +28,10 @@ function getPermissionId(action: string): number {
   return permissionMap[action as keyof typeof permissionMap] || 0;
 }
 
-// Helper function to get DocuNinja data from React Query cache
+// Helper function to get DocuNinja data from React Query cache (DEPRECATED - use unified atoms)
 function getDocuDataFromCache(queryClient: any): Promise<DocuNinjaData | null> {
-  // Try to get data from React Query cache first
-  const cachedData = queryClient.getQueryData(['/api/docuninja/login']);
-  
-  if (cachedData) {
-    return Promise.resolve(cachedData);
-  }
-  
-  // Data not in cache, fetch it
-  return queryClient.fetchQuery({
-    queryKey: ['/api/docuninja/login'],
-    queryFn: () => request(
-      'POST',
-      endpoint('/api/docuninja/login'),
-      {},
-      { skipIntercept: true }
-    ).then((response) => response.data.data),
-    staleTime: Infinity,
-    retry: (failureCount: number, error: any) => {
-      // Don't retry on 401 errors (expected when no account exists)
-      if (error?.response?.status === 401) {
-        return false;
-      }
-      // Retry other errors up to 3 times
-      return failureCount < 3;
-    },
-  }).catch(() => null);
+  // This is now deprecated - data should come from unified atoms
+  return Promise.resolve(null);
 }
 
 function isAdmin(data: DocuNinjaData | null){
@@ -134,32 +108,17 @@ function checkPermission(
 }
 
 export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaGuard {
-
-  return ({ docuData, queryClient }: { docuData?: DocuNinjaData; queryClient: any }) => {
-
-    if (docuData) {
-      const result = checkPermission(docuData, permission.model, permission.action);
-      return Promise.resolve(result);
-    }
-    
-    return getDocuDataFromCache(queryClient).then(data => {
-      const result = checkPermission(data, permission.model, permission.action);
-      return result;
-    });
+  return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
+    return Promise.resolve(checkPermission(data, permission.model, permission.action));
   };
 }
 
 export function docuNinjaAdmin(): DocuNinjaGuard {
-  return ({ docuData, queryClient }: { docuData?: DocuNinjaData; queryClient: any }) => {
-    
-    if (docuData) {
-      const result = isAdmin(docuData);
-      return Promise.resolve(result);
-    }
-    
-    return getDocuDataFromCache(queryClient).then(data => {
-      const result = isAdmin(data);
-      return result;
-    });
+  return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
+    // Use provided docuData or return false if not available
+    const data = docuData || null;
+    return Promise.resolve(isAdmin(data));
   };
 }

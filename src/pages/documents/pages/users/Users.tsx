@@ -18,8 +18,8 @@ import { Default } from '$app/components/layouts/Default';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
-import { useAtomValue } from 'jotai';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
+import { useDocuNinjaData, useDocuNinjaAccount } from '$app/common/hooks/useDocuNinjaData';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 
 export default function Users() {
@@ -30,7 +30,10 @@ export default function Users() {
 
   const columns = useUserColumns();
 
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+  // Get DocuNinja data from unified atoms (NO QUERY!)
+  const docuData = useDocuNinjaData();
+  const docuAccount = useDocuNinjaAccount();
+  const { getToken } = useDocuNinjaActions();
   
   // Get actual DocuNinja users count from API
   const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 
@@ -40,7 +43,7 @@ export default function Users() {
   });
   
   const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
-  const maxUsers = docuCompanyAccountDetails?.account?.num_users || 0;
+  const maxUsers = docuAccount?.num_users || 0;
 
   const pages = [
     {
@@ -73,7 +76,7 @@ export default function Users() {
         linkToEdit="/documents/users/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          Authorization: `Bearer ${getToken()}`,
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
