@@ -59,7 +59,7 @@ export default function UserSelection() {
 
   // Get DocuNinja account details for quota checking (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
-  const docuAccount = docuData?.account;
+  const docuAccount = docuData;
 
   // Combine users with DocuNinja status
   useEffect(() => {

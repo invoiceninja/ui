@@ -33,7 +33,7 @@ export default function Users() {
 
   // Get DocuNinja data from unified atoms (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
-  const docuAccount = docuData?.account;
+  const docuAccount = docuData;
   const { getToken } = useDocuNinjaActions();
   
   // Get actual DocuNinja users count from API

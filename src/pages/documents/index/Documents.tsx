@@ -59,7 +59,7 @@ export default function Documents() {
   const { createAccount, getToken } = useDocuNinjaActions();
 
   // Determine account states
-  const hasAccount = !!docuData?.account;
+  const hasAccount = !!docuData;
 
   // Check if company exists in DocuNinja by looking for matching company key
   const docuCompany = docuData?.companies?.find(
@@ -74,7 +74,7 @@ export default function Documents() {
 
   // For non-owners, if no account exists, they need account creation
   const needsAccountCreation = !hasAccount && !isAdmin;
-  const needsPlanUpgrade = (hasAccount && docuData?.account?.plan !== 'pro' && isAdmin);
+  const needsPlanUpgrade = (hasAccount && docuData?.plan !== 'pro' && isAdmin);
 
   const handleCreateAccount = async () => {
     try {

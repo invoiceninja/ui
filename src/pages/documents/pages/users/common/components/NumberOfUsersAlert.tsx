@@ -20,7 +20,7 @@ export function NumberOfUsersAlert() {
 
   // Get DocuNinja account data from unified atoms (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
-  const docuAccount = docuData?.account;
+  const docuAccount = docuData;
   
   // Get actual DocuNinja users count from API
   const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 
