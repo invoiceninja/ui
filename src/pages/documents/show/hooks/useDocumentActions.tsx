@@ -82,7 +82,7 @@ export function useDocumentActions({ document }: Params) {
     (invitation) =>
       invitation.entity === 'user' &&
       invitation.user_id ===
-        docuData?.account?.users?.find(
+        docuData?.users?.find(
           (user) => user.company_user?.is_owner
         )?.id
   );
