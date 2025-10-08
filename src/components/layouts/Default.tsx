@@ -9,22 +9,19 @@
  */
 
 import { FormEvent, ReactElement, ReactNode, useState } from 'react';
-import { Menu as MenuIcon, Info, File } from 'react-feather';
+import { Menu as MenuIcon, Info } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Link } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
-import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
+import { DesktopSidebar } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
 import { isDemo, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
-import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import {
@@ -34,7 +31,6 @@ import {
 import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
@@ -46,25 +42,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
 import classNames from 'classnames';
-import { Plus } from '../icons/Plus';
-import { House } from '../icons/House';
-import { Cube } from '../icons/Cube';
-import { Invoice as InvoiceIcon } from '../icons/Invoice';
-import { Refresh } from '../icons/Refresh';
-import { Users } from '../icons/Users';
-import { CreditCard } from '../icons/CreditCard';
-import { Files } from '../icons/Files';
-import { Wallet } from '../icons/Wallet';
-import { SuitCase } from '../icons/SuitCase';
-import { ClipboardCheck } from '../icons/ClipboardCheck';
-import { Office } from '../icons/Office';
-import { FileClock } from '../icons/FileClock';
-import SackCoins from '../icons/SackCoins';
-import { CurrencyExchange } from '../icons/CurrencyExchange';
-import { ChartLine } from '../icons/ChartLine';
-import { ArrowsTransaction } from '../icons/ArrowsTransaction';
-import { Gear } from '../icons/Gear';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
 import { useNavigation } from './common/navigation';
 
 export interface SaveOption {
@@ -91,17 +68,12 @@ interface Props extends CommonProps {
 export function Default(props: Props) {
   const [t] = useTranslation();
 
-  const location = useLocation();
   const colors = useColorScheme();
 
-  const enabled = useEnabled();
-  const hasPermission = useHasPermission();
   const preventNavigation = usePreventNavigation();
 
   const user = useInjectUserChanges();
-  const company = useCurrentCompany();
   const companyUser = useCurrentCompanyUser();
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
