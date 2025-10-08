@@ -21,7 +21,7 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { User } from '$app/common/interfaces/user';
 import { SettingsLevel } from '../stores/slices/settings';
 import { useActiveSettingsDetails } from '../hooks/useActiveSettingsDetails';
-import { Account } from '$app/common/interfaces/docuninja/api';
+import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
 import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
@@ -34,7 +34,7 @@ export interface DocuNinjaContext {
   user: User | undefined;
   companyUser: CompanyUser | undefined;
   settingsLevel: SettingsLevel;
-  docuData?: Account;
+  docuData?: DocuNinjaData;
 }
 
 // DocuNinjaData is now imported from atoms
@@ -49,10 +49,11 @@ export interface DocuNinjaGuardProps {
   guards: DocuNinjaGuard[];
   component: React.ReactElement;
   type?: 'page' | 'subPage' | 'component';
-  docuData?: Account;
+  docuData?: DocuNinjaData;
 }
 
-export function useDocuNinjaGuardContext(docuData?: Account) {
+//@todo - do we really need to pass docuData as a prop?
+export function useDocuNinjaGuardContext(docuData?: DocuNinjaData) {
   const queryClient = useQueryClient();
   const params = useParams();
   const user = useCurrentUser();

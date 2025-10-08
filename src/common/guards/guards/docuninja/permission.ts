@@ -9,7 +9,7 @@
  */
 
 import { DocuNinjaGuard } from '../../DocuNinjaGuard';
-import { Account } from '$app/common/interfaces/docuninja/api';
+import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
 import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
@@ -52,8 +52,8 @@ export function useDocuNinjaPaidUser(): boolean {
   const [data] = useAtom(docuNinjaAtom);
   if (!data) return false;
   
-  return data.plan !== 'free' && 
-         new Date(data.plan_expires ?? '') > new Date();
+  return data?.account.plan !== 'free' && 
+         new Date(data.account.plan_expires ?? '') > new Date();
 }
 
 export function useDocuNinjaPermission(model: string, action: string): boolean {
@@ -64,7 +64,7 @@ export function useDocuNinjaPermission(model: string, action: string): boolean {
 
 // Core permission checking logic
 function checkPermission(
-  data: Account | undefined,
+  data: DocuNinjaData | undefined,
   model: string,
   action: string
 ): boolean {
@@ -120,7 +120,7 @@ function checkPermission(
 }
 
 export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaGuard {
-  return ({ docuData }: { docuData?: Account; queryClient: any }) => {
+  return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
     // Use provided docuData or return false if not available
     const data = docuData || undefined;
     return Promise.resolve(checkPermission(data, permission.model, permission.action));
@@ -128,7 +128,7 @@ export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaG
 }
 
 export function docuNinjaAdmin(): DocuNinjaGuard {
-  return ({ docuData }: { docuData?: Account; queryClient: any }) => {
+  return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
     // Use provided docuData or return false if not available
     const data = docuData || undefined;
     if (!data?.company_user) {

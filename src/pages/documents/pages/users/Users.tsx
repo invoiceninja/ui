@@ -10,7 +10,6 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { DataTable } from '$app/components/DataTable';
 import { User } from '$app/common/interfaces/docuninja/api';
 import { useUserColumns } from './common/hooks/useUserColumns';
@@ -27,13 +26,12 @@ export default function Users() {
   useTitle('users');
 
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
   const columns = useUserColumns();
 
   // Get DocuNinja data from unified atoms (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
-  const docuAccount = docuData;
+  const docuAccount = docuData?.account;
   const { getToken } = useDocuNinjaActions();
   
   // Get actual DocuNinja users count from API

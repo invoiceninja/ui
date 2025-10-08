@@ -46,7 +46,7 @@ export function DocuNinja() {
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  const docuAccount = docuData;
+  const docuAccount = docuData?.account;
   
   return (
     <Card>

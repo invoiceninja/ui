@@ -55,7 +55,6 @@ export function useDocumentActions({ document }: Params) {
 
   // Get DocuNinja data from unified atoms (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
-  const docuCompanies = docuData?.companies;
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);

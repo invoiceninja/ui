@@ -9,6 +9,6 @@
  */
 
 import { atom } from 'jotai';
-import { Account } from '../interfaces/docuninja/api';
+import { DocuNinjaData } from '../interfaces/docuninja/api';
 // Main DocuNinja data atom - following the exact same pattern as expenses
-export const docuNinjaAtom = atom<Account | undefined>(undefined);
+export const docuNinjaAtom = atom<DocuNinjaData | undefined>(undefined);

@@ -14,7 +14,7 @@ import { useSetAtom } from 'jotai';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { Account } from '$app/common/interfaces/docuninja/api';
+import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
 import collect from 'collect.js';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
@@ -43,7 +43,7 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
           { skipIntercept: true }
         );
 
-        const docuData = response.data.data as Account;
+        const docuData = response.data.data as DocuNinjaData;
         
         // Find the matching company by ninja_company_key
         const companies = docuData.companies || [];
