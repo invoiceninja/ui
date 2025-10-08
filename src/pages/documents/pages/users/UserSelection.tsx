@@ -335,13 +335,7 @@ export default function UserSelection() {
 
         {/* Actions */}
         <div className="flex justify-between items-center pt-6 border-t">
-          <div className="text-sm text-gray-600">
-            {selectedUserIds.length > 0 && (
-              <span>
-                {t('selected_users_count', { count: selectedUserIds.length })}
-              </span>
-            )}
-          </div>
+          
           <div className="flex space-x-3">
             <Button
               type="secondary"
