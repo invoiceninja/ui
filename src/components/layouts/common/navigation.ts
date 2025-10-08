@@ -298,7 +298,7 @@ export function useNavigation() {
         label: t('new_document'),
         visible: true,
       },
-      visible: true,
+      visible: false,
       subOptions: [
         {
           name: t('blueprints'),
@@ -375,7 +375,7 @@ export function useNavigation() {
     });
 
     setTimeout(() => {
-      $visibility('/documents/users', true);
+      $visibility('/documents', true);
     }, 5000);
 
     setTimeout(() => {
