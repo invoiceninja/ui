@@ -310,7 +310,7 @@ export default function UserSelection() {
         {/* Permissions */}
         {selectedUserIds.length > 0 && (
           <div>
-            <h2 className="text-lg font-medium mb-4">{t('set_permissions')}</h2>
+            <h2 className="text-lg font-medium mb-4">{t('permissions')}</h2>
             <div className="border rounded-lg p-6 bg-gray-50">
               <Permissions
                 user={{ 
@@ -334,7 +334,7 @@ export default function UserSelection() {
         )}
 
         {/* Actions */}
-        <div className="flex justify-between items-center pt-6 border-t">
+        <div className="flex justify-end items-end pt-6 border-t">
           
           <div className="flex space-x-3">
             <Button

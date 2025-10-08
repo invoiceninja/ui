@@ -159,9 +159,11 @@ class DocuNinjaService {
       const docuData = response.data.data;
       
       // Find the matching company by ninja_company_key
-      const matchingCompany = collect(get(docuData, 'companies', []))
+      const companies = docuData.companies || [];
+      const matchingCompany = collect(companies)
         .where('ninja_company_key', company.company_key)
         .first() as { id: string; token: string } | undefined;
+
 
       if (matchingCompany) {
         // Store the company-specific token

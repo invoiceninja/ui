@@ -72,6 +72,22 @@ export default function Documents() {
   const needsPlanUpgrade = !hasDocuNinjaModules || (hasAccount && docuData?.account?.plan !== 'pro') || 
                           (isAdmin && !hasAccount && isTokenReady && !isLoading);
 
+  // Debug logging
+  console.log('Documents Debug:', {
+    isTokenReady,
+    hasAccount,
+    isAdmin,
+    needsPlanUpgrade,
+    needsAccountCreation,
+    needsCompanySetup,
+    hasDocuNinjaModules,
+    docuData: !!docuData,
+    companyUser: docuData?.company_user,
+    isOwner: docuData?.company_user?.is_owner,
+    isAdminFromData: docuData?.company_user?.is_admin
+  });
+
+
 
   const handleCreateAccount = async () => {
     try {
@@ -122,9 +138,8 @@ export default function Documents() {
     },
   ];
 
-  // Show loading state if token is not ready (e.g., during company switch)
-  // But allow company setup and plan upgrade if we have account data but no matching company
-  if (!isTokenReady && !needsCompanySetup && !needsPlanUpgrade) {
+  // Show loading state only if we're actually loading and don't have any specific state to show
+  if (isLoading && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
     return (
       <Default title={t('documents')} breadcrumbs={pages}>
         <div className="flex items-center justify-center py-8">
@@ -137,8 +152,48 @@ export default function Documents() {
     );
   }
 
-  // Show splash page for non-admin users
-  if (isTokenReady && !isAdmin) {
+  // Show upgrade page for owners without DocuNinja account (check this BEFORE needsPlanUpgrade)
+  if (!hasAccount && isAdmin) {
+    return (
+      <Default title={t('documents')} breadcrumbs={pages}>
+        <div className="flex flex-col items-center gap-4 p-6">
+          <span style={{ color: colors.$17 }}>
+            {t('upgrade_plan_docuninja')}
+          </span>
+
+          <Button
+            onClick={() => navigate('/settings/account_management')}
+            behavior="button"
+          >
+            {t('upgrade_plan')}
+          </Button>
+        </div>
+      </Default>
+    );
+  }
+
+  // Show plan upgrade message for non-pro users (but only if not already handled above)
+  if (needsPlanUpgrade) {
+    return (
+      <Default title={t('documents')} breadcrumbs={pages}>
+        <div className="flex flex-col items-center gap-4 p-6">
+          <span style={{ color: colors.$17 }}>
+            {t('upgrade_plan_docuninja')}
+          </span>
+
+          <Button
+            onClick={() => navigate('/settings/account_management')}
+            behavior="button"
+          >
+            {t('upgrade_plan')}
+          </Button>
+        </div>
+      </Default>
+    );
+  }
+
+  // Show splash page for users without DocuNinja access
+  if (!hasAccount || (hasAccount && !isAdmin)) {
     return (
       <Default title={t('documents')} breadcrumbs={pages}>
         <div className="flex items-center justify-center py-8">
@@ -161,25 +216,6 @@ export default function Documents() {
     );
   }
 
-  // Show plan upgrade message for non-pro users
-  if (needsPlanUpgrade) {
-    return (
-      <Default title={t('documents')} breadcrumbs={pages}>
-        <div className="flex flex-col items-center gap-4 p-6">
-          <span style={{ color: colors.$17 }}>
-            {t('upgrade_plan_docuninja')}
-          </span>
-
-          <Button
-            onClick={() => navigate('/settings/account_management')}
-            behavior="button"
-          >
-            {t('upgrade_plan')}
-          </Button>
-        </div>
-      </Default>
-    );
-  }
 
   // Show account creation UI
   if (needsAccountCreation) {

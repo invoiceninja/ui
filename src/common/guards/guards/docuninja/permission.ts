@@ -113,21 +113,24 @@ function checkPermission(
 }
 
 export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaGuard {
+
+  console.log('docuNinjaPermission', permission);
   return ({ docuData, queryClient }: { docuData?: DocuNinjaData; queryClient: any }) => {
 
-    
+    console.log('docuNinjaPermission', docuData);
+
     if (docuData) {
       const result = checkPermission(docuData, permission.model, permission.action);
       return Promise.resolve(result);
     }
     
     return getDocuDataFromCache(queryClient).then(data => {
+      console.log('docuNinjaPermission cache', data);
       const result = checkPermission(data, permission.model, permission.action);
       return result;
     });
   };
 }
-
 
 export function docuNinjaAdmin(): DocuNinjaGuard {
   return ({ docuData, queryClient }: { docuData?: DocuNinjaData; queryClient: any }) => {

@@ -393,7 +393,7 @@ export function Default(props: Props) {
           visible: true,
           rightButton: {
             icon: Plus,
-            to: '/documents/users/create',
+            to: '/documents/users/selection',
             label: t('new_user'),
             visible: true,
           },
