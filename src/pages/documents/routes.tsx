@@ -9,7 +9,7 @@
  */
 
 import { Guard } from '$app/common/guards/Guard';
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import { lazy } from 'react';
 import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
 import { docuNinjaAdmin, docuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
@@ -77,19 +77,17 @@ export const documentsRoutes = (
     <Route
       path="documents/settings"
       element={<DocuNinjaGuard guards={[docuNinjaAdmin()]} component={<Settings />} />}
-    />
-
-    <Route
-      path="documents/settings/email_templates"
-      element={
-        <DocuNinjaGuard guards={[docuNinjaAdmin()]} type="subPage" component={<EmailSettings />} />
-      }
-    />
-
-    <Route
-      path="documents/settings/notifications"
-      element={<Guard guards={[]} type="subPage" component={<Notifications />} />}
-    />
+    >
+      <Route index element={<Navigate to="email_templates" replace />} />
+      <Route
+        path="email_templates"
+        element={<DocuNinjaGuard guards={[docuNinjaAdmin()]} type="subPage" component={<EmailSettings />} />}
+      />
+      <Route
+        path="notifications"
+        element={<Guard guards={[]} type="subPage" component={<Notifications />} />}
+      />
+    </Route>
 
     <Route
       path="documents/:id"
