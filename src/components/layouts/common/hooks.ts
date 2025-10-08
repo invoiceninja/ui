@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  useAdmin,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { atom, useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
