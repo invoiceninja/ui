@@ -48,7 +48,7 @@ export interface Company {
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
   ninja_company_key: string;
-
+  token?: string;
   // Relations
   users?: User[];
   pivot?: CompanyUser | null;

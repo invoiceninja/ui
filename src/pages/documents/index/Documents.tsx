@@ -21,7 +21,7 @@ import { Gear } from '$app/components/icons/Gear';
 import { DocumentCreationDropZone } from '../common/components/DocumentCreationDropZone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useSetAtom } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useAtom } from 'jotai';
