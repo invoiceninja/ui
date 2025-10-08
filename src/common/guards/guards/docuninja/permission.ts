@@ -66,16 +66,20 @@ function checkPermission(
   if (!data?.company_user) {
     return false;
   }
+  
+  const permissions = data.permissions || [];
 
   const { company_user } = data;
   
   // Admin/owner has all permissions
   if (company_user.is_admin || company_user.is_owner) {
+    console.log("admin user returning true");
     return true;
   }
 
-  const permissions = data.permissions || [];
+  // Check permissions in both company_user.permissions and top-level permissions
   if (permissions.length === 0) {
+    console.log("no permissions returning false");
     return false;
   }
 
@@ -114,10 +118,7 @@ function checkPermission(
 
 export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaGuard {
 
-  console.log('docuNinjaPermission', permission);
   return ({ docuData, queryClient }: { docuData?: DocuNinjaData; queryClient: any }) => {
-
-    console.log('docuNinjaPermission', docuData);
 
     if (docuData) {
       const result = checkPermission(docuData, permission.model, permission.action);
@@ -125,7 +126,6 @@ export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaG
     }
     
     return getDocuDataFromCache(queryClient).then(data => {
-      console.log('docuNinjaPermission cache', data);
       const result = checkPermission(data, permission.model, permission.action);
       return result;
     });

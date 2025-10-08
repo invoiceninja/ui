@@ -29,7 +29,7 @@ import { useDocuNinjaData, useDocuNinjaActions, useDocuNinjaTokenReady, useDocuN
 import { isPaidDocuninjaUserAtom, docuCompanyAccountDetailsAtom } from '../atoms';
 import { useColorScheme } from '$app/common/colors';
 import { Card } from '$app/components/cards';
-import { useDocuNinjaAdmin } from '$app/pages/documents/hooks/useDocuNinjaPermissions';
+import { useDocuNinjaAdmin, useDocuNinjaPermission } from '$app/pages/documents/hooks/useDocuNinjaPermissions';
 
 export default function Documents() {
   useTitle('documents');
@@ -49,6 +49,7 @@ export default function Documents() {
   const isLoading = useDocuNinjaLoading();
   const colors = useColorScheme();
   const isAdmin = useDocuNinjaAdmin();
+  const canCreateDocumentPermission = useDocuNinjaPermission('documents', 'create');
 
   const isPaidUser =
     docuData?.account?.plan !== 'free' &&
@@ -71,23 +72,6 @@ export default function Documents() {
   const needsAccountCreation = !hasAccount && isTokenReady && !isLoading && !isAdmin;
   const needsPlanUpgrade = !hasDocuNinjaModules || (hasAccount && docuData?.account?.plan !== 'pro') || 
                           (isAdmin && !hasAccount && isTokenReady && !isLoading);
-
-  // Debug logging
-  console.log('Documents Debug:', {
-    isTokenReady,
-    hasAccount,
-    isAdmin,
-    needsPlanUpgrade,
-    needsAccountCreation,
-    needsCompanySetup,
-    hasDocuNinjaModules,
-    docuData: !!docuData,
-    companyUser: docuData?.company_user,
-    isOwner: docuData?.company_user?.is_owner,
-    isAdminFromData: docuData?.company_user?.is_admin
-  });
-
-
 
   const handleCreateAccount = async () => {
     try {
@@ -193,7 +177,7 @@ export default function Documents() {
   }
 
   // Show splash page for users without DocuNinja access
-  if (!hasAccount || (hasAccount && !isAdmin)) {
+  if (!docuData && !isAdmin) {
     return (
       <Default title={t('documents')} breadcrumbs={pages}>
         <div className="flex items-center justify-center py-8">
@@ -272,7 +256,10 @@ export default function Documents() {
   return (
     <Default title={t('documents')} breadcrumbs={pages}>
       <div className="flex flex-col gap-y-4">
-        <DocumentCreationDropZone />
+
+        {canCreateDocumentPermission && (
+          <DocumentCreationDropZone />
+        )}
 
         <DataTable<Document>
           queryIdentificator="/api/documents/docuninja"
@@ -292,7 +279,7 @@ export default function Documents() {
           withoutIdsBulkPayloadPropertyForDeleteAction
           useDeleteMethod
           deleteBulkRoute="/api/documents/bulk"
-          rightSide={
+          rightSide={isAdmin && (
             <Button
               behavior="button"
               type="secondary"
@@ -306,7 +293,7 @@ export default function Documents() {
                 <span>{t('settings')}</span>
               </div>
             </Button>
-          }
+          )}
           showEdit={(document) =>
             document?.status_id !== DocumentStatus.Completed &&
             document?.status_id !== DocumentStatus.Voided

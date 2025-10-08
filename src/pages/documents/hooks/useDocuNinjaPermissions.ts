@@ -32,6 +32,8 @@ function checkPermissionSync(
     return false;
   }
 
+  const permissions = data.permissions || [];
+
   const { company_user } = data;
   
   // Admin/owner has all permissions
@@ -39,7 +41,7 @@ function checkPermissionSync(
     return true;
   }
 
-  const permissions = data.permissions || [];
+  // Check permissions in both company_user.permissions and top-level permissions
   if (permissions.length === 0) {
     return false;
   }
