@@ -10,7 +10,6 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { get } from 'lodash';
 import collect from 'collect.js';
 import { store } from '$app/common/stores/store';
 import { Company } from '$app/common/interfaces/company.interface';
