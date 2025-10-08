@@ -21,7 +21,7 @@ import { Gear } from '$app/components/icons/Gear';
 import { DocumentCreationDropZone } from '../common/components/DocumentCreationDropZone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useSetAtom } from 'jotai';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useAtom } from 'jotai';
@@ -46,6 +46,7 @@ export default function Documents() {
   const company = useCurrentCompany();
 
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
   // Get DocuNinja data from atom (NO QUERY!) - following app pattern
   const [docuData] = useAtom(docuNinjaAtom);
@@ -77,11 +78,14 @@ export default function Documents() {
   const needsPlanUpgrade = (hasAccount && docuData?.plan !== 'pro' && isAdmin);
 
   const handleCreateAccount = async () => {
+    setIsCreatingAccount(true);
     try {
       await createAccount();
       // The service will automatically refresh and update the state
     } catch (error) {
       // Handle error silently or show user-friendly message
+    } finally {
+      setIsCreatingAccount(false);
     }
   };
 
@@ -137,6 +141,7 @@ export default function Documents() {
       <AccountCreation 
         pages={pages} 
         onCreateAccount={handleCreateAccount} 
+        isLoading={isCreatingAccount}
       />
     );
   }
@@ -147,6 +152,7 @@ export default function Documents() {
       <CompanySetup 
         pages={pages} 
         onCreateAccount={handleCreateAccount} 
+        isLoading={isCreatingAccount}
       />
     );
   }

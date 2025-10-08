@@ -50,11 +50,10 @@ export function useDocuNinjaAdmin(): boolean {
 
 export function useDocuNinjaPaidUser(): boolean {
   const [data] = useAtom(docuNinjaAtom);
-  const account = data?.account;
-  if (!account) return false;
+  if (!data) return false;
   
-  return account.plan !== 'free' && 
-         new Date(account.plan_expires ?? '') > new Date();
+  return data.plan !== 'free' && 
+         new Date(data.plan_expires ?? '') > new Date();
 }
 
 export function useDocuNinjaPermission(model: string, action: string): boolean {

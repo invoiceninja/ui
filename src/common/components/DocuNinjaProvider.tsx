@@ -49,7 +49,7 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
         const companies = docuData.companies || [];
         const matchingCompany = collect(companies)
           .where('ninja_company_key', company.company_key)
-          .first() as { id: string; token: string } | undefined;
+          .first();
 
         if (matchingCompany) {
           // Store the company-specific token
