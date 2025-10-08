@@ -13,15 +13,25 @@ import { Link } from '$app/components/forms';
 import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 
 export function NumberOfUsersAlert() {
   const [t] = useTranslation();
 
   const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+  
+  // Get actual DocuNinja users count from API
+  const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 
+    perPage: '1', 
+    currentPage: '1', 
+    filter: '' 
+  });
+  
+  const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
+  const maxUsers = docuCompanyAccountDetails?.account?.num_users || 0;
 
-  if (
-    (docuCompanyAccountDetails?.account?.num_users || 0) <= 0
-  ) {
+  // Only show alert if user limit is reached
+  if (currentUserCount < maxUsers || maxUsers <= 0) {
     return null;
   }
 

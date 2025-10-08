@@ -20,6 +20,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
 import { useAtomValue } from 'jotai';
 import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
+import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 
 export default function Users() {
   useTitle('users');
@@ -30,6 +31,16 @@ export default function Users() {
   const columns = useUserColumns();
 
   const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+  
+  // Get actual DocuNinja users count from API
+  const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 
+    perPage: '1', 
+    currentPage: '1', 
+    filter: '' 
+  });
+  
+  const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
+  const maxUsers = docuCompanyAccountDetails?.account?.num_users || 0;
 
   const pages = [
     {
@@ -66,10 +77,7 @@ export default function Users() {
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
-        disabledCreateButton={
-          (docuCompanyAccountDetails?.account?.num_users || 0) >=
-          (docuCompanyAccountDetails?.account?.users || [])?.length
-        }
+        disabledCreateButton={currentUserCount >= maxUsers}
         filterParameterKey="search"
       />
     </Default>

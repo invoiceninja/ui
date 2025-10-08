@@ -25,8 +25,11 @@ import { useEffect } from 'react';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { cloneDeep } from 'lodash';
-import { useDocuNinjaData, useDocuNinjaActions, useDocuNinjaTokenReady } from '$app/common/hooks/useDocuNinja';
+import { useDocuNinjaData, useDocuNinjaActions, useDocuNinjaTokenReady, useDocuNinjaLoading } from '$app/common/hooks/useDocuNinja';
 import { isPaidDocuninjaUserAtom, docuCompanyAccountDetailsAtom } from '../atoms';
+import { useColorScheme } from '$app/common/colors';
+import { Card } from '$app/components/cards';
+import { useDocuNinjaAdmin } from '$app/pages/documents/hooks/useDocuNinjaPermissions';
 
 export default function Documents() {
   useTitle('documents');
@@ -41,12 +44,43 @@ export default function Documents() {
 
   // Get DocuNinja data from the service (already loaded by guard)
   const docuData = useDocuNinjaData();
-  const { getToken } = useDocuNinjaActions();
+  const { getToken, createAccount } = useDocuNinjaActions();
   const isTokenReady = useDocuNinjaTokenReady();
+  const isLoading = useDocuNinjaLoading();
+  const colors = useColorScheme();
+  const isAdmin = useDocuNinjaAdmin();
 
   const isPaidUser =
     docuData?.account?.plan !== 'free' &&
     new Date(docuData?.account?.plan_expires ?? '') > new Date();
+
+  // Determine account states
+  const hasAccount = !!docuData?.account;
+  
+  // Check if company exists in DocuNinja by looking for matching company key
+  const docuCompany = docuData?.companies?.find(
+    (c) => c.ninja_company_key === company?.company_key
+  );
+  const needsCompanySetup = hasAccount && !docuCompany;
+  
+  // Check if company has DocuNinja modules enabled (additional data point)
+  const hasDocuNinjaModules = !!company?.enable_modules;
+  
+  // For owners, if no account exists, it means they need plan upgrade (401 scenario)
+  // For non-owners, if no account exists, they need account creation
+  const needsAccountCreation = !hasAccount && isTokenReady && !isLoading && !isAdmin;
+  const needsPlanUpgrade = !hasDocuNinjaModules || (hasAccount && docuData?.account?.plan !== 'pro') || 
+                          (isAdmin && !hasAccount && isTokenReady && !isLoading);
+
+
+  const handleCreateAccount = async () => {
+    try {
+      await createAccount();
+      // The service will automatically refresh and update the state
+    } catch (error) {
+      // Handle error silently or show user-friendly message
+    }
+  };
 
   useEffect(() => {
     setIsPaidDocuninjaUser(isPaidUser);
@@ -89,7 +123,8 @@ export default function Documents() {
   ];
 
   // Show loading state if token is not ready (e.g., during company switch)
-  if (!isTokenReady) {
+  // But allow company setup and plan upgrade if we have account data but no matching company
+  if (!isTokenReady && !needsCompanySetup && !needsPlanUpgrade) {
     return (
       <Default title={t('documents')} breadcrumbs={pages}>
         <div className="flex items-center justify-center py-8">
@@ -97,6 +132,102 @@ export default function Documents() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
             <p className="text-gray-600">{t('loading')}...</p>
           </div>
+        </div>
+      </Default>
+    );
+  }
+
+  // Show splash page for non-admin users
+  if (isTokenReady && !isAdmin) {
+    return (
+      <Default title={t('documents')} breadcrumbs={pages}>
+        <div className="flex items-center justify-center py-8">
+          <Card className="shadow-sm max-w-md">
+            <div className="flex flex-col items-center gap-4 p-8 text-center">
+              <div className="text-6xl mb-4">📄</div>
+              <h2 className="text-xl font-semibold text-gray-800">
+                {t('documents')}
+              </h2>
+              <p className="text-gray-600">
+                {t('documents_splash_message')}
+              </p>
+              <p className="text-sm text-gray-500">
+                {t('contact_admin_for_access')}
+              </p>
+            </div>
+          </Card>
+        </div>
+      </Default>
+    );
+  }
+
+  // Show plan upgrade message for non-pro users
+  if (needsPlanUpgrade) {
+    return (
+      <Default title={t('documents')} breadcrumbs={pages}>
+        <div className="flex flex-col items-center gap-4 p-6">
+          <span style={{ color: colors.$17 }}>
+            {t('upgrade_plan_docuninja')}
+          </span>
+
+          <Button
+            onClick={() => navigate('/settings/account_management')}
+            behavior="button"
+          >
+            {t('upgrade_plan')}
+          </Button>
+        </div>
+      </Default>
+    );
+  }
+
+  // Show account creation UI
+  if (needsAccountCreation) {
+    return (
+      <Default title={t('documents')} breadcrumbs={pages}>
+        <div className="flex justify-center items-center">
+          <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
+            <div className="flex flex-col items-center gap-4 p-6">
+              <span style={{ color: colors.$3 }}>
+                {t('welcome_to_docuninja')}
+              </span>
+
+              <span className="text-center" style={{ color: colors.$17 }}>
+                {t('create_docuninja_account')}
+              </span>
+
+              <Button
+                className="mt-4"
+                onClick={handleCreateAccount}
+                disabled={isLoading}
+                behavior="button"
+              >
+                {t('create')}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </Default>
+    );
+  }
+
+  // Show company setup UI
+  if (needsCompanySetup) {
+    return (
+      <Default title={t('documents')} breadcrumbs={pages}>
+        <div className="flex flex-col items-center gap-4 p-6">
+          <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
+          <p className="text-gray-600 mb-4">
+            Your account exists but this company is not set up yet. Please
+            click the button below to set it up.
+          </p>
+          <Button
+            onClick={handleCreateAccount}
+            disabled={isLoading}
+            behavior="button"
+          >
+            {t('setup_company')}
+          </Button>
         </div>
       </Default>
     );

@@ -61,6 +61,7 @@ export function useDocuNinjaActions() {
     getToken: () => docuNinjaService.getToken(),
     flushData: () => docuNinjaService.flushData(),
     flushDataWithQueryClient: () => docuNinjaService.flushDataWithQueryClient(queryClient),
+    reinitialize: () => docuNinjaService.refresh(),
   };
 }
 

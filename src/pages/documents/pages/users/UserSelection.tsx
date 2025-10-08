@@ -27,6 +27,8 @@ import { Permission as PermissionType } from '$app/common/interfaces/docuninja/a
 import { Default } from '$app/components/layouts/Default';
 import { useTitle } from '$app/common/hooks/useTitle';
 import Permissions from './common/components/Permissions';
+import { useAtomValue } from 'jotai';
+import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/atoms';
 
 interface UserWithDocuNinjaStatus extends InvoiceNinjaUser {
   hasDocuNinjaAccess: boolean;
@@ -54,6 +56,9 @@ export default function UserSelection() {
     currentPage: '1', 
     filter: '' 
   });
+
+  // Get DocuNinja account details for quota checking
+  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   // Combine users with DocuNinja status
   useEffect(() => {
@@ -179,6 +184,13 @@ export default function UserSelection() {
   const allAvailableSelected = availableUsers.length > 0 && 
     availableUsers.every(user => selectedUserIds.includes(user.id));
 
+  // Check DocuNinja quotas and available users
+  const currentDocuNinjaUserCount = docuNinjaUsers?.data?.meta?.total || 0;
+  const maxDocuNinjaUsers = docuCompanyAccountDetails?.account?.num_users || 0;
+  const hasAvailableQuota = currentDocuNinjaUserCount < maxDocuNinjaUsers;
+  const hasNoAvailableUsers = availableUsers.length === 0;
+  const hasQuotaButNoUsers = hasAvailableQuota && hasNoAvailableUsers;
+
 
 
   const pages = [
@@ -207,13 +219,7 @@ export default function UserSelection() {
               {t('docuninja_grant_access_help')}
             </p>
           </div>
-          <Button
-            type="secondary"
-            onClick={() => navigate('/documents/users')}
-            disabled={isFormBusy}
-          >
-            {t('back')}
-          </Button>
+          
         </div>
 
         {/* User Selection */}
@@ -223,6 +229,19 @@ export default function UserSelection() {
           {isLoadingInvoiceUsers ? (
             <div className="text-center py-8">
               <div className="text-gray-500">{t('loading')}...</div>
+            </div>
+          ) : hasQuotaButNoUsers ? (
+            <div className="text-center py-8">
+              
+              <div className="text-sm text-gray-400 mb-4">
+                {t('docuninja_quota_available_but_no_users')}
+              </div>
+              <div className="text-sm text-gray-400 mb-4">
+                {t('users')}: {currentDocuNinjaUserCount} / {maxDocuNinjaUsers}
+              </div>
+              <div className="text-sm text-blue-500">
+                <Link to="/settings/users/create">{t('add_user')}</Link>
+              </div>
             </div>
           ) : availableUsers.length === 0 ? (
             <div className="text-center py-8">
