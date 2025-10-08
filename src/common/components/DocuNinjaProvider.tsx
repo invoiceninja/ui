@@ -27,9 +27,9 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
   
   const setData = useSetAtom(docuNinjaAtom);
 
-  // SINGLE QUERY - Only runs here, never in components
+  // SINGLE QUERY - Only runs once, never refetches unless invalidated
   useQuery(
-    ['/api/docuninja/login', company?.company_key],
+    ['/api/docuninja/login'], // Fixed query key - no company dependency
     async () => {
       if (!company?.company_key) {
         throw new Error('No company key available');
@@ -74,7 +74,8 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
     },
     {
       enabled: !!company?.company_key,
-      staleTime: 0, // Always refetch when company changes
+      staleTime: Infinity, // Never refetch unless invalidated
+      cacheTime: Infinity, // Keep in cache forever
       retry: (failureCount, error) => {
         // Don't retry on 401 errors (expected when no account exists)
         if ((error as any)?.response?.status === 401) {

@@ -193,7 +193,13 @@ function Edit() {
                 </div>
 
                 <div className="py-4">
-                  <Notifications />
+                  <Notifications 
+                    notifications={notifications}
+                    setNotifications={setNotifications}
+                    allNotificationsValue={allNotificationsValue}
+                    setAllNotificationsValue={setAllNotificationsValue}
+                    isFormBusy={isFormBusy}
+                  />
                 </div>
 
                 <div className="py-4">

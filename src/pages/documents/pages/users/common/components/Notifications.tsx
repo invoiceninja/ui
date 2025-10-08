@@ -13,54 +13,26 @@ import { SelectField } from '$app/components/forms';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NOTIFICATION_TYPES, NOTIFICATION_VALUES } from '../constants/notifications';
-import { useUserEditContext } from '../contexts/UserEditContext';
-import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NotificationValue } from '../constants/notifications';
 
-// Legacy props interface for backward compatibility
-export interface DocuninjaUserProps {
-  user: User;
-  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
-  errors: ValidationBag | undefined;
-  isFormBusy: boolean;
-  isAdmin: boolean;
-  setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
-  permissions: PermissionType[];
-  setPermissions: React.Dispatch<React.SetStateAction<PermissionType[]>>;
+interface NotificationsProps {
   notifications: Record<string, string>;
   setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   allNotificationsValue: NotificationValue;
   setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+  isFormBusy: boolean;
 }
 
-// Overloaded function signatures for better TypeScript support
-export function Notifications(): JSX.Element;
-export function Notifications(props: DocuninjaUserProps): JSX.Element;
-export function Notifications(props?: DocuninjaUserProps) {
+export function Notifications(props: NotificationsProps) {
   const [t] = useTranslation();
   
-  // Try to use context first, fall back to props for backward compatibility
-  let contextData;
-  try {
-    contextData = useUserEditContext();
-  } catch {
-    contextData = null;
-  }
-
-  const data = contextData || props;
-  
-  if (!data) {
-    return null; // Early return if no data available
-  }
-
   const { 
     notifications, 
     setNotifications, 
     allNotificationsValue, 
     setAllNotificationsValue, 
     isFormBusy 
-  } = data;
+  } = props;
 
   const notificationTypes = useMemo(
     () => NOTIFICATION_TYPES.map(type => ({

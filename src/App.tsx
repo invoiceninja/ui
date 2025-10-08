@@ -45,7 +45,6 @@ import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
 import { useReactSettings } from './common/hooks/useReactSettings';
-import { DocuNinjaProvider } from './common/components/DocuNinjaProvider';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';
@@ -272,7 +271,7 @@ export function App() {
   });
 
   return (
-    <DocuNinjaProvider>
+    <>
       <div className="App">
         <Toaster position="top-center" />
         {routes}
@@ -284,6 +283,6 @@ export function App() {
       />
 
       <PreventNavigationModal />
-    </DocuNinjaProvider>
+    </>
   );
 }
