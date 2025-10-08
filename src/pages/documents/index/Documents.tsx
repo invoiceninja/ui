@@ -37,6 +37,7 @@ import {
   AccountCreation, 
   CompanySetup 
 } from '../components/DocumentStates';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
 
 export default function Documents() {
@@ -72,16 +73,17 @@ export default function Documents() {
 
   const needsPlanUpgrade = (hasAccount && docuData?.account.plan !== 'pro' && isAdmin);
 
-  const handleCreateAccount = async () => {
+  function handleCreateAccount() {
     setIsCreatingAccount(true);
-    try {
-      await createAccount();
-      // The service will automatically refresh and update the state
-    } catch (error) {
-      // Handle error silently or show user-friendly message
-    } finally {
-      setIsCreatingAccount(false);
-    }
+
+    createAccount()
+      .catch((error: any) => {
+        toast.error(error.response?.data?.error ?? 'Failed to create Docuninja account');
+      })
+      .finally(() => {
+        setIsCreatingAccount(false);
+      });
+
   };
 
   useEffect(() => {

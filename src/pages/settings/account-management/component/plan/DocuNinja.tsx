@@ -22,26 +22,23 @@ export function DocuNinja() {
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Get DocuNinja data from atoms (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
   
-  // Get actions from the actions hook (NO QUERY!)
-  const { createAccount: createDocuNinjaAccountAction, flushData } = useDocuNinjaActions();
+  const { createAccount, flushData } = useDocuNinjaActions();
 
-  async function createDocuNinjaAccount() {
+  function createDocuNinjaAccount() {
     setError(null);
     setIsCreating(true);
 
-    try {
-      await createDocuNinjaAccountAction();
-      // The service will automatically refresh and update the state
-    } catch (error: any) {
-      setError(
-        error.response?.data?.error ?? 'Failed to create Docuninja account'
-      );
-    } finally {
-      setIsCreating(false);
-    }
+    createAccount()
+      .catch((error: any) => {
+        setError(
+          error.response?.data?.error ?? 'Failed to create Docuninja account'
+        );
+      })
+      .finally(() => {
+        setIsCreating(false);
+      });
   }
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);

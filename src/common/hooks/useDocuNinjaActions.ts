@@ -23,19 +23,17 @@ export function useDocuNinjaActions() {
     return localStorage.getItem('X-DOCU-NINJA-TOKEN') || '';
   };
 
-  const createAccount = async () => {
-
-      await request(
-        'POST',
-        endpoint('/api/docuninja/create'),
-        {},
-        { skipIntercept: true }
-      );
-      
+  const createAccount = () => {
+    return request(
+      'POST',
+      endpoint('/api/docuninja/create'),
+      {},
+      { skipIntercept: true }
+    ).then(() => {
       // Refetch the data after creating account
-      await queryClient.invalidateQueries(['/api/docuninja/login']);
-
-    };
+      return queryClient.invalidateQueries(['/api/docuninja/login']);
+    });
+  };
 
   const refresh = () => {
     return queryClient.invalidateQueries(['/api/docuninja/login']);
