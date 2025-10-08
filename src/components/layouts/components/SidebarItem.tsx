@@ -126,7 +126,7 @@ export function SidebarItem(props: Props) {
           {item.subOptions && (
             <div className="flex flex-col space-y-1">
               {item.subOptions.map((subOption) => (
-                <Div
+                subOption.visible && <Div
                   key={subOption.name}
                   theme={{
                     color: subOption.current
