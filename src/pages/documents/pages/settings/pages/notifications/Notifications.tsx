@@ -16,7 +16,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import Toggle from '$app/components/forms/Toggle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { useDocuNinjaData, useDocuNinjaCompanies } from '$app/common/hooks/useDocuNinjaData';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { cloneDeep } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,8 +41,8 @@ function Notifications() {
   const settingsRef = useRef<Settings>(settings);
 
   // Get DocuNinja data from unified atoms (NO QUERY!)
-  const docuData = useDocuNinjaData();
-  const docuCompanies = useDocuNinjaCompanies();
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuCompanies = docuData?.companies;
   const id = docuCompanies?.[0]?.id;
 
   // Initialize settings from company data only once

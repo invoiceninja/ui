@@ -12,19 +12,19 @@ import { useQueryClient } from 'react-query';
 import { useSetAtom } from 'jotai';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { resetDocuNinjaDataAtom } from '$app/common/atoms/docuninja';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 // This hook ONLY provides actions, no data fetching
 export function useDocuNinjaActions() {
   const queryClient = useQueryClient();
-  const resetData = useSetAtom(resetDocuNinjaDataAtom);
+  const setData = useSetAtom(docuNinjaAtom);
 
   const getToken = (): string => {
     return localStorage.getItem('X-DOCU-NINJA-TOKEN') || '';
   };
 
   const createAccount = async () => {
-    try {
+
       await request(
         'POST',
         endpoint('/api/docuninja/create'),
@@ -34,17 +34,15 @@ export function useDocuNinjaActions() {
       
       // Refetch the data after creating account
       await queryClient.invalidateQueries(['/api/docuninja/login']);
-    } catch (error) {
-      throw error;
-    }
-  };
+
+    };
 
   const refresh = () => {
     return queryClient.invalidateQueries(['/api/docuninja/login']);
   };
 
   const flushData = () => {
-    resetData();
+    setData(undefined);
   };
 
   return {

@@ -27,7 +27,8 @@ import { Permission as PermissionType } from '$app/common/interfaces/docuninja/a
 import { Default } from '$app/components/layouts/Default';
 import { useTitle } from '$app/common/hooks/useTitle';
 import Permissions from './common/components/Permissions';
-import { useDocuNinjaData, useDocuNinjaAccount } from '$app/common/hooks/useDocuNinjaData';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 interface UserWithDocuNinjaStatus extends InvoiceNinjaUser {
   hasDocuNinjaAccess: boolean;
@@ -57,8 +58,8 @@ export default function UserSelection() {
   });
 
   // Get DocuNinja account details for quota checking (NO QUERY!)
-  const docuData = useDocuNinjaData();
-  const docuAccount = useDocuNinjaAccount();
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuAccount = docuData?.account;
 
   // Combine users with DocuNinja status
   useEffect(() => {

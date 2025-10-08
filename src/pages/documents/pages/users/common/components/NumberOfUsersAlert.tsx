@@ -10,7 +10,8 @@
 
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
-import { useDocuNinjaAccount } from '$app/common/hooks/useDocuNinjaData';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useTranslation } from 'react-i18next';
 import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 
@@ -18,7 +19,8 @@ export function NumberOfUsersAlert() {
   const [t] = useTranslation();
 
   // Get DocuNinja account data from unified atoms (NO QUERY!)
-  const docuAccount = useDocuNinjaAccount();
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuAccount = docuData?.account;
   
   // Get actual DocuNinja users count from API
   const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 

@@ -80,6 +80,8 @@ export interface Account {
   companies?: Company[]; // Relation
   users?: User[]; // Relation
   gateway_tokens?: GatewayToken[]; // Relation
+  company_user?: CompanyUser; // Relation
+  permissions?: Permission[]; // Relation
 }
 
 export interface GatewayToken {

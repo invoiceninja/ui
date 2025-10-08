@@ -33,7 +33,8 @@ import { RestoreDocumentAction } from '../components/RestoreDocumentAction';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { FaFileSignature } from 'react-icons/fa';
-import { useDocuNinjaData, useDocuNinjaCompanies } from '$app/common/hooks/useDocuNinjaData';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDownloadAuditLog } from './useDownloadAuditLog';
 
 interface DocumentAction {
@@ -53,8 +54,8 @@ export function useDocumentActions({ document }: Params) {
   const navigate = useNavigate();
 
   // Get DocuNinja data from unified atoms (NO QUERY!)
-  const docuData = useDocuNinjaData();
-  const docuCompanies = useDocuNinjaCompanies();
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuCompanies = docuData?.companies;
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);

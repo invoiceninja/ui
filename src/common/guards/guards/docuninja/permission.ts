@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DocuNinjaGuard, DocuNinjaData } from '../../DocuNinjaGuard';
+import { DocuNinjaGuard } from '../../DocuNinjaGuard';
+import { Account } from '$app/common/interfaces/docuninja/api';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 export type DocuNinjaPermission = {
   model: 'documents' | 'templates' | 'blueprints' | 'clients' | 'users' | 'settings';
@@ -28,14 +31,9 @@ function getPermissionId(action: string): number {
   return permissionMap[action as keyof typeof permissionMap] || 0;
 }
 
-// Helper function to get DocuNinja data from React Query cache (DEPRECATED - use unified atoms)
-function getDocuDataFromCache(queryClient: any): Promise<DocuNinjaData | null> {
-  // This is now deprecated - data should come from unified atoms
-  return Promise.resolve(null);
-}
-
-function isAdmin(data: DocuNinjaData | null){
-
+// Hooks that use useAtom like everything else in the app
+export function useDocuNinjaAdmin(): boolean {
+  const [data] = useAtom(docuNinjaAtom);
   if (!data?.company_user) {
     return false;
   }
@@ -50,9 +48,24 @@ function isAdmin(data: DocuNinjaData | null){
   return false;
 }
 
+export function useDocuNinjaPaidUser(): boolean {
+  const [data] = useAtom(docuNinjaAtom);
+  const account = data?.account;
+  if (!account) return false;
+  
+  return account.plan !== 'free' && 
+         new Date(account.plan_expires ?? '') > new Date();
+}
+
+export function useDocuNinjaPermission(model: string, action: string): boolean {
+  const [data] = useAtom(docuNinjaAtom);
+  return checkPermission(data, model, action);
+}
+
+
 // Core permission checking logic
 function checkPermission(
-  data: DocuNinjaData | null,
+  data: Account | undefined,
   model: string,
   action: string
 ): boolean {
@@ -108,17 +121,28 @@ function checkPermission(
 }
 
 export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaGuard {
-  return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
+  return ({ docuData }: { docuData?: Account; queryClient: any }) => {
     // Use provided docuData or return false if not available
-    const data = docuData || null;
+    const data = docuData || undefined;
     return Promise.resolve(checkPermission(data, permission.model, permission.action));
   };
 }
 
 export function docuNinjaAdmin(): DocuNinjaGuard {
-  return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
+  return ({ docuData }: { docuData?: Account; queryClient: any }) => {
     // Use provided docuData or return false if not available
-    const data = docuData || null;
-    return Promise.resolve(isAdmin(data));
+    const data = docuData || undefined;
+    if (!data?.company_user) {
+      return Promise.resolve(false);
+    }
+
+    const { company_user } = data;
+    
+    // Admin/owner has all permissions
+    if (company_user.is_admin || company_user.is_owner) {
+      return Promise.resolve(true);
+    }
+
+    return Promise.resolve(false);
   };
 }

@@ -21,11 +21,10 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { User } from '$app/common/interfaces/user';
 import { SettingsLevel } from '../stores/slices/settings';
 import { useActiveSettingsDetails } from '../hooks/useActiveSettingsDetails';
-import { DocuNinjaData } from '$app/common/atoms/docuninja';
-import { useDocuNinjaData } from '$app/common/hooks/useDocuNinjaData';
+import { Account } from '$app/common/interfaces/docuninja/api';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
-// Re-export DocuNinjaData for backward compatibility
-export type { DocuNinjaData };
 
 export type DocuNinjaGuard = (ctx: DocuNinjaContext) => Promise<boolean>;
 
@@ -35,7 +34,7 @@ export interface DocuNinjaContext {
   user: User | undefined;
   companyUser: CompanyUser | undefined;
   settingsLevel: SettingsLevel;
-  docuData?: DocuNinjaData;
+  docuData?: Account;
 }
 
 // DocuNinjaData is now imported from atoms
@@ -50,10 +49,10 @@ export interface DocuNinjaGuardProps {
   guards: DocuNinjaGuard[];
   component: React.ReactElement;
   type?: 'page' | 'subPage' | 'component';
-  docuData?: DocuNinjaData;
+  docuData?: Account;
 }
 
-export function useDocuNinjaGuardContext(docuData?: DocuNinjaData) {
+export function useDocuNinjaGuardContext(docuData?: Account) {
   const queryClient = useQueryClient();
   const params = useParams();
   const user = useCurrentUser();
@@ -61,7 +60,7 @@ export function useDocuNinjaGuardContext(docuData?: DocuNinjaData) {
   const activeSettings = useActiveSettingsDetails();
   
   // Get DocuNinja data from unified atoms (NO QUERY!)
-  const unifiedDocuData = useDocuNinjaData();
+  const [unifiedDocuData] = useAtom(docuNinjaAtom);
 
   // Use provided docuData, unified data, or null if not available
   const globalDocuData = docuData || unifiedDocuData || null;

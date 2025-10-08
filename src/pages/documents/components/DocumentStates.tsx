@@ -111,7 +111,14 @@ export function AccountCreation({ pages, onCreateAccount, isLoading }: AccountCr
               disabled={isLoading}
               behavior="button"
             >
-              {t('create')}
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>{t('creating')}...</span>
+                </div>
+              ) : (
+                t('create')
+              )}
             </Button>
           </div>
         </Card>
@@ -141,7 +148,14 @@ export function CompanySetup({ pages, onCreateAccount, isLoading }: CompanySetup
           disabled={isLoading}
           behavior="button"
         >
-          {t('setup_company')}
+          {isLoading ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>{t('setting_up')}...</span>
+            </div>
+          ) : (
+            t('setup_company')
+          )}
         </Button>
       </div>
     </Default>

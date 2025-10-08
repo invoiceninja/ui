@@ -24,7 +24,10 @@ import { useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useDocuNinjaData, useDocuNinjaTokenReady, useDocuNinjaLoading, useDocuNinjaIsAdmin, useDocuNinjaIsPaidUser, useDocuNinjaPermission } from '$app/common/hooks/useDocuNinjaData';
+import { useAtom } from 'jotai';
+import { 
+  docuNinjaAtom
+} from '$app/common/atoms/docuninja';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { isPaidDocuninjaUserAtom } from '../atoms';
 import { 
@@ -34,6 +37,7 @@ import {
   AccountCreation, 
   CompanySetup 
 } from '../components/DocumentStates';
+import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
 
 export default function Documents() {
   useTitle('documents');
@@ -43,22 +47,20 @@ export default function Documents() {
 
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
 
-  // Get DocuNinja data from atoms (NO QUERY!)
-  const docuData = useDocuNinjaData();
-  const isTokenReady = useDocuNinjaTokenReady();
-  const isLoading = useDocuNinjaLoading();
-  const isAdmin = useDocuNinjaIsAdmin();
-  const isPaidUser = useDocuNinjaIsPaidUser();
+  // Get DocuNinja data from atom (NO QUERY!) - following app pattern
+  const [docuData] = useAtom(docuNinjaAtom);
+  
+  // Use hooks that use useAtom like everything else
+  const isAdmin = useDocuNinjaAdmin();
+  const isPaidUser = useDocuNinjaPaidUser();
   const canCreateDocumentPermission = useDocuNinjaPermission('documents', 'create');
   
   // Get actions from the actions hook (NO QUERY!)
   const { createAccount, getToken } = useDocuNinjaActions();
 
-  console.log(docuData);
-  console.log(canCreateDocumentPermission);
   // Determine account states
   const hasAccount = !!docuData?.account;
-  
+
   // Check if company exists in DocuNinja by looking for matching company key
   const docuCompany = docuData?.companies?.find(
     (c) => c.ninja_company_key === company?.company_key
@@ -69,10 +71,10 @@ export default function Documents() {
   const hasDocuNinjaModules = !!company?.enable_modules;
   
   // For owners, if no account exists, it means they need plan upgrade (401 scenario)
+
   // For non-owners, if no account exists, they need account creation
-  const needsAccountCreation = !hasAccount && isTokenReady && !isLoading && !isAdmin;
-  const needsPlanUpgrade = !hasDocuNinjaModules || (hasAccount && docuData?.account?.plan !== 'pro') || 
-                          (isAdmin && !hasAccount && isTokenReady && !isLoading);
+  const needsAccountCreation = !hasAccount && !isAdmin;
+  const needsPlanUpgrade = (hasAccount && docuData?.account?.plan !== 'pro' && isAdmin);
 
   const handleCreateAccount = async () => {
     try {
@@ -86,8 +88,6 @@ export default function Documents() {
   useEffect(() => {
     setIsPaidDocuninjaUser(isPaidUser);
   }, [isPaidUser, setIsPaidDocuninjaUser]);
-
-  // No need for separate atom - using unified data directly
 
   useSocketEvent({
     on: [
@@ -107,23 +107,26 @@ export default function Documents() {
     },
   ];
 
-  // Show loading state only if we're actually loading and don't have any specific state to show
-  if (isLoading && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
+  // Show loading state only if we don't have any specific state to show
+  if (!docuData && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
     return <LoadingState pages={pages} />;
   }
 
   // Show upgrade page for owners without DocuNinja account (check this BEFORE needsPlanUpgrade)
   if (!hasAccount && isAdmin) {
+    console.log("isAdmin");
     return <UpgradePlan pages={pages} />;
   }
 
   // Show plan upgrade message for non-pro users (but only if not already handled above)
   if (needsPlanUpgrade) {
+    console.log("needsPlanUpgrade");
     return <UpgradePlan pages={pages} />;
   }
 
   // Show splash page for users without DocuNinja access
   if (!docuData && !isAdmin) {
+    console.log("no docuData");
     return <SplashPage pages={pages} />;
   }
 
@@ -134,7 +137,6 @@ export default function Documents() {
       <AccountCreation 
         pages={pages} 
         onCreateAccount={handleCreateAccount} 
-        isLoading={isLoading} 
       />
     );
   }
@@ -145,7 +147,6 @@ export default function Documents() {
       <CompanySetup 
         pages={pages} 
         onCreateAccount={handleCreateAccount} 
-        isLoading={isLoading} 
       />
     );
   }

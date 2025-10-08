@@ -18,7 +18,8 @@ import { Default } from '$app/components/layouts/Default';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
-import { useDocuNinjaData, useDocuNinjaAccount } from '$app/common/hooks/useDocuNinjaData';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 
@@ -31,8 +32,8 @@ export default function Users() {
   const columns = useUserColumns();
 
   // Get DocuNinja data from unified atoms (NO QUERY!)
-  const docuData = useDocuNinjaData();
-  const docuAccount = useDocuNinjaAccount();
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuAccount = docuData?.account;
   const { getToken } = useDocuNinjaActions();
   
   // Get actual DocuNinja users count from API

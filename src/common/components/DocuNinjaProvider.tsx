@@ -14,14 +14,9 @@ import { useSetAtom } from 'jotai';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { DocuNinjaData } from '$app/common/atoms/docuninja';
+import { Account } from '$app/common/interfaces/docuninja/api';
 import collect from 'collect.js';
-import { 
-  setDocuNinjaDataAtom,
-  setDocuNinjaLoadingAtom,
-  setDocuNinjaErrorAtom,
-  setDocuNinjaTokenReadyAtom
-} from '$app/common/atoms/docuninja';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 interface DocuNinjaProviderProps {
   children: ReactNode;
@@ -30,10 +25,7 @@ interface DocuNinjaProviderProps {
 export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
   const company = useCurrentCompany();
   
-  const setData = useSetAtom(setDocuNinjaDataAtom);
-  const setLoading = useSetAtom(setDocuNinjaLoadingAtom);
-  const setError = useSetAtom(setDocuNinjaErrorAtom);
-  const setTokenReady = useSetAtom(setDocuNinjaTokenReadyAtom);
+  const setData = useSetAtom(docuNinjaAtom);
 
   // SINGLE QUERY - Only runs here, never in components
   useQuery(
@@ -43,9 +35,6 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
         throw new Error('No company key available');
       }
 
-      setLoading(true);
-      setError(null);
-
       try {
         const response = await request(
           'POST',
@@ -54,7 +43,7 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
           { skipIntercept: true }
         );
 
-        const docuData = response.data.data as DocuNinjaData;
+        const docuData = response.data.data as Account;
         
         // Find the matching company by ninja_company_key
         const companies = docuData.companies || [];
@@ -66,31 +55,21 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
           // Store the company-specific token
           localStorage.setItem('X-DOCU-NINJA-TOKEN', matchingCompany.token);
           localStorage.setItem('DOCUNINJA_COMPANY_ID', matchingCompany.id);
-          setTokenReady(true);
-        } else {
-          setTokenReady(false);
         }
 
-        // Update atoms with the data
+        // Update atom with the data
         setData(docuData);
         return docuData;
 
       } catch (error: any) {
-        const errorObj = error as Error;
-        setError(errorObj);
-        
         // Handle 401 errors gracefully (no account exists)
         if (error?.response?.status === 401) {
-          setData(null);
-          setTokenReady(false);
+          setData(undefined);
         } else {
-          setData(null);
-          setTokenReady(false);
+          setData(undefined);
         }
         
         throw error;
-      } finally {
-        setLoading(false);
       }
     },
     {

@@ -8,7 +8,8 @@ import { useState } from 'react';
 import { Check } from 'react-feather';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useColorScheme } from '$app/common/colors';
-import { useDocuNinjaData, useDocuNinjaLoading } from '$app/common/hooks/useDocuNinjaData';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { Alert } from '$app/components/Alert';
 
@@ -22,8 +23,7 @@ export function DocuNinja() {
   const [isCreating, setIsCreating] = useState(false);
 
   // Get DocuNinja data from atoms (NO QUERY!)
-  const docuData = useDocuNinjaData();
-  const isLoading = useDocuNinjaLoading();
+  const [docuData] = useAtom(docuNinjaAtom);
   
   // Get actions from the actions hook (NO QUERY!)
   const { createAccount: createDocuNinjaAccountAction, flushData } = useDocuNinjaActions();
@@ -147,7 +147,7 @@ export function DocuNinja() {
               <Button
                 onClick={() => createDocuNinjaAccount()}
                 behavior="button"
-                disabled={isCreating || isLoading}
+                disabled={isCreating}
               >
                 {t('create')}
               </Button>
