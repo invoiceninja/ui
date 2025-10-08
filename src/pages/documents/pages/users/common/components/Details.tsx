@@ -17,10 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { DefaultSignature } from './DefaultSignature';
 import { SignatureFontSelector } from '$app/components/SignatureFontSelector';
-import { useUserEditContext } from '../contexts/UserEditContext';
 import { NotificationValue } from '../constants/notifications';
-
-// Legacy props interface for backward compatibility
 export interface DocuninjaUserProps {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
@@ -37,27 +34,14 @@ export interface DocuninjaUserProps {
   editPage?: boolean;
 }
 
-// Overloaded function signatures for better TypeScript support
-export default function Details(): JSX.Element;
-export default function Details(props: DocuninjaUserProps): JSX.Element;
 export default function Details(props?: DocuninjaUserProps) {
   const [t] = useTranslation();
   
-  // Try to use context first, fall back to props for backward compatibility
-  let contextData;
-  try {
-    contextData = useUserEditContext();
-  } catch {
-    contextData = null;
+  if (!props) {
+    return null; // Early return if no props available
   }
 
-  const data = contextData || props;
-  
-  if (!data) {
-    return null; // Early return if no data available
-  }
-
-  const { user, setUser, errors, editPage } = data;
+  const { user, setUser, errors, editPage } = props;
 
   const [showStoredInitials, setShowStoredInitials] = useState<boolean>(true);
   const [showStoredSignature, setShowStoredSignature] = useState<boolean>(true);

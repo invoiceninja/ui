@@ -33,7 +33,6 @@ import Details from '../common/components/Details';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
 import { useNotifications } from '../common/hooks/useNotifications';
-import { UserEditProvider } from '../common/contexts/UserEditContext';
 
 function Edit() {
   const [t] = useTranslation();
@@ -142,22 +141,6 @@ function Edit() {
     callback: () => $refetch(['docuninja_users']),
   });
 
-  const contextValue = {
-    user,
-    setUser,
-    errors,
-    isFormBusy,
-    isAdmin,
-    setIsAdmin,
-    permissions,
-    setPermissions,
-    notifications,
-    setNotifications,
-    allNotificationsValue,
-    setAllNotificationsValue,
-    editPage: true,
-  };
-
   return (
     <Default
       title={t('edit_user')}
@@ -173,42 +156,67 @@ function Edit() {
       }
     >
       {!isLoading && user ? (
-        <UserEditProvider value={contextValue}>
-          <div className="space-y-4">
-            <Card
-              title={t('edit_user')}
-              className="shadow-sm"
-              style={{ borderColor: colors.$24 }}
-              withoutBodyPadding
-              withoutHeaderBorder
+        <div className="space-y-4">
+          <Card
+            title={t('edit_user')}
+            className="shadow-sm"
+            style={{ borderColor: colors.$24 }}
+            withoutBodyPadding
+            withoutHeaderBorder
+          >
+            <TabGroup
+              tabs={[t('user_details'), t('notifications'), t('permissions')]}
+              withHorizontalPadding
+              horizontalPaddingWidth="1.5rem"
+              fullRightPadding
             >
-              <TabGroup
-                tabs={[t('user_details'), t('notifications'), t('permissions')]}
-                withHorizontalPadding
-                horizontalPaddingWidth="1.5rem"
-                fullRightPadding
-              >
-                <div className="py-4">
-                  <Details />
-                </div>
+              <div className="py-4">
+                <Details 
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
+                  editPage={true}
+                />
+              </div>
 
-                <div className="py-4">
-                  <Notifications 
-                    notifications={notifications}
-                    setNotifications={setNotifications}
-                    allNotificationsValue={allNotificationsValue}
-                    setAllNotificationsValue={setAllNotificationsValue}
-                    isFormBusy={isFormBusy}
-                  />
-                </div>
+              <div className="py-4">
+                <Notifications 
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
+                  isFormBusy={isFormBusy}
+                />
+              </div>
 
-                <div className="py-4">
-                  <Permissions />
-                </div>
-              </TabGroup>
-            </Card>
-          </div>
-        </UserEditProvider>
+              <div className="py-4">
+                <Permissions 
+                  user={user}
+                  setUser={setUser}
+                  errors={errors}
+                  isFormBusy={isFormBusy}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  allNotificationsValue={allNotificationsValue}
+                  setAllNotificationsValue={setAllNotificationsValue}
+                />
+              </div>
+            </TabGroup>
+          </Card>
+        </div>
       ) : (
         <div className="flex justify-center items-center py-8">
           <Spinner />

@@ -48,10 +48,8 @@ export default function Documents() {
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
-  // Get DocuNinja data from atom (NO QUERY!) - following app pattern
   const [docuData] = useAtom(docuNinjaAtom);
   
-  console.log("docuData", docuData);
   // Use hooks that use useAtom like everything else
   const isAdmin = useDocuNinjaAdmin();
   const isPaidUser = useDocuNinjaPaidUser();
@@ -67,15 +65,11 @@ export default function Documents() {
   const docuCompany = docuData?.companies?.find(
     (c) => c.ninja_company_key === company?.company_key
   );
+  
   const needsCompanySetup = hasAccount && !docuCompany;
   
-  // Check if company has DocuNinja modules enabled (additional data point)
-  const hasDocuNinjaModules = !!company?.enable_modules;
-  
-  // For owners, if no account exists, it means they need plan upgrade (401 scenario)
-
-  // For non-owners, if no account exists, they need account creation
   const needsAccountCreation = !hasAccount && !isAdmin;
+
   const needsPlanUpgrade = (hasAccount && docuData?.account.plan !== 'pro' && isAdmin);
 
   const handleCreateAccount = async () => {

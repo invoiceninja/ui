@@ -4,7 +4,6 @@ import { Divider } from '$app/components/cards/Divider';
 import { Checkbox } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { useUserEditContext } from '../contexts/UserEditContext';
 import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NotificationValue } from '../constants/notifications';
@@ -87,25 +86,12 @@ const MODELS: Record<string, { name: string; permissions: ModelPermission[] }> =
     },
   };
 
-// Overloaded function signatures for better TypeScript support
-export default function Permissions(): JSX.Element;
-export default function Permissions(props: DocuninjaUserProps): JSX.Element;
 export default function Permissions(props?: DocuninjaUserProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   
-  // Try to use context first, fall back to props for backward compatibility
-  let contextData;
-  try {
-    contextData = useUserEditContext();
-  } catch {
-    contextData = null;
-  }
-
-  const data = contextData || props;
-  
-  if (!data) {
-    return null; // Early return if no data available
+  if (!props) {
+    return null; // Early return if no props available
   }
 
   const {
@@ -115,7 +101,7 @@ export default function Permissions(props?: DocuninjaUserProps) {
     setPermissions,
     isAdmin,
     setIsAdmin,
-  } = data;
+  } = props;
 
   const basicPermissionTypes = [
     PERMISSION_CREATE,
