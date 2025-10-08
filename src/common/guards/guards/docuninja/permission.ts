@@ -73,13 +73,11 @@ function checkPermission(
   
   // Admin/owner has all permissions
   if (company_user.is_admin || company_user.is_owner) {
-    console.log("admin user returning true");
     return true;
   }
 
   // Check permissions in both company_user.permissions and top-level permissions
   if (permissions.length === 0) {
-    console.log("no permissions returning false");
     return false;
   }
 

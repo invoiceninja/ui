@@ -23,7 +23,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Blueprints() {
   useTitle('blueprints');
-console.log('Blueprints');
+  
   const [t] = useTranslation();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);

@@ -47,9 +47,7 @@ const EmailSettings = lazy(
 );
 
 const Users = lazy(() => import('$app/pages/documents/pages/users/Users'));
-const CreateUser = lazy(
-  () => import('$app/pages/documents/pages/users/create/Create')
-);
+
 const EditUser = lazy(
   () => import('$app/pages/documents/pages/users/edit/Edit')
 );
@@ -126,11 +124,6 @@ export const documentsRoutes = (
     <Route 
       path="documents/users" 
       element={<DocuNinjaGuard guards={[docuNinjaAdmin()]} component={<Users />} />} 
-    />
-
-    <Route
-      path="documents/users/create"
-      element={<DocuNinjaGuard guards={[docuNinjaAdmin()]} component={<CreateUser />} />}
     />
 
     <Route

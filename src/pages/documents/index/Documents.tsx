@@ -28,8 +28,14 @@ import { cloneDeep } from 'lodash';
 import { useDocuNinjaData, useDocuNinjaActions, useDocuNinjaTokenReady, useDocuNinjaLoading } from '$app/common/hooks/useDocuNinja';
 import { isPaidDocuninjaUserAtom, docuCompanyAccountDetailsAtom } from '../atoms';
 import { useColorScheme } from '$app/common/colors';
-import { Card } from '$app/components/cards';
 import { useDocuNinjaAdmin, useDocuNinjaPermission } from '$app/pages/documents/hooks/useDocuNinjaPermissions';
+import { 
+  LoadingState, 
+  UpgradePlan, 
+  SplashPage, 
+  AccountCreation, 
+  CompanySetup 
+} from '../components/DocumentStates';
 
 export default function Documents() {
   useTitle('documents');
@@ -124,132 +130,44 @@ export default function Documents() {
 
   // Show loading state only if we're actually loading and don't have any specific state to show
   if (isLoading && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
-    return (
-      <Default title={t('documents')} breadcrumbs={pages}>
-        <div className="flex items-center justify-center py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">{t('loading')}...</p>
-          </div>
-        </div>
-      </Default>
-    );
+    return <LoadingState pages={pages} />;
   }
 
   // Show upgrade page for owners without DocuNinja account (check this BEFORE needsPlanUpgrade)
   if (!hasAccount && isAdmin) {
-    return (
-      <Default title={t('documents')} breadcrumbs={pages}>
-        <div className="flex flex-col items-center gap-4 p-6">
-          <span style={{ color: colors.$17 }}>
-            {t('upgrade_plan_docuninja')}
-          </span>
-
-          <Button
-            onClick={() => navigate('/settings/account_management')}
-            behavior="button"
-          >
-            {t('upgrade_plan')}
-          </Button>
-        </div>
-      </Default>
-    );
+    return <UpgradePlan pages={pages} />;
   }
 
   // Show plan upgrade message for non-pro users (but only if not already handled above)
   if (needsPlanUpgrade) {
-    return (
-      <Default title={t('documents')} breadcrumbs={pages}>
-        <div className="flex flex-col items-center gap-4 p-6">
-          <span style={{ color: colors.$17 }}>
-            {t('upgrade_plan_docuninja')}
-          </span>
-
-          <Button
-            onClick={() => navigate('/settings/account_management')}
-            behavior="button"
-          >
-            {t('upgrade_plan')}
-          </Button>
-        </div>
-      </Default>
-    );
+    return <UpgradePlan pages={pages} />;
   }
 
   // Show splash page for users without DocuNinja access
   if (!docuData && !isAdmin) {
-    return (
-      <Default title={t('documents')} breadcrumbs={pages}>
-        <div className="flex items-center justify-center py-8">
-          <Card className="shadow-sm max-w-md">
-            <div className="flex flex-col items-center gap-4 p-8 text-center">
-              <div className="text-6xl mb-4">📄</div>
-              <h2 className="text-xl font-semibold text-gray-800">
-                {t('documents')}
-              </h2>
-              <p className="text-gray-600">
-                {t('documents_splash_message')}
-              </p>
-              <p className="text-sm text-gray-500">
-                {t('contact_admin_for_access')}
-              </p>
-            </div>
-          </Card>
-        </div>
-      </Default>
-    );
+    return <SplashPage pages={pages} />;
   }
 
 
   // Show account creation UI
   if (needsAccountCreation) {
     return (
-      <Default title={t('documents')} breadcrumbs={pages}>
-        <div className="flex justify-center items-center">
-          <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
-            <div className="flex flex-col items-center gap-4 p-6">
-              <span style={{ color: colors.$3 }}>
-                {t('welcome_to_docuninja')}
-              </span>
-
-              <span className="text-center" style={{ color: colors.$17 }}>
-                {t('create_docuninja_account')}
-              </span>
-
-              <Button
-                className="mt-4"
-                onClick={handleCreateAccount}
-                disabled={isLoading}
-                behavior="button"
-              >
-                {t('create')}
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </Default>
+      <AccountCreation 
+        pages={pages} 
+        onCreateAccount={handleCreateAccount} 
+        isLoading={isLoading} 
+      />
     );
   }
 
   // Show company setup UI
   if (needsCompanySetup) {
     return (
-      <Default title={t('documents')} breadcrumbs={pages}>
-        <div className="flex flex-col items-center gap-4 p-6">
-          <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
-          <p className="text-gray-600 mb-4">
-            Your account exists but this company is not set up yet. Please
-            click the button below to set it up.
-          </p>
-          <Button
-            onClick={handleCreateAccount}
-            disabled={isLoading}
-            behavior="button"
-          >
-            {t('setup_company')}
-          </Button>
-        </div>
-      </Default>
+      <CompanySetup 
+        pages={pages} 
+        onCreateAccount={handleCreateAccount} 
+        isLoading={isLoading} 
+      />
     );
   }
 
