@@ -9,6 +9,8 @@
  */
 
 import { DocuNinjaGuard, DocuNinjaData } from '../../DocuNinjaGuard';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
 
 export type DocuNinjaPermission = {
   model: 'documents' | 'templates' | 'blueprints' | 'clients' | 'users' | 'settings';
@@ -38,7 +40,24 @@ function getDocuDataFromCache(queryClient: any): Promise<DocuNinjaData | null> {
   }
   
   // Data not in cache, fetch it
-  return queryClient.fetchQuery(['/api/docuninja/login']).catch(() => null);
+  return queryClient.fetchQuery({
+    queryKey: ['/api/docuninja/login'],
+    queryFn: () => request(
+      'POST',
+      endpoint('/api/docuninja/login'),
+      {},
+      { skipIntercept: true }
+    ).then((response) => response.data.data),
+    staleTime: Infinity,
+    retry: (failureCount: number, error: any) => {
+      // Don't retry on 401 errors (expected when no account exists)
+      if (error?.response?.status === 401) {
+        return false;
+      }
+      // Retry other errors up to 3 times
+      return failureCount < 3;
+    },
+  }).catch(() => null);
 }
 
 function isAdmin(data: DocuNinjaData | null){

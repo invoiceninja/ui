@@ -65,17 +65,4 @@ export function useDocuNinjaActions() {
   };
 }
 
-// Legacy hook for backward compatibility
-export function useLogin({ enabled = true }: { enabled?: boolean } = {}) {
-  const state = useDocuNinja();
-  
-  return {
-    data: state.data,
-    isLoading: state.isLoading,
-    error: state.error,
-    isSuccess: !!state.data && !state.error,
-    isError: !!state.error,
-    refetch: () => docuNinjaService.refresh(),
-  };
-}
 
