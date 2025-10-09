@@ -29,7 +29,7 @@ export function useUsersQuery() {
 export function useUsersForDocuNinjaQuery() {
   return useQuery(
     ['/api/v1/users/docuninja-eligible'],
-    () => request('GET', endpoint('/api/v1/users?hideOwnerUsers=true&status=active&sort=id|desc')),
+    () => request('GET', endpoint('/api/v1/users?hideOwnerUsers=true&showAccountUsers=true&status=active&sort=id|desc')),
     { staleTime: Infinity }
   );
 }

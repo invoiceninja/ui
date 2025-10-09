@@ -15,4 +15,7 @@ export interface Params {
   status?: string[];
   sort?: string;
   companyDocuments?: 'true' | 'false';
+  ninjaCompanyKey?: string;
+  ninjaAccountKey?: string;
+  search?: string;
 }

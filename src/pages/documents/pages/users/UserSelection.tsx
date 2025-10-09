@@ -29,6 +29,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import Permissions from './common/components/Permissions';
 import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface UserWithDocuNinjaStatus extends InvoiceNinjaUser {
   hasDocuNinjaAccess: boolean;
@@ -39,7 +40,6 @@ export default function UserSelection() {
   useTitle('grant_docuninja_access');
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const colors = useColorScheme();
 
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -49,24 +49,23 @@ export default function UserSelection() {
 
   // Fetch Invoice Ninja users
   const { data: invoiceNinjaUsers, isLoading: isLoadingInvoiceUsers } = useUsersForDocuNinjaQuery();
-  
-  // Fetch DocuNinja users to check status
-  const { data: docuNinjaUsers } = useDocuNinjaUsersQuery({ 
-    perPage: '100', 
-    currentPage: '1', 
-    filter: '' 
-  });
 
+  const company = useCurrentCompany();  
   // Get DocuNinja account details for quota checking (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
   const docuAccount = docuData?.account;
 
+  const { data: docuNinjaUsers } = useDocuNinjaUsersQuery({ 
+    perPage: '10000', 
+    currentPage: '1', 
+    ninjaCompanyKey: company.company_key
+  });
+
   // Combine users with DocuNinja status
   useEffect(() => {
-    if (invoiceNinjaUsers?.data?.data && docuNinjaUsers?.data?.data) {
+    if (invoiceNinjaUsers?.data?.data && docuNinjaUsers) {
       const invoiceUsers = invoiceNinjaUsers.data.data;
       const docuUsers = docuNinjaUsers.data.data;
-      
       
       const usersWithStatus: UserWithDocuNinjaStatus[] = invoiceUsers
         .map((user: InvoiceNinjaUser) => {
@@ -74,7 +73,6 @@ export default function UserSelection() {
           const docuUser = docuUsers.find((du: DocuNinjaUser) => 
             du.email === user.email
           );
-          
           
           return {
             ...user,
@@ -186,8 +184,8 @@ export default function UserSelection() {
     availableUsers.every(user => selectedUserIds.includes(user.id));
 
   // Check DocuNinja quotas and available users
-  const currentDocuNinjaUserCount = docuNinjaUsers?.data?.meta?.total || 0;
-  const maxDocuNinjaUsers = docuAccount?.num_users || 0;
+  const currentDocuNinjaUserCount = docuNinjaUsers?.data?.data?.length || 1;
+  const maxDocuNinjaUsers = docuAccount?.num_users || 1;
   const hasAvailableQuota = currentDocuNinjaUserCount < maxDocuNinjaUsers;
   const hasNoAvailableUsers = availableUsers.length === 0;
   const hasQuotaButNoUsers = hasAvailableQuota && hasNoAvailableUsers;

@@ -20,7 +20,7 @@ import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
 import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
-import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Users() {
   useTitle('users');
@@ -28,20 +28,14 @@ export default function Users() {
   const [t] = useTranslation();
 
   const columns = useUserColumns();
-
+  const company = useCurrentCompany();
   // Get DocuNinja data from unified atoms (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
   const docuAccount = docuData?.account;
   const { getToken } = useDocuNinjaActions();
-  
-  // Get actual DocuNinja users count from API
-  const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 
-    perPage: '1', 
-    currentPage: '1', 
-    filter: '' 
-  });
-  
-  const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
+    
+  const currentUserCount = docuData?.account?.users?.length || 1;
+  // const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
   const maxUsers = docuAccount?.num_users || 0;
 
   const pages = [
@@ -63,13 +57,14 @@ export default function Users() {
   return (
     <Default title={t('users')} breadcrumbs={pages}>
       <NumberOfUsersAlert />
-
+      
       <DataTable<User>
-        queryIdentificator="/api/users/docuninja"
+        queryIdentificator="/api/users"
         resource="user"
-        endpoint="/api/users?sort=id|desc"
+        endpoint={`/api/users?ninjaCompanyKey=${company.company_key}`}
         columns={columns}
         withResourcefulActions
+        useRestoreForDeletedResources
         bulkRoute="/api/users/bulk"
         linkToCreate="/documents/users/selection"
         linkToEdit="/documents/users/:id/edit"

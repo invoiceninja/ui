@@ -123,6 +123,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
     if (!selectedTemplate || isLoading) return;
 
     setIsLoading(true);
+    
     toast.processing();
       request(
         'GET',
@@ -145,7 +146,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       navigate(route('/documents/blueprints/create/template_editor'), {
         state: { templateHtml, templateName }
       });
-      
+
     }).catch ((error: AxiosError<ValidationBag>) => {
       if (error.response?.status === 422) {
         toast.error("Error loading template");

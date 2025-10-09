@@ -19,16 +19,19 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useUsersQuery(params: Params) {
   return useQuery(
-    ['/api/users/docuninja', params],
+    ['/api/users', params],
     () =>
       request(
         'GET',
         docuNinjaEndpoint(
-          '/api/users?per_page=:per_page&page=:page&filter=:filter',
+          '/api/users?per_page=:per_page&page=:page&search=:search&ninjaCompanyKey=:ninjaCompanyKey&ninjaAccountKey=:ninjaAccountKey',
           {
-            per_page: params.perPage ?? '100',
+            per_page: params.perPage ?? '10',
             page: params.currentPage ?? '1',
-            filter: params.filter ?? '',
+            search: params.search ?? '',
+            ninjaCompanyKey: params.ninjaCompanyKey ?? '',
+            ninjaAccountKey: params.ninjaAccountKey ?? '',
+            status: params.status ?? 'active',
           }
         ),
         {},
@@ -70,7 +73,7 @@ interface UserParams {
 
 export function useDocuNinjaUserQuery(params: UserParams) {
   return useQuery(
-    ['/api/users/docuninja', params],
+    ['/api/users', params],
     () =>
       request(
         'GET',

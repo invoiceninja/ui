@@ -56,13 +56,10 @@ export default function Documents() {
   const isPaidUser = useDocuNinjaPaidUser();
   const canCreateDocumentPermission = useDocuNinjaPermission('documents', 'create');
   
-  // Get actions from the actions hook (NO QUERY!)
   const { createAccount, getToken } = useDocuNinjaActions();
 
-  // Determine account states
   const hasAccount = !!docuData;
 
-  // Check if company exists in DocuNinja by looking for matching company key
   const docuCompany = docuData?.companies?.find(
     (c) => c.ninja_company_key === company?.company_key
   );
