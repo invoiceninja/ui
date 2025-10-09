@@ -103,22 +103,22 @@ export const documentsRoutes = (
         />
 
         <Route
-          path="blueprints"
+          path="templates"
           element={<DocuNinjaGuard guards={[docuNinjaPermission({ model: 'blueprints', action: 'view' })]} component={<Blueprints />} />}
         />
 
         <Route
-          path="blueprints/create"
+          path="templates/create"
           element={<DocuNinjaGuard guards={[docuNinjaPermission({ model: 'blueprints', action: 'create' })]} component={<CreateBlueprint />} />}
         />
 
         <Route
-          path="blueprints/:id/template_editor"
+          path="templates/:id/editor"
           element={<DocuNinjaGuard guards={[docuNinjaPermission({ model: 'blueprints', action: 'create' })]} component={<BlueprintEditor />} />}
         />
 
         <Route
-          path="blueprints/:id/edit"
+          path="templates/:id/edit"
           element={<DocuNinjaGuard guards={[docuNinjaPermission({ model: 'blueprints', action: 'create' })]} component={<BlueprintBuilder />} />}
         />
 

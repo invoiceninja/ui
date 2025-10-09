@@ -373,15 +373,15 @@ export function Default(props: Props) {
       visible: true, //isHosted(), //@TODO: switch back @ release @docuninja
       subOptions: [
         {
-          name: t('blueprints'),
-          href: '/documents/blueprints',
+          name: t('templates'),
+          href: '/documents/templates',
           icon: File,
           visible: true,
-          current: location.pathname.startsWith('/documents/blueprints'),
+          current: location.pathname.startsWith('/documents/templates'),
           rightButton: {
             icon: Plus,
-            to: '/documents/blueprints/create',
-            label: t('new_blueprint'),
+            to: '/documents/templates/create',
+            label: t('new_templates'),
             visible: true,
           },
         },

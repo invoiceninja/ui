@@ -64,7 +64,7 @@ export function useTableColumns() {
       label: t('name'),
       format: (field, blueprint) => (
         <Link
-          to={route('/documents/blueprints/:id/edit', {
+          to={route('/documents/templates/:id/edit', {
             id: blueprint.id,
           })}
         >

@@ -143,7 +143,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       toast.success('template_loaded');
       
       // Navigate to GrapeJS editor with the template HTML
-      navigate(route('/documents/blueprints/create/template_editor'), {
+      navigate(route('/documents/templates/create/editor'), {
         state: { templateHtml, templateName }
       });
 
@@ -161,7 +161,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('templates')}</h2>
-        <p className="text-gray-600">{t('blueprint_template_description')}</p>
+        <p className="text-gray-600">{t('new_template_description')}</p>
       </div>
 
       <div className="flex">
@@ -249,7 +249,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
           onClick={handleCreateBlueprint}
           disabled={!selectedTemplate || isLoading}
         >
-          {isLoading ? t('creating') : t('create_blueprint')}
+          {isLoading ? t('creating') : t('create_template')}
         </Button>
       </div>
     </div>

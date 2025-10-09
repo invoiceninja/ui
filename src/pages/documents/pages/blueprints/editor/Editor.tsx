@@ -62,7 +62,7 @@ export default function BlueprintEditor() {
         });
         
         // Navigate to the editor for the newly created blueprint
-        navigate(route('/documents/blueprints/:id/template_editor', { id: response.data.data.id }));
+        navigate(route('/documents/templates/:id/editor', { id: response.data.data.id }));
       } else if (id) {
         // Update existing blueprint
         await updateBlueprint({
@@ -105,7 +105,7 @@ export default function BlueprintEditor() {
       title="Template Editor"
       breadcrumbs={[
         { name: 'Blueprints', href: '/documents/blueprints' },
-        { name: templateName || 'Blueprint', href: `/documents/blueprints/${id}/edit` },
+        { name: templateName || 'Blueprint', href: `/documents/templates/${id}/edit` },
         { name: 'Template Editor', href: '#' }
       ]}
     >
