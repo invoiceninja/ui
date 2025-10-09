@@ -24,6 +24,10 @@ import {
   MdPalette,
   MdSettings,
 } from 'react-icons/md';
+<<<<<<< HEAD
+=======
+import { FaFileSignature } from 'react-icons/fa';
+>>>>>>> 61b75ff8c (rebase to upstream)
 import { useLocation } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
