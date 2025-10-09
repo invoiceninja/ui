@@ -26,7 +26,7 @@ import { Gear } from '$app/components/icons/Gear';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { File } from 'react-feather';
 import collect from 'collect.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 const $cache = atom<NavigationItem[] | null>(null);
