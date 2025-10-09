@@ -285,13 +285,13 @@ export function useNavigation() {
         label: t('new_document'),
         visible: true,
       },
-      visible: false,
+      visible: true,
       subOptions: [
         {
           name: t('blueprints'),
           href: '/documents/blueprints',
           icon: File,
-          visible: false,
+          visible: true,
           rightButton: {
             icon: Plus,
             to: '/documents/blueprints/create',
@@ -367,18 +367,6 @@ export function useNavigation() {
         return updated.all() as NavigationItem[];
       });
     });
-
-    setTimeout(() => {
-      $visibility('/documents', true);
-    }, 5000);
-
-    setTimeout(() => {
-      $visibility('/documents/blueprints', true);
-    }, 8000);
-
-    setTimeout(() => {
-      $visibility('/documents/users', true);
-    }, 10_000);
   }, []);
 
   return cache ?? initialNavigation;
