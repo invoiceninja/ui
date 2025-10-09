@@ -124,6 +124,10 @@ export function useActions(params?: Params) {
     //     </DropdownElement>
     //   ),
     (doc) =>
+      Boolean(doc && !doc.is_deleted) && (
+        <SendInvitationsModal document={doc} renderAsDropdownElement />
+      ),
+    (doc) =>
       Boolean(doc && doc.status_id === DocumentStatus.Completed) && (
         <DropdownElement
           onClick={() => downloadAuditLog()}
@@ -169,6 +173,7 @@ export function useActions(params?: Params) {
           {t('void')}
         </DropdownElement>
       ),
+    
       (doc) =>
         Boolean(doc && !doc.is_deleted) && (
           <DropdownElement
@@ -209,11 +214,7 @@ export function useActions(params?: Params) {
     actions,
     modals: (
       <>
-        {Boolean(document) && (
-          <SendInvitationsModal document={document!} renderAsDropdownElement />
-        )}
-
-        {Boolean(document) && (
+        {Boolean(document) && isSettingsModalOpen && (
           <DocumentSettingsModal
             document={document!}
             visible={isSettingsModalOpen}
