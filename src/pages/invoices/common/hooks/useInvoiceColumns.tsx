@@ -185,7 +185,14 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           />
 
           {isEInvoiceSuccessfullySent(invoice) && (
-            <Icon element={FaTriangleExclamation} color="red" size={16} />
+            <div
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
+              }}
+            >
+              <Icon element={FaTriangleExclamation} color="red" size={16} />
+            </div>
           )}
         </div>
       ),
