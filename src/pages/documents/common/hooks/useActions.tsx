@@ -101,15 +101,15 @@ export function useActions(params?: Params) {
   };
 
   const actions: Action<Document>[] = [
-    (doc) =>
-      Boolean(doc && !doc.is_deleted) && (
-        <DropdownElement
-          to={route('/documents/:id/builder', { id: doc.id })}
-          icon={<Icon element={MdSettings} />}
-        >
-          {t('edit')}
-        </DropdownElement>
-      ),
+    // (doc) =>
+    //   Boolean(doc && !doc.is_deleted) && (
+    //     <DropdownElement
+    //       to={route('/documents/:id/builder', { id: doc.id })}
+    //       icon={<Icon element={MdSettings} />}
+    //     >
+    //       {t('edit')}
+    //     </DropdownElement>
+    //   ),
     // (doc) =>
     //   Boolean(doc && !doc.is_deleted) && (
     //     <DropdownElement
