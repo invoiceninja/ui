@@ -102,7 +102,7 @@ export function useBulk() {
         },
       }
     ).then(() => {
-      const message = `${action}d_blueprint`;
+      const message = `${action}d_template`;
 
       toast.success(message);
 

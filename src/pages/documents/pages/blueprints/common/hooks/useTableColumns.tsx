@@ -68,7 +68,7 @@ export function useTableColumns() {
             id: blueprint.id,
           })}
         >
-          {blueprint.name || t('untitled_blueprint')}
+          {blueprint.name || t('untitled_template')}
         </Link>
       ),
     },

@@ -43,10 +43,10 @@ export default function Edit() {
     { name: t('documents'), href: '/documents' },
     {
       name: t('templates'),
-      href: route('/documents/blueprints'),
+      href: route('/documents/templates'),
     },
     {
-      name: t('edit_blueprint'),
+      name: t('edit_template'),
       href: route('/documents/templates/:id/edit', { id }),
     },
   ];
@@ -61,7 +61,7 @@ export default function Edit() {
 
   return (
     <Default
-      title={t('edit_blueprint')}
+      title={t('edit_template')}
       breadcrumbs={pages}
       navigationTopRight={
         <ResourceActions

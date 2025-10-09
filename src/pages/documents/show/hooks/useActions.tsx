@@ -133,7 +133,7 @@ export function useActions({ document }: Params) {
       visible: true,
     },
     {
-      label: t('make_blueprint'),
+      label: t('make_template'),
       icon: <Icon element={MdPalette} />,
       onClick: () => makeBluePrint(document!),
       visible: true,

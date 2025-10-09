@@ -81,8 +81,8 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
       
       onComplete(response.data.data.id);
     } catch (error) {
-      console.error('Error creating blueprint:', error);
-      toast.error('error_creating_blueprint');
+      // console.error('Error creating blueprint:', error);
+      toast.error('Error creating blueprint:');
     } finally {
       setIsLoading(false);
     }
