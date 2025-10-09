@@ -54,7 +54,7 @@ export default function Blueprints() {
     },
     {
       name: t('templates'),
-      href: '/documents/blueprints',
+      href: '/documents/templates',
     },
   ];
 

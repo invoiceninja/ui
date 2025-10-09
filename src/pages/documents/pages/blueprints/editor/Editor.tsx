@@ -55,7 +55,7 @@ export default function BlueprintEditor() {
       if (isNewTemplate) {
         // Create new blueprint
         const response = await createBlueprint({
-          name: templateName || 'New Blueprint',
+          name: templateName || 'New Template',
           base64_file: base64Html,
           is_template: true,
           grapesjs: projectData
@@ -68,7 +68,7 @@ export default function BlueprintEditor() {
         await updateBlueprint({
           id: id,
           base64_file: base64Html,
-          name: templateName || 'Updated Blueprint',
+          name: templateName || 'Updated Template',
           is_template: true,
           grapesjs: projectData
         });
@@ -77,13 +77,13 @@ export default function BlueprintEditor() {
 
       
     } catch (error) {
-      console.error('Error saving blueprint:', error);
+      console.error('Error saving template:', error);
     }
   };
 
   const handleCancel = () => {
     // Navigate back to blueprints list
-    navigate('/documents/blueprints');
+    navigate('/documents/templates');
   };
 
   // Show loading state while we're fetching data
@@ -104,7 +104,7 @@ export default function BlueprintEditor() {
     <Default 
       title="Template Editor"
       breadcrumbs={[
-        { name: 'Blueprints', href: '/documents/blueprints' },
+        { name: 'Templates', href: '/documents/templates' },
         { name: templateName || 'Blueprint', href: `/documents/templates/${id}/edit` },
         { name: 'Template Editor', href: '#' }
       ]}

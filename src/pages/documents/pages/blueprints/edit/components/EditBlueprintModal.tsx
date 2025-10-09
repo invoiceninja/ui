@@ -91,7 +91,7 @@ export function EditBlueprintModal({ blueprint, isOpen, onClose }: Props) {
 
   return (
     <Modal
-      title={t('edit_blueprint')}
+      title={t('edit_template')}
       visible={isOpen}
       onClose={handleClose}
       size="regular"
