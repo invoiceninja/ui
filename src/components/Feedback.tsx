@@ -11,18 +11,30 @@ import { MdCheck } from 'react-icons/md';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { cloneDeep, set } from 'lodash';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useDispatch } from 'react-redux';
+
+dayjs.extend(utc);
 
 export const isFeedbackSliderVisible = atom<boolean>(false);
 
 export function Feedback() {
   const [t] = useTranslation();
 
-  const openFeedbackSlider = useOpenFeedbackSlider();
-
-  const ratings = Array.from({ length: 11 }, (_, i) => i);
+  const dispatch = useDispatch();
 
   const colors = useColorScheme();
+  const currentUser = useCurrentUser();
+
+  const reactSettings = useReactSettings();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [feedbackValue, setFeedbackValue] = useState<string>('');
@@ -45,6 +57,34 @@ export function Feedback() {
     }
   };
 
+  const handleUpdateReactSettings = () => {
+    const currentUnixTime = dayjs().utc().unix();
+
+    const updatedReactSettings = cloneDeep(reactSettings);
+
+    set(updatedReactSettings, 'preferences.feedback_given_at', currentUnixTime);
+    set(
+      updatedReactSettings,
+      'preferences.feedback_slider_displayed_at',
+      currentUnixTime
+    );
+
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id/preferences?include=company_user', {
+        id: currentUser?.id,
+      }),
+      {
+        react_settings: updatedReactSettings,
+      }
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      $refetch(['company_users']);
+
+      dispatch(updateUser(response.data.data));
+      dispatch(resetChanges());
+    });
+  };
+
   const handleFeedbackSubmit = (
     currentRating: number,
     currentFeedback: string
@@ -58,11 +98,14 @@ export function Feedback() {
         notes: currentFeedback,
       })
         .then(() => {
+          handleUpdateReactSettings();
+
           toast.success('feedback_submitted');
 
           setIsSubmitted(true);
 
           setTimeout(() => {
+            setIsVisible(false);
             setShowFeedbackModal(false);
           }, 2000);
         })
@@ -88,7 +131,7 @@ export function Feedback() {
           <Icon element={MdCheck} size={55} color="white" />
 
           <h3 className="text-xl font-semibold text-white">
-            Thank you for your feedback!
+            {t('thank_you_for_feedback')}
           </h3>
         </div>
       </div>
@@ -105,9 +148,8 @@ export function Feedback() {
         disableClosing={isFormBusy}
       >
         <div className="flex flex-col space-y-4">
-          <span className="text-xs text-gray-500">
-            We are sorry to hear that you are not satisfied with our service.
-            Please tell us more about your experience so we can improve.
+          <span className="text-xs" style={{ color: colors.$17 }}>
+            {t('feedback_modal_description')}
           </span>
 
           <InputField
@@ -144,20 +186,20 @@ export function Feedback() {
       >
         <button
           type="button"
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+          className="absolute top-4 right-4 transition-colors duration-200 hover:opacity-75"
           onClick={() => setIsVisible(false)}
         >
-          <X size={24} />
+          <X size={24} color={colors.$3} />
         </button>
 
         <div className="flex flex-col items-center space-y-6 py-6 px-4 max-w-5xl mx-auto">
           <h3 className="text-lg font-medium" style={{ color: colors.$3 }}>
-            How likely are you to recommend us to your friends and colleagues?
+            {t('feedback_slider_title')}
           </h3>
 
           <div className="flex items-center justify-center w-full gap-3">
             <div className="flex items-center justify-center space-x-2">
-              {ratings.map((rating) => (
+              {Array.from({ length: 11 }, (_, i) => i).map((rating) => (
                 <button
                   key={rating}
                   type="button"
@@ -179,8 +221,12 @@ export function Feedback() {
           </div>
 
           <div className="flex justify-between w-full max-w-3xl px-2">
-            <span className="text-xs text-gray-500">Not at all likely</span>
-            <span className="text-xs text-gray-500">Extremely likely</span>
+            <span className="text-xs" style={{ color: colors.$17 }}>
+              {t('not_likely')}
+            </span>
+            <span className="text-xs" style={{ color: colors.$17 }}>
+              {t('extremely_likely')}
+            </span>
           </div>
         </div>
       </div>
