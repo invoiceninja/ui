@@ -76,7 +76,7 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
         { entity: selectedEntityType }, { skipIntercept: true }
       ) as GenericSingleResourceResponse<Document>;
 
-      toast.success('blueprint_created');
+      toast.success('template_created');
       $refetch(['blueprints']);
       
       onComplete(response.data.data.id);
@@ -158,7 +158,7 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
           onClick={handleCreateBlueprint}
           disabled={!selectedEntityType || isLoading}
         >
-          {isLoading ? t('creating') : t('create_blueprint')}
+          {isLoading ? t('creating') : t('create_template')}
         </Button>
       </div>
     </div>

@@ -57,7 +57,7 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
         }
       ).then((response: GenericSingleResourceResponse<Document>) =>{
 
-          toast.success('blueprint_created');
+          toast.success('template_created');
           $refetch(['blueprints']);
           
           onComplete(response.data.data.id);
@@ -87,7 +87,7 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
           value={payload.name}
           onValueChange={(value) => setPayload({ ...payload, name: value })}
           errorMessage={errors?.errors.name}
-          placeholder={t('blueprint_name')}
+          placeholder={t('template_name')}
         />
       </Element>
 
@@ -111,7 +111,7 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
           type="primary"
           onClick={handleCreateBlueprint}
         >
-          {t('create_blueprint')}
+          {t('create_template')}
         </Button>
       </div>
     </div>

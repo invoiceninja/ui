@@ -139,7 +139,7 @@ export function useCreateBlueprint() {
         },
       }
     ).then((response) => {
-      toast.success('blueprint_created');
+      toast.success('template_created');
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
@@ -179,7 +179,7 @@ export function useUpdateBlueprint() {
       }
     )
       .then((response: GenericSingleResourceResponse<Blueprint>) => {
-        toast.success('blueprint_updated');
+        toast.success('template_updated');
 
         $refetch(['blueprints']);
    
