@@ -39,7 +39,6 @@ import {
 } from '../components/DocumentStates';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
-import { useActions } from '../show/hooks/useActions';
 
 export default function Documents() {
   useTitle('documents');
@@ -58,9 +57,6 @@ export default function Documents() {
   const canCreateDocumentPermission = useDocuNinjaPermission('documents', 'create');
   
   const { createAccount, getToken } = useDocuNinjaActions();
-
-  // Create custom actions function that works with DataTable
-  // const customActions = useActions();
 
   const hasAccount = !!docuData;
 

@@ -30,10 +30,9 @@ import { DeleteDocumentAction } from '../components/DeleteDocumentAction';
 import { Divider } from '$app/components/cards/Divider';
 import { ArchiveDocumentAction } from '../components/ArchiveDocumentAction';
 import { RestoreDocumentAction } from '../components/RestoreDocumentAction';
-import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { FaFileSignature } from 'react-icons/fa';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDownloadAuditLog } from './useDownloadAuditLog';
 
