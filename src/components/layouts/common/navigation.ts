@@ -20,7 +20,6 @@ import SackCoins from '$app/components/icons/SackCoins';
 import { CurrencyExchange } from '$app/components/icons/CurrencyExchange';
 import { ArrowsTransaction } from '$app/components/icons/ArrowsTransaction';
 import { ChartLine } from '$app/components/icons/ChartLine';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
 import { useAtomValue } from 'jotai';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { Gear } from '$app/components/icons/Gear';
@@ -28,12 +27,13 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { File } from 'react-feather';
 import collect from 'collect.js';
 import { useEffect, useState } from 'react';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 export function useNavigation() {
   const [t] = useTranslation();
   const enabled = useEnabled();
   const hasPermission = useHasPermission();
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+  const docuCompanyAccountDetails = useAtomValue(docuNinjaAtom);
   const companyUser = useCurrentCompanyUser();
   const company = useCurrentCompany();
 
