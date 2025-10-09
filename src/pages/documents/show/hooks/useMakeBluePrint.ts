@@ -46,10 +46,10 @@ export function useMakeBluePrint() {
         .then((response) => {
           $refetch(['docuninja_documents', 'blueprints']);
 
-          toast.success('blueprint_created');
+          toast.success('template_created');
 
           navigate(
-            route('/documents/blueprints/:id/edit', {
+            route('/documents/templates/:id/edit', {
               id: response.data.data?.id,
             })
           );

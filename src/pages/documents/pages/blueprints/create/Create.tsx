@@ -22,30 +22,30 @@ export default function Create() {
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
-      name: t('blueprints'),
-      href: route('/documents/blueprints'),
+      name: t('templates'),
+      href: route('/documents/templates'),
     },
     {
-      name: t('create_blueprint'),
-      href: route('/documents/blueprints/create'),
+      name: t('create_template'),
+      href: route('/documents/templates/create'),
     },
   ];
 
   const handleWizardComplete = (blueprintId: string) => {
     navigate(
-      route('/documents/blueprints/:id/edit', {
+      route('/documents/templates/:id/edit', {
         id: blueprintId,
       })
     );
   };
 
   const handleWizardCancel = () => {
-    navigate(route('/documents/blueprints'));
+    navigate(route('/documents/templates'));
   };
 
   return (
     <Default
-      title={t('new_blueprint')}
+      title={t('new_template')}
       breadcrumbs={pages}
     >
       <BlueprintWizard

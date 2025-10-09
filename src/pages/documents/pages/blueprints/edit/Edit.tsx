@@ -42,12 +42,12 @@ export default function Edit() {
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
-      name: t('blueprints'),
-      href: route('/documents/blueprints'),
+      name: t('templates'),
+      href: route('/documents/templates'),
     },
     {
-      name: t('edit_blueprint'),
-      href: route('/documents/blueprints/:id/edit', { id }),
+      name: t('edit_template'),
+      href: route('/documents/templates/:id/edit', { id }),
     },
   ];
 
@@ -61,7 +61,7 @@ export default function Edit() {
 
   return (
     <Default
-      title={t('edit_blueprint')}
+      title={t('edit_template')}
       breadcrumbs={pages}
       navigationTopRight={
         <ResourceActions
@@ -72,7 +72,7 @@ export default function Edit() {
     >
       <div className="flex justify-center">
         <Card
-          title={isLoading ? t('loading') : t('blueprint_details')}
+          title={isLoading ? t('loading') : t('template_details')}
           className="shadow-sm w-full xl:w-1/2"
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}

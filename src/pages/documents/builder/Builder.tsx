@@ -499,7 +499,7 @@ function Builder() {
 
   return (
     <Default
-      title={t('builder')}
+      title={t('')}
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">

@@ -8,12 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+
+import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Template } from '$app/common/interfaces/docuninja/api';
 import { Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
@@ -117,6 +120,9 @@ function EmailSettings() {
     [currentTemplates]
   );
 
+  const colors = useColorScheme();
+
+
   return (
     <>
     
@@ -185,8 +191,10 @@ function EmailSettings() {
       {templates &&
         !isLoading &&
         templates.map((template: Template, index: number) => (
+    
+        <>  
         <Element leftSide={template.name} key={template.id}>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mb-4 mt-4">
             <InputField
               label={t('subject')}
               value={template.subject}
@@ -201,6 +209,9 @@ function EmailSettings() {
             />
           </div>
         </Element>
+        <Divider withoutPadding borderColor={colors.$20} />
+        </>
+    
       ))}
     </div>
   </>
