@@ -736,8 +736,6 @@ export function GrapeJSEditor({ initialHtml, onSave, onCancel, blueprintName, in
         // Load project data if provided
         if (initialProjectData) {
           try {
-
-            console.log(initialProjectData);
             editor.loadProjectData(initialProjectData);
           } catch (error) {
             // Silent error handling

@@ -32,8 +32,9 @@ import Permissions from '../common/components/Permissions';
 import Details from '../common/components/Details';
 import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
+import { useNotifications } from '../common/hooks/useNotifications';
 
-function Create() {
+function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();
@@ -61,44 +62,19 @@ function Create() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
-  const [notifications, setNotifications] = useState<Record<string, string>>(
-    {}
-  );
-  const [allNotificationsValue, setAllNotificationsValue] =
-    useState<string>('none');
+
+  const {
+    notifications,
+    setNotifications,
+    allNotificationsValue,
+    setAllNotificationsValue,
+    adjustNotificationsForPayload,
+    initializeNotifications,
+  } = useNotifications();
 
   const { data: userResponse, isLoading } = useDocuNinjaUserQuery({
     id,
   });
-
-  const adjustNotificationsForPayload = (): string[] => {
-    let notificationArray: string[] = [];
-
-    if (
-      allNotificationsValue === 'all' ||
-      allNotificationsValue === 'all_user'
-    ) {
-      notificationArray = [allNotificationsValue];
-    } else {
-      notificationArray = Object.entries(notifications)
-        .filter(([id, value]) => {
-          if (!value || value === 'none') return false;
-
-          return typeof id === 'string' && id.length > 0;
-        })
-        .map(([id, value]) => {
-          if (value === 'all') {
-            return id;
-          }
-          if (value === 'all_user') {
-            return `${id}_user`;
-          }
-          return id;
-        });
-    }
-
-    return notificationArray;
-  };
 
   const handleUpdate = () => {
     if (!isFormBusy) {
@@ -117,10 +93,7 @@ function Create() {
           ...user,
           is_admin: isAdmin,
           permissions: isAdmin ? [] : permissions,
-          company_user: {
-            ...user?.company_user,
-            notifications: adjustNotificationsForPayload(),
-          },
+          notifications: adjustNotificationsForPayload(),
         },
         {
           headers: {
@@ -152,16 +125,16 @@ function Create() {
   }, [userResponse]);
 
   useEffect(() => {
-    if (user?.company_user?.notifications) {
-      setAllNotificationsValue(
-        user.company_user.notifications.includes('all')
-          ? 'all'
-          : user.company_user.notifications.includes('all_user')
-          ? 'all_user'
-          : 'none'
-      );
+    if (user) {
+      initializeNotifications(user);
+      
+      if (user.permissions) {
+        setPermissions(user.permissions);
+      }
+
+      setIsAdmin(user.company_user?.is_admin ?? false);
     }
-  }, [user]);
+  }, [user, initializeNotifications]);
 
   useSocketEvent({
     on: ['App\\Events\\User\\UserWasVerified'],
@@ -198,7 +171,7 @@ function Create() {
               fullRightPadding
             >
               <div className="py-4">
-                <Details
+                <Details 
                   user={user}
                   setUser={setUser}
                   errors={errors}
@@ -211,29 +184,22 @@ function Create() {
                   setNotifications={setNotifications}
                   allNotificationsValue={allNotificationsValue}
                   setAllNotificationsValue={setAllNotificationsValue}
-                  editPage
+                  editPage={true}
                 />
               </div>
 
               <div className="py-4">
-                <Notifications
-                  user={user}
-                  setUser={setUser}
-                  errors={errors}
-                  isFormBusy={isFormBusy}
-                  isAdmin={isAdmin}
-                  setIsAdmin={setIsAdmin}
-                  permissions={permissions}
-                  setPermissions={setPermissions}
+                <Notifications 
                   notifications={notifications}
                   setNotifications={setNotifications}
                   allNotificationsValue={allNotificationsValue}
                   setAllNotificationsValue={setAllNotificationsValue}
+                  isFormBusy={isFormBusy}
                 />
               </div>
 
               <div className="py-4">
-                <Permissions
+                <Permissions 
                   user={user}
                   setUser={setUser}
                   errors={errors}
@@ -260,4 +226,4 @@ function Create() {
   );
 }
 
-export default Create;
+export default Edit;

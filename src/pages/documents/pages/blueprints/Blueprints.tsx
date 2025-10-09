@@ -16,19 +16,21 @@ import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { useTableColumns } from './common/hooks/useTableColumns';
 import { EditBlueprintModal } from './edit/components/EditBlueprintModal';
 import { useState } from 'react';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { MdSettings } from 'react-icons/md';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
+import { useActions } from './common/hooks/useActions';
 
 export default function Blueprints() {
   useTitle('blueprints');
-
+  
   const [t] = useTranslation();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);
 
   const columns = useTableColumns();
+  
+  // Get token from unified actions (NO QUERY!)
+  const { getToken } = useDocuNinjaActions();
 
   const handleSettingsClick = (blueprint: Blueprint) => {
     setSelectedBlueprint(blueprint);
@@ -39,6 +41,11 @@ export default function Blueprints() {
     setIsEditModalOpen(false);
     setSelectedBlueprint(null);
   };
+
+  // Extract custom actions using the hook
+  const customActions = useActions({
+    onSettingsClick: handleSettingsClick,
+  });
 
   const pages = [
     {
@@ -63,7 +70,7 @@ export default function Blueprints() {
         linkToEdit="/documents/blueprints/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          Authorization: `Bearer ${getToken()}`,
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
@@ -75,16 +82,7 @@ export default function Blueprints() {
         onBulkActionSuccess={() => {
           $refetch(['blueprints']);
         }}
-        customActions={[
-          (blueprint: Blueprint) => (
-            <DropdownElement
-              onClick={() => handleSettingsClick(blueprint)}
-              icon={<Icon element={MdSettings} />}
-            >
-              {t('settings')}
-            </DropdownElement>
-          ),
-        ]}
+        customActions={customActions}
       />
 
       {selectedBlueprint && (

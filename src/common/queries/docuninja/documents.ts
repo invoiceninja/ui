@@ -61,6 +61,7 @@ export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
               'X-DOCU-NINJA-TOKEN'
             )}`,
           },
+          skipIntercept: true,
         }
       ).then(
         (response: GenericSingleResourceResponse<Document>) =>
@@ -87,6 +88,7 @@ export function useDocumentTimelineQuery({ id, enabled }: GenericQueryOptions) {
               'X-DOCU-NINJA-TOKEN'
             )}`,
           },
+          skipIntercept: true,
         }
       ).then((response: AxiosResponse<TimelineItemType[]>) => response.data),
     {

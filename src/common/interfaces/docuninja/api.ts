@@ -48,7 +48,7 @@ export interface Company {
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
   ninja_company_key: string;
-
+  token?: string;
   // Relations
   users?: User[];
   pivot?: CompanyUser | null;
@@ -64,6 +64,26 @@ export interface Template {
   type_id: number;
 }
 
+export interface DocuNinjaData {
+  account: Account;
+  companies?: Company[]; // Relation
+  users?: User[]; // Relation
+  gateway_tokens?: GatewayToken[]; // Relation
+  company_user?: CompanyUser; // Relation
+  permissions?: Permission[]; // Relation
+  archived_at?: string;
+  e_initials?: string;
+  e_signature?: string;
+  email?: string;
+  email_verified_at?: string;
+  first_name?: string;
+  last_name?: string;
+  id: string;
+  phone_number?: string;
+  phone_number_verified?: number;
+  updated_at?: string;
+
+}
 export interface Account {
   id: string;
   plan: string | null;
@@ -80,6 +100,8 @@ export interface Account {
   companies?: Company[]; // Relation
   users?: User[]; // Relation
   gateway_tokens?: GatewayToken[]; // Relation
+  company_user?: CompanyUser; // Relation
+  permissions?: Permission[]; // Relation
 }
 
 export interface GatewayToken {

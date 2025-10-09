@@ -9,7 +9,7 @@
  */
 
 import { useAtomValue } from 'jotai';
-import { isPaidDocuninjaUserAtom } from '../../Document';
+import { isPaidDocuninjaUserAtom } from '$app/pages/documents/atoms';
 import { useTranslation } from 'react-i18next';
 import { Alert } from '$app/components/Alert';
 import { Button } from '$app/components/forms';

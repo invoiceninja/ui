@@ -28,9 +28,9 @@ import { Invitations } from './components/Invitations';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { useDocumentActions } from './hooks/useDocumentActions';
 import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { useActions } from './hooks/useActions';
 
 export default function Document() {
   const { documentTitle } = useTitle('view_document');
@@ -71,7 +71,7 @@ export default function Document() {
     []
   );
 
-  const actions = useDocumentActions({ document });
+  const actions = useActions({ document });
 
   const {
     data: timelineData,

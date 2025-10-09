@@ -4,7 +4,25 @@ import { Divider } from '$app/components/cards/Divider';
 import { Checkbox } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { DocuninjaUserProps } from './Details';
+import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { NotificationValue } from '../constants/notifications';
+
+// Legacy props interface for backward compatibility
+export interface DocuninjaUserProps {
+  user: User;
+  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+  errors: ValidationBag | undefined;
+  isFormBusy: boolean;
+  isAdmin: boolean;
+  setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
+  permissions: PermissionType[];
+  setPermissions: React.Dispatch<React.SetStateAction<PermissionType[]>>;
+  notifications: Record<string, string>;
+  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  allNotificationsValue: NotificationValue;
+  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+}
 
 export const PERMISSION_VIEW = 1;
 export const PERMISSION_EDIT = 2;
@@ -68,17 +86,22 @@ const MODELS: Record<string, { name: string; permissions: ModelPermission[] }> =
     },
   };
 
-export default function Permissions({
-  user,
-  isFormBusy,
-  permissions,
-  setPermissions,
-  isAdmin,
-  setIsAdmin,
-}: DocuninjaUserProps) {
+export default function Permissions(props?: DocuninjaUserProps) {
   const [t] = useTranslation();
-
   const colors = useColorScheme();
+  
+  if (!props) {
+    return null; // Early return if no props available
+  }
+
+  const {
+    user,
+    isFormBusy,
+    permissions,
+    setPermissions,
+    isAdmin,
+    setIsAdmin,
+  } = props;
 
   const basicPermissionTypes = [
     PERMISSION_CREATE,
@@ -148,7 +171,6 @@ export default function Permissions({
     permissionId: ModelPermission,
     checked: boolean
   ) => {
-    console.log('toggleAllPermissionsOfType', permissionId, checked);
     const newPermissions = [...permissions];
     for (const model of Object.values(MODELS)) {
       if (!model.permissions.includes(permissionId)) continue;
@@ -178,8 +200,8 @@ export default function Permissions({
   };
 
   const hasChanges = () => {
-    const originalIsAdmin = user.company_user?.is_admin ?? false;
-    const originalPermissions = user.permissions ?? [];
+    const originalIsAdmin = user?.company_user?.is_admin ?? false;
+    const originalPermissions = user?.permissions ?? [];
 
     if (isAdmin !== originalIsAdmin) {
       return true;

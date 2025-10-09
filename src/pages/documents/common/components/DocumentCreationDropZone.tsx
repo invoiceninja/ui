@@ -84,8 +84,6 @@ export function DocumentCreationDropZone() {
     
     const newFormData = new FormData();
 
-    console.log(acceptedFiles);
-
     acceptedFiles.forEach((file) => {
       newFormData.append('files[]', file);
       
