@@ -12,69 +12,48 @@ import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DocuninjaUserProps } from './Details';
+import { NOTIFICATION_TYPES, NOTIFICATION_VALUES } from '../constants/notifications';
+import { NotificationValue } from '../constants/notifications';
 
-export function Notifications({
-  notifications,
-  setNotifications,
-  allNotificationsValue,
-  setAllNotificationsValue,
-  isFormBusy,
-}: DocuninjaUserProps) {
+interface NotificationsProps {
+  notifications: Record<string, string>;
+  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  allNotificationsValue: NotificationValue;
+  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+  isFormBusy: boolean;
+}
+
+export function Notifications(props: NotificationsProps) {
   const [t] = useTranslation();
+  
+  const { 
+    notifications, 
+    setNotifications, 
+    allNotificationsValue, 
+    setAllNotificationsValue, 
+    isFormBusy 
+  } = props;
 
   const notificationTypes = useMemo(
-    () => [
-      {
-        id: 'document_created',
-        label: t('document_created_notification'),
-      },
-      {
-        id: 'document_sent',
-        label: t('document_sent_notification'),
-      },
-      {
-        id: 'document_viewed',
-        label: t('document_viewed_notification'),
-      },
-      {
-        id: 'document_signed',
-        label: t('document_signed_notification'),
-      },
-      {
-        id: 'document_completed',
-        label: t('document_completed_notification'),
-      },
-      {
-        id: 'document_rejected',
-        label: t('document_rejected_notification'),
-      },
-      {
-        id: 'document_voided',
-        label: t('document_voided_notification'),
-      },
-      {
-        id: 'document_expired',
-        label: t('document_expired_notification'),
-      },
-    ],
-    []
+    () => NOTIFICATION_TYPES.map(type => ({
+      id: type.id,
+      label: t(type.labelKey),
+    })),
+    [t]
   );
 
   const handlePreferenceChange = (id: string, value: string) => {
     if (!id || typeof id !== 'string') {
-      console.warn('Invalid notification ID:', id);
       return;
     }
 
     if (!value || typeof value !== 'string') {
-      console.warn('Invalid notification value:', value);
       return;
     }
 
     const newNotifications = { ...notifications };
 
-    if (value === 'none') {
+    if (value === NOTIFICATION_VALUES.NONE) {
       delete newNotifications[id];
     } else {
       newNotifications[id] = value;
@@ -89,45 +68,46 @@ export function Notifications({
         <SelectField
           value={allNotificationsValue}
           onValueChange={(value) => {
-            setAllNotificationsValue(value);
-
-            if (value === 'all' || value === 'all_user') {
+            if (value === NOTIFICATION_VALUES.ALL || value === NOTIFICATION_VALUES.ALL_USER) {
               const newNotifications: Record<string, string> = {};
-
-              for (const type of notificationTypes) {
-                newNotifications[type.id] = 'none';
-              }
+              setAllNotificationsValue(value);
               setNotifications(newNotifications);
+            } else if (value === NOTIFICATION_VALUES.NONE) {
+              const newNotifications: Record<string, string> = {};
+              setNotifications(newNotifications);
+              setAllNotificationsValue(value);
             }
           }}
           customSelector
+          dismissable={false}
           disabled={isFormBusy}
         >
-          <option value="none">{t('none')}</option>
-          <option value="all">{t('all')}</option>
-          <option value="all_user">{t('owned_by_user')}</option>
+          <option value={NOTIFICATION_VALUES.CUSTOM}>{t('custom')}</option>
+          <option value={NOTIFICATION_VALUES.NONE}>{t('none')}</option>
+          <option value={NOTIFICATION_VALUES.ALL}>{t('all')}</option>
+          <option value={NOTIFICATION_VALUES.ALL_USER}>{t('owned_by_user')}</option>
         </SelectField>
       </Element>
 
       {notificationTypes.map((notification) => (
         <Element key={notification.id} leftSide={notification.label}>
           <SelectField
-            value={notifications[notification.id] ?? 'none'}
+            value={notifications[notification.id] ?? NOTIFICATION_VALUES.NONE}
             onValueChange={(value) => {
               handlePreferenceChange(notification.id, value);
-
-              setAllNotificationsValue('none');
+              setAllNotificationsValue(NOTIFICATION_VALUES.CUSTOM);
             }}
             disabled={
-              allNotificationsValue === 'all' ||
-              allNotificationsValue === 'all_user' ||
+              allNotificationsValue === NOTIFICATION_VALUES.ALL ||
+              allNotificationsValue === NOTIFICATION_VALUES.ALL_USER ||
               isFormBusy
             }
             customSelector
+            dismissable={false}
           >
-            <option value="none">{t('none')}</option>
-            <option value="all">{t('all')}</option>
-            <option value="all_user">{t('owned_by_user')}</option>
+            <option value={NOTIFICATION_VALUES.NONE}>{t('none')}</option>
+            <option value={NOTIFICATION_VALUES.ALL}>{t('all')}</option>
+            <option value={NOTIFICATION_VALUES.ALL_USER}>{t('owned_by_user')}</option>
           </SelectField>
         </Element>
       ))}

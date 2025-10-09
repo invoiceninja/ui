@@ -30,11 +30,10 @@ import { DeleteDocumentAction } from '../components/DeleteDocumentAction';
 import { Divider } from '$app/components/cards/Divider';
 import { ArchiveDocumentAction } from '../components/ArchiveDocumentAction';
 import { RestoreDocumentAction } from '../components/RestoreDocumentAction';
-import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { FaFileSignature } from 'react-icons/fa';
 import { useAtomValue } from 'jotai';
-import { docuCompanyAccountDetailsAtom } from '../../Document';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDownloadAuditLog } from './useDownloadAuditLog';
 
 interface DocumentAction {
@@ -48,12 +47,10 @@ interface Params {
   document: Document | undefined;
 }
 
-export function useDocumentActions({ document }: Params) {
+export function useActions({ document }: Params) {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
-
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+  const docuCompanyAccountDetails = useAtomValue(docuNinjaAtom);
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);

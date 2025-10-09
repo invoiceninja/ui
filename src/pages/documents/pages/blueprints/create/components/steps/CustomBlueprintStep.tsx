@@ -39,13 +39,12 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
     description: '',
   });
 
-  const handleCreateBlueprint = async () => {
+  function handleCreateBlueprint() {
     if (!payload.name.trim()) return;
 
     setErrors(undefined);
 
-    try {
-      const response = await request(
+     request(
         'POST',
         docuNinjaEndpoint('/api/blueprints'),
         payload,
@@ -56,21 +55,24 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
             )}`,
           },
         }
-      ) as GenericSingleResourceResponse<Document>;
+      ).then((response: GenericSingleResourceResponse<Document>) =>{
 
-      toast.success('blueprint_created');
-      $refetch(['blueprints']);
+          toast.success('blueprint_created');
+          $refetch(['blueprints']);
+          
+          onComplete(response.data.data.id);
+
+      }).catch((error: AxiosError<ValidationBag>) => {
       
-      onComplete(response.data.data.id);
-    } catch (error) {
-      console.error('Error creating blueprint:', error);
-      
-      if (error instanceof AxiosError && error.response?.status === 422) {
-        setErrors(error.response.data);
-      } else {
-        toast.error('Error creating blueprint:');
-      }
-    }
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
+        else {
+          toast.error('Error creating blueprint:');
+        }
+
+      });
   };
 
   return (

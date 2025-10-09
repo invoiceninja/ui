@@ -17,8 +17,10 @@ import { Default } from '$app/components/layouts/Default';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
-import { useAtomValue } from 'jotai';
-import { docuCompanyAccountDetailsAtom } from '../../Document';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Users() {
   useTitle('users');
@@ -26,8 +28,15 @@ export default function Users() {
   const [t] = useTranslation();
 
   const columns = useUserColumns();
-
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
+  const company = useCurrentCompany();
+  // Get DocuNinja data from unified atoms (NO QUERY!)
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuAccount = docuData?.account;
+  const { getToken } = useDocuNinjaActions();
+    
+  const currentUserCount = docuData?.account?.users?.length || 1;
+  // const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
+  const maxUsers = docuAccount?.num_users || 0;
 
   const pages = [
     {
@@ -48,26 +57,24 @@ export default function Users() {
   return (
     <Default title={t('users')} breadcrumbs={pages}>
       <NumberOfUsersAlert />
-
+      
       <DataTable<User>
-        queryIdentificator="/api/users/docuninja"
+        queryIdentificator="/api/users"
         resource="user"
-        endpoint="/api/users?sort=id|desc"
+        endpoint={`/api/users?ninjaCompanyKey=${company.company_key}`}
         columns={columns}
         withResourcefulActions
+        useRestoreForDeletedResources
         bulkRoute="/api/users/bulk"
-        linkToCreate="/documents/users/create"
+        linkToCreate="/documents/users/selection"
         linkToEdit="/documents/users/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          Authorization: `Bearer ${getToken()}`,
         }}
         totalPagesPropPath="data.meta.last_page"
         totalRecordsPropPath="data.meta.total"
-        disabledCreateButton={
-          (docuCompanyAccountDetails?.account?.num_users || 0) ===
-          (docuCompanyAccountDetails?.account?.users || [])?.length
-        }
+        disabledCreateButton={currentUserCount >= maxUsers}
         filterParameterKey="search"
       />
     </Default>

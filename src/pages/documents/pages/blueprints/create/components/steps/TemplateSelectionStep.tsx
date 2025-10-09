@@ -18,6 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { docuNinjaEndpoint } from '$app/common/helpers';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface TemplateSelectionStepProps {
   onComplete: (blueprintId: string) => void;
@@ -117,14 +119,13 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
     (template) => template.category === selectedCategory
   );
 
-  const handleCreateBlueprint = async () => {
+  function handleCreateBlueprint() {
     if (!selectedTemplate || isLoading) return;
 
     setIsLoading(true);
+    
     toast.processing();
-
-    try {
-      const response = await request(
+      request(
         'GET',
         docuNinjaEndpoint('/api/galleries/:id', { id: selectedTemplate }),{},
         {
@@ -134,12 +135,10 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
             )}`,
           },
         }
-      ) as any;
+      ).then((response: any) => {
 
       const templateHtml = response.data.html;
       const templateName = response.data.name;
-
-      console.log(templateName);
 
       toast.success('template_loaded');
       
@@ -147,11 +146,15 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       navigate(route('/documents/blueprints/create/template_editor'), {
         state: { templateHtml, templateName }
       });
-    } catch (error) {
-      toast.error('error_loading_template');
-    } finally {
+
+    }).catch ((error: AxiosError<ValidationBag>) => {
+      if (error.response?.status === 422) {
+        toast.error("Error loading template");
+      }
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
+   
   };
 
   return (

@@ -23,8 +23,6 @@ export default function BlueprintEditor() {
   
   useEffect(() => {
 
-    console.log(stateTemplateHtml);
-    console.log(stateBlueprintName);
 
     // Use state data if available, otherwise use fetched data
     if (stateTemplateHtml) {
@@ -54,7 +52,6 @@ export default function BlueprintEditor() {
       // Base64 encode the HTML content
       const base64Html = btoa(html);
       
-      console.log(projectData);
       if (isNewTemplate) {
         // Create new blueprint
         const response = await createBlueprint({

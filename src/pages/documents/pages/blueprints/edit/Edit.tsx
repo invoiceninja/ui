@@ -32,7 +32,7 @@ export default function Edit() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   const actions = useActions({
-    onEdit: (blueprint) => {
+    onSettingsClick: (blueprint: Blueprint) => {
       setIsEditModalOpen(true);
     },
   });

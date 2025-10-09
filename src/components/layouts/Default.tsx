@@ -64,7 +64,6 @@ import { CurrencyExchange } from '../icons/CurrencyExchange';
 import { ChartLine } from '../icons/ChartLine';
 import { ArrowsTransaction } from '../icons/ArrowsTransaction';
 import { Gear } from '../icons/Gear';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
 
 export interface SaveOption {
   label: string;
@@ -100,7 +99,6 @@ export function Default(props: Props) {
   const user = useInjectUserChanges();
   const company = useCurrentCompany();
   const companyUser = useCurrentCompanyUser();
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
@@ -110,6 +108,7 @@ export function Default(props: Props) {
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
+  // Define navigation array with reactive permission values
   const navigation: NavigationItem[] = [
     {
       name: t('dashboard'),
@@ -394,11 +393,9 @@ export function Default(props: Props) {
           visible: true,
           rightButton: {
             icon: Plus,
-            to: '/documents/users/create',
+            to: '/documents/users/selection',
             label: t('new_user'),
-            visible:
-              (docuCompanyAccountDetails?.account?.num_users || 0) !==
-              (docuCompanyAccountDetails?.account?.users || [])?.length,
+            visible: true,
           },
         },
       ],

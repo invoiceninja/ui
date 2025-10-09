@@ -10,22 +10,30 @@
 
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
-import { docuCompanyAccountDetailsAtom } from '$app/pages/documents/Document';
-import { useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 
 export function NumberOfUsersAlert() {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
+  // Get DocuNinja account data from unified atoms (NO QUERY!)
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuAccount = docuData?.account;
+  
+  // Get actual DocuNinja users count from API
+  const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 
+    perPage: '1', 
+    currentPage: '1', 
+    filter: '' 
+  });
+  
+  const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
+  const maxUsers = docuAccount?.num_users || 0;
 
-  const docuCompanyAccountDetails = useAtomValue(docuCompanyAccountDetailsAtom);
-
-  if (
-    (docuCompanyAccountDetails?.account?.num_users || 0) <
-    (docuCompanyAccountDetails?.account?.users || [])?.length
-  ) {
+  // Only show alert if user limit is reached
+  if (currentUserCount < maxUsers || maxUsers <= 0) {
     return null;
   }
 

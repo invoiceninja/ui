@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-const Blueprint = () => {
-  return <div>Blueprint</div>;
-};
+import { atom } from 'jotai';
 
-export default Blueprint;
+export const isPaidDocuninjaUserAtom = atom<boolean>(false);

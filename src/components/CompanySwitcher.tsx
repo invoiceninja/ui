@@ -28,6 +28,7 @@ import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
 import { styled } from 'styled-components';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Check } from './icons/Check';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { Plus } from './icons/Plus';
 import { Person } from './icons/Person';
 import { Exit } from './icons/Exit';
@@ -60,6 +61,7 @@ export function CompanySwitcher() {
   const queryClient = useQueryClient();
   const { isAdmin, isOwner } = useAdmin();
   const currentCompany = useCurrentCompany();
+  const { flushData } = useDocuNinjaActions();
 
   const currentUser = useCurrentUser();
   const userChanges = useInjectUserChanges();
@@ -91,6 +93,9 @@ export function CompanySwitcher() {
     sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'false');
 
     queryClient.invalidateQueries();
+    
+    // Clear DocuNinja data and cache when switching companies
+    flushData();
 
     if (id) {
       const basePage =

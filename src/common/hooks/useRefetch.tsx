@@ -233,7 +233,7 @@ export const keys = {
     dependencies: [],
   },
   docuninja_users: {
-    path: '/api/users/docuninja',
+    path: '/api/users',
     dependencies: [],
   },
   docuninja_clients: {
