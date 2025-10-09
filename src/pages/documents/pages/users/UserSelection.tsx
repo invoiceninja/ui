@@ -14,7 +14,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '$app/components/forms';
 import { Checkbox } from '$app/components/forms';
 import { Element } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
 import { User as InvoiceNinjaUser } from '$app/common/interfaces/user';
 import { User as DocuNinjaUser } from '$app/common/interfaces/docuninja/api';
 import { request } from '$app/common/helpers/request';
