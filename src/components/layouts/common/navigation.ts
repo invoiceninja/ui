@@ -20,7 +20,7 @@ import SackCoins from '$app/components/icons/SackCoins';
 import { CurrencyExchange } from '$app/components/icons/CurrencyExchange';
 import { ArrowsTransaction } from '$app/components/icons/ArrowsTransaction';
 import { ChartLine } from '$app/components/icons/ChartLine';
-import { useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { Gear } from '$app/components/icons/Gear';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -28,6 +28,8 @@ import { File } from 'react-feather';
 import collect from 'collect.js';
 import { useEffect, useState } from 'react';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+
+const $cache = atom<NavigationItem[] | null>(null);
 
 export function useNavigation() {
   const [t] = useTranslation();
@@ -37,19 +39,19 @@ export function useNavigation() {
   const companyUser = useCurrentCompanyUser();
   const company = useCurrentCompany();
 
-  const [navigation, setNavigation] = useState<NavigationItem[]>([
+  const [cache, setCache] = useAtom($cache);
+
+  const initialNavigation: NavigationItem[] = [
     {
       name: t('dashboard'),
       href: '/dashboard',
       icon: House,
-      current: location.pathname.startsWith('/dashboard'),
       visible: hasPermission('view_dashboard'),
     },
     {
       name: t('clients'),
       href: '/clients',
       icon: Users,
-      current: location.pathname.startsWith('/clients'),
       visible:
         hasPermission('view_client') ||
         hasPermission('create_client') ||
@@ -65,7 +67,6 @@ export function useNavigation() {
       name: t('products'),
       href: '/products',
       icon: Cube,
-      current: location.pathname.startsWith('/products'),
       visible:
         hasPermission('view_product') ||
         hasPermission('create_product') ||
@@ -81,7 +82,6 @@ export function useNavigation() {
       name: t('invoices'),
       href: '/invoices',
       icon: InvoiceIcon,
-      current: location.pathname.startsWith('/invoices'),
       visible:
         enabled(ModuleBitmask.Invoices) &&
         (hasPermission('view_invoice') ||
@@ -98,7 +98,6 @@ export function useNavigation() {
       name: t('recurring_invoices'),
       href: '/recurring_invoices',
       icon: Refresh,
-      current: location.pathname.startsWith('/recurring_invoices'),
       visible:
         enabled(ModuleBitmask.RecurringInvoices) &&
         (hasPermission('view_recurring_invoice') ||
@@ -115,7 +114,6 @@ export function useNavigation() {
       name: t('payments'),
       href: '/payments',
       icon: CreditCard,
-      current: location.pathname.startsWith('/payments'),
       visible:
         hasPermission('view_payment') ||
         hasPermission('create_payment') ||
@@ -131,7 +129,6 @@ export function useNavigation() {
       name: t('quotes'),
       href: '/quotes',
       icon: Files,
-      current: location.pathname.startsWith('/quotes'),
       visible:
         enabled(ModuleBitmask.Quotes) &&
         (hasPermission('view_quote') ||
@@ -148,7 +145,6 @@ export function useNavigation() {
       name: t('credits'),
       href: '/credits',
       icon: Wallet,
-      current: location.pathname.startsWith('/credits'),
       visible:
         enabled(ModuleBitmask.Credits) &&
         (hasPermission('view_credit') ||
@@ -165,7 +161,6 @@ export function useNavigation() {
       name: t('projects'),
       href: '/projects',
       icon: SuitCase,
-      current: location.pathname.startsWith('/projects'),
       visible:
         enabled(ModuleBitmask.Projects) &&
         (hasPermission('view_project') ||
@@ -182,7 +177,6 @@ export function useNavigation() {
       name: t('tasks'),
       href: '/tasks',
       icon: ClipboardCheck,
-      current: location.pathname.startsWith('/tasks'),
       visible:
         enabled(ModuleBitmask.Tasks) &&
         (hasPermission('view_task') ||
@@ -199,7 +193,6 @@ export function useNavigation() {
       name: t('vendors'),
       href: '/vendors',
       icon: Office,
-      current: location.pathname.startsWith('/vendors'),
       visible:
         enabled(ModuleBitmask.Vendors) &&
         (hasPermission('view_vendor') ||
@@ -216,7 +209,6 @@ export function useNavigation() {
       name: t('purchase_orders'),
       href: '/purchase_orders',
       icon: FileClock,
-      current: location.pathname.startsWith('/purchase_orders'),
       visible:
         enabled(ModuleBitmask.PurchaseOrders) &&
         (hasPermission('view_purchase_order') ||
@@ -233,7 +225,6 @@ export function useNavigation() {
       name: t('expenses'),
       href: '/expenses',
       icon: SackCoins,
-      current: location.pathname.startsWith('/expenses'),
       visible:
         enabled(ModuleBitmask.Expenses) &&
         (hasPermission('view_expense') ||
@@ -250,7 +241,6 @@ export function useNavigation() {
       name: t('recurring_expenses'),
       href: '/recurring_expenses',
       icon: CurrencyExchange,
-      current: location.pathname.startsWith('/recurring_expenses'),
       visible:
         enabled(ModuleBitmask.RecurringExpenses) &&
         (hasPermission('view_recurring_expense') ||
@@ -267,7 +257,6 @@ export function useNavigation() {
       name: t('transactions'),
       href: '/transactions',
       icon: ArrowsTransaction,
-      current: location.pathname.startsWith('/transactions'),
       visible:
         enabled(ModuleBitmask.Transactions) &&
         (hasPermission('view_bank_transaction') ||
@@ -284,14 +273,12 @@ export function useNavigation() {
       name: t('reports'),
       href: '/reports',
       icon: ChartLine,
-      current: location.pathname.startsWith('/reports'),
       visible: hasPermission('view_reports'),
     },
     {
       name: t('documents'),
       href: '/documents',
       icon: ArrowsTransaction,
-      current: location.pathname.startsWith('/documents'),
       rightButton: {
         icon: Plus,
         to: '/documents/create',
@@ -305,7 +292,6 @@ export function useNavigation() {
           href: '/documents/blueprints',
           icon: File,
           visible: false,
-          current: location.pathname.startsWith('/documents/blueprints'),
           rightButton: {
             icon: Plus,
             to: '/documents/blueprints/create',
@@ -317,8 +303,7 @@ export function useNavigation() {
           name: t('users'),
           href: '/documents/users',
           icon: Users,
-          current: location.pathname.startsWith('/documents/users'),
-          visible: false,
+          visible: true,
           rightButton: {
             icon: Plus,
             to: '/documents/users/create',
@@ -337,10 +322,15 @@ export function useNavigation() {
           ? '/settings/company_details'
           : '/settings/user_details',
       icon: Gear,
-      current: location.pathname.startsWith('/settings'),
       visible: Boolean(company),
     },
-  ]);
+  ];
+
+  useEffect(() => {
+    if (cache === null) {
+      setCache(initialNavigation);
+    }
+  }, []);
 
   useEffect(() => {
     window.addEventListener('navigation.changeVisibility', (event) => {
@@ -349,7 +339,11 @@ export function useNavigation() {
         visible: boolean;
       };
 
-      setNavigation((current) => {
+      setCache((current) => {
+        if (!current) {
+          return initialNavigation;
+        }
+
         const collection = collect(current);
 
         const updated = collection.map((item) => {
@@ -387,7 +381,7 @@ export function useNavigation() {
     }, 10_000);
   }, []);
 
-  return navigation;
+  return cache ?? initialNavigation;
 }
 
 export interface NavigationHandler {
