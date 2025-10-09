@@ -53,21 +53,21 @@ export default function Blueprints() {
       href: '/documents',
     },
     {
-      name: t('blueprints'),
-      href: '/documents/blueprints',
+      name: t('templates'),
+      href: '/documents/templates',
     },
   ];
 
   return (
-    <Default title={t('blueprints')} breadcrumbs={pages}>
+    <Default title={t('templates')} breadcrumbs={pages}>
       <DataTable<Blueprint>
-        resource="blueprint"
+        resource="template"
         endpoint="/api/blueprints?sort=id|desc"
         columns={columns}
         withResourcefulActions
         bulkRoute="/api/blueprints/bulk"
-        linkToCreate="/documents/blueprints/create"
-        linkToEdit="/documents/blueprints/:id/edit"
+        linkToCreate="/documents/templates/create"
+        linkToEdit="/documents/templates/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
           Authorization: `Bearer ${getToken()}`,

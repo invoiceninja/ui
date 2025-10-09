@@ -477,10 +477,10 @@ function BlueprintBuilder() {
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
-    { name: t('blueprints'), href: '/documents/blueprints' },
+    { name: t('templates'), href: '/documents/blueprints' },
     {
       name: blueprint?.name || t('blueprint'),
-      href: route('/documents/blueprints/:id/edit', { id }),
+      href: route('/documents/templates/:id/edit', { id }),
     },
   ];
 
@@ -502,7 +502,7 @@ function BlueprintBuilder() {
     };
 
     const handleSuccessfullySavedDocument = () => {
-      toast.success('blueprint_updated');
+      toast.success('template_updated');
       $refetch(['blueprints']);
     };
 
@@ -545,7 +545,7 @@ function BlueprintBuilder() {
   
   return (
     <Default
-      title={t('builder')}
+      title={t('')}
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
@@ -554,7 +554,7 @@ function BlueprintBuilder() {
             type="secondary"  
             behavior="button"
             onClick={() => {
-              navigate(route('/documents/blueprints/:id/template_editor', { 
+              navigate(route('/documents/templates/:id/editor', { 
                 id, 
                 state: { 
                   templateHtml: blueprint.template, 

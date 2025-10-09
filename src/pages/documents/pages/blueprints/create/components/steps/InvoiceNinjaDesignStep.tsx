@@ -76,13 +76,13 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
         { entity: selectedEntityType }, { skipIntercept: true }
       ) as GenericSingleResourceResponse<Document>;
 
-      toast.success('blueprint_created');
+      toast.success('template_created');
       $refetch(['blueprints']);
       
       onComplete(response.data.data.id);
     } catch (error) {
-      console.error('Error creating blueprint:', error);
-      toast.error('error_creating_blueprint');
+      // console.error('Error creating blueprint:', error);
+      toast.error('Error creating blueprint:');
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +158,7 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
           onClick={handleCreateBlueprint}
           disabled={!selectedEntityType || isLoading}
         >
-          {isLoading ? t('creating') : t('create_blueprint')}
+          {isLoading ? t('creating') : t('create_template')}
         </Button>
       </div>
     </div>

@@ -64,7 +64,7 @@ export function EditBlueprintModal({ blueprint, isOpen, onClose }: Props) {
         }
       )
         .then((response: GenericSingleResourceResponse<Blueprint>) => {
-          toast.success('blueprint_updated');
+          toast.success('template_updated');
           $refetch(['blueprints']);
           onClose();
         })
@@ -91,7 +91,7 @@ export function EditBlueprintModal({ blueprint, isOpen, onClose }: Props) {
 
   return (
     <Modal
-      title={t('edit_blueprint')}
+      title={t('edit_template')}
       visible={isOpen}
       onClose={handleClose}
       size="regular"

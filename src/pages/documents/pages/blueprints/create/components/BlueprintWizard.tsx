@@ -77,7 +77,7 @@ export function BlueprintWizard({ onComplete, onCancel }: BlueprintWizardProps) 
   return (
     <div className="flex justify-center">
       <Card
-        title={t('create_blueprint')}
+        title={t('create_template')}
         className="shadow-sm w-full xl:w-2/3"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
@@ -108,7 +108,7 @@ function SelectionStep({
     {
       id: 'invoice-ninja',
       title: 'Invoice Ninja',
-      description: t('invoice_ninja_blueprint_description'),
+      description: t('invoice_ninja_template_description'),
       icon: '📄',
       onClick: onSelectInvoiceNinja,
     },
@@ -122,7 +122,7 @@ function SelectionStep({
     {
       id: 'template',
       title: t('templates'),
-      description: t('blueprint_template_description'),
+      description: t('new_template_description'),
       icon: '📋',
       onClick: onSelectTemplate,
     },
@@ -131,7 +131,7 @@ function SelectionStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">{t('choose_blueprint_type')}</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('choose_template_type')}</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
