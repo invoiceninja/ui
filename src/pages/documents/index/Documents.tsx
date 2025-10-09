@@ -115,19 +115,16 @@ export default function Documents() {
 
   // Show upgrade page for owners without DocuNinja account (check this BEFORE needsPlanUpgrade)
   if (!hasAccount && isAdmin) {
-    console.log("isAdmin");
     return <UpgradePlan pages={pages} />;
   }
 
   // Show plan upgrade message for non-pro users (but only if not already handled above)
   if (needsPlanUpgrade) {
-    console.log("needsPlanUpgrade");
     return <UpgradePlan pages={pages} />;
   }
 
   // Show splash page for users without DocuNinja access
   if (!docuData && !isAdmin) {
-    console.log("no docuData");
     return <SplashPage pages={pages} />;
   }
 
