@@ -24,7 +24,6 @@ import {
   MdPalette,
   MdSettings,
 } from 'react-icons/md';
-import { FaFileSignature } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
