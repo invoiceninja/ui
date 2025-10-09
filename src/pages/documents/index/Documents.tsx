@@ -39,6 +39,7 @@ import {
 } from '../components/DocumentStates';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
+import { useActions } from '../show/hooks/useActions';
 
 export default function Documents() {
   useTitle('documents');
@@ -58,8 +59,12 @@ export default function Documents() {
   
   const { createAccount, getToken } = useDocuNinjaActions();
 
+  // Create custom actions function that works with DataTable
+  // const customActions = useActions();
+
   const hasAccount = !!docuData;
 
+  // Check if company exists in DocuNinja by looking for matching company key
   const docuCompany = docuData?.companies?.find(
     (c) => c.ninja_company_key === company?.company_key
   );

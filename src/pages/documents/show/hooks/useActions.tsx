@@ -33,7 +33,7 @@ import { RestoreDocumentAction } from '../components/RestoreDocumentAction';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { FaFileSignature } from 'react-icons/fa';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDownloadAuditLog } from './useDownloadAuditLog';
 
@@ -48,13 +48,10 @@ interface Params {
   document: Document | undefined;
 }
 
-export function useDocumentActions({ document }: Params) {
+export function useActions({ document }: Params) {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
-
-  // Get DocuNinja data from unified atoms (NO QUERY!)
-  const [docuData] = useAtom(docuNinjaAtom);
+  const docuCompanyAccountDetails = useAtomValue(docuNinjaAtom);
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
@@ -81,7 +78,7 @@ export function useDocumentActions({ document }: Params) {
     (invitation) =>
       invitation.entity === 'user' &&
       invitation.user_id ===
-        docuData?.users?.find(
+        docuCompanyAccountDetails?.account?.users?.find(
           (user) => user.company_user?.is_owner
         )?.id
   );

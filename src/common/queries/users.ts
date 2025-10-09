@@ -86,7 +86,7 @@ export function useBulk(params: Params) {
         action,
         ids,
       },
-      { headers: { 'X-Api-Password': password } }
+      { headers: { 'X-Api-Password': password }, skipIntercept: true }
     )
       .then(() => {
         toast.success(`${action}d_user`);

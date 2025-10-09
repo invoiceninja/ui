@@ -111,6 +111,7 @@ export function useBulk() {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
         },
+        skipIntercept: true,
       }
     ).then(() => {
       const message = `${action}d_user`;

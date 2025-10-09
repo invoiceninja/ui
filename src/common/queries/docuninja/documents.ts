@@ -46,10 +46,6 @@ export function useDocumentsQuery(params: Params) {
 }
 
 export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
-  console.log(localStorage.getItem(
-    'X-DOCU-NINJA-TOKEN'
-  ));
-
   return useQuery(
     ['/api/documents/docuninja', id],
     () =>

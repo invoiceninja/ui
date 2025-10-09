@@ -16,7 +16,7 @@ import { docuNinjaAdmin, docuNinjaPermission } from '$app/common/guards/guards/d
 import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
-const DocumentShow = lazy(() => import('$app/pages/documents/show/Document'));
+const Document = lazy(() => import('$app/pages/documents/show/Document'));
 const Create = lazy(() => import('$app/pages/documents/create/Create'));
 const Blueprints = lazy(
   () => import('$app/pages/documents/pages/blueprints/Blueprints')
@@ -68,6 +68,11 @@ export const documentsRoutes = (
         />
 
         <Route
+          path=":id"
+          element={<DocuNinjaGuard guards={[]} component={<Document />} />}
+        />
+
+        <Route
           path="create"
           element={
             <DocuNinjaGuard 
@@ -91,11 +96,6 @@ export const documentsRoutes = (
             element={<Guard guards={[]} type="subPage" component={<Notifications />} />}
           />
         </Route>
-
-        <Route
-          path=":id"
-          element={<Guard guards={[]} component={<DocumentShow />} />}
-        />
 
         <Route
           path=":id/builder"

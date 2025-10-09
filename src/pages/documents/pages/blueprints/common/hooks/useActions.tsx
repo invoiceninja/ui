@@ -12,56 +12,26 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { MdArchive, MdDelete, MdRestore, MdEdit } from 'react-icons/md';
-import { useBulk } from '$app/common/queries/docuninja/blueprints';
+import { MdSettings } from 'react-icons/md';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 
-interface UseActionsProps {
-  onEdit?: (blueprint: Blueprint) => void;
+interface UseActionsParams {
+  onSettingsClick: (blueprint: Blueprint) => void;
 }
 
-export function useActions({ onEdit }: UseActionsProps = {}) {
+export function useActions(params: UseActionsParams) {
   const [t] = useTranslation();
-
-  const bulk = useBulk();
+  const { onSettingsClick } = params;
 
   const actions: Action<Blueprint>[] = [
-    (blueprint) =>
-      onEdit && (
-        <DropdownElement
-          onClick={() => onEdit(blueprint)}
-          icon={<Icon element={MdEdit} />}
-        >
-          {t('edit')}
-        </DropdownElement>
-      ),
-    (blueprint) =>
-      !blueprint?.archived_at && (
-        <DropdownElement
-          onClick={() => bulk([blueprint.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
-        >
-          {t('archive')}
-        </DropdownElement>
-      ),
-    (blueprint) =>
-      Boolean(blueprint?.archived_at || blueprint?.is_deleted) && (
-        <DropdownElement
-          onClick={() => bulk([blueprint.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
-        >
-          {t('restore')}
-        </DropdownElement>
-      ),
-    (blueprint) =>
-      !blueprint?.is_deleted && (
-        <DropdownElement
-          onClick={() => bulk([blueprint.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
-        >
-          {t('delete')}
-        </DropdownElement>
-      ),
+    (blueprint: Blueprint) => (
+      <DropdownElement
+        onClick={() => onSettingsClick(blueprint)}
+        icon={<Icon element={MdSettings} />}
+      >
+        {t('settings')}
+      </DropdownElement>
+    ),
   ];
 
   return actions;
