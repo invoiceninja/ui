@@ -10,7 +10,6 @@
 
 import { EntityState } from '$app/common/enums/entity-state';
 import { getEntityState } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
