@@ -21,7 +21,6 @@ interface SubNavigationItem {
   href: string;
   icon: React.ElementType;
   visible: boolean;
-  current: boolean;
   rightButton?: {
     icon: React.ElementType;
     to: string;
@@ -34,7 +33,6 @@ export interface NavigationItem {
   name: string;
   href: string;
   icon: React.ElementType;
-  current: boolean;
   visible: boolean;
   rightButton?: {
     icon: React.ElementType;
