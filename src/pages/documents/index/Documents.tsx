@@ -39,6 +39,8 @@ import {
 } from '../components/DocumentStates';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
+import { useActions } from '../common/hooks/useActions';
+import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
 
 export default function Documents() {
   useTitle('documents');
@@ -46,8 +48,16 @@ export default function Documents() {
   const navigate = useNavigate();
   const company = useCurrentCompany();
 
+  const actions = useActions({
+    onSettingsClick: (document: Document) => {
+      setSelectedDocument(document);
+      setIsSettingsModalOpen(true);
+    },
+  });
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const [docuData] = useAtom(docuNinjaAtom);
   
@@ -175,6 +185,7 @@ export default function Documents() {
           withoutIdsBulkPayloadPropertyForDeleteAction
           useDeleteMethod
           deleteBulkRoute="/api/documents/bulk"
+          customActions={actions}
           rightSide={isAdmin && (
             <Button
               behavior="button"
@@ -197,6 +208,14 @@ export default function Documents() {
           filterParameterKey="search"
         />
       </div>
+
+      {selectedDocument && (
+        <DocumentSettingsModal
+          document={selectedDocument}
+          visible={isSettingsModalOpen}
+          setVisible={setIsSettingsModalOpen}
+        />
+      )}
     </Default>
   );
 }

@@ -97,7 +97,7 @@ export function DocumentSettingsModal({
 
       <InputField
         type="date"
-        label={t('expired_at')}
+        label={t('expires')}
         value={payload.expires_at}
         onValueChange={(value) => setPayload({ ...payload, expires_at: value })}
         errorMessage={errors?.errors.expires_at}

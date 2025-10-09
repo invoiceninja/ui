@@ -63,7 +63,7 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
 
   return (
     <Modal
-      title={t('send_confirmation_description')}
+      title={t('send_confirmation')}
       visible={open}
       onClose={onOpenChange}
     >
