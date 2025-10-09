@@ -111,6 +111,7 @@ export function request(
 ) {
   const axiosClient = config?.skipIntercept ? noInterceptClient : client;
 
+  console.log("skipping interceptor ?", config?.skipIntercept);
   return axiosClient({
     method,
     url,
