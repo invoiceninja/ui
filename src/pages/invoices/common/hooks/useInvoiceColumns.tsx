@@ -35,6 +35,11 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import classNames from 'classnames';
+import { Icon } from '$app/components/icons/Icon';
+import { FaTriangleExclamation } from 'react-icons/fa6';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
+import { useNavigate } from 'react-router-dom';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -124,7 +129,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const [t] = useTranslation();
 
+  const navigate = useNavigate();
+
   const reactSettings = useReactSettings();
+  const currentCompany = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const getSetting = useGetSetting();
@@ -143,12 +151,59 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       entity: 'invoice',
     });
 
+  const isPeppolEnabled = () => {
+    return (
+      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
+      currentCompany.settings.enable_e_invoice
+    );
+  };
+
+  const isEInvoiceSuccessfullySent = (currentInvoice: Invoice) => {
+    return (
+      isPeppolEnabled() &&
+      currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
+      !currentInvoice.backup?.guid &&
+      !currentInvoice.is_deleted &&
+      !currentInvoice.archived_at
+    );
+  };
+
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (_value, invoice) => <InvoiceStatus entity={invoice} />,
+      format: (_value, invoice) => (
+        <div className="flex items-center gap-x-2">
+          {isEInvoiceSuccessfullySent(invoice) ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
+              }}
+            >
+              <InvoiceStatus
+                entity={invoice}
+                style={{ textDecoration: 'underline' }}
+              />
+            </button>
+          ) : (
+            <InvoiceStatus entity={invoice} />
+          )}
+
+          {isEInvoiceSuccessfullySent(invoice) && (
+            <div
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
+              }}
+            >
+              <Icon element={FaTriangleExclamation} color="red" size={16} />
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',
