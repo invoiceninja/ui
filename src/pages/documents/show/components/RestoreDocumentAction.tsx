@@ -75,19 +75,21 @@ export function RestoreDocumentAction({ document }: Props) {
         {t('restore')}
       </DropdownElement>
 
-      <Modal
-        title={t('are_you_sure')}
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      >
-        <span className="text-sm font-medium" style={{ color: colors.$3 }}>
-          {t('restore_document_description')}.
-        </span>
+      {isModalOpen && (
+        <Modal
+          title={t('are_you_sure')}
+          visible={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        >
+          <span className="text-sm font-medium" style={{ color: colors.$3 }}>
+            {t('restore_document_description')}.
+          </span>
 
-        <Button behavior="button" onClick={handleSubmit} disabled={isFormBusy}>
-          {t('continue')}
-        </Button>
-      </Modal>
+          <Button behavior="button" onClick={handleSubmit} disabled={isFormBusy}>
+            {t('continue')}
+          </Button>
+        </Modal>
+      )}
     </>
   );
 }

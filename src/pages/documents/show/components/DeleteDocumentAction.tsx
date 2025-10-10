@@ -69,18 +69,20 @@ export function DeleteDocumentAction({ document }: Props) {
         {t('delete')}
       </DropdownElement>
 
-      <Modal
-        title={t('are_you_sure')}
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        disableClosing={isFormBusy}
-      >
-        <span className="font-medium">{t('delete_docuninja_document')}.</span>
+      {isModalOpen && (
+        <Modal
+          title={t('are_you_sure')}
+          visible={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          disableClosing={isFormBusy}
+        >
+          <span className="font-medium">{t('delete_docuninja_document')}.</span>
 
-        <Button behavior="button" onClick={handleSubmit} disabled={isFormBusy}>
-          {t('continue')}
-        </Button>
-      </Modal>
+          <Button behavior="button" onClick={handleSubmit} disabled={isFormBusy}>
+            {t('continue')}
+          </Button>
+        </Modal>
+      )}
     </>
   );
 }

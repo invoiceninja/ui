@@ -30,7 +30,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
-import { useActions } from './hooks/useActions';
+import { useActions } from '../common/hooks/useActions';
 
 export default function Document() {
   const { documentTitle } = useTitle('view_document');
@@ -71,7 +71,10 @@ export default function Document() {
     []
   );
 
-  const actions = useActions({ document });
+  const actionsResult = useActions({ document });
+  const actions = Array.isArray(actionsResult) ? actionsResult : actionsResult.actions;
+  const modals = Array.isArray(actionsResult) ? null : actionsResult.modals;
+  const isActionsLoading = Array.isArray(actionsResult) ? false : actionsResult.isLoading;
 
   const {
     data: timelineData,
@@ -106,7 +109,7 @@ export default function Document() {
             cardActions
             labelButtonBorderColor={colors.$1}
           >
-            {actions}
+            {actions.map((action: any, index: number) => document ? action(document) : null)}
           </Dropdown>
         </div>
       }
@@ -174,6 +177,8 @@ export default function Document() {
             </div>
           </Card>
         )}
+
+      {modals}
     </Default>
   );
 }

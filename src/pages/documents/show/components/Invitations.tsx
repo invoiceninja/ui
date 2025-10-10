@@ -126,7 +126,7 @@ function Invitation({ invitation, document }: InvitationProps) {
       label = t('viewed_on');
     } else if (invitation.sent_date) {
       dateString = invitation.sent_date;
-      label = t('sent_on');
+      label = t('sent');
     } else {
       dateString = invitation.created_at;
       label = t('created_on');
