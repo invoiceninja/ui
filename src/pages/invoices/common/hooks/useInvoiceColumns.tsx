@@ -175,14 +175,22 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('status'),
       format: (_value, invoice) => (
         <div className="flex items-center gap-x-2">
-          <InvoiceStatus
-            entity={invoice}
-            {...(isEInvoiceSuccessfullySent(invoice) && {
-              style: { textDecoration: 'underline' },
-              onClick: () =>
-                navigate(route('/invoices/:id/e_invoice', { id: invoice.id })),
-            })}
-          />
+          {isEInvoiceSuccessfullySent(invoice) ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
+              }}
+            >
+              <InvoiceStatus
+                entity={invoice}
+                style={{ textDecoration: 'underline' }}
+              />
+            </button>
+          ) : (
+            <InvoiceStatus entity={invoice} />
+          )}
 
           {isEInvoiceSuccessfullySent(invoice) && (
             <div
