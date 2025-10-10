@@ -288,24 +288,14 @@ export function useNavigation() {
       visible: true,
       subOptions: [
         {
-<<<<<<< HEAD
-          name: t('blueprints'),
-          href: '/documents/blueprints',
-=======
           name: t('templates'),
           href: '/documents/templates',
->>>>>>> 2025_10_09_translation_fixes
           icon: File,
           visible: true,
           rightButton: {
             icon: Plus,
-<<<<<<< HEAD
-            to: '/documents/blueprints/create',
-            label: t('new_blueprint'),
-=======
             to: '/documents/templates/create',
             label: t('new_template'),
->>>>>>> 2025_10_09_translation_fixes
             visible: true,
           },
         },
