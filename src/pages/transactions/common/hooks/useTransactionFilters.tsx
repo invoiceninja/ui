@@ -18,7 +18,9 @@ export function useTransactionFilters() {
 
   const statusThemeColors = useStatusThemeColorScheme();
 
-  const { data: bankIntegrations } = useBankAccountsQuery({ perPage: 1000 });
+  const { data: bankIntegrations } = useBankAccountsQuery({
+    perPage: 1000,
+  });
 
   const filters: SelectOption[] = [
     {

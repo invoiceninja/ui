@@ -45,7 +45,7 @@ export function useBankAccountsQuery(params?: Params) {
   const { perPage } = params || {};
 
   return useQuery<BankAccount[]>(
-    ['/api/v1/bank_integrations'],
+    ['/api/v1/bank_integrations', params],
     () =>
       request(
         'GET',
