@@ -31,6 +31,7 @@ import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { useQuery } from 'react-query';
 import { useColorScheme } from '$app/common/colors';
 import reactStringReplace from 'react-string-replace';
+import { Element } from '$app/components/cards';
 
 export interface Context {
     invoice: Invoice | undefined;
@@ -276,6 +277,26 @@ export default function Verifactu() {
                                 </div>
                             ))}
                     </div>
+                </Card>
+            )}
+
+            {/* Show the history of the invoice if it has a backup - can be parent or child invoice relations */}
+            {invoice?.backup?.guid && (invoice.backup?.parent_invoice_id || (invoice.backup?.child_invoice_ids && invoice.backup?.child_invoice_ids?.length > 0)) &&(
+                <Card title={t('history')}>
+
+                {invoice.backup?.parent_invoice_id && (
+                    <Element leftSide={t('linked_to')}>
+                    <Link to={route('/invoices/:id/edit', { id: invoice.backup?.parent_invoice_id })}>{t('invoice')} {invoice.backup?.parent_invoice_number}</Link>
+                    </Element>
+                )}
+
+                {invoice.backup?.child_invoice_ids && invoice.backup?.child_invoice_ids?.length > 0 && (
+                    <Element leftSide="Factura Rectificativa">
+                    {invoice.backup?.child_invoice_ids.map((id) => (
+                        <Link to={route('/invoices/:id/edit', { id })}>{t('invoice')}</Link>
+                    ))}
+                    </Element>
+                )}
                 </Card>
             )}
         </>
