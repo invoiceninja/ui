@@ -11,6 +11,7 @@
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -31,7 +32,8 @@ export function useTabs(params: Params) {
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-
+  const verifactuEnabled = useCompanyVerifactu();
+  
   const { id } = useParams();
 
   const { invoice, eInvoiceValidationResponse } = params;
@@ -77,9 +79,7 @@ export function useTabs(params: Params) {
     {
       name: t('verifactu'),
       href: route('/invoices/:id/verifactu', { id }),
-      enabled: Boolean(
-        company?.settings.e_invoice_type === 'VERIFACTU' 
-      ),
+      enabled: verifactuEnabled,
       formatName: () => (
         <div className="flex space-x-1">
           <span>{t('verifactu')}</span>
