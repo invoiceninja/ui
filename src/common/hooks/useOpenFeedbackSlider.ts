@@ -8,7 +8,7 @@ import { request } from '../helpers/request';
 import { $refetch } from './useRefetch';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
-import { endpoint } from '../helpers';
+import { endpoint, isHosted } from '../helpers';
 import { cloneDeep, set } from 'lodash';
 import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
@@ -51,28 +51,30 @@ export function useOpenFeedbackSlider() {
   };
 
   return () => {
-    const isUserAccountOlderThan7Days =
-      currentUser &&
-      dayjs().diff(dayjs.unix(currentUser.created_at), 'days') > 7;
+    if (isHosted()) {
+      const isUserAccountOlderThan7Days =
+        currentUser &&
+        dayjs().diff(dayjs.unix(currentUser.created_at), 'days') > 7;
 
-    const canShowSliderAgain =
-      !reactSettings?.preferences.feedback_slider_displayed_at ||
-      dayjs().diff(
-        dayjs.unix(reactSettings.preferences.feedback_slider_displayed_at),
-        'hours'
-      ) > 48;
+      const canShowSliderAgain =
+        !reactSettings?.preferences.feedback_slider_displayed_at ||
+        dayjs().diff(
+          dayjs.unix(reactSettings.preferences.feedback_slider_displayed_at),
+          'hours'
+        ) > 48;
 
-    if (
-      reactSettings &&
-      !reactSettings.preferences.feedback_given_at &&
-      canShowSliderAgain &&
-      isUserAccountOlderThan7Days
-    ) {
-      setTimeout(() => {
-        handleUpdateReactSettings();
+      if (
+        reactSettings &&
+        !reactSettings.preferences.feedback_given_at &&
+        canShowSliderAgain &&
+        isUserAccountOlderThan7Days
+      ) {
+        setTimeout(() => {
+          handleUpdateReactSettings();
 
-        setIsFeedbackSliderVisible(true);
-      }, 1000);
+          setIsFeedbackSliderVisible(true);
+        }, 1000);
+      }
     }
   };
 }
