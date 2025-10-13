@@ -43,7 +43,7 @@ export interface SelectOption {
   backgroundColor: string;
   color: string;
   queryKey?: string;
-  dropdownKey?: '0' | '1';
+  dropdownKey?: '0' | '1' | '2' | '3';
   placeHolder?: string;
 }
 
@@ -380,6 +380,8 @@ export function Actions(props: Props) {
     Option,
     Control,
   };
+
+  console.log(customFilterDropdowns);
 
   return (
     <div
