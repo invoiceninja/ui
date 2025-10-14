@@ -79,7 +79,6 @@ import {
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
-import { useColorScheme } from '$app/common/colors';
 
 export const defaultColumns: string[] = [
   'status',
@@ -407,8 +406,6 @@ export function useSave() {
 
 export function useTaskFilters() {
   const [t] = useTranslation();
-
-  const colors = useColorScheme();
 
   const adjustColorDarkness = useAdjustColorDarkness();
   const statusThemeColors = useStatusThemeColorScheme();

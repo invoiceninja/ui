@@ -43,7 +43,7 @@ export interface SelectOption {
   backgroundColor: string;
   color: string;
   queryKey?: string;
-  dropdownKey?: '0' | '1' | '2' | '3';
+  dropdownKey?: '0' | '1';
   placeHolder?: string;
 }
 
