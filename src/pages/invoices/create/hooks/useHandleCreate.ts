@@ -23,7 +23,6 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Dispatch, SetStateAction } from 'react';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
 
 interface Params {
   isDefaultTerms: boolean;
@@ -35,8 +34,6 @@ interface Params {
 export function useHandleCreate(params: Params) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  const openFeedbackSlider = useOpenFeedbackSlider();
 
   const {
     setErrors,
@@ -92,8 +89,6 @@ export function useHandleCreate(params: Params) {
             table: searchParams.get('table') ?? 'products',
           })
         );
-
-        openFeedbackSlider();
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
