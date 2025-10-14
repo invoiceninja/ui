@@ -228,7 +228,7 @@ export default function Verifactu() {
                 )}
             </Card>
 
-            {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Cancelled].includes((invoice?.status_id?.toString()) as InvoiceStatus)) && (
+            {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Cancelled].includes((invoice?.status_id?.toString()) as InvoiceStatus)) && !invoice?.is_deleted&& (
                 <Card title={t('status')}>
                     <div className="flex px-6 text-sm">
                         <div
@@ -292,9 +292,15 @@ export default function Verifactu() {
 
                 {invoice.backup?.child_invoice_ids && invoice.backup?.child_invoice_ids?.length > 0 && (
                     <Element leftSide="Factura Rectificativa">
-                    {invoice.backup?.child_invoice_ids.map((id) => (
-                        <Link to={route('/invoices/:id/edit', { id })}>{t('invoice')}</Link>
-                    ))}
+                        <ul className="list-none space-y-4">
+                        {invoice.backup?.child_invoice_ids.map((id) => (
+                            <li key={id}>
+                                <div className="flex items-start">
+                                    <Link to={route('/invoices/:id/edit', { id })}>{t('invoice')}</Link>
+                                </div>
+                            </li>
+                        ))}
+                        </ul>
                     </Element>
                 )}
                 </Card>

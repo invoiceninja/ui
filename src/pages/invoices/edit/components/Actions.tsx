@@ -59,6 +59,7 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -85,6 +86,8 @@ export function useActions(params?: Params) {
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
+  const verifactuEnabled = useCompanyVerifactu();
+
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'invoice',
     editPageTabs: [
@@ -128,6 +131,7 @@ export function useActions(params?: Params) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      backup: undefined,
     });
 
     navigate('/invoices/create?action=clone');
@@ -223,23 +227,7 @@ export function useActions(params?: Params) {
           {t('print_pdf')}
         </EntityActionElement>
       ),
-    (invoice: Invoice) =>
-      invoice.status_id !== InvoiceStatus.Paid &&
-      (isAdmin || isOwner) && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'schedule',
-          })}
-          entity="invoice"
-          actionKey="schedule"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('schedule')}
-          onClick={() => scheduleEmailRecord(invoice.id)}
-          icon={MdSchedule}
-        >
-          {t('schedule')}
-        </EntityActionElement>
-      ),
+    
     (invoice: Invoice) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -420,6 +408,25 @@ export function useActions(params?: Params) {
     //       {t('reverse')}
     //     </EntityActionElement>
     //   ),
+    (invoice: Invoice) =>
+      !invoice.is_deleted &&
+      ['1','2','3'].includes(invoice.status_id) &&
+      !['R1','R2'].includes(invoice.backup?.document_type ?? '') &&
+      (isAdmin || isOwner) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'schedule',
+          })}
+          entity="invoice"
+          actionKey="schedule"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('schedule')}
+          onClick={() => scheduleEmailRecord(invoice.id)}
+          icon={MdSchedule}
+        >
+          {t('schedule')}
+        </EntityActionElement>
+      ),
     (invoice: Invoice) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -512,7 +519,8 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
-      !invoice.is_deleted && (
+      !invoice.is_deleted && 
+      (!verifactuEnabled || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'delete',
@@ -531,7 +539,8 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) && (
+        invoice.status_id === InvoiceStatus.Partial) && 
+        invoice.backup?.document_type !== 'R2' && (
         <EntityActionElement
           key="cancel_invoice"
           entity="invoice"
@@ -550,6 +559,7 @@ export function useActions(params?: Params) {
         invoice.client?.country_id === '724' &&
         invoice.backup?.document_type === 'F1' &&
         (invoice.backup?.adjustable_amount ?? 0) > 0 &&
+        invoice.amount > 0 &&
         company?.settings.e_invoice_type === 'VERIFACTU' &&
         !invoice.is_deleted) && (
         <EntityActionElement
