@@ -381,8 +381,6 @@ export function Actions(props: Props) {
     Control,
   };
 
-  console.log(customFilterDropdowns);
-
   return (
     <div
       className="flex flex-col lg:flex-row lg:items-center lg:justify-between"

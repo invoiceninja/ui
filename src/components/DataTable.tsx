@@ -62,6 +62,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
 import { isEqual } from 'lodash';
+import { FilterColumn } from './FilterColumn';
 
 export interface DateRangeColumn {
   column: string;
@@ -111,6 +112,17 @@ interface StyleOptions {
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
   withoutTdPadding?: boolean;
+}
+
+export interface FilterOption {
+  label: string;
+  value: string;
+}
+
+export interface FilterColumn {
+  query_identifier: string;
+  options: FilterOption[];
+  column_id: string;
 }
 
 interface Props<T> extends CommonProps {
@@ -163,6 +175,7 @@ interface Props<T> extends CommonProps {
   enableSavingFilterPreference?: boolean;
   applyManualHeight?: boolean;
   onDeleteBulkAction?: (selectedIds: string[]) => void;
+  filterColumns?: FilterColumn[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -232,6 +245,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     enableSavingFilterPreference = false,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
+    filterColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -261,6 +275,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     useState<boolean>(false);
   const [currentData, setCurrentData] = useState<T[]>([]);
   const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
+  const [filterColumnsValues, setFilterColumnsValues] = useState<
+    Record<string, string[]>
+  >({});
 
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
@@ -336,6 +353,17 @@ export function DataTable<T extends object>(props: Props<T>) {
       apiEndpoint.searchParams.set(dateRangeQueryParameter, dateRange);
     }
 
+    if (Object.keys(filterColumnsValues).length) {
+      filterColumns.forEach((filterColumn) => {
+        if (filterColumnsValues[filterColumn.column_id]) {
+          apiEndpoint.searchParams.set(
+            filterColumn.query_identifier,
+            filterColumnsValues[filterColumn.column_id].join(',')
+          );
+        }
+      });
+    }
+
     setApiEndpoint(apiEndpoint);
 
     isInitialConfiguration && setIsInitialConfiguration(false);
@@ -352,6 +380,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilter,
     dateRange,
     dateRangeQueryParameter,
+    filterColumns,
+    filterColumnsValues,
   ]);
 
   useEffect(() => {
@@ -403,6 +433,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       dateRangeQueryParameter
         ? [dateRangeQueryParameter]
         : []),
+      filterColumnsValues,
     ],
     () => request(methodType, apiEndpoint.href),
     {
@@ -785,6 +816,26 @@ export function DataTable<T extends object>(props: Props<T>) {
                       <DateRangePicker
                         setDateRange={setDateRange}
                         onClick={() => handleDateRangeColumnClick(column.id)}
+                      />
+                    )}
+
+                    {filterColumns?.some(
+                      (filterColumn) => column.id === filterColumn.column_id
+                    ) && (
+                      <FilterColumn
+                        label={column.label}
+                        options={
+                          filterColumns?.find(
+                            (filterColumn) =>
+                              filterColumn.column_id === column.id
+                          )?.options || []
+                        }
+                        onChange={(value) =>
+                          setFilterColumnsValues((current) => ({
+                            ...current,
+                            [column.id]: value,
+                          }))
+                        }
                       />
                     )}
                     <span>{column.label}</span>

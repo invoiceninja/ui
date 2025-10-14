@@ -45,6 +45,7 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { ExtensionBanner } from '../common/components/ExtensionBanner';
+import { useFilterColumns } from '../common/hooks/useFilterColumns';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -60,6 +61,7 @@ export default function Tasks() {
   const filters = useTaskFilters();
   const columns = useTaskColumns();
   const taskColumns = useAllTaskColumns();
+  const filterColumns = useFilterColumns();
   const customBulkActions = useCustomBulkActions();
 
   const [sliderTaskId, setSliderTaskId] = useState<string>('');
@@ -137,6 +139,7 @@ export default function Tasks() {
           setTaskSliderVisibility(true);
         }}
         enableSavingFilterPreference
+        filterColumns={filterColumns}
       />
 
       {!disableNavigation('task', taskSlider) && <TaskSlider />}

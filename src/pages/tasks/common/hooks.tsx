@@ -79,10 +79,7 @@ import {
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
-import { useProjectsQuery } from '$app/common/queries/projects';
 import { useColorScheme } from '$app/common/colors';
-import { useClientsQuery } from '$app/common/queries/clients';
-import { useUsersQuery } from '$app/common/queries/users';
 
 export const defaultColumns: string[] = [
   'status',
@@ -420,10 +417,6 @@ export function useTaskFilters() {
     status: 'active',
   });
 
-  const { data: users } = useUsersQuery();
-  const { data: clients } = useClientsQuery({ status: ['active'] });
-  const { data: projects } = useProjectsQuery({ status: ['active'] });
-
   const filters: SelectOption[] = [
     {
       label: t('invoiced'),
@@ -450,42 +443,6 @@ export function useTaskFilters() {
       color: adjustColorDarkness(hex, darknessAmount),
       backgroundColor: taskStatus.color,
       queryKey: 'task_status',
-    });
-  });
-
-  projects?.forEach((project) => {
-    filters.push({
-      dropdownKey: '1',
-      label: project.name,
-      value: project.id,
-      color: colors.$3,
-      backgroundColor: colors.$1,
-      queryKey: 'project_ids',
-      placeHolder: t('projects') as string,
-    });
-  });
-
-  clients?.forEach((client) => {
-    filters.push({
-      dropdownKey: '2',
-      label: client.display_name,
-      value: client.id,
-      color: colors.$3,
-      backgroundColor: colors.$1,
-      queryKey: 'client_ids',
-      placeHolder: t('clients') as string,
-    });
-  });
-
-  users?.data.data.forEach((user: User) => {
-    filters.push({
-      dropdownKey: '3',
-      label: user.first_name + ' ' + user.last_name,
-      value: user.id,
-      color: colors.$3,
-      backgroundColor: colors.$1,
-      queryKey: 'assigned_user_ids',
-      placeHolder: t('assigned_users') as string,
     });
   });
 
