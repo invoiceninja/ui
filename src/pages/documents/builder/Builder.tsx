@@ -303,11 +303,17 @@ function SignatorySelector({
 
   const existing = collect(signatories).pluck('id').toArray();
 
+  const existingKeys = collect(signatories)
+    .filter((s) => s.metadata !== undefined)
+    .map((s) => s.metadata?.contact_key)
+    .toArray();
+
   const list = collect(clients)
     .filter(
       (client) =>
         client.contacts.length > 0 && client.contacts[0].contact_key.length > 0
     )
+    .filter((client) => !existingKeys.includes(client.contacts[0].contact_key))
     .map((client) => ({
       label: client.name,
       value: `contact|${client.contacts[0].contact_key}`,
