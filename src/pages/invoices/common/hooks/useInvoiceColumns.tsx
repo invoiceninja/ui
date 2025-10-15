@@ -35,6 +35,11 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import classNames from 'classnames';
+import { MdTextSnippet } from 'react-icons/md';
+import { Assigned } from '$app/components/Assigned';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useNavigate } from 'react-router-dom';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -124,6 +129,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const accentColor = useAccentColor();
+  const navigate = useNavigate();
   const reactSettings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -148,7 +156,62 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (_value, invoice) => <InvoiceStatus entity={invoice} />,
+      format: (_value, invoice) => (
+        <div className="flex items-center space-x-2">
+          <InvoiceStatus entity={invoice} />
+
+          {['R1','R2'].includes(invoice.backup?.document_type ?? '') && (
+            <Assigned
+              entityId={invoice.backup?.parent_invoice_id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
+              component={
+                <MdTextSnippet
+                  className="cursor-pointer"
+                  fontSize={19}
+                  color={accentColor}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id: invoice.backup?.parent_invoice_id })
+                    )
+                  }
+                />
+              }
+            />
+            
+
+          )}
+
+          {invoice.backup?.document_type === 'F1' && (invoice.backup?.child_invoice_ids?.length ?? 0) > 0 && (
+
+            invoice.backup?.child_invoice_ids?.map((id) => (
+              <Assigned
+              entityId={id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
+              component={
+                <MdTextSnippet
+                  className="cursor-pointer"
+                  fontSize={19}
+                  color={accentColor}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id })
+                    )
+                  }
+                />
+              }
+            />
+            ))
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',

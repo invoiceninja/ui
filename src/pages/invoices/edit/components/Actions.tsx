@@ -540,7 +540,8 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
         invoice.status_id === InvoiceStatus.Partial) && 
-        invoice.backup?.document_type !== 'R2' && (
+        !['R1','R2'].includes(invoice.backup?.document_type ?? '') &&
+        (invoice.backup?.child_invoice_ids?.length ?? 0) === 0 && (
         <EntityActionElement
           key="cancel_invoice"
           entity="invoice"

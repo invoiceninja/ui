@@ -95,7 +95,14 @@ export const useCustomBulkActions = () => {
   };
 
   const showCancelOption = (invoices: Invoice[]) => {
-    return !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent || verifactuEnabled);
+
+    if(verifactuEnabled) {
+      return !invoices.some((invoice) => invoice.status_id !== InvoiceStatus.Sent && 
+      !['R1','R2'].includes(invoice.status_id) && 
+      (invoice.backup?.child_invoice_ids?.length ?? 0) === 0);
+    }
+
+    return !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent);
   };
 
   const showMarkSendOption = (invoices: Invoice[]) => {
