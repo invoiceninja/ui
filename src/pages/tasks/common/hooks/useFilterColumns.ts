@@ -12,7 +12,7 @@ export function useFilterColumns() {
   const filterColumns: FilterColumn[] = [
     {
       column_id: 'assigned_user_id',
-      query_identifier: 'user_ids',
+      query_identifier: 'assigned_user_ids',
       options:
         users?.data.data.map((user: User) => ({
           label:
