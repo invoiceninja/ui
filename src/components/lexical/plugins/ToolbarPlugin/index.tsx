@@ -196,32 +196,22 @@ const ELEMENT_FORMAT_OPTIONS: {
   center: {
     icon: 'center-align',
     iconRTL: 'center-align',
-    name: 'center_align',
-  },
-  end: {
-    icon: 'right-align',
-    iconRTL: 'left-align',
-    name: 'end_align',
+    name: 'center',
   },
   justify: {
     icon: 'justify-align',
     iconRTL: 'justify-align',
-    name: 'justify_align',
+    name: 'justify',
   },
   left: {
     icon: 'left-align',
     iconRTL: 'left-align',
-    name: 'left_align',
+    name: 'left',
   },
   right: {
     icon: 'right-align',
     iconRTL: 'right-align',
-    name: 'right_align',
-  },
-  start: {
-    icon: 'left-align',
-    iconRTL: 'right-align',
-    name: 'start_align',
+    name: 'right',
   },
 };
 
@@ -444,7 +434,7 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon left-align" />
-          <span className="text">{t('left_align')}</span>
+          <span className="text">{t('left')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.LEFT_ALIGN}</span>
       </DropDownItem>
@@ -456,7 +446,7 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon center-align" />
-          <span className="text">{t('center_align')}</span>
+          <span className="text">{t('center')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.CENTER_ALIGN}</span>
       </DropDownItem>
@@ -468,7 +458,7 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon right-align" />
-          <span className="text">{t('right_align')}</span>
+          <span className="text">{t('right')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.RIGHT_ALIGN}</span>
       </DropDownItem>
@@ -480,40 +470,12 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon justify-align" />
-          <span className="text">{t('justify_align')}</span>
+          <span className="text">{t('justify')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.JUSTIFY_ALIGN}</span>
       </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'start');
-        }}
-        className="item wide"
-      >
-        <i
-          className={`icon ${
-            isRTL
-              ? ELEMENT_FORMAT_OPTIONS.start.iconRTL
-              : ELEMENT_FORMAT_OPTIONS.start.icon
-          }`}
-        />
-        <span className="text">{t('start_align')}</span>
-      </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'end');
-        }}
-        className="item wide"
-      >
-        <i
-          className={`icon ${
-            isRTL
-              ? ELEMENT_FORMAT_OPTIONS.end.iconRTL
-              : ELEMENT_FORMAT_OPTIONS.end.icon
-          }`}
-        />
-        <span className="text">{t('end_align')}</span>
-      </DropDownItem>
+      
+     
       <Divider />
       <DropDownItem
         onClick={() => {
