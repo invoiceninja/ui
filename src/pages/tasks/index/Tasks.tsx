@@ -140,6 +140,9 @@ export default function Tasks() {
         }}
         enableSavingFilterPreference
         filterColumns={filterColumns}
+        dateRangeColumns={[
+          { column: 'calculated_start_date', queryParameterKey: 'date_range' },
+        ]}
       />
 
       {!disableNavigation('task', taskSlider) && <TaskSlider />}

@@ -1,12 +1,13 @@
 import { MdFilterList } from 'react-icons/md';
 import { Icon } from './icons/Icon';
 import { FilterOption } from './DataTable';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Checkbox } from './forms';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { Popover } from 'antd';
 import styled from 'styled-components';
+import { useClickAway } from 'react-use';
 
 interface Props {
   label: string;
@@ -27,7 +28,11 @@ export const FilterColumn = ({ label, options, onChange }: Props) => {
 
   const colors = useColorScheme();
 
+  const iconWrapperRef = useRef<HTMLDivElement>(null);
+  const popoverContentRef = useRef<HTMLDivElement>(null);
+
   const [selected, setSelected] = useState<string[]>([]);
+  const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
 
   const handleCheckboxChange = (value: string) => {
     if (selected.includes(value)) {
@@ -39,16 +44,33 @@ export const FilterColumn = ({ label, options, onChange }: Props) => {
 
   const handleApply = () => {
     onChange(selected);
+    setIsPopoverOpen(false);
   };
 
   const handleCancel = () => {
-    setSelected([]);
+    if (selected.length) {
+      setSelected([]);
+      onChange([]);
+    }
+
+    setIsPopoverOpen(false);
   };
+
+  useClickAway(popoverContentRef, (event) => {
+    if (iconWrapperRef.current?.contains(event.target as Node)) {
+      return;
+    }
+    setIsPopoverOpen(false);
+  });
 
   return (
     <Popover
+      open={isPopoverOpen}
+      onOpenChange={setIsPopoverOpen}
+      trigger={['click']}
       content={
         <div
+          ref={popoverContentRef}
           className="w-48 flex flex-col space-y-4"
           onClick={(event) => event.stopPropagation()}
         >
@@ -91,17 +113,20 @@ export const FilterColumn = ({ label, options, onChange }: Props) => {
           </div>
         </div>
       }
-      trigger={['click']}
       arrow={false}
       placement="bottom"
     >
       <div
+        ref={iconWrapperRef}
         className="cursor-pointer"
         onClick={(event) => {
           event.stopPropagation();
         }}
       >
-        <Icon element={MdFilterList} />
+        <Icon
+          element={MdFilterList}
+          color={selected.length ? '#22c55e' : colors.$17}
+        />
       </div>
     </Popover>
   );
