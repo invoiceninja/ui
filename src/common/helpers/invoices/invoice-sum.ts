@@ -300,10 +300,10 @@ export class InvoiceSum {
 
   protected taxer(amount: number, tax_rate: number) {
 
-    const taxAmount = amount * ((tax_rate ?? 0) / 100);
+    const taxAmount = amount * ((tax_rate ?? 0) / 100) + 0.000000000000004;
+
     return this.roundToPrecision(taxAmount);
-    // return Number((Math.ceil(taxAmount * 100)) / 100);    
-    // return Number((Math.round(amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100);
+    
   }
 
   protected roundToPrecision(number: number) {
@@ -313,10 +313,13 @@ export class InvoiceSum {
     if (isNegative) {
       number = number * -1;
     }
+
     number = Number(Math.round(Number(number + `e+${precision}`)) + `e-${precision}`);
+    
     if (isNegative) {
       number = number * -1;
     }
+
     return number;
   }
 
