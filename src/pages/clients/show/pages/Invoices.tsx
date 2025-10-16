@@ -29,7 +29,7 @@ export default function Invoices() {
 
   const hasPermission = useHasPermission();
 
-  const actions = useActions();
+  const { actions } = useActions();
   const columns = useInvoiceColumns();
   const { footerColumns } = useFooterColumns();
   const customBulkActions = useCustomBulkActions();

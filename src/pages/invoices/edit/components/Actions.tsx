@@ -49,6 +49,8 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { useBulk } from '$app/common/queries/invoices';
 import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
 import { CancelInvoiceModal } from './CancelInvoiceModal';
+import { useRectifyInvoiceModal } from '../hooks/useRectifyInvoiceModal';
+import { RectifyInvoiceModal } from './RectifyInvoiceModal';
 // import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import {
@@ -104,6 +106,7 @@ export function useActions(params?: Params) {
   const bulk = useBulk();
   const navigate = useNavigate();
   const { openModal: openCancelModal, isCancelModalOpen, closeModal: closeCancelModal, confirmCancel } = useCancelInvoiceModal();
+  const { openModal: openRectifyModal, isRectifyModalOpen, closeModal: closeRectifyModal, confirmRectify } = useRectifyInvoiceModal();
   const hasPermission = useHasPermission();
   // const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -572,7 +575,7 @@ export function useActions(params?: Params) {
           actionKey="credit_note"
           isCommonActionSection={!dropdown}
           tooltipText={t('credit_note')}
-          onClick={() => cloneToNegativeInvoice(invoice)}
+          onClick={() => openRectifyModal(invoice)}
           icon={MdCreditScore}
           disablePreventNavigation
         >
@@ -584,11 +587,18 @@ export function useActions(params?: Params) {
   return {
     actions,
     modal: (
-      <CancelInvoiceModal
-        visible={isCancelModalOpen}
-        onClose={closeCancelModal}
-        onConfirm={confirmCancel}
-      />
+      <>
+        <CancelInvoiceModal
+          visible={isCancelModalOpen}
+          onClose={closeCancelModal}
+          onConfirm={confirmCancel}
+        />
+        <RectifyInvoiceModal
+          visible={isRectifyModalOpen}
+          onClose={closeRectifyModal}
+          onConfirm={confirmRectify}
+        />
+      </>
     ),
   };
 }

@@ -65,7 +65,7 @@ export default function Invoice() {
   const entityAssigned = useEntityAssigned();
   const verifactuEnabled = useCompanyVerifactu();
 
-  const actions = useActions();
+  const { actions, modal } = useActions();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [triggerValidationQuery, setTriggerValidationQuery] =
@@ -233,6 +233,8 @@ export default function Invoice() {
       </Default>
 
       <AddUninvoicedItemsButton invoice={invoice} setInvoice={setInvoice} />
+      
+      {modal}
     </>
   );
 }

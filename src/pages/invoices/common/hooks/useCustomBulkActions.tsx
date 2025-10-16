@@ -96,8 +96,9 @@ export const useCustomBulkActions = () => {
   const showCancelOption = (invoices: Invoice[]) => {
 
     if(verifactuEnabled) {
-      return !invoices.some((invoice) => invoice.status_id !== InvoiceStatus.Sent && 
-      (!['R1','R2'].includes(invoice.status_id) || (invoice.backup?.child_invoice_ids?.length ?? 0) === 0));
+      return !invoices.some((invoice) => invoice.status_id !== InvoiceStatus.Sent || 
+      (invoice.backup?.document_type ?? '') !== 'F1' || 
+      (invoice.backup?.child_invoice_ids?.length ?? 0) > 0);
     }
 
     return !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent);
