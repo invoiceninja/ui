@@ -333,7 +333,7 @@ export function AboutModal(props: Props) {
                 {t('cli')}: {systemInfo?.php_version.current_php_cli_version}
               </span>
               <span>Memory: {systemInfo?.php_version.memory_limit}</span>
-              <span>API: {systemInfo.api_version}</span>
+              <span>API: {systemInfo?.api_version}</span>
             </div>
 
             <div>
