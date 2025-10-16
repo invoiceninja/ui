@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState, ChangeEvent } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';

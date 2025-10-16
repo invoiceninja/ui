@@ -14,7 +14,6 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import {
-  MdCancel,
   MdDelete,
   MdDesignServices,
   MdDownload,
@@ -23,7 +22,6 @@ import {
   MdPrint,
   MdArchive,
   MdRestore
-  // MdRefresh,
 } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
