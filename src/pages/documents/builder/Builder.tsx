@@ -62,11 +62,7 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
 
   return (
-    <Modal
-      title={t('send_confirmation')}
-      visible={open}
-      onClose={onOpenChange}
-    >
+    <Modal title={t('send_confirmation')} visible={open} onClose={onOpenChange}>
       {content}
 
       {action}
@@ -265,13 +261,32 @@ function SignatorySelector({
       return;
     }
 
+    if (v.startsWith('user')) {
+      // In this case we're working with users directly from DocuNinja.
+
+      const [, value] = v.split('|');
+
+      const user = collect(results).firstWhere(
+        'value',
+        value
+      ) as SignatorySelectorProps['results'][number];
+
+      if (user) {
+        onSelect(value, 'user', user.entity);
+      }
+
+      return;
+    }
+
     if (v === 'create') {
       setCreateDialogOpen(true);
 
       return;
     }
 
-    const [type, value] = v.split('|');
+    // In this case we're handling Invoice Ninja clients.
+
+    const [, value] = v.split('|');
 
     let entity = clients?.find(
       (client) => client.contacts?.[0]?.contact_key === value
@@ -321,6 +336,14 @@ function SignatorySelector({
     .filter((client) => !existing.includes(client.value))
     .toArray() as { label: string; value: string }[];
 
+  const users = collect(results)
+    .filter((user) => user.type === 'user')
+    .map((user) => ({
+      ...user,
+      value: `user|${user.value}`,
+    }))
+    .all();
+
   return (
     <div className="space-y-3">
       <InputLabel className="mt-3">{t('select_user_or_client')}</InputLabel>
@@ -338,6 +361,12 @@ function SignatorySelector({
         {list.map((client) => (
           <option key={client.value} value={client.value}>
             {client.label}
+          </option>
+        ))}
+
+        {users.map((user) => (
+          <option key={user.value} value={user.value}>
+            {user.label}
           </option>
         ))}
       </SelectField>
