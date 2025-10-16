@@ -228,7 +228,9 @@ export default function Verifactu() {
                 )}
             </Card>
 
-            {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Cancelled].includes((invoice?.status_id?.toString()) as InvoiceStatus)) && !invoice?.is_deleted&& (
+            {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Cancelled].includes((invoice?.status_id?.toString()) as InvoiceStatus)) && 
+            !invoice?.is_deleted && 
+            invoice?.backup?.guid !== 'exempt' &&(
                 <Card title={t('status')}>
                     <div className="flex px-6 text-sm">
                         <div
@@ -286,7 +288,8 @@ export default function Verifactu() {
 
                 {invoice.backup?.parent_invoice_id && (
                     <Element leftSide={t('linked_to')}>
-                    <Link to={route('/invoices/:id/edit', { id: invoice.backup?.parent_invoice_id })}>{t('invoice')} {invoice.backup?.parent_invoice_number}</Link>
+                        <Link to={route('/invoices/:id/edit', { id: invoice.backup?.parent_invoice_id })}>{t('invoice')} {invoice.backup?.parent_invoice_number}</Link>
+                        {invoice.backup?.notes ? `  Tipo: ${invoice.backup?.document_type} - Razón: ${invoice.backup?.notes}` : ''}
                     </Element>
                 )}
 

@@ -97,6 +97,7 @@ export interface Backup {
   child_invoice_ids?: string[];
   redirect?: string;
   adjustable_amount?: number
+  notes?: string;
 }
 export interface Activity {
   id: string;

@@ -43,6 +43,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
+import { CancelInvoiceBulkAction } from '../components/CancelInvoiceBulkAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -98,8 +99,7 @@ export const useCustomBulkActions = () => {
 
     if(verifactuEnabled) {
       return !invoices.some((invoice) => invoice.status_id !== InvoiceStatus.Sent && 
-      !['R1','R2'].includes(invoice.status_id) && 
-      (invoice.backup?.child_invoice_ids?.length ?? 0) === 0);
+      (!['R1','R2'].includes(invoice.status_id) || (invoice.backup?.child_invoice_ids?.length ?? 0) === 0));
     }
 
     return !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent);
@@ -272,18 +272,15 @@ export const useCustomBulkActions = () => {
     //       {t('reverse')}
     //     </DropdownElement>
     //   ),
-    ({ selectedIds, selectedResources, setSelected }) =>
+    ({ selectedIds, selectedResources, setSelected }) => (
       showCancelOption(selectedResources) && (
-        <DropdownElement
-          onClick={() => {
-            bulk(selectedIds, 'cancel');
-            setSelected([]);
-          }}
-          icon={<Icon element={MdCancel} />}
-        >
-          {t('cancel_invoice')}
-        </DropdownElement>
-      ),
+      <CancelInvoiceBulkAction
+        selectedIds={selectedIds}
+        selectedResources={selectedResources}
+        setSelected={setSelected}
+        showCancelOption={showCancelOption}
+      />
+    )),
     ({ selectedResources }) => (
       <DropdownElement
         onClick={() => {

@@ -117,7 +117,8 @@ export function useBulk(params?: Params) {
       | 'cancel'
       | 'auto_bill'
       | 'delete',
-    emailType?: EmailType
+    emailType?: EmailType,
+    additionalParams?: Record<string, unknown>
   ) => {
     toast.processing();
 
@@ -125,6 +126,7 @@ export function useBulk(params?: Params) {
       action,
       ids,
       ...(emailType && { email_type: emailType }),
+      ...additionalParams,
     }).then(() => {
       const message =
         successMessages[action as keyof typeof successMessages] ||
