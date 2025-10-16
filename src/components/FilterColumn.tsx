@@ -1,7 +1,7 @@
 import { MdFilterList } from 'react-icons/md';
 import { Icon } from './icons/Icon';
 import { FilterOption } from './DataTable';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Checkbox } from './forms';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { useClickAway } from 'react-use';
 
 interface Props {
-  label: string;
+  selectedValues: string[];
   options: FilterOption[];
   onChange: (value: string[]) => void;
 }
@@ -23,7 +23,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export const FilterColumn = ({ label, options, onChange }: Props) => {
+export const FilterColumn = ({ options, onChange, selectedValues }: Props) => {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -62,6 +62,10 @@ export const FilterColumn = ({ label, options, onChange }: Props) => {
     }
     setIsPopoverOpen(false);
   });
+
+  useEffect(() => {
+    setSelected(selectedValues);
+  }, [selectedValues]);
 
   return (
     <Popover
@@ -104,7 +108,7 @@ export const FilterColumn = ({ label, options, onChange }: Props) => {
 
           <div className="flex justify-between space-x-2">
             <Button type="secondary" behavior="button" onClick={handleCancel}>
-              {t('cancel')}
+              {t('clear')}
             </Button>
 
             <Button behavior="button" onClick={handleApply}>

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputLabel, Link } from '$app/components/forms';
+import { Button, InputLabel, Link } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { BsKanban } from 'react-icons/bs';
@@ -69,6 +69,9 @@ export default function Tasks() {
   const [taskSliderVisibility, setTaskSliderVisibility] = useAtom(
     taskSliderVisibilityAtom
   );
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
 
   const { data: taskResponse } = useTaskQuery({ id: sliderTaskId });
 
@@ -109,6 +112,16 @@ export default function Tasks() {
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
+            {Object.keys(filterColumnsValues).length > 0 && (
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={() => setFilterColumnsValues({})}
+              >
+                {t('clear_filters')} ({Object.keys(filterColumnsValues).length})
+              </Button>
+            )}
+
             <DataTableColumnsPicker
               columns={taskColumns as unknown as string[]}
               defaultColumns={defaultColumns}

@@ -42,7 +42,7 @@ import {
   Th,
   Thead,
 } from './tables';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -183,6 +183,7 @@ export type ResourceAction<T> = (resource: T) => ReactElement;
 export type PerPage = '10' | '50' | '100';
 
 export const dataTableSelectedAtom = atom<Record<string, string[]>>({});
+export const filterColumnsValuesAtom = atom<Record<string, string[]>>({});
 
 function DataTableCheckbox({
   resourceId,
@@ -275,9 +276,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     useState<boolean>(false);
   const [currentData, setCurrentData] = useState<T[]>([]);
   const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
-  const [filterColumnsValues, setFilterColumnsValues] = useState<
-    Record<string, string[]>
-  >({});
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
 
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
@@ -351,6 +352,14 @@ export function DataTable<T extends object>(props: Props<T>) {
       dateRange?.split(',').every((date) => date.length > 1)
     ) {
       apiEndpoint.searchParams.set(dateRangeQueryParameter, dateRange);
+    }
+
+    if (
+      dateRangeColumns.length &&
+      dateRangeQueryParameter &&
+      !dateRange?.split(',').every((date) => date.length > 1)
+    ) {
+      apiEndpoint.searchParams.set(dateRangeQueryParameter, '');
     }
 
     if (Object.keys(filterColumnsValues).length) {
@@ -823,7 +832,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       (filterColumn) => column.id === filterColumn.column_id
                     ) && (
                       <FilterColumn
-                        label={column.label}
+                        selectedValues={filterColumnsValues[column.id] || []}
                         options={
                           filterColumns?.find(
                             (filterColumn) =>

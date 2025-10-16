@@ -327,21 +327,21 @@ export function AboutModal(props: Props) {
             <div className="flex flex-col">
               <span className="font-medium text-base mb-1">PHP</span>
               <span>
-                {t('web')}: {systemInfo?.php_version?.current_php_version}
+                {t('web')}: {systemInfo?.php_version.current_php_version}
               </span>
               <span>
-                {t('cli')}: {systemInfo?.php_version?.current_php_cli_version}
+                {t('cli')}: {systemInfo?.php_version.current_php_cli_version}
               </span>
-              <span>Memory: {systemInfo?.php_version?.memory_limit}</span>
-              <span>API: {systemInfo?.api_version}</span>
+              <span>Memory: {systemInfo?.php_version.memory_limit}</span>
+              <span>API: {systemInfo.api_version}</span>
             </div>
 
             <div>
               <Icon
                 element={
-                  systemInfo?.php_version?.is_okay ? CheckCircle : MdWarning
+                  systemInfo?.php_version.is_okay ? CheckCircle : MdWarning
                 }
-                color={systemInfo?.php_version?.is_okay ? 'green' : 'red'}
+                color={systemInfo?.php_version.is_okay ? 'green' : 'red'}
                 size={25}
               />
             </div>
