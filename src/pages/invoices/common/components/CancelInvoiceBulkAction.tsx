@@ -15,7 +15,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCancel } from 'react-icons/md';
 import { useBulk } from '$app/common/queries/invoices';
-import { CancelInvoiceModal } from '../../edit/components/CancelInvoiceModal';
+import { CancelInvoiceModal } from '$app/pages/invoices/edit/components/CancelInvoiceModal';
 
 interface Props {
   selectedIds: string[];
@@ -30,14 +30,7 @@ export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSel
   const bulk = useBulk();
 
   const handleCancel = () => {
-    const f1Invoices = selectedResources.filter(invoice => invoice.backup?.document_type === 'F1');
-    
-    if (f1Invoices.length > 0) {
-      setIsCancelModalOpen(true);
-    } else {
-      bulk(selectedIds, 'cancel');
-      setSelected([]);
-    }
+    setIsCancelModalOpen(true);
   };
 
   const handleConfirmCancel = (cancellationReason: string) => {

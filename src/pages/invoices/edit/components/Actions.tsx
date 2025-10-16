@@ -47,6 +47,8 @@ import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
+import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
+import { CancelInvoiceModal } from './CancelInvoiceModal';
 // import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import {
@@ -101,6 +103,7 @@ export function useActions(params?: Params) {
 
   const bulk = useBulk();
   const navigate = useNavigate();
+  const { openModal: openCancelModal, isCancelModalOpen, closeModal: closeCancelModal, confirmCancel } = useCancelInvoiceModal();
   const hasPermission = useHasPermission();
   // const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -175,7 +178,7 @@ export function useActions(params?: Params) {
     navigate('/invoices/create?action=clone');
   };
 
-  return [
+  const actions = [
     (invoice: Invoice) =>
       Boolean(showEditAction) && (
         <DropdownElement
@@ -548,7 +551,7 @@ export function useActions(params?: Params) {
           actionKey="cancel_invoice"
           isCommonActionSection={!dropdown}
           tooltipText={t('cancel_invoice')}
-          onClick={() => bulk([invoice.id], 'cancel')}
+          onClick={() => openCancelModal(invoice.id)}
           icon={MdCancel}
           disablePreventNavigation
         >
@@ -577,4 +580,15 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
   ];
+
+  return {
+    actions,
+    modal: (
+      <CancelInvoiceModal
+        visible={isCancelModalOpen}
+        onClose={closeCancelModal}
+        onConfirm={confirmCancel}
+      />
+    ),
+  };
 }
