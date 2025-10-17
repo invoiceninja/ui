@@ -56,6 +56,9 @@ export function useOpenFeedbackSlider() {
         currentUser &&
         dayjs().diff(dayjs.unix(currentUser.created_at), 'days') > 7;
 
+      const isHiddenByDoNotAskAgain =
+        reactSettings?.preferences.feedback_slider_displayed_at === -1;
+
       const canShowSliderAgain =
         !reactSettings?.preferences.feedback_slider_displayed_at ||
         dayjs().diff(
@@ -64,6 +67,7 @@ export function useOpenFeedbackSlider() {
         ) > 48;
 
       if (
+        !isHiddenByDoNotAskAgain &&
         reactSettings &&
         !reactSettings.preferences.feedback_given_at &&
         canShowSliderAgain &&

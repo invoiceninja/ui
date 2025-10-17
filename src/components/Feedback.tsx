@@ -113,6 +113,30 @@ export function Feedback() {
     }
   };
 
+  const handleDoNotAskAgain = () => {
+    setIsVisible(false);
+    setShowFeedbackModal(false);
+
+    const updatedReactSettings = cloneDeep(reactSettings);
+
+    set(updatedReactSettings, 'preferences.feedback_slider_displayed_at', 0);
+
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id/preferences?include=company_user', {
+        id: currentUser?.id,
+      }),
+      {
+        react_settings: updatedReactSettings,
+      }
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      $refetch(['company_users']);
+
+      dispatch(updateUser(response.data.data));
+      dispatch(resetChanges());
+    });
+  };
+
   if (isSubmitted) {
     return (
       <div
@@ -171,6 +195,7 @@ export function Feedback() {
           </Button>
         </div>
       </Modal>
+
       <div
         className={classNames(
           'fixed bottom-0 left-0 right-0 z-50 w-full shadow-lg transform transition-all duration-500 ease-in-out border-t',
@@ -193,9 +218,20 @@ export function Feedback() {
         </button>
 
         <div className="flex flex-col items-center space-y-6 py-6 px-4 max-w-5xl mx-auto">
-          <h3 className="text-lg font-medium" style={{ color: colors.$3 }}>
-            {t('feedback_slider_title')}
-          </h3>
+          <div className="flex flex-col items-center space-y-1">
+            <h3 className="text-lg font-medium" style={{ color: colors.$3 }}>
+              {t('feedback_slider_title')}
+            </h3>
+
+            <button
+              type="button"
+              onClick={handleDoNotAskAgain}
+              className="text-xs underline hover:opacity-75 transition-colors duration-200"
+              style={{ color: colors.$17 }}
+            >
+              {t('do_not_ask_again')}
+            </button>
+          </div>
 
           <div className="flex items-center justify-center w-full gap-3">
             <div className="flex items-center justify-center space-x-2">
@@ -224,6 +260,7 @@ export function Feedback() {
             <span className="text-xs" style={{ color: colors.$17 }}>
               {t('not_likely')}
             </span>
+
             <span className="text-xs" style={{ color: colors.$17 }}>
               {t('extremely_likely')}
             </span>
