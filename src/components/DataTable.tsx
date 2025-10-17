@@ -182,6 +182,7 @@ export type ResourceAction<T> = (resource: T) => ReactElement;
 
 export type PerPage = '10' | '50' | '100';
 
+export const dateRangeAtom = atom<string>('');
 export const dataTableSelectedAtom = atom<Record<string, string[]>>({});
 export const filterColumnsValuesAtom = atom<Record<string, string[]>>({});
 
@@ -264,7 +265,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
-  const [dateRange, setDateRange] = useState<string>('');
+  const [dateRange, setDateRange] = useAtom(dateRangeAtom);
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
