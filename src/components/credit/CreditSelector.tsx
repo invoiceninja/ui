@@ -49,6 +49,7 @@ export function CreditSelector(props: Props) {
       }}
       onDismiss={props.onClearButtonClick}
       errorMessage={props.errorMessage}
+      sortBy="date|desc"
     />
   );
 }

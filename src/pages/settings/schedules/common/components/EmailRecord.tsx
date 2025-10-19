@@ -93,6 +93,7 @@ export function EmailRecord(props: Props) {
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
             errorMessage={errors?.errors['parameters.entity_id']}
+            sortBy="date|desc"
           />
         </Element>
       )}
@@ -156,6 +157,7 @@ export function EmailRecord(props: Props) {
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
             errorMessage={errors?.errors['parameters.entity_id']}
+            sortBy="date|desc"
           />
         </Element>
       )}

@@ -214,6 +214,7 @@ export default function Apply() {
               .pluck('invoice_id')
               .toArray()}
             clearInputAfterSelection
+            sortBy="date|desc"
           />
         ) : null}
 

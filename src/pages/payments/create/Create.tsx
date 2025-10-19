@@ -318,6 +318,7 @@ export default function Create() {
                       )
                         .pluck('invoice_id')
                         .toArray()}
+                      sortBy="date|desc"
                     />
 
                     <NumberInputField
@@ -365,7 +366,7 @@ export default function Create() {
                   `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
                 )}
                 inputOptions={{
-                  value: 'id',
+                  value: '',
                 }}
                 entryOptions={{
                   id: 'id',
@@ -388,6 +389,7 @@ export default function Create() {
                   .pluck('invoice_id')
                   .toArray()}
                 clearInputAfterSelection
+                sortBy="date|desc"
               />
             </Element>
           )}
@@ -442,6 +444,7 @@ export default function Create() {
                       )
                         .pluck('credit_id')
                         .toArray()}
+                      sortBy="date|desc"
                     />
 
                     <NumberInputField
@@ -510,6 +513,7 @@ export default function Create() {
                 }
                 exclude={collect(payment.credits).pluck('credit_id').toArray()}
                 clearInputAfterSelection
+                sortBy="date|desc"
               />
             </Element>
           )}

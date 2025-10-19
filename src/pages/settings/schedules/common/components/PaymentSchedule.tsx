@@ -396,6 +396,7 @@ export function PaymentSchedule(props: Props) {
                             handleChange('parameters.invoice_id' as keyof Schedule, '')
                         }
                         errorMessage={errors?.errors['parameters.invoice_id']}
+                        sortBy="date|desc"
                     />
                 )}
             </Element>
