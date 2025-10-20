@@ -65,7 +65,7 @@ export default function Create() {
         },
       })
         .then((response: GenericSingleResourceResponse<Document>) => {
-          toast.success('created_document');
+          toast.success('document_created');
 
           $refetch(['docuninja_documents']);
 
