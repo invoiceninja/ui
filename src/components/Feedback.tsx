@@ -57,7 +57,7 @@ export function Feedback() {
     }
   };
 
-  const handleUpdateReactSettings = () => {
+  const handleUpdateReactSettings = (isDoNotAskAgain: boolean = false) => {
     const currentUnixTime = dayjs().utc().unix();
 
     const updatedReactSettings = cloneDeep(reactSettings);
@@ -66,7 +66,7 @@ export function Feedback() {
     set(
       updatedReactSettings,
       'preferences.feedback_slider_displayed_at',
-      currentUnixTime
+      isDoNotAskAgain ? -1 : currentUnixTime
     );
 
     request(
@@ -87,7 +87,8 @@ export function Feedback() {
 
   const handleFeedbackSubmit = (
     currentRating: number,
-    currentFeedback: string
+    currentFeedback: string,
+    isDoNotAskAgain: boolean = false
   ) => {
     if (!isFormBusy) {
       toast.processing();
@@ -98,7 +99,7 @@ export function Feedback() {
         notes: currentFeedback,
       })
         .then(() => {
-          handleUpdateReactSettings();
+          handleUpdateReactSettings(isDoNotAskAgain);
 
           toast.success('feedback_submitted');
 
@@ -119,7 +120,7 @@ export function Feedback() {
 
     const updatedReactSettings = cloneDeep(reactSettings);
 
-    set(updatedReactSettings, 'preferences.feedback_slider_displayed_at', 0);
+    set(updatedReactSettings, 'preferences.feedback_slider_displayed_at', -1);
 
     request(
       'PUT',
@@ -183,16 +184,30 @@ export function Feedback() {
             onValueChange={(value) => setFeedbackValue(value)}
           />
 
-          <Button
-            behavior="button"
-            onClick={() =>
-              handleFeedbackSubmit(selectedRating || 0, feedbackValue)
-            }
-            disabled={isFormBusy}
-            disableWithoutIcon
-          >
-            {t('submit')}
-          </Button>
+          <div className="flex justify-between">
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() =>
+                handleFeedbackSubmit(selectedRating || 0, feedbackValue, true)
+              }
+              disabled={isFormBusy}
+              disableWithoutIcon
+            >
+              {t('do_not_ask_again')}
+            </Button>
+
+            <Button
+              behavior="button"
+              onClick={() =>
+                handleFeedbackSubmit(selectedRating || 0, feedbackValue)
+              }
+              disabled={isFormBusy}
+              disableWithoutIcon
+            >
+              {t('submit')}
+            </Button>
+          </div>
         </div>
       </Modal>
 
