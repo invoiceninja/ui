@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Settings } from '$app/components/layouts/Settings';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField, Link, SelectField } from '$app/components/forms';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
@@ -228,6 +228,12 @@ export function EInvoice() {
           headerStyle={{ borderColor: colors.$20 }}
         >
           <Element
+            leftSide={t('help')}>
+              <Link external to="https://invoiceninja.github.io/en/einvoicing">
+                {t('learn_more')}
+              </Link>
+          </Element>
+          <Element
             leftSide={
               <PropertyCheckbox
                 propertyKey="e_invoice_type"
@@ -263,6 +269,7 @@ export function EInvoice() {
                   labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
                 />
               }
+              
             >
               <Toggle
                 checked={Boolean(company?.settings.enable_e_invoice)}
@@ -276,13 +283,6 @@ export function EInvoice() {
 
           {company?.settings.e_invoice_type === 'PEPPOL' ? (
             <>
-              {/* {company?.settings.enable_e_invoice && (
-              <EInvoiceGenerator
-                ref={eInvoiceRef}
-                currentEInvoice={company?.e_invoice || {}}
-              />
-            )} */}
-
               {company?.settings.enable_e_invoice &&
               company?.legal_entity_id ? (
                 <div className="flex flex-col space-y-4">{/*  */}</div>
@@ -409,13 +409,11 @@ export function EInvoice() {
         <Preferences />
       ) : null}
 
-      {company?.settings.enable_e_invoice ? (
-        <PaymentMeans
-          ref={eInvoiceRef}
-          currentEInvoice={company?.e_invoice || {}}
-          entity="company"
-        />
-      ) : null}
+      <PaymentMeans
+        ref={eInvoiceRef}
+        currentEInvoice={company?.e_invoice || {}}
+        entity="company"
+      />
 
       {company?.settings.enable_e_invoice &&
       company?.legal_entity_id &&
