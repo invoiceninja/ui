@@ -8,9 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputLabel, Link } from '$app/components/forms';
+import { Button, InputLabel, Link } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import {
+  DataTable,
+  dateRangeAtom,
+  filterColumnsValuesAtom,
+} from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { BsKanban } from 'react-icons/bs';
@@ -45,6 +49,8 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { ExtensionBanner } from '../common/components/ExtensionBanner';
+import { useFilterColumns } from '../common/hooks/useFilterColumns';
+import { emitter } from '$app';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -60,12 +66,17 @@ export default function Tasks() {
   const filters = useTaskFilters();
   const columns = useTaskColumns();
   const taskColumns = useAllTaskColumns();
+  const filterColumns = useFilterColumns();
   const customBulkActions = useCustomBulkActions();
 
-  const [sliderTaskId, setSliderTaskId] = useState<string>('');
+  const [dateRange, setDateRange] = useAtom(dateRangeAtom);
   const [taskSlider, setTaskSlider] = useAtom(taskSliderAtom);
+  const [sliderTaskId, setSliderTaskId] = useState<string>('');
   const [taskSliderVisibility, setTaskSliderVisibility] = useAtom(
     taskSliderVisibilityAtom
+  );
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
   );
 
   const { data: taskResponse } = useTaskQuery({ id: sliderTaskId });
@@ -107,6 +118,23 @@ export default function Tasks() {
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
+            {(Object.keys(filterColumnsValues).length > 0 ||
+              dateRange.length > 0) && (
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={() => {
+                  setFilterColumnsValues({});
+                  emitter.emit('date_range_picker.clear');
+                }}
+              >
+                {t('clear_filters')} (
+                {Object.keys(filterColumnsValues).length +
+                  (dateRange.length > 0 ? 1 : 0)}
+                )
+              </Button>
+            )}
+
             <DataTableColumnsPicker
               columns={taskColumns as unknown as string[]}
               defaultColumns={defaultColumns}
@@ -137,6 +165,10 @@ export default function Tasks() {
           setTaskSliderVisibility(true);
         }}
         enableSavingFilterPreference
+        filterColumns={filterColumns}
+        dateRangeColumns={[
+          { column: 'calculated_start_date', queryParameterKey: 'date_range' },
+        ]}
       />
 
       {!disableNavigation('task', taskSlider) && <TaskSlider />}

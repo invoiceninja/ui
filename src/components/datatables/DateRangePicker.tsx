@@ -20,24 +20,22 @@ import { Icon } from '../icons/Icon';
 import { Calendar } from 'react-feather';
 import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
+import { emitter } from '$app';
 
 interface Props {
   setDateRange: Dispatch<SetStateAction<string>>;
   onClick: () => void;
 }
-export function DateRangePicker(props: Props) {
+export function DateRangePicker({ setDateRange, onClick }: Props) {
   const divRef = useRef(null);
 
   const { RangePicker } = DatePicker;
 
   const colors = useColorScheme();
 
-  const { setDateRange, onClick } = props;
-
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
-
   const [currentDateRange, setCurrentDateRange] = useState<string>('');
+  const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
 
   const antdLocale = useAtomValue(antdLocaleAtom);
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -89,6 +87,13 @@ export function DateRangePicker(props: Props) {
       );
     }
   }, [isVisible]);
+
+  useEffect(() => {
+    emitter.on('date_range_picker.clear', () => {
+      setCurrentDateRange('');
+      setDateRange('');
+    });
+  }, []);
 
   return (
     <div ref={divRef}>
