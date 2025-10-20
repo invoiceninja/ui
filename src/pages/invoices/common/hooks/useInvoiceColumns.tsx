@@ -118,6 +118,7 @@ export function useAllInvoiceColumns() {
     'tax_amount',
     'created_at',
     'updated_at',
+    'project',
   ] as const;
 
   return invoiceColumns;
@@ -250,6 +251,19 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           renderSpan={disableNavigation('client', invoice.client)}
         >
           {invoice.client?.display_name}
+        </DynamicLink>
+      ),
+    },
+    {
+      column: 'project',
+      id: 'project_id',
+      label: t('project'),
+      format: (value, invoice) =>(
+        <DynamicLink
+          to={route('/projects/:id', { id: invoice.project_id })}
+          renderSpan={disableNavigation('invoice', invoice.project)}
+        >
+          {invoice?.project?.name ?? ''} 
         </DynamicLink>
       ),
     },
