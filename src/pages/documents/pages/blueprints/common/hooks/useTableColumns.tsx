@@ -68,7 +68,9 @@ export function useTableColumns() {
             id: blueprint.id,
           })}
         >
-          {blueprint.name || t('untitled_template')}
+          <span className="truncate block max-w-xs">
+            {blueprint.name || t('untitled_template')}
+          </span>
         </Link>
       ),
     },
@@ -77,7 +79,9 @@ export function useTableColumns() {
       label: t('description'),
       format: (field, blueprint) => (
         <>
-        {blueprint.description}
+          <span className="truncate block max-w-xs">
+            {blueprint.description}
+          </span>
         </>
       ),
     },

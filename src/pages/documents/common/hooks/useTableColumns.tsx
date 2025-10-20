@@ -110,7 +110,9 @@ export function useTableColumns() {
       label: t('description'),
       format: (_, document) => (
         <Link to={route('/documents/:id', { id: document.id })}>
-          {document.description || t('untitled_document')}
+          <span className="truncate block max-w-xs">
+            {document.description || t('untitled_document')}
+          </span>
         </Link>
       ),
     },
