@@ -196,32 +196,32 @@ const ELEMENT_FORMAT_OPTIONS: {
   center: {
     icon: 'center-align',
     iconRTL: 'center-align',
-    name: 'center_align',
+    name: 'center',
   },
   end: {
     icon: 'right-align',
     iconRTL: 'left-align',
-    name: 'end_align',
+    name: 'end',
   },
   justify: {
     icon: 'justify-align',
     iconRTL: 'justify-align',
-    name: 'justify_align',
+    name: 'justify',
   },
   left: {
     icon: 'left-align',
     iconRTL: 'left-align',
-    name: 'left_align',
+    name: 'left',
   },
   right: {
     icon: 'right-align',
     iconRTL: 'right-align',
-    name: 'right_align',
+    name: 'right',
   },
   start: {
     icon: 'left-align',
     iconRTL: 'right-align',
-    name: 'start_align',
+    name: 'start',
   },
 };
 
@@ -272,7 +272,7 @@ function BlockFormatDropDown({
       >
         <div className="icon-text-container">
           <i className="icon h1" />
-          <span className="text">{t('heading_1')}</span>
+          <span className="text">Heading 1</span>
         </div>
         <span className="shortcut">{SHORTCUTS.HEADING1}</span>
       </DropDownItem>
@@ -282,7 +282,7 @@ function BlockFormatDropDown({
       >
         <div className="icon-text-container">
           <i className="icon h2" />
-          <span className="text">{t('heading_2')}</span>
+          <span className="text">Heading 2</span>
         </div>
         <span className="shortcut">{SHORTCUTS.HEADING2}</span>
       </DropDownItem>
@@ -292,7 +292,7 @@ function BlockFormatDropDown({
       >
         <div className="icon-text-container">
           <i className="icon h3" />
-          <span className="text">{t('heading_3')}</span>
+          <span className="text">Heading 3</span>
         </div>
         <span className="shortcut">{SHORTCUTS.HEADING3}</span>
       </DropDownItem>
@@ -302,7 +302,7 @@ function BlockFormatDropDown({
       >
         <div className="icon-text-container">
           <i className="icon numbered-list" />
-          <span className="text">{t('numbered_list')}</span>
+          <span className="text">Numbered List</span>
         </div>
         <span className="shortcut">{SHORTCUTS.NUMBERED_LIST}</span>
       </DropDownItem>
@@ -312,7 +312,7 @@ function BlockFormatDropDown({
       >
         <div className="icon-text-container">
           <i className="icon bullet-list" />
-          <span className="text">{t('bullet_list')}</span>
+          <span className="text">Bullet List</span>
         </div>
         <span className="shortcut">{SHORTCUTS.BULLET_LIST}</span>
       </DropDownItem>
@@ -322,7 +322,7 @@ function BlockFormatDropDown({
       >
         <div className="icon-text-container">
           <i className="icon check-list" />
-          <span className="text">{t('check_list')}</span>
+          <span className="text">Check List</span>
         </div>
         <span className="shortcut">{SHORTCUTS.CHECK_LIST}</span>
       </DropDownItem>
@@ -342,7 +342,7 @@ function BlockFormatDropDown({
       >
         <div className="icon-text-container">
           <i className="icon code" />
-          <span className="text">{t('code_block')}</span>
+          <span className="text">Code Block</span>
         </div>
         <span className="shortcut">{SHORTCUTS.CODE_BLOCK}</span>
       </DropDownItem>
@@ -444,7 +444,7 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon left-align" />
-          <span className="text">{t('left_align')}</span>
+          <span className="text">{t('left')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.LEFT_ALIGN}</span>
       </DropDownItem>
@@ -456,7 +456,7 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon center-align" />
-          <span className="text">{t('center_align')}</span>
+          <span className="text">{t('center')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.CENTER_ALIGN}</span>
       </DropDownItem>
@@ -468,7 +468,7 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon right-align" />
-          <span className="text">{t('right_align')}</span>
+          <span className="text">{t('right')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.RIGHT_ALIGN}</span>
       </DropDownItem>
@@ -480,7 +480,7 @@ function ElementFormatDropdown({
       >
         <div className="icon-text-container">
           <i className="icon justify-align" />
-          <span className="text">{t('justify_align')}</span>
+          <span className="text">{t('justify')}</span>
         </div>
         <span className="shortcut">{SHORTCUTS.JUSTIFY_ALIGN}</span>
       </DropDownItem>
@@ -497,7 +497,7 @@ function ElementFormatDropdown({
               : ELEMENT_FORMAT_OPTIONS.start.icon
           }`}
         />
-        <span className="text">{t('start_align')}</span>
+        <span className="text">{t('start')}</span>
       </DropDownItem>
       <DropDownItem
         onClick={() => {
@@ -512,7 +512,7 @@ function ElementFormatDropdown({
               : ELEMENT_FORMAT_OPTIONS.end.icon
           }`}
         />
-        <span className="text">{t('end_align')}</span>
+        <span className="text">{t('end')}</span>
       </DropDownItem>
       <Divider />
       <DropDownItem
@@ -1252,12 +1252,12 @@ export default function ToolbarPlugin({
             <DropDownItem
               onClick={() => clearFormatting(activeEditor)}
               className="item wide"
-              title={t('clear_text_formatting') as string}
+              title={t('clear') as string}
               aria-label="Clear all text formatting"
             >
               <div className="icon-text-container">
                 <i className="icon clear" />
-                <span className="text">{t('clear_text_formatting')}</span>
+                <span className="text">{t('clear')}</span>
               </div>
               <span className="shortcut">{SHORTCUTS.CLEAR_FORMATTING}</span>
             </DropDownItem>

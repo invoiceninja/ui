@@ -57,7 +57,7 @@ export function useProjectsQuery(params?: Params) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/projects?status=:status', {
+        endpoint('/api/v1/projects?status=:status&per_page=1000', {
           status: params?.status?.join(',') ?? 'all',
         })
       ).then(
