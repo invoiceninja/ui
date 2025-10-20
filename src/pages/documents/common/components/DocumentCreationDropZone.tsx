@@ -57,7 +57,7 @@ export function DocumentCreationDropZone() {
         .then((response: GenericSingleResourceResponse<Document>) => {
           $refetch(['docuninja_documents']);
 
-          toast.success('created_document');
+          toast.success('document_created');
 
           navigate(
             route('/documents/:id/builder', { id: response.data.data.id })
