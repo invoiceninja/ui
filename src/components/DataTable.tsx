@@ -163,6 +163,8 @@ interface Props<T> extends CommonProps {
   enableSavingFilterPreference?: boolean;
   applyManualHeight?: boolean;
   onDeleteBulkAction?: (selectedIds: string[]) => void;
+  withoutAllBulkActions?: boolean;
+  onSelectedResourcesChange?: (selectedResources: T[]) => void;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -190,6 +192,9 @@ function DataTableCheckbox({
         value={resourceId}
         id={resourceId}
         cypressRef="dataTableCheckbox"
+        onChange={(event: any) => {
+          console.log(event.target.checked);
+        }}
       />
     );
   }
@@ -232,6 +237,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     enableSavingFilterPreference = false,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
+    onSelectedResourcesChange,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -613,6 +619,10 @@ export function DataTable<T extends object>(props: Props<T>) {
     emitter.on('bulk.completed', () => setSelected([]));
   }, []);
 
+  useEffect(() => {
+    onSelectedResourcesChange?.(selectedResources);
+  }, [selectedResources]);
+
   return (
     <div data-cy="dataTable">
       {!props.withoutActions && (
@@ -648,7 +658,11 @@ export function DataTable<T extends object>(props: Props<T>) {
           beforeFilter={props.beforeFilter}
           withoutStatusFilter={props.withoutStatusFilter}
         >
-          {Boolean(!hideEditableOptions && selectedResources.length) && (
+          {Boolean(
+            !hideEditableOptions &&
+              selectedResources.length &&
+              !props.withoutAllBulkActions
+          ) && (
             <Dropdown
               label={t('actions')}
               disabled={!selected.length}
