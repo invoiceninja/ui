@@ -14,7 +14,7 @@ import { Payment } from './payment';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
 import { TaxInfo } from './tax-info';
-
+import { Project } from './project';
 export interface Invoice {
   id: string;
   user_id: string;
@@ -87,7 +87,8 @@ export interface Invoice {
   is_locked?: boolean;
   backup?: Backup;
   location_id: string;
-  schedule?: ScheduleItem[]
+  schedule?: ScheduleItem[];
+  project?: Project;
 }
 
 export interface Backup {

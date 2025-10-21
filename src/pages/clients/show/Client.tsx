@@ -14,7 +14,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { Tabs } from '$app/components/Tabs';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { Contacts } from './components/Contacts';
@@ -124,6 +124,15 @@ export default function Client() {
     };
   }, [client]);
 
+  const currentCards = useMemo(() => {
+    return (reactSettings.client_show_cards || [
+      'details',
+      'address',
+      'contacts',
+      'standing',
+    ]) as ClientShowCard[];
+  }, [reactSettings.client_show_cards]);
+
   const {
     changeTemplateVisible,
     setChangeTemplateVisible,
@@ -178,7 +187,7 @@ export default function Client() {
       {client && (
         <>
           <div className="grid grid-cols-12 lg:space-y-0 gap-4">
-            {reactSettings.client_show_cards
+            {currentCards
               ?.filter((card) => isCardVisible(card))
               .map((card) => displayCard(card))}
           </div>
