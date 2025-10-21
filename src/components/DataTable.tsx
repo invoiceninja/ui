@@ -620,6 +620,12 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, []);
 
   useEffect(() => {
+    emitter.on('deselect.resource', (id: string) =>
+      setSelected((current) => current.filter((v) => v !== id))
+    );
+  }, []);
+
+  useEffect(() => {
     onSelectedResourcesChange?.(selectedResources);
   }, [selectedResources]);
 

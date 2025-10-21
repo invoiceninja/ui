@@ -31,8 +31,9 @@ import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
-import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { emitter } from '$app';
+import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
 
 export default function Apply() {
   const [t] = useTranslation();
@@ -40,9 +41,9 @@ export default function Apply() {
   const { id } = useParams();
   const colors = useColorScheme();
 
-  const columns = useInvoiceColumns();
+  const columns = useApplyInvoiceTableColumns();
 
-  const { data: payment, isLoading } = usePaymentQuery({ id });
+  const { data: payment } = usePaymentQuery({ id });
 
   const [errors, setErrors] = useState<ValidationBag>();
 
@@ -106,22 +107,6 @@ export default function Apply() {
         });
     },
   });
-
-  const handleInvoiceChange = (id: string, amount: number, number: string) => {
-    formik.setFieldValue('invoices', [
-      ...formik.values.invoices,
-      { _id: v4(), amount, credit_id: '', invoice_id: id, number: number },
-    ]);
-  };
-
-  const handleRemovingInvoice = (id: string) => {
-    formik.setFieldValue(
-      'invoices',
-      formik.values.invoices.filter(
-        (record: { _id: string }) => record._id !== id
-      )
-    );
-  };
 
   useEffect(() => {
     let total = 0;
@@ -211,7 +196,6 @@ export default function Apply() {
               }}
               withoutPagination
               withoutStatusFilter
-              withResourcefulActions
               withoutAllBulkActions
             />
           </div>
@@ -231,6 +215,7 @@ export default function Apply() {
             amount: number;
             number: string;
             balance: number;
+            invoice_id: string;
           },
           index
         ) => (
@@ -254,7 +239,9 @@ export default function Apply() {
 
               <div
                 className="cursor-pointer focus:outline-none focus:ring-0 mt-6"
-                onClick={() => handleRemovingInvoice(record._id)}
+                onClick={() =>
+                  emitter.emit('deselect.resource', record.invoice_id)
+                }
               >
                 <CircleXMark
                   color={colors.$16}
