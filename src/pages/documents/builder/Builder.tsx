@@ -349,7 +349,7 @@ function SignatorySelector({
         className="-mt-2"
       >
         <option value="create">
-          <b>{t('create_client')}</b>
+          <b>&mdash; {t('create_client')} &mdash;</b>
         </option>
 
         {list.map((client) => (
@@ -357,6 +357,10 @@ function SignatorySelector({
             {client.label}
           </option>
         ))}
+
+        <option disabled>
+          <b>&mdash; {t('users')} &mdash;</b>
+        </option>
 
         {users.map((user) => (
           <option key={user.value} value={user.value}>
