@@ -21,7 +21,6 @@ import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
-import { TabGroup } from '$app/components/TabGroup';
 import {
   Builder as Builder$,
   BuilderContext,
