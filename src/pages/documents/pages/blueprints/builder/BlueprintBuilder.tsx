@@ -477,7 +477,7 @@ function BlueprintBuilder() {
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
-    { name: t('templates'), href: '/documents/blueprints' },
+    { name: t('templates'), href: '/documents/templates' },
     {
       name: blueprint?.name || t('blueprint'),
       href: route('/documents/templates/:id/edit', { id }),
