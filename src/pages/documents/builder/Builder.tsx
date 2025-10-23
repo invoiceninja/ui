@@ -21,7 +21,6 @@ import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
-import { TabGroup } from '$app/components/TabGroup';
 import {
   Builder as Builder$,
   BuilderContext,
@@ -167,27 +166,19 @@ export function CreateDialog({
   open,
   onOpenChange,
   client,
-  user,
 }: CreateDialogProps) {
   const [t] = useTranslation();
   return (
     <Modal
-      title={t('create_client_or_user')}
+      title={t('create_client')}
       visible={open}
       onClose={onOpenChange}
       withoutHorizontalPadding
       withoutVerticalMargin
     >
-      <TabGroup
-        tabs={[t('client'), t('user')]}
-        withHorizontalPadding
-        horizontalPaddingWidth="1.5rem"
-        width="full"
-        className="pt-3"
-      >
+      <div className="pt-3">
         <div className="px-4 sm:px-6 pt-2">{client}</div>
-        <div className="px-4 sm:px-6 pt-2">{user}</div>
-      </TabGroup>
+      </div>
     </Modal>
   );
 }
@@ -356,13 +347,19 @@ function SignatorySelector({
         clearAfterSelection
         className="-mt-2"
       >
-        <option value="create">{t('create_client_or_user')}</option>
+        <option value="create">
+          <b>&mdash; {t('create_client')} &mdash;</b>
+        </option>
 
         {list.map((client) => (
           <option key={client.value} value={client.value}>
             {client.label}
           </option>
         ))}
+
+        <option disabled>
+          <b>&mdash; {t('users')} &mdash;</b>
+        </option>
 
         {users.map((user) => (
           <option key={user.value} value={user.value}>
