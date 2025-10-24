@@ -58,7 +58,6 @@ export function EmailRecord({ schedule, handleChange, errors }: Props) {
       ],
       quote: [
         { value: 'quote', label: t('initial_email') },
-        { value: 'quote_reminder1', label: t('first_reminder') },
         { value: 'reminder1', label: t('first_reminder') },
       ],
       credit: [{ value: 'credit', label: t('initial_email') }],
