@@ -24,70 +24,164 @@ import {
   MdSettings,
 } from 'react-icons/md';
 
-import { useLocation } from 'react-router-dom';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { useDownloadDocument } from '../../show/hooks/useDownloadDocument';
-import { useDownloadAuditLog } from '../../show/hooks/useDownloadAuditLog';
 import { useCloneDocument } from '../../show/hooks/useCloneDocument';
-import { useMakeBluePrint } from '../../show/hooks/useMakeBluePrint';
+import { useMakeTemplate } from '../../show/hooks/useMakeTemplate';
 import { useVoidDocument } from '../../show/hooks/useVoidDocument';
 import { DeleteDocumentAction } from '../../show/components/DeleteDocumentAction';
 import { ArchiveDocumentAction } from '../../show/components/ArchiveDocumentAction';
 import { RestoreDocumentAction } from '../../show/components/RestoreDocumentAction';
 import { SendInvitationsModal } from '../../show/components/SendInvitationsModal';
-import { DocumentSettingsModal } from '../../show/components/DocumentSettingsModal';
-import { useState } from 'react';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface Params {
-  document?: Document;
-  onSettingsClick?: (document: Document) => void;
+  onSettingsClick?: (doc: Document) => void;
 }
 
 export function useActions(params?: Params) {
   const [t] = useTranslation();
-  const { document, onSettingsClick } = params || {};
+  const { onSettingsClick } = params || {};
 
   const docuCompanyAccountDetails = useAtomValue(docuNinjaAtom);
 
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
+  const downloadDocument = (doc: Document) => {
+    if (!doc) return;
 
-  const { downloadDocument, isFormBusy: isDownloadingDoc } =
-    useDownloadDocument({
-      doc: document,
-    });
+    toast.processing();
 
-  const { downloadAuditLog, isFormBusy: isDownloadingAuditLog } =
-    useDownloadAuditLog({
-      doc: document,
-    });
+    request(
+      'POST',
+      docuNinjaEndpoint(`/api/documents/${doc.id}/download`),
+      {},
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            'X-DOCU-NINJA-TOKEN'
+          )}`,
+        },
+      }
+    )
+      .then((response) => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
 
-  const { makeBluePrint, isFormBusy: isMakingBluePrintBusy } =
-    useMakeBluePrint();
+        const contentDisposition = response.headers['content-disposition'];
+        let filename = 'document.pdf';
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(
+            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+          );
+          if (filenameMatch?.[1]) {
+            filename = filenameMatch[1].replace(/['"]/g, '');
+          }
+        }
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        toast.dismiss();
+      })
+      .catch((error) => {
+        if (error.response?.status === 422) {
+          toast.error(error.response.data.message || 'something_went_wrong');
+        } else if (error.response?.status === 400) {
+          toast.error('document_not_ready_for_download');
+        } else {
+          toast.error('something_went_wrong');
+        }
+      });
+  };
+
+  const downloadAuditLog = (doc: Document) => {
+    if (!doc) return;
+
+    toast.processing();
+
+    request(
+      'POST',
+      docuNinjaEndpoint('/api/documents/:id/audit_log', {
+        id: doc.id,
+      }),
+      {},
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            'X-DOCU-NINJA-TOKEN'
+          )}`,
+        },
+      }
+    )
+      .then((response) => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+
+        const contentDisposition = response.headers['content-disposition'];
+        let filename = 'audit-log.pdf';
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(
+            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+          );
+          if (filenameMatch?.[1]) {
+            filename = filenameMatch[1].replace(/['"]/g, '');
+          }
+        }
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        toast.dismiss();
+      })
+      .catch((error) => {
+        if (error.response?.status === 422) {
+          toast.error(error.response.data.message || 'something_went_wrong');
+        } else if (error.response?.status === 400) {
+          toast.error('audit_log_not_ready_for_download');
+        } else {
+          toast.error('something_went_wrong');
+        }
+      });
+  };
+
+  const { makeTemplate, isFormBusy: isMakingTemplateBusy } =
+    useMakeTemplate();
 
   const { cloneDocument, isFormBusy: isCloningDocumentBusy } =
     useCloneDocument();
 
   const { voidDocument, isFormBusy: isVoidingDocumentBusy } = useVoidDocument();
 
-  const location = useLocation();
-  const isEditOrShowPage = location.pathname.includes('/documents/') && 
-    location.pathname.split('/').length > 2 && 
-    !location.pathname.includes('/builder') &&
-    !location.pathname.includes('/create');
+  const { isEditOrShowPage } = useEntityPageIdentifier({
+    entity: 'blueprint',
+  });
 
-  const userInvitation = document?.invitations?.find(
-    (invitation) =>
-      invitation.entity === 'user' &&
-      invitation.user_id ===
-        docuCompanyAccountDetails?.account?.users?.find(
-          (user) => user.company_user?.is_owner
-        )?.id
-  );
+  const getUserInvitation = (doc: Document) => {
+    return doc?.invitations?.find(
+      (invitation) =>
+        invitation.entity === 'user' &&
+        invitation.user_id ===
+          docuCompanyAccountDetails?.account?.users?.find(
+            (user) => user.company_user?.is_owner
+          )?.id
+    );
+  };
 
-  const hasRectangles = () => {
+  const hasRectangles = (doc: Document) => {
     return (
-      document?.files?.some(
+      doc?.files?.some(
         (file) =>
           file.metadata?.rectangles &&
           Array.isArray(file.metadata.rectangles) &&
@@ -130,7 +224,7 @@ export function useActions(params?: Params) {
     (doc) =>
       Boolean(doc && doc.status_id === DocumentStatus.Completed) && (
         <DropdownElement
-          onClick={() => downloadAuditLog()}
+          onClick={() => downloadAuditLog(doc)}
           icon={<Icon element={MdDownload} />}
         >
           {t('audit_log')}
@@ -139,7 +233,7 @@ export function useActions(params?: Params) {
     (doc) =>
       Boolean(doc && doc.status_id === DocumentStatus.Completed) && (
         <DropdownElement
-          onClick={() => downloadDocument()}
+          onClick={() => downloadDocument(doc)}
           icon={<Icon element={MdDownload} />}
         >
           {t('download')}
@@ -158,10 +252,10 @@ export function useActions(params?: Params) {
     (doc) =>
       Boolean(doc && !doc.is_deleted) && (
         <DropdownElement
-          onClick={() => makeBluePrint(doc)}
+          onClick={() => makeTemplate(doc)}
           icon={<Icon element={MdPalette} />}
         >
-          {t('make_blueprint')}
+          {t('make_template')}
         </DropdownElement>
       ),
     (doc) =>
@@ -173,16 +267,16 @@ export function useActions(params?: Params) {
           {t('void')}
         </DropdownElement>
       ),
+    (doc) =>
+      Boolean(doc && !doc.is_deleted) && (
+        <DropdownElement
+          onClick={() => onSettingsClick ? onSettingsClick(doc) : console.log('Settings clicked for document:', doc.id)}
+          icon={<Icon element={MdSettings} />}
+        >
+          {t('settings')}
+        </DropdownElement>
+      ),
     
-      (doc) =>
-        Boolean(doc && !doc.is_deleted) && (
-          <DropdownElement
-            onClick={() => onSettingsClick ? onSettingsClick(doc) : setIsSettingsModalOpen(true)}
-            icon={<Icon element={MdSettings} />}
-          >
-            {t('settings')}
-          </DropdownElement>
-        ),
     (doc) =>
       isEditOrShowPage && !doc.is_deleted && <Divider withoutPadding />,
     (doc) =>
@@ -204,30 +298,5 @@ export function useActions(params?: Params) {
       ),
   ];
 
-  // If onSettingsClick is provided, we're in list view - only return actions
-  if (onSettingsClick) {
-    return actions;
-  }
-
-  // Otherwise, we're in show view - return actions and modals
-  return {
-    actions,
-    modals: (
-      <>
-        {Boolean(document) && isSettingsModalOpen && (
-          <DocumentSettingsModal
-            document={document!}
-            visible={isSettingsModalOpen}
-            setVisible={setIsSettingsModalOpen}
-          />
-        )}
-      </>
-    ),
-    isLoading:
-      isDownloadingDoc ||
-      isCloningDocumentBusy ||
-      isMakingBluePrintBusy ||
-      isVoidingDocumentBusy ||
-      isDownloadingAuditLog,
-  };
+  return actions;
 }
