@@ -19,7 +19,7 @@ import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Default } from '$app/components/layouts/Default';
 import { Alert } from '$app/components/Alert';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge, BadgeVariant } from '$app/components/Badge';
 import { Spinner } from '$app/components/Spinner';
 import { Button } from '$app/components/forms';
@@ -29,8 +29,9 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
-import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { Document as DocumentType } from '$app/common/interfaces/docuninja/api';
 import { useActions } from '../common/hooks/useActions';
+import { DocumentSettingsModal } from './components/DocumentSettingsModal';
 
 export default function Document() {
   const { documentTitle } = useTitle('view_document');
@@ -38,6 +39,7 @@ export default function Document() {
 
   const { id } = useParams();
   const colors = useColorScheme();
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const {
     data: document,
@@ -71,10 +73,11 @@ export default function Document() {
     []
   );
 
-  const actionsResult = useActions({ document });
-  const actions = Array.isArray(actionsResult) ? actionsResult : actionsResult.actions;
-  const modals = Array.isArray(actionsResult) ? null : actionsResult.modals;
-  const isActionsLoading = Array.isArray(actionsResult) ? false : actionsResult.isLoading;
+  const actions = useActions({
+    onSettingsClick: (doc: DocumentType) => {
+      setIsSettingsModalOpen(true);
+    },
+  });
 
   const {
     data: timelineData,
@@ -178,7 +181,13 @@ export default function Document() {
           </Card>
         )}
 
-      {modals}
+      {document && (
+        <DocumentSettingsModal
+          document={document}
+          visible={isSettingsModalOpen}
+          setVisible={setIsSettingsModalOpen}
+        />
+      )}
     </Default>
   );
 }

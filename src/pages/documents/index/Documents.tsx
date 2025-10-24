@@ -12,7 +12,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { DataTable } from '$app/components/DataTable';
 import { useTableColumns } from '../common/hooks/useTableColumns';
-import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { Document as DocumentType, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { Default } from '$app/components/layouts/Default';
 import { Page } from '$app/components/Breadcrumbs';
 import { Button } from '$app/components/forms';
@@ -49,14 +49,14 @@ export default function Documents() {
   const company = useCurrentCompany();
 
   const actions = useActions({
-    onSettingsClick: (document: Document) => {
-      setSelectedDocument(document);
+    onSettingsClick: (doc: DocumentType) => {
+      setSelectedDocument(doc);
       setIsSettingsModalOpen(true);
     },
   });
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const [docuData] = useAtom(docuNinjaAtom);

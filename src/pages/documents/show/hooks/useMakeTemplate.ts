@@ -19,11 +19,11 @@ import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export function useMakeBluePrint() {
+export function useMakeTemplate() {
   const navigate = useNavigate();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const makeBluePrint = (document: Document) => {
+  const makeTemplate = (document: Document) => {
     if (!isFormBusy) {
       setIsFormBusy(true);
       toast.processing();
@@ -32,7 +32,7 @@ export function useMakeBluePrint() {
         'POST',
         docuNinjaEndpoint('/api/documents/:id/action', { id: document.id }),
         {
-          action: 'make_blueprint',
+          action: 'make_template',
           id: document.id,
         },
         {
@@ -63,5 +63,5 @@ export function useMakeBluePrint() {
     }
   };
 
-  return { makeBluePrint, isFormBusy };
+  return { makeTemplate, isFormBusy };
 }
