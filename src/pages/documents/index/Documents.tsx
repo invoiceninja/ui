@@ -167,7 +167,7 @@ export default function Documents() {
           <DocumentCreationDropZone />
         )}
 
-        <DataTable<Document>
+        <DataTable<DocumentType>
           queryIdentificator="/api/documents/docuninja"
           resource="document"
           endpoint="/api/documents?sort=id|desc"
@@ -201,7 +201,7 @@ export default function Documents() {
               </div>
             </Button>
           )}
-          showEdit={(document) =>
+          showEdit={(document: DocumentType) =>
             document?.status_id !== DocumentStatus.Completed &&
             document?.status_id !== DocumentStatus.Voided
           }

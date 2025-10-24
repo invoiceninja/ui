@@ -29,7 +29,7 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
-import { Document as DocumentType } from '$app/common/interfaces/docuninja/api';
+import { Document as DocumentType, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { useActions } from '../common/hooks/useActions';
 import { DocumentSettingsModal } from './components/DocumentSettingsModal';
 
