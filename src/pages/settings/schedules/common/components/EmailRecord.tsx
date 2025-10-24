@@ -50,18 +50,18 @@ export function EmailRecord({ schedule, handleChange, errors }: Props) {
   const TEMPLATE_OPTIONS = useMemo(() => {
     const options = {
       invoice: [
-        { value: 'invoice', label: t('initial_email') },
+        { value: 'invoice', label: t('invoice') },
         { value: 'reminder1', label: t('first_reminder') },
         { value: 'reminder2', label: t('second_reminder') },
         { value: 'reminder3', label: t('third_reminder') },
         { value: 'reminder_endless', label: t('endless_reminder') },
       ],
       quote: [
-        { value: 'quote', label: t('initial_email') },
+        { value: 'quote', label: t('quote') },
         { value: 'reminder1', label: t('first_reminder') },
       ],
-      credit: [{ value: 'credit', label: t('initial_email') }],
-      purchase_order: [{ value: 'purchase_order', label: t('initial_email') }],
+      credit: [{ value: 'credit', label: t('credit') }],
+      purchase_order: [{ value: 'purchase_order', label: t('purchase_order') }],
     };
 
     if (company?.settings.email_subject_custom1) {
