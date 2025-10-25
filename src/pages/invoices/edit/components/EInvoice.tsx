@@ -294,8 +294,8 @@ export default function EInvoice() {
         </Card>
       )}
 
-      <Card title={t('date_range')}>
-        <Element leftSide={t('start_date')}>
+      <Card title={t('invoice_period')}>
+        <Element leftSide={t('start_date')} leftSideHelp={t('invoice_period_help')}>
           <InputField
             type="date"
             value={
@@ -322,6 +322,24 @@ export default function EInvoice() {
             errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.0.EndDate']}
           />
         </Element>
+      </Card>
+
+      <Card title={t('actual_delivery_date')}>
+        <Element leftSide={t('date')} leftSideHelp={t('actual_delivery_date_help')}>
+          <InputField
+            type="date"
+            value={
+              get(invoice, 'e_invoice.Invoice.Delivery.0.ActualDeliveryDate') || ''
+            }
+            onValueChange={(value) =>
+              handleChange('e_invoice.Invoice.Delivery.0.ActualDeliveryDate', value)
+            }
+            errorMessage={
+              errors?.errors?.['e_invoice.Invoice.Delivery.0.ActualDeliveryDate']
+            }
+          />
+        </Element>
+
       </Card>
     </>
   );
