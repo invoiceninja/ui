@@ -7,7 +7,7 @@ import { request } from '$app/common/helpers/request';
 import { useEffect, useState } from 'react';
 import { Alert } from '$app/components/Alert';
 import { Account, Company } from '$app/common/interfaces/docuninja/api';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useQueryClient } from 'react-query';
 import { useLogin } from '$app/common/queries/docuninja/docuninja';
@@ -141,16 +141,16 @@ export default function Document() {
       $refetch(['docuninja_documents', 'docuninja_document_timeline']),
   });
 
-  if (
-    !isLoading &&
-    !(
-      docuCompanyAccountDetails?.account?.plan !== 'pro' ||
-      needsAccountCreation ||
-      Boolean(hasAccount && !docuCompanyAccountDetails?.company)
-    )
-  ) {
-    return <Outlet />;
-  }
+  // if (
+  //   !isLoading &&
+  //   !(
+  //     docuCompanyAccountDetails?.account?.plan !== 'pro' ||
+  //     needsAccountCreation ||
+  //     Boolean(hasAccount && !docuCompanyAccountDetails?.company)
+  //   )
+  // ) {
+  //   return <Outlet />;
+  // }
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} docsLink="en/documents">
@@ -166,61 +166,105 @@ export default function Document() {
         </div>
       ) : (
         <>
-          {docuCompanyAccountDetails?.account?.plan !== 'pro' && (
-            <div className="flex flex-col items-center gap-4 p-6">
-              <span style={{ color: colors.$17 }}>
-                {t('upgrade_plan_docuninja')}
-              </span>
-
-              <Button
-                onClick={() => navigate('/settings/account_management')}
-                behavior="button"
-              >
-                {t('upgrade_plan')}
-              </Button>
-            </div>
-          )}
-
-          {Boolean(needsAccountCreation) && (
+          {import.meta.env.VITE_IS_DOCUNINJA_IN_BETA === 'true' ? (
             <div className="flex justify-center items-center">
-              <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
-                <div className="flex flex-col items-center gap-4 p-6">
-                  <span style={{ color: colors.$3 }}>
+              <Card
+                className="shadow-sm min-w-[20rem]"
+                style={{ borderColor: colors.$24 }}
+              >
+                <div className="flex flex-col items-center gap-4 p-6 max-w-2xl">
+                  <span
+                    className="text-xl font-semibold"
+                    style={{ color: colors.$3 }}
+                  >
                     {t('welcome_to_docuninja')}
                   </span>
 
-                  <span className="text-center" style={{ color: colors.$17 }}>
-                    {t('create_docuninja_account')}
-                  </span>
+                  <div className="flex flex-col gap-3 text-center">
+                    <span style={{ color: colors.$17 }}>
+                      {t('docuninja_beta_description')}
+                    </span>
+
+                    <span style={{ color: colors.$17 }}>
+                      {t('beta_trial_info')}
+                    </span>
+                  </div>
 
                   <Button
                     className="mt-4"
-                    onClick={() => create()}
                     disabled={isCreating || isLoading}
                     behavior="button"
                   >
-                    {t('create')}
+                    {t('start_trial')}
                   </Button>
                 </div>
               </Card>
             </div>
-          )}
+          ) : (
+            <>
+              {docuCompanyAccountDetails?.account?.plan !== 'pro' && (
+                <div className="flex flex-col items-center gap-4 p-6">
+                  <span style={{ color: colors.$17 }}>
+                    {t('upgrade_plan_docuninja')}
+                  </span>
 
-          {Boolean(hasAccount && !docuCompanyAccountDetails?.company) && (
-            <div className="flex flex-col items-center gap-4 p-6">
-              <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
-              <p className="text-gray-600 mb-4">
-                Your account exists but this company is not set up yet. Please
-                click the button below to set it up.
-              </p>
-              <Button
-                onClick={() => create()}
-                disabled={isCreating || isLoading}
-                behavior="button"
-              >
-                {t('setup_company')}
-              </Button>
-            </div>
+                  <Button
+                    onClick={() => navigate('/settings/account_management')}
+                    behavior="button"
+                  >
+                    {t('upgrade_plan')}
+                  </Button>
+                </div>
+              )}
+
+              {Boolean(needsAccountCreation) && (
+                <div className="flex justify-center items-center">
+                  <Card
+                    className="shadow-sm"
+                    style={{ borderColor: colors.$24 }}
+                  >
+                    <div className="flex flex-col items-center gap-4 p-6">
+                      <span style={{ color: colors.$3 }}>
+                        {t('welcome_to_docuninja')}
+                      </span>
+
+                      <span
+                        className="text-center"
+                        style={{ color: colors.$17 }}
+                      >
+                        {t('create_docuninja_account')}
+                      </span>
+
+                      <Button
+                        className="mt-4"
+                        onClick={() => create()}
+                        disabled={isCreating || isLoading}
+                        behavior="button"
+                      >
+                        {t('create')}
+                      </Button>
+                    </div>
+                  </Card>
+                </div>
+              )}
+
+              {Boolean(hasAccount && !docuCompanyAccountDetails?.company) && (
+                <div className="flex flex-col items-center gap-4 p-6">
+                  <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
+                  <p className="text-gray-600 mb-4">
+                    Your account exists but this company is not set up yet.
+                    Please click the button below to set it up.
+                  </p>
+                  <Button
+                    onClick={() => create()}
+                    disabled={isCreating || isLoading}
+                    behavior="button"
+                  >
+                    {t('setup_company')}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
