@@ -213,7 +213,7 @@ export function Feedback() {
 
       <div
         className={classNames(
-          'fixed bottom-0 left-0 right-0 z-50 w-full shadow-lg transform transition-all duration-500 ease-in-out border-t',
+          'fixed bottom-0 left-0 right-0 z-50 w-full transform transition-all duration-500 ease-in-out border-t',
           {
             'translate-y-0': isVisible,
             'translate-y-full': !isVisible,
@@ -222,6 +222,8 @@ export function Feedback() {
         style={{
           borderColor: colors.$20,
           backgroundColor: colors.$1,
+          boxShadow:
+            '0 -4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)',
         }}
       >
         <button
@@ -256,13 +258,17 @@ export function Feedback() {
                   type="button"
                   onClick={() => handleRatingClick(rating)}
                   className={classNames(
-                    `w-12 h-12 rounded-full font-medium transition-all duration-200 focus:outline-none ${
-                      selectedRating === rating
-                        ? 'bg-blue-500 text-white scale-105'
-                        : selectedRating !== null && selectedRating >= rating
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                    }`
+                    'w-12 h-12 rounded-full font-semibold transition-all duration-200 focus:outline-none border-2',
+                    {
+                      'bg-blue-600 text-white border-blue-800 shadow-md scale-105':
+                        selectedRating === rating,
+                      'bg-blue-500 text-white border-blue-700':
+                        selectedRating !== null &&
+                        selectedRating >= rating &&
+                        selectedRating !== rating,
+                      'bg-gray-100 text-gray-800 border-gray-400 hover:bg-gray-200 hover:border-gray-500':
+                        selectedRating === null || selectedRating < rating,
+                    }
                   )}
                 >
                   {rating}
