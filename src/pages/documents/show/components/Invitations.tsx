@@ -120,16 +120,16 @@ function Invitation({ invitation, document }: InvitationProps) {
 
     if (invitation.signed_date) {
       dateString = invitation.signed_date;
-      label = t('signed_on');
+      label = t('signed');
     } else if (invitation.viewed_date) {
       dateString = invitation.viewed_date;
-      label = t('viewed_on');
+      label = t('viewed');
     } else if (invitation.sent_date) {
       dateString = invitation.sent_date;
       label = t('sent');
     } else {
       dateString = invitation.created_at;
-      label = t('created_on');
+      label = t('created');
     }
 
     return (
