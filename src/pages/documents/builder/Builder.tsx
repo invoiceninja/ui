@@ -1,9 +1,21 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { useClientsQuery } from '$app/common/queries/clients';
+import { useDocumentQuery } from '$app/common/queries/docuninja/documents';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -42,9 +54,11 @@ import {
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
 import collect from 'collect.js';
+import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { FaFileSignature } from 'react-icons/fa';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
@@ -456,10 +470,17 @@ function Builder() {
   const [t] = useTranslation();
 
   const { id } = useParams();
+
   const colors = useColorScheme();
 
+  const docuninjaAccount = useAtomValue(docuNinjaAtom);
+
+  const { data: document } = useDocumentQuery({
+    id,
+    enabled: Boolean(id),
+  });
+
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
@@ -480,6 +501,30 @@ function Builder() {
 
   const handleSend = () => {
     window.dispatchEvent(new CustomEvent('builder:open.send.confirmation'));
+  };
+
+  const getDocuNinjaCompany = () => {
+    return docuninjaAccount?.companies?.find(
+      (company) => company.id === localStorage.getItem('DOCUNINJA_COMPANY_ID')
+    );
+  };
+
+  const getInvitationId = () => {
+    const currentInvitationIndex = document?.invitations?.findIndex(
+      (invitation) => invitation.user_id === docuninjaAccount?.id
+    ) as unknown as number;
+
+    if (currentInvitationIndex === -1) {
+      return null;
+    }
+
+    const currentInvitation = document?.invitations?.[currentInvitationIndex];
+
+    if (!document?.invitations?.[currentInvitationIndex]?.client_contact_id) {
+      return currentInvitation?.id;
+    }
+
+    return null;
   };
 
   useEffect(() => {
@@ -535,11 +580,40 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
+          {getInvitationId() && (
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() =>
+                window.open(
+                  route(
+                    '/documents/sign/:document/:invitation?sig=:sig&company=:company',
+                    {
+                      document: id,
+                      invitation: getInvitationId(),
+                      sig: getInvitationId(),
+                      company: getDocuNinjaCompany()?.id,
+                    }
+                  ),
+                  '_blank'
+                )
+              }
+              disabled={isDocumentSaving}
+              disableWithoutIcon
+            >
+              <div>
+                <Icon element={FaFileSignature} />
+              </div>
+
+              <span>{t('sign')}</span>
+            </Button>
+          )}
+
           <Button
             type="secondary"
             behavior="button"
             onClick={handleSend}
-            disabled={isDocumentSaving || isDocumentSending}
+            disabled={isDocumentSaving}
             disableWithoutIcon
           >
             <div>
