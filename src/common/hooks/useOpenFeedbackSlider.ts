@@ -51,7 +51,10 @@ export function useOpenFeedbackSlider() {
   };
 
   return () => {
-    if (isHosted()) {
+    const isFeedbackFeatureDisabled =
+      import.meta.env.VITE_DISABLE_FEEDBACK_FEATURE === 'true';
+
+    if (isHosted() && !isFeedbackFeatureDisabled) {
       const isUserAccountOlderThan7Days =
         currentUser &&
         dayjs().diff(dayjs.unix(currentUser.created_at), 'days') > 7;
