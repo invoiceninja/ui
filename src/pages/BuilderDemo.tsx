@@ -33,6 +33,7 @@ import {
 } from '@docuninja/builder2.0';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { Alertbox } from './documents/builder/Builder';
 
 export function BuilderDemo() {
   return (
@@ -88,6 +89,7 @@ export function BuilderDemo() {
               validationErrors: ValidationErrors,
               sign: () => null,
               toolboxContext: ToolboxContext,
+              alert: Alertbox,
             },
             styles: {
               frame: {
@@ -100,6 +102,7 @@ export function BuilderDemo() {
                 sticky: false,
               },
             },
+            readonly: false,
           }}
         >
           <Builder />
