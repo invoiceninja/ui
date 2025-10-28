@@ -4,6 +4,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { useClientsQuery } from '$app/common/queries/clients';
+import { useDocumentQuery } from '$app/common/queries/docuninja/documents';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -458,8 +459,12 @@ function Builder() {
   const { id } = useParams();
   const colors = useColorScheme();
 
+  const { data: document } = useDocumentQuery({
+    id,
+    enabled: Boolean(id),
+  });
+
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
@@ -480,6 +485,13 @@ function Builder() {
 
   const handleSend = () => {
     window.dispatchEvent(new CustomEvent('builder:open.send.confirmation'));
+  };
+
+  const doesDocumentHaveSignatories = () => {
+    const rectangles =
+      document?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+
+    return rectangles.length > 0;
   };
 
   useEffect(() => {
@@ -535,19 +547,21 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-          <Button
-            type="secondary"
-            behavior="button"
-            onClick={handleSend}
-            disabled={isDocumentSaving || isDocumentSending}
-            disableWithoutIcon
-          >
-            <div>
-              <Icon element={MdSend} />
-            </div>
+          {doesDocumentHaveSignatories() && (
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={handleSend}
+              disabled={isDocumentSaving}
+              disableWithoutIcon
+            >
+              <div>
+                <Icon element={MdSend} />
+              </div>
 
-            <span>{t('send')}</span>
-          </Button>
+              <span>{t('send')}</span>
+            </Button>
+          )}
 
           <Button
             behavior="button"
