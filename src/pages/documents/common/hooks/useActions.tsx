@@ -255,7 +255,7 @@ export function useActions(params?: Params) {
           onClick={() => makeTemplate(doc)}
           icon={<Icon element={MdPalette} />}
         >
-          {t('make_template')}
+          {t('create_template')}
         </DropdownElement>
       ),
     (doc) =>
