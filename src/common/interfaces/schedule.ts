@@ -38,8 +38,10 @@ export interface Parameters {
   include_project_tasks?: boolean;
   auto_send?: boolean;
   invoice_id?: string;
-  schedule?: ScheduleParams[]
+  schedule?: ScheduleParams[];
+  template?: string;
 }
+
 export interface ScheduleParams {
   id: number;
   date: string;
@@ -67,4 +69,3 @@ export interface Schedule {
   archived_at: number;
   remaining_cycles: number;
 }
-
