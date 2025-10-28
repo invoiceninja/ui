@@ -199,7 +199,7 @@ export default function SignatoryMapping() {
         navigate(route('/documents/:id/builder', { id: response.data.data.id }));
       })
       .catch((error) => {
-        toast.error('failed_to_create_document');
+        toast.error('error_refresh_page');
         console.error(error);
       })
       .finally(() => setIsSubmitting(false));
@@ -387,7 +387,7 @@ export default function SignatoryMapping() {
                 disabled={isSubmitting || Object.keys(mappings).filter(id => mappings[id]).length !== signatoryIds.length}
                 className="w-full"
               >
-                {t('create_document')}
+                {t('create')}
               </Button>
               
               <Button

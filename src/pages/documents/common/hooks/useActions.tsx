@@ -161,7 +161,7 @@ export function useActions(params?: Params) {
           onClick={() => makeBluePrint(doc)}
           icon={<Icon element={MdPalette} />}
         >
-          {t('make_blueprint')}
+          {t('create_template')}
         </DropdownElement>
       ),
     (doc) =>
