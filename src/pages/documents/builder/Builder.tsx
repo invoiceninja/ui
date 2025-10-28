@@ -22,6 +22,7 @@ import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import {
+  AlertProps,
   Builder as Builder$,
   BuilderContext,
   ConfirmationDialogButtonProps,
@@ -452,6 +453,14 @@ function ToolboxContext({ options }: ToolboxContextProps) {
   );
 }
 
+export function Alertbox({ children }: AlertProps) {
+  return (
+    <Alert className="m-5" type="danger">
+      {children}
+    </Alert>
+  );
+}
+
 function Builder() {
   const [t] = useTranslation();
 
@@ -612,6 +621,7 @@ function Builder() {
               sign: () => null,
               toolboxContext: ToolboxContext,
               helper: () => null,
+              alert: Alertbox,
             },
             styles: {
               frame: {
@@ -667,6 +677,7 @@ function Builder() {
             company:
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
+            readonly: false,
           }}
         >
           <Builder$ />
