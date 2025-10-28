@@ -61,6 +61,8 @@ export default function Details(props?: DocuninjaUserProps) {
           value={user?.first_name}
           onValueChange={(value) => handleChange('first_name', value)}
           errorMessage={errors?.errors.first_name}
+          readOnly={true}
+          disabled={true}
         />
       </Element>
 
@@ -69,6 +71,8 @@ export default function Details(props?: DocuninjaUserProps) {
           value={user?.last_name}
           onValueChange={(value) => handleChange('last_name', value)}
           errorMessage={errors?.errors.last_name}
+          readOnly={true}
+          disabled={true}
         />
       </Element>
 
@@ -77,6 +81,8 @@ export default function Details(props?: DocuninjaUserProps) {
           value={user?.email}
           onValueChange={(value) => handleChange('email', value)}
           errorMessage={errors?.errors.email}
+          readOnly={true}
+          disabled={true}
         />
       </Element>
 
