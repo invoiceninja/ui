@@ -23,6 +23,7 @@ import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import {
   AlertProps,
+  Blueprint,
   Builder as Builder$,
   BuilderContext,
   ConfirmationDialogButtonProps,
@@ -32,6 +33,7 @@ import {
   CreateDialogTabButtonProps,
   DeleteDialogButtonProps,
   DeleteDialogProps,
+  Document,
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
@@ -43,6 +45,7 @@ import {
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
 import collect from 'collect.js';
+import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -469,13 +472,14 @@ function Builder() {
 
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
+  const [entity, setEntity] = useState<Document | Blueprint | null>(null)
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
-      name: t('edit'),
+      name: entity?.description || t('edit'),
       href: route('/documents/:id/builder', { id }),
     },
   ];
@@ -678,6 +682,7 @@ function Builder() {
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
             readonly: false,
+            onEntityReady: (entity) => setEntity(entity),
           }}
         >
           <Builder$ />
