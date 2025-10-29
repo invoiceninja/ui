@@ -34,6 +34,8 @@ import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import {
+  AlertProps,
+  Blueprint,
   Builder as Builder$,
   BuilderContext,
   ConfirmationDialogButtonProps,
@@ -43,6 +45,7 @@ import {
   CreateDialogTabButtonProps,
   DeleteDialogButtonProps,
   DeleteDialogProps,
+  Document,
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
@@ -466,6 +469,14 @@ function ToolboxContext({ options }: ToolboxContextProps) {
   );
 }
 
+export function Alertbox({ children }: AlertProps) {
+  return (
+    <Alert className="m-5" type="danger">
+      {children}
+    </Alert>
+  );
+}
+
 function Builder() {
   const [t] = useTranslation();
 
@@ -481,13 +492,15 @@ function Builder() {
   });
 
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
+  const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
+  const [entity, setEntity] = useState<Document | Blueprint | null>(null);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
-      name: t('edit'),
+      name: entity?.description || t('edit'),
       href: route('/documents/:id/builder', { id }),
     },
   ];
@@ -686,6 +699,7 @@ function Builder() {
               sign: () => null,
               toolboxContext: ToolboxContext,
               helper: () => null,
+              alert: Alertbox,
             },
             styles: {
               frame: {
@@ -741,6 +755,8 @@ function Builder() {
             company:
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
+            readonly: false,
+            onEntityReady: (entity) => setEntity(entity),
           }}
         >
           <Builder$ />
