@@ -45,7 +45,6 @@ import {
   ValidationErrorsProps,
 } from '@docuninja/builder2.0';
 import collect from 'collect.js';
-import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
