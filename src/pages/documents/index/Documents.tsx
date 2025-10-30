@@ -201,10 +201,11 @@ export default function Documents() {
               </div>
             </Button>
           )}
-          showEdit={(document: DocumentType) =>
-            document?.status_id !== DocumentStatus.Completed &&
-            document?.status_id !== DocumentStatus.Voided
-          }
+          showEdit={() => true}
+          // showEdit={(document: DocumentType) =>
+          //   document?.status_id !== DocumentStatus.Completed &&
+          //   document?.status_id !== DocumentStatus.Voided
+          // }
           filterParameterKey="search"
         />
       </div>

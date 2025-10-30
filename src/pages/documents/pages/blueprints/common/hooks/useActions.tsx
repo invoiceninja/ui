@@ -137,7 +137,7 @@ export function useActions(params: UseActionsParams) {
         onClick={() => onSettingsClick(blueprint)}
         icon={<Icon element={MdSettings} />}
       >
-        {t('settings')}
+        {t('options')}
       </DropdownElement>
     ),
   ];
