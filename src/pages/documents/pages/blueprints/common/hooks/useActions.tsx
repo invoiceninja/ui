@@ -96,11 +96,37 @@ export function useActions(params: UseActionsParams) {
     }
   };
   
+  const handleUseTemplateNoMapping = (blueprint: Blueprint) => {
+
+      request(
+        'POST',
+        docuNinjaEndpoint(`/api/blueprints/${blueprint.id}/action`),
+        { action: 'make_document' },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          },
+        }
+      ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
+        navigate(route('/documents/:id/builder', { id: response.data.data.id }))
+      );
+
+  };
+
   const actions: Action<Blueprint>[] = [
     (blueprint: Blueprint) => (
       Boolean(blueprint.is_template && !blueprint.is_deleted) && (
       <DropdownElement
         onClick={() => handleUseTemplate(blueprint)}
+        icon={<Icon element={MdCreate} />}
+      >
+        {t('use_template')}
+      </DropdownElement>
+    )),
+    (blueprint: Blueprint) => (
+      Boolean(!blueprint.is_template && !blueprint.is_deleted) && (
+      <DropdownElement
+        onClick={() => handleUseTemplateNoMapping(blueprint)}
         icon={<Icon element={MdCreate} />}
       >
         {t('use_template')}
