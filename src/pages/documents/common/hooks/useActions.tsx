@@ -22,6 +22,7 @@ import {
   MdDownload,
   MdPalette,
   MdSettings,
+  MdTimer,
 } from 'react-icons/md';
 
 import { docuNinjaEndpoint } from '$app/common/helpers';
@@ -37,6 +38,8 @@ import { ArchiveDocumentAction } from '../../show/components/ArchiveDocumentActi
 import { RestoreDocumentAction } from '../../show/components/RestoreDocumentAction';
 import { SendInvitationsModal } from '../../show/components/SendInvitationsModal';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { route } from '$app/common/helpers/route';
+import { useNavigate } from 'react-router-dom';
 
 interface Params {
   onSettingsClick?: (doc: Document) => void;
@@ -165,7 +168,7 @@ export function useActions(params?: Params) {
   const { voidDocument, isFormBusy: isVoidingDocumentBusy } = useVoidDocument();
 
   const { isEditOrShowPage } = useEntityPageIdentifier({
-    entity: 'blueprint',
+    entity: 'document',
   });
 
   const getUserInvitation = (doc: Document) => {
@@ -189,34 +192,18 @@ export function useActions(params?: Params) {
       ) ?? false
     );
   };
+  const navigate = useNavigate();
 
   const actions: Action<Document>[] = [
-    // (doc) =>
-    //   Boolean(doc && !doc.is_deleted) && (
-    //     <DropdownElement
-    //       to={route('/documents/:id/builder', { id: doc.id })}
-    //       icon={<Icon element={MdSettings} />}
-    //     >
-    //       {t('edit')}
-    //     </DropdownElement>
-    //   ),
-    // (doc) =>
-    //   Boolean(doc && !doc.is_deleted) && (
-    //     <DropdownElement
-    //       onClick={() =>
-    //         window.open(
-    //           route('/documents/sign/:document/:invitation', {
-    //             document: doc.id,
-    //             invitation: userInvitation?.id,
-    //           }),
-    //           '_blank'
-    //         )
-    //       }
-    //       icon={<Icon element={FaFileSignature} />}
-    //     >
-    //       {t('sign')}
-    //     </DropdownElement>
-    //   ),
+    (doc) =>
+      Boolean(doc && !doc.is_deleted) && (
+        <DropdownElement
+          onClick={() => navigate(route('/documents/:id', { id: doc.id }))}
+          icon={<Icon element={MdTimer} />}
+        >
+          {t('timeline')}
+        </DropdownElement>
+      ),      
     (doc) =>
       Boolean(doc && !doc.is_deleted) && (
         <SendInvitationsModal document={doc} renderAsDropdownElement />
@@ -255,25 +242,31 @@ export function useActions(params?: Params) {
           onClick={() => makeTemplate(doc)}
           icon={<Icon element={MdPalette} />}
         >
-          {t('make_template')}
+          {t('clone_to_template')}
         </DropdownElement>
       ),
-    (doc) =>
-      Boolean(doc && !doc.is_deleted && doc.status_id === DocumentStatus.Sent) && (
-        <DropdownElement
-          onClick={() => voidDocument(doc)}
-          icon={<Icon element={MdCancel} />}
-        >
-          {t('void')}
-        </DropdownElement>
-      ),
+    (doc) => {
+      const statusId = doc?.status_id;
+      const isSent = statusId === DocumentStatus.Sent;
+      const isNotVoided = statusId !== DocumentStatus.Voided;
+      return (
+        Boolean(doc && !doc.is_deleted && isSent && isNotVoided) && (
+          <DropdownElement
+            onClick={() => voidDocument(doc)}
+            icon={<Icon element={MdCancel} />}
+          >
+            {t('void')}
+          </DropdownElement>
+        )
+      );
+    },
     (doc) =>
       Boolean(doc && !doc.is_deleted) && (
         <DropdownElement
-          onClick={() => onSettingsClick ? onSettingsClick(doc) : console.log('Settings clicked for document:', doc.id)}
+          onClick={() => onSettingsClick?.(doc)}
           icon={<Icon element={MdSettings} />}
         >
-          {t('settings')}
+          {t('options')}
         </DropdownElement>
       ),
     

@@ -31,13 +31,13 @@ export default function Edit() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
+  const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
+  
   const actions = useActions({
     onSettingsClick: (blueprint: Blueprint) => {
       setIsEditModalOpen(true);
     },
   });
-
-  const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
 
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },

@@ -858,6 +858,7 @@ export interface ComboboxAsyncProps<T> {
   onInputValueChange?: (value: string) => void;
   compareOnlyByValue?: boolean;
   withShadow?: boolean;
+  headers?: Record<string, string>;
 }
 
 export function ComboboxAsync<T = any>({
@@ -881,10 +882,17 @@ export function ComboboxAsync<T = any>({
   onInputValueChange,
   compareOnlyByValue,
   withShadow,
+  headers,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
   const [enableQuery, setEnableQuery] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (initiallyVisible) {
+      setEnableQuery(true);
+    }
+  }, [initiallyVisible]);
 
   useEffect(() => {
     setUrl(endpoint);
@@ -909,11 +917,11 @@ export function ComboboxAsync<T = any>({
   const { data, isLoading } = useQuery(
     [new URL(url).pathname, new URL(url).pathname + new URL(url).search],
     () =>
-      request('GET', new URL(url).href).then(
+      request('GET', new URL(url).href, {}, { headers: headers || {} }).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
-          response.data.data.map((entry) =>
+          (response.data.data || []).map((entry) =>
             data.push({
               id: entry[entryOptions.id],
               label: entry[entryOptions.label],

@@ -21,6 +21,7 @@ import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
+import { Alertbox } from '$app/pages/documents/builder/Builder';
 import {
   Builder as Builder$,
   BuilderContext,
@@ -636,6 +637,7 @@ function BlueprintBuilder() {
               sign: () => null,
               toolboxContext: ToolboxContext,
               helper: () => null,
+              alert: Alertbox,
             },
             styles: {
               frame: {
@@ -687,6 +689,7 @@ function BlueprintBuilder() {
             company:
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
+              readonly: false,
           }}
         >
           <Builder$ />

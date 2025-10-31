@@ -150,17 +150,26 @@ export default function Document() {
                 <span>{document.description || documentTitle}</span>
 
                 {document && !isLoading && (
-                  <Badge
-                    variant={
-                      (STATUS_VARIANTS[
-                        document.status_id as keyof typeof STATUS_VARIANTS
-                      ] || 'primary') as BadgeVariant
-                    }
-                  >
-                    {STATUS_LABELS[
-                      document.status_id as keyof typeof STATUS_LABELS
-                    ] || 'Unknown'}
-                  </Badge>
+                  <>
+                    {document.is_deleted && (
+                      <Badge variant="red">{t('deleted')}</Badge>
+                    )}
+                    {document.archived_at && (
+                      <Badge variant="orange">{t('archived')}</Badge>
+                    )}
+
+                    <Badge
+                      variant={
+                        (STATUS_VARIANTS[
+                          document.status_id as keyof typeof STATUS_VARIANTS
+                        ] || 'primary') as BadgeVariant
+                      }
+                    >
+                      {STATUS_LABELS[
+                        document.status_id as keyof typeof STATUS_LABELS
+                      ] || 'Unknown'}
+                    </Badge>
+                  </>
                 )}
               </div>
             }

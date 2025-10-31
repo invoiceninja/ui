@@ -23,6 +23,8 @@ import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import {
+  AlertProps,
+  Blueprint,
   Builder as Builder$,
   BuilderContext,
   ConfirmationDialogButtonProps,
@@ -32,6 +34,7 @@ import {
   CreateDialogTabButtonProps,
   DeleteDialogButtonProps,
   DeleteDialogProps,
+  Document,
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
@@ -49,6 +52,7 @@ import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
+import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 
 function Loading() {
   return (
@@ -453,6 +457,14 @@ function ToolboxContext({ options }: ToolboxContextProps) {
   );
 }
 
+export function Alertbox({ children }: AlertProps) {
+  return (
+    <Alert className="m-5" type="danger">
+      {children}
+    </Alert>
+  );
+}
+
 function Builder() {
   const [t] = useTranslation();
 
@@ -465,13 +477,14 @@ function Builder() {
   });
 
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
+  const [entity, setEntity] = useState<Document | Blueprint | null>(null)
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
     { name: t('documents'), href: '/documents' },
     {
-      name: t('edit'),
+      name: entity?.description || t('edit'),
       href: route('/documents/:id/builder', { id }),
     },
   ];
@@ -548,7 +561,9 @@ function Builder() {
       navigationTopRight={
         <div className="flex items-center gap-2">
           {doesDocumentHaveSignatories() && (
-            <Button
+            {entity && (entity as Document)?.status_id <= DocumentStatus.Sent && (
+          
+          <Button
               type="secondary"
               behavior="button"
               onClick={handleSend}
@@ -562,7 +577,7 @@ function Builder() {
               <span>{t('send')}</span>
             </Button>
           )}
-
+        )}
           <Button
             behavior="button"
             onClick={handleSave}
@@ -626,6 +641,7 @@ function Builder() {
               sign: () => null,
               toolboxContext: ToolboxContext,
               helper: () => null,
+              alert: Alertbox,
             },
             styles: {
               frame: {
@@ -681,6 +697,8 @@ function Builder() {
             company:
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
+            readonly: false,
+            onEntityReady: (entity) => setEntity(entity),
           }}
         >
           <Builder$ />

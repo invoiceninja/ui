@@ -71,10 +71,10 @@ export function SplashPage({ pages }: DocumentStateProps) {
               {t('documents')}
             </h2>
             <p className="text-gray-600">
-              {t('documents_splash_message')}
+              {t('docuninja_splash_message')}
             </p>
             <p className="text-sm text-gray-500">
-              {t('contact_admin_for_access')}
+              {t('docuninja_contact_admin_for_access')}
             </p>
           </div>
         </Card>
