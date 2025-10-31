@@ -477,7 +477,7 @@ function Builder() {
   });
 
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const [entity, setEntity] = useState<Document | Blueprint | null>(null)
+  const [entity, setEntity] = useState<Document | Blueprint | null>(null);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
@@ -560,28 +560,28 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-          {doesDocumentHaveSignatories() && (
-            {entity && (entity as Document)?.status_id <= DocumentStatus.Sent && (
-          
-          <Button
-              type="secondary"
-              behavior="button"
-              onClick={handleSend}
-              disabled={isDocumentSaving}
-              disableWithoutIcon
-            >
-              <div>
-                <Icon element={MdSend} />
-              </div>
+          {doesDocumentHaveSignatories() &&
+            entity &&
+            (entity as Document)?.status_id <= DocumentStatus.Sent && (
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={handleSend}
+                disabled={isDocumentSaving}
+                disableWithoutIcon
+              >
+                <div>
+                  <Icon element={MdSend} />
+                </div>
 
-              <span>{t('send')}</span>
-            </Button>
-          )}
-        )}
+                <span>{t('send')}</span>
+              </Button>
+            )}
+
           <Button
             behavior="button"
             onClick={handleSave}
-            // disabled={isDocumentSaving || isDocumentSending}
+            disabled={isDocumentSaving}
             disableWithoutIcon
           >
             {t('save')}
