@@ -10,7 +10,7 @@
 
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useColorScheme } from '$app/common/colors';
-import { route } from '$app/common/helpers/route';
+import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
@@ -492,7 +492,6 @@ function Builder() {
   });
 
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
   const [entity, setEntity] = useState<Document | Blueprint | null>(null);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
@@ -589,7 +588,7 @@ function Builder() {
 
   return (
     <Default
-      title={t('')}
+      title={t('edit_document')}
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
@@ -599,7 +598,7 @@ function Builder() {
               behavior="button"
               onClick={() =>
                 window.open(
-                  route(
+                  routeWithOrigin(
                     '/documents/sign/:document/:invitation?sig=:sig&company=:company',
                     {
                       document: id,
