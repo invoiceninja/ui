@@ -65,6 +65,7 @@ import { FaFileSignature } from 'react-icons/fa';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
+import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 
 function Loading() {
   return (
@@ -621,20 +622,21 @@ function Builder() {
             </Button>
           )}
 
-          <Button
-            type="secondary"
-            behavior="button"
-            onClick={handleSend}
-            disabled={isDocumentSaving}
-            disableWithoutIcon
-          >
-            <div>
-              <Icon element={MdSend} />
-            </div>
+          {entity && (entity as Document)?.status_id <= DocumentStatus.Sent && (
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={handleSend}
+              disabled={isDocumentSaving}
+              disableWithoutIcon
+            >
+              <div>
+                <Icon element={MdSend} />
+              </div>
 
-            <span>{t('send')}</span>
-          </Button>
-
+              <span>{t('send')}</span>
+            </Button>
+          )}
           <Button
             behavior="button"
             onClick={handleSave}

@@ -12,7 +12,7 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Document } from '$app/common/interfaces/docuninja/api';
+import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
@@ -82,7 +82,7 @@ export function DocumentSettingsModal({
 
   return (
     <Modal
-      title={t('settings')}
+      title={t('options')}
       visible={visible}
       onClose={() => setVisible(false)}
     >
@@ -95,14 +95,15 @@ export function DocumentSettingsModal({
         errorMessage={errors?.errors.description}
       />
 
+    {document.status_id <= DocumentStatus.Sent && (
       <InputField
         type="date"
-        label={t('expires')}
+        label={t('expiry_date')}
         value={payload.expires_at}
         onValueChange={(value) => setPayload({ ...payload, expires_at: value })}
         errorMessage={errors?.errors.expires_at}
       />
-
+    )}
       <Button behavior="button" disabled={isFormBusy} onClick={handleSubmit}>
         {t('save')}
       </Button>

@@ -85,7 +85,7 @@ export function useTableColumns() {
       variant = 'red';
       label = t('deleted');
     }
-    else if (document.archived_at) {
+    else if (document.archived_at !== null) {
       variant = 'orange';
       label = t('archived');
     }
