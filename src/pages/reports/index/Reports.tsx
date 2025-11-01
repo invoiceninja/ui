@@ -58,6 +58,7 @@ import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { cloneDeep } from 'lodash';
 import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
+import { TemplateSelector } from '../common/components/TemplateSelector';
 
 interface Range {
   identifier: string;
@@ -540,6 +541,20 @@ export default function Reports() {
                 onValueChange={(statuses) =>
                   handlePayloadChange('status', statuses)
                 }
+              />
+            </Element>
+          )}
+
+          {showReportField('template_id') && (
+            <Element leftSide={t('template')}>
+              <TemplateSelector
+                value={report.payload.template_id}
+                onChange={(design) =>
+                  handlePayloadChange('template_id', design.id)
+                }
+                clearButton
+                onClearButtonClick={() => handlePayloadChange('template_id', '')}
+                entity={report.identifier}
               />
             </Element>
           )}
