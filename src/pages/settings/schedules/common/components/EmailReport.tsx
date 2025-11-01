@@ -24,7 +24,6 @@ import { MultiVendorSelector } from '$app/pages/reports/common/components/MultiV
 import { MultiProjectSelector } from '$app/pages/reports/common/components/MultiProjectSelector';
 import { MultiExpenseCategorySelector } from '$app/pages/reports/common/components/MultiExpenseCategorySelector';
 import { TemplateSelector } from '$app/pages/reports/common/components/TemplateSelector';
-import { report } from 'process';
 
 interface Props {
   schedule: Schedule;
