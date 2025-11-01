@@ -113,8 +113,8 @@ const ReportFields: Record<Identifier, Field[]> = {
     'product_key',
     'template_id',
   ],
-  project: ['clients', 'projects', 'template_id'],
-  activity: ['activity_type_id', 'template_id'],
+  project: ['clients', 'projects'],
+  activity: ['activity_type_id'],
   contact: [],
   recurring_invoice: ['include_deleted', 'status', 'client', 'template_id'],
   recurring_invoice_item: [

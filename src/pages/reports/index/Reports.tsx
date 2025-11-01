@@ -406,7 +406,7 @@ export default function Reports() {
           label={t('actions')}
           disabled={!proPlan() && !enterprisePlan()}
         >
-          {report.supports_previews && (
+          {report.supports_previews && !report.payload?.template_id && (
             <DropdownElement
               icon={<Icon element={MdOutlinePreview} />}
               onClick={handlePreview}
