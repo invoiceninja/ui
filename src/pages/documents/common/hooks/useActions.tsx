@@ -16,23 +16,13 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import {
-  MdCancel,
-  MdControlPointDuplicate,
-  MdDownload,
-  MdPalette,
-  MdSettings,
-  MdTimer,
-} from 'react-icons/md';
+import { MdDownload, MdSettings, MdTimer } from 'react-icons/md';
 
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { useCloneDocument } from '../../show/hooks/useCloneDocument';
-import { useMakeTemplate } from '../../show/hooks/useMakeTemplate';
-import { useVoidDocument } from '../../show/hooks/useVoidDocument';
 import { DeleteDocumentAction } from '../../show/components/DeleteDocumentAction';
 import { ArchiveDocumentAction } from '../../show/components/ArchiveDocumentAction';
 import { RestoreDocumentAction } from '../../show/components/RestoreDocumentAction';
@@ -40,6 +30,9 @@ import { SendInvitationsModal } from '../../show/components/SendInvitationsModal
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { route } from '$app/common/helpers/route';
 import { useNavigate } from 'react-router-dom';
+import { VoidAction } from '../components/VoidAction';
+import { CloneAction } from '../components/CloneAction';
+import { MakeTemplateAction } from '../components/MakeTemplateAction';
 
 interface Params {
   onSettingsClick?: (doc: Document) => void;
@@ -47,6 +40,13 @@ interface Params {
 
 export function useActions(params?: Params) {
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const { isEditOrShowPage } = useEntityPageIdentifier({
+    entity: 'document',
+  });
+
   const { onSettingsClick } = params || {};
 
   const docuCompanyAccountDetails = useAtomValue(docuNinjaAtom);
@@ -63,9 +63,7 @@ export function useActions(params?: Params) {
       {
         responseType: 'blob',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem(
-            'X-DOCU-NINJA-TOKEN'
-          )}`,
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
         },
       }
     )
@@ -118,9 +116,7 @@ export function useActions(params?: Params) {
       {
         responseType: 'blob',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem(
-            'X-DOCU-NINJA-TOKEN'
-          )}`,
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
         },
       }
     )
@@ -159,18 +155,6 @@ export function useActions(params?: Params) {
       });
   };
 
-  const { makeTemplate, isFormBusy: isMakingTemplateBusy } =
-    useMakeTemplate();
-
-  const { cloneDocument, isFormBusy: isCloningDocumentBusy } =
-    useCloneDocument();
-
-  const { voidDocument, isFormBusy: isVoidingDocumentBusy } = useVoidDocument();
-
-  const { isEditOrShowPage } = useEntityPageIdentifier({
-    entity: 'document',
-  });
-
   const getUserInvitation = (doc: Document) => {
     return doc?.invitations?.find(
       (invitation) =>
@@ -192,7 +176,6 @@ export function useActions(params?: Params) {
       ) ?? false
     );
   };
-  const navigate = useNavigate();
 
   const actions: Action<Document>[] = [
     (doc) =>
@@ -203,7 +186,7 @@ export function useActions(params?: Params) {
         >
           {t('timeline')}
         </DropdownElement>
-      ),      
+      ),
     (doc) =>
       Boolean(doc && !doc.is_deleted) && (
         <SendInvitationsModal document={doc} renderAsDropdownElement />
@@ -226,40 +209,10 @@ export function useActions(params?: Params) {
           {t('download')}
         </DropdownElement>
       ),
-    
-    (doc) =>
-      Boolean(doc && !doc.is_deleted) && (
-        <DropdownElement
-          onClick={() => cloneDocument(doc)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone')}
-        </DropdownElement>
-      ),
-    (doc) =>
-      Boolean(doc && !doc.is_deleted) && (
-        <DropdownElement
-          onClick={() => makeTemplate(doc)}
-          icon={<Icon element={MdPalette} />}
-        >
-          {t('clone_to_template')}
-        </DropdownElement>
-      ),
-    (doc) => {
-      const statusId = doc?.status_id;
-      const isSent = statusId === DocumentStatus.Sent;
-      const isNotVoided = statusId !== DocumentStatus.Voided;
-      return (
-        Boolean(doc && !doc.is_deleted && isSent && isNotVoided) && (
-          <DropdownElement
-            onClick={() => voidDocument(doc)}
-            icon={<Icon element={MdCancel} />}
-          >
-            {t('void')}
-          </DropdownElement>
-        )
-      );
-    },
+
+    (doc) => <CloneAction document={doc} />,
+    (doc) => <MakeTemplateAction document={doc} />,
+    (doc) => <VoidAction document={doc} />,
     (doc) =>
       Boolean(doc && !doc.is_deleted) && (
         <DropdownElement
@@ -269,9 +222,7 @@ export function useActions(params?: Params) {
           {t('options')}
         </DropdownElement>
       ),
-    
-    (doc) =>
-      isEditOrShowPage && !doc.is_deleted && <Divider withoutPadding />,
+    (doc) => isEditOrShowPage && !doc.is_deleted && <Divider withoutPadding />,
     (doc) =>
       isEditOrShowPage &&
       getEntityState(doc) === EntityState.Active && (
