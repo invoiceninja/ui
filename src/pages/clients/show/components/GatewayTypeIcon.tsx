@@ -17,7 +17,7 @@ import paypalLogo from '/gateway-card-images/paypal.png';
 import braintreeLogo from '/gateway-card-images/braintree.svg.png';
 import checkoutcomLogo from '/gateway-card-images/checkout.jpg';
 import goCardlessLogo from '/gateway-card-images/gocardless.png';
-import mollieLogo from '/gateway-card-images/mollie.png';
+import { MollieIcon } from '$app/components/icons/MollieIcon';
 import payfastLogo from '/gateway-card-images/payfast.png';
 import paytraceLogo from '/gateway-card-images/paytrace.svg';
 import razorpayLogo from '/gateway-card-images/razorpay.png';
@@ -175,11 +175,9 @@ export function GatewayTypeIcon(props: Props) {
 
     case 'mollie':
       return (
-        <img
-          src={mollieLogo}
-          alt="Mollie"
-          style={props.style || { width: 40, height: 40 }}
-        />
+        <div style={props.style || { width: 40, height: 40, display: 'flex' }}>
+          <MollieIcon />
+        </div>
       );
 
     case 'payfast':
