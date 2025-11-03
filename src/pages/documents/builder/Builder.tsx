@@ -15,7 +15,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { useClientsQuery } from '$app/common/queries/clients';
-import { useDocumentQuery } from '$app/common/queries/docuninja/documents';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -485,15 +484,9 @@ function Builder() {
 
   const docuninjaAccount = useAtomValue(docuNinjaAtom);
 
-  const { data: document } = useDocumentQuery({
-    id,
-    enabled: Boolean(id),
-  });
-
   const [entity, setEntity] = useState<Document | null>(null);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
-  const [entity, setEntity] = useState<Document | Blueprint | null>(null);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
@@ -530,7 +523,7 @@ function Builder() {
   };
 
   const getInvitationId = () => {
-    const currentInvitationIndex = document?.invitations?.findIndex(
+    const currentInvitationIndex = entity?.invitations?.findIndex(
       (invitation) => invitation.user_id === docuninjaAccount?.id
     ) as unknown as number;
 
@@ -538,9 +531,9 @@ function Builder() {
       return null;
     }
 
-    const currentInvitation = document?.invitations?.[currentInvitationIndex];
+    const currentInvitation = entity?.invitations?.[currentInvitationIndex];
 
-    if (!document?.invitations?.[currentInvitationIndex]?.client_contact_id) {
+    if (!entity?.invitations?.[currentInvitationIndex]?.client_contact_id) {
       return currentInvitation?.id;
     }
 
