@@ -36,9 +36,6 @@ export interface ValidationEntityResponse {
 export function useCheckEInvoiceValidation(params: Params) {
   const { resource, enableQuery, onFinished } = params;
 
-  const isEntityValidationQueryEnabled =
-    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true';
-
   const queryClient = useQueryClient();
 
   const [validationEntityResponse, setValidationEntityResponse] = useState<
@@ -80,7 +77,7 @@ export function useCheckEInvoiceValidation(params: Params) {
   };
 
   useEffect(() => {
-    if (enableQuery && resource && isEntityValidationQueryEnabled) {
+    if (enableQuery && resource) {
       handleCheckValidation();
     }
   }, [enableQuery, resource]);

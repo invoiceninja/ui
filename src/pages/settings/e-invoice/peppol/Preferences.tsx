@@ -195,7 +195,6 @@ export function useTriggerEInvoiceRoutes() {
 
   return (
     isSelfHosted() &&
-    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true' &&
     Boolean(company) &&
     company?.settings.enable_e_invoice &&
     company?.settings.e_invoice_type === 'PEPPOL'
