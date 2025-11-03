@@ -29,6 +29,7 @@ export interface Payload {
   include_deleted?: boolean;
   pdf_email_attachment?: boolean;
   activity_type_id?: string;
+  template_id?: string;
 }
 
 export interface Report {

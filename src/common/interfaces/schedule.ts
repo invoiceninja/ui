@@ -39,7 +39,8 @@ export interface Parameters {
   auto_send?: boolean;
   invoice_id?: string;
   schedule?: ScheduleParams[];
-  template?: string;
+  template?: string; // This is the EMAIL template
+  template_id?: string;  // This is the REPORT template
 }
 
 export interface ScheduleParams {
@@ -68,4 +69,5 @@ export interface Schedule {
   created_at: number;
   archived_at: number;
   remaining_cycles: number;
+
 }
