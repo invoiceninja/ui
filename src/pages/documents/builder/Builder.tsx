@@ -612,7 +612,7 @@ function Builder() {
                   '_blank'
                 )
               }
-              disabled={isDocumentSaving}
+              disabled={isDocumentSaving || isDocumentSending}
               disableWithoutIcon
             >
               <div>
@@ -623,7 +623,11 @@ function Builder() {
             </Button>
           )}
 
-          {entity && (entity as Document)?.status_id <= DocumentStatus.Sent && (
+          {Boolean(
+            entity &&
+              (entity as Document)?.status_id <= DocumentStatus.Sent &&
+              doesDocumentHaveSignatories()
+          ) && (
             <Button
               type="secondary"
               behavior="button"
