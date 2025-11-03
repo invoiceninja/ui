@@ -4,7 +4,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { useClientsQuery } from '$app/common/queries/clients';
-import { useDocumentQuery } from '$app/common/queries/docuninja/documents';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -24,7 +23,6 @@ import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import {
   AlertProps,
-  Blueprint,
   Builder as Builder$,
   BuilderContext,
   ConfirmationDialogButtonProps,
@@ -471,13 +469,8 @@ function Builder() {
   const { id } = useParams();
   const colors = useColorScheme();
 
-  const { data: document } = useDocumentQuery({
-    id,
-    enabled: Boolean(id),
-  });
-
+  const [entity, setEntity] = useState<Document | null>(null);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const [entity, setEntity] = useState<Document | Blueprint | null>(null);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
@@ -502,7 +495,7 @@ function Builder() {
 
   const doesDocumentHaveSignatories = () => {
     const rectangles =
-      document?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
 
     return rectangles.length > 0;
   };
@@ -698,7 +691,7 @@ function Builder() {
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
             readonly: false,
-            onEntityReady: (entity) => setEntity(entity),
+            onEntityReady: (entity) => setEntity(entity as Document),
           }}
         >
           <Builder$ />
