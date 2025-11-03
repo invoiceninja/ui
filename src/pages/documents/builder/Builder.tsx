@@ -10,7 +10,7 @@
 
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useColorScheme } from '$app/common/colors';
-import { route } from '$app/common/helpers/route';
+import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
@@ -63,6 +63,7 @@ import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { FaFileSignature } from 'react-icons/fa';
 
 function Loading() {
   return (
@@ -593,6 +594,35 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
+          {getInvitationId() && (
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() =>
+                window.open(
+                  routeWithOrigin(
+                    '/documents/sign/:document/:invitation?sig=:sig&company=:company',
+                    {
+                      document: id,
+                      invitation: getInvitationId(),
+                      sig: getInvitationId(),
+                      company: getDocuNinjaCompany()?.id,
+                    }
+                  ),
+                  '_blank'
+                )
+              }
+              disabled={isDocumentSaving}
+              disableWithoutIcon
+            >
+              <div>
+                <Icon element={FaFileSignature} />
+              </div>
+
+              <span>{t('sign')}</span>
+            </Button>
+          )}
+
           {entity && (entity as Document)?.status_id <= DocumentStatus.Sent && (
             <Button
               type="secondary"
