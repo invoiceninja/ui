@@ -24,9 +24,10 @@ import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdCategory, MdDownload } from 'react-icons/md';
+import { MdCategory, MdDesignServices, MdDownload } from 'react-icons/md';
 import { AddToInvoiceAction } from '../components/AddToInvoiceAction';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface Props {
   isVisible: boolean;
@@ -146,6 +147,12 @@ export const useCustomBulkActions = () => {
 
   const [isChangeCategoryVisible, setIsChangeCategoryVisible] = useState(false);
 
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+  
   const customBulkActions: CustomBulkAction<Expense>[] = [
     ({ selectedResources, setSelected }) => (
       <DropdownElement
@@ -192,6 +199,21 @@ export const useCustomBulkActions = () => {
         resourceIds={selectedIds}
         setSelected={setSelected}
       />
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/expenses/bulk',
+            entity: 'expense',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
     ),
   ];
 

@@ -26,6 +26,10 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
+import { Client } from '$app/common/interfaces/client';
+import { ChangeTemplateModal, useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Expense } from '$app/common/interfaces/expense';
+import { InputLabel } from '$app/components/forms';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -45,6 +49,12 @@ export default function Expenses() {
 
   const customBulkActions = useCustomBulkActions();
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+    
   return (
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="en/expenses">
       <DataTable
@@ -80,6 +90,29 @@ export default function Expenses() {
         hideEditableOptions={!hasPermission('edit_expense')}
         enableSavingFilterPreference
       />
+
+    <ChangeTemplateModal<Expense>
+        entity="expense"
+        entities={changeTemplateResources as Expense[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(expense) => (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('number')}</InputLabel>
+
+            <span>{expense.number}</span>
+          </div>
+        )}
+        bulkLabelFn={(expense) => (
+          <div className="flex space-x-2">
+            <InputLabel>{t('number')}:</InputLabel>
+
+            <span>{expense.number}</span>
+          </div>
+        )}
+        bulkUrl="/api/v1/expenses/bulk"
+      />
+      
     </Default>
   );
 }
