@@ -27,6 +27,10 @@ export function MakeTemplateAction({ document }: Props) {
         onClose={() => setIsModalVisible(false)}
       >
         <div className="flex flex-col space-y-6">
+          <span className="font-medium text-sm">
+            {t('make_template_description')}
+          </span>
+
           <Button
             behavior="button"
             onClick={() => makeTemplate(document)}

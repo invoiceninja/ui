@@ -31,6 +31,10 @@ export function VoidAction({ document }: Props) {
         onClose={() => setIsModalVisible(false)}
       >
         <div className="flex flex-col space-y-6">
+          <span className="font-medium text-sm">
+            {t('void_document_description')}
+          </span>
+
           <Button
             behavior="button"
             onClick={() => voidDocument(document)}

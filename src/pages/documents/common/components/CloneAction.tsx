@@ -28,6 +28,10 @@ export function CloneAction({ document }: Props) {
         onClose={() => setIsModalVisible(false)}
       >
         <div className="flex flex-col space-y-6">
+          <span className="font-medium text-sm">
+            {t('clone_document_description')}
+          </span>
+
           <Button
             behavior="button"
             onClick={() => cloneDocument(document)}
