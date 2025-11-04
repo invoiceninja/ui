@@ -26,7 +26,6 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
-import { Client } from '$app/common/interfaces/client';
 import { ChangeTemplateModal, useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Expense } from '$app/common/interfaces/expense';
 import { InputLabel } from '$app/components/forms';
@@ -54,7 +53,7 @@ export default function Expenses() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
-    
+
   return (
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="en/expenses">
       <DataTable
