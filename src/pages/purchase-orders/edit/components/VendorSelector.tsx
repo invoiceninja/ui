@@ -21,6 +21,8 @@ import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { Tooltip } from '$app/components/Tooltip';
 
 interface Props {
   resource?: PurchaseOrder;
@@ -218,8 +220,42 @@ export function VendorSelector(props: Props) {
                       </div>
                     </div>
                   )}
+
+                  <div className="flex flex-col relative left-7">
+                    {(() => {
+                      const contactInvitation = resource?.invitations?.find(inv => inv.vendor_contact_id === contact.id);
+                      if(!contactInvitation) return null;
+                      return Boolean(
+                        contactInvitation?.link
+                      ) && (
+                        <div className="flex items-center space-x-2">
+                          <Link
+                            className="font-medium"
+                            to={`${contactInvitation.link}?silent=true&vendor_hash=${vendor.vendor_hash}`}
+                            external
+                          >
+                            {t('view_in_portal')}
+                          </Link>
+
+                          <Tooltip
+                            width="auto"
+                            placement="bottom"
+                            message={t('copy_link') as string}
+                            withoutArrow
+                          >
+                            <div className="mt-1.5">
+                              <CopyToClipboardIconOnly
+                                text={contactInvitation.link}
+                              />
+                            </div>
+                          </Tooltip>
+                        </div>
+                      );
+                    })()}
+                  </div>
                 </div>
               </div>
+              
             ))}
           </div>
         </div>
