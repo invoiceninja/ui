@@ -13,19 +13,21 @@ import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorSelector as Selector } from '$app/components/vendors/VendorSelector';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   resource?: PurchaseOrder;
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (id: string, checked: boolean) => unknown;
+  onContactCanSignCheckboxChange: (id: string, checked: boolean) => unknown;
   readonly?: boolean;
   errorMessage?: string | string[];
   initiallyVisible?: boolean;
@@ -67,6 +69,25 @@ export function VendorSelector(props: Props) {
     return Boolean(potential);
   };
 
+  const company = useCurrentCompany();
+
+  const isContactInvited = useCallback((contactId: string) => {
+    const isInvited = resource?.invitations?.some(inv => inv.vendor_contact_id === contactId) || false;
+    return isInvited;
+  }, [resource?.invitations]);
+
+  const getCanSignState = useCallback((contactId: string) => {
+    if (!resource?.invitations || !vendor?.contacts) {
+      return false;
+    }
+
+    // Find the invitation for this contact
+    const invitation = resource.invitations.find(inv => inv.vendor_contact_id === contactId);
+    
+    // Return the can_sign property if it exists, otherwise false
+    return invitation?.can_sign || false;
+  }, [resource?.invitations, vendor?.contacts]);
+  
   return (
     <div className="flex flex-col space-y-4">
       <div
@@ -170,6 +191,33 @@ export function VendorSelector(props: Props) {
                       )}
                     </div>
                   </div>
+
+                  {company?.enable_modules && (
+                    <div className="flex space-x-2.5 w-full mt-2">
+                      <Checkbox
+                        id={`can-sign-${contact.id}`}
+                        checked={getCanSignState(contact.id)}
+                        disabled={false}
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          props.onContactCanSignCheckboxChange?.(
+                            contact.id,
+                            event.target.checked
+                          );
+                        }}
+                      />
+
+                      <div className="flex truncate">
+                        <span
+                          className={`text-sm font-medium ${
+                            !isContactInvited(contact.id) ? 'opacity-50' : ''
+                          }`}
+                          style={{ color: colors.$3 }}
+                        >
+                          {t('authorized_to_sign')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

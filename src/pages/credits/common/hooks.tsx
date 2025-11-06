@@ -119,6 +119,7 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     setCredit((current) => current && { ...current, [property]: value });
   };
 
+
   const handleInvitationChange = (id: string, checked: boolean) => {
     let invitations = [...credit!.invitations];
 
@@ -183,6 +184,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
   };
 
+
+
+
   const handleDeleteLineItem = (index: number) => {
     const lineItems = credit?.line_items || [];
 
@@ -205,6 +209,45 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     }
   };
 
+
+
+  const handleContactCanSignChange = (id: string, checked: boolean) => {
+    const clientContacts = credit?.client?.contacts || props.client?.contacts;
+
+    if(!clientContacts) return;
+
+    // Find the contact by id
+    const contact = clientContacts.find(c => c.id === id);
+    if (!contact) return;
+
+    // Check if contact is invited - if not, don't allow can_sign changes
+    const isInvited = credit?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    if (!isInvited) return;
+
+    // Update the invitations array with the can_sign property
+    const invitations = [...(credit?.invitations || [])];
+    
+    // Find existing invitation for this contact
+    const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
+    
+    if (existingInvitationIndex >= 0) {
+      // Update existing invitation
+      invitations[existingInvitationIndex] = {
+        ...invitations[existingInvitationIndex],
+        can_sign: checked
+      };
+    }
+
+    // Update the credit with the modified invitations
+    setCredit((current) => 
+      current && {
+        ...current,
+        invitations: invitations,
+      }
+    );
+  };
+  
+
   return {
     handleChange,
     handleInvitationChange,
@@ -213,6 +256,7 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     handleCreateLineItem,
     handleDeleteLineItem,
     calculateInvoiceSum,
+    handleContactCanSignChange,
   };
 }
 

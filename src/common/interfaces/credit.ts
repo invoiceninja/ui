@@ -13,6 +13,7 @@ import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
 import { ScheduleItem } from './schedule';
+import { Invitation } from './purchase-order';
 
 export interface Credit {
   id: string;
@@ -77,7 +78,7 @@ export interface Credit {
   paid_to_date: number;
   subscription_id: string;
   auto_bill_enabled: boolean;
-  invitations: any[];
+  invitations: Invitation[];
   documents: any[];
   client?: Client;
   e_invoice?: EInvoiceType;
