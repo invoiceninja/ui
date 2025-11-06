@@ -81,21 +81,9 @@ export function AddToInvoiceAction(props: Props) {
     setVisibleModal(true);
   };
 
-  const getConvertedAmount = (expense: Expense, invoice: Invoice) => {
+  const getCurrentAmount = (expense: Expense, invoice: Invoice) => {
     if (expense.currency_id !== invoice.client?.settings.currency_id) {
-      const expenseCurrency = resolveCurrency(expense.currency_id);
-      const invoiceCurrency = resolveCurrency(
-        invoice.client?.settings.currency_id
-      );
-
-      if (!expenseCurrency || !invoiceCurrency) {
-        return expense.amount;
-      }
-
-      const exchangeRate =
-        invoiceCurrency.exchange_rate / expenseCurrency.exchange_rate;
-
-      return expense.amount * exchangeRate;
+      return expense.foreign_amount;
     }
 
     return expense.amount;
@@ -111,12 +99,12 @@ export function AddToInvoiceAction(props: Props) {
             ...expenses.map((expense) => ({
               ...blankLineItem(),
               type_id: InvoiceItemType.Product,
-              cost: getConvertedAmount(expense, invoice),
+              cost: getCurrentAmount(expense, invoice),
               quantity: 1,
               product_key: expense?.category?.name ?? '',
               notes: expense.public_notes,
               line_total: Number(
-                (getConvertedAmount(expense, invoice) * 1).toPrecision(2)
+                (getCurrentAmount(expense, invoice) * 1).toPrecision(2)
               ),
               expense_id: expense.id,
               tax_name1: expense.tax_name1,
