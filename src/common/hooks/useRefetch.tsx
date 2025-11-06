@@ -31,6 +31,7 @@ export const keys = {
       '/api/v1/credits',
       '/api/v1/recurring_invoices',
       '/api/v1/purchase_orders',
+      '/api/v1/expenses',
     ],
   },
   tokens: {

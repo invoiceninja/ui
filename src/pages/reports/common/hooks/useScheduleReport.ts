@@ -64,6 +64,7 @@ export function useScheduleReport() {
       report_keys: reportKeys,
       include_deleted: report.payload.include_deleted ?? false,
       pdf_email_attachment: report.payload.pdf_email_attachment ?? false,
+      template_id: report.payload.template_id || '',
     });
 
     navigate('/settings/schedules/create?template=email_report');

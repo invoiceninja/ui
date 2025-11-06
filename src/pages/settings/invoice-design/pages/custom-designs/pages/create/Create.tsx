@@ -41,6 +41,7 @@ export const templateEntites = [
   'purchase_order',
   'project',
   'task',
+  'expense',
 ];
 
 export default function Create() {
