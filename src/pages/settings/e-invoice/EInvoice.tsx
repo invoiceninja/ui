@@ -85,10 +85,6 @@ export function EInvoice() {
       return true;
     }
 
-    if (import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true') {
-      return false;
-    }
-
     const isPlanActive =
       (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
 

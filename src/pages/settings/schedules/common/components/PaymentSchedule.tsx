@@ -14,7 +14,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { atom } from 'jotai';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { endpoint } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -23,6 +23,7 @@ import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { AddScheduleModal } from './AddScheduleModal';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 
 interface Props {
@@ -51,6 +52,8 @@ export function PaymentSchedule(props: Props) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedScheduleIndex, setSelectedScheduleIndex] = useState(-1);
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+    const { dateFormat } = useCurrentCompanyDateFormats();
 
     const { schedule, handleChange, errors, setErrors, page, disableInvoiceSelection } = props;
 
@@ -437,7 +440,7 @@ export function PaymentSchedule(props: Props) {
                                             key={index}
                                             className={`border-b ${isScheduleInPast(schedule.date) ? 'opacity-60' : ''}`}
                                         >
-                                            <Td width="30%">{schedule.date}</Td>
+                                            <Td width="30%">{date(schedule.date, dateFormat)}</Td>
                                             <Td>{formatScheduleAmount(schedule)}</Td>
                                             <Td>
                                                 <div className="">
