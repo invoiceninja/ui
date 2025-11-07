@@ -48,6 +48,7 @@ import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTabl
 import { InvoiceLabel } from './components/InvoiceLabel';
 import { useCreditColumns } from './hooks/useCreditColumns';
 import { CreditLabel } from './components/CreditLabel';
+import { emitter } from '$app';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -313,8 +314,8 @@ export default function Create() {
             <div className="flex flex-col gap-y-4 mt-4 w-full">
               {payment.invoices.map((invoice, index) => (
                 <div className="flex flex-col gap-y-2 w-full" key={index}>
-                  <div className="flex flex-col">
-                    <div className="flex items-start justify-start space-x-16 px-4 sm:px-6">
+                  <div className="flex flex-col px-4 sm:px-6">
+                    <div className="flex items-start justify-start space-x-16">
                       <InvoiceLabel invoiceId={invoice.invoice_id} />
 
                       <div className="flex items-center space-x-2">
@@ -333,7 +334,12 @@ export default function Create() {
 
                         <div
                           className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
-                          onClick={() => handleDeletingInvoice(invoice._id)}
+                          onClick={() =>
+                            emitter.emit(
+                              'deselect.resource',
+                              invoice.invoice_id
+                            )
+                          }
                         >
                           <CircleXMark
                             color={colors.$16}
@@ -413,8 +419,8 @@ export default function Create() {
             <div className="flex flex-col gap-y-4 mt-4 w-full">
               {payment.credits.map((credit, index) => (
                 <div className="flex flex-col gap-y-2 w-full" key={index}>
-                  <div className="flex flex-col">
-                    <div className="flex items-start justify-start space-x-16 px-4 sm:px-6">
+                  <div className="flex flex-col px-4 sm:px-6">
+                    <div className="flex items-start justify-start space-x-16">
                       <CreditLabel creditId={credit.credit_id} />
 
                       <div className="flex items-center space-x-2">
@@ -433,7 +439,9 @@ export default function Create() {
 
                         <div
                           className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
-                          onClick={() => handleDeletingCredit(credit._id)}
+                          onClick={() =>
+                            emitter.emit('deselect.resource', credit.credit_id)
+                          }
                         >
                           <CircleXMark
                             color={colors.$16}
