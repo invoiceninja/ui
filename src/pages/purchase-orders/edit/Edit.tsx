@@ -16,7 +16,7 @@ import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTota
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
 import { VendorSelector } from './components/VendorSelector';
@@ -29,6 +29,8 @@ import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { useColorScheme } from '$app/common/colors';
 import { PurchaseOrderContext } from '../create/Create';
+import { Badge } from '$app/components/Badge';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -59,7 +61,7 @@ export default function Edit() {
   const handleInvitationChange = useHandleInvitationChange(handleChange);
   const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
   const handleDeleteLineItem = useHandleDeleteLineItem(setPurchaseOrder);
-
+  const statusThemeColors = useStatusThemeColorScheme();
   const handleProductChange = useHandleProductChange(setPurchaseOrder);
 
   const handleLineItemPropertyChange =
@@ -116,12 +118,26 @@ export default function Edit() {
                   {t('status')}
                 </span>
 
-                <div>
+                <div className="flex items-center space-x-2">
                   <PurchaseOrderStatus entity={purchaseOrder} />
+
+                  {purchaseOrder && purchaseOrder.sync?.dn_completed && purchaseOrder.sync?.invitations[0]?.dn_id && (
+                    
+                    <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+                      <Link
+                        className="font-medium"
+                        to={`/documents/${purchaseOrder.sync?.invitations[0]?.dn_id}`}
+                        >
+                        {t('signed_document')}
+                      </Link>
+                    </Badge>
+                              
+                  )}
                 </div>
               </div>
             )}
 
+            
             <VendorSelector
               resource={purchaseOrder}
               onChange={(id) => handleChange('vendor_id', id)}

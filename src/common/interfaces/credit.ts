@@ -14,6 +14,7 @@ import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
 import { ScheduleItem } from './schedule';
 import { Invitation } from './purchase-order';
+import { Sync } from './invoice';
 
 export interface Credit {
   id: string;
@@ -87,4 +88,5 @@ export interface Credit {
   reminder_schedule?: string;
   location_id: string;
   schedule?: ScheduleItem[]
+  sync?: Sync;
 }
