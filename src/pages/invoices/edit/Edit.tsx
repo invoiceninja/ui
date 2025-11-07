@@ -125,7 +125,7 @@ export default function Edit() {
                   className="text-sm font-medium"
                   style={{ color: colors.$22 }}
                 >
-                  {t('docuninja_document')}
+                  {t('signed_document')}
                 </span>
 
                 <Link to={`/documents/${invoice.sync?.invitations[0]?.dn_id}`}>
