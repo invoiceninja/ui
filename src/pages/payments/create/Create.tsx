@@ -9,11 +9,10 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField, InputLabel, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Credit } from '$app/common/interfaces/credit';
@@ -36,8 +35,6 @@ import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { ComboboxAsync } from '$app/components/forms/Combobox';
-import { endpoint } from '$app/common/helpers';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
@@ -46,6 +43,11 @@ import { Banner } from '$app/components/Banner';
 import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { DataTable } from '$app/components/DataTable';
+import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
+import { InvoiceLabel } from './components/InvoiceLabel';
+import { useCreditColumns } from './hooks/useCreditColumns';
+import { CreditLabel } from './components/CreditLabel';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -78,10 +80,11 @@ export default function Create() {
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
+  const creditColumns = useCreditColumns();
   const creditResolver = useCreditResolver();
   const invoiceResolver = useInvoiceResolver();
+  const invoiceColumns = useApplyInvoiceTableColumns();
 
-  const formatMoney = useFormatMoney();
   const paymentTypes = usePaymentTypes();
 
   const [payment, setPayment] = useAtom(paymentAtom);
@@ -175,19 +178,12 @@ export default function Create() {
     }
   }, [blankPayment]);
 
-  const {
-    handleInvoiceChange,
-    handleExistingInvoiceChange,
-    handleInvoiceInputChange,
-    handleDeletingInvoice,
-  } = useHandleInvoice({ payment, setPayment });
+  const { handleInvoiceInputChange, handleDeletingInvoice } = useHandleInvoice({
+    payment,
+    setPayment,
+  });
 
-  const {
-    handleCreditChange,
-    handleExistingCreditChange,
-    handleCreditInputChange,
-    handleDeletingCredit,
-  } = useHandleCredit({
+  const { handleCreditInputChange, handleDeletingCredit } = useHandleCredit({
     payment,
     setPayment,
   });
@@ -273,125 +269,94 @@ export default function Create() {
 
           {payment?.client_id && <Divider />}
 
-          {payment &&
-            payment.invoices.length > 0 &&
-            payment.invoices.map((invoice, index) => (
-              <Element key={index}>
-                <div className="flex flex-col">
-                  <div className="flex items-end space-x-2">
-                    <ComboboxAsync<Invoice>
-                      inputOptions={{
-                        value: invoice.invoice_id,
-                        label: t('invoice') ?? '',
-                      }}
-                      endpoint={endpoint(
-                        `/api/v1/invoices?payable=${payment.client_id}&per_page=100`
-                      )}
-                      entryOptions={{
-                        label: 'number',
-                        id: 'id',
-                        value: 'id',
-                        searchable: 'number',
-                        dropdownLabelFn: (invoice) =>
-                          `${t('invoice_number_short')}${invoice.number} - ${t(
-                            'balance'
-                          )} ${formatMoney(
-                            invoice.balance,
-                            payment.client?.country_id,
-                            payment.client?.settings.currency_id
-                          )}`,
-                        inputLabelFn: (invoice) => {
-                          return invoice
-                            ? `${t('invoice_number_short')}${invoice?.number}`
-                            : '';
-                        },
-                      }}
-                      onChange={(entry) =>
-                        entry.resource
-                          ? handleExistingInvoiceChange(entry.resource, index)
-                          : null
-                      }
-                      exclude={collect(
-                        payment.invoices.filter(
-                          ({ invoice_id }) => invoice_id !== invoice.invoice_id
-                        )
-                      )
-                        .pluck('invoice_id')
-                        .toArray()}
-                      sortBy="date|desc"
-                    />
-
-                    <NumberInputField
-                      label={t('amount_received')}
-                      value={invoice.amount || ''}
-                      onValueChange={(value) =>
-                        handleInvoiceInputChange(
-                          index,
-                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
-                        )
-                      }
-                      className="w-full"
-                      withoutLabelWrapping
-                    />
-
-                    <div
-                      className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
-                      onClick={() => handleDeletingInvoice(invoice._id)}
-                    >
-                      <CircleXMark
-                        color={colors.$16}
-                        hoverColor={colors.$3}
-                        borderColor={colors.$5}
-                        hoverBorderColor={colors.$17}
-                        size="1.6rem"
-                      />
-                    </div>
-                  </div>
-
-                  <ErrorMessage className="mt-2">
-                    {errors?.errors[`invoices.${index}.amount`]}
-                  </ErrorMessage>
-
-                  <ErrorMessage className="mt-2">
-                    {errors?.errors[`invoices.${index}.invoice_id`]}
-                  </ErrorMessage>
-                </div>
-              </Element>
-            ))}
-
           {payment?.client_id && (
-            <Element leftSide={t('invoices')}>
-              <ComboboxAsync<Invoice>
-                endpoint={endpoint(
-                  `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
-                )}
-                inputOptions={{
-                  value: '',
+            <div className="flex flex-col px-4 sm:px-6 gap-y-2 mt-4">
+              <InputLabel>{t('invoices')}</InputLabel>
+
+              <DataTable<Invoice>
+                resource="invoice"
+                endpoint={`/api/v1/invoices?payable=${payment?.client_id}&per_page=100&sort=date|desc&per_page=1000`}
+                columns={invoiceColumns}
+                onSelectedResourcesChange={(selectedResources) => {
+                  if (selectedResources.length > 0) {
+                    const newInvoices: PaymentInvoice[] = [];
+
+                    selectedResources.forEach((resource: Invoice) => {
+                      newInvoices.push({
+                        _id: v4(),
+                        amount:
+                          resource.balance > 0
+                            ? resource.balance
+                            : resource.amount,
+                        invoice_id: resource.id,
+                      });
+                    });
+
+                    setPayment(
+                      (current) =>
+                        current && { ...current, invoices: newInvoices }
+                    );
+                  } else {
+                    setPayment(
+                      (current) => current && { ...current, invoices: [] }
+                    );
+                  }
                 }}
-                entryOptions={{
-                  id: 'id',
-                  value: 'id',
-                  label: 'number',
-                  searchable: 'number',
-                  dropdownLabelFn: (invoice) =>
-                    `${t('invoice_number_short')}${invoice.number} - ${t(
-                      'balance'
-                    )} ${formatMoney(
-                      invoice.balance,
-                      payment.client?.country_id,
-                      payment.client?.settings.currency_id
-                    )}`,
-                }}
-                onChange={({ resource }) =>
-                  resource ? handleInvoiceChange(resource) : null
-                }
-                exclude={collect(payment.invoices)
-                  .pluck('invoice_id')
-                  .toArray()}
-                clearInputAfterSelection
-                sortBy="date|desc"
+                withoutPagination
+                withoutStatusFilter
+                withoutAllBulkActions
               />
-            </Element>
+            </div>
+          )}
+
+          {payment && payment.invoices.length > 0 && (
+            <div className="flex flex-col gap-y-4 mt-4 w-full">
+              {payment.invoices.map((invoice, index) => (
+                <div className="flex flex-col gap-y-2 w-full" key={index}>
+                  <div className="flex flex-col">
+                    <div className="flex items-start justify-start space-x-16 px-4 sm:px-6">
+                      <InvoiceLabel invoiceId={invoice.invoice_id} />
+
+                      <div className="flex items-center space-x-2">
+                        <NumberInputField
+                          label={t('amount_received')}
+                          value={invoice.amount || ''}
+                          onValueChange={(value) =>
+                            handleInvoiceInputChange(
+                              index,
+                              isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                            )
+                          }
+                          className="w-full"
+                          withoutLabelWrapping
+                        />
+
+                        <div
+                          className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
+                          onClick={() => handleDeletingInvoice(invoice._id)}
+                        >
+                          <CircleXMark
+                            color={colors.$16}
+                            hoverColor={colors.$3}
+                            borderColor={colors.$5}
+                            hoverBorderColor={colors.$17}
+                            size="1.6rem"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <ErrorMessage className="mt-2">
+                      {errors?.errors[`invoices.${index}.amount`]}
+                    </ErrorMessage>
+
+                    <ErrorMessage className="mt-2">
+                      {errors?.errors[`invoices.${index}.invoice_id`]}
+                    </ErrorMessage>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
 
           {errors?.errors.invoices && (
@@ -404,118 +369,94 @@ export default function Create() {
 
           {payment?.client_id && <Divider />}
 
-          {payment &&
-            payment.credits.length > 0 &&
-            payment.credits.map((credit, index) => (
-              <Element key={index}>
-                <div className="flex flex-col">
-                  <div className="flex items-end space-x-2">
-                    <ComboboxAsync<Credit>
-                      inputOptions={{
-                        value: credit.credit_id,
-                        label: t('credit') ?? '',
-                      }}
-                      endpoint={endpoint(
-                        `/api/v1/credits?client_id=${payment.client_id}&per_page=100&applicable=true`
-                      )}
-                      entryOptions={{
-                        id: 'id',
-                        value: 'id',
-                        label: 'number',
-                        searchable: 'number',
-                        dropdownLabelFn: (credit) =>
-                          `${t('credit')} #${credit.number} - ${t(
-                            'balance'
-                          )} ${formatMoney(
-                            credit.balance,
-                            payment.client?.country_id,
-                            payment.client?.settings.currency_id
-                          )}`,
-                      }}
-                      onChange={(entry) =>
-                        entry.resource
-                          ? handleExistingCreditChange(entry.resource, index)
-                          : null
-                      }
-                      exclude={collect(
-                        payment.credits.filter(
-                          ({ credit_id }) => credit_id !== credit.credit_id
-                        )
-                      )
-                        .pluck('credit_id')
-                        .toArray()}
-                      sortBy="date|desc"
-                    />
-
-                    <NumberInputField
-                      label={t('amount')}
-                      onValueChange={(value) =>
-                        handleCreditInputChange(
-                          index,
-                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
-                        )
-                      }
-                      className="w-full"
-                      value={credit.amount || ''}
-                      withoutLabelWrapping
-                    />
-
-                    <div
-                      className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
-                      onClick={() => handleDeletingCredit(credit._id)}
-                    >
-                      <CircleXMark
-                        color={colors.$16}
-                        hoverColor={colors.$3}
-                        borderColor={colors.$5}
-                        hoverBorderColor={colors.$17}
-                        size="1.6rem"
-                      />
-                    </div>
-                  </div>
-
-                  <ErrorMessage className="mt-2">
-                    {errors?.errors[`credits.${index}.amount`]}
-                  </ErrorMessage>
-
-                  <ErrorMessage className="mt-2">
-                    {errors?.errors[`credits.${index}.credit_id`]}
-                  </ErrorMessage>
-                </div>
-              </Element>
-            ))}
-
           {payment?.client_id && (
-            <Element leftSide={t('credits')}>
-              <ComboboxAsync<Credit>
-                endpoint={endpoint(
-                  `/api/v1/credits?client_id=${payment.client_id}&applicable=true`
-                )}
-                inputOptions={{
-                  value: null,
+            <div className="flex flex-col px-4 sm:px-6 gap-y-2 mt-4">
+              <InputLabel>{t('credits')}</InputLabel>
+
+              <DataTable<Credit>
+                resource="credit"
+                endpoint={`/api/v1/credits?client_id=${payment?.client_id}&per_page=100&applicable=true`}
+                columns={creditColumns}
+                onSelectedResourcesChange={(selectedResources) => {
+                  if (selectedResources.length > 0) {
+                    const newCredits: PaymentCredit[] = [];
+
+                    selectedResources.forEach((resource: Credit) => {
+                      newCredits.push({
+                        _id: v4(),
+                        amount:
+                          resource.balance > 0
+                            ? resource.balance
+                            : resource.amount,
+                        credit_id: resource.id,
+                      });
+                    });
+
+                    setPayment(
+                      (current) =>
+                        current && { ...current, credits: newCredits }
+                    );
+                  } else {
+                    setPayment(
+                      (current) => current && { ...current, credits: [] }
+                    );
+                  }
                 }}
-                entryOptions={{
-                  id: 'id',
-                  label: 'number',
-                  value: 'id',
-                  searchable: 'number',
-                  dropdownLabelFn: (credit) =>
-                    `${t('credit')} #${credit.number} - ${t(
-                      'balance'
-                    )} ${formatMoney(
-                      credit.balance,
-                      payment.client?.country_id,
-                      payment.client?.settings.currency_id
-                    )}`,
-                }}
-                onChange={(entry) =>
-                  entry.resource ? handleCreditChange(entry.resource) : null
-                }
-                exclude={collect(payment.credits).pluck('credit_id').toArray()}
-                clearInputAfterSelection
-                sortBy="date|desc"
+                withoutPagination
+                withoutStatusFilter
+                withoutAllBulkActions
               />
-            </Element>
+            </div>
+          )}
+
+          {payment && payment.credits.length > 0 && (
+            <div className="flex flex-col gap-y-4 mt-4 w-full">
+              {payment.credits.map((credit, index) => (
+                <div className="flex flex-col gap-y-2 w-full" key={index}>
+                  <div className="flex flex-col">
+                    <div className="flex items-start justify-start space-x-16 px-4 sm:px-6">
+                      <CreditLabel creditId={credit.credit_id} />
+
+                      <div className="flex items-center space-x-2">
+                        <NumberInputField
+                          label={t('amount_received')}
+                          value={credit.amount || ''}
+                          onValueChange={(value) =>
+                            handleCreditInputChange(
+                              index,
+                              isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                            )
+                          }
+                          className="w-full"
+                          withoutLabelWrapping
+                        />
+
+                        <div
+                          className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
+                          onClick={() => handleDeletingCredit(credit._id)}
+                        >
+                          <CircleXMark
+                            color={colors.$16}
+                            hoverColor={colors.$3}
+                            borderColor={colors.$5}
+                            hoverBorderColor={colors.$17}
+                            size="1.6rem"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <ErrorMessage className="mt-2">
+                      {errors?.errors[`credits.${index}.amount`]}
+                    </ErrorMessage>
+
+                    <ErrorMessage className="mt-2">
+                      {errors?.errors[`credits.${index}.credit_id`]}
+                    </ErrorMessage>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
 
           {errors?.errors.credits && (
