@@ -48,7 +48,7 @@ export function useCloneDocument() {
 
           toast.success('cloned_document');
 
-          navigate(route('/documents/:id', { id: response.data.data?.id }));
+          navigate(route('/docuninja/:id', { id: response.data.data?.id }));
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

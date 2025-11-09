@@ -124,7 +124,7 @@ export function useTableColumns() {
       id: 'description',
       label: t('description'),
       format: (_, document) => (
-        <Link to={route('/documents/:id', { id: document.id })}>
+        <Link to={route('/docuninja/:id', { id: document.id })}>
           <span className="truncate block max-w-xs">
             {document.description || t('untitled_document')}
           </span>

@@ -61,7 +61,7 @@ export function Invitations({ document }: InvitationsProps) {
         }}
         style={{ borderColor: colors.$5 }}
         onClick={() =>
-          navigate(route('/documents/:id/builder', { id: document.id }))
+          navigate(route('/docuninja/:id/builder', { id: document.id }))
         }
       >
         <Plus size="2rem" color={colors.$3} />

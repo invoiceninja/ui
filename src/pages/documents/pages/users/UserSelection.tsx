@@ -167,7 +167,7 @@ export default function UserSelection() {
       $refetch(['users']);
       
       // Navigate back to users page
-      navigate('/documents/users');
+      navigate('/docuninja/users');
       
     } catch (error: any) {
       console.error('Error granting DocuNinja access:', error);
@@ -193,16 +193,16 @@ export default function UserSelection() {
 
   const pages = [
     {
-      name: t('documents'),
-      href: '/documents',
+      name: t('docuninja'),
+      href: '/docuninja',
     },
     {
       name: t('users'),
-      href: '/documents/users',
+      href: '/docuninja/users',
     },
     {
       name: t('add_user'),
-      href: '/documents/users/selection',
+      href: '/docuninja/users/selection',
     },
   ];
 
@@ -337,7 +337,7 @@ export default function UserSelection() {
           <div className="flex space-x-3">
             <Button
               type="secondary"
-              onClick={() => navigate('/documents/users')}
+              onClick={() => navigate('/docuninja/users')}
               disabled={isFormBusy}
             >
               {t('cancel')}

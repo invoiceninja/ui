@@ -60,7 +60,7 @@ export function DocumentCreationDropZone() {
           toast.success('document_created');
 
           navigate(
-            route('/documents/:id/builder', { id: response.data.data.id })
+            route('/docuninja/:id/builder', { id: response.data.data.id })
           );
         })
         .catch((e) => {

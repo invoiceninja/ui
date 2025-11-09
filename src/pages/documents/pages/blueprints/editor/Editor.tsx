@@ -62,7 +62,7 @@ export default function BlueprintEditor() {
         });
         
         // Navigate to the editor for the newly created blueprint
-        navigate(route('/documents/templates/:id/editor', { id: response.data.data.id }));
+        navigate(route('/docuninja/templates/:id/editor', { id: response.data.data.id }));
       } else if (id) {
         // Update existing blueprint
         await updateBlueprint({
@@ -83,7 +83,7 @@ export default function BlueprintEditor() {
 
   const handleCancel = () => {
     // Navigate back to blueprints list
-    navigate('/documents/templates');
+    navigate('/docuninja/templates');
   };
 
   // Show loading state while we're fetching data
@@ -104,8 +104,8 @@ export default function BlueprintEditor() {
     <Default 
       title="Template Editor"
       breadcrumbs={[
-        { name: 'Templates', href: '/documents/templates' },
-        { name: templateName || 'Blueprint', href: `/documents/templates/${id}/edit` },
+        { name: 'Templates', href: '/docuninja/templates' },
+        { name: templateName || 'Blueprint', href: `/docuninja/templates/${id}/edit` },
         { name: 'Template Editor', href: '#' }
       ]}
     >
