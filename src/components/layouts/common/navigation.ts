@@ -276,7 +276,7 @@ export function useNavigation() {
       visible: hasPermission('view_reports'),
     },
     {
-      name: t('documents'),
+      name: t('docuninja'),
       href: '/documents',
       icon: ArrowsTransaction,
       rightButton: {
