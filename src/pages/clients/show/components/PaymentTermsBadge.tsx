@@ -1,4 +1,5 @@
 import { Badge } from '$app/components/Badge';
+import { Tooltip } from '$app/components/Tooltip';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -13,8 +14,16 @@ export function PaymentTermsBadge({ payment_terms }: Props) {
   }
 
   return (
-    <Badge variant="dark-blue">
-      {payment_terms} {t('days')}
-    </Badge>
+    <Tooltip
+      message={t('payment_terms') as string}
+      width="auto"
+      withoutArrow
+      placement="bottom"
+      centerVertically
+    >
+      <Badge variant="dark-blue">
+        {payment_terms} {t('days')}
+      </Badge>
+    </Tooltip>
   );
 }
