@@ -35,6 +35,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import collect from 'collect.js';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 
 interface Props {
   expenses: Expense[];
@@ -56,6 +57,7 @@ export function AddToInvoiceAction(props: Props) {
   const formatMoney = useFormatMoney();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const resolveCurrency = useResolveCurrency();
   const { calculatedTaxRate } = useInvoiceExpense();
 
   const colors = useColorScheme();
@@ -79,6 +81,14 @@ export function AddToInvoiceAction(props: Props) {
     setVisibleModal(true);
   };
 
+  const getCurrentAmount = (expense: Expense, invoice: Invoice) => {
+    if (expense.currency_id !== invoice.client?.settings.currency_id) {
+      return expense.foreign_amount;
+    }
+
+    return expense.amount;
+  };
+
   const handleAddToInvoice = (invoice: Invoice) => {
     setInvoice(
       () =>
@@ -89,11 +99,13 @@ export function AddToInvoiceAction(props: Props) {
             ...expenses.map((expense) => ({
               ...blankLineItem(),
               type_id: InvoiceItemType.Product,
-              cost: expense.amount,
+              cost: getCurrentAmount(expense, invoice),
               quantity: 1,
               product_key: expense?.category?.name ?? '',
               notes: expense.public_notes,
-              line_total: Number((expense.amount * 1).toPrecision(2)),
+              line_total: Number(
+                (getCurrentAmount(expense, invoice) * 1).toPrecision(2)
+              ),
               expense_id: expense.id,
               tax_name1: expense.tax_name1,
               tax_rate1: calculatedTaxRate(

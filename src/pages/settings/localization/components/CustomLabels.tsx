@@ -188,7 +188,7 @@ export function CustomLabels() {
         <Button
           behavior="button"
           type="secondary"
-          onClick={() => setIsCustomModalOpen(true)}
+          onClick={() => setTimeout(() => setIsCustomModalOpen(true), 100)}
         >
           {t('add_custom')}
         </Button>
