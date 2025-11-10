@@ -38,10 +38,10 @@ export default function Create() {
   const colors = useColorScheme();
 
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
+    { name: t('docuninja'), href: '/docuninja' },
     {
       name: t('new_document'),
-      href: route('/documents/create'),
+      href: route('/docuninja/create'),
     },
   ];
 
@@ -74,7 +74,7 @@ export default function Create() {
           });
 
           navigate(
-            route('/documents/:id/builder', { id: response.data.data.id })
+            route('/docuninja/:id/builder', { id: response.data.data.id })
           );
         })
         .catch((error: AxiosError<ValidationBag>) => {

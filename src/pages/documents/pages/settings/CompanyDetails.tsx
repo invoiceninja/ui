@@ -24,12 +24,12 @@ function CompanyDetails() {
 
   const pages = [
     {
-      name: t('documents'),
-      href: '/documents',
+      name: t('docuninja'),
+      href: '/docuninja',
     },
     {
       name: t('settings'),
-      href: '/documents/settings',
+      href: '/docuninja/settings',
     },
   ];
 

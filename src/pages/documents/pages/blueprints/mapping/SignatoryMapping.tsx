@@ -196,7 +196,7 @@ export default function SignatoryMapping() {
     )
       .then((response: AxiosResponse<GenericSingleResponse<Document>>) => {
         toast.success('document_created');
-        navigate(route('/documents/:id/builder', { id: response.data.data.id }));
+        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }));
       })
       .catch((error) => {
         toast.error('error_refresh_page');
@@ -218,8 +218,8 @@ export default function SignatoryMapping() {
   }
 
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
-    { name: t('templates'), href: '/documents/templates' },
+    { name: t('docuninja'), href: '/docuninja' },
+    { name: t('templates'), href: '/docuninja/templates' },
     { name: t('map_signatories'), href: '#' },
   ];
 

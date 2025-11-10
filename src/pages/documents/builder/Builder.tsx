@@ -492,10 +492,10 @@ function Builder() {
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
+    { name: t('docuninja'), href: '/docuninja' },
     {
       name: entity?.description || t('edit'),
-      href: route('/documents/:id/builder', { id }),
+      href: route('/docuninja/:id/builder', { id }),
     },
   ];
 
@@ -601,7 +601,7 @@ function Builder() {
               onClick={() =>
                 window.open(
                   routeWithOrigin(
-                    '/documents/sign/:document/:invitation?sig=:sig&company=:company',
+                    '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
                     {
                       document: id,
                       invitation: getInvitationId(),

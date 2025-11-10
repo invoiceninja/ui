@@ -13,7 +13,7 @@ import { Expense } from './expense';
 import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Vendor } from './vendor';
-
+import { Sync } from './invoice';
 export interface PurchaseOrder {
   id: string;
   user_id: string;
@@ -83,6 +83,8 @@ export interface PurchaseOrder {
   activities?: Activity[];
   reminder_schedule?: string;
   location_id: string;
+  sync?: Sync;
+
 }
 
 export interface Invitation {

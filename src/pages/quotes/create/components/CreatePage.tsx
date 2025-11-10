@@ -58,6 +58,7 @@ export default function CreatePage() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
+    handleContactCanSignChange,
   } = useQuoteUtilities({ client });
 
   return (
@@ -77,6 +78,7 @@ export default function CreatePage() {
               handleChange('location_id', '');
             }}
             onContactCheckboxChange={handleInvitationChange}
+            onContactCanSignCheckboxChange={handleContactCanSignChange}
             errorMessage={errors?.errors.client_id}
             disableWithSpinner={searchParams.get('action') === 'create'}
           />

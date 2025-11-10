@@ -34,6 +34,7 @@ export default function Create() {
 
   const context: PurchaseOrderContext = useOutletContext();
   const {
+    vendor,
     purchaseOrder,
     setPurchaseOrder,
     errors,
@@ -62,6 +63,55 @@ export default function Create() {
   const handleLineItemPropertyChange =
     useHandleLineItemPropertyChange(setPurchaseOrder);
 
+
+  const handleContactCanSignChange = (id: string, checked: boolean) => {
+    if (!purchaseOrder) {
+      return;
+    }
+
+    // Use vendor from context if purchaseOrder.vendor is not available
+    const vendorContacts = purchaseOrder?.vendor?.contacts || vendor?.contacts;
+    
+    if (!vendorContacts) {
+      return;
+    }
+
+    // Find the contact by id
+    const contact = vendorContacts.find(c => c.id === id);
+    if (!contact) {
+      return;
+    }
+
+    // Check if contact is invited - if not, don't allow can_sign changes
+    const isInvited = purchaseOrder.invitations?.some(inv => inv.vendor_contact_id === contact.id) || false;
+    if (!isInvited) {
+      return;
+    }
+
+    // Update the invitations array with the can_sign property
+    const invitations = [...(purchaseOrder.invitations || [])];
+    
+    // Find existing invitation for this contact
+    const existingInvitationIndex = invitations.findIndex(inv => inv.vendor_contact_id === contact.id);
+    
+    if (existingInvitationIndex >= 0) {
+      // Update existing invitation
+      invitations[existingInvitationIndex] = {
+        ...invitations[existingInvitationIndex],
+        can_sign: checked
+      };
+    }
+
+    // Update the purchase order with the modified invitations
+    setPurchaseOrder((current) => 
+      current && {
+        ...current,
+        invitations: invitations,
+      }
+    );
+  };
+  
+
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
@@ -77,6 +127,10 @@ export default function Create() {
             onContactCheckboxChange={(id, checked) =>
               purchaseOrder &&
               handleInvitationChange(purchaseOrder, id, checked)
+            }
+            onContactCanSignCheckboxChange={(id, checked) =>
+              purchaseOrder &&
+              handleContactCanSignChange(id, checked)
             }
             initiallyVisible
             errorMessage={errors?.errors.vendor_id}

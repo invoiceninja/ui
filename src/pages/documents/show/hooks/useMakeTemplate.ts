@@ -49,7 +49,7 @@ export function useMakeTemplate() {
           toast.success('template_created');
 
           navigate(
-            route('/documents/templates/:id/edit', {
+            route('/docuninja/templates/:id/edit', {
               id: response.data.data?.id,
             })
           );

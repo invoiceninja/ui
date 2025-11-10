@@ -17,7 +17,7 @@ const useTabs = () => {
   const tabs: Tab[] = [
     {
       name: t('create'),
-      href: '/documents/users/create',
+      href: '/docuninja/users/create',
     },
     {
       name: t('documents'),

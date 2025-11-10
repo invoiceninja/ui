@@ -181,7 +181,7 @@ export function useActions(params?: Params) {
     (doc) =>
       Boolean(doc && !doc.is_deleted) && (
         <DropdownElement
-          onClick={() => navigate(route('/documents/:id', { id: doc.id }))}
+          onClick={() => navigate(route('/docuninja/:id', { id: doc.id }))}
           icon={<Icon element={MdTimer} />}
         >
           {t('timeline')}

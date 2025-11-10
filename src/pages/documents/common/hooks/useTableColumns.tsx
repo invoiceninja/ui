@@ -46,8 +46,10 @@ export function useTableColumns() {
     8: t('voided'),
   };
 
-  const getName = (document: Document) => {
-    const firstInvitation = document.invitations?.[0];
+  const getContactName = (document: Document) => {
+    const firstInvitation = document.invitations?.find(
+      (invitation) => invitation.client_contact_id !== undefined && invitation.client_contact_id !== null
+    );
 
     if (firstInvitation) {
       if (firstInvitation.contact) {
@@ -60,17 +62,25 @@ export function useTableColumns() {
 
         return `${firstInvitation.contact.first_name} ${firstInvitation.contact.last_name}`;
       }
+    }
 
-      if (firstInvitation.user) {
-        if (
-          !firstInvitation.user.first_name &&
-          !firstInvitation.user.last_name
-        ) {
-          return firstInvitation.user.email;
-        }
+    return '';
+  };
 
-        return `${firstInvitation.user.first_name} ${firstInvitation.user.last_name}`;
+  const getUserName = (document: Document) => {
+    const firstInvitation = document.invitations?.find(
+      (invitation) => invitation.user_id !== undefined && invitation.user_id !== null
+    );
+
+    if (firstInvitation?.user) {
+      if (
+        !firstInvitation.user.first_name &&
+        !firstInvitation.user.last_name
+      ) {
+        return firstInvitation.user.email;
       }
+
+      return `${firstInvitation.user.first_name} ${firstInvitation.user.last_name}`;
     }
 
     return '';
@@ -101,15 +111,20 @@ export function useTableColumns() {
 
   const columns: DataTableColumns<Document> = [
     {
-      id: 'id',
-      label: t('signatory'),
-      format: (_, document) => getName(document),
+      id: 'contact',
+      label: t('contact'),
+      format: (_, document) => getContactName(document),
+    },
+    {
+      id: 'user',
+      label: t('user'),
+      format: (_, document) => getUserName(document),
     },
     {
       id: 'description',
       label: t('description'),
       format: (_, document) => (
-        <Link to={route('/documents/:id', { id: document.id })}>
+        <Link to={route('/docuninja/:id', { id: document.id })}>
           <span className="truncate block max-w-xs">
             {document.description || t('untitled_document')}
           </span>

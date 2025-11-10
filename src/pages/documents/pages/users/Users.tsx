@@ -40,12 +40,12 @@ export default function Users() {
 
   const pages = [
     {
-      name: t('documents'),
-      href: '/documents',
+      name: t('docuninja'),
+      href: '/docuninja',
     },
     {
       name: t('users'),
-      href: '/documents/users',
+      href: '/docuninja/users',
     },
   ];
 

@@ -76,7 +76,7 @@ export function useActions(params: UseActionsParams) {
 
     if (signatoryIds.length > 0) {
       // Navigate to signatory mapping page
-      navigate(route('/documents/templates/:id/map-signatories', { id: blueprint.id }), {
+      navigate(route('/docuninja/templates/:id/map-signatories', { id: blueprint.id }), {
         state: { blueprint, signatoryIds, signatoryInfo },
       });
     } else {
@@ -91,7 +91,7 @@ export function useActions(params: UseActionsParams) {
           },
         }
       ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
-        navigate(route('/documents/:id/builder', { id: response.data.data.id }))
+        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
       );
     }
   };
@@ -108,7 +108,7 @@ export function useActions(params: UseActionsParams) {
           },
         }
       ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
-        navigate(route('/documents/:id/builder', { id: response.data.data.id }))
+        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
       );
 
   };

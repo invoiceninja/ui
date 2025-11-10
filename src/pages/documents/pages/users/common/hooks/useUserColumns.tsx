@@ -29,7 +29,7 @@ export function useUserColumns() {
       label: t('email'),
       format: (_, user) => (
         <Link
-          to={route('/documents/users/:id/edit', {
+          to={route('/docuninja/users/:id/edit', {
             id: user.id,
           })}
         >

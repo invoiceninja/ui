@@ -20,27 +20,27 @@ export default function Create() {
   const navigate = useNavigate();
 
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
+    { name: t('docuninja'), href: '/docuninja' },
     {
       name: t('templates'),
-      href: route('/documents/templates'),
+      href: route('/docuninja/templates'),
     },
     {
       name: t('create_template'),
-      href: route('/documents/templates/create'),
+      href: route('/docuninja/templates/create'),
     },
   ];
 
   const handleWizardComplete = (blueprintId: string) => {
     navigate(
-      route('/documents/templates/:id/edit', {
+      route('/docuninja/templates/:id/edit', {
         id: blueprintId,
       })
     );
   };
 
   const handleWizardCancel = () => {
-    navigate(route('/documents/templates'));
+    navigate(route('/docuninja/templates'));
   };
 
   return (
