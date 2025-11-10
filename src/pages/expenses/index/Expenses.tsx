@@ -26,7 +26,10 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
-import { ChangeTemplateModal, useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Expense } from '$app/common/interfaces/expense';
 import { InputLabel } from '$app/components/forms';
 
@@ -38,14 +41,10 @@ export default function Expenses() {
 
   const pages = [{ name: t('expenses'), href: '/expenses' }];
 
-  const columns = useExpenseColumns();
-
   const actions = useActions();
-
   const filters = useExpenseFilters();
-
+  const columns = useExpenseColumns();
   const expenseColumns = useAllExpenseColumns();
-
   const customBulkActions = useCustomBulkActions();
 
   const {
@@ -88,9 +87,10 @@ export default function Expenses() {
         linkToCreateGuards={[permission('create_expense')]}
         hideEditableOptions={!hasPermission('edit_expense')}
         enableSavingFilterPreference
+        dateRangeColumns={[{ column: 'date', queryParameterKey: 'date_range' }]}
       />
 
-    <ChangeTemplateModal<Expense>
+      <ChangeTemplateModal<Expense>
         entity="expense"
         entities={changeTemplateResources as Expense[]}
         visible={changeTemplateVisible}
@@ -111,7 +111,6 @@ export default function Expenses() {
         )}
         bulkUrl="/api/v1/expenses/bulk"
       />
-      
     </Default>
   );
 }
