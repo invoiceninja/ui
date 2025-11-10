@@ -13,7 +13,6 @@ import { useColorScheme } from '$app/common/colors';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useDocumentQuery } from '$app/common/queries/docuninja/documents';
 import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
@@ -31,7 +30,6 @@ import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import {
   AlertProps,
-  Blueprint,
   Builder as Builder$,
   BuilderContext,
   ConfirmationDialogButtonProps,
@@ -55,12 +53,12 @@ import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { FaFileSignature } from 'react-icons/fa';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { SignatorySelector, SignatorySwap } from '../pages/blueprints/builder/Elements';
+import { FaFileSignature } from 'react-icons/fa';
 
 function Loading() {
   return (
@@ -348,21 +346,17 @@ function Builder() {
 
   const docuninjaAccount = useAtomValue(docuNinjaAtom);
 
-  const { data: document } = useDocumentQuery({
-    id,
-    enabled: Boolean(id),
-  });
-
+  const [entity, setEntity] = useState<Document | null>(null);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const [entity, setEntity] = useState<Document | Blueprint | null>(null);
+  const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
+    { name: t('docuninja'), href: '/docuninja' },
     {
       name: entity?.description || t('edit'),
-      href: route('/documents/:id/builder', { id }),
+      href: route('/docuninja/:id/builder', { id }),
     },
   ];
 
@@ -377,6 +371,13 @@ function Builder() {
     window.dispatchEvent(new CustomEvent('builder:open.send.confirmation'));
   };
 
+  const doesDocumentHaveSignatories = () => {
+    const rectangles =
+      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+
+    return rectangles.length > 0;
+  };
+
   const getDocuNinjaCompany = () => {
     return docuninjaAccount?.companies?.find(
       (company) => company.id === localStorage.getItem('DOCUNINJA_COMPANY_ID')
@@ -384,7 +385,7 @@ function Builder() {
   };
 
   const getInvitationId = () => {
-    const currentInvitationIndex = document?.invitations?.findIndex(
+    const currentInvitationIndex = entity?.invitations?.findIndex(
       (invitation) => invitation.user_id === docuninjaAccount?.id
     ) as unknown as number;
 
@@ -392,9 +393,9 @@ function Builder() {
       return null;
     }
 
-    const currentInvitation = document?.invitations?.[currentInvitationIndex];
+    const currentInvitation = entity?.invitations?.[currentInvitationIndex];
 
-    if (!document?.invitations?.[currentInvitationIndex]?.client_contact_id) {
+    if (!entity?.invitations?.[currentInvitationIndex]?.client_contact_id) {
       return currentInvitation?.id;
     }
 
@@ -461,7 +462,7 @@ function Builder() {
               onClick={() =>
                 window.open(
                   routeWithOrigin(
-                    '/documents/sign/:document/:invitation?sig=:sig&company=:company',
+                    '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
                     {
                       document: id,
                       invitation: getInvitationId(),
@@ -472,7 +473,7 @@ function Builder() {
                   '_blank'
                 )
               }
-              disabled={isDocumentSaving}
+              disabled={isDocumentSaving || isDocumentSending}
               disableWithoutIcon
             >
               <div>
@@ -483,12 +484,16 @@ function Builder() {
             </Button>
           )}
 
-          {entity && (entity as Document)?.status_id <= DocumentStatus.Sent && (
+          {Boolean(
+            entity &&
+              (entity as Document)?.status_id <= DocumentStatus.Sent &&
+              doesDocumentHaveSignatories()
+          ) && (
             <Button
               type="secondary"
               behavior="button"
               onClick={handleSend}
-              disabled={isDocumentSaving}
+              disabled={isDocumentSaving || isDocumentSending}
               disableWithoutIcon
             >
               <div>
@@ -501,7 +506,7 @@ function Builder() {
           <Button
             behavior="button"
             onClick={handleSave}
-            // disabled={isDocumentSaving || isDocumentSending}
+            disabled={isDocumentSaving}
             disableWithoutIcon
           >
             {t('save')}
@@ -618,7 +623,7 @@ function Builder() {
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
             readonly: false,
-            onEntityReady: (entity) => setEntity(entity),
+            onEntityReady: (entity) => setEntity(entity as Document),
           }}
         >
           <Builder$ />

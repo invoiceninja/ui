@@ -52,6 +52,7 @@ export default function Edit() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
+    handleContactCanSignChange,
   } = useCreditUtilities({ client });
 
   return (
@@ -85,6 +86,7 @@ export default function Edit() {
                 handleChange('location_id', locationId)
               }
               onContactCheckboxChange={handleInvitationChange}
+              onContactCanSignCheckboxChange={handleContactCanSignChange}
               errorMessage={errors?.errors.client_id}
               readonly
               textOnly

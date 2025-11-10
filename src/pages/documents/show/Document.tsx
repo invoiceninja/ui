@@ -52,10 +52,10 @@ export default function Document() {
   });
 
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
+    { name: t('docuninja'), href: '/docuninja' },
     {
       name: document?.description || documentTitle,
-      href: route('/documents/:id', { id }),
+      href: route('/docuninja/:id', { id }),
     },
   ];
 
@@ -97,7 +97,7 @@ export default function Document() {
         <div className="flex">
           <Button
             className="rounded-br-none rounded-tr-none px-3"
-            to={route('/documents/:id/builder', { id: document?.id })}
+            to={route('/docuninja/:id/builder', { id: document?.id })}
             disabled={
               document?.status_id === DocumentStatus.Completed ||
               document?.status_id === DocumentStatus.Voided

@@ -149,18 +149,20 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
   };
 
   const handleContactCanSignChange = (id: string, checked: boolean) => {
-    if (!quote?.client?.contacts) return;
+    const clientContacts = quote?.client?.contacts || props.client?.contacts;
+
+    if(!clientContacts) return;
 
     // Find the contact by id
-    const contact = quote.client.contacts.find(c => c.id === id);
+    const contact = clientContacts.find(c => c.id === id);
     if (!contact) return;
 
     // Check if contact is invited - if not, don't allow can_sign changes
-    const isInvited = quote.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    const isInvited = quote?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
     if (!isInvited) return;
 
     // Update the invitations array with the can_sign property
-    const invitations = [...(quote.invitations || [])];
+    const invitations = [...(quote?.invitations || [])];
     
     // Find existing invitation for this contact
     const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);

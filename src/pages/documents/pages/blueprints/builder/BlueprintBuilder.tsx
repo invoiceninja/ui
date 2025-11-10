@@ -478,10 +478,10 @@ function BlueprintBuilder() {
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
-    { name: t('templates'), href: '/documents/templates' },
+    { name: t('templates'), href: '/docuninja/templates' },
     {
       name: blueprint?.name || t('blueprint'),
-      href: route('/documents/templates/:id/edit', { id }),
+      href: route('/docuninja/templates/:id/edit', { id }),
     },
   ];
 
@@ -555,7 +555,7 @@ function BlueprintBuilder() {
             type="secondary"  
             behavior="button"
             onClick={() => {
-              navigate(route('/documents/templates/:id/editor', { 
+              navigate(route('/docuninja/templates/:id/editor', { 
                 id, 
                 state: { 
                   templateHtml: blueprint.template, 

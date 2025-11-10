@@ -62,7 +62,7 @@ const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 
 
 export const documentsRoutes = (
-  <Route path="documents/*" element={
+  <Route path="docuninja/*" element={
     <DocuNinjaProvider>
       <Routes>
         <Route

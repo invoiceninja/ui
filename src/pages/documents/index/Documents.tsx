@@ -111,8 +111,8 @@ export default function Documents() {
 
   const pages: Page[] = [
     {
-      name: t('documents'),
-      href: '/documents',
+      name: t('docuninja'),
+      href: '/docuninja',
     },
   ];
 
@@ -160,7 +160,7 @@ export default function Documents() {
   }
 
   return (
-    <Default title={t('documents')} breadcrumbs={pages}>
+    <Default title={t('docuninja')} breadcrumbs={pages}>
       <div className="flex flex-col gap-y-4">
 
         {canCreateDocumentPermission && (
@@ -174,7 +174,7 @@ export default function Documents() {
           columns={columns}
           withResourcefulActions
           bulkRoute="/api/documents/bulk"
-          linkToEdit="/documents/:id/builder"
+          linkToEdit="/docuninja/:id/builder"
           useDocuNinjaApi
           endpointHeaders={{
             Authorization: `Bearer ${getToken()}`,
@@ -190,7 +190,7 @@ export default function Documents() {
             <Button
               behavior="button"
               type="secondary"
-              onClick={() => navigate('/documents/settings')}
+              onClick={() => navigate('/docuninja/settings')}
             >
               <div className="flex items-center space-x-2">
                 <div>

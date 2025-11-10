@@ -45,7 +45,10 @@ import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
 import { InputLabel, Link } from '$app/components/forms';
+import { Link as RouterLink } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { Badge } from '$app/components/Badge';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -96,6 +99,8 @@ export default function Edit() {
   const { changeTemplateVisible, setChangeTemplateVisible } =
     useChangeTemplate();
 
+    const statusThemeColors = useStatusThemeColorScheme();
+
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
@@ -113,8 +118,21 @@ export default function Edit() {
                   {t('status')}
                 </span>
 
-                <div>
+                <div className="flex items-center space-x-2">
                   <InvoiceStatusBadge entity={invoice} />
+
+                  {invoice && invoice.sync?.dn_completed && invoice.sync?.invitations[0]?.dn_id && (
+                    
+                    <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+                      <RouterLink
+                        className="font-medium"
+                        to={`/documents/${invoice.sync?.invitations[0]?.dn_id}`}
+                        >
+                        {t('signed_document')}
+                      </RouterLink>
+                    </Badge>
+                              
+                  )}
                 </div>
               </div>
             )}
@@ -125,7 +143,7 @@ export default function Edit() {
                   className="text-sm font-medium"
                   style={{ color: colors.$22 }}
                 >
-                  {t('docuninja_document')}
+                  {t('signed_document')}
                 </span>
 
                 <Link to={`/documents/${invoice.sync?.invitations[0]?.dn_id}`}>

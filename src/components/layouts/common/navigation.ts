@@ -276,12 +276,12 @@ export function useNavigation() {
       visible: hasPermission('view_reports'),
     },
     {
-      name: t('documents'),
-      href: '/documents',
+      name: t('docuninja'),
+      href: '/docuninja',
       icon: ArrowsTransaction,
       rightButton: {
         icon: Plus,
-        to: '/documents/create',
+        to: '/docuninja/create',
         label: t('new_document'),
         visible: true,
       },
@@ -289,24 +289,24 @@ export function useNavigation() {
       subOptions: [
         {
           name: t('templates'),
-          href: '/documents/templates',
+          href: '/docuninja/templates',
           icon: File,
           visible: true,
           rightButton: {
             icon: Plus,
-            to: '/documents/templates/create',
+            to: '/docuninja/templates/create',
             label: t('new_template'),
             visible: true,
           },
         },
         {
           name: t('users'),
-          href: '/documents/users',
+          href: '/docuninja/users',
           icon: Users,
           visible: true,
           rightButton: {
             icon: Plus,
-            to: '/documents/users/create',
+            to: '/docuninja/users/create',
             label: t('new_user'),
             visible:
               (docuCompanyAccountDetails?.account?.num_users || 0) !==

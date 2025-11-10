@@ -44,16 +44,16 @@ function Edit() {
 
   const pages = [
     {
-      name: t('documents'),
-      href: '/documents',
+      name: t('docuninja'),
+      href: '/docuninja',
     },
     {
       name: t('users'),
-      href: '/documents/users',
+      href: '/docuninja/users',
     },
     {
       name: t('edit_user'),
-      href: route('/documents/users/:id/edit', { id }),
+      href: route('/docuninja/users/:id/edit', { id }),
     },
   ];
 

@@ -33,8 +33,10 @@ import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders'
 import { Tab, Tabs } from '$app/components/Tabs';
 import { useCalculateInvoiceSum } from '../edit/hooks/useCalculateInvoiceSum';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { Vendor } from '$app/common/interfaces/vendor';
 
 export interface PurchaseOrderContext {
+  vendor: Vendor | undefined;
   purchaseOrder: PurchaseOrder | undefined;
   setPurchaseOrder: Dispatch<SetStateAction<PurchaseOrder | undefined>>;
   isDefaultTerms: boolean;
@@ -94,6 +96,7 @@ export default function Create() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+  const [vendor, setVendor] = useState<Vendor | undefined>();
 
   const handleChange = <T extends keyof PurchaseOrder>(
     property: T,
@@ -160,9 +163,10 @@ export default function Create() {
   }, [data]);
 
   useEffect(() => {
-    purchaseOrder &&
-      purchaseOrder.vendor_id &&
+    if (purchaseOrder && purchaseOrder.vendor_id) {
       vendorResolver.find(purchaseOrder.vendor_id).then((vendor) => {
+        setVendor(vendor);
+
         const invitations: Invitation[] = [];
 
         vendor.contacts.map((contact) => {
@@ -172,12 +176,16 @@ export default function Create() {
             ) as unknown as Invitation;
 
             invitation.vendor_contact_id = contact.id;
+            invitation.can_sign = contact.can_sign;
             invitations.push(invitation);
           }
         });
 
         handleChange('invitations', invitations);
       });
+    } else {
+      setVendor(undefined);
+    }
   }, [purchaseOrder?.vendor_id]);
 
   useEffect(() => {
@@ -196,6 +204,7 @@ export default function Create() {
 
           <Outlet
             context={{
+              vendor,
               purchaseOrder,
               setPurchaseOrder,
               errors,

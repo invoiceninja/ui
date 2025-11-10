@@ -40,14 +40,14 @@ export default function Edit() {
   });
 
   const pages: Page[] = [
-    { name: t('documents'), href: '/documents' },
+    { name: t('docuninja'), href: '/docuninja' },
     {
       name: t('templates'),
-      href: route('/documents/templates'),
+      href: route('/docuninja/templates'),
     },
     {
       name: t('edit_template'),
-      href: route('/documents/templates/:id/edit', { id }),
+      href: route('/docuninja/templates/:id/edit', { id }),
     },
   ];
 

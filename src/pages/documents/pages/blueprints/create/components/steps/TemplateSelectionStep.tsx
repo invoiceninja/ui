@@ -143,7 +143,7 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
       toast.success('template_loaded');
       
       // Navigate to GrapeJS editor with the template HTML
-      navigate(route('/documents/templates/create/editor'), {
+      navigate(route('/docuninja/templates/create/editor'), {
         state: { templateHtml, templateName }
       });
 

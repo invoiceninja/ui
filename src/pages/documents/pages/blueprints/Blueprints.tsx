@@ -49,12 +49,12 @@ export default function Blueprints() {
 
   const pages = [
     {
-      name: t('documents'),
-      href: '/documents',
+      name: t('docuninja'),
+      href: '/docuninja',
     },
     {
       name: t('templates'),
-      href: '/documents/templates',
+      href: '/docuninja/templates',
     },
   ];
 
@@ -66,8 +66,8 @@ export default function Blueprints() {
         columns={columns}
         withResourcefulActions
         bulkRoute="/api/blueprints/bulk"
-        linkToCreate="/documents/templates/create"
-        linkToEdit="/documents/templates/:id/edit"
+        linkToCreate="/docuninja/templates/create"
+        linkToEdit="/docuninja/templates/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
           Authorization: `Bearer ${getToken()}`,
