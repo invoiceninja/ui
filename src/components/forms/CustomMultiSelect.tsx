@@ -288,6 +288,7 @@ function CustomSelect(props: any) {
       clearValues={clearValues}
       withoutLabel={Boolean(!restProps.placeholder)}
       filterOption={filterOption}
+      closeMenuOnSelect={false}
     />
   );
 }
