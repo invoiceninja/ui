@@ -96,6 +96,14 @@ export default function Create() {
   );
   const [convertCurrency, setConvertCurrency] = useState(false);
 
+  const [initialEndpoints, setInitialEndpoints] = useState<{
+    invoices: string;
+    credits: string;
+  }>({
+    invoices: '',
+    credits: '',
+  });
+
   const { data: blankPayment } = useBlankPaymentQuery();
 
   useEffect(() => {
@@ -179,12 +187,46 @@ export default function Create() {
     }
   }, [blankPayment]);
 
-  const { handleInvoiceInputChange, handleDeletingInvoice } = useHandleInvoice({
+  useEffect(() => {
+    if (
+      payment?.client_id &&
+      (searchParams.get('client') === payment?.client_id ||
+        !searchParams.get('client'))
+    ) {
+      setInitialEndpoints({
+        invoices: `/api/v1/invoices?payable=${
+          payment?.client_id
+        }&per_page=100&sort=date|desc&per_page=1000${
+          searchParams.get('invoice')
+            ? `&with=${searchParams.get('invoice')}`
+            : ''
+        }`,
+        credits: `/api/v1/credits?client_id=${
+          payment?.client_id
+        }&per_page=100&applicable=true${
+          searchParams.get('credit')
+            ? `&with=${searchParams.get('credit')}`
+            : ''
+        }`,
+      });
+    }
+  }, [payment?.client_id, searchParams]);
+
+  useEffect(() => {
+    return () => {
+      setInitialEndpoints({
+        invoices: '',
+        credits: '',
+      });
+    };
+  }, []);
+
+  const { handleInvoiceInputChange } = useHandleInvoice({
     payment,
     setPayment,
   });
 
-  const { handleCreditInputChange, handleDeletingCredit } = useHandleCredit({
+  const { handleCreditInputChange } = useHandleCredit({
     payment,
     setPayment,
   });
@@ -270,13 +312,13 @@ export default function Create() {
 
           {payment?.client_id && <Divider />}
 
-          {payment?.client_id && (
+          {payment?.client_id && initialEndpoints.invoices && (
             <div className="flex flex-col px-4 sm:px-6 gap-y-2 mt-4">
               <InputLabel>{t('invoices')}</InputLabel>
 
               <DataTable<Invoice>
                 resource="invoice"
-                endpoint={`/api/v1/invoices?payable=${payment?.client_id}&per_page=100&sort=date|desc&per_page=1000`}
+                endpoint={initialEndpoints.invoices}
                 columns={invoiceColumns}
                 onSelectedResourcesChange={(selectedResources) => {
                   if (selectedResources.length > 0) {
@@ -306,6 +348,11 @@ export default function Create() {
                 withoutPagination
                 withoutStatusFilter
                 withoutAllBulkActions
+                preSelected={
+                  searchParams.get('invoice')
+                    ? [searchParams.get('invoice') as string]
+                    : []
+                }
               />
             </div>
           )}
@@ -375,13 +422,13 @@ export default function Create() {
 
           {payment?.client_id && <Divider />}
 
-          {payment?.client_id && (
+          {payment?.client_id && initialEndpoints.credits && (
             <div className="flex flex-col px-4 sm:px-6 gap-y-2 mt-4">
               <InputLabel>{t('credits')}</InputLabel>
 
               <DataTable<Credit>
                 resource="credit"
-                endpoint={`/api/v1/credits?client_id=${payment?.client_id}&per_page=100&applicable=true`}
+                endpoint={initialEndpoints.credits}
                 columns={creditColumns}
                 onSelectedResourcesChange={(selectedResources) => {
                   if (selectedResources.length > 0) {
@@ -411,6 +458,11 @@ export default function Create() {
                 withoutPagination
                 withoutStatusFilter
                 withoutAllBulkActions
+                preSelected={
+                  searchParams.get('credit')
+                    ? [searchParams.get('credit') as string]
+                    : []
+                }
               />
             </div>
           )}

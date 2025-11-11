@@ -61,7 +61,7 @@ import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import { FilterColumn } from './FilterColumn';
 
 export interface DateRangeColumn {
@@ -178,6 +178,7 @@ interface Props<T> extends CommonProps {
   filterColumns?: FilterColumn[];
   withoutAllBulkActions?: boolean;
   onSelectedResourcesChange?: (selectedResources: T[]) => void;
+  preSelected?: string[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -254,6 +255,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutPageAsPreference = false,
     filterColumns = [],
     onSelectedResourcesChange,
+    preSelected = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -665,6 +667,12 @@ export function DataTable<T extends object>(props: Props<T>) {
       setSelected((current) => current.filter((v) => v !== id))
     );
   }, []);
+
+  useEffect(() => {
+    if (preSelected?.length && isInitialConfiguration) {
+      setSelected(cloneDeep(preSelected));
+    }
+  }, [preSelected, isInitialConfiguration]);
 
   useEffect(() => {
     onSelectedResourcesChange?.(selectedResources);
