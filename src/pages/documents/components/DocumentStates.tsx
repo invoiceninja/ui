@@ -15,6 +15,7 @@ import { Button } from '$app/components/forms';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { Spinner } from '$app/components/Spinner';
 
 interface DocumentStateProps {
   pages: Page[];
@@ -43,9 +44,7 @@ export function UpgradePlan({ pages }: DocumentStateProps) {
   return (
     <Default title={t('documents')} breadcrumbs={pages}>
       <div className="flex flex-col items-center gap-4 p-6">
-        <span style={{ color: colors.$17 }}>
-          {t('upgrade_plan_docuninja')}
-        </span>
+        <span style={{ color: colors.$17 }}>{t('upgrade_plan_docuninja')}</span>
 
         <Button
           onClick={() => navigate('/settings/account_management')}
@@ -59,27 +58,11 @@ export function UpgradePlan({ pages }: DocumentStateProps) {
 }
 
 export function SplashPage({ pages }: DocumentStateProps) {
-  const [t] = useTranslation();
-
+  // Instead of the splash page, render a loading spinner inside a <div>
   return (
-    <Default title={t('documents')} breadcrumbs={pages}>
-      <div className="flex items-center justify-center py-8">
-        <Card className="shadow-sm max-w-md">
-          <div className="flex flex-col items-center gap-4 p-8 text-center">
-            <div className="text-6xl mb-4">📄</div>
-            <h2 className="text-xl font-semibold text-gray-800">
-              {t('documents')}
-            </h2>
-            <p className="text-gray-600">
-              {t('docuninja_splash_message')}
-            </p>
-            <p className="text-sm text-gray-500">
-              {t('docuninja_contact_admin_for_access')}
-            </p>
-          </div>
-        </Card>
-      </div>
-    </Default>
+    <div className="flex items-center justify-center py-8 min-h-[300px]">
+      <Spinner />
+    </div>
   );
 }
 
@@ -88,7 +71,11 @@ interface AccountCreationProps extends DocumentStateProps {
   isLoading: boolean;
 }
 
-export function AccountCreation({ pages, onCreateAccount, isLoading }: AccountCreationProps) {
+export function AccountCreation({
+  pages,
+  onCreateAccount,
+  isLoading,
+}: AccountCreationProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
@@ -132,7 +119,11 @@ interface CompanySetupProps extends DocumentStateProps {
   isLoading: boolean;
 }
 
-export function CompanySetup({ pages, onCreateAccount, isLoading }: CompanySetupProps) {
+export function CompanySetup({
+  pages,
+  onCreateAccount,
+  isLoading,
+}: CompanySetupProps) {
   const [t] = useTranslation();
 
   return (
@@ -140,8 +131,8 @@ export function CompanySetup({ pages, onCreateAccount, isLoading }: CompanySetup
       <div className="flex flex-col items-center gap-4 p-6">
         <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
         <p className="text-gray-600 mb-4">
-          Your account exists but this company is not set up yet. Please
-          click the button below to set it up.
+          Your account exists but this company is not set up yet. Please click
+          the button below to set it up.
         </p>
         <Button
           onClick={onCreateAccount}
