@@ -236,52 +236,52 @@ export default function SignatoryMapping() {
 
   return (
     <Default title={t('map_signatories')} breadcrumbs={pages}>
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-1">
         <Card
           className="col-span-12 xl:col-span-8"
           withContainer
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
         >
-          <Element leftSide={t('template')}>
+          <Element leftSide={t('template')} noExternalPadding noVerticalPadding>
             <div className="text-sm font-medium" style={{ color: colors.$3 }}>
               {blueprint.name}
             </div>
           </Element>
 
-          <Element leftSide={t('instructions')}>
+          <Element leftSide={t('instructions')} noExternalPadding noVerticalPadding>
             <div className="text-sm" style={{ color: colors.$3 }}>
               {t('map_signatories_instructions')}
             </div>
           </Element>
 
-          <div className="pt-4">
+          <div className="">
             {signatoryIds.map((signatoryId: string, index: number) => {
               const mapping = mappings[signatoryId];
               const error = errors[signatoryId];
               const signatoryColor = getSignatoryColor(signatoryId);
               const hasClient = mapping?.type === 'contact';
               const hasUser = mapping?.type === 'user';
-              
+
+              const signatoryName = blueprint.document?.metadata?.signatory_map?.[signatoryId]?.name || signatoryId;
+
               return (
                 <div
                   key={signatoryId}
                   className={classNames(
-                    'pb-4 pt-4 border-b border-dashed',
-                    {
-                      'border-b-0': index === signatoryIds.length - 1,
-                    }
+                    'border-t border-dashed'
                   )}
                   style={{ borderColor: colors.$24 }}
                 >
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-5 h-5 rounded flex-shrink-0 mt-1"
-                      style={{ backgroundColor: signatoryColor }}
-                    />
-                    <div className="flex-1 space-y-3">
-                      <Element leftSide={t('signatory')} noExternalPadding>
-                        <InputLabel>{index + 1}</InputLabel>
+                  <div className="space-y-1">
+                    <Element leftSide={t('signatory')} noExternalPadding>
+                        <div className="flex flex-row items-center space-x-2">
+                          <div
+                            className="w-5 h-5 rounded flex-shrink-0"
+                            style={{ backgroundColor: signatoryColor }}
+                          />
+                          <InputLabel>{ signatoryName }</InputLabel>
+                        </div>
                       </Element>
 
                       {!hasUser && (
@@ -352,7 +352,6 @@ export default function SignatoryMapping() {
                           />
                         </Element>
                       )}
-                    </div>
                   </div>
                 </div>
               );

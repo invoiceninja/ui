@@ -126,7 +126,7 @@ export default function Edit() {
                     <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
                       <RouterLink
                         className="font-medium"
-                        to={`/documents/${invoice.sync?.invitations[0]?.dn_id}`}
+                        to={`/docuninja/${invoice.sync?.invitations[0]?.dn_id}`}
                         >
                         {t('signed_document')}
                       </RouterLink>
@@ -146,7 +146,7 @@ export default function Edit() {
                   {t('signed_document')}
                 </span>
 
-                <Link to={`/documents/${invoice.sync?.invitations[0]?.dn_id}`}>
+                <Link to={`/docuninja/${invoice.sync?.invitations[0]?.dn_id}`}>
                   {t('link')}
                 </Link>
               </div>
