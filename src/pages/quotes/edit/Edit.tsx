@@ -88,7 +88,7 @@ export default function Edit() {
                     <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
                     <Link
                       className="font-medium"
-                      to={`/documents/${quote.sync?.invitations[0]?.dn_id}`}
+                      to={`/docuninja/${quote.sync?.invitations[0]?.dn_id}`}
                       >
                       {t('signed_document')}
                     </Link>
