@@ -12,6 +12,7 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { EInvoiceComponent } from '$app/pages/settings';
+import { useQueryClient } from 'react-query';
 import {
   Dispatch,
   ReactNode,
@@ -60,6 +61,7 @@ const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const location = useLocation();
   const colors = useColorScheme();
@@ -105,7 +107,9 @@ export default function EInvoice() {
         entity_id: invoice?.id,
       })
         .then(() => {
-          $refetch(['invoices']);
+          setTimeout(() => {
+            queryClient.invalidateQueries(['/api/v1/invoices', invoice?.id]);
+          }, 2000);
           toast.success('success');
         })
         .finally(() => setIsFormBusy(false));
@@ -294,8 +298,10 @@ export default function EInvoice() {
         </Card>
       )}
 
-      <Card title={t('invoice_period')}>
-        <Element leftSide={t('start_date')} leftSideHelp={t('invoice_period_help')}>
+     
+
+      <Card title={t('date_range')}>
+        <Element leftSide={t('start_date')}>
           <InputField
             type="date"
             value={
