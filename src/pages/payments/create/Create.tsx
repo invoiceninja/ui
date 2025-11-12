@@ -218,6 +218,8 @@ export default function Create() {
         invoices: '',
         credits: '',
       });
+
+      setPayment(undefined);
     };
   }, []);
 
