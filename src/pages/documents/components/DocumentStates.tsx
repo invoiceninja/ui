@@ -58,11 +58,14 @@ export function UpgradePlan({ pages }: DocumentStateProps) {
 }
 
 export function SplashPage({ pages }: DocumentStateProps) {
-  // Instead of the splash page, render a loading spinner inside a <div>
+  const [t] = useTranslation();
+
   return (
-    <div className="flex items-center justify-center py-8 min-h-[300px]">
-      <Spinner />
-    </div>
+    <Default title={t('documents')} breadcrumbs={pages}>
+      <div className="flex items-center justify-center py-24">
+        <Spinner />
+      </div>
+    </Default>
   );
 }
 
