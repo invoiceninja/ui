@@ -72,7 +72,8 @@ export default function Invoices() {
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
 
-  const { actions } = useActions();
+  // const { actions } = useActions();
+  const { actions, modal } = useActions();
 
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
@@ -192,6 +193,7 @@ export default function Invoices() {
         selectedInvoiceIds={selectedInvoiceIds}
         setSelectedInvoiceIds={setSelectedInvoiceIds}
       />
+      {modal}
     </Default>
   );
 }
