@@ -54,6 +54,8 @@ export default function PurchaseOrders() {
       excludeColumns={['vendor_id']}
       linkToCreateGuards={[permission('create_purchase_order')]}
       hideEditableOptions={!hasPermission('edit_purchase_order')}
+      withoutPerPageAsPreference
+      withoutPageAsPreference
     />
   );
 }

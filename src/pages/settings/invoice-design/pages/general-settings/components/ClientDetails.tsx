@@ -26,6 +26,7 @@ export default function ClientDetails() {
   const customField = useCustomField();
 
   const defaultVariables = [
+    { value: '$client.location_name', label: t('location_name') },
     { value: '$client.name', label: t('client_name') },
     { value: '$client.number', label: t('client_number') },
     { value: '$client.id_number', label: t('id_number') },

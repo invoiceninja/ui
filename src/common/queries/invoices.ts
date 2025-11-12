@@ -43,7 +43,7 @@ export function useInvoiceQuery(params: InvoiceQueryParams) {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/:id?include=payments,client.group_settings${isLockedParam}`,
+          `/api/v1/invoices/:id?include=payments,client.group_settings&show_schedule=true${isLockedParam}`,
           {
             id: params.id,
           }
@@ -136,7 +136,9 @@ export function useBulk(params?: Params) {
 
       params?.onSuccess?.();
 
-      $refetch(['invoices']);
+      if (action !== 'auto_bill') {
+        $refetch(['invoices']);
+      }
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

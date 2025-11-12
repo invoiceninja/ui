@@ -81,7 +81,7 @@ export function useCheckEInvoiceValidation(params: Params) {
   };
 
   useEffect(() => {
-    if (enableQuery && resource && isEntityValidationQueryEnabled) {
+    if (enableQuery && resource) {
       handleCheckValidation();
     }
   }, [enableQuery, resource]);

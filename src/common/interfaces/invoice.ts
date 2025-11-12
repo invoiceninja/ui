@@ -12,8 +12,9 @@ import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
 import { Invitation } from './purchase-order';
+import { ScheduleItem } from './schedule';
 import { TaxInfo } from './tax-info';
-
+import { Project } from './project';
 export interface Invoice {
   id: string;
   user_id: string;
@@ -86,6 +87,8 @@ export interface Invoice {
   is_locked?: boolean;
   backup?: Backup;
   location_id: string;
+  schedule?: ScheduleItem[];
+  project?: Project;
   modified_invoice_id?: string;
 }
 

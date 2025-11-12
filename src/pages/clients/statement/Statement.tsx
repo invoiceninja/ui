@@ -23,7 +23,6 @@ import quarter from 'dayjs/plugin/quarterOfYear';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -33,6 +32,8 @@ import { Client } from '$app/common/interfaces/client';
 import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
 import { Spinner } from '$app/components/Spinner';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 dayjs.extend(quarter);
 
@@ -58,7 +59,8 @@ export default function Statement() {
 
   const { isAdmin, isOwner } = useAdmin();
 
-  const user = useCurrentUser();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { data: clientResponse } = useClientQuery({ id, enabled: true });
 
@@ -228,7 +230,7 @@ export default function Statement() {
       breadcrumbs={pages}
       navigationTopRight={
         <Dropdown label={t('more_actions')}>
-          {user?.company_user?.is_admin && (
+          {(hasPermission('edit_client') || entityAssigned(client)) && (
             <DropdownElement
               onClick={handleSendEmail}
               icon={<Icon element={MdSend} />}

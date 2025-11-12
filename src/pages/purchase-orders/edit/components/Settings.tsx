@@ -48,10 +48,11 @@ export default function Settings() {
           <div className="col-span-12 lg:col-span-6 space-y-6">
             <div className="space-y-2">
               <UserSelector
-                inputLabel={t('User')}
+                inputLabel={t('assigned_user')}
                 value={purchaseOrder?.assigned_user_id}
                 onChange={(user) => handleChange('assigned_user_id', user.id)}
                 errorMessage={errors?.errors.assigned_user_id}
+                onClearButtonClick={() => handleChange('assigned_user_id', '')}
               />
             </div>
 
@@ -61,6 +62,7 @@ export default function Settings() {
                 value={purchaseOrder?.project_id}
                 onChange={(project) => handleChange('project_id', project.id)}
                 errorMessage={errors?.errors.project_id}
+                onClearButtonClick={() => handleChange('project_id', '')}
               />
             </div>
 
@@ -70,6 +72,7 @@ export default function Settings() {
                 value={purchaseOrder?.client_id}
                 onChange={(client) => handleChange('client_id', client.id)}
                 errorMessage={errors?.errors.client_id}
+                onClearButtonClick={() => handleChange('client_id', '')}
               />
             </div>
           </div>

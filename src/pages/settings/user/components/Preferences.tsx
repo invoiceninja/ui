@@ -172,6 +172,21 @@ export function Preferences() {
         />
       </Element>
 
+      <Element
+        leftSide={t('use_legacy_editor')}
+        leftSideHelp={t('use_legacy_editor_help')}
+      >
+        <Toggle
+          checked={Boolean(reactSettings.preferences.use_legacy_editor)}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.use_legacy_editor',
+              value
+            )
+          }
+        />
+      </Element>
+
       <StatusColorTheme />
 
       <PreferenceCard

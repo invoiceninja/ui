@@ -35,7 +35,6 @@ import {
   MdPaid,
   MdPictureAsPdf,
   MdPrint,
-  // MdRefresh,
   MdRestore,
   MdSchedule,
 } from 'react-icons/md';

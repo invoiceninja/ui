@@ -35,7 +35,6 @@ import { v4 } from 'uuid';
 import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
-import { Alert } from '$app/components/Alert';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
@@ -46,6 +45,7 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Banner } from '$app/components/Banner';
 import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -347,17 +347,13 @@ export default function Create() {
                     </div>
                   </div>
 
-                  {errors?.errors[`invoices.${index}.amount`] && (
-                    <Alert className="mt-2" type="danger">
-                      {errors?.errors[`invoices.${index}.amount`]}
-                    </Alert>
-                  )}
+                  <ErrorMessage className="mt-2">
+                    {errors?.errors[`invoices.${index}.amount`]}
+                  </ErrorMessage>
 
-                  {errors?.errors[`invoices.${index}.invoice_id`] && (
-                    <Alert className="mt-2" type="danger">
-                      {errors?.errors[`invoices.${index}.invoice_id`]}
-                    </Alert>
-                  )}
+                  <ErrorMessage className="mt-2">
+                    {errors?.errors[`invoices.${index}.invoice_id`]}
+                  </ErrorMessage>
                 </div>
               </Element>
             ))}
@@ -398,9 +394,9 @@ export default function Create() {
 
           {errors?.errors.invoices && (
             <div className="px-6">
-              <Alert className="mt-2" type="danger">
+              <ErrorMessage className="mt-2">
                 {errors?.errors.invoices}
-              </Alert>
+              </ErrorMessage>
             </div>
           )}
 
@@ -475,17 +471,13 @@ export default function Create() {
                     </div>
                   </div>
 
-                  {errors?.errors[`credits.${index}.amount`] && (
-                    <Alert className="mt-2" type="danger">
-                      {errors?.errors[`credits.${index}.amount`]}
-                    </Alert>
-                  )}
+                  <ErrorMessage className="mt-2">
+                    {errors?.errors[`credits.${index}.amount`]}
+                  </ErrorMessage>
 
-                  {errors?.errors[`credits.${index}.credit_id`] && (
-                    <Alert className="mt-2" type="danger">
-                      {errors?.errors[`credits.${index}.credit_id`]}
-                    </Alert>
-                  )}
+                  <ErrorMessage className="mt-2">
+                    {errors?.errors[`credits.${index}.credit_id`]}
+                  </ErrorMessage>
                 </div>
               </Element>
             ))}
@@ -524,9 +516,9 @@ export default function Create() {
 
           {errors?.errors.credits && (
             <div className="px-6">
-              <Alert className="mt-2" type="danger">
+              <ErrorMessage className="mt-2">
                 {errors?.errors.credits}
-              </Alert>
+              </ErrorMessage>
             </div>
           )}
 

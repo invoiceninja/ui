@@ -240,6 +240,10 @@ export function Search$() {
       tasks: [] as Entry<SearchRecord>[],
       purchase_orders: [] as Entry<SearchRecord>[],
       settings: [] as Entry<SearchRecord>[],
+      products: [] as Entry<SearchRecord>[],
+      expenses: [] as Entry<SearchRecord>[],
+      vendors: [] as Entry<SearchRecord>[],
+      vendor_contacts: [] as Entry<SearchRecord>[],
       other: [] as Entry<SearchRecord>[],
     };
 
@@ -266,6 +270,15 @@ export function Search$() {
           break;
         case '/credit':
           groups.credits.push(entry);
+          break;
+        case '/expense':
+          groups.expenses.push(entry);
+          break;
+        case '/vendor':
+          groups.vendors.push(entry);
+          break;
+        case '/vendor_contact':
+          groups.vendor_contacts.push(entry);
           break;
         case '/project':
           groups.projects.push(entry);

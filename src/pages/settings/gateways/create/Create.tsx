@@ -332,15 +332,15 @@ export function Create() {
   useEffect(() => {
     if (!filteredGateways.length) return;
 
-    const gatewayIndex = filteredGateways.findIndex(
-      (gateway) => gateway.key === 'b9886f9257f0c6ee7c302f1c74475f6c'
+    const gatewayIndex = filteredGateways.findIndex((gateway) =>
+      gateway.name?.toLowerCase().includes('paypal')
     );
 
-    if (gatewayIndex === -1 || gatewayIndex === 2) return;
+    if (gatewayIndex === -1 || gatewayIndex === 1) return;
 
     const updatedGateways = [...filteredGateways];
     const [gateway] = updatedGateways.splice(gatewayIndex, 1);
-    updatedGateways.splice(2, 0, gateway);
+    updatedGateways.splice(1, 0, gateway);
 
     setFilteredGateways(updatedGateways);
   }, [filteredGateways]);

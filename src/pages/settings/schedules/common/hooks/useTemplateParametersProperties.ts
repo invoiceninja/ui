@@ -60,8 +60,21 @@ export function useTemplateParametersProperties(params: Params) {
       'only_clients_with_invoices',
       'clients',
     ],
-    email_record: ['entity', 'entity_id'],
+    email_record: ['entity', 'entity_id', 'template'],
     email_report: ['report_name', ...getReportParametersProperties()],
+    invoice_outstanding_tasks: [
+      'date_range',
+      'clients',
+      'auto_send',
+      'include_project_tasks',
+    ],
+    payment_schedule: [
+      'template',
+      'next_run',
+      'schedule',
+      'auto_bill',
+      'invoice_id',
+    ],
   };
 
   return templateParametersProperties;

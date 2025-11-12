@@ -31,6 +31,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -68,6 +69,7 @@ import {
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { Link } from '$app/components/forms';
 import classNames from 'classnames';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -112,6 +114,12 @@ export function useActions() {
     navigate('/recurring_expenses/create?action=clone');
   };
 
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const actions: Action<Expense>[] = [
     (expense) =>
       expense.should_be_invoiced === true &&
@@ -145,6 +153,21 @@ export function useActions() {
           icon={<Icon element={MdControlPointDuplicate} />}
         >
           {t('clone_to_recurring')}
+        </DropdownElement>
+      ),
+      (expense) => (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([expense]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/expenses/bulk',
+              entity: 'expense',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
         </DropdownElement>
       ),
     () => isEditPage && <Divider withoutPadding />,

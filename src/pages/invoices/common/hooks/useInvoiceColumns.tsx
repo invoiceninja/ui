@@ -35,6 +35,8 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import classNames from 'classnames';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 import { MdTextSnippet } from 'react-icons/md';
 import { Assigned } from '$app/components/Assigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -118,6 +120,7 @@ export function useAllInvoiceColumns() {
     'tax_amount',
     'created_at',
     'updated_at',
+    'project',
   ] as const;
 
   return invoiceColumns;
@@ -133,6 +136,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
   const reactSettings = useReactSettings();
+  const currentCompany = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const getSetting = useGetSetting();
@@ -151,14 +155,47 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       entity: 'invoice',
     });
 
+  const isPeppolEnabled = () => {
+    return (
+      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
+      currentCompany.settings.enable_e_invoice
+    );
+  };
+
+  const isEInvoiceSuccessfullySent = (currentInvoice: Invoice) => {
+    return (
+      isPeppolEnabled() &&
+      currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
+      !currentInvoice.backup?.guid &&
+      !currentInvoice.is_deleted &&
+      !currentInvoice.archived_at
+    );
+  };
+
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
       column: 'status',
       id: 'status_id',
       label: t('status'),
       format: (_value, invoice) => (
-        <div className="flex items-center space-x-2">
-          <InvoiceStatus entity={invoice} />
+        <div className="flex items-center gap-x-2">
+          {isEInvoiceSuccessfullySent(invoice) ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
+              }}
+            >
+              <InvoiceStatus
+                entity={invoice}
+                style={{ textDecoration: 'underline' }}
+              />
+            </button>
+          ) : (
+            <InvoiceStatus entity={invoice} />
+          )}
+
 
           {['R1','R2'].includes(invoice.backup?.document_type ?? '') && (
             <Assigned
@@ -258,6 +295,19 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           renderSpan={disableNavigation('client', invoice.client)}
         >
           {invoice.client?.display_name}
+        </DynamicLink>
+      ),
+    },
+    {
+      column: 'project',
+      id: 'project_id',
+      label: t('project'),
+      format: (value, invoice) =>(
+        <DynamicLink
+          to={route('/projects/:id', { id: invoice.project_id })}
+          renderSpan={disableNavigation('invoice', invoice.project)}
+        >
+          {invoice?.project?.name ?? ''} 
         </DynamicLink>
       ),
     },

@@ -42,7 +42,7 @@ import {
   Th,
   Thead,
 } from './tables';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -62,6 +62,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
 import { isEqual } from 'lodash';
+import { FilterColumn } from './FilterColumn';
 
 export interface DateRangeColumn {
   column: string;
@@ -113,6 +114,17 @@ interface StyleOptions {
   withoutTdPadding?: boolean;
 }
 
+export interface FilterOption {
+  label: string;
+  value: string;
+}
+
+export interface FilterColumn {
+  query_identifier: string;
+  options: FilterOption[];
+  column_id: string;
+}
+
 interface Props<T> extends CommonProps {
   resource: string;
   columns: DataTableColumns;
@@ -157,18 +169,22 @@ interface Props<T> extends CommonProps {
   disableQuery?: boolean;
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
+  withoutPageAsPreference?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
   applyManualHeight?: boolean;
   onDeleteBulkAction?: (selectedIds: string[]) => void;
+  filterColumns?: FilterColumn[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
 
 export type PerPage = '10' | '50' | '100';
 
+export const dateRangeAtom = atom<string>('');
 export const dataTableSelectedAtom = atom<Record<string, string[]>>({});
+export const filterColumnsValuesAtom = atom<Record<string, string[]>>({});
 
 function DataTableCheckbox({
   resourceId,
@@ -230,6 +246,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     showRestoreBulk,
     enableSavingFilterPreference = false,
     onDeleteBulkAction,
+    withoutPageAsPreference = false,
+    filterColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -247,7 +265,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
-  const [dateRange, setDateRange] = useState<string>('');
+  const [dateRange, setDateRange] = useAtom(dateRangeAtom);
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
@@ -259,6 +277,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     useState<boolean>(false);
   const [currentData, setCurrentData] = useState<T[]>([]);
   const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
 
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
@@ -275,6 +296,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
+    withoutStoringPage: withoutPageAsPreference,
     enableSavingFilterPreference,
   });
 
@@ -325,14 +347,31 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
-    if (dateRangeColumns.length && dateRangeQueryParameter) {
-      const startDate = dateRange?.split(',')[0];
-      const endDate = dateRange?.split(',')[1];
+    if (
+      dateRangeColumns.length &&
+      dateRangeQueryParameter &&
+      dateRange?.split(',').every((date) => date.length > 1)
+    ) {
+      apiEndpoint.searchParams.set(dateRangeQueryParameter, dateRange);
+    }
 
-      apiEndpoint.searchParams.set(
-        dateRangeQueryParameter,
-        startDate && endDate ? dateRange : ''
-      );
+    if (
+      dateRangeColumns.length &&
+      dateRangeQueryParameter &&
+      !dateRange?.split(',').every((date) => date.length > 1)
+    ) {
+      apiEndpoint.searchParams.set(dateRangeQueryParameter, '');
+    }
+
+    if (Object.keys(filterColumnsValues).length) {
+      filterColumns.forEach((filterColumn) => {
+        if (filterColumnsValues[filterColumn.column_id]) {
+          apiEndpoint.searchParams.set(
+            filterColumn.query_identifier,
+            filterColumnsValues[filterColumn.column_id].join(',')
+          );
+        }
+      });
     }
 
     setApiEndpoint(apiEndpoint);
@@ -351,6 +390,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilter,
     dateRange,
     dateRangeQueryParameter,
+    filterColumns,
+    filterColumnsValues,
   ]);
 
   useEffect(() => {
@@ -395,8 +436,14 @@ export function DataTable<T extends object>(props: Props<T>) {
       sort,
       status,
       customFilter,
-      dateRange,
-      dateRangeQueryParameter,
+      ...(dateRange?.split(',').every((date) => date.length > 1)
+        ? [dateRange]
+        : []),
+      ...(dateRange?.split(',').every((date) => date.length > 1) &&
+      dateRangeQueryParameter
+        ? [dateRangeQueryParameter]
+        : []),
+      filterColumnsValues,
     ],
     () => request(methodType, apiEndpoint.href),
     {
@@ -779,6 +826,26 @@ export function DataTable<T extends object>(props: Props<T>) {
                       <DateRangePicker
                         setDateRange={setDateRange}
                         onClick={() => handleDateRangeColumnClick(column.id)}
+                      />
+                    )}
+
+                    {filterColumns?.some(
+                      (filterColumn) => column.id === filterColumn.column_id
+                    ) && (
+                      <FilterColumn
+                        selectedValues={filterColumnsValues[column.id] || []}
+                        options={
+                          filterColumns?.find(
+                            (filterColumn) =>
+                              filterColumn.column_id === column.id
+                          )?.options || []
+                        }
+                        onChange={(value) =>
+                          setFilterColumnsValues((current) => ({
+                            ...current,
+                            [column.id]: value,
+                          }))
+                        }
                       />
                     )}
                     <span>{column.label}</span>

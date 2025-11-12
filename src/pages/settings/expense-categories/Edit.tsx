@@ -138,6 +138,7 @@ export function Edit() {
           disableSubmitButton={isFormBusy}
           title={expenseCategory?.name}
           disableWithoutIcon
+          onSaveClick={handleSubmit}
         >
           <Element leftSide={t('status')}>
             {!data.data.data.is_deleted && !data.data.data.archived_at && (

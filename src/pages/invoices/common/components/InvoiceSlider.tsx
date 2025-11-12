@@ -231,7 +231,7 @@ export function InvoiceSlider() {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`
+          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true&show_schedule=true`
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
@@ -571,8 +571,8 @@ export function InvoiceSlider() {
                           <span>
                             {formatMoney(
                               paymentable.amount,
-                              payment.client?.country_id,
-                              payment.client?.settings.currency_id
+                              invoice?.client?.country_id,
+                              invoice?.client?.settings.currency_id
                             )}
                           </span>
 

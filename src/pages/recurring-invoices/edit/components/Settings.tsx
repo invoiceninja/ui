@@ -89,7 +89,7 @@ export default function Settings() {
           <div className="col-span-12 lg:col-span-6 space-y-6">
             <div className="space-y-2">
               <UserSelector
-                inputLabel={t('user')}
+                inputLabel={t('assigned_user')}
                 value={recurringInvoice?.assigned_user_id}
                 onChange={(user) => handleChange('assigned_user_id', user.id)}
                 errorMessage={errors?.errors.assigned_user_id}

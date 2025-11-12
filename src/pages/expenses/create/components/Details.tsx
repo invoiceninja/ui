@@ -23,7 +23,7 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import { ExpenseStatus } from '../../common/components/ExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
-import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from '../../common/hooks/useCalculateExpenseAmount';
+import { useCalculateExpenseExclusiveAmount } from '../../common/hooks/useCalculateExpenseAmount';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
@@ -66,7 +66,6 @@ export function Details(props: Props) {
   const { data: taxes } = useTaxRatesQuery({ status: ['active'] });
 
   const formatMoney = useFormatMoney();
-  const calculateExpenseAmount = useCalculateExpenseAmount();
   const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
   const isAnyTaxHidden = () => {
     if (
@@ -111,13 +110,8 @@ export function Details(props: Props) {
       {expense && (
         <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
           <Element leftSide={t('net_amount')} withoutWrappingLeftSide>
-            {expense.uses_inclusive_taxes ? formatMoney(
+            {formatMoney(
               calculateExpenseExclusiveAmount(expense),
-              expense.client?.country_id,
-              expense.currency_id || expense.client?.settings.currency_id
-            )
-            : formatMoney(
-              calculateExpenseAmount(expense),
               expense.client?.country_id,
               expense.currency_id || expense.client?.settings.currency_id
             )}
@@ -240,7 +234,7 @@ export function Details(props: Props) {
         )}
 
         {expense && (
-          <Element leftSide={t('user')}>
+          <Element leftSide={t('assigned_user')}>
             <UserSelector
               value={expense.assigned_user_id}
               clearButton={Boolean(expense.assigned_user_id)}
@@ -271,7 +265,7 @@ export function Details(props: Props) {
           </div>
         )}
 
-        {Boolean(getNonExistingTaxes().length) && (
+        {/* {Boolean(getNonExistingTaxes().length) && (
           <Element leftSide={t('taxes')}>
             {getNonExistingTaxes().map((tax) => (
               <div key={tax} className="flex items-center space-x-2">
@@ -281,7 +275,7 @@ export function Details(props: Props) {
               </div>
             ))}
           </Element>
-        )}
+        )} */}
 
         {/* Tax 1 */}
         {expense &&

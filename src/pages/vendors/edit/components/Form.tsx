@@ -210,7 +210,7 @@ export function Form(props: Props) {
                 />
               </Element>
 
-              <Element leftSide={t('user')}>
+              <Element leftSide={t('assigned_user')}>
                 <UserSelector
                   value={vendor.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}

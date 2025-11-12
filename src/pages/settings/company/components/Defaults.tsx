@@ -33,6 +33,7 @@ export function Defaults() {
       {companyChanges?.settings && (
         <>
           <Element
+            className="mt-4"
             leftSide={
               <PropertyCheckbox
                 propertyKey="invoice_terms"

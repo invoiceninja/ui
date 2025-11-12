@@ -33,7 +33,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import collect from 'collect.js';
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
-// import { useReverseInvoice } from './useReverseInvoice';
+import { useReverseInvoice } from './useReverseInvoice';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -57,7 +57,7 @@ export const useCustomBulkActions = () => {
 
   const bulk = useBulk();
 
-  // const reverseInvoice = useReverseInvoice();
+  const reverseInvoice = useReverseInvoice();
 
   const getDocumentsIds = (invoices: Invoice[]) => {
     return invoices.flatMap(({ documents }) => documents.map(({ id }) => id));
@@ -118,15 +118,15 @@ export const useCustomBulkActions = () => {
     );
   };
 
-  // const showReverseOption = (invoices: Invoice[]) => {
-  //   return !invoices.some(
-  //     ({ status_id, is_deleted, archived_at }) =>
-  //       (status_id !== InvoiceStatus.Paid &&
-  //         status_id !== InvoiceStatus.Partial) ||
-  //       is_deleted ||
-  //       archived_at
-  //   );
-  // };
+  const showReverseOption = (invoices: Invoice[]) => {
+    return !invoices.some(
+      ({ status_id, is_deleted, archived_at }) =>
+        (status_id !== InvoiceStatus.Paid &&
+          status_id !== InvoiceStatus.Partial) ||
+        is_deleted ||
+        archived_at
+    );
+  };
 
   const handleDownloadDocuments = (
     selectedInvoices: Invoice[],

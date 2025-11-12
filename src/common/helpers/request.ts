@@ -57,17 +57,27 @@ client.interceptors.response.use(
       return;
     }
 
-    if (url?.endsWith('/api/v1/einvoice/token/update') && error.response?.status === 500) {
+    if (
+      url?.endsWith('/api/v1/einvoice/token/update') &&
+      error.response?.status === 500
+    ) {
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 429 || error.response?.status === 403) {
+    if (error.response?.status === 403) {
+      toast.error('unauthorized_action');
+
+      return;
+    }
+
+    if (error.response?.status === 429 || error.response?.status === 401) {
       window.location.reload();
       clearLocalStorage();
     }
 
     if (error.response?.status === 404) {
-      window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
+      toast.error('not_found');
+      return;
     }
 
     if (

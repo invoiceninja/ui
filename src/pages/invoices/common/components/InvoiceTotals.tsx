@@ -48,7 +48,7 @@ export function InvoiceTotals(props: Props) {
   const company = useCurrentCompany();
   const variables = useTotalVariables();
   const reactSettings = useReactSettings();
-
+  
   const resolveVariable = useResolveTotalVariable({
     resource,
     onChange: props.onChange,
@@ -81,7 +81,13 @@ export function InvoiceTotals(props: Props) {
   };
 
   const isTaxField = (variable: string) => {
-    return variable === '$tax1' || variable === '$tax2' || variable === '$tax3';
+    return (
+      variable === '$tax1' ||
+      variable === '$tax2' ||
+      variable === '$tax3' ||
+      variable === '$total_taxes' ||
+      variable === '$line_taxes'
+    );
   };
 
   const isSurchargeField = (variable: string) => {

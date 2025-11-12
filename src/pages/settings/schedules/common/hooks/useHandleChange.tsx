@@ -46,6 +46,9 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   categories: '',
   report_keys: [],
   pdf_email_attachment: false,
+  auto_send: false,
+  include_project_tasks: false,
+  template: '',
 };
 
 export function useHandleChange(params: Params) {

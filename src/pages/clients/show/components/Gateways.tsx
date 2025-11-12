@@ -16,7 +16,7 @@ import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
@@ -26,15 +26,11 @@ import classNames from 'classnames';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import styled from 'styled-components';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import {
-  ConfirmActionModal,
-  confirmActionModalAtom,
-} from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
-import { useSetAtom } from 'jotai';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
 import { InfoCard } from '$app/components/InfoCard';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   client: Client;
@@ -56,12 +52,11 @@ export function Gateways(props: Props) {
 
   const { data: companyGatewaysResponse } = useCompanyGatewaysQuery();
 
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [companyGateways, setCompanyGateways] = useState<CompanyGateway[]>();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [deleteGatewayTokenId, setDeleteGatewayTokenId] = useState<string>('');
-
-  const setIsConfirmationVisible = useSetAtom(confirmActionModalAtom);
 
   const getCompanyGateway = (gatewayId: string) => {
     return companyGateways?.find(({ id }) => id === gatewayId);
@@ -91,7 +86,7 @@ export function Gateways(props: Props) {
           $refetch(['clients']);
 
           setDeleteGatewayTokenId('');
-          setIsConfirmationVisible(false);
+          setIsModalVisible(false);
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -115,17 +110,30 @@ export function Gateways(props: Props) {
 
   useEffect(() => {
     if (deleteGatewayTokenId) {
-      setIsConfirmationVisible(true);
+      setIsModalVisible(true);
     }
   }, [deleteGatewayTokenId]);
 
   return (
     <>
-      <ConfirmActionModal
-        onClick={() => handleDeleteGatewayToken()}
-        onClose={() => setDeleteGatewayTokenId('')}
-        disabledButton={isFormBusy}
-      />
+      <Modal
+        title={t('are_you_sure')}
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+      >
+        <div className="flex flex-col space-y-6">
+          <span className="font-medium text-sm">{t('are_you_sure')}</span>
+
+          <Button
+            behavior="button"
+            onClick={() => handleDeleteGatewayToken()}
+            disabled={false}
+            disableWithoutIcon
+          >
+            {t('continue')}
+          </Button>
+        </div>
+      </Modal>
 
       <InfoCard
         title={t('payment_methods')}
@@ -194,7 +202,13 @@ export function Gateways(props: Props) {
                     'justify-between':
                       isStripeGateway(
                         getCompanyGateway(token.company_gateway_id)?.gateway_key
-                      ) && token.is_default,
+                      ) &&
+                      (token.is_default || !token.is_default),
+                    'justify-end':
+                      !token.is_default &&
+                      !isStripeGateway(
+                        getCompanyGateway(token.company_gateway_id)?.gateway_key
+                      ),
                   })}
                 >
                   {isStripeGateway(
@@ -208,12 +222,13 @@ export function Gateways(props: Props) {
                           customerReference: token.gateway_customer_reference,
                         }
                       )}
+                      withoutExternalIcon
                     >
                       <Icon element={MdLaunch} size={18} />
                     </Link>
                   )}
 
-                  {token.is_default && (
+                  {token.is_default ? (
                     <div
                       className="inline-flex items-center text-xs"
                       style={{ height: '1.5rem' }}
@@ -256,60 +271,56 @@ export function Gateways(props: Props) {
                         </Dropdown>
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
-
-              {!token.is_default && (
-                <div className="flex items-center justify-start">
-                  <div
-                    className="inline-flex items-center text-xs cursor-pointer self-start"
-                    style={{ height: '1.5rem' }}
-                  >
-                    <Div
-                      className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
-                      onClick={() => handleSetDefault(token.id)}
-                      style={{
-                        borderColor: colors.$5,
-                      }}
-                      theme={{ hoverBgColor: colors.$5 }}
+                  ) : (
+                    <div
+                      className="inline-flex items-center text-xs cursor-pointer self-end"
+                      style={{ height: '1.5rem' }}
                     >
-                      {t('save_as_default')}
-                    </Div>
-
-                    {isAdmin && (
-                      <Dropdown
-                        className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
-                        customLabel={
-                          <Div
-                            className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
-                            style={{
-                              borderColor: colors.$5,
-                              paddingTop: '0.21rem',
-                              paddingBottom: '0.21rem',
-                            }}
-                            theme={{ hoverBgColor: colors.$4 }}
-                          >
-                            <ChevronDown size="0.9rem" color={colors.$3} />
-                          </Div>
-                        }
-                        minWidth="10rem"
-                        maxWidth="12rem"
+                      <Div
+                        className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
+                        onClick={() => handleSetDefault(token.id)}
                         style={{
                           borderColor: colors.$5,
                         }}
+                        theme={{ hoverBgColor: colors.$5 }}
                       >
-                        <DropdownElement
-                          icon={<Icon element={MdDelete} />}
-                          onClick={() => setDeleteGatewayTokenId(token.id)}
+                        {t('save_as_default')}
+                      </Div>
+
+                      {isAdmin && (
+                        <Dropdown
+                          className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
+                          customLabel={
+                            <Div
+                              className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
+                              style={{
+                                borderColor: colors.$5,
+                                paddingTop: '0.26rem',
+                                paddingBottom: '0.26rem',
+                              }}
+                              theme={{ hoverBgColor: colors.$4 }}
+                            >
+                              <ChevronDown size="0.9rem" color={colors.$3} />
+                            </Div>
+                          }
+                          minWidth="10rem"
+                          maxWidth="12rem"
+                          style={{
+                            borderColor: colors.$5,
+                          }}
                         >
-                          {t('delete')}
-                        </DropdownElement>
-                      </Dropdown>
-                    )}
-                  </div>
+                          <DropdownElement
+                            icon={<Icon element={MdDelete} />}
+                            onClick={() => setDeleteGatewayTokenId(token.id)}
+                          >
+                            {t('delete')}
+                          </DropdownElement>
+                        </Dropdown>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>

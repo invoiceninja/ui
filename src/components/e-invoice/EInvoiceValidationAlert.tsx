@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Alert } from '../Alert';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props {
   errors: ValidationBag;
@@ -46,7 +46,7 @@ export function EInvoiceValidationAlert(props: Props) {
   };
 
   return (
-    <Alert className="mb-6" type="danger">
+    <ErrorMessage className="mb-6">
       <ul>
         {Object.keys(props.errors.errors).map((key, index) => (
           <li key={index}>{`${errors.errors[key]} ${getFieldParentLabel(
@@ -54,6 +54,6 @@ export function EInvoiceValidationAlert(props: Props) {
           )}`}</li>
         ))}
       </ul>
-    </Alert>
+    </ErrorMessage>
   );
 }

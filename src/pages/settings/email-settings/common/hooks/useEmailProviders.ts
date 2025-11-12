@@ -40,6 +40,11 @@ export function useEmailProviders() {
       enabled: true,
     },
     {
+      value: 'ses',
+      label: 'Amazon SES (Hosted)',
+      enabled: true,
+    },
+    {
       value: 'gmail',
       label: 'Gmail (OAuth)',
       enabled: true,
@@ -64,6 +69,11 @@ export function useEmailProviders() {
       label: 'Brevo',
       enabled: true,
     },
+    // {
+    //   value: 'client_ses',
+    //   label: 'Amazon SES',
+    //   enabled: true,
+    // },
     {
       value: 'smtp',
       label: 'SMTP',
@@ -94,6 +104,11 @@ export function useEmailProviders() {
     {
       value: 'client_brevo',
       label: 'Brevo',
+      enabled: true,
+    },
+    {
+      value: 'client_ses',
+      label: 'Amazon SES',
       enabled: true,
     },
     {

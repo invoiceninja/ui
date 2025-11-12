@@ -23,7 +23,7 @@ const TemplateProperties = {
     'remaining_cycles',
     'parameters',
   ],
-  email_record: ['template', 'next_run', 'parameters'],
+  email_record: ['template', 'next_run', 'parameters', 'template'],
   email_report: [
     'template',
     'next_run',
@@ -31,6 +31,8 @@ const TemplateProperties = {
     'remaining_cycles',
     'parameters',
   ],
+  invoice_outstanding_tasks: ['template', 'next_run', 'parameters'],
+  payment_schedule: ['template', 'next_run', 'parameters'],
 };
 
 const NullableProperties = ['vendors', 'projects', 'categories'];

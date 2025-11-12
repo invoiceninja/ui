@@ -102,7 +102,7 @@ export function Details(props: Props) {
       )}
 
       {users && (
-        <Element leftSide={t('user')}>
+        <Element leftSide={t('assigned_user')}>
           <SelectField
             value={props.client?.assigned_user_id}
             onValueChange={(value) => handleChange('assigned_user_id', value)}

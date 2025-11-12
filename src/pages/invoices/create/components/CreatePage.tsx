@@ -27,6 +27,7 @@ import { InvoicePreview } from '../../common/components/InvoicePreview';
 import { CreateInvoiceContext } from '../Create';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { TasksTabLabel } from '../../common/components/TasksTabLabel';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -108,6 +109,11 @@ export default function CreatePage() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            formatTabLabel={(index) => {
+              if (index === 1) {
+                return <TasksTabLabel lineItems={invoice?.line_items || []} />;
+              }
+            }}
           >
             <div>
               {invoice ? (

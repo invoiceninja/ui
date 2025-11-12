@@ -26,6 +26,7 @@ import { useQuoteUtilities } from '../../common/hooks';
 import { QuoteDetails } from '../../common/components/QuoteDetails';
 import { QuoteFooter } from '../../common/components/QuoteFooter';
 import { useColorScheme } from '$app/common/colors';
+import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
 
 export default function CreatePage() {
   const [t] = useTranslation();
@@ -88,6 +89,11 @@ export default function CreatePage() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            formatTabLabel={(index) => {
+              if (index === 1) {
+                return <TasksTabLabel lineItems={quote?.line_items || []} />;
+              }
+            }}
           >
             <div>
               {quote ? (
