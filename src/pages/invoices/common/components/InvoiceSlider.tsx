@@ -217,7 +217,7 @@ export function InvoiceSlider() {
   const queryClient = useQueryClient();
 
   const formatMoney = useFormatMoney();
-  const actions = useActions({
+  const { actions, modal } = useActions({
     showCommonBulkAction: true,
     showEditAction: true,
   });
@@ -795,6 +795,8 @@ export function InvoiceSlider() {
           ))}
         </div>
       </TabGroup>
+      
+      {modal}
     </Slider>
   );
 }

@@ -21,19 +21,23 @@ import { useSetAtom } from 'jotai';
 import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { useState } from 'react';
 import { DeleteInvoicesConfirmationModal } from '$app/pages/invoices/common/components/DeleteInvoicesConfirmationModal';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 export default function Invoices() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
 
-  const actions = useActions();
+  const { actions } = useActions();
   const columns = useInvoiceColumns();
   const { footerColumns } = useFooterColumns();
   const customBulkActions = useCustomBulkActions();
 
   const setIsConfirmActionModalOpen = useSetAtom(confirmActionModalAtom);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
+
+  const verifactuEnabled = useCompanyVerifactu();
 
   return (
     <>
@@ -48,6 +52,7 @@ export default function Invoices() {
         customActions={actions}
         customBulkActions={customBulkActions}
         withResourcefulActions
+        withoutDefaultBulkActions={Boolean(verifactuEnabled)}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate={route('/invoices/create?client=:id', { id })}
         linkToEdit="/invoices/:id/edit"
@@ -60,6 +65,8 @@ export default function Invoices() {
         }}
         withoutPerPageAsPreference
         withoutPageAsPreference
+        showDelete={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
+        showRestore={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
       />
 
       <DeleteInvoicesConfirmationModal

@@ -14,13 +14,14 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import {
-  MdCancel,
+  MdDelete,
   MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
   MdPrint,
-  MdRefresh,
+  MdArchive,
+  MdRestore
 } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
@@ -37,6 +38,10 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { getEntityState } from '$app/common/helpers';
+import { EntityState } from '$app/common/enums/entity-state';
+import { CancelInvoiceBulkAction } from '../components/CancelInvoiceBulkAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -89,6 +94,13 @@ export const useCustomBulkActions = () => {
   };
 
   const showCancelOption = (invoices: Invoice[]) => {
+
+    if(verifactuEnabled) {
+      return !invoices.some((invoice) => invoice.status_id !== InvoiceStatus.Sent || 
+      (invoice.backup?.document_type ?? '') !== 'F1' || 
+      (invoice.backup?.child_invoice_ids?.length ?? 0) > 0);
+    }
+
     return !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent);
   };
 
@@ -131,6 +143,29 @@ export const useCustomBulkActions = () => {
     setChangeTemplateResources,
     setChangeTemplateEntityContext,
   } = useChangeTemplate();
+
+  const verifactuEnabled = useCompanyVerifactu();
+
+  const showRestoreBulkAction = (invoices: Invoice[]) => {
+    if(verifactuEnabled) {
+      return invoices.every((invoice) => invoice.archived_at > 0 && !invoice.is_deleted);
+    }
+
+    return invoices.every((invoice) => getEntityState(invoice) === EntityState.Archived);
+  };
+
+  const showArchiveBulkAction = (invoices: Invoice[]) => {
+    return invoices.every((invoice) => getEntityState(invoice) === EntityState.Active);
+  };
+
+  const showDeleteBulkAction = (invoices: Invoice[]) => {
+    
+    if(verifactuEnabled) {
+      return invoices.every((invoice) => invoice.status_id === InvoiceStatus.Draft);
+    }
+
+    return invoices.every((invoice) => getEntityState(invoice) === (EntityState.Active || EntityState.Archived));
+  };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
     ({ selectedResources, setSelected }) => (
@@ -223,31 +258,28 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
-    ({ selectedResources, setSelected }) =>
-      showReverseOption(selectedResources) &&
-      hasPermission('create_credit') && (
-        <DropdownElement
-          onClick={() => {
-            reverseInvoice(selectedResources[0]);
-            setSelected([]);
-          }}
-          icon={<Icon element={MdRefresh} />}
-        >
-          {t('reverse')}
-        </DropdownElement>
-      ),
-    ({ selectedIds, selectedResources, setSelected }) =>
+    // ({ selectedResources, setSelected }) =>
+    //   showReverseOption(selectedResources) &&
+    //   hasPermission('create_credit') && (
+    //     <DropdownElement
+    //       onClick={() => {
+    //         reverseInvoice(selectedResources[0]);
+    //         setSelected([]);
+    //       }}
+    //       icon={<Icon element={MdRefresh} />}
+    //     >
+    //       {t('reverse')}
+    //     </DropdownElement>
+    //   ),
+    ({ selectedIds, selectedResources, setSelected }) => (
       showCancelOption(selectedResources) && (
-        <DropdownElement
-          onClick={() => {
-            bulk(selectedIds, 'cancel');
-            setSelected([]);
-          }}
-          icon={<Icon element={MdCancel} />}
-        >
-          {t('cancel_invoice')}
-        </DropdownElement>
-      ),
+      <CancelInvoiceBulkAction
+        selectedIds={selectedIds}
+        selectedResources={selectedResources}
+        setSelected={setSelected}
+        showCancelOption={showCancelOption}
+      />
+    )),
     ({ selectedResources }) => (
       <DropdownElement
         onClick={() => {
@@ -263,6 +295,46 @@ export const useCustomBulkActions = () => {
         {t('run_template')}
       </DropdownElement>
     ),
+
+
+    ({ selectedIds, selectedResources, setSelected }) => (
+      showArchiveBulkAction(selectedResources) && (
+      <DropdownElement
+        onClick={() => {
+          bulk(selectedIds, 'archive');
+            setSelected([]);
+        }} 
+        icon={<Icon element={MdArchive} />}
+      >
+        {t('archive')}
+      </DropdownElement>
+    )),
+
+    ({ selectedIds, selectedResources, setSelected }) => (
+      showDeleteBulkAction(selectedResources) && (
+      <DropdownElement
+        onClick={() => {
+          bulk(selectedIds, 'delete');
+              setSelected([]);
+          }}
+        icon={<Icon element={MdDelete} />}
+      >
+        {t('delete')}
+      </DropdownElement>
+    )),
+
+    ({ selectedIds, selectedResources, setSelected }) => (
+      showRestoreBulkAction(selectedResources) && (
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'restore');
+              setSelected([]);
+            }}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      )),
   ];
 
   return customBulkActions;
