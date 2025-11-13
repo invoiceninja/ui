@@ -9,14 +9,14 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, InputLabel } from '$app/components/forms';
+import { InputLabel } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
-import { useFormik } from 'formik';
+import { FormikProps, useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -26,22 +26,21 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { emitter } from '$app';
-import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
+import {
+  ApplyInvoice,
+  useApplyInvoiceTableColumns,
+} from '../common/hooks/useApplyInvoiceTableColumns';
+import { PaymentOnCreation } from '..';
 
 export default function Apply() {
   const [t] = useTranslation();
 
   const { id } = useParams();
   const colors = useColorScheme();
-
-  const columns = useApplyInvoiceTableColumns();
 
   const { data: payment } = usePaymentQuery({ id });
 
@@ -106,6 +105,13 @@ export default function Apply() {
           $refetch(['payments', 'invoices', 'clients', 'credits']);
         });
     },
+  });
+
+  const columns = useApplyInvoiceTableColumns({
+    payment: payment as unknown as PaymentOnCreation,
+    errors,
+    formik: formik as unknown as FormikProps<{ invoices: ApplyInvoice[] }>,
+    isApplyPage: true,
   });
 
   useEffect(() => {
@@ -207,62 +213,6 @@ export default function Apply() {
           </div>
         )}
       </>
-
-      {formik.values.invoices.map(
-        (
-          record: {
-            _id: string;
-            amount: number;
-            number: string;
-            balance: number;
-            invoice_id: string;
-          },
-          index
-        ) => (
-          <Element key={index} leftSide={t('applied')}>
-            <div className="flex items-center space-x-2">
-              <InputField
-                disabled
-                label={t('invoice_number')}
-                value={record.number}
-              />
-              <NumberInputField
-                label={t('amount_received')}
-                value={record.amount || ''}
-                onValueChange={(value) =>
-                  formik.setFieldValue(
-                    `invoices.${index}.amount`,
-                    parseFloat(value)
-                  )
-                }
-              />
-
-              <div
-                className="cursor-pointer focus:outline-none focus:ring-0 mt-6"
-                onClick={() =>
-                  emitter.emit('deselect.resource', record.invoice_id)
-                }
-              >
-                <CircleXMark
-                  color={colors.$16}
-                  hoverColor={colors.$3}
-                  borderColor={colors.$5}
-                  hoverBorderColor={colors.$17}
-                  size="1.6rem"
-                />
-              </div>
-            </div>
-
-            {errors?.errors[`invoices.${[index]}.invoice_id`] && (
-              <div className="py-2">
-                <ErrorMessage>
-                  {errors.errors[`invoices.${[index]}.invoice_id`]}
-                </ErrorMessage>
-              </div>
-            )}
-          </Element>
-        )
-      )}
     </Card>
   );
 }
