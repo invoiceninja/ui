@@ -19,8 +19,24 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Credit } from '$app/common/interfaces/credit';
 import { useAllCreditColumns } from '$app/pages/credits/common/hooks';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { PaymentOnCreation } from '../Create';
+import { Dispatch, SetStateAction } from 'react';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { cloneDeep, set } from 'lodash';
+import { InputField } from '$app/components/forms';
 
-export function useCreditColumns(): DataTableColumns<Credit> {
+interface UseCreditColumnsProps {
+  payment: PaymentOnCreation | undefined;
+  setPayment: Dispatch<SetStateAction<PaymentOnCreation | undefined>>;
+  errors: ValidationBag | undefined;
+}
+
+export function useCreditColumns({
+  payment,
+  setPayment,
+  errors,
+}: UseCreditColumnsProps): DataTableColumns<Credit> {
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
 
@@ -62,6 +78,55 @@ export function useCreditColumns(): DataTableColumns<Credit> {
           credit.client?.country_id,
           credit.client?.settings.currency_id
         ),
+    },
+    {
+      column: 'received',
+      id: 'id',
+      label: t('received'),
+      format: (_, credit) => {
+        const creditIndex = payment?.credits.findIndex(
+          (p) => p.credit_id === credit.id
+        );
+
+        return (
+          <div className="flex flex-col gap-y-2 w-full">
+            <InputField
+              value={
+                payment?.credits.find((p) => p.credit_id === credit.id)
+                  ?.amount || ''
+              }
+              onValueChange={(value) => {
+                if (creditIndex === -1) return;
+
+                setPayment((current) => {
+                  if (current) {
+                    const updatedPayment = cloneDeep(current);
+
+                    set(
+                      updatedPayment,
+                      `credits.${creditIndex}.amount`,
+                      isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                    );
+
+                    return updatedPayment;
+                  }
+
+                  return current;
+                });
+              }}
+              disabled={creditIndex === -1}
+            />
+
+            <ErrorMessage className="mt-2">
+              {errors?.errors[`credits.${creditIndex}.amount`]}
+            </ErrorMessage>
+
+            <ErrorMessage className="mt-2">
+              {errors?.errors[`credits.${creditIndex}.credit_id`]}
+            </ErrorMessage>
+          </div>
+        );
+      },
     },
   ];
 

@@ -31,8 +31,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { useHandleCredit } from './hooks/useHandleCredit';
-import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { useAtom } from 'jotai';
@@ -41,14 +39,10 @@ import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Banner } from '$app/components/Banner';
 import { useColorScheme } from '$app/common/colors';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
 import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
-import { InvoiceLabel } from './components/InvoiceLabel';
 import { useCreditColumns } from './hooks/useCreditColumns';
-import { CreditLabel } from './components/CreditLabel';
-import { emitter } from '$app';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -81,10 +75,8 @@ export default function Create() {
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
-  const creditColumns = useCreditColumns();
   const creditResolver = useCreditResolver();
   const invoiceResolver = useInvoiceResolver();
-  const invoiceColumns = useApplyInvoiceTableColumns();
 
   const paymentTypes = usePaymentTypes();
 
@@ -105,6 +97,17 @@ export default function Create() {
   });
 
   const { data: blankPayment } = useBlankPaymentQuery();
+
+  const creditColumns = useCreditColumns({
+    payment,
+    setPayment,
+    errors,
+  });
+  const invoiceColumns = useApplyInvoiceTableColumns({
+    payment,
+    setPayment,
+    errors,
+  });
 
   useEffect(() => {
     setPayment((current) => {
@@ -188,6 +191,8 @@ export default function Create() {
   }, [blankPayment]);
 
   useEffect(() => {
+    console.log('payment', payment?.client_id);
+
     if (
       payment?.client_id &&
       (searchParams.get('client') === payment?.client_id ||
@@ -222,16 +227,6 @@ export default function Create() {
       setPayment(undefined);
     };
   }, []);
-
-  const { handleInvoiceInputChange } = useHandleInvoice({
-    payment,
-    setPayment,
-  });
-
-  const { handleCreditInputChange } = useHandleCredit({
-    payment,
-    setPayment,
-  });
 
   const handleChange = <
     TField extends keyof PaymentOnCreation,
@@ -269,13 +264,20 @@ export default function Create() {
           <Element leftSide={t('client')}>
             <ClientSelector
               onChange={(client) => {
-                handleChange('client_id', client?.id as string);
-                handleChange(
-                  'currency_id',
-                  client?.settings.currency_id || '1'
-                );
-                handleChange('invoices', []);
-                handleChange('credits', []);
+                setInitialEndpoints({
+                  invoices: '',
+                  credits: '',
+                });
+
+                setTimeout(() => {
+                  handleChange('client_id', client?.id as string);
+                  handleChange(
+                    'currency_id',
+                    client?.settings.currency_id || '1'
+                  );
+                  handleChange('invoices', []);
+                  handleChange('credits', []);
+                }, 25);
               }}
               onClearButtonClick={() => {
                 handleChange('client_id', '');
@@ -320,6 +322,7 @@ export default function Create() {
 
               <DataTable<Invoice>
                 resource="invoice"
+                queryIdentificator={initialEndpoints.invoices}
                 endpoint={initialEndpoints.invoices}
                 columns={invoiceColumns}
                 onSelectedResourcesChange={(selectedResources) => {
@@ -359,61 +362,6 @@ export default function Create() {
             </div>
           )}
 
-          {payment && payment.invoices.length > 0 && (
-            <div className="flex flex-col gap-y-4 mt-4 w-full">
-              {payment.invoices.map((invoice, index) => (
-                <div className="flex flex-col gap-y-2 w-full" key={index}>
-                  <div className="flex flex-col px-4 sm:px-6">
-                    <div className="flex items-start justify-start space-x-16">
-                      <InvoiceLabel invoiceId={invoice.invoice_id} />
-
-                      <div className="flex items-center space-x-2">
-                        <NumberInputField
-                          label={t('amount_received')}
-                          value={invoice.amount || ''}
-                          onValueChange={(value) =>
-                            handleInvoiceInputChange(
-                              index,
-                              isNaN(parseFloat(value)) ? 0 : parseFloat(value)
-                            )
-                          }
-                          className="w-full"
-                          withoutLabelWrapping
-                        />
-
-                        <div
-                          className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
-                          onClick={() =>
-                            emitter.emit(
-                              'deselect.resource',
-                              invoice.invoice_id
-                            )
-                          }
-                        >
-                          <CircleXMark
-                            color={colors.$16}
-                            hoverColor={colors.$3}
-                            borderColor={colors.$5}
-                            hoverBorderColor={colors.$17}
-                            size="1.6rem"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <ErrorMessage className="mt-2">
-                      {errors?.errors[`invoices.${index}.amount`]}
-                    </ErrorMessage>
-
-                    <ErrorMessage className="mt-2">
-                      {errors?.errors[`invoices.${index}.invoice_id`]}
-                    </ErrorMessage>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {errors?.errors.invoices && (
             <div className="px-6">
               <ErrorMessage className="mt-2">
@@ -430,6 +378,7 @@ export default function Create() {
 
               <DataTable<Credit>
                 resource="credit"
+                queryIdentificator={initialEndpoints.credits}
                 endpoint={initialEndpoints.credits}
                 columns={creditColumns}
                 onSelectedResourcesChange={(selectedResources) => {
@@ -466,58 +415,6 @@ export default function Create() {
                     : []
                 }
               />
-            </div>
-          )}
-
-          {payment && payment.credits.length > 0 && (
-            <div className="flex flex-col gap-y-4 mt-4 w-full">
-              {payment.credits.map((credit, index) => (
-                <div className="flex flex-col gap-y-2 w-full" key={index}>
-                  <div className="flex flex-col px-4 sm:px-6">
-                    <div className="flex items-start justify-start space-x-16">
-                      <CreditLabel creditId={credit.credit_id} />
-
-                      <div className="flex items-center space-x-2">
-                        <NumberInputField
-                          label={t('amount_received')}
-                          value={credit.amount || ''}
-                          onValueChange={(value) =>
-                            handleCreditInputChange(
-                              index,
-                              isNaN(parseFloat(value)) ? 0 : parseFloat(value)
-                            )
-                          }
-                          className="w-full"
-                          withoutLabelWrapping
-                        />
-
-                        <div
-                          className="cursor-pointer self-center mt-6 focus:outline-none focus:ring-0"
-                          onClick={() =>
-                            emitter.emit('deselect.resource', credit.credit_id)
-                          }
-                        >
-                          <CircleXMark
-                            color={colors.$16}
-                            hoverColor={colors.$3}
-                            borderColor={colors.$5}
-                            hoverBorderColor={colors.$17}
-                            size="1.6rem"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <ErrorMessage className="mt-2">
-                      {errors?.errors[`credits.${index}.amount`]}
-                    </ErrorMessage>
-
-                    <ErrorMessage className="mt-2">
-                      {errors?.errors[`credits.${index}.credit_id`]}
-                    </ErrorMessage>
-                  </div>
-                </div>
-              ))}
             </div>
           )}
 
