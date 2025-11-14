@@ -135,7 +135,7 @@ function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
 
   return (
     <Modal
-      title={t('upload_document')}
+      title={t('upload')}
       visible={open}
       onClose={onOpenChange}
       size="small"
