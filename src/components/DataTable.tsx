@@ -179,6 +179,7 @@ interface Props<T> extends CommonProps {
   withoutAllBulkActions?: boolean;
   onSelectedResourcesChange?: (selectedResources: T[]) => void;
   preSelected?: string[];
+  emptyState?: ReactNode;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -208,9 +209,6 @@ function DataTableCheckbox({
         value={resourceId}
         id={resourceId}
         cypressRef="dataTableCheckbox"
-        onChange={(event: any) => {
-          console.log(event.target.checked);
-        }}
       />
     );
   }
@@ -256,6 +254,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     filterColumns = [],
     onSelectedResourcesChange,
     preSelected = [],
+    emptyState,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -677,6 +676,10 @@ export function DataTable<T extends object>(props: Props<T>) {
   useEffect(() => {
     onSelectedResourcesChange?.(selectedResources);
   }, [selectedResources]);
+
+  if (currentData.length === 0 && !isLoading && !isFetching && emptyState) {
+    return emptyState;
+  }
 
   return (
     <div data-cy="dataTable">

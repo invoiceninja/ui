@@ -358,6 +358,13 @@ export default function Create() {
                     ? [searchParams.get('invoice') as string]
                     : []
                 }
+                emptyState={
+                  <div className="flex items-center justify-center pt-6 pb-8">
+                    <span className="text-sm" style={{ color: colors.$17 }}>
+                      {t('no_invoices_found')}
+                    </span>
+                  </div>
+                }
               />
             </div>
           )}
@@ -413,6 +420,13 @@ export default function Create() {
                   searchParams.get('credit')
                     ? [searchParams.get('credit') as string]
                     : []
+                }
+                emptyState={
+                  <div className="flex items-center justify-center pt-6 pb-8">
+                    <span className="text-sm" style={{ color: colors.$17 }}>
+                      {t('no_credits_found')}
+                    </span>
+                  </div>
                 }
               />
             </div>
