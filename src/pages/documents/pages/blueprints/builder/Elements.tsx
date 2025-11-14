@@ -19,8 +19,9 @@ import collect from 'collect.js';
 import { Client } from '$app/common/interfaces/client';
 import { InputLabel, SelectField } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from '$app/components/Modal';
+import { get } from 'lodash';
 
 export function SignatorySwap(props: SignatorySwapProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -147,6 +148,22 @@ export function SignatorySelector({
       value: `user|${user.value}`,
     }))
     .all();
+
+  useEffect(() => {
+    const handler = (data: Event) => {
+      const id = `${get(data, 'data.detail.type')}|${get(
+        data,
+        'data.detail.id'
+      )}`;
+
+      handleSelect(id);
+    };
+
+    window.addEventListener('builder:signatory-created', handler);
+
+    return () =>
+      window.removeEventListener('builder:signatory-created', handler);
+  }, []);
 
   return (
     <div className="space-y-3">
