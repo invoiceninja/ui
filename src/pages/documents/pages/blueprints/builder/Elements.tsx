@@ -58,8 +58,9 @@ export function SignatorySelector({
   isSwapModal = false,
 }: SignatorySelector) {
   const [t] = useTranslation();
+  const [pendingSelect, setPendingSelect] = useState<string>();
 
-  const { data: clients } = useClientsQuery({ status: ['active'] });
+  const { data: clients, refetch } = useClientsQuery({ status: ['active'] });
 
   const handleSelect = (v: string | undefined) => {
     if (!v) {
@@ -151,12 +152,11 @@ export function SignatorySelector({
 
   useEffect(() => {
     const handler = (data: Event) => {
-      const id = `${get(data, 'data.detail.type')}|${get(
-        data,
-        'data.detail.id'
-      )}`;
+      const key = get(data, 'detail.data.contacts.0.contact_key');
+      const id = `contact|${key}`;
 
-      handleSelect(id);
+      setPendingSelect(id);
+      refetch();
     };
 
     window.addEventListener('builder:signatory-created', handler);
@@ -164,6 +164,13 @@ export function SignatorySelector({
     return () =>
       window.removeEventListener('builder:signatory-created', handler);
   }, []);
+
+  useEffect(() => {
+    if (pendingSelect) {
+      handleSelect(pendingSelect);
+      setPendingSelect(undefined);
+    }
+  }, [clients]);
 
   return (
     <div className="space-y-3">
