@@ -19,8 +19,9 @@ import { route } from '$app/common/helpers/route';
 import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useColorScheme } from '$app/common/colors';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { InfoCard } from '$app/components/InfoCard';
+import { CurrencyCodeBadge } from './CurrencyCodeBadge';
+import { PaymentTermsBadge } from './PaymentTermsBadge';
 
 interface Props {
   client: Client;
@@ -37,7 +38,6 @@ export function Details(props: Props) {
   const getSetting = useGetSetting();
   const formatMoney = useFormatMoney();
   const customField = useCustomField();
-  const resolveCountry = useResolveCountry();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const isAnyCustomFieldPopulated = () => {
@@ -55,7 +55,19 @@ export function Details(props: Props) {
     <>
       {client && (
         <InfoCard
-          title={t('details')}
+          title={
+            <div className="flex items-center gap-x-2 justify-between">
+              <span className="text-xl font-medium">{t('details')}</span>
+
+              <div className="flex items-center gap-x-2">
+                <CurrencyCodeBadge currency_id={client.settings?.currency_id} />
+
+                <PaymentTermsBadge
+                  payment_terms={client.settings?.payment_terms}
+                />
+              </div>
+            </div>
+          }
           className="h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 shadow-sm p-4"
           style={{ borderColor: colors.$24 }}
           withoutPadding
