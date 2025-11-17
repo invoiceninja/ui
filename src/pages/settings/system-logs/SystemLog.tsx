@@ -187,7 +187,7 @@ export function SystemLog() {
                   leftSide={getCategory(systemLog.category_id)}
                   leftSideHelp={`${getType(systemLog.type_id)} ${formatDate(
                     systemLog.created_at,
-                    dateFormat
+                    `${dateFormat} HH:mm:ss`
                   )}`}
                   noExternalPadding
                 >
