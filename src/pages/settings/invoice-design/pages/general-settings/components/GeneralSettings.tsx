@@ -1613,38 +1613,37 @@ export default function GeneralSettings() {
           />
         </Element>
 
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="page_numbering_alignment"
-              labelElement={
-                <SettingsLabel label={t('page_numbering_alignment')} />
-              }
-              defaultValue="C"
-            />
-          }
-        >
-          <SelectField
-            id="settings.page_numbering_alignment"
-            disabled={
-              !company?.settings?.page_numbering ||
-              disableSettingsField('page_numbering_alignment')
+        {Boolean(company?.settings?.page_numbering) && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="page_numbering_alignment"
+                labelElement={
+                  <SettingsLabel label={t('page_numbering_alignment')} />
+                }
+                defaultValue="C"
+              />
             }
-            value={
-              company?.settings?.page_numbering_alignment?.toString() || 'C'
-            }
-            onValueChange={(value) =>
-              handleChange('page_numbering_alignment', value)
-            }
-            errorMessage={errors?.errors['settings.page_numbering_alignment']}
-            customSelector
-            dismissable={false}
           >
-            <option value="C">{t('center')}</option>
-            <option value="R">{t('right')}</option>
-            <option value="L">{t('left')}</option>
-          </SelectField>
-        </Element>
+            <SelectField
+              id="settings.page_numbering_alignment"
+              disabled={disableSettingsField('page_numbering_alignment')}
+              value={
+                company?.settings?.page_numbering_alignment?.toString() || 'C'
+              }
+              onValueChange={(value) =>
+                handleChange('page_numbering_alignment', value)
+              }
+              errorMessage={errors?.errors['settings.page_numbering_alignment']}
+              customSelector
+              dismissable={false}
+            >
+              <option value="C">{t('center')}</option>
+              <option value="R">{t('right')}</option>
+              <option value="L">{t('left')}</option>
+            </SelectField>
+          </Element>
+        )}
       </Card>
     </>
   );
