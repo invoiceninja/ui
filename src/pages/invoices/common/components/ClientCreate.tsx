@@ -32,7 +32,7 @@ import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInf
 
 interface Props {
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (open: boolean) => void;
   onClientCreated?: (client: Client) => unknown;
 }
 

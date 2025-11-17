@@ -180,7 +180,6 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   return (
     <ClientCreate
       isModalOpen={open}
-      // ts-expect-error TS2322 - Need to verify the types here.
       setIsModalOpen={onOpenChange}
       onClientCreated={(client) => {
         window.dispatchEvent(
