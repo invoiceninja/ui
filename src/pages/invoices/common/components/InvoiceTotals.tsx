@@ -48,7 +48,7 @@ export function InvoiceTotals(props: Props) {
   const company = useCurrentCompany();
   const variables = useTotalVariables();
   const reactSettings = useReactSettings();
-  
+
   const resolveVariable = useResolveTotalVariable({
     resource,
     onChange: props.onChange,
@@ -227,11 +227,7 @@ export function InvoiceTotals(props: Props) {
 
               {isSurchargeField(variable) && (
                 <>
-                  {Boolean(
-                    company &&
-                      company?.custom_fields?.surcharge1 &&
-                      variable === '$custom_surcharge1'
-                  ) && (
+                  {Boolean(company && company?.custom_fields?.surcharge1) && (
                     <CustomSurchargeField
                       field="surcharge1"
                       type="number"
@@ -249,11 +245,7 @@ export function InvoiceTotals(props: Props) {
                     />
                   )}
 
-                  {Boolean(
-                    company &&
-                      company?.custom_fields?.surcharge2 &&
-                      variable === '$custom_surcharge2'
-                  ) && (
+                  {Boolean(company && company?.custom_fields?.surcharge2) && (
                     <CustomSurchargeField
                       field="surcharge2"
                       type="number"
@@ -271,11 +263,7 @@ export function InvoiceTotals(props: Props) {
                     />
                   )}
 
-                  {Boolean(
-                    company &&
-                      company?.custom_fields?.surcharge3 &&
-                      variable === '$custom_surcharge3'
-                  ) && (
+                  {Boolean(company && company?.custom_fields?.surcharge3) && (
                     <CustomSurchargeField
                       field="surcharge3"
                       type="number"
@@ -293,11 +281,7 @@ export function InvoiceTotals(props: Props) {
                     />
                   )}
 
-                  {Boolean(
-                    company &&
-                      company?.custom_fields?.surcharge4 &&
-                      variable === '$custom_surcharge4'
-                  ) && (
+                  {Boolean(company && company?.custom_fields?.surcharge4) && (
                     <CustomSurchargeField
                       field="surcharge4"
                       type="number"
