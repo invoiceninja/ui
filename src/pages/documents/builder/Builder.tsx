@@ -18,10 +18,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import {
-  Button,
-  InputField,
-} from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/icons/Settings';
@@ -57,8 +54,12 @@ import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
-import { SignatorySelector, SignatorySwap } from '../pages/blueprints/builder/Elements';
+import {
+  SignatorySelector,
+  SignatorySwap,
+} from '../pages/blueprints/builder/Elements';
 import { FaFileSignature } from 'react-icons/fa';
+import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 
 function Loading() {
   return (
@@ -173,42 +174,25 @@ function ConfirmationDialogButton({ ...props }: ConfirmationDialogButtonProps) {
   );
 }
 
-export function CreateDialog({
-  open,
-  onOpenChange,
-  client,
-}: CreateDialogProps) {
-  const [t] = useTranslation();
-  return (
-    <Modal
-      title={t('create_client')}
-      visible={open}
-      onClose={onOpenChange}
-      withoutHorizontalPadding
-      withoutVerticalMargin
-    >
-      <div className="pt-3">
-        <div className="px-4 sm:px-6 pt-2">{client}</div>
-      </div>
-    </Modal>
-  );
-}
-
-function CreateClientForm({ fields, errors }: CreateClientTabProps) {
+export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   const [t] = useTranslation();
 
   return (
-    <>
-      {fields.map((field) => (
-        <div key={field.name} className="mb-4">
-          <InputField
-            label={t(field.name)}
-            errorMessage={errors?.errors[field.name]}
-            onValueChange={field.onValueChange}
-          />
-        </div>
-      ))}
-    </>
+    <ClientCreate
+      isModalOpen={open}
+      setIsModalOpen={onOpenChange}
+      onClientCreated={(client) => {
+        window.dispatchEvent(
+          new CustomEvent('builder:signatory-created', {
+            detail: {
+              id: client.id,
+              type: 'contact',
+              data: client,
+            },
+          })
+        );
+      }}
+    />
   );
 }
 
@@ -548,7 +532,7 @@ function Builder() {
               createSignatory: {
                 dialog: CreateDialog,
                 client: {
-                  form: CreateClientForm,
+                  form: () => null,
                   button: CreateDialogTabButton,
                 },
                 user: {

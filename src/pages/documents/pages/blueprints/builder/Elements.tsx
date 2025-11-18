@@ -19,8 +19,9 @@ import collect from 'collect.js';
 import { Client } from '$app/common/interfaces/client';
 import { InputLabel, SelectField } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from '$app/components/Modal';
+import { get } from 'lodash';
 
 export function SignatorySwap(props: SignatorySwapProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,8 +58,9 @@ export function SignatorySelector({
   isSwapModal = false,
 }: SignatorySelector) {
   const [t] = useTranslation();
+  const [pendingSelect, setPendingSelect] = useState<string>();
 
-  const { data: clients } = useClientsQuery({ status: ['active'] });
+  const { data: clients, refetch } = useClientsQuery({ status: ['active'] });
 
   const handleSelect = (v: string | undefined) => {
     if (!v) {
@@ -147,6 +149,28 @@ export function SignatorySelector({
       value: `user|${user.value}`,
     }))
     .all();
+
+  useEffect(() => {
+    const handler = (data: Event) => {
+      const key = get(data, 'detail.data.contacts.0.contact_key');
+      const id = `contact|${key}`;
+
+      setPendingSelect(id);
+      refetch();
+    };
+
+    window.addEventListener('builder:signatory-created', handler);
+
+    return () =>
+      window.removeEventListener('builder:signatory-created', handler);
+  }, []);
+
+  useEffect(() => {
+    if (pendingSelect) {
+      handleSelect(pendingSelect);
+      setPendingSelect(undefined);
+    }
+  }, [clients]);
 
   return (
     <div className="space-y-3">
