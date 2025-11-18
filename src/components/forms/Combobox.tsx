@@ -392,6 +392,12 @@ export function Combobox<T = any>({
 
                   setIsOpen(false);
 
+                  setInputValue('');
+
+                  if (inputRef && inputRef.current) {
+                    inputRef.current.value = '';
+                  }
+
                   return onDismiss();
                 }
               }}
