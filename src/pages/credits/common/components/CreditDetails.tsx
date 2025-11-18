@@ -130,6 +130,7 @@ export function CreditDetails(props: Props) {
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
               <SelectField
+                dropdownIndicatorClassName="pr-3"
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
@@ -137,6 +138,9 @@ export function CreditDetails(props: Props) {
                 errorMessage={errors?.errors.is_amount_discount}
                 customSelector
                 dismissable={false}
+                searchable={false}
+                withoutControlPadding
+                withoutDropdownIndicatorPadding
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>

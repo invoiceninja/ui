@@ -36,6 +36,9 @@ export interface SelectProps extends CommonProps {
   controlStyle?: CSSProperties;
   applyCustomDropdownIndicator?: boolean;
   dropdownIndicatorClassName?: string;
+  withoutDropdownIndicatorPadding?: boolean;
+  withoutControlPadding?: boolean;
+  controlClassName?: string;
 }
 
 export function SelectField(props: SelectProps) {
@@ -58,6 +61,9 @@ export function SelectField(props: SelectProps) {
     controlIcon,
     controlStyle,
     dropdownIndicatorClassName,
+    withoutDropdownIndicatorPadding = false,
+    withoutControlPadding = false,
+    controlClassName,
   } = props;
 
   const blankEntry: ReactNode = (
@@ -203,9 +209,10 @@ export function SelectField(props: SelectProps) {
                   className={classNames(
                     'flex items-center rounded-md border cursor-pointer',
                     {
-                      'pl-2': controlIcon,
-                      'pl-1': !controlIcon,
-                    }
+                      'pl-2': controlIcon && !withoutControlPadding,
+                      'pl-1': !controlIcon && !withoutControlPadding,
+                    },
+                    controlClassName
                   )}
                   style={{
                     height: '2.5rem',
@@ -224,7 +231,8 @@ export function SelectField(props: SelectProps) {
             DropdownIndicator: () => (
               <div
                 className={classNames(
-                  'flex items-center justify-center px-3 hover:opacity-75 h-full w-full',
+                  'flex items-center justify-center hover:opacity-75 h-full w-full',
+                  { 'px-3': !withoutDropdownIndicatorPadding },
                   dropdownIndicatorClassName
                 )}
                 style={{ color: colors.$3 }}
