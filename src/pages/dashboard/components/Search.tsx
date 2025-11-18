@@ -35,7 +35,6 @@ import { ExternalLink } from '$app/components/icons/ExternalLink';
 import { SearchGroups } from './SearchGroups';
 import { BiSearch } from 'react-icons/bi';
 import { Icon } from '$app/components/icons/Icon';
-import { MdClose } from 'react-icons/md';
 
 export function Search$() {
   const [t] = useTranslation();
@@ -352,7 +351,7 @@ export function Search$() {
                   <SearchIcon color={colors.$5} size="1.6rem" />
                 )}
 
-                <div className="flex-1 relative">
+                <div className="flex-1">
                   <InputField
                     className="border-transparent focus:border-transparent focus:ring-0 border-0 w-full px-0"
                     innerRef={inputRef}
@@ -362,18 +361,8 @@ export function Search$() {
                     placeholder={t('search_placeholder')}
                     changeOverride
                     style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                    clearable
                   />
-
-                  {query && (
-                    <div className="absolute top-[0.55rem] right-[0.4rem] hover:opacity-50 cursor-pointer transition-opacity duration-200">
-                      <Icon
-                        element={MdClose}
-                        size={19}
-                        style={{ color: colors.$3 }}
-                        onClick={() => setQuery('')}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

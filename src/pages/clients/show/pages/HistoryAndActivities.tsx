@@ -31,8 +31,6 @@ import { Spinner } from '$app/components/Spinner';
 import { InputField } from '$app/components/forms';
 import { Search as SearchIcon } from '$app/components/icons/Search';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { MdClose } from 'react-icons/md';
-import { Icon } from '$app/components/icons/Icon';
 
 export default function HistoryAndActivities() {
   const [t] = useTranslation();
@@ -147,7 +145,7 @@ export default function HistoryAndActivities() {
               <div className="flex items-center space-x-1.5 py-2 px-4 flex-1 border-b mb-4">
                 <SearchIcon color={colors.$5} size="1.6rem" />
 
-                <div className="flex-1 relative">
+                <div className="flex-1">
                   <InputField
                     className="border-transparent focus:border-transparent focus:ring-0 border-0 w-full px-0"
                     value={filter}
@@ -155,18 +153,8 @@ export default function HistoryAndActivities() {
                     placeholder={t('search')}
                     changeOverride
                     style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                    clearable
                   />
-
-                  {filter && (
-                    <div className="absolute top-[0.55rem] right-[0.4rem] hover:opacity-50 cursor-pointer transition-opacity duration-200">
-                      <Icon
-                        element={MdClose}
-                        size={19}
-                        style={{ color: colors.$3 }}
-                        onClick={() => setFilter('')}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
 

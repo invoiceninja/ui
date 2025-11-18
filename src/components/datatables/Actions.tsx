@@ -36,8 +36,6 @@ import classNames from 'classnames';
 import { useClickAway } from 'react-use';
 import styled from 'styled-components';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { Icon } from '../icons/Icon';
-import { MdClose } from 'react-icons/md';
 
 export interface SelectOption {
   value: string;
@@ -412,19 +410,9 @@ export function Actions(props: Props) {
             onValueChange={(value) =>
               props.onFilterChange && props.onFilterChange(value)
             }
-            debounceTimeout={800}
+            debounceTimeout={300}
+            clearable
           />
-
-          {props.filter && (
-            <div className="absolute top-[0.65rem] right-[0.4rem] hover:opacity-50 cursor-pointer transition-opacity duration-200">
-              <Icon
-                element={MdClose}
-                size={17}
-                style={{ color: colors.$3 }}
-                onClick={() => props.onFilterChange?.('')}
-              />
-            </div>
-          )}
         </div>
 
         {props.options &&
