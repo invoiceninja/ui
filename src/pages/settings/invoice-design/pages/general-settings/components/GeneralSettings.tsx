@@ -858,8 +858,21 @@ export default function GeneralSettings() {
     );
   };
 
+  const handleScrollToBottom = () => {
+    const pageNumberingAlignment = document.querySelector(
+      '.page-numbering-alignment-select'
+    );
+
+    if (pageNumberingAlignment) {
+      pageNumberingAlignment.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  };
+
   return (
-    <>
+    <div className="flex flex-col pb-24">
       <AdvancedSettingsPlanAlert />
 
       <Card
@@ -1608,7 +1621,15 @@ export default function GeneralSettings() {
           <Toggle
             checked={Boolean(company?.settings?.page_numbering)}
             id="settings.page_numbering"
-            onChange={(value) => handleChange('page_numbering', value)}
+            onChange={(value) => {
+              handleChange('page_numbering', value);
+
+              if (value) {
+                setTimeout(() => {
+                  handleScrollToBottom();
+                }, 25);
+              }
+            }}
             disabled={disableSettingsField('page_numbering')}
           />
         </Element>
@@ -1626,6 +1647,7 @@ export default function GeneralSettings() {
             }
           >
             <SelectField
+              className="page-numbering-alignment-select"
               id="settings.page_numbering_alignment"
               disabled={disableSettingsField('page_numbering_alignment')}
               value={
@@ -1645,6 +1667,6 @@ export default function GeneralSettings() {
           </Element>
         )}
       </Card>
-    </>
+    </div>
   );
 }
