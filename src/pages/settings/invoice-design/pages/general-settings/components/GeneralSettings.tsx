@@ -858,8 +858,21 @@ export default function GeneralSettings() {
     );
   };
 
+  const handleScrollToBottom = () => {
+    const pageNumberingAlignment = document.querySelector(
+      '.page-numbering-alignment-select'
+    );
+
+    if (pageNumberingAlignment) {
+      pageNumberingAlignment.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  };
+
   return (
-    <>
+    <div className="flex flex-col pb-24">
       <AdvancedSettingsPlanAlert />
 
       <Card
@@ -1608,44 +1621,52 @@ export default function GeneralSettings() {
           <Toggle
             checked={Boolean(company?.settings?.page_numbering)}
             id="settings.page_numbering"
-            onChange={(value) => handleChange('page_numbering', value)}
+            onChange={(value) => {
+              handleChange('page_numbering', value);
+
+              if (value) {
+                setTimeout(() => {
+                  handleScrollToBottom();
+                }, 25);
+              }
+            }}
             disabled={disableSettingsField('page_numbering')}
           />
         </Element>
 
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="page_numbering_alignment"
-              labelElement={
-                <SettingsLabel label={t('page_numbering_alignment')} />
-              }
-              defaultValue="C"
-            />
-          }
-        >
-          <SelectField
-            id="settings.page_numbering_alignment"
-            disabled={
-              !company?.settings?.page_numbering ||
-              disableSettingsField('page_numbering_alignment')
+        {Boolean(company?.settings?.page_numbering) && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="page_numbering_alignment"
+                labelElement={
+                  <SettingsLabel label={t('page_numbering_alignment')} />
+                }
+                defaultValue="C"
+              />
             }
-            value={
-              company?.settings?.page_numbering_alignment?.toString() || 'C'
-            }
-            onValueChange={(value) =>
-              handleChange('page_numbering_alignment', value)
-            }
-            errorMessage={errors?.errors['settings.page_numbering_alignment']}
-            customSelector
-            dismissable={false}
           >
-            <option value="C">{t('center')}</option>
-            <option value="R">{t('right')}</option>
-            <option value="L">{t('left')}</option>
-          </SelectField>
-        </Element>
+            <SelectField
+              className="page-numbering-alignment-select"
+              id="settings.page_numbering_alignment"
+              disabled={disableSettingsField('page_numbering_alignment')}
+              value={
+                company?.settings?.page_numbering_alignment?.toString() || 'C'
+              }
+              onValueChange={(value) =>
+                handleChange('page_numbering_alignment', value)
+              }
+              errorMessage={errors?.errors['settings.page_numbering_alignment']}
+              customSelector
+              dismissable={false}
+            >
+              <option value="C">{t('center')}</option>
+              <option value="R">{t('right')}</option>
+              <option value="L">{t('left')}</option>
+            </SelectField>
+          </Element>
+        )}
       </Card>
-    </>
+    </div>
   );
 }
