@@ -65,8 +65,6 @@ export default function Invoice() {
   const entityAssigned = useEntityAssigned();
   const verifactuEnabled = useCompanyVerifactu();
 
-  const { actions, modal } = useActions();
-
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [triggerValidationQuery, setTriggerValidationQuery] =
     useState<boolean>(true);
@@ -77,10 +75,14 @@ export default function Invoice() {
     disableFunctionality: id === data?.id && data?.is_locked,
   });
 
+  const { actions, modal } = useActions({ invoice });
+
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: invoice,
     enableQuery:
-      ((company?.settings.e_invoice_type === 'PEPPOL' && company?.tax_data?.acts_as_sender) || verifactuEnabled) &&
+      ((company?.settings.e_invoice_type === 'PEPPOL' &&
+        company?.tax_data?.acts_as_sender) ||
+        verifactuEnabled) &&
       triggerValidationQuery &&
       id === invoice?.id,
     onFinished: () => {
@@ -233,7 +235,7 @@ export default function Invoice() {
       </Default>
 
       <AddUninvoicedItemsButton invoice={invoice} setInvoice={setInvoice} />
-      
+
       {modal}
     </>
   );

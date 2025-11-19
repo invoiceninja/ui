@@ -63,6 +63,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { useMarkPaid } from '../hooks/useMarkPaid';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -77,7 +78,9 @@ interface Params {
   showEditAction?: boolean;
   showCommonBulkAction?: boolean;
   dropdown?: boolean;
+  invoice?: Invoice | undefined;
 }
+
 export function useActions(params?: Params) {
   const { t } = useTranslation();
 
@@ -85,6 +88,7 @@ export function useActions(params?: Params) {
     showEditAction,
     showCommonBulkAction,
     dropdown = true,
+    invoice: currentInvoice,
   } = params || {};
 
   const company = useCurrentCompany();
@@ -103,9 +107,20 @@ export function useActions(params?: Params) {
   });
 
   const bulk = useBulk();
+  const markPaid = useMarkPaid();
   const navigate = useNavigate();
-  const { openModal: openCancelModal, isCancelModalOpen, closeModal: closeCancelModal, confirmCancel } = useCancelInvoiceModal();
-  const { openModal: openRectifyModal, isRectifyModalOpen, closeModal: closeRectifyModal, confirmRectify } = useRectifyInvoiceModal();
+  const {
+    openModal: openCancelModal,
+    isCancelModalOpen,
+    closeModal: closeCancelModal,
+    confirmCancel,
+  } = useCancelInvoiceModal();
+  const {
+    openModal: openRectifyModal,
+    isRectifyModalOpen,
+    closeModal: closeRectifyModal,
+    confirmRectify,
+  } = useRectifyInvoiceModal();
   const hasPermission = useHasPermission();
   // const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -143,7 +158,6 @@ export function useActions(params?: Params) {
   };
 
   const cloneToNegativeInvoice = (invoice: Invoice) => {
-    
     // Create a deep copy of the invoice with negative quantities for all line items
     const negativeInvoice = {
       ...invoice,
@@ -166,7 +180,7 @@ export function useActions(params?: Params) {
       amount: -Math.abs(invoice.amount),
       balance: -Math.abs(invoice.balance),
       // Iterate through all line items and set quantities to negative
-      line_items: invoice.line_items.map(item => ({
+      line_items: invoice.line_items.map((item) => ({
         ...item,
         quantity: -Math.abs(item.quantity),
         // Recalculate line totals for negative quantities
@@ -232,7 +246,7 @@ export function useActions(params?: Params) {
           {t('print_pdf')}
         </EntityActionElement>
       ),
-    
+
     (invoice: Invoice) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -332,7 +346,11 @@ export function useActions(params?: Params) {
           actionKey="mark_paid"
           isCommonActionSection={!dropdown}
           tooltipText={t('mark_paid')}
-          onClick={() => bulk([invoice.id], 'mark_paid')}
+          onClick={() =>
+            currentInvoice
+              ? markPaid(currentInvoice)
+              : bulk([invoice.id], 'mark_paid')
+          }
           icon={MdPaid}
           disablePreventNavigation
         >
@@ -415,8 +433,8 @@ export function useActions(params?: Params) {
     //   ),
     (invoice: Invoice) =>
       !invoice.is_deleted &&
-      ['1','2','3'].includes(invoice.status_id) &&
-      !['R1','R2'].includes(invoice.backup?.document_type ?? '') &&
+      ['1', '2', '3'].includes(invoice.status_id) &&
+      !['R1', 'R2'].includes(invoice.backup?.document_type ?? '') &&
       (isAdmin || isOwner) && (
         <EntityActionElement
           {...(!dropdown && {
@@ -524,8 +542,9 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
-      !invoice.is_deleted && 
-      (!verifactuEnabled || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)) && (
+      !invoice.is_deleted &&
+      (!verifactuEnabled ||
+        (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'delete',
@@ -544,9 +563,9 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) && 
-        !['R1','R2'].includes(invoice.backup?.document_type ?? '') &&
-        (invoice.backup?.child_invoice_ids?.length ?? 0) === 0 && (
+        invoice.status_id === InvoiceStatus.Partial) &&
+      !['R1', 'R2'].includes(invoice.backup?.document_type ?? '') &&
+      (invoice.backup?.child_invoice_ids?.length ?? 0) === 0 && (
         <EntityActionElement
           key="cancel_invoice"
           entity="invoice"
@@ -561,13 +580,13 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (invoice: Invoice) =>
-      (invoice.status_id === InvoiceStatus.Sent &&
-        invoice.client?.country_id === '724' &&
-        invoice.backup?.document_type === 'F1' &&
-        (invoice.backup?.adjustable_amount ?? 0) > 0 &&
-        invoice.amount > 0 &&
-        company?.settings.e_invoice_type === 'VERIFACTU' &&
-        !invoice.is_deleted) && (
+      invoice.status_id === InvoiceStatus.Sent &&
+      invoice.client?.country_id === '724' &&
+      invoice.backup?.document_type === 'F1' &&
+      (invoice.backup?.adjustable_amount ?? 0) > 0 &&
+      invoice.amount > 0 &&
+      company?.settings.e_invoice_type === 'VERIFACTU' &&
+      !invoice.is_deleted && (
         <EntityActionElement
           key="credit_note"
           entity="invoice"
