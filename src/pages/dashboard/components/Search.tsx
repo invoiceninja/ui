@@ -361,6 +361,7 @@ export function Search$() {
                     placeholder={t('search_placeholder')}
                     changeOverride
                     style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                    clearable
                   />
                 </div>
               </div>
