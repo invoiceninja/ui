@@ -17,6 +17,7 @@ import { InputLabel } from './InputLabel';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ErrorMessage } from '../ErrorMessage';
+import { MdClose } from 'react-icons/md';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -41,6 +42,7 @@ interface Props extends CommonProps {
   changeOverride?: boolean;
   readOnly?: boolean;
   width?: string | number;
+  clearable?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -82,6 +84,7 @@ export function InputField(props: Props) {
           style={{
             backgroundColor: colors.$1,
             color: colors.$3,
+            paddingRight: props.value && props.clearable ? '2.5rem' : '0.75rem',
             ...props.style,
           }}
           min={props.min}
@@ -168,6 +171,27 @@ export function InputField(props: Props) {
           name={props.name}
           readOnly={props.readOnly}
         />
+
+        {Boolean(props.value && props.clearable) && (
+          <button
+            type="button"
+            className={classNames(
+              'absolute top-1/2 -translate-y-1/2 right-2',
+              'p-1 rounded-full transition-all duration-150',
+              'focus:outline-none focus:ring-2',
+              {
+                'text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:ring-gray-300':
+                  !reactSettings.dark_mode,
+                'text-gray-400 hover:text-gray-300 hover:bg-gray-800 focus:ring-gray-600':
+                  reactSettings.dark_mode,
+              }
+            )}
+            onClick={() => props.onValueChange?.('')}
+            aria-label="Clear input"
+          >
+            <MdClose size={14} />
+          </button>
+        )}
 
         {isInitialTypePassword && (
           <span className="absolute top-1/4 right-3 cursor-pointer">

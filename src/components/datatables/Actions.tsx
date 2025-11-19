@@ -400,17 +400,20 @@ export function Actions(props: Props) {
       >
         {props.children}
 
-        <InputField
-          id="filter"
-          className="shadow-sm"
-          changeOverride={true}
-          placeholder={t('filter')}
-          value={props.filter}
-          onValueChange={(value) =>
-            props.onFilterChange && props.onFilterChange(value)
-          }
-          debounceTimeout={800}
-        />
+        <div className="relative">
+          <InputField
+            id="filter"
+            className="shadow-sm"
+            changeOverride={true}
+            placeholder={t('filter')}
+            value={props.filter}
+            onValueChange={(value) =>
+              props.onFilterChange && props.onFilterChange(value)
+            }
+            debounceTimeout={300}
+            clearable
+          />
+        </div>
 
         {props.options &&
           props.defaultOptions &&

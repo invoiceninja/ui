@@ -128,7 +128,7 @@ export function InvoiceDetails(props: Props) {
           <div className="flex space-x-2">
             <div className="w-full lg:w-1/2">
               <SelectField
-                className="shadow-sm"
+                dropdownIndicatorClassName="pr-3"
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
@@ -136,6 +136,9 @@ export function InvoiceDetails(props: Props) {
                 errorMessage={props.errors?.errors.is_amount_discount}
                 customSelector
                 dismissable={false}
+                searchable={false}
+                withoutDropdownIndicatorPadding
+                withoutControlPadding
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
