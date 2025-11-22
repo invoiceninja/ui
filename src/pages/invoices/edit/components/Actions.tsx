@@ -347,9 +347,7 @@ export function useActions(params?: Params) {
           isCommonActionSection={!dropdown}
           tooltipText={t('mark_paid')}
           onClick={() =>
-            currentInvoice
-              ? markPaid(currentInvoice)
-              : bulk([invoice.id], 'mark_paid')
+            currentInvoice ? markPaid(currentInvoice) : markPaid(invoice)
           }
           icon={MdPaid}
           disablePreventNavigation
