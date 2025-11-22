@@ -47,9 +47,10 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { useSharedHistoryContext } from './context/SharedHistoryContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
-import { $insertNodes } from 'lexical';
+import { $getRoot, $insertNodes } from 'lexical';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { debounce } from 'lodash';
 
 interface Props {
   value: string | undefined;
@@ -81,6 +82,17 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
     }
   };
 
+  const debouncedOnChange = React.useCallback(
+    debounce((htmlString: string) => {
+      onChange(htmlString);
+
+      setTimeout(() => {
+        isManualChange.current = false;
+      }, 150);
+    }, 500),
+    [onChange]
+  );
+
   useEffect(() => {
     const updateViewPortWidth = () => {
       const isNextSmallWidthViewport =
@@ -99,13 +111,20 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
   }, [isSmallWidthViewport]);
 
   useEffect(() => {
-    if (isFirstRender.current && !isManualChange.current && value) {
-      isFirstRender.current = false;
+    if (isManualChange.current) {
+      isManualChange.current = false;
+      return;
+    }
 
+    if (value) {
       editor.update(() => {
         const parser = new DOMParser();
         const dom = parser.parseFromString(value, 'text/html');
         const nodes = $generateNodesFromDOM(editor, dom);
+
+        const root = $getRoot();
+        root.clear();
+
         $insertNodes(nodes);
       });
     }
@@ -118,6 +137,12 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
       editor.setEditable(true);
     }
   }, [disabled]);
+
+  useEffect(() => {
+    return () => {
+      debouncedOnChange.cancel();
+    };
+  }, [debouncedOnChange]);
 
   return (
     <div className="border rounded-md" style={{ borderColor: colors.$24 }}>
@@ -145,7 +170,7 @@ export function Editor({ value, disabled, onChange }: Props): JSX.Element {
 
             editorState.read(() => {
               const htmlString = $generateHtmlFromNodes(editor, null);
-              onChange(htmlString);
+              debouncedOnChange(htmlString);
             });
           }}
         />
