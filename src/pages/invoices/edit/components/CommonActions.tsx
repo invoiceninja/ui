@@ -46,7 +46,7 @@ export function CommonActions(props: Props) {
 
   const quoteActions = useQuoteActions({ dropdown: false });
   const creditActions = useCreditActions({ dropdown: false });
-  const invoiceActions = useInvoiceActions({ dropdown: false });
+  const { actions: invoiceActions, modal: invoiceModal } = useInvoiceActions({ dropdown: false });
   const purchaseOrderActions = usePurchaseOrderActions({ dropdown: false });
   const recurringInvoiceActions = useRecurringInvoiceActions({
     dropdown: false,
@@ -142,6 +142,8 @@ export function CommonActions(props: Props) {
         visible={isPreferenceModalOpen}
         setVisible={setIsPreferenceModalOpen}
       />
+      
+      {entity === 'invoice' && invoiceModal}
     </>
   );
 }

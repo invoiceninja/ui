@@ -47,7 +47,7 @@ import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/u
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
-
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 dayjs.extend(utc);
 
 export default function Invoice() {
@@ -63,8 +63,9 @@ export default function Invoice() {
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const verifactuEnabled = useCompanyVerifactu();
 
-  const actions = useActions();
+  const { actions, modal } = useActions();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [triggerValidationQuery, setTriggerValidationQuery] =
@@ -79,9 +80,7 @@ export default function Invoice() {
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: invoice,
     enableQuery:
-      company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.settings.enable_e_invoice &&
-      company?.tax_data?.acts_as_sender &&
+      ((company?.settings.e_invoice_type === 'PEPPOL' && company?.tax_data?.acts_as_sender) || verifactuEnabled) &&
       triggerValidationQuery &&
       id === invoice?.id,
     onFinished: () => {
@@ -234,6 +233,8 @@ export default function Invoice() {
       </Default>
 
       <AddUninvoicedItemsButton invoice={invoice} setInvoice={setInvoice} />
+      
+      {modal}
     </>
   );
 }

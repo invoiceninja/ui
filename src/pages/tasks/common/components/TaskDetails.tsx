@@ -309,37 +309,45 @@ export function TaskDetails(props: Props) {
 
           {task && company?.custom_fields?.task1 && (
             <CustomField
+              labelWrapperClassName="w-full"
               field="task1"
               defaultValue={task.custom_value1 || ''}
               value={company.custom_fields.task1}
               onValueChange={(value) => handleChange('custom_value1', value)}
+              labelOnTop
             />
           )}
 
           {task && company?.custom_fields?.task2 && (
             <CustomField
+              labelWrapperClassName="w-full"
               field="task2"
               defaultValue={task.custom_value2 || ''}
               value={company.custom_fields.task2}
               onValueChange={(value) => handleChange('custom_value2', value)}
+              labelOnTop
             />
           )}
 
           {task && company?.custom_fields?.task3 && (
             <CustomField
+              labelWrapperClassName="w-full"
               field="task3"
               defaultValue={task.custom_value3 || ''}
               value={company.custom_fields.task3}
               onValueChange={(value) => handleChange('custom_value3', value)}
+              labelOnTop
             />
           )}
 
           {task && company?.custom_fields?.task4 && (
             <CustomField
+              labelWrapperClassName="w-full"
               field="task4"
               defaultValue={task.custom_value4 || ''}
               value={company.custom_fields.task4}
               onValueChange={(value) => handleChange('custom_value4', value)}
+              labelOnTop
             />
           )}
         </div>

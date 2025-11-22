@@ -126,7 +126,7 @@
     "@types/react-dom": "^18.3.5",
     "@types/socket.io-client": "^3.0.0",
     "@types/uuid": "^9.0.8",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^5.1.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.22.0",
     "eslint-plugin-react": "^7.37.4",

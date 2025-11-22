@@ -13,7 +13,7 @@ import classNames from 'classnames';
 import { CSSProperties, ReactNode } from 'react';
 
 interface Props {
-  title: string;
+  title: ReactNode;
   value?: ReactNode;
   children?: ReactNode;
   className?: string;

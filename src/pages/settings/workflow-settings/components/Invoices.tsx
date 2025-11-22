@@ -23,6 +23,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -32,7 +33,7 @@ export function Invoices() {
   const companyChanges = useCompanyChanges();
 
   const disableSettingsField = useDisableSettingsField();
-
+  const verifactuEnabled = useCompanyVerifactu();
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
@@ -154,7 +155,7 @@ export function Invoices() {
           <PropertyCheckbox
             propertyKey="lock_invoices"
             labelElement={<SettingsLabel label={t('lock_invoices')} />}
-            defaultValue="off"
+            defaultValue={verifactuEnabled ? "when_sent" : "off"}
           />
         }
       >
@@ -163,7 +164,7 @@ export function Invoices() {
           onValueChange={(value) =>
             handleToggleChange('settings.lock_invoices', value)
           }
-          disabled={disableSettingsField('lock_invoices')}
+          disabled={disableSettingsField('lock_invoices') || verifactuEnabled}
           errorMessage={errors?.errors['settings.lock_invoices']}
           customSelector
           dismissable={false}

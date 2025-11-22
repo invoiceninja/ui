@@ -132,6 +132,7 @@ const ReportFields: Record<Identifier, Field[]> = {
   client_sales_report: [],
   profitloss: ['is_expense_billed', 'is_income_billed', 'include_tax'],
   tax_summary_report: [],
+  tax_period_report: ['is_income_billed'],
   user_sales_report: [],
 };
 

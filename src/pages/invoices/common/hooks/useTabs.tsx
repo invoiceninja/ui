@@ -11,6 +11,7 @@
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -31,7 +32,8 @@ export function useTabs(params: Params) {
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-
+  const verifactuEnabled = useCompanyVerifactu();
+  
   const { id } = useParams();
 
   const { invoice, eInvoiceValidationResponse } = params;
@@ -71,6 +73,30 @@ export function useTabs(params: Params) {
               )
             </span>
           )}
+        </div>
+      ),
+    },
+    {
+      name: t('verifactu'),
+      href: route('/invoices/:id/verifactu', { id }),
+      enabled: verifactuEnabled,
+      formatName: () => (
+        <div className="flex space-x-1">
+          <span>{t('verifactu')}</span>
+
+          {Boolean(
+            eInvoiceValidationResponse?.client.length ||
+            eInvoiceValidationResponse?.company.length ||
+            eInvoiceValidationResponse?.invoice.length
+          ) && (
+              <span className="font-bold">
+                (
+                {(eInvoiceValidationResponse?.client.length || 0) +
+                  (eInvoiceValidationResponse?.company.length || 0) +
+                  (eInvoiceValidationResponse?.invoice.length || 0)}
+                )
+              </span>
+            )}
         </div>
       ),
     },

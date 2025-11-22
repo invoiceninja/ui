@@ -159,7 +159,7 @@ export function ListBox(props: Props) {
       id: resourceItem.id,
       number: resourceItem.number,
       name: resourceItem.name,
-      clientName: getClientName(resourceItem.client_id),
+      clientName: resourceItem.client?.display_name || getClientName(resourceItem.client_id),
       statusId: resourceItem.status_id,
       amount: resourceItem.amount,
       date: resourceItem.date,

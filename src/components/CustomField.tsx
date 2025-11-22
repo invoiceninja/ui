@@ -17,12 +17,14 @@ import {
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Entity } from '$app/common/hooks/useEntityCustomFields';
 import { InputLabel } from './forms';
+import classNames from 'classnames';
 
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
   noExternalPadding?: boolean;
   selectMenuPosition?: 'fixed';
   labelOnTop?: boolean;
+  labelWrapperClassName?: string;
 }
 
 export function customField(value: string) {
@@ -76,7 +78,12 @@ export function CustomField(props: Props) {
 
   if (props.labelOnTop) {
     return (
-      <div className="flex flex-col gap-y-1">
+      <div
+        className={classNames(
+          'flex flex-col gap-y-1',
+          props.labelWrapperClassName
+        )}
+      >
         {label ? <InputLabel>{label}</InputLabel> : null}
 
         <InputCustomField {...props} />

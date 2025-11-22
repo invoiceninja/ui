@@ -50,6 +50,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdEdit,
+  MdInfo,
   MdNotStarted,
   MdPictureAsPdf,
   MdRestore,
@@ -697,7 +698,20 @@ export function useRecurringInvoiceColumns() {
       id: 'status_id',
       label: t('status'),
       format: (value, recurringInvoice) => (
-        <RecurringInvoiceStatusBadge entity={recurringInvoice} />
+        <div className="flex items-center space-x-1">
+          <RecurringInvoiceStatusBadge entity={recurringInvoice} />
+
+          {recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED && (
+            <Tooltip
+              placement="top"
+              message={t('paused_recurring_invoice_helper') as string}
+              withoutArrow
+              width="auto"
+            >
+              <Icon element={MdInfo} size={20} />
+            </Tooltip>
+          )}
+        </div>
       ),
     },
     {

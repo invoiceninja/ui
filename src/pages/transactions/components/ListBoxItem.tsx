@@ -67,7 +67,6 @@ export function ListBoxItem(props: Props) {
           </span>
           <span className="text-sm" style={{ color: colors.$3 }}>
             {formatDate(props.resourceItem.date || '', dateFormat)}
-            {formatDate(props.resourceItem.date || '', dateFormat)}
           </span>
         </div>
         {typeof props.resourceItem.amount === 'number' && (

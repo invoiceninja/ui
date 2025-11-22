@@ -15,6 +15,7 @@ import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-st
 import dayjs from 'dayjs';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { CSSProperties } from 'react';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 interface Props {
   entity: Invoice;
@@ -35,6 +36,8 @@ export function InvoiceStatus(props: Props) {
     );
   };
 
+  const verifactuEnabled = useCompanyVerifactu();
+
   const isSent = status_id !== InvoiceStatusEnum.Draft;
   const isPaid = status_id === InvoiceStatusEnum.Paid;
   const isUnpaid = !isPaid;
@@ -44,6 +47,8 @@ export function InvoiceStatus(props: Props) {
   const isCancelled = status_id === InvoiceStatusEnum.Cancelled;
   const isCancelledOrReversed = isCancelled || isReversed;
   const isDeleted = Boolean(props.entity.is_deleted);
+
+  const isRectificativa = verifactuEnabled && ['R1','R2'].includes(props.entity.backup?.document_type ?? '');
 
   const isPastDue = () => {
     const date =
@@ -114,7 +119,7 @@ export function InvoiceStatus(props: Props) {
           ...props.style,
         }}
       >
-        {t('sent')}
+        {isRectificativa ? 'Rectificativa' : t('sent')}
       </Badge>
     );
   }
