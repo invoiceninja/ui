@@ -170,7 +170,7 @@ export function useDataTablePreferences(params: Params) {
         setFilter((getPreference('filter') as string) || '');
       }
 
-      if (tableKey === 'invoices' && pathname === '/invoices') {
+      if (tableKey === 'invoices' && pathname.endsWith('/invoices')) {
         setFilter((getPreference('filter') as string) || '');
       }
 
