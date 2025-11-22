@@ -191,8 +191,6 @@ export default function Create() {
   }, [blankPayment]);
 
   useEffect(() => {
-    console.log('payment', payment?.client_id);
-
     if (
       payment?.client_id &&
       (searchParams.get('client') === payment?.client_id ||
@@ -317,9 +315,7 @@ export default function Create() {
           {payment?.client_id && <Divider />}
 
           {payment?.client_id && initialEndpoints.invoices && (
-            <div className="flex flex-col px-4 sm:px-6 gap-y-2 mt-4">
-              <InputLabel>{t('invoices')}</InputLabel>
-
+            <div className="block px-4 sm:px-6 gap-y-2 mt-4">
               <DataTable<Invoice>
                 resource="invoice"
                 queryIdentificator={initialEndpoints.invoices}
@@ -359,12 +355,13 @@ export default function Create() {
                     : []
                 }
                 emptyState={
-                  <div className="flex items-center justify-center pt-6 pb-8">
+                  <div className="flex items-center justify-center pt-2">
                     <span className="text-sm" style={{ color: colors.$17 }}>
                       {t('no_invoices_found')}
                     </span>
                   </div>
                 }
+                beforeFilterInput={<InputLabel>{t('invoices')}</InputLabel>}
               />
             </div>
           )}
@@ -380,9 +377,7 @@ export default function Create() {
           {payment?.client_id && <Divider />}
 
           {payment?.client_id && initialEndpoints.credits && (
-            <div className="flex flex-col px-4 sm:px-6 gap-y-2 mt-4">
-              <InputLabel>{t('credits')}</InputLabel>
-
+            <div className="block px-4 sm:px-6 mt-4">
               <DataTable<Credit>
                 resource="credit"
                 queryIdentificator={initialEndpoints.credits}
@@ -422,12 +417,13 @@ export default function Create() {
                     : []
                 }
                 emptyState={
-                  <div className="flex items-center justify-center pt-6 pb-8">
+                  <div className="flex items-center justify-center pt-2">
                     <span className="text-sm" style={{ color: colors.$17 }}>
                       {t('no_credits_found')}
                     </span>
                   </div>
                 }
+                beforeFilterInput={<InputLabel>{t('credits')}</InputLabel>}
               />
             </div>
           )}

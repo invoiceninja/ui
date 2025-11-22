@@ -180,6 +180,7 @@ interface Props<T> extends CommonProps {
   onSelectedResourcesChange?: (selectedResources: T[]) => void;
   preSelected?: string[];
   emptyState?: ReactNode;
+  beforeFilterInput?: ReactNode;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -255,6 +256,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     onSelectedResourcesChange,
     preSelected = [],
     emptyState,
+    beforeFilterInput,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -715,6 +717,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           }
           beforeFilter={props.beforeFilter}
           withoutStatusFilter={props.withoutStatusFilter}
+          beforeFilterInput={beforeFilterInput}
         >
           {Boolean(
             !hideEditableOptions &&
