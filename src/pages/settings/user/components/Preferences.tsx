@@ -172,7 +172,7 @@ export function Preferences() {
         />
       </Element>
 
-      <Element
+      {/* <Element
         leftSide={t('use_legacy_editor')}
         leftSideHelp={t('use_legacy_editor_help')}
       >
@@ -185,7 +185,7 @@ export function Preferences() {
             )
           }
         />
-      </Element>
+      </Element> */}
 
       <StatusColorTheme />
 
