@@ -217,7 +217,7 @@ export function InvoiceSlider() {
   const queryClient = useQueryClient();
 
   const formatMoney = useFormatMoney();
-  const actions = useActions({
+  const { actions, modal } = useActions({
     showCommonBulkAction: true,
     showEditAction: true,
   });
@@ -571,8 +571,8 @@ export function InvoiceSlider() {
                           <span>
                             {formatMoney(
                               paymentable.amount,
-                              payment.client?.country_id,
-                              payment.client?.settings.currency_id
+                              invoice?.client?.country_id,
+                              invoice?.client?.settings.currency_id
                             )}
                           </span>
 
@@ -795,6 +795,8 @@ export function InvoiceSlider() {
           ))}
         </div>
       </TabGroup>
+      
+      {modal}
     </Slider>
   );
 }

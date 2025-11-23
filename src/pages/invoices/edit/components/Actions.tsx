@@ -26,6 +26,7 @@ import {
   MdCloudCircle,
   MdComment,
   MdControlPointDuplicate,
+  MdCreditScore,
   MdDelete,
   MdDesignServices,
   MdDownload,
@@ -34,7 +35,6 @@ import {
   MdPaid,
   MdPictureAsPdf,
   MdPrint,
-  MdRefresh,
   MdRestore,
   MdSchedule,
 } from 'react-icons/md';
@@ -46,7 +46,11 @@ import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
-import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
+import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
+import { CancelInvoiceModal } from './CancelInvoiceModal';
+import { useRectifyInvoiceModal } from '../hooks/useRectifyInvoiceModal';
+import { RectifyInvoiceModal } from './RectifyInvoiceModal';
+// import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import {
   useAdmin,
@@ -58,6 +62,8 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { useMarkPaid } from '../hooks/useMarkPaid';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -72,7 +78,9 @@ interface Params {
   showEditAction?: boolean;
   showCommonBulkAction?: boolean;
   dropdown?: boolean;
+  invoice?: Invoice | undefined;
 }
+
 export function useActions(params?: Params) {
   const { t } = useTranslation();
 
@@ -80,10 +88,13 @@ export function useActions(params?: Params) {
     showEditAction,
     showCommonBulkAction,
     dropdown = true,
+    invoice: currentInvoice,
   } = params || {};
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
+  const verifactuEnabled = useCompanyVerifactu();
+
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'invoice',
     editPageTabs: [
@@ -96,9 +107,22 @@ export function useActions(params?: Params) {
   });
 
   const bulk = useBulk();
+  const markPaid = useMarkPaid();
   const navigate = useNavigate();
+  const {
+    openModal: openCancelModal,
+    isCancelModalOpen,
+    closeModal: closeCancelModal,
+    confirmCancel,
+  } = useCancelInvoiceModal();
+  const {
+    openModal: openRectifyModal,
+    isRectifyModalOpen,
+    closeModal: closeRectifyModal,
+    confirmRectify,
+  } = useRectifyInvoiceModal();
   const hasPermission = useHasPermission();
-  const reverseInvoice = useReverseInvoice();
+  // const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
@@ -127,12 +151,50 @@ export function useActions(params?: Params) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      backup: undefined,
     });
 
     navigate('/invoices/create?action=clone');
   };
 
-  return [
+  const cloneToNegativeInvoice = (invoice: Invoice) => {
+    // Create a deep copy of the invoice with negative quantities for all line items
+    const negativeInvoice = {
+      ...invoice,
+      id: '',
+      number: '',
+      documents: [],
+      due_date: '',
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+      partial: 0,
+      partial_due_date: '',
+      // Reverse monetary amounts for credit note
+      amount: -Math.abs(invoice.amount),
+      balance: -Math.abs(invoice.balance),
+      // Iterate through all line items and set quantities to negative
+      line_items: invoice.line_items.map((item) => ({
+        ...item,
+        quantity: -Math.abs(item.quantity),
+        // Recalculate line totals for negative quantities
+        line_total: -Math.abs(item.line_total),
+        gross_line_total: -Math.abs(item.gross_line_total),
+      })),
+      modified_invoice_id: invoice.id,
+    };
+
+    setInvoice(negativeInvoice);
+    navigate('/invoices/create?action=clone');
+  };
+
+  const actions = [
     (invoice: Invoice) =>
       Boolean(showEditAction) && (
         <DropdownElement
@@ -184,23 +246,7 @@ export function useActions(params?: Params) {
           {t('print_pdf')}
         </EntityActionElement>
       ),
-    (invoice: Invoice) =>
-      invoice.status_id !== InvoiceStatus.Paid &&
-      (isAdmin || isOwner) && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'schedule',
-          })}
-          entity="invoice"
-          actionKey="schedule"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('schedule')}
-          onClick={() => scheduleEmailRecord(invoice.id)}
-          icon={MdSchedule}
-        >
-          {t('schedule')}
-        </EntityActionElement>
-      ),
+
     (invoice: Invoice) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -300,7 +346,9 @@ export function useActions(params?: Params) {
           actionKey="mark_paid"
           isCommonActionSection={!dropdown}
           tooltipText={t('mark_paid')}
-          onClick={() => bulk([invoice.id], 'mark_paid')}
+          onClick={() =>
+            currentInvoice ? markPaid(currentInvoice) : markPaid(invoice)
+          }
           icon={MdPaid}
           disablePreventNavigation
         >
@@ -361,24 +409,43 @@ export function useActions(params?: Params) {
       </EntityActionElement>
     ),
 
+    // (invoice: Invoice) =>
+    //   (invoice.status_id === InvoiceStatus.Paid ||
+    //     invoice.status_id === InvoiceStatus.Partial) &&
+    //   !invoice.is_deleted &&
+    //   !invoice.archived_at &&
+    //   hasPermission('create_credit') && (
+    //     <EntityActionElement
+    //       {...(!dropdown && {
+    //         key: 'reverse',
+    //       })}
+    //       entity="invoice"
+    //       actionKey="reverse"
+    //       isCommonActionSection={!dropdown}
+    //       tooltipText={t('reverse')}
+    //       onClick={() => reverseInvoice(invoice)}
+    //       icon={MdRefresh}
+    //     >
+    //       {t('reverse')}
+    //     </EntityActionElement>
+    //   ),
     (invoice: Invoice) =>
-      (invoice.status_id === InvoiceStatus.Paid ||
-        invoice.status_id === InvoiceStatus.Partial) &&
       !invoice.is_deleted &&
-      !invoice.archived_at &&
-      hasPermission('create_credit') && (
+      ['1', '2', '3'].includes(invoice.status_id) &&
+      !['R1', 'R2'].includes(invoice.backup?.document_type ?? '') &&
+      (isAdmin || isOwner) && (
         <EntityActionElement
           {...(!dropdown && {
-            key: 'reverse',
+            key: 'schedule',
           })}
           entity="invoice"
-          actionKey="reverse"
+          actionKey="schedule"
           isCommonActionSection={!dropdown}
-          tooltipText={t('reverse')}
-          onClick={() => reverseInvoice(invoice)}
-          icon={MdRefresh}
+          tooltipText={t('schedule')}
+          onClick={() => scheduleEmailRecord(invoice.id)}
+          icon={MdSchedule}
         >
-          {t('reverse')}
+          {t('schedule')}
         </EntityActionElement>
       ),
     (invoice: Invoice) => (
@@ -473,7 +540,9 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
-      !invoice.is_deleted && (
+      !invoice.is_deleted &&
+      (!verifactuEnabled ||
+        (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'delete',
@@ -492,19 +561,60 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) && (
+        invoice.status_id === InvoiceStatus.Partial) &&
+      !['R1', 'R2'].includes(invoice.backup?.document_type ?? '') &&
+      (invoice.backup?.child_invoice_ids?.length ?? 0) === 0 && (
         <EntityActionElement
           key="cancel_invoice"
           entity="invoice"
           actionKey="cancel_invoice"
           isCommonActionSection={!dropdown}
           tooltipText={t('cancel_invoice')}
-          onClick={() => bulk([invoice.id], 'cancel')}
+          onClick={() => openCancelModal(invoice.id)}
           icon={MdCancel}
           disablePreventNavigation
         >
           {t('cancel_invoice')}
         </EntityActionElement>
       ),
+    (invoice: Invoice) =>
+      invoice.status_id === InvoiceStatus.Sent &&
+      invoice.client?.country_id === '724' &&
+      invoice.backup?.document_type === 'F1' &&
+      (invoice.backup?.adjustable_amount ?? 0) > 0 &&
+      invoice.amount > 0 &&
+      company?.settings.e_invoice_type === 'VERIFACTU' &&
+      !invoice.is_deleted && (
+        <EntityActionElement
+          key="credit_note"
+          entity="invoice"
+          actionKey="credit_note"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('credit_note')}
+          onClick={() => openRectifyModal(invoice)}
+          icon={MdCreditScore}
+          disablePreventNavigation
+        >
+          {t('rectify')}
+        </EntityActionElement>
+      ),
   ];
+
+  return {
+    actions,
+    modal: (
+      <>
+        <CancelInvoiceModal
+          visible={isCancelModalOpen}
+          onClose={closeCancelModal}
+          onConfirm={confirmCancel}
+        />
+        <RectifyInvoiceModal
+          visible={isRectifyModalOpen}
+          onClose={closeRectifyModal}
+          onConfirm={confirmRectify}
+        />
+      </>
+    ),
+  };
 }

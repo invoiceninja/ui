@@ -16,11 +16,15 @@ import {
 } from './forms/InputCustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Entity } from '$app/common/hooks/useEntityCustomFields';
+import { InputLabel } from './forms';
+import classNames from 'classnames';
 
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
   noExternalPadding?: boolean;
   selectMenuPosition?: 'fixed';
+  labelOnTop?: boolean;
+  labelWrapperClassName?: string;
 }
 
 export function customField(value: string) {
@@ -40,7 +44,11 @@ export type CustomFields =
   | 'surcharge1'
   | 'surcharge2'
   | 'surcharge3'
-  | 'surcharge4';
+  | 'surcharge4'
+  | 'location1'
+  | 'location2'
+  | 'location3'
+  | 'location4';
 
 export function useCustomField() {
   const company = useCurrentCompany();
@@ -66,6 +74,21 @@ export function CustomField(props: Props) {
 
   if (props.fieldOnly) {
     return <InputCustomField {...props} />;
+  }
+
+  if (props.labelOnTop) {
+    return (
+      <div
+        className={classNames(
+          'flex flex-col gap-y-1',
+          props.labelWrapperClassName
+        )}
+      >
+        {label ? <InputLabel>{label}</InputLabel> : null}
+
+        <InputCustomField {...props} />
+      </div>
+    );
   }
 
   return (

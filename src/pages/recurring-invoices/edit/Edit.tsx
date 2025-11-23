@@ -29,6 +29,11 @@ import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import { useColorScheme } from '$app/common/colors';
 import { RecurringInvoiceContext } from '../create/Create';
+import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
+import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
+import { Tooltip } from '$app/components/Tooltip';
+import { Icon } from '$app/components/icons/Icon';
+import { MdInfo } from 'react-icons/md';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -72,8 +77,20 @@ export default function Edit() {
                   {t('status')}
                 </span>
 
-                <div>
+                <div className="flex items-center space-x-1">
                   <RecurringInvoiceStatusBadge entity={recurringInvoice} />
+
+                  {recurringInvoice.status_id ===
+                    RecurringInvoiceStatus.PAUSED && (
+                    <Tooltip
+                      placement="top"
+                      message={t('paused_recurring_invoice_helper') as string}
+                      withoutArrow
+                      width="auto"
+                    >
+                      <Icon element={MdInfo} size={20} />
+                    </Tooltip>
+                  )}
                 </div>
               </div>
             )}
@@ -99,6 +116,15 @@ export default function Edit() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            formatTabLabel={(index) => {
+              if (index === 1) {
+                return (
+                  <TasksTabLabel
+                    lineItems={recurringInvoice?.line_items || []}
+                  />
+                );
+              }
+            }}
           >
             <div>
               {recurringInvoice && client ? (

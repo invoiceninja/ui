@@ -48,7 +48,7 @@ export function InvoiceTotals(props: Props) {
   const company = useCurrentCompany();
   const variables = useTotalVariables();
   const reactSettings = useReactSettings();
-  
+
   const resolveVariable = useResolveTotalVariable({
     resource,
     onChange: props.onChange,

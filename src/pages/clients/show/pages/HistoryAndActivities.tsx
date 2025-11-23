@@ -153,6 +153,7 @@ export default function HistoryAndActivities() {
                     placeholder={t('search')}
                     changeOverride
                     style={{ backgroundColor: colors.$1, color: colors.$3 }}
+                    clearable
                   />
                 </div>
               </div>

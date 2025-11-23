@@ -49,6 +49,8 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { InputLabel } from '$app/components/forms';
 import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { DeleteInvoicesConfirmationModal } from '../common/components/DeleteInvoicesConfirmationModal';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -70,7 +72,8 @@ export default function Invoices() {
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
 
-  const actions = useActions();
+  // const { actions } = useActions();
+  const { actions, modal } = useActions();
 
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
@@ -79,6 +82,7 @@ export default function Invoices() {
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
   const { footerColumns, allFooterColumns } = useFooterColumns();
+  const verifactuEnabled = useCompanyVerifactu();
 
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
@@ -108,13 +112,14 @@ export default function Invoices() {
     <Default title={documentTitle} breadcrumbs={pages} docsLink="en/invoices">
       <DataTable
         resource="invoice"
-        endpoint="/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/invoices?include=client.group_settings,project&without_deleted_clients=true&sort=id|desc"
         columns={columns}
         footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
+        withoutDefaultBulkActions={Boolean(verifactuEnabled)}
         customActions={actions}
         bottomActionsKeys={['cancel_invoice']}
         customBulkActions={customBulkActions}
@@ -156,6 +161,8 @@ export default function Invoices() {
           setSelectedInvoiceIds(selected);
           setIsConfirmActionModalOpen(true);
         }}
+        showDelete={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
+        showRestore={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
@@ -186,6 +193,7 @@ export default function Invoices() {
         selectedInvoiceIds={selectedInvoiceIds}
         setSelectedInvoiceIds={setSelectedInvoiceIds}
       />
+      {modal}
     </Default>
   );
 }

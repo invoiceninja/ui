@@ -19,6 +19,7 @@ import { companySettingsErrorsAtom } from '../../common/atoms';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export const COUNTER_PADDINGS = [
   '1',
@@ -56,7 +57,8 @@ export function Settings() {
 
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
-
+  const verifactuEnabled = useCompanyVerifactu();
+  
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
@@ -102,9 +104,9 @@ export function Settings() {
             companyChanges?.settings?.counter_number_applied || 'when_saved'
           }
           onValueChange={(value) =>
-            handleChange('settings.counter_number_applied', value)
+            handleChange('settings.counter_number_applied', value) 
           }
-          disabled={disableSettingsField('counter_number_applied')}
+          disabled={disableSettingsField('counter_number_applied') || verifactuEnabled}
           errorMessage={errors?.errors['settings.counter_number_applied']}
           customSelector
           dismissable={false}

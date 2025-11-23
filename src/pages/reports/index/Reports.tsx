@@ -58,6 +58,7 @@ import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { cloneDeep } from 'lodash';
 import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
+import { TemplateSelector } from '../common/components/TemplateSelector';
 
 interface Range {
   identifier: string;
@@ -110,7 +111,39 @@ export const ranges: Range[] = [
   { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
-const download = (data: BlobPart, identifier: string) => {
+/**
+ * Extracts filename from Content-Disposition header
+ * Handles formats like:
+ * - attachment; filename="filename.pdf"
+ * - attachment; filename=filename.pdf
+ * - attachment; filename*=UTF-8''filename.pdf
+ */
+const extractFilenameFromHeader = (contentDisposition: string | undefined): string | null => {
+  if (!contentDisposition) {
+    return null;
+  }
+
+  // Try to extract filename from Content-Disposition header
+  const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+  
+  if (filenameMatch && filenameMatch[1]) {
+    let filename = filenameMatch[1];
+    
+    // Remove quotes if present
+    filename = filename.replace(/^["']|["']$/g, '');
+    
+    // Handle RFC 5987 encoded filenames (filename*=UTF-8''...)
+    if (filename.startsWith("UTF-8''")) {
+      filename = decodeURIComponent(filename.substring(7));
+    }
+    
+    return filename.trim();
+  }
+
+  return null;
+};
+
+const download = (data: BlobPart, identifier: string, headers?: any) => {
   let isPDF = false;
 
   // Check if data is ArrayBuffer or Uint8Array
@@ -129,11 +162,21 @@ const download = (data: BlobPart, identifier: string) => {
   const fileType = isPDF ? 'pdf' : 'csv';
   const mimeType = isPDF ? 'application/pdf' : 'text/csv';
 
+  const contentDisposition = 
+    (typeof headers?.['content-disposition'] === 'string' ? headers['content-disposition'] : null) ||
+    (typeof headers?.['Content-Disposition'] === 'string' ? headers['Content-Disposition'] : null) ||
+    (Array.isArray(headers?.['content-disposition']) ? headers['content-disposition'][0] : null) ||
+    (Array.isArray(headers?.['Content-Disposition']) ? headers['Content-Disposition'][0] : null);
+  
+  const headerFilename = extractFilenameFromHeader(contentDisposition);
+
+  const filename = headerFilename || `${identifier}.${fileType}`;
+
   const blob = new Blob([data], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
-  link.download = `${identifier}.${fileType}`;
+  link.download = filename;
   link.href = url;
   link.click();
 
@@ -256,12 +299,12 @@ export default function Reports() {
                 {
                   responseType: 'arraybuffer',
                 }
-              ).then((response) => response.data),
+              ),
             retry: 50,
             retryDelay: import.meta.env.DEV ? 1000 : 2000,
           })
           .then((response) => {
-            download(response, report.identifier);
+            download(response.data, report.identifier, response.headers);
 
             toast.success();
           })
@@ -405,7 +448,7 @@ export default function Reports() {
           label={t('actions')}
           disabled={!proPlan() && !enterprisePlan()}
         >
-          {report.supports_previews && (
+          {report.supports_previews && !report.payload?.template_id && (
             <DropdownElement
               icon={<Icon element={MdOutlinePreview} />}
               onClick={handlePreview}
@@ -540,6 +583,20 @@ export default function Reports() {
                 onValueChange={(statuses) =>
                   handlePayloadChange('status', statuses)
                 }
+              />
+            </Element>
+          )}
+
+          {showReportField('template_id') && (
+            <Element leftSide={t('template')}>
+              <TemplateSelector
+                value={report.payload.template_id}
+                onChange={(design) =>
+                  handlePayloadChange('template_id', design.id)
+                }
+                clearButton
+                onClearButtonClick={() => handlePayloadChange('template_id', '')}
+                entity={report.identifier}
               />
             </Element>
           )}

@@ -23,6 +23,7 @@ import { useDispatch } from 'react-redux';
 import { injectInChangesWithData, updateUser } from '../stores/slices/user';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 import { useCurrentUser } from './useCurrentUser';
+import { useLocation } from 'react-router-dom';
 
 interface Params {
   apiEndpoint: URL;
@@ -158,9 +159,21 @@ export function useDataTablePreferences(params: Params) {
     }
   };
 
+  const { pathname } = useLocation();
+
   useEffect(() => {
     if (!isInitialConfiguration && !customFilter) {
-      setFilter((getPreference('filter') as string) || '');
+      // We wanna set filter only if we're on parent invoices page.
+      // Skip setting filter on other pages like client invoices.
+
+      if (tableKey !== 'invoices') {
+        setFilter((getPreference('filter') as string) || '');
+      }
+
+      if (tableKey === 'invoices' && pathname.endsWith('/invoices')) {
+        setFilter((getPreference('filter') as string) || '');
+      }
+
       if (customFilters) {
         if ((getPreference('customFilter') as string[]).length) {
           setCustomFilter(getPreference('customFilter') as string[]);

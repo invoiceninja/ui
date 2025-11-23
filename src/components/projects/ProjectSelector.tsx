@@ -21,6 +21,7 @@ import { ErrorMessage } from '../ErrorMessage';
 
 interface Props extends GenericSelectorProps<Project> {
   clientId?: string;
+  withoutAction?: boolean;
 }
 
 export function ProjectSelector(props: Props) {
@@ -56,7 +57,7 @@ export function ProjectSelector(props: Props) {
         action={{
           label: t('new_project'),
           onClick: () => setIsModalOpen(true),
-          visible: hasPermission('create_project'),
+          visible: hasPermission('create_project') && !props.withoutAction,
         }}
       />
 

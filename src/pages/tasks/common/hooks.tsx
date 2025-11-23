@@ -78,6 +78,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
+import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 
 export const defaultColumns: string[] = [
   'status',
@@ -474,7 +475,14 @@ export function useActions(params?: Params) {
   const setTask = useSetAtom(taskAtom);
 
   const cloneToTask = (task: Task) => {
-    setTask({ ...task, id: '', documents: [], number: '', invoice_id: '' });
+    setTask({
+      ...task,
+      id: '',
+      documents: [],
+      number: '',
+      invoice_id: '',
+      created_at: 0,
+    });
 
     navigate('/tasks/create?action=clone');
   };
@@ -652,6 +660,13 @@ export const useCustomBulkActions = () => {
   } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Task>[] = [
+    ({ selectedIds, setSelected }) => (
+      <BulkUpdatesAction
+        entity="task"
+        resourceIds={selectedIds}
+        setSelected={setSelected}
+      />
+    ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
       showStartAction(selectedResources) && (

@@ -23,6 +23,7 @@ import { MultiClientSelector } from '$app/pages/reports/common/components/MultiC
 import { MultiVendorSelector } from '$app/pages/reports/common/components/MultiVendorSelector';
 import { MultiProjectSelector } from '$app/pages/reports/common/components/MultiProjectSelector';
 import { MultiExpenseCategorySelector } from '$app/pages/reports/common/components/MultiExpenseCategorySelector';
+import { TemplateSelector } from '$app/pages/reports/common/components/TemplateSelector';
 
 interface Props {
   schedule: Schedule;
@@ -51,6 +52,7 @@ type ReportFiled =
   | 'projects'
   | 'report_keys'
   | 'include_deleted'
+  | 'template_id'
   | 'pdf_email_attachment';
 
 export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
@@ -69,6 +71,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'include_deleted',
     'client',
     'pdf_email_attachment',
+    'template_id',
   ],
   invoice_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -78,6 +81,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'status',
     'include_deleted',
     'client',
+    'template_id',
   ],
   product_sales: [...DEFAULT_REPORT_FIELDS, 'products', 'client'],
   profitloss: [
@@ -91,14 +95,16 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'document_email_attachment',
     'report_keys',
     'include_deleted',
+    'template_id',
   ],
-  contact: [...DEFAULT_REPORT_FIELDS, 'report_keys'],
+  contact: [...DEFAULT_REPORT_FIELDS, 'report_keys', 'template_id'],
   recurring_invoice: [
     ...DEFAULT_REPORT_FIELDS,
     'report_keys',
     'status',
     'include_deleted',
     'client',
+    'template_id',
   ],
   quote: [
     ...DEFAULT_REPORT_FIELDS,
@@ -108,6 +114,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'include_deleted',
     'client',
     'pdf_email_attachment',
+    'template_id',
   ],
   quote_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -116,6 +123,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'status',
     'include_deleted',
     'client',
+    'template_id',
   ],
   credit: [
     ...DEFAULT_REPORT_FIELDS,
@@ -125,6 +133,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'status',
     'client',
     'pdf_email_attachment',
+    'template_id',
   ],
   document: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
   payment: [
@@ -133,6 +142,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'client',
+    'template_id',
   ],
   expense: [
     ...DEFAULT_REPORT_FIELDS,
@@ -144,6 +154,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'template_id',
   ],
   task: [
     ...DEFAULT_REPORT_FIELDS,
@@ -152,12 +163,14 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'status',
     'include_deleted',
     'client',
+    'template_id',
   ],
-  product: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  product: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment', 'template_id'],
   vendor: [
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
     'report_keys',
+    'template_id',
   ],
   purchase_order: [
     ...DEFAULT_REPORT_FIELDS,
@@ -166,6 +179,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'status',
     'include_deleted',
     'pdf_email_attachment',
+    'template_id',
   ],
   purchase_order_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -173,6 +187,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'template_id',
   ],
 };
 
@@ -452,6 +467,21 @@ export function EmailReport(props: Props) {
           errorMessage={errors?.errors['parameters.categories']}
         />
       )}
+
+      {showReportFiled('template_id') && (
+        <Element leftSide={t('template')}>
+          <TemplateSelector
+            value={schedule.parameters.template_id}
+            onChange={(design) =>
+              handleChange('parameters.template_id' as keyof Schedule, design.id)
+            }
+            clearButton
+            onClearButtonClick={() => handleChange('parameters.template_id' as keyof Schedule, '')}
+            entity={schedule.parameters.report_name as Identifier}
+          />
+        </Element>
+      )}
+
     </>
   );
 }

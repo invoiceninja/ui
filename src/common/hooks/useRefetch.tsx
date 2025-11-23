@@ -20,6 +20,7 @@ export const keys = {
       '/api/v1/activities/entity',
       '/api/v1/activities',
       '/api/v1/documents',
+      '/api/v1/tasks',
     ],
   },
   designs: {
@@ -30,6 +31,7 @@ export const keys = {
       '/api/v1/credits',
       '/api/v1/recurring_invoices',
       '/api/v1/purchase_orders',
+      '/api/v1/expenses',
     ],
   },
   tokens: {
@@ -129,6 +131,9 @@ export const keys = {
       '/api/v1/recurring_expenses',
       '/api/v1/purchase_orders',
       '/api/v1/activities/entity',
+      '/api/v1/charts/totals_v2',
+      '/api/v1/charts/chart_summary_v2',
+      '/api/v1/activities',
     ],
   },
   users: {

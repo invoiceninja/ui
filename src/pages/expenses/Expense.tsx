@@ -35,6 +35,8 @@ import { useMediaQuery } from 'react-responsive';
 import { Divider } from '$app/components/cards/Divider';
 import { useColorScheme } from '$app/common/colors';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { InputLabel } from '$app/components/forms';
+import { ChangeTemplateModal, useChangeTemplate } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -79,6 +81,13 @@ export default function Expense() {
 
   const save = useSave({ setErrors, isFormBusy, setIsFormBusy });
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
+  
   useEffect(() => {
     if (data) {
       setExpense(data);
@@ -152,6 +161,29 @@ export default function Expense() {
               )}
             </Panel>
           </PanelGroup>
+
+
+          <ChangeTemplateModal<ExpenseType>
+            entity="expense"
+            entities={changeTemplateResources as ExpenseType[]}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(expense) => (
+              <div className="flex flex-col space-y-1">
+                <InputLabel>{t('number')}</InputLabel>
+
+                <span>{expense.number}</span>
+              </div>
+            )}
+            bulkLabelFn={(expense) => (
+              <div className="flex space-x-2">
+                <InputLabel>{t('number')}:</InputLabel>
+
+                <span>{expense.number}</span>
+              </div>
+            )}
+            bulkUrl="/api/v1/expenses/bulk"
+          />
         </div>
       ) : (
         <Spinner />

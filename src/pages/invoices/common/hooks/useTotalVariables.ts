@@ -18,7 +18,11 @@ export function useTotalVariables() {
 
   useEffect(() => {
     if (company?.settings.pdf_variables.total_columns.length > 0) {
-      const columns = cloneDeep(company?.settings.pdf_variables.total_columns);
+      let columns = cloneDeep(company?.settings.pdf_variables.total_columns);
+
+      columns = columns.filter(
+        (variable) => !variable.includes('$custom_surcharge')
+      );
 
       if (company?.enabled_tax_rates > 0) {
         columns.push('$tax1');
@@ -30,6 +34,22 @@ export function useTotalVariables() {
         columns.push('$tax3');
       }
 
+      if (company?.custom_fields?.surcharge1) {
+        columns.push('$custom_surcharge1');
+      }
+
+      if (company?.custom_fields?.surcharge2) {
+        columns.push('$custom_surcharge2');
+      }
+
+      if (company?.custom_fields?.surcharge3) {
+        columns.push('$custom_surcharge3');
+      }
+
+      if (company?.custom_fields?.surcharge4) {
+        columns.push('$custom_surcharge4');
+      }
+
       // Replace $line_taxes and $total_taxes with $taxes at their positions
       columns.forEach((column, index) => {
         if (column === '$line_taxes' || column === '$total_taxes') {
@@ -38,8 +58,9 @@ export function useTotalVariables() {
       });
 
       // Remove duplicates of $taxes that might have been created
-      const uniqueColumns = columns.filter((column, index, arr) =>
-        column !== '$taxes' || arr.indexOf(column) === index
+      const uniqueColumns = columns.filter(
+        (column, index, arr) =>
+          column !== '$taxes' || arr.indexOf(column) === index
       );
 
       setColumns(uniqueColumns);
@@ -48,7 +69,7 @@ export function useTotalVariables() {
 
     // We need to clone the product columns to local object,
     // because by default it's frozen.
-    let variables: string[] = ['$subtotal'];
+    const variables: string[] = ['$subtotal'];
     variables.push('$total');
 
     // clone(company?.settings.pdf_variables.total_columns) || [];
@@ -63,28 +84,20 @@ export function useTotalVariables() {
     //   variables = variables.filter((variable) => variable !== '$line_taxes');
     // }
 
-    if (!company?.custom_fields?.surcharge1) {
-      variables = variables.filter(
-        (variable) => variable !== '$custom_surcharge1'
-      );
+    if (company?.custom_fields?.surcharge1) {
+      variables.push('$custom_surcharge1');
     }
 
-    if (!company?.custom_fields?.surcharge2) {
-      variables = variables.filter(
-        (variable) => variable !== '$custom_surcharge2'
-      );
+    if (company?.custom_fields?.surcharge2) {
+      variables.push('$custom_surcharge2');
     }
 
-    if (!company?.custom_fields?.surcharge3) {
-      variables = variables.filter(
-        (variable) => variable !== '$custom_surcharge3'
-      );
+    if (company?.custom_fields?.surcharge3) {
+      variables.push('$custom_surcharge3');
     }
 
-    if (!company?.custom_fields?.surcharge4) {
-      variables = variables.filter(
-        (variable) => variable !== '$custom_surcharge4'
-      );
+    if (company?.custom_fields?.surcharge4) {
+      variables.push('$custom_surcharge4');
     }
 
     variables.push('$discount');

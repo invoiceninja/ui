@@ -35,6 +35,13 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import classNames from 'classnames';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
+import { MdTextSnippet } from 'react-icons/md';
+import { Assigned } from '$app/components/Assigned';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useNavigate } from 'react-router-dom';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -113,6 +120,7 @@ export function useAllInvoiceColumns() {
     'tax_amount',
     'created_at',
     'updated_at',
+    'project',
   ] as const;
 
   return invoiceColumns;
@@ -124,7 +132,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const accentColor = useAccentColor();
+  const navigate = useNavigate();
   const reactSettings = useReactSettings();
+  const currentCompany = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const getSetting = useGetSetting();
@@ -143,12 +155,100 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       entity: 'invoice',
     });
 
+  const isPeppolEnabled = () => {
+    return (
+      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
+      currentCompany.settings.enable_e_invoice
+    );
+  };
+
+  const isEInvoiceSuccessfullySent = (currentInvoice: Invoice) => {
+    return (
+      isPeppolEnabled() &&
+      currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
+      !currentInvoice.backup?.guid &&
+      !currentInvoice.is_deleted &&
+      !currentInvoice.archived_at
+    );
+  };
+
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (_value, invoice) => <InvoiceStatus entity={invoice} />,
+      format: (_value, invoice) => (
+        <div className="flex items-center gap-x-2">
+          {isEInvoiceSuccessfullySent(invoice) ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
+              }}
+            >
+              <InvoiceStatus
+                entity={invoice}
+                style={{ textDecoration: 'underline' }}
+              />
+            </button>
+          ) : (
+            <InvoiceStatus entity={invoice} />
+          )}
+
+
+          {['R1','R2'].includes(invoice.backup?.document_type ?? '') && (
+            <Assigned
+              entityId={invoice.backup?.parent_invoice_id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
+              component={
+                <MdTextSnippet
+                  className="cursor-pointer"
+                  fontSize={19}
+                  color={accentColor}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id: invoice.backup?.parent_invoice_id })
+                    )
+                  }
+                />
+              }
+            />
+            
+
+          )}
+
+          {invoice.backup?.document_type === 'F1' && (invoice.backup?.child_invoice_ids?.length ?? 0) > 0 && (
+
+            invoice.backup?.child_invoice_ids?.map((id) => (
+              <Assigned
+              entityId={id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
+              component={
+                <MdTextSnippet
+                  className="cursor-pointer"
+                  fontSize={19}
+                  color={accentColor}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id })
+                    )
+                  }
+                />
+              }
+            />
+            ))
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',
@@ -195,6 +295,19 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           renderSpan={disableNavigation('client', invoice.client)}
         >
           {invoice.client?.display_name}
+        </DynamicLink>
+      ),
+    },
+    {
+      column: 'project',
+      id: 'project_id',
+      label: t('project'),
+      format: (value, invoice) =>(
+        <DynamicLink
+          to={route('/projects/:id', { id: invoice.project_id })}
+          renderSpan={disableNavigation('invoice', invoice.project)}
+        >
+          {invoice?.project?.name ?? ''} 
         </DynamicLink>
       ),
     },

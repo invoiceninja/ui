@@ -30,7 +30,7 @@ export function useMarkPaid() {
       endpoint('/api/v1/invoices/:id?paid=true', { id: invoice.id }),
       invoice
     ).then(() => {
-      toast.success('invoice_paid');
+      toast.success('marked_invoices_as_paid');
 
       $refetch(['invoices', 'clients']);
 

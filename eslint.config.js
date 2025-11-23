@@ -13,7 +13,7 @@ export default tseslint.config({
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-unused-expressions': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
-    '@typescript-eslint/no-loss-of-precision': "off",
+    '@typescript-eslint/no-loss-of-precision': 'off',
     'no-use-before-define': 'off',
     'react/display-name': 'off',
     'react/prop-types': 'off',

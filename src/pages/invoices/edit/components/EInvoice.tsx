@@ -12,6 +12,7 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { EInvoiceComponent } from '$app/pages/settings';
+import { useQueryClient } from 'react-query';
 import {
   Dispatch,
   ReactNode,
@@ -60,6 +61,7 @@ const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const location = useLocation();
   const colors = useColorScheme();
@@ -105,13 +107,16 @@ export default function EInvoice() {
         entity_id: invoice?.id,
       })
         .then(() => {
-          $refetch(['invoices']);
+          setTimeout(() => {
+            queryClient.invalidateQueries(['/api/v1/invoices', invoice?.id]);
+          }, 2000);
           toast.success('success');
         })
         .finally(() => setIsFormBusy(false));
     }
   };
 
+  console.log(activities);
   const getActivityText = (activityTypeId: number) => {
     let text = trans(
       `activity_${activityTypeId}`,
@@ -248,40 +253,37 @@ export default function EInvoice() {
 
       {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Paid, InvoiceStatus.Partial].includes((invoice?.status_id?.toString() ?? InvoiceStatus.Draft) as InvoiceStatus)) && (
         <Card title={t('status')}>
-          <div className="flex px-6 text-sm">
+          <div className="px-6 text-sm">
             <div
               className="flex items-center space-x-4 border-l-2 pl-4 py-4"
               style={{
                 borderColor: colors.$5,
               }}
             >
-              {invoice?.backup?.guid && (
-                <span className="whitespace-nowrap font-medium">
-                  {t('reference')}:
-                </span>
-              )}
-
-              {invoice?.backup?.guid ? (
-                <div className="flex flex-col space-y-2.5">
-                  <span>{invoice?.backup?.guid}</span>
-
-                  {activities
-                    ?.filter((activity) =>
-                      EINVOICE_ACTIVITY_TYPES.includes(
-                        activity.activity_type_id
-                      )
+              <div className="flex flex-col space-y-2.5">
+                
+                {activities
+                  ?.filter((activity) =>
+                    EINVOICE_ACTIVITY_TYPES.includes(
+                      activity.activity_type_id
                     )
-                    .map((activity) => (
-                      <div
-                        key={activity.id}
-                        className="flex items-center space-x-4"
-                      >
-                        <span className="font-medium">{t('message')}:</span>
-                        <div>{getActivityText(activity.activity_type_id)}</div>
-                      </div>
-                    ))}
-                </div>
-              ) : (
+                  )
+                  .map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center space-x-4"
+                    >
+                      <span className="font-medium"> {activity.activity_type_id === 147 ? t('failure') : t('success')}:</span>
+                      <div>{activity.notes.length > 1 ? activity.notes : getActivityText(activity.activity_type_id)}</div>
+                    </div>
+                  ))}
+
+                
+              </div>
+            </div>
+
+            {!invoice?.backup?.guid && (
+              <div className="flex items-center space-x-4 px-6 py-4">
                 <Button
                   behavior="button"
                   onClick={handleSend}
@@ -290,11 +292,13 @@ export default function EInvoice() {
                 >
                   {t('send')}
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </Card>
       )}
+
+     
 
       <Card title={t('date_range')}>
         <Element leftSide={t('start_date')}>
@@ -324,6 +328,24 @@ export default function EInvoice() {
             errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.0.EndDate']}
           />
         </Element>
+      </Card>
+
+      <Card title={t('actual_delivery_date')}>
+        <Element leftSide={t('date')} leftSideHelp={t('actual_delivery_date_help')}>
+          <InputField
+            type="date"
+            value={
+              get(invoice, 'e_invoice.Invoice.Delivery.0.ActualDeliveryDate') || ''
+            }
+            onValueChange={(value) =>
+              handleChange('e_invoice.Invoice.Delivery.0.ActualDeliveryDate', value)
+            }
+            errorMessage={
+              errors?.errors?.['e_invoice.Invoice.Delivery.0.ActualDeliveryDate']
+            }
+          />
+        </Element>
+
       </Card>
     </>
   );

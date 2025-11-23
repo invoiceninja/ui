@@ -20,6 +20,7 @@ import { Payment } from '$app/common/interfaces/payment';
 import { Project } from '$app/common/interfaces/project';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Task } from '$app/common/interfaces/task';
+import { Expense } from '$app/common/interfaces/expense';
 import { Modal } from '$app/components/Modal';
 import {
   Button,
@@ -40,7 +41,8 @@ type ChangeTemplateResource =
   | Client
   | PurchaseOrder
   | Project
-  | Task;
+  | Task
+  | Expense;
 
 export const changeTemplateModalAtom = atom<boolean>(false);
 export const templatePdfUrlAtom = atom<string | null>(null);

@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Settings } from '$app/components/layouts/Settings';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField, Link, SelectField } from '$app/components/forms';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
@@ -48,6 +48,7 @@ import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { useColorScheme } from '$app/common/colors';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -59,6 +60,7 @@ export interface EInvoiceComponent {
 
 const INVOICE_TYPES = {
   PEPPOL: 'PEPPOL',
+  VERIFACTU: 'VERIFACTU',
   FACT1: 'FACT1',
   EN16931: 'EN16931',
   XInvoice_3_0: 'XInvoice_3.0',
@@ -85,10 +87,6 @@ export function EInvoice() {
       return true;
     }
 
-    if (import.meta.env.VITE_ENABLE_PEPPOL_STANDARD !== 'true') {
-      return false;
-    }
-
     const isPlanActive =
       (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
 
@@ -96,6 +94,21 @@ export function EInvoice() {
       isPlanActive &&
       PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
     );
+  };
+
+  const shouldShowVERIFACTUOption = () => {
+    if (import.meta.env.DEV) {
+      return true;
+    }
+
+    if (import.meta.env.VITE_ENABLE_VERIFACTU_STANDARD !== 'true') {
+      return false;
+    }
+
+    const isPlanActive =
+      (isHosted() && (proPlan() || enterprisePlan()));
+
+    return isPlanActive && company?.settings.country_id === '724';
   };
 
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
@@ -228,6 +241,12 @@ export function EInvoice() {
           headerStyle={{ borderColor: colors.$20 }}
         >
           <Element
+            leftSide={t('help')}>
+              <Link external to="https://invoiceninja.github.io/en/einvoicing">
+                {t('learn_more')}
+              </Link>
+          </Element>
+          <Element
             leftSide={
               <PropertyCheckbox
                 propertyKey="e_invoice_type"
@@ -246,7 +265,15 @@ export function EInvoice() {
               customSelector
             >
               {Object.entries(INVOICE_TYPES)
-                .filter(([key]) => key !== 'PEPPOL' || shouldShowPEPPOLOption())
+                .filter(([key]) => {
+                  if (key === 'PEPPOL') {
+                    return shouldShowPEPPOLOption();
+                  }
+                  if (key === 'VERIFACTU') {
+                    return shouldShowVERIFACTUOption();
+                  }
+                  return true;
+                })
                 .map(([key, value]) => (
                   <option key={key} value={key}>
                     {value}
@@ -263,6 +290,7 @@ export function EInvoice() {
                   labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
                 />
               }
+              
             >
               <Toggle
                 checked={Boolean(company?.settings.enable_e_invoice)}
@@ -274,15 +302,68 @@ export function EInvoice() {
             </Element>
           ) : null}
 
+          {company?.settings.e_invoice_type === 'VERIFACTU' ? (
+           <div className="flex flex-col space-y-4 p-5">
+           <h3>Activar envío VERI*FACTU</h3>
+           <p>
+             <strong>Declaración responsable:</strong> los registros de facturación generados por esta plataforma se
+             enviarán a la Agencia Estatal de Administración Tributaria (AEAT), garantizando su
+             <strong> integridad, trazabilidad, conservación y accesibilidad</strong>, conforme a la normativa vigente
+             sobre sistemas de facturación VERI*FACTU.
+           </p>
+         
+           <hr className="my-4"/>
+         
+           <h4>Dar permiso para presentar facturas en su nombre</h4>
+           <p>
+             Para poder remitir sus facturas a la AEAT en su representación, necesitamos que nos otorgue un
+             <strong> apoderamiento (autorización)</strong>.
+           </p>
+         
+           <p>
+             Siga estos pasos para concederlo de forma segura:
+           </p>
+         
+           <ol className="list-decimal list-inside space-y-2">
+             <li>
+               Acceda a la página de apoderamientos de la AEAT:<br/>
+               <Link
+                 external
+                 to="https://sede.agenciatributaria.gob.es/Sede/colaborar-agencia-tributaria/registro-apoderamientos.html"
+               >
+                 👉 Otorgar apoderamiento (AEAT) →
+               </Link>
+             </li>
+             <li>
+               Identifíquese con <strong>Cl@ve</strong>, <strong>certificado electrónico</strong>, <strong>DNIe</strong> o <strong>eIDAS</strong>.
+             </li>
+             <li>
+               Elija la opción <em>“Otorgar apoderamiento”</em> e introduzca nuestro <strong>NIF: N0384863G</strong>.
+             </li>
+             <li>
+               Seleccione el ámbito correspondiente, por ejemplo:<br/>
+               <em>“Trámites relacionados con la facturación y el envío de registros VERI*FACTU”.</em>
+             </li>
+             <li>
+               Confirme la operación y, una vez completada, envíenos el <strong>número de justificante</strong> o una
+               <strong> captura de pantalla del registro</strong>.
+             </li>
+           </ol>
+         
+           <p>
+             Si lo prefiere, también puede otorgar un <strong>poder notarial (documento público)</strong> y presentarlo
+             a través del <strong>Registro Electrónico de la AEAT</strong>.
+           </p>
+           <p>
+             Si necesita este formulario, <strong><a href="mailto:contact@invoiceninja.com">contáctenos</a></strong> y le enviaremos una plantilla en PDF.
+           </p>
+         </div>
+         
+
+          ) : null}
+
           {company?.settings.e_invoice_type === 'PEPPOL' ? (
             <>
-              {/* {company?.settings.enable_e_invoice && (
-              <EInvoiceGenerator
-                ref={eInvoiceRef}
-                currentEInvoice={company?.e_invoice || {}}
-              />
-            )} */}
-
               {company?.settings.enable_e_invoice &&
               company?.legal_entity_id ? (
                 <div className="flex flex-col space-y-4">{/*  */}</div>
@@ -409,13 +490,11 @@ export function EInvoice() {
         <Preferences />
       ) : null}
 
-      {company?.settings.enable_e_invoice ? (
-        <PaymentMeans
-          ref={eInvoiceRef}
-          currentEInvoice={company?.e_invoice || {}}
-          entity="company"
-        />
-      ) : null}
+      <PaymentMeans
+        ref={eInvoiceRef}
+        currentEInvoice={company?.e_invoice || {}}
+        entity="company"
+      />
 
       {company?.settings.enable_e_invoice &&
       company?.legal_entity_id &&

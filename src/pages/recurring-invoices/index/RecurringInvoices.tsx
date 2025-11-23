@@ -142,6 +142,12 @@ export default function RecurringInvoices() {
           setRecurringInvoiceSliderVisibility(true);
         }}
         enableSavingFilterPreference
+        dateRangeColumns={[
+          {
+            column: 'next_send_datetime',
+            queryParameterKey: 'next_send_between',
+          },
+        ]}
       />
 
       {!disableNavigation('recurring_invoice', recurringInvoiceSlider) && (

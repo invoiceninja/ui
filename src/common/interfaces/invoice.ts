@@ -14,7 +14,7 @@ import { Payment } from './payment';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
 import { TaxInfo } from './tax-info';
-
+import { Project } from './project';
 export interface Invoice {
   id: string;
   user_id: string;
@@ -87,13 +87,21 @@ export interface Invoice {
   is_locked?: boolean;
   backup?: Backup;
   location_id: string;
-  schedule?: ScheduleItem[]
+  schedule?: ScheduleItem[];
+  project?: Project;
+  modified_invoice_id?: string;
 }
 
 export interface Backup {
   guid?: string;
+  parent_invoice_id?: string;
+  parent_invoice_number?: string;
+  document_type?: string;
+  child_invoice_ids?: string[];
+  redirect?: string;
+  adjustable_amount?: number
+  notes?: string;
 }
-
 export interface Activity {
   id: string;
   activity_type_id: string;

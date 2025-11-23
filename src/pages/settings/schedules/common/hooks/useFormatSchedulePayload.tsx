@@ -23,7 +23,7 @@ const TemplateProperties = {
     'remaining_cycles',
     'parameters',
   ],
-  email_record: ['template', 'next_run', 'parameters'],
+  email_record: ['template', 'next_run', 'parameters', 'template'],
   email_report: [
     'template',
     'next_run',

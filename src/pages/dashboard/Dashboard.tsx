@@ -23,17 +23,26 @@ import { ModuleBitmask } from '../settings';
 import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
+import { useEffect } from 'react';
 
 export default function Dashboard() {
-  const [t] = useTranslation();
   useTitle('dashboard');
 
+  const [t] = useTranslation();
+
   const enabled = useEnabled();
+
+  const openFeedbackSlider = useOpenFeedbackSlider();
 
   useSocketEvent({
     on: 'App\\Events\\Invoice\\InvoiceWasPaid',
     callback: () => $refetch(['invoices']),
   });
+
+  useEffect(() => {
+    openFeedbackSlider();
+  }, []);
 
   return (
     <Default title={t('dashboard')} breadcrumbs={[]}>

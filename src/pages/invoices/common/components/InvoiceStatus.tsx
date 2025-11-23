@@ -14,9 +14,12 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 import dayjs from 'dayjs';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { CSSProperties } from 'react';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 interface Props {
   entity: Invoice;
+  style?: CSSProperties;
 }
 
 export function InvoiceStatus(props: Props) {
@@ -33,6 +36,8 @@ export function InvoiceStatus(props: Props) {
     );
   };
 
+  const verifactuEnabled = useCompanyVerifactu();
+
   const isSent = status_id !== InvoiceStatusEnum.Draft;
   const isPaid = status_id === InvoiceStatusEnum.Paid;
   const isUnpaid = !isPaid;
@@ -42,6 +47,8 @@ export function InvoiceStatus(props: Props) {
   const isCancelled = status_id === InvoiceStatusEnum.Cancelled;
   const isCancelledOrReversed = isCancelled || isReversed;
   const isDeleted = Boolean(props.entity.is_deleted);
+
+  const isRectificativa = verifactuEnabled && ['R1','R2'].includes(props.entity.backup?.document_type ?? '');
 
   const isPastDue = () => {
     const date =
@@ -58,16 +65,27 @@ export function InvoiceStatus(props: Props) {
   };
 
   if (isDeleted) {
-    return <Badge variant="red">{t('deleted')}</Badge>;
+    return (
+      <Badge variant="red" style={props.style}>
+        {t('deleted')}
+      </Badge>
+    );
   }
 
   if (props.entity.archived_at) {
-    return <Badge variant="orange">{t('archived')}</Badge>;
+    return (
+      <Badge variant="orange" style={props.style}>
+        {t('archived')}
+      </Badge>
+    );
   }
 
   if (isPastDue() && !isCancelledOrReversed) {
     return (
-      <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
+      <Badge
+        variant="red"
+        style={{ backgroundColor: statusThemeColors.$5, ...props.style }}
+      >
         {t('past_due')}
       </Badge>
     );
@@ -75,23 +93,33 @@ export function InvoiceStatus(props: Props) {
 
   if (isViewed && isUnpaid && !isPartial && !isCancelledOrReversed) {
     return (
-      <Badge variant="yellow" style={{ backgroundColor: statusThemeColors.$4 }}>
+      <Badge
+        variant="yellow"
+        style={{ backgroundColor: statusThemeColors.$4, ...props.style }}
+      >
         {t('viewed')}
       </Badge>
     );
   }
 
   if (status_id === InvoiceStatusEnum.Draft) {
-    return <Badge variant="generic">{t('draft')}</Badge>;
+    return (
+      <Badge variant="generic" style={props.style}>
+        {t('draft')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Sent) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColors.$1 }}
+        style={{
+          backgroundColor: statusThemeColors.$1,
+          ...props.style,
+        }}
       >
-        {t('sent')}
+        {isRectificativa ? 'Rectificativa' : t('sent')}
       </Badge>
     );
   }
@@ -100,7 +128,7 @@ export function InvoiceStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColors.$2 }}
+        style={{ backgroundColor: statusThemeColors.$2, ...props.style }}
       >
         {t('partial')}
       </Badge>
@@ -109,19 +137,34 @@ export function InvoiceStatus(props: Props) {
 
   if (status_id === InvoiceStatusEnum.Paid) {
     return (
-      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+      <Badge
+        variant="green"
+        style={{ backgroundColor: statusThemeColors.$3, ...props.style }}
+      >
         {t('paid')}
       </Badge>
     );
   }
 
   if (status_id === InvoiceStatusEnum.Cancelled) {
-    return <Badge variant="black">{t('cancelled')}</Badge>;
+    return (
+      <Badge variant="black" style={props.style}>
+        {t('cancelled')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Reversed) {
-    return <Badge variant="purple">{t('reversed')}</Badge>;
+    return (
+      <Badge variant="purple" style={props.style}>
+        {t('reversed')}
+      </Badge>
+    );
   }
 
-  return <Badge variant="purple">{t('reversed')}</Badge>;
+  return (
+    <Badge variant="purple" style={props.style}>
+      {t('reversed')}
+    </Badge>
+  );
 }
