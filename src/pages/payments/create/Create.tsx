@@ -417,7 +417,7 @@ export default function Create() {
                     : []
                 }
                 emptyState={
-                  <div className="flex items-center justify-center pt-2">
+                  <div className="flex items-center justify-center py-2">
                     <span className="text-sm" style={{ color: colors.$17 }}>
                       {t('no_credits_found')}
                     </span>

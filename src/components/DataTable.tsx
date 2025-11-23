@@ -679,10 +679,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     onSelectedResourcesChange?.(selectedResources);
   }, [selectedResources]);
 
-  if (currentData.length === 0 && !isLoading && !isFetching && emptyState) {
-    return emptyState;
-  }
-
   return (
     <div data-cy="dataTable">
       {!props.withoutActions && (
@@ -800,325 +796,331 @@ export function DataTable<T extends object>(props: Props<T>) {
         </Actions>
       )}
 
-      <Table
-        className={props.className}
-        withoutPadding={props.withoutPadding}
-        withoutBottomBorder={styleOptions?.withoutBottomBorder}
-        withoutTopBorder={styleOptions?.withoutTopBorder}
-        withoutLeftBorder={styleOptions?.withoutLeftBorder}
-        withoutRightBorder={styleOptions?.withoutRightBorder}
-        isDataLoading={isLoading}
-        style={props.style}
-        resizable={apiEndpoint.pathname}
-      >
-        <Thead
-          backgroundColor={styleOptions?.headerBackgroundColor}
-          style={styleOptions?.thStyle}
+      {currentData.length === 0 && !isLoading && !isFetching && emptyState ? (
+        emptyState
+      ) : (
+        <Table
+          className={props.className}
+          withoutPadding={props.withoutPadding}
+          withoutBottomBorder={styleOptions?.withoutBottomBorder}
+          withoutTopBorder={styleOptions?.withoutTopBorder}
+          withoutLeftBorder={styleOptions?.withoutLeftBorder}
+          withoutRightBorder={styleOptions?.withoutRightBorder}
+          isDataLoading={isLoading}
+          style={props.style}
+          resizable={apiEndpoint.pathname}
         >
-          {!props.withoutActions && !hideEditableOptions && (
-            <Th
-              className={styleOptions?.thClassName}
-              resizable={`${apiEndpoint.pathname}.leftCheckbox`}
-              withoutVerticalPadding={styleOptions?.withoutThVerticalPadding}
-              textSize={styleOptions?.thTextSize}
-              disableUppercase={styleOptions?.disableThUppercase}
-              onClick={handleAllCheckboxClick}
-            >
-              <DataTableCheckbox
-                resource={props.resource}
-                dataLength={currentData.length}
-              />
-            </Th>
-          )}
+          <Thead
+            backgroundColor={styleOptions?.headerBackgroundColor}
+            style={styleOptions?.thStyle}
+          >
+            {!props.withoutActions && !hideEditableOptions && (
+              <Th
+                className={styleOptions?.thClassName}
+                resizable={`${apiEndpoint.pathname}.leftCheckbox`}
+                withoutVerticalPadding={styleOptions?.withoutThVerticalPadding}
+                textSize={styleOptions?.thTextSize}
+                disableUppercase={styleOptions?.disableThUppercase}
+                onClick={handleAllCheckboxClick}
+              >
+                <DataTableCheckbox
+                  resource={props.resource}
+                  dataLength={currentData.length}
+                />
+              </Th>
+            )}
 
-          {props.columns.map(
-            (column, index) =>
-              Boolean(!excludeColumns.includes(column.id)) && (
-                <Th
-                  id={column.id}
-                  key={index}
-                  className={styleOptions?.thClassName}
-                  isCurrentlyUsed={sortedBy === column.id}
-                  onColumnClick={(data: ColumnSortPayload) => {
-                    setSortedBy(data.field);
-                    setSort(data.sort);
-                  }}
-                  childrenClassName={styleOptions?.thChildrenClassName}
-                  resizable={`${apiEndpoint.pathname}.${column.id}`}
-                  useOnlyCurrentSortDirectionIcon={
-                    styleOptions?.useOnlyCurrentSortDirectionIcon
-                  }
-                  textSize={styleOptions?.thTextSize}
-                  disableUppercase={styleOptions?.disableThUppercase}
-                  descIcon={styleOptions?.descIcon}
-                  ascIcon={styleOptions?.ascIcon}
-                >
-                  <div className="flex items-center space-x-3">
-                    {dateRangeColumns.some(
-                      (dateRangeColumn) => column.id === dateRangeColumn.column
-                    ) && (
-                      <DateRangePicker
-                        setDateRange={setDateRange}
-                        onClick={() => handleDateRangeColumnClick(column.id)}
-                      />
-                    )}
+            {props.columns.map(
+              (column, index) =>
+                Boolean(!excludeColumns.includes(column.id)) && (
+                  <Th
+                    id={column.id}
+                    key={index}
+                    className={styleOptions?.thClassName}
+                    isCurrentlyUsed={sortedBy === column.id}
+                    onColumnClick={(data: ColumnSortPayload) => {
+                      setSortedBy(data.field);
+                      setSort(data.sort);
+                    }}
+                    childrenClassName={styleOptions?.thChildrenClassName}
+                    resizable={`${apiEndpoint.pathname}.${column.id}`}
+                    useOnlyCurrentSortDirectionIcon={
+                      styleOptions?.useOnlyCurrentSortDirectionIcon
+                    }
+                    textSize={styleOptions?.thTextSize}
+                    disableUppercase={styleOptions?.disableThUppercase}
+                    descIcon={styleOptions?.descIcon}
+                    ascIcon={styleOptions?.ascIcon}
+                  >
+                    <div className="flex items-center space-x-3">
+                      {dateRangeColumns.some(
+                        (dateRangeColumn) =>
+                          column.id === dateRangeColumn.column
+                      ) && (
+                        <DateRangePicker
+                          setDateRange={setDateRange}
+                          onClick={() => handleDateRangeColumnClick(column.id)}
+                        />
+                      )}
 
-                    {filterColumns?.some(
-                      (filterColumn) => column.id === filterColumn.column_id
-                    ) && (
-                      <FilterColumn
-                        selectedValues={filterColumnsValues[column.id] || []}
-                        options={
-                          filterColumns?.find(
-                            (filterColumn) =>
-                              filterColumn.column_id === column.id
-                          )?.options || []
-                        }
-                        onChange={(value) =>
-                          setFilterColumnsValues((current) => ({
-                            ...current,
-                            [column.id]: value,
-                          }))
-                        }
-                      />
-                    )}
-                    <span>{column.label}</span>
-                  </div>
-                </Th>
-              )
-          )}
+                      {filterColumns?.some(
+                        (filterColumn) => column.id === filterColumn.column_id
+                      ) && (
+                        <FilterColumn
+                          selectedValues={filterColumnsValues[column.id] || []}
+                          options={
+                            filterColumns?.find(
+                              (filterColumn) =>
+                                filterColumn.column_id === column.id
+                            )?.options || []
+                          }
+                          onChange={(value) =>
+                            setFilterColumnsValues((current) => ({
+                              ...current,
+                              [column.id]: value,
+                            }))
+                          }
+                        />
+                      )}
+                      <span>{column.label}</span>
+                    </div>
+                  </Th>
+                )
+            )}
 
-          {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
-        </Thead>
+            {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
+          </Thead>
 
-        <Tbody
-          style={{
-            ...styleOptions?.tBodyStyle,
-            opacity: areRowsRendered || !currentData.length ? 1 : 0.5,
-            pointerEvents:
-              areRowsRendered || !currentData.length ? 'auto' : 'none',
-            cursor:
-              areRowsRendered || !currentData.length ? 'default' : 'progress',
-          }}
-        >
-          {(isLoading || !isEqual(currentData, data?.data?.data)) && (
-            <MemoizedTr
-              className="border-b"
-              style={{
-                borderColor: colors.$20,
-              }}
-            >
-              <Td colSpan={100}>
-                <Spinner />
-              </Td>
-            </MemoizedTr>
-          )}
-
-          {isError && !isLoading && (
-            <MemoizedTr
-              className="border-b"
-              style={{
-                borderColor: colors.$20,
-              }}
-            >
-              <Td className="text-center" colSpan={100}>
-                {t('error_refresh_page')}
-              </Td>
-            </MemoizedTr>
-          )}
-
-          {!isLoading &&
-            currentData?.length === 0 &&
-            isEqual(currentData, data?.data?.data) && (
+          <Tbody
+            style={{
+              ...styleOptions?.tBodyStyle,
+              opacity: areRowsRendered || !currentData.length ? 1 : 0.5,
+              pointerEvents:
+                areRowsRendered || !currentData.length ? 'auto' : 'none',
+              cursor:
+                areRowsRendered || !currentData.length ? 'default' : 'progress',
+            }}
+          >
+            {(isLoading || !isEqual(currentData, data?.data?.data)) && (
               <MemoizedTr
                 className="border-b"
                 style={{
                   borderColor: colors.$20,
                 }}
               >
-                <Td className={styleOptions?.tdClassName} colSpan={100}>
-                  <div className="flex items-center justify-center py-10">
-                    <span className="text-sm" style={{ color: colors.$17 }}>
-                      {t('no_records_found')}
-                    </span>
-                  </div>
+                <Td colSpan={100}>
+                  <Spinner />
                 </Td>
               </MemoizedTr>
             )}
 
-          {isEqual(currentData, data?.data?.data) &&
-            currentData.map((resource: any, rowIndex: number) => (
+            {isError && !isLoading && (
               <MemoizedTr
-                key={rowIndex}
-                className="border-b table-row"
+                className="border-b"
                 style={{
                   borderColor: colors.$20,
                 }}
-                resource={resource}
-                memoValue={props.columns}
-                withoutBackgroundColor
               >
-                {!props.withoutActions && !hideEditableOptions && (
-                  <Td
-                    className="cursor-pointer"
-                    onClick={() => handleCheckboxClick(resource.id)}
-                  >
-                    <DataTableCheckbox
-                      resourceId={resource.id}
-                      resource={props.resource}
-                    />
+                <Td className="text-center" colSpan={100}>
+                  {t('error_refresh_page')}
+                </Td>
+              </MemoizedTr>
+            )}
+
+            {!isLoading &&
+              currentData?.length === 0 &&
+              isEqual(currentData, data?.data?.data) && (
+                <MemoizedTr
+                  className="border-b"
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                >
+                  <Td className={styleOptions?.tdClassName} colSpan={100}>
+                    <div className="flex items-center justify-center py-10">
+                      <span className="text-sm" style={{ color: colors.$17 }}>
+                        {t('no_records_found')}
+                      </span>
+                    </div>
                   </Td>
-                )}
+                </MemoizedTr>
+              )}
+
+            {isEqual(currentData, data?.data?.data) &&
+              currentData.map((resource: any, rowIndex: number) => (
+                <MemoizedTr
+                  key={rowIndex}
+                  className="border-b table-row"
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                  resource={resource}
+                  memoValue={props.columns}
+                  withoutBackgroundColor
+                >
+                  {!props.withoutActions && !hideEditableOptions && (
+                    <Td
+                      className="cursor-pointer"
+                      onClick={() => handleCheckboxClick(resource.id)}
+                    >
+                      <DataTableCheckbox
+                        resourceId={resource.id}
+                        resource={props.resource}
+                      />
+                    </Td>
+                  )}
+
+                  {props.columns.map(
+                    (column, index) =>
+                      Boolean(!excludeColumns.includes(column.id)) && (
+                        <Td
+                          key={index}
+                          className={classNames(
+                            {
+                              'cursor-pointer': index < 3,
+                              'py-4': hideEditableOptions,
+                            },
+                            styleOptions?.tdClassName
+                          )}
+                          onClick={() => {
+                            if (index < 3) {
+                              props.onTableRowClick
+                                ? props.onTableRowClick(resource)
+                                : document.getElementById(resource.id)?.click();
+                            }
+                          }}
+                          withoutPadding={styleOptions?.withoutTdPadding}
+                          resizable={`${apiEndpoint.pathname}.${column.id}`}
+                        >
+                          {column.format
+                            ? column.format(resource[column.id], resource)
+                            : resource[column.id]}
+                        </Td>
+                      )
+                  )}
+
+                  {props.withResourcefulActions && !hideEditableOptions && (
+                    <Td>
+                      <Dropdown label={t('actions')}>
+                        {props.linkToEdit &&
+                          (props.showEdit?.(resource) || !props.showEdit) && (
+                            <DropdownElement
+                              to={route(props.linkToEdit, {
+                                id: resource?.id,
+                              })}
+                              icon={<Icon element={MdEdit} />}
+                            >
+                              {t('edit')}
+                            </DropdownElement>
+                          )}
+
+                        {props.linkToEdit &&
+                          props.customActions &&
+                          showCustomActionDivider(resource) &&
+                          (props.showEdit?.(resource) || !props.showEdit) && (
+                            <Divider withoutPadding />
+                          )}
+
+                        {props.customActions &&
+                          props.customActions.map(
+                            (
+                              action: ResourceAction<typeof resource>,
+                              index: number
+                            ) =>
+                              !bottomActionsKeys.includes(
+                                action(resource)?.key || ''
+                              ) && <div key={index}>{action(resource)}</div>
+                          )}
+
+                        {props.customActions &&
+                          (props.showRestore?.(resource) ||
+                            !props.showRestore) && <Divider withoutPadding />}
+
+                        {resource?.archived_at === 0 &&
+                          (props.showArchive?.(resource) ||
+                            !props.showArchive) && (
+                            <DropdownElement
+                              onClick={() => bulk('archive', resource.id)}
+                              icon={<Icon element={MdArchive} />}
+                            >
+                              {t('archive')}
+                            </DropdownElement>
+                          )}
+
+                        {resource?.archived_at > 0 &&
+                          (props.showRestore?.(resource) ||
+                            !props.showRestore) && (
+                            <DropdownElement
+                              onClick={() => bulk('restore', resource.id)}
+                              icon={<Icon element={MdRestore} />}
+                            >
+                              {t('restore')}
+                            </DropdownElement>
+                          )}
+
+                        {!resource?.is_deleted &&
+                          (props.showDelete?.(resource) ||
+                            !props.showDelete) && (
+                            <DropdownElement
+                              onClick={() => bulk('delete', resource.id)}
+                              icon={<Icon element={MdDelete} />}
+                            >
+                              {t('delete')}
+                            </DropdownElement>
+                          )}
+
+                        {props.customActions &&
+                          props.customActions.map(
+                            (
+                              action: ResourceAction<typeof resource>,
+                              index: number
+                            ) =>
+                              bottomActionsKeys.includes(
+                                action(resource)?.key || ''
+                              ) && <div key={index}>{action(resource)}</div>
+                          )}
+                      </Dropdown>
+                    </Td>
+                  )}
+                </MemoizedTr>
+              ))}
+          </Tbody>
+
+          {Boolean(footerColumns.length) &&
+            Boolean(currentData?.length) &&
+            Boolean(reactSettings.show_table_footer) && (
+              <TFooter>
+                {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
                 {props.columns.map(
                   (column, index) =>
                     Boolean(!excludeColumns.includes(column.id)) && (
                       <Td
                         key={index}
-                        className={classNames(
-                          {
-                            'cursor-pointer': index < 3,
-                            'py-4': hideEditableOptions,
-                          },
-                          styleOptions?.tdClassName
-                        )}
-                        onClick={() => {
-                          if (index < 3) {
-                            props.onTableRowClick
-                              ? props.onTableRowClick(resource)
-                              : document.getElementById(resource.id)?.click();
-                          }
-                        }}
-                        withoutPadding={styleOptions?.withoutTdPadding}
+                        customizeTextColor
                         resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
-                        {column.format
-                          ? column.format(resource[column.id], resource)
-                          : resource[column.id]}
+                        {getFooterColumn(column.id) ? (
+                          <div className="flex items-center space-x-3">
+                            {getFooterColumn(column.id)?.format(
+                              getColumnValues(column.id) as (string | number)[],
+                              currentData || []
+                            ) ?? '-/-'}
+                          </div>
+                        ) : (
+                          <></>
+                        )}
                       </Td>
                     )
                 )}
 
                 {props.withResourcefulActions && !hideEditableOptions && (
-                  <Td>
-                    <Dropdown label={t('actions')}>
-                      {props.linkToEdit &&
-                        (props.showEdit?.(resource) || !props.showEdit) && (
-                          <DropdownElement
-                            to={route(props.linkToEdit, {
-                              id: resource?.id,
-                            })}
-                            icon={<Icon element={MdEdit} />}
-                          >
-                            {t('edit')}
-                          </DropdownElement>
-                        )}
-
-                      {props.linkToEdit &&
-                        props.customActions &&
-                        showCustomActionDivider(resource) &&
-                        (props.showEdit?.(resource) || !props.showEdit) && (
-                          <Divider withoutPadding />
-                        )}
-
-                      {props.customActions &&
-                        props.customActions.map(
-                          (
-                            action: ResourceAction<typeof resource>,
-                            index: number
-                          ) =>
-                            !bottomActionsKeys.includes(
-                              action(resource)?.key || ''
-                            ) && <div key={index}>{action(resource)}</div>
-                        )}
-
-                      {props.customActions &&
-                        (props.showRestore?.(resource) ||
-                          !props.showRestore) && <Divider withoutPadding />}
-
-                      {resource?.archived_at === 0 &&
-                        (props.showArchive?.(resource) ||
-                          !props.showArchive) && (
-                          <DropdownElement
-                            onClick={() => bulk('archive', resource.id)}
-                            icon={<Icon element={MdArchive} />}
-                          >
-                            {t('archive')}
-                          </DropdownElement>
-                        )}
-
-                      {resource?.archived_at > 0 &&
-                        (props.showRestore?.(resource) ||
-                          !props.showRestore) && (
-                          <DropdownElement
-                            onClick={() => bulk('restore', resource.id)}
-                            icon={<Icon element={MdRestore} />}
-                          >
-                            {t('restore')}
-                          </DropdownElement>
-                        )}
-
-                      {!resource?.is_deleted &&
-                        (props.showDelete?.(resource) || !props.showDelete) && (
-                          <DropdownElement
-                            onClick={() => bulk('delete', resource.id)}
-                            icon={<Icon element={MdDelete} />}
-                          >
-                            {t('delete')}
-                          </DropdownElement>
-                        )}
-
-                      {props.customActions &&
-                        props.customActions.map(
-                          (
-                            action: ResourceAction<typeof resource>,
-                            index: number
-                          ) =>
-                            bottomActionsKeys.includes(
-                              action(resource)?.key || ''
-                            ) && <div key={index}>{action(resource)}</div>
-                        )}
-                    </Dropdown>
-                  </Td>
+                  <Th></Th>
                 )}
-              </MemoizedTr>
-            ))}
-        </Tbody>
-
-        {Boolean(footerColumns.length) &&
-          Boolean(currentData?.length) &&
-          Boolean(reactSettings.show_table_footer) && (
-            <TFooter>
-              {!props.withoutActions && !hideEditableOptions && <Th></Th>}
-
-              {props.columns.map(
-                (column, index) =>
-                  Boolean(!excludeColumns.includes(column.id)) && (
-                    <Td
-                      key={index}
-                      customizeTextColor
-                      resizable={`${apiEndpoint.pathname}.${column.id}`}
-                    >
-                      {getFooterColumn(column.id) ? (
-                        <div className="flex items-center space-x-3">
-                          {getFooterColumn(column.id)?.format(
-                            getColumnValues(column.id) as (string | number)[],
-                            currentData || []
-                          ) ?? '-/-'}
-                        </div>
-                      ) : (
-                        <></>
-                      )}
-                    </Td>
-                  )
-              )}
-
-              {props.withResourcefulActions && !hideEditableOptions && (
-                <Th></Th>
-              )}
-            </TFooter>
-          )}
-      </Table>
+              </TFooter>
+            )}
+        </Table>
+      )}
 
       {data && !props.withoutPagination && (
         <Pagination
