@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -17,9 +17,6 @@ import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankClientQuery } from '$app/common/queries/clients';
 import { cloneDeep, set } from 'lodash';
-import { Address } from '$app/pages/clients/edit/components/Address';
-import { Contacts } from '$app/pages/clients/edit/components/Contacts';
-import { Details } from '$app/pages/clients/edit/components/Details';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
@@ -27,8 +24,12 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Modal } from '$app/components/Modal';
 import { CurrencySelector } from '$app/components/CurrencySelector';
-import classNames from 'classnames';
-import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInfo';
+import { TabGroup } from '$app/components/TabGroup';
+import { CountrySelector } from '$app/components/CountrySelector';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   isModalOpen: boolean;
@@ -53,17 +54,33 @@ export function ClientCreate({
       send_email: false,
     },
   ]);
-  const [fundamentalConceptVisible, setFundamentalConceptVisible] =
-    useState<boolean>(true);
 
   const { data: blankClient } = useBlankClientQuery({
     refetchOnWindowFocus: false,
   });
 
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
+
   const handleChange = (property: keyof Client, value: string) => {
     setErrors(undefined);
 
     setClient((client) => client && set({ ...client }, property, value));
+  };
+
+  const handleSettingsChange = (
+    property: keyof Client['settings'],
+    value: string | number | boolean
+  ) => {
+    setErrors(undefined);
+
+    setClient(
+      (client) =>
+        client &&
+        set({ ...client }, 'settings', {
+          ...client.settings,
+          [property]: value,
+        })
+    );
   };
 
   const handleContactsChange = (
@@ -82,7 +99,6 @@ export function ClientCreate({
   };
 
   const handleClose = (value: boolean) => {
-    setFundamentalConceptVisible(true);
     setIsModalOpen(value);
     setErrors(undefined);
     setClient(undefined);
@@ -124,6 +140,8 @@ export function ClientCreate({
 
         onClientCreated && onClientCreated(response.data.data);
 
+        handleClose(false);
+
         $refetch(['clients']);
 
         window.dispatchEvent(
@@ -133,8 +151,6 @@ export function ClientCreate({
             },
           })
         );
-
-        handleClose(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -155,128 +171,271 @@ export function ClientCreate({
       title={t('new_client')!}
       visible={isModalOpen}
       onClose={() => handleClose(false)}
-      size={fundamentalConceptVisible ? 'extraSmall' : 'large'}
+      size="extraSmall"
       renderTransitionChildAsFragment
       overflowVisible
+      withoutVerticalMargin
+      withoutHorizontalPadding
+      withoutBorderLine
     >
-      <div className="flex flex-col space-y-7">
+      <div className="flex flex-col">
         {client ? (
-          <>
-            {fundamentalConceptVisible ? (
-              <div className="flex flex-col space-y-3">
-                <InputField
-                  label={t('name')}
-                  value={client?.name || ''}
-                  onValueChange={(value) => handleChange('name', value)}
-                  errorMessage={errors?.errors.name || errors?.errors.id}
-                />
+          <TabGroup
+            tabs={[t('details'), t('billing'), t('shipping'), t('settings')]}
+            width="full"
+            withHorizontalPadding
+            horizontalPaddingWidth="1.5rem"
+          >
+            <div className="flex flex-col space-y-3 px-4 sm:px-6">
+              <InputField
+                label={t('name')}
+                value={client?.name || ''}
+                onValueChange={(value) => handleChange('name', value)}
+                errorMessage={errors?.errors.name || errors?.errors.id}
+              />
 
-                <InputField
-                  label={`${t('contact')} ${t('first_name')}`}
-                  value={contacts[0].first_name}
+              <InputField
+                label={`${t('contact')} ${t('first_name')}`}
+                value={contacts[0].first_name}
+                onValueChange={(value) =>
+                  handleContactsChange(value, 'first_name')
+                }
+                errorMessage={errors?.errors.name}
+              />
+
+              <InputField
+                label={`${t('contact')} ${t('last_name')}`}
+                value={contacts[0].last_name}
+                onValueChange={(value) =>
+                  handleContactsChange(value, 'last_name')
+                }
+                errorMessage={errors?.errors.name}
+              />
+
+              <InputField
+                label={`${t('contact')} ${t('email')}`}
+                value={contacts[0].email}
+                onValueChange={(value) => handleContactsChange(value, 'email')}
+                errorMessage={errors?.errors['contacts.0.email']}
+              />
+
+              <InputField
+                label={`${t('contact')} ${t('phone')}`}
+                value={contacts[0].phone}
+                onValueChange={(value) => handleContactsChange(value, 'phone')}
+                errorMessage={errors?.errors['contacts.0.phone']}
+              />
+
+              <CurrencySelector
+                label={t('currency')}
+                value={client?.settings?.currency_id || ''}
+                onChange={(value) => {
+                  const $client = cloneDeep(client)!;
+                  set($client, 'settings.currency_id', value);
+                  setClient($client);
+                }}
+                errorMessage={errors?.errors['settings.currency_id']}
+                dismissable
+              />
+            </div>
+
+            <div className="flex flex-col space-y-3 px-4 sm:px-6">
+              <InputField
+                label={t('billing_address1')}
+                value={client?.address1 || ''}
+                onValueChange={(value) => handleChange('address1', value)}
+                errorMessage={errors?.errors.address1}
+              />
+
+              <InputField
+                label={t('address2')}
+                value={client?.address2 || ''}
+                onValueChange={(value) => handleChange('address2', value)}
+                errorMessage={errors?.errors.address2}
+              />
+
+              <InputField
+                label={t('city')}
+                value={client?.city || ''}
+                onValueChange={(value) => handleChange('city', value)}
+                errorMessage={errors?.errors.city}
+              />
+
+              <InputField
+                label={t('state')}
+                value={client?.state || ''}
+                onValueChange={(value) => handleChange('state', value)}
+                errorMessage={errors?.errors.state}
+              />
+
+              <InputField
+                label={t('postal_code')}
+                value={client?.postal_code || ''}
+                onValueChange={(value) => handleChange('postal_code', value)}
+                errorMessage={errors?.errors.postal_code}
+              />
+
+              <CountrySelector
+                label={t('country')}
+                value={client?.country_id || ''}
+                onChange={(value) => handleChange('country_id', value)}
+                errorMessage={errors?.errors.country_id}
+                dismissable
+              />
+            </div>
+
+            <div className="flex flex-col space-y-3 px-4 sm:px-6">
+              <InputField
+                label={t('shipping_address1')}
+                value={client?.shipping_address1 || ''}
+                onValueChange={(value) =>
+                  handleChange('shipping_address1', value)
+                }
+                errorMessage={errors?.errors.shipping_address1}
+              />
+
+              <InputField
+                label={t('shipping_address2')}
+                value={client?.shipping_address2 || ''}
+                onValueChange={(value) =>
+                  handleChange('shipping_address2', value)
+                }
+                errorMessage={errors?.errors.shipping_address2}
+              />
+
+              <InputField
+                label={t('city')}
+                value={client?.shipping_city || ''}
+                onValueChange={(value) => handleChange('shipping_city', value)}
+                errorMessage={errors?.errors.shipping_city}
+              />
+
+              <InputField
+                label={t('state')}
+                value={client?.shipping_state || ''}
+                onValueChange={(value) => handleChange('shipping_state', value)}
+                errorMessage={errors?.errors.shipping_state}
+              />
+
+              <InputField
+                label={t('postal_code')}
+                value={client?.shipping_postal_code || ''}
+                onValueChange={(value) =>
+                  handleChange('shipping_postal_code', value)
+                }
+                errorMessage={errors?.errors.shipping_postal_code}
+              />
+
+              <CountrySelector
+                label={t('country')}
+                value={client?.shipping_country_id || ''}
+                onChange={(value) => handleChange('shipping_country_id', value)}
+                errorMessage={errors?.errors.shipping_country_id}
+                dismissable
+              />
+            </div>
+
+            <div className="flex flex-col space-y-3 px-4 sm:px-6">
+              <CurrencySelector
+                label={t('currency')}
+                value={client?.settings?.currency_id || ''}
+                onChange={(value) => handleSettingsChange('currency_id', value)}
+                errorMessage={errors?.errors['settings.currency_id']}
+              />
+
+              <LanguageSelector
+                label={t('language')}
+                value={client?.settings?.language_id || ''}
+                onChange={(value) => handleSettingsChange('language_id', value)}
+                errorMessage={errors?.errors['settings.language_id']}
+              />
+
+              {paymentTermsResponse && (
+                <SelectField
+                  label={t('payment_terms')}
+                  value={client?.settings?.payment_terms || ''}
+                  errorMessage={errors?.errors['settings.payment_terms']}
                   onValueChange={(value) =>
-                    handleContactsChange(value, 'first_name')
+                    handleSettingsChange('payment_terms', value)
                   }
-                  errorMessage={errors?.errors.name}
-                />
+                  withBlank
+                  customSelector
+                >
+                  {paymentTermsResponse.data.data.map(
+                    (paymentTerm: PaymentTerm, index: number) => (
+                      <option
+                        key={index}
+                        value={paymentTerm.num_days.toString()}
+                      >
+                        {paymentTerm.name}
+                      </option>
+                    )
+                  )}
+                </SelectField>
+              )}
 
-                <InputField
-                  label={`${t('contact')} ${t('last_name')}`}
-                  value={contacts[0].last_name}
+              {paymentTermsResponse && (
+                <SelectField
+                  label={t('quote_valid_until')}
+                  value={client?.settings?.valid_until || ''}
                   onValueChange={(value) =>
-                    handleContactsChange(value, 'last_name')
+                    handleSettingsChange('valid_until', value)
                   }
-                  errorMessage={errors?.errors.name}
-                />
+                  errorMessage={errors?.errors['settings.valid_until']}
+                  withBlank
+                  customSelector
+                >
+                  {paymentTermsResponse.data.data.map(
+                    (paymentTerm: PaymentTerm, index: number) => (
+                      <option
+                        key={index}
+                        value={paymentTerm.num_days.toString()}
+                      >
+                        {paymentTerm.name}
+                      </option>
+                    )
+                  )}
+                </SelectField>
+              )}
 
-                <InputField
-                  label={`${t('contact')} ${t('email')}`}
-                  value={contacts[0].email}
-                  onValueChange={(value) =>
-                    handleContactsChange(value, 'email')
-                  }
-                  errorMessage={errors?.errors['contacts.0.email']}
-                />
+              <NumberInputField
+                label={t('task_rate')}
+                value={client?.settings?.default_task_rate || ''}
+                onValueChange={(value) =>
+                  handleSettingsChange('default_task_rate', parseFloat(value))
+                }
+                errorMessage={errors?.errors['settings.default_task_rate']}
+              />
 
-                <InputField
-                  label={`${t('contact')} ${t('phone')}`}
-                  value={contacts[0].phone}
-                  onValueChange={(value) =>
-                    handleContactsChange(value, 'phone')
-                  }
-                  errorMessage={errors?.errors['contacts.0.phone']}
-                />
-
-                <CurrencySelector
-                  label={t('currency')}
-                  value={client?.settings?.currency_id || ''}
-                  onChange={(value) => {
-                    const $client = cloneDeep(client)!;
-                    set($client, 'settings.currency_id', value);
-                    setClient($client);
-                  }}
-                  errorMessage={errors?.errors['settings.currency_id']}
-                  dismissable
-                />
-              </div>
-            ) : (
-              <div className="flex flex-col xl:flex-row xl:gap-4">
-                <div className="w-full xl:w-1/2">
-                  <Details
-                    client={client}
-                    setClient={setClient}
-                    setErrors={setErrors}
-                    errors={errors}
-                  />
-
-                  <div className="mt-5">
-                    <Address
-                      client={client}
-                      setClient={setClient}
-                      setErrors={setErrors}
-                      errors={errors}
-                    />
-                  </div>
-                </div>
-
-                <div className="w-full xl:w-1/2">
-                  <Contacts
-                    contacts={contacts}
-                    setContacts={setContacts}
-                    setErrors={setErrors}
-                    errors={errors}
-                  />
-
-                  <div className="mt-5">
-                    <AdditionalInfo
-                      client={client}
-                      setClient={setClient}
-                      setErrors={setErrors}
-                      errors={errors}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
+              <SelectField
+                label={t('send_reminders')}
+                value={
+                  client?.settings?.send_reminders === true
+                    ? 'enabled'
+                    : client?.settings?.send_reminders === false
+                    ? 'disabled'
+                    : ''
+                }
+                onValueChange={(value) =>
+                  handleSettingsChange(
+                    'send_reminders',
+                    value === 'enabled' ? true : value === '' ? '' : false
+                  )
+                }
+                withBlank
+                errorMessage={errors?.errors['settings.send_reminders']}
+                customSelector
+              >
+                <option value="enabled">{t('enabled')}</option>
+                <option value="disabled">{t('disabled')}</option>
+              </SelectField>
+            </div>
+          </TabGroup>
         ) : (
           <Spinner />
         )}
 
-        <div
-          className={classNames('flex', {
-            'justify-between': fundamentalConceptVisible,
-            'justify-end space-x-5': !fundamentalConceptVisible,
-          })}
-        >
-          <Button
-            behavior="button"
-            type="secondary"
-            onClick={() => setFundamentalConceptVisible((current) => !current)}
-          >
-            {fundamentalConceptVisible ? t('more_fields') : t('less_fields')}
-          </Button>
-
+        <div className="flex justify-end mt-2 px-4 sm:px-6">
           <Button behavior="button" onClick={onSave}>
             {t('save')}
           </Button>
