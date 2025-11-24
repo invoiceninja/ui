@@ -289,6 +289,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [filterColumnsValues, setFilterColumnsValues] = useAtom(
     filterColumnsValuesAtom
   );
+  const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
@@ -461,14 +462,27 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   );
 
-  const selectedResources = useMemo(() => {
-    if (!selected?.length) return [];
+  useEffect(() => {
+    if (!selected?.length) {
+      setSelectedResources([]);
+      return;
+    }
 
-    return (
-      currentData.filter((resource: T) =>
+    setSelectedResources((prevSelected) => {
+      const fromCurrent = currentData.filter((resource: T) =>
         selected?.includes(resource?.['id' as keyof T] as string)
-      ) || []
-    );
+      );
+
+      const fromPrevious = prevSelected.filter((resource: T) => {
+        const id = resource?.['id' as keyof T] as string;
+        return (
+          selected.includes(id) &&
+          !currentData.some((r: T) => r?.['id' as keyof T] === id)
+        );
+      });
+
+      return [...fromPrevious, ...fromCurrent];
+    });
   }, [currentData, selected]);
 
   const showRestoreBulkAction = () => {

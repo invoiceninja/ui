@@ -318,7 +318,7 @@ export default function Create() {
             <div className="block px-4 sm:px-6 gap-y-2 mt-4">
               <DataTable<Invoice>
                 resource="invoice"
-                queryIdentificator={initialEndpoints.invoices}
+                queryIdentificator="/api/v1/invoices"
                 endpoint={initialEndpoints.invoices}
                 columns={invoiceColumns}
                 onSelectedResourcesChange={(selectedResources) => {
@@ -326,12 +326,17 @@ export default function Create() {
                     const newInvoices: PaymentInvoice[] = [];
 
                     selectedResources.forEach((resource: Invoice) => {
+                      const existingInvoice = payment?.invoices.find(
+                        (pInvoice) => pInvoice.invoice_id === resource.id
+                      );
+
                       newInvoices.push({
                         _id: v4(),
-                        amount:
-                          resource.balance > 0
-                            ? resource.balance
-                            : resource.amount,
+                        amount: existingInvoice
+                          ? existingInvoice.amount
+                          : resource.balance > 0
+                          ? resource.balance
+                          : resource.amount,
                         invoice_id: resource.id,
                       });
                     });
@@ -380,7 +385,7 @@ export default function Create() {
             <div className="block px-4 sm:px-6 mt-4">
               <DataTable<Credit>
                 resource="credit"
-                queryIdentificator={initialEndpoints.credits}
+                queryIdentificator="/api/v1/credits"
                 endpoint={initialEndpoints.credits}
                 columns={creditColumns}
                 onSelectedResourcesChange={(selectedResources) => {
@@ -388,12 +393,17 @@ export default function Create() {
                     const newCredits: PaymentCredit[] = [];
 
                     selectedResources.forEach((resource: Credit) => {
+                      const existingCredit = payment?.credits.find(
+                        (pCredit) => pCredit.credit_id === resource.id
+                      );
+
                       newCredits.push({
                         _id: v4(),
-                        amount:
-                          resource.balance > 0
-                            ? resource.balance
-                            : resource.amount,
+                        amount: existingCredit
+                          ? existingCredit.amount
+                          : resource.balance > 0
+                          ? resource.balance
+                          : resource.amount,
                         credit_id: resource.id,
                       });
                     });
