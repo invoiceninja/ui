@@ -16,21 +16,29 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdCancel } from 'react-icons/md';
 import { useBulk } from '$app/common/queries/invoices';
 import { CancelInvoiceModal } from '$app/pages/invoices/edit/components/CancelInvoiceModal';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 interface Props {
   selectedIds: string[];
   selectedResources: Invoice[];
   setSelected: (ids: string[]) => void;
-  showCancelOption: (invoices: Invoice[]) => boolean;
 }
 
-export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSelected, showCancelOption }: Props) {
+export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSelected }: Props) {
   const [t] = useTranslation();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const bulk = useBulk();
+  const verifactuEnabled = useCompanyVerifactu();
 
   const handleCancel = () => {
-    setIsCancelModalOpen(true);
+    // If Verifactu is enabled, show modal to get cancellation reason
+    // Otherwise, cancel directly without modal
+    if (verifactuEnabled) {
+      setIsCancelModalOpen(true);
+    } else {
+      bulk(selectedIds, 'cancel');
+      setSelected([]);
+    }
   };
 
   const handleConfirmCancel = (cancellationReason: string) => {
@@ -38,10 +46,6 @@ export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSel
     setSelected([]);
     setIsCancelModalOpen(false);
   };
-
-  if (!showCancelOption(selectedResources)) {
-    return null;
-  }
 
   return (
     <>
@@ -52,11 +56,13 @@ export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSel
         {t('cancel_invoice')}
       </DropdownElement>
       
-      <CancelInvoiceModal
-        visible={isCancelModalOpen}
-        onClose={() => setIsCancelModalOpen(false)}
-        onConfirm={handleConfirmCancel}
-      />
+      {verifactuEnabled && (
+        <CancelInvoiceModal
+          visible={isCancelModalOpen}
+          onClose={() => setIsCancelModalOpen(false)}
+          onConfirm={handleConfirmCancel}
+        />
+      )}
     </>
   );
 }
