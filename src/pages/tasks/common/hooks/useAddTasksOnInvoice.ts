@@ -43,8 +43,8 @@ export function useAddTasksOnInvoice(params: Params) {
 
   const navigate = useNavigate();
   const numericFormatter = useNumericFormatter();
-  const getCurrencySeparators = useGetCurrencySeparators();
-  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat();
+  const getCurrencySeparators = useGetCurrencySeparators(undefined, tasks?.[0]);
+  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat(tasks?.[0]);
 
   const company = useCurrentCompany();
   const { timeFormat } = useCompanyTimeFormat();
@@ -57,13 +57,16 @@ export function useAddTasksOnInvoice(params: Params) {
     const updatedInvoice = cloneDeep(invoice);
 
     if (tasks) {
+      // Pass the client object if available in the task relation
+      const client = tasks[0]?.client;
+
       const currencySeparators = await getCurrencySeparators(
         tasks[0]?.client_id,
         'client_id'
       );
 
       const { dateFormat: clientDateFormat, timeFormat: clientTimeFormat } =
-        await resolveDateAndTimeClientFormat(tasks[0]?.client_id);
+        await resolveDateAndTimeClientFormat(tasks[0]?.client_id, client);
 
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
