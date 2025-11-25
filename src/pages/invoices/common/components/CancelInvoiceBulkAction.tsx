@@ -30,12 +30,18 @@ export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSel
   const bulk = useBulk();
   const verifactuEnabled = useCompanyVerifactu();
 
+  // Debug logging
+  console.log('[CancelInvoiceBulkAction] verifactuEnabled:', verifactuEnabled);
+
   const handleCancel = () => {
+    console.log('[CancelInvoiceBulkAction] handleCancel called, verifactuEnabled:', verifactuEnabled);
     // If Verifactu is enabled, show modal to get cancellation reason
     // Otherwise, cancel directly without modal
     if (verifactuEnabled) {
+      console.log('[CancelInvoiceBulkAction] Opening modal');
       setIsCancelModalOpen(true);
     } else {
+      console.log('[CancelInvoiceBulkAction] Cancelling directly');
       bulk(selectedIds, 'cancel');
       setSelected([]);
     }
