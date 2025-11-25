@@ -20,10 +20,11 @@ import { useCurrentCompany } from './useCurrentCompany';
 import { useResolveCountry } from './useResolveCountry';
 import { useVendorResolver } from './vendors/useVendorResolver';
 
-export function useGetCurrencySeparators(
+export function useGetCurrencySeparators<T = any>(
   setInputCurrencySeparators?: React.Dispatch<
     React.SetStateAction<DecimalInputSeparators | undefined>
-  >
+  >,
+  resource?: T
 ) {
   const company = useCurrentCompany();
 
@@ -37,7 +38,40 @@ export function useGetCurrencySeparators(
     let separators: DecimalInputSeparators | undefined;
 
     if (relationId.length >= 1 && relationType === 'client_id') {
-      await clientResolver.find(relationId).then(async (client: Client) => {
+      // Check if client is already available in the resource relation
+      const clientPromise = (resource && typeof resource === 'object' && resource !== null && 'client' in resource && resource.client)
+        ? Promise.resolve(resource.client as Client)
+        : clientResolver.find(relationId).catch(() => null);
+
+      await clientPromise.then(async (client: Client | null) => {
+        if (!client) {
+          // Fall back to company currency if client not available
+          await currencyResolver
+            .find(company.settings?.currency_id)
+            .then((currency: Currency | undefined) => {
+              const companyCountry = resolveCountry(company.settings.country_id);
+
+              const currentSeparators = {
+                thousandSeparator:
+                  companyCountry?.thousand_separator ||
+                  currency?.thousand_separator ||
+                  ',',
+                decimalSeparator:
+                  companyCountry?.decimal_separator ||
+                  currency?.decimal_separator ||
+                  '.',
+                precision: currency?.precision || 2,
+              };
+
+              if (setInputCurrencySeparators) {
+                setInputCurrencySeparators(currentSeparators);
+              } else {
+                separators = currentSeparators;
+              }
+            });
+          return;
+        }
+
         await currencyResolver
           .find(client.settings.currency_id || company.settings?.currency_id)
           .then((currency: Currency | undefined) => {
@@ -63,7 +97,40 @@ export function useGetCurrencySeparators(
           });
       });
     } else if (relationId.length >= 1 && relationType === 'vendor_id') {
-      await vendorResolver.find(relationId).then(async (vendor: Vendor) => {
+      // Check if vendor is already available in the resource relation
+      const vendorPromise = (resource && typeof resource === 'object' && resource !== null && 'vendor' in resource && resource.vendor)
+        ? Promise.resolve(resource.vendor as Vendor)
+        : vendorResolver.find(relationId).catch(() => null);
+
+      await vendorPromise.then(async (vendor: Vendor | null) => {
+        if (!vendor) {
+          // Fall back to company currency if vendor not available
+          await currencyResolver
+            .find(company.settings?.currency_id)
+            .then((currency: Currency | undefined) => {
+              const companyCountry = resolveCountry(company.settings.country_id);
+
+              const currentSeparators = {
+                thousandSeparator:
+                  companyCountry?.thousand_separator ||
+                  currency?.thousand_separator ||
+                  ',',
+                decimalSeparator:
+                  companyCountry?.decimal_separator ||
+                  currency?.decimal_separator ||
+                  '.',
+                precision: currency?.precision || 2,
+              };
+
+              if (setInputCurrencySeparators) {
+                setInputCurrencySeparators(currentSeparators);
+              } else {
+                separators = currentSeparators;
+              }
+            });
+          return;
+        }
+
         await currencyResolver
           .find(vendor.currency_id || company.settings?.currency_id)
           .then((currency: Currency | undefined) => {
