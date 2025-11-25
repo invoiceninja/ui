@@ -181,7 +181,7 @@ export function ClientCreate({
       <div className="flex flex-col">
         {client ? (
           <TabGroup
-            tabs={[t('details'), t('billing'), t('shipping'), t('settings')]}
+            tabs={[t('details'), t('address'), t('shipping'), t('settings')]}
             width="full"
             withHorizontalPadding
             horizontalPaddingWidth="1.5rem"
