@@ -49,11 +49,31 @@ export function useFormatMoney(props: Props) {
 
   useEffect(() => {
     if (clientId && relationType === 'client_id') {
-      clientResolver.find(clientId).then((client) => setRelation(client));
+      // Use client from resource if available to avoid permission issues
+      if (resource && 'client' in resource && resource.client) {
+        setRelation(resource.client);
+      } else {
+        clientResolver
+          .find(clientId)
+          .then((client) => setRelation(client))
+          .catch(() => {
+            // Silently fail if user doesn't have view_client permission
+          });
+      }
     }
 
     if (vendorId && relationType === 'vendor_id') {
-      vendorResolver.find(vendorId).then((vendor) => setRelation(vendor));
+      // Use vendor from resource if available to avoid permission issues
+      if (resource && 'vendor' in resource && resource.vendor) {
+        setRelation(resource.vendor);
+      } else {
+        vendorResolver
+          .find(vendorId)
+          .then((vendor) => setRelation(vendor))
+          .catch(() => {
+            // Silently fail if user doesn't have view_vendor permission
+          });
+      }
     }
   }, [clientId, vendorId]);
 
