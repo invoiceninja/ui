@@ -44,7 +44,7 @@ export function useInvoiceTask(params?: Params) {
 
   const navigate = useNavigate();
   const numericFormatter = useNumericFormatter();
-  const getCurrencySeparators = useGetCurrencySeparators();
+  const getCurrencySeparators = useGetCurrencySeparators(undefined, undefined);
 
   const company = useCurrentCompany();
   const { data } = useBlankInvoiceQuery();
@@ -54,7 +54,7 @@ export function useInvoiceTask(params?: Params) {
 
   const setInvoice = useSetAtom(invoiceAtom);
 
-  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat();
+  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat(undefined);
 
   const calculateTaskHours = (timeLog: string, precision?: number) => {
     const parsedTimeLogs = parseTimeLog(timeLog);
@@ -115,13 +115,16 @@ export function useInvoiceTask(params?: Params) {
         invoice.project_id = tasks[0]?.project_id;
       }
 
+      // Pass the client object if available in the task relation
+      const client = tasks[0]?.client;
+
       const currencySeparators = await getCurrencySeparators(
         tasks[0]?.client_id,
         'client_id'
       );
 
       const { dateFormat: clientDateFormat, timeFormat: clientTimeFormat } =
-        await resolveDateAndTimeClientFormat(tasks[0]?.client_id);
+        await resolveDateAndTimeClientFormat(tasks[0]?.client_id, client);
 
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
