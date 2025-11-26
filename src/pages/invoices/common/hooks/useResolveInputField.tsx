@@ -245,7 +245,7 @@ export function useResolveInputField(props: Props) {
     relationType: props.relationType,
   });
 
-  const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
+  const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators, resource);
 
   useEffect(() => {
     if (resource[props.relationType]) {

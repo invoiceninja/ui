@@ -64,7 +64,18 @@ export function useHandleProductChange(props: Props) {
       }
 
       if (resource.client_id) {
-        await resolveClient.find(resource.client_id).then((client) => {
+        // Use client from resource if available to avoid permission issues
+        const clientPromise = ('client' in resource && resource.client)
+          ? Promise.resolve(resource.client)
+          : resolveClient.find(resource.client_id).catch(() => null);
+
+        await clientPromise.then((client) => {
+          if (!client) {
+            // Fall back to current price if client not available
+            lineItem.cost = currentPrice;
+            return;
+          }
+
           const clientCurrencyId = client.settings.currency_id;
 
           if (
