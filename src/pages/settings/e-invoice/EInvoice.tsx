@@ -106,7 +106,7 @@ export function EInvoice() {
     }
 
     const isPlanActive =
-      (isHosted() && (proPlan() || enterprisePlan()));
+      (isHosted());
 
     return isPlanActive && company?.settings.country_id === '724';
   };
