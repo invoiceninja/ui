@@ -118,6 +118,62 @@ export const useGenerateActivityElement = () => {
   };
 };
 
+const useCalculateNextDueDate = (recurringInvoice: RecurringInvoice | null) => {
+  const [t] = useTranslation();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  if (!recurringInvoice) {
+    return null;
+  }
+
+  if (
+    recurringInvoice.client?.settings.payment_terms &&
+    recurringInvoice.next_send_date
+  ) {
+    const nextSendDate = dayjs(recurringInvoice.next_send_date);
+    const dueDate = nextSendDate.add(
+      parseInt(recurringInvoice.client?.settings.payment_terms),
+      'days'
+    );
+
+    return `${t('terms')} ${
+      recurringInvoice.client?.settings.payment_terms
+    } ${t('days')} - ${t('due')}: ${date(dueDate.unix(), dateFormat)}`;
+  }
+
+  if (recurringInvoice.due_date_days) {
+    const dayNumber = parseInt(recurringInvoice.due_date_days);
+    const today = dayjs();
+    let nextDueDate = today.date(dayNumber);
+
+    if (nextDueDate.isBefore(today)) {
+      nextDueDate = nextDueDate.add(1, 'month');
+    }
+
+    return date(nextDueDate.unix(), dateFormat);
+  }
+
+  return null;
+};
+
+const getDaySuffix = (day: number): string => {
+  if (day >= 11 && day <= 13) {
+    return 'th';
+  }
+
+  switch (day % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+};
+
 export const RecurringInvoiceSlider = () => {
   const [isVisible, setIsSliderVisible] = useAtom(
     recurringInvoiceSliderVisibilityAtom
@@ -137,6 +193,7 @@ export const RecurringInvoiceSlider = () => {
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
   const dateTime = useDateTime({ withTimezone: true });
+  const nextDueDate = useCalculateNextDueDate(recurringInvoice);
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -305,14 +362,26 @@ export const RecurringInvoiceSlider = () => {
             </Element>
 
             <Element
+              className="border-b border-dashed"
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {recurringInvoice ? (
                 <RecurringInvoiceStatus entity={recurringInvoice} />
               ) : null}
             </Element>
+
+            {nextDueDate && (
+              <Element
+                leftSide={t('next_send_date')}
+                pushContentToRight
+                noExternalPadding
+              >
+                {nextDueDate}
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
