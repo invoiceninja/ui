@@ -24,10 +24,9 @@ import {
 import { PaymentOnCreation } from '../..';
 import { Dispatch, SetStateAction } from 'react';
 import { cloneDeep, set } from 'lodash';
-import { ErrorMessage } from '$app/components/ErrorMessage';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { FormikProps } from 'formik';
+import { TableNumberInputField } from '../components/TableNumberInputField';
 
 export interface ApplyInvoice {
   _id: string;
@@ -113,51 +112,45 @@ export function useApplyInvoiceTableColumns({
         }
 
         return (
-          <div className="flex flex-col gap-y-2 w-full">
-            <NumberInputField
-              value={
-                (isApplyPage
-                  ? formik?.values.invoices.find(
-                      (p) => p.invoice_id === invoice.id
-                    )?.amount
-                  : payment?.invoices.find((p) => p.invoice_id === invoice.id)
-                      ?.amount) || 0
-              }
-              onValueChange={(value) => {
-                if (invoiceIndex === -1) return;
+          <TableNumberInputField
+            value={
+              (isApplyPage
+                ? formik?.values.invoices.find(
+                    (p) => p.invoice_id === invoice.id
+                  )?.amount
+                : payment?.invoices.find((p) => p.invoice_id === invoice.id)
+                    ?.amount) || 0
+            }
+            onValueChange={(value) => {
+              if (invoiceIndex === -1) return;
 
-                setPayment?.((current) => {
-                  if (current) {
-                    const updatedPayment = cloneDeep(current);
+              setPayment?.((current) => {
+                if (current) {
+                  const updatedPayment = cloneDeep(current);
 
-                    set(
-                      updatedPayment,
-                      `invoices.${invoiceIndex}.amount`,
-                      isNaN(parseFloat(value)) ? 0 : parseFloat(value)
-                    );
+                  set(
+                    updatedPayment,
+                    `invoices.${invoiceIndex}.amount`,
+                    isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                  );
 
-                    return updatedPayment;
-                  }
+                  return updatedPayment;
+                }
 
-                  return current;
-                });
+                return current;
+              });
 
-                formik?.setFieldValue(
-                  `invoices.${invoiceIndex}.amount`,
-                  parseFloat(value)
-                );
-              }}
-              disabled={invoiceIndex === -1}
-            />
-
-            <ErrorMessage className="mt-2">
-              {errors?.errors[`invoices.${invoiceIndex}.amount`]}
-            </ErrorMessage>
-
-            <ErrorMessage className="mt-2">
-              {errors?.errors[`invoices.${invoiceIndex}.invoice_id`]}
-            </ErrorMessage>
-          </div>
+              formik?.setFieldValue(
+                `invoices.${invoiceIndex}.amount`,
+                parseFloat(value)
+              );
+            }}
+            disabled={invoiceIndex === -1}
+            errorMessage={[
+              ...(errors?.errors[`invoices.${invoiceIndex}.amount`] || []),
+              ...(errors?.errors[`invoices.${invoiceIndex}.invoice_id`] || []),
+            ]}
+          />
         );
       },
     },

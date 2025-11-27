@@ -22,9 +22,8 @@ import { useAllCreditColumns } from '$app/pages/credits/common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { PaymentOnCreation } from '../Create';
 import { Dispatch, SetStateAction } from 'react';
-import { ErrorMessage } from '$app/components/ErrorMessage';
 import { cloneDeep, set } from 'lodash';
-import { InputField } from '$app/components/forms';
+import { TableNumberInputField } from '../../common/components/TableNumberInputField';
 
 interface UseCreditColumnsProps {
   payment: PaymentOnCreation | undefined;
@@ -89,42 +88,36 @@ export function useCreditColumns({
         );
 
         return (
-          <div className="flex flex-col gap-y-2 w-full">
-            <InputField
-              value={
-                payment?.credits.find((p) => p.credit_id === credit.id)
-                  ?.amount || ''
-              }
-              onValueChange={(value) => {
-                if (creditIndex === -1) return;
+          <TableNumberInputField
+            value={
+              payment?.credits.find((p) => p.credit_id === credit.id)?.amount ||
+              0
+            }
+            onValueChange={(value) => {
+              if (creditIndex === -1) return;
 
-                setPayment((current) => {
-                  if (current) {
-                    const updatedPayment = cloneDeep(current);
+              setPayment((current) => {
+                if (current) {
+                  const updatedPayment = cloneDeep(current);
 
-                    set(
-                      updatedPayment,
-                      `credits.${creditIndex}.amount`,
-                      isNaN(parseFloat(value)) ? 0 : parseFloat(value)
-                    );
+                  set(
+                    updatedPayment,
+                    `credits.${creditIndex}.amount`,
+                    isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                  );
 
-                    return updatedPayment;
-                  }
+                  return updatedPayment;
+                }
 
-                  return current;
-                });
-              }}
-              disabled={creditIndex === -1}
-            />
-
-            <ErrorMessage className="mt-2">
-              {errors?.errors[`credits.${creditIndex}.amount`]}
-            </ErrorMessage>
-
-            <ErrorMessage className="mt-2">
-              {errors?.errors[`credits.${creditIndex}.credit_id`]}
-            </ErrorMessage>
-          </div>
+                return current;
+              });
+            }}
+            disabled={creditIndex === -1}
+            errorMessage={[
+              ...(errors?.errors[`credits.${creditIndex}.amount`] || []),
+              ...(errors?.errors[`credits.${creditIndex}.credit_id`] || []),
+            ]}
+          />
         );
       },
     },
