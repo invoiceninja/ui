@@ -14,14 +14,14 @@ import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
 
-export function useResolveDateAndTimeClientFormat() {
+export function useResolveDateAndTimeClientFormat<T = any>(resource?: T) {
   const company = useCurrentCompany();
   const clientResolver = useClientResolver();
   const { timeFormat } = useCompanyTimeFormat();
 
   const resolveDateFormat = useResolveDateFormat();
 
-  return async (relationId: string) => {
+  return async (relationId: string, client?: Client) => {
     const dateFormat = resolveDateFormat(company?.settings.date_format_id);
 
     const dateTimeFormats = {
@@ -30,15 +30,32 @@ export function useResolveDateAndTimeClientFormat() {
     };
 
     if (relationId.length >= 1) {
-      await clientResolver.find(relationId).then((client: Client) => {
-        if (client.settings.date_format_id) {
+      // Check if client is already available in the resource relation or passed directly
+      const clientData = client || 
+        (resource && typeof resource === 'object' && resource !== null && 'client' in resource && resource.client as Client | undefined);
+
+      if (clientData) {
+        if (clientData.settings.date_format_id) {
           dateTimeFormats.dateFormat = resolveDateFormat(
-            client.settings.date_format_id
+            clientData.settings.date_format_id
           );
         }
-
         dateTimeFormats.timeFormat = timeFormat;
-      });
+      } else {
+        // Only fetch if client not already available
+        await clientResolver.find(relationId)
+          .then((fetchedClient: Client) => {
+            if (fetchedClient.settings.date_format_id) {
+              dateTimeFormats.dateFormat = resolveDateFormat(
+                fetchedClient.settings.date_format_id
+              );
+            }
+            dateTimeFormats.timeFormat = timeFormat;
+          })
+          .catch(() => {
+            // Silently fail if user doesn't have permission - use company defaults
+          });
+      }
     }
 
     return dateTimeFormats;

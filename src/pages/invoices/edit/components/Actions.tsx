@@ -570,7 +570,15 @@ export function useActions(params?: Params) {
           actionKey="cancel_invoice"
           isCommonActionSection={!dropdown}
           tooltipText={t('cancel_invoice')}
-          onClick={() => openCancelModal(invoice.id)}
+          onClick={() => {
+            // If Verifactu is enabled, show modal to get cancellation reason
+            // Otherwise, cancel directly without modal
+            if (verifactuEnabled) {
+              openCancelModal(invoice.id);
+            } else {
+              bulk([invoice.id], 'cancel');
+            }
+          }}
           icon={MdCancel}
           disablePreventNavigation
         >
@@ -604,11 +612,13 @@ export function useActions(params?: Params) {
     actions,
     modal: (
       <>
-        <CancelInvoiceModal
-          visible={isCancelModalOpen}
-          onClose={closeCancelModal}
-          onConfirm={confirmCancel}
-        />
+        {verifactuEnabled && (
+          <CancelInvoiceModal
+            visible={isCancelModalOpen}
+            onClose={closeCancelModal}
+            onConfirm={confirmCancel}
+          />
+        )}
         <RectifyInvoiceModal
           visible={isRectifyModalOpen}
           onClose={closeRectifyModal}

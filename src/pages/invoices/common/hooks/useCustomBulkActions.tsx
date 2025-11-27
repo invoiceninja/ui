@@ -277,7 +277,6 @@ export const useCustomBulkActions = () => {
         selectedIds={selectedIds}
         selectedResources={selectedResources}
         setSelected={setSelected}
-        showCancelOption={showCancelOption}
       />
     )),
     ({ selectedResources }) => (

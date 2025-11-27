@@ -28,12 +28,15 @@ import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns'
 import { useColorScheme } from '$app/common/colors';
 import { QuoteContext } from '../create/Create';
 import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
+import { useProductQuoteColumns } from '$app/pages/invoices/common/hooks/useProductQuoteColumns';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Edit() {
   const [t] = useTranslation();
 
   const [searchParams] = useSearchParams();
 
+  const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
   const context: QuoteContext = useOutletContext();
@@ -51,6 +54,7 @@ export default function Edit() {
   const colors = useColorScheme();
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
+  const productQuoteColumns = useProductQuoteColumns();
 
   const {
     handleChange,
@@ -119,7 +123,11 @@ export default function Edit() {
                   items={quote.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Product
                   )}
-                  columns={productColumns}
+                  columns={
+                    company?.settings.sync_invoice_quote_columns
+                      ? productColumns
+                      : productQuoteColumns
+                  }
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}

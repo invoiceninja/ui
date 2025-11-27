@@ -57,10 +57,19 @@ export function ClientSelector(props: Props) {
   };
 
   useEffect(() => {
-    resource?.client_id &&
+    // Use the client data that's already included in the invoice relation
+    // instead of fetching it separately (which requires view_client permission)
+    if (resource?.client) {
+      setClient(resource.client);
+    } else if (resource?.client_id) {
+      // Only fetch if client not already included
       clientResolver
         .find(resource.client_id)
-        .then((client) => setClient(client));
+        .then((client) => setClient(client))
+        .catch(() => {
+          // Silently fail if user doesn't have view_client permission
+        });
+    }
   }, [resource?.client_id]);
 
   return (
