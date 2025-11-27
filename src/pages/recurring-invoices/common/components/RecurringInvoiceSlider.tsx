@@ -118,7 +118,7 @@ export const useGenerateActivityElement = () => {
   };
 };
 
-const useCalculateNextDueDate = (recurringInvoice: RecurringInvoice | null) => {
+const useCalculateDueDate = (recurringInvoice: RecurringInvoice | null) => {
   const [t] = useTranslation();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -127,19 +127,11 @@ const useCalculateNextDueDate = (recurringInvoice: RecurringInvoice | null) => {
     return null;
   }
 
-  if (
-    recurringInvoice.client?.settings.payment_terms &&
-    recurringInvoice.next_send_date
-  ) {
-    const nextSendDate = dayjs(recurringInvoice.next_send_date);
-    const dueDate = nextSendDate.add(
-      parseInt(recurringInvoice.client?.settings.payment_terms),
-      'days'
-    );
-
-    return `${t('terms')} ${
-      recurringInvoice.client?.settings.payment_terms
-    } ${t('days')} - ${t('due')}: ${date(dueDate.unix(), dateFormat)}`;
+  if (recurringInvoice.client?.settings.payment_terms) {
+    return {
+      label: t('payment_terms'),
+      value: `${recurringInvoice.client?.settings.payment_terms} ${t('days')}`,
+    };
   }
 
   if (recurringInvoice.due_date_days) {
@@ -151,7 +143,10 @@ const useCalculateNextDueDate = (recurringInvoice: RecurringInvoice | null) => {
       nextDueDate = nextDueDate.add(1, 'month');
     }
 
-    return date(nextDueDate.unix(), dateFormat);
+    return {
+      label: t('due_date'),
+      value: date(nextDueDate.unix(), dateFormat),
+    };
   }
 
   return null;
@@ -176,7 +171,7 @@ export const RecurringInvoiceSlider = () => {
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
   const dateTime = useDateTime({ withTimezone: true });
-  const nextDueDate = useCalculateNextDueDate(recurringInvoice);
+  const dueDate = useCalculateDueDate(recurringInvoice);
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -356,13 +351,13 @@ export const RecurringInvoiceSlider = () => {
               ) : null}
             </Element>
 
-            {nextDueDate && (
+            {dueDate && (
               <Element
-                leftSide={t('next_send_date')}
+                leftSide={dueDate.label}
                 pushContentToRight
                 noExternalPadding
               >
-                {nextDueDate}
+                {dueDate.value}
               </Element>
             )}
           </div>
