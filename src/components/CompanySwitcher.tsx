@@ -35,6 +35,8 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useColorScheme } from '$app/common/colors';
 import companySettings from '$app/common/constants/company-settings';
+import { CompanyUpdateModal } from './CompanyUpdateModal';
+import { Button } from './forms';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -73,6 +75,8 @@ export function CompanySwitcher() {
   const [shouldShowAddCompany, setShouldShowAddCompany] =
     useState<boolean>(false);
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
+    useState<boolean>(false);
+  const [isCompanyUpdateModalVisible, setIsCompanyUpdateModalVisible] =
     useState<boolean>(false);
 
   const switchCompany = (index: number) => {
@@ -138,6 +142,11 @@ export function CompanySwitcher() {
         setIsModalOpen={setIsCompanyCreateModalOpened}
       />
 
+      <CompanyUpdateModal
+        visible={isCompanyUpdateModalVisible}
+        setVisible={setIsCompanyUpdateModalVisible}
+      />
+
       <Menu
         as="div"
         className="relative inline-block text-left w-full"
@@ -191,6 +200,21 @@ export function CompanySwitcher() {
                 </div>
               </Menu.Item>
             </div>
+
+            {(isAdmin || isOwner) && (
+              <Menu.Item>
+                <div className="border-b py-2 px-2">
+                  <Button
+                    type="minimal"
+                    behavior="button"
+                    className="w-full py-1"
+                    onClick={() => setIsCompanyUpdateModalVisible(true)}
+                  >
+                    {t('update_company')}
+                  </Button>
+                </div>
+              </Menu.Item>
+            )}
 
             <div
               className="flex flex-col pb-1 pt-2 border-b"
