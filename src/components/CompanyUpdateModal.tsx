@@ -21,12 +21,13 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Modal } from '$app/components/Modal';
 import { TabGroup } from '$app/components/TabGroup';
 import { Company } from '$app/common/interfaces/company.interface';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useDispatch } from 'react-redux';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
+import { CountrySelector } from './CountrySelector';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   visible: boolean;
@@ -57,7 +58,7 @@ export function CompanyUpdateModal({ visible, setVisible }: Props) {
   };
 
   const onSave = () => {
-    if (isFormBusy) {
+    if (!isFormBusy) {
       toast.processing();
 
       setIsFormBusy(true);
@@ -94,9 +95,15 @@ export function CompanyUpdateModal({ visible, setVisible }: Props) {
     }
   }, [visible, currentCompany]);
 
+  useEffect(() => {
+    if (currentCompany && !visible && company) {
+      setCompany(cloneDeep(currentCompany));
+    }
+  }, [visible, currentCompany]);
+
   return (
     <Modal
-      title={t('edit_company')!}
+      title={t('company_details')!}
       visible={visible}
       onClose={() => setVisible(false)}
       size="extraSmall"
@@ -207,6 +214,23 @@ export function CompanyUpdateModal({ visible, setVisible }: Props) {
                 onValueChange={(value) => handleChange('settings.state', value)}
                 errorMessage={errors?.errors['settings.state']}
               />
+
+              <InputField
+                label={t('postal_code')}
+                value={company?.settings?.postal_code || ''}
+                onValueChange={(value) =>
+                  handleChange('settings.postal_code', value)
+                }
+                errorMessage={errors?.errors['settings.postal_code']}
+              />
+
+              <CountrySelector
+                label={t('country')}
+                value={company?.settings?.country_id || ''}
+                onChange={(value) => handleChange('settings.country_id', value)}
+                errorMessage={errors?.errors['settings.country_id']}
+                dismissable
+              />
             </div>
           </TabGroup>
         ) : (
@@ -214,7 +238,7 @@ export function CompanyUpdateModal({ visible, setVisible }: Props) {
         )}
 
         <div className="flex justify-end mt-2 px-4 sm:px-6">
-          <Button behavior="button" onClick={onSave}>
+          <Button behavior="button" onClick={onSave} disabled={isFormBusy}>
             {t('save')}
           </Button>
         </div>
