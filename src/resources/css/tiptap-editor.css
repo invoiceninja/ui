@@ -1,0 +1,394 @@
+/* Editor Wrapper */
+.markdown-editor-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* Toolbar */
+.markdown-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  flex-wrap: wrap;
+}
+
+/* Toolbar Button */
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  color: #374151;
+  transition: all 0.15s ease;
+}
+
+.toolbar-button:hover:not(.is-disabled) {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.toolbar-button.is-active {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.toolbar-button.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Toolbar Dropdown Trigger */
+.toolbar-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  min-width: 6rem;
+}
+
+.toolbar-dropdown-trigger:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+/* Toolbar Divider */
+.toolbar-divider {
+  width: 1px;
+  height: 1.5rem;
+  background: #e5e7eb;
+  margin: 0 0.25rem;
+}
+
+/* Font Size Input */
+.font-size-input {
+  width: 3rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #374151;
+  outline: none;
+}
+
+.font-size-input:focus {
+  border-color: #3b82f6;
+  ring: 2px;
+  ring-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Color Picker */
+.color-picker {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  padding: 0.125rem;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 0.25rem;
+}
+
+/* Editor Content */
+.markdown-editor-content {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+/* Tiptap Editor Styles */
+.tiptap {
+  outline: none;
+}
+
+.tiptap :first-child {
+  margin-top: 0;
+}
+
+.tiptap p {
+  margin: 0.5rem 0;
+}
+
+.tiptap p:first-child {
+  margin-top: 0;
+}
+
+.tiptap p:last-child {
+  margin-bottom: 0;
+}
+
+/* List styles */
+.tiptap ul,
+.tiptap ol {
+  padding: 0 1rem;
+  margin: 1.25rem 1rem 1.25rem 0.4rem;
+}
+
+.tiptap ul li,
+.tiptap ol li {
+  margin: 0.25rem 0;
+}
+
+.tiptap ul li p,
+.tiptap ol li p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Task list styles */
+.tiptap ul[data-type='taskList'] {
+  list-style: none;
+  padding: 0;
+  margin-left: 0;
+}
+
+.tiptap ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.tiptap ul[data-type='taskList'] li > label {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
+  user-select: none;
+}
+
+.tiptap ul[data-type='taskList'] li > div {
+  flex: 1 1 auto;
+}
+
+.tiptap input[type='checkbox'] {
+  cursor: pointer;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.25rem;
+}
+
+/* Heading styles */
+.tiptap h1,
+.tiptap h2,
+.tiptap h3,
+.tiptap h4,
+.tiptap h5,
+.tiptap h6 {
+  line-height: 1.1;
+  margin-top: 2.5rem;
+  text-wrap: pretty;
+}
+
+.tiptap h1,
+.tiptap h2 {
+  margin-top: 3.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tiptap h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.tiptap h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.tiptap h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.tiptap h4,
+.tiptap h5,
+.tiptap h6 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Code and preformatted text styles */
+.tiptap code {
+  background-color: #f3f4f6;
+  border-radius: 0.25rem;
+  color: #111827;
+  font-size: 0.85rem;
+  padding: 0.125rem 0.375rem;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.tiptap pre {
+  background: #1f2937;
+  border-radius: 0.5rem;
+  color: #f9fafb;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+}
+
+.tiptap pre code {
+  background: none;
+  color: inherit;
+  font-size: 0.875rem;
+  padding: 0;
+}
+
+/* Blockquote */
+.tiptap blockquote {
+  border-left: 3px solid #d1d5db;
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Horizontal rule */
+.tiptap hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 2rem 0;
+}
+
+/* Link styles */
+.tiptap a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tiptap a:hover {
+  color: #1d4ed8;
+}
+
+/* Text decorations */
+.tiptap strong {
+  font-weight: 700;
+}
+
+.tiptap em {
+  font-style: italic;
+}
+
+.tiptap u {
+  text-decoration: underline;
+}
+
+.tiptap s {
+  text-decoration: line-through;
+}
+
+.tiptap sub {
+  vertical-align: sub;
+  font-size: 0.75em;
+}
+
+.tiptap sup {
+  vertical-align: super;
+  font-size: 0.75em;
+}
+
+.tiptap mark {
+  background-color: #fef08a;
+  padding: 0.125rem 0;
+  border-radius: 0.125rem;
+}
+
+/* Text alignment */
+.tiptap .text-left {
+  text-align: left;
+}
+
+.tiptap .text-center {
+  text-align: center;
+}
+
+.tiptap .text-right {
+  text-align: right;
+}
+
+.tiptap .text-justify {
+  text-align: justify;
+}
+
+/* Placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Bubble Menu */
+.link-bubble-menu {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.bubble-button,
+.bubble-button-remove {
+  padding: 0.375rem 0.75rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bubble-button {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.bubble-button:hover {
+  background: #e5e7eb;
+}
+
+.bubble-button-remove {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.bubble-button-remove:hover {
+  background: #fecaca;
+}
+
+/* Focus state */
+.tiptap:focus {
+  outline: none;
+}
+
+/* Selection */
+.tiptap ::selection {
+  background: #dbeafe;
+}
