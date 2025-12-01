@@ -336,12 +336,23 @@ export function EInvoice() {
              <li>
                Identifíquese con <strong>Cl@ve</strong>, <strong>certificado electrónico</strong>, <strong>DNIe</strong> o <strong>eIDAS</strong>.
              </li>
+
+              <li>
+                Acceda a la página de apoderamientos de la AEAT:<br/>
+                <Link
+                  external
+                  to="https://www1.agenciatributaria.gob.es/wlpl/ITTI-APOD/ApodAltaEspecifico?"
+                >
+                  👉 Acceder a la página de apoderamientos (AEAT) →
+                </Link>
+              </li>
+
              <li>
                Elija la opción <em>“Otorgar apoderamiento”</em> e introduzca nuestro <strong>NIF: N0384863G</strong>.
              </li>
              <li>
                Seleccione el ámbito correspondiente, por ejemplo:<br/>
-               <em>“Trámites relacionados con la facturación y el envío de registros VERI*FACTU”.</em>
+               <em>IZ860 - Remisión y consulta de registros de facturación por servicio web</em>
              </li>
              <li>
                Confirme la operación y, una vez completada, envíenos el <strong>número de justificante</strong> o una
