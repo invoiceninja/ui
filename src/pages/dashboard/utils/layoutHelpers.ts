@@ -11,15 +11,119 @@
 import { Layout } from 'react-grid-layout';
 
 /**
+ * Define row groups based on Y coordinates with tolerance
+ */
+export interface RowGroup {
+  rowY: number;
+  items: Layout[];
+  maxHeight: number;
+}
+
+export function identifyRows(layout: Layout[], tolerance = 10): RowGroup[] {
+  const rowGroups: Record<number, Layout[]> = {};
+
+  // Group items by row Y position
+  layout.forEach((item) => {
+    // Skip static items and special containers
+    if (item.static || item.i === '0' || item.i === '1') {
+      return;
+    }
+
+    const existingRowKey = Object.keys(rowGroups)
+      .map(Number)
+      .find((y) => Math.abs(y - item.y) <= tolerance);
+
+    if (existingRowKey !== undefined) {
+      rowGroups[existingRowKey].push(item);
+    } else {
+      rowGroups[item.y] = [item];
+    }
+  });
+
+  // Convert to RowGroup array with max height for each row
+  return Object.entries(rowGroups).map(([y, items]) => {
+    const maxHeight = Math.max(...items.map((i) => i.h));
+    return {
+      rowY: Number(y),
+      items,
+      maxHeight,
+    };
+  });
+}
+
+/**
+ * Snap item to nearest row during drag, maintaining row heights
+ */
+export function snapToRow(
+  item: Layout,
+  rows: RowGroup[],
+  tolerance = 30
+): Layout {
+  // Find closest row
+  let closestRow: RowGroup | null = null;
+  let minDistance = Infinity;
+
+  rows.forEach((row) => {
+    const distance = Math.abs(item.y - row.rowY);
+    if (distance < minDistance && distance <= tolerance) {
+      minDistance = distance;
+      closestRow = row;
+    }
+  });
+
+  // If within tolerance of a row, snap to that row's Y and adopt its height
+  if (closestRow) {
+    return {
+      ...item,
+      y: (closestRow as RowGroup).rowY,
+      h: (closestRow as RowGroup).maxHeight,
+    };
+  }
+
+  // Otherwise, keep the item where it is
+  return item;
+}
+
+/**
+ * Enforce row constraints during drag: items must snap to rows and adopt row heights
+ */
+export function enforceRowConstraints(layout: Layout[]): Layout[] {
+  // Identify current rows
+  const rows = identifyRows(layout);
+
+  // For each item, snap to nearest row
+  return layout.map((item) => {
+    // Skip static items and special containers
+    if (item.static || item.i === '0' || item.i === '1') {
+      return item;
+    }
+
+    return snapToRow(item, rows);
+  });
+}
+
+/**
  * Compact a layout vertically by moving items up to fill gaps
  */
-export function compactLayout(layout: Layout[]): Layout[] {
+export function compactLayout(layout: Layout[], preserveRowHeights = true): Layout[] {
+  // Store original row information before compaction
+  const rowHeightMap = new Map<string, number>();
+  
+  if (preserveRowHeights) {
+    const rows = identifyRows(layout);
+    rows.forEach((row) => {
+      row.items.forEach((item) => {
+        rowHeightMap.set(item.i, row.maxHeight);
+      });
+    });
+  }
+
   const sortedLayout = [...layout].sort((a, b) => {
     if (a.y === b.y) return a.x - b.x;
     return a.y - b.y;
   });
 
-  return sortedLayout.map((item) => {
+  const compacted = sortedLayout.map((item) => {
     // Don't compact static items
     if (item.static) return item;
 
@@ -47,8 +151,17 @@ export function compactLayout(layout: Layout[]): Layout[] {
       }
     }
 
-    return { ...item, y: newY };
+    const result = { ...item, y: newY };
+    
+    // Restore original height if preserving row heights
+    if (preserveRowHeights && rowHeightMap.has(item.i)) {
+      result.h = rowHeightMap.get(item.i)!;
+    }
+    
+    return result;
   });
+
+  return compacted;
 }
 
 /**

@@ -69,6 +69,7 @@ import {
   compactLayout,
   normalizeRowHeights,
   enforceConstraints,
+  enforceRowConstraints,
 } from '../utils/layoutHelpers';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -1114,10 +1115,14 @@ export function ResizableDashboardCards() {
   const onDragStop = (layout: GridLayout.Layout[]) => {
     if (!layoutBreakpoint) return;
 
-    // Apply layout improvements: normalize row heights and compact
+    // Apply row constraints first to snap items to rows
     let updatedLayout = cloneDeep(layout);
-    updatedLayout = normalizeRowHeights(updatedLayout);
-    updatedLayout = compactLayout(updatedLayout);
+    
+    // Enforce row constraints - snap to rows and preserve row heights
+    updatedLayout = enforceRowConstraints(updatedLayout);
+    
+    // Compact vertically while preserving row heights
+    updatedLayout = compactLayout(updatedLayout, true);
 
     setLayouts((current) => ({
       ...current,
