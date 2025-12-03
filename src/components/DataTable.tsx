@@ -223,6 +223,12 @@ export function DataTable<T extends object>(props: Props<T>) {
   const options = useDataTableOptions();
   const reactSettings = useReactSettings();
 
+  // Memoize style object to prevent MemoizedTr prop changes
+  const tableBorderStyle = useMemo(
+    () => ({ borderColor: colors.$20 }),
+    [colors.$20]
+  );
+
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
@@ -915,11 +921,9 @@ export function DataTable<T extends object>(props: Props<T>) {
           {isEqual(currentData, data?.data?.data) &&
             currentData.map((resource: any, rowIndex: number) => (
               <MemoizedTr
-                key={rowIndex}
+                key={resource.id || rowIndex}
                 className="border-b table-row"
-                style={{
-                  borderColor: colors.$20,
-                }}
+                style={tableBorderStyle}
                 resource={resource}
                 memoValue={props.columns}
                 withoutBackgroundColor
