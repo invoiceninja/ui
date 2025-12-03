@@ -14,6 +14,9 @@ import { Button, InputField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 import {
+  type ConsentContinueButtonProps,
+  type ConsentDownloadButtonProps,
+  type ConsentScreenProps,
   type DateInputProps,
   type MinimizeButtonProps,
   type NavigateButtonProps,
@@ -73,6 +76,11 @@ export default function Index() {
             },
             previous: Previous,
             next: Next,
+            consent: {
+              screen: ConsentScreen,
+              download: ConsentDownloadButton,
+              continue: ConsentContinueButton,
+            },
           },
           styles: {
             border: colors.$24,
@@ -331,5 +339,74 @@ function Next({ onClick, disabled }: NavigateButtonProps) {
     >
       <Icon element={ChevronRight} className="w-7 h-7" />
     </Div>
+  );
+}
+
+function ConsentScreen({ onCheckboxChange }: ConsentScreenProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  return (
+    <div className="flex flex-col items-center text-center max-w-xl">
+      <h1
+        className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0"
+        style={{ color: colors.$3 }}
+      >
+        {t('consent')}
+      </h1>
+
+      <p className="leading-7" style={{ color: colors.$3 }}>
+        {t('consent_description')}
+      </p>
+
+      <div className="flex items-center gap-3 mb-3 mt-16">
+        <input
+          type="checkbox"
+          id="consent-checkbox"
+          onChange={(e) => onCheckboxChange(e.target.checked)}
+          className="w-4 h-4 rounded border"
+          style={{
+            borderColor: colors.$24,
+            accentColor: colors.$5,
+          }}
+        />
+        <label
+          htmlFor="consent-checkbox"
+          className="text-sm"
+          style={{ color: colors.$3 }}
+        >
+          {t('consent_checkbox_label')}
+        </label>
+      </div>
+    </div>
+  );
+}
+
+function ConsentContinueButton({
+  onClick,
+  disabled,
+}: ConsentContinueButtonProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button
+      type="primary"
+      behavior="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full"
+    >
+      {t('continue_to_document')}
+    </Button>
+  );
+}
+
+function ConsentDownloadButton({ onClick }: ConsentDownloadButtonProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button type="secondary" behavior="button" onClick={onClick}>
+      {t('download_document_before_continuing')}
+    </Button>
   );
 }
