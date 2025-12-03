@@ -20,6 +20,7 @@
     "@tiptap/extension-color": "^3.11.1",
     "@tiptap/extension-font-family": "^3.11.1",
     "@tiptap/extension-highlight": "^3.11.1",
+    "@tiptap/extension-image": "^3.12.1",
     "@tiptap/extension-link": "^3.11.1",
     "@tiptap/extension-placeholder": "^3.11.1",
     "@tiptap/extension-strike": "^3.11.1",

@@ -10,7 +10,6 @@ import {
   FaLink,
   FaUnlink,
   FaQuoteRight,
-  FaCode,
   FaAlignLeft,
   FaAlignCenter,
   FaAlignRight,
@@ -21,8 +20,11 @@ import {
   FaFont,
   FaTextHeight,
   FaChevronDown,
+  FaImage,
+  FaFileCode,
 } from 'react-icons/fa';
-import { MdFormatListBulleted } from 'react-icons/md';
+import { MdFormatListBulleted, MdFormatListNumbered } from 'react-icons/md';
+import { PiPencilSimpleFill } from 'react-icons/pi';
 
 import Color from '@tiptap/extension-color';
 import FontFamily from '@tiptap/extension-font-family';
@@ -37,14 +39,17 @@ import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import Image from '@tiptap/extension-image';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Extension } from '@tiptap/core';
 
-import { InputLabel } from './forms';
+import { InputLabel, InputField, Button } from './forms';
 import { Icon } from './icons/Icon';
+import { Modal } from './Modal';
 import { useColorScheme } from '$app/common/colors';
 import { useTranslation } from 'react-i18next';
+import { useDebounce } from 'react-use';
 
 interface ThemeProps {
   backgroundColor: string;
@@ -86,17 +91,11 @@ interface TipTapEditorProps {
   minHeight?: string;
 }
 
-interface BubbleMenuProps {
-  editor: Editor;
-  children: React.ReactNode;
-}
-
 interface ToolbarButtonProps {
   onClick: () => void;
   isActive?: boolean;
   disabled?: boolean;
   children: React.ReactNode;
-  title?: string;
 }
 
 interface DropdownProps {
@@ -109,6 +108,7 @@ interface ColorPickerProps {
   color: string;
   onChange: (color: string) => void;
   title?: string;
+  icon?: React.ReactNode;
 }
 
 const ToolbarSection = styled.div`
@@ -229,6 +229,8 @@ const DropdownMenu = styled.div<{ theme: ThemeProps }>`
   z-index: 1000;
   padding: 4px 0;
   animation: dropdownFade 0.2s ease;
+  max-height: 400px;
+  overflow-y: auto;
 
   @keyframes dropdownFade {
     from {
@@ -270,8 +272,28 @@ const DropdownItemIcon = styled.span`
 
 const ColorPickerWrapper = styled.div`
   position: relative;
+  display: inline-flex;
+  align-items: center;
+`;
+
+const ColorPickerButton = styled.button<{ theme: ThemeProps }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   width: 32px;
   height: 32px;
+  padding: 0;
+  border: 1px solid ${(props) => props.theme.borderColor};
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    background: ${(props) => props.theme.hoverColor};
+  }
 `;
 
 const ColorPickerInput = styled.input`
@@ -283,12 +305,27 @@ const ColorPickerInput = styled.input`
   z-index: 1;
 `;
 
-const ColorPickerPreview = styled.div<{ theme: ThemeProps; color: string }>`
-  width: 100%;
-  height: 100%;
-  border-radius: 6px;
-  border: 1px solid ${(props) => props.theme.borderColor};
-  background: ${(props) => props.color};
+const ColorIconWrapper = styled.div<{ color: string }>`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  .icon-letter {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .icon-underline {
+    width: 16px;
+    height: 3px;
+    background: ${(props) => props.color};
+    border-radius: 1px;
+    margin-top: 1px;
+  }
 `;
 
 const EditorWrapper = styled.div<{ theme: ThemeProps }>`
@@ -338,6 +375,22 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
     ol {
       padding-left: 1.5em;
       margin: 1em 0;
+
+      li {
+        color: ${(props) => props.theme.textColor};
+
+        &::marker {
+          color: ${(props) => props.theme.textColor};
+        }
+      }
+    }
+
+    ul {
+      list-style-type: disc;
+    }
+
+    ol {
+      list-style-type: decimal;
     }
 
     blockquote {
@@ -367,6 +420,13 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
       color: ${(props) => props.theme.linkColor};
       text-decoration: underline;
       cursor: pointer;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin: 1em 0;
     }
 
     table {
@@ -410,131 +470,8 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
   }
 `;
 
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-`;
-
-const LinkModal = styled.div<{ theme: ThemeProps }>`
-  background: ${(props) => props.theme.backgroundColor};
-  border-radius: 8px;
-  padding: 20px;
-  min-width: 400px;
-  border: 1px solid ${(props) => props.theme.borderColor};
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-
-  h3 {
-    margin: 0 0 16px;
-    color: ${(props) => props.theme.textColor};
-    font-size: 18px;
-  }
-
-  @media (max-width: 768px) {
-    min-width: 90%;
-    margin: 20px;
-  }
-`;
-
-const LinkInput = styled.input<{ theme: ThemeProps }>`
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid ${(props) => props.theme.borderColor};
-  border-radius: 6px;
-  background: ${(props) => props.theme.backgroundColor};
-  color: ${(props) => props.theme.textColor};
-  font-size: 14px;
-  margin-bottom: 20px;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props) => props.theme.buttonBackgroundColor};
-  }
-`;
-
-const ModalActions = styled.div`
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-`;
-
-const Button = styled.button<{ theme: ThemeProps }>`
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-
-  ${({ theme }) => {
-    if (theme.variant === 'primary') {
-      return `
-        background: ${theme.buttonBackgroundColor};
-        color: ${theme.backgroundColor};
-        
-        &:hover {
-          opacity: 0.9;
-        }
-      `;
-    } else if (theme.variant === 'secondary') {
-      return `
-        background: transparent;
-        color: ${theme.textColor};
-        border: 1px solid ${theme.borderColor};
-        
-        &:hover {
-          background: ${theme.hoverColor};
-        }
-      `;
-    } else if (theme.variant === 'danger') {
-      return `
-        background: #ef4444;
-        color: white;
-        
-        &:hover {
-          opacity: 0.9;
-        }
-      `;
-    }
-  }}
-`;
-
-const BubbleMenuContainer = styled.div<{ theme: ThemeProps }>`
-  display: flex;
-  gap: 4px;
-  padding: 6px;
-  background: ${(props) => props.theme.backgroundColor};
-  border: 1px solid ${(props) => props.theme.borderColor};
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: dropdownFade 0.2s ease;
-`;
-
-const BubbleButton = styled.button<{ theme: ThemeProps }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: ${({ theme }) => (theme.isDanger ? '#ef4444' : theme.textColor)};
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${({ theme }) =>
-      theme.isDanger ? 'rgba(239, 68, 68, 0.1)' : theme.hoverColor};
-  }
+const HiddenFileInput = styled.input`
+  display: none;
 `;
 
 const FontSize = Extension.create({
@@ -584,83 +521,58 @@ const FontSize = Extension.create({
   },
 });
 
-function BubbleMenu({ editor, children }: BubbleMenuProps) {
-  const colors = useColorScheme();
-  const [visible, setVisible] = useState<boolean>(false);
-  const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
-
-  useEffect(() => {
-    if (!editor) return;
-
-    const update = () => {
-      const { from, to } = editor.state.selection;
-      const shouldShow = from !== to && editor.isActive('link');
-
-      if (shouldShow) {
-        const { view } = editor;
-        const { state } = view;
-        const { selection } = state;
-        const { $from, $to } = selection;
-        const start = view.coordsAtPos($from.pos);
-        const end = view.coordsAtPos($to.pos);
-
-        setPosition({
-          x: (start.left + end.left) / 2,
-          y: start.top - 40,
-        });
-      }
-
-      setVisible(shouldShow);
+const BackgroundColor = Extension.create({
+  name: 'backgroundColor',
+  addOptions() {
+    return {
+      types: ['textStyle'],
     };
-
-    editor.on('selectionUpdate', update);
-    return () => {
-      editor.off('selectionUpdate', update);
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          backgroundColor: {
+            default: null,
+            parseHTML: (element: HTMLElement) => element.style.backgroundColor,
+            renderHTML: (attributes: { backgroundColor?: string }) => {
+              if (!attributes.backgroundColor) {
+                return {};
+              }
+              return {
+                style: `background-color: ${attributes.backgroundColor}`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setBackgroundColor:
+        (backgroundColor: string) =>
+        ({ chain }: { chain: () => any }) => {
+          return chain().setMark('textStyle', { backgroundColor }).run();
+        },
+      unsetBackgroundColor:
+        () =>
+        ({ chain }: { chain: () => any }) => {
+          return chain()
+            .setMark('textStyle', { backgroundColor: null })
+            .removeEmptyTextStyle()
+            .run();
+        },
     };
-  }, [editor]);
-
-  if (!visible || !editor) return null;
-
-  const theme: ThemeProps = {
-    backgroundColor: colors.$1,
-    toolbarBackground: colors.$2,
-    textColor: colors.$3,
-    borderColor: colors.$24,
-    iconColor: colors.$16,
-    placeholderColor: colors.$17,
-    buttonBackgroundColor: colors.$18,
-    lightBorderColor: colors.$19,
-    dropdownHoverColor: colors.$20,
-    dividerColor: colors.$21,
-    labelColor: colors.$22,
-    contentBackground: colors.$23,
-    hoverColor: colors.$25,
-    linkColor: colors.$18,
-  };
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        transform: 'translateX(-50%)',
-      }}
-    >
-      <BubbleMenuContainer theme={theme}>{children}</BubbleMenuContainer>
-    </div>
-  );
-}
+  },
+});
 
 function ToolbarButtonComponent({
   onClick,
   isActive,
   disabled,
   children,
-  title,
 }: ToolbarButtonProps) {
   const colors = useColorScheme();
 
@@ -687,7 +599,6 @@ function ToolbarButtonComponent({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      title={title}
       theme={theme}
     >
       {children}
@@ -794,7 +705,12 @@ function DropdownComponent({ label, icon, items }: DropdownProps) {
   );
 }
 
-function ColorPickerComponent({ color, onChange, title }: ColorPickerProps) {
+function ColorPickerComponent({
+  color,
+  onChange,
+  title,
+  type = 'text',
+}: ColorPickerProps & { type?: 'text' | 'background' }) {
   const colors = useColorScheme();
 
   const theme: ThemeProps = {
@@ -816,13 +732,28 @@ function ColorPickerComponent({ color, onChange, title }: ColorPickerProps) {
 
   return (
     <ColorPickerWrapper>
-      <ColorPickerInput
-        type="color"
-        value={color}
-        onChange={(e) => onChange(e.target.value)}
-        title={title}
-      />
-      <ColorPickerPreview color={color} theme={theme} />
+      <ColorPickerButton theme={theme} title={title}>
+        <ColorPickerInput
+          type="color"
+          value={color}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {type === 'text' ? (
+          <ColorIconWrapper color={color}>
+            <span className="icon-letter">A</span>
+            <div className="icon-underline" />
+          </ColorIconWrapper>
+        ) : (
+          <ColorIconWrapper color={color}>
+            <Icon
+              element={PiPencilSimpleFill}
+              size={16}
+              style={{ color: colors.$3 }}
+            />
+            <div className="icon-underline" />
+          </ColorIconWrapper>
+        )}
+      </ColorPickerButton>
     </ColorPickerWrapper>
   );
 }
@@ -837,13 +768,16 @@ export function TipTapEditor({
   minHeight = '12.5rem',
 }: TipTapEditorProps) {
   const [t] = useTranslation();
-
   const colors = useColorScheme();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [currentValue, setCurrentValue] = useState<string | undefined>();
   const [linkUrl, setLinkUrl] = useState<string>('');
+  const [htmlCode, setHtmlCode] = useState<string>('');
+  const [htmlModal, setHtmlModal] = useState<boolean>(false);
   const [linkModal, setLinkModal] = useState<boolean>(false);
   const [textColor, setTextColor] = useState<string>('#000000');
-  const [highlightColor, setHighlightColor] = useState<string>('#FFFF00');
+  const [backgroundColor, setBackgroundColor] = useState<string>('#FFFF00');
 
   const editor = useEditor({
     extensions: [
@@ -861,6 +795,14 @@ export function TipTapEditor({
           target: '_blank',
           rel: 'noopener noreferrer',
         },
+        validate: (href) => /^https?:\/\//.test(href),
+      }),
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+        HTMLAttributes: {
+          class: 'editor-image',
+        },
       }),
       Underline,
       Strike,
@@ -874,6 +816,7 @@ export function TipTapEditor({
       }),
       TextStyle,
       Color,
+      BackgroundColor,
       FontFamily,
       FontSize,
       TaskList,
@@ -881,12 +824,26 @@ export function TipTapEditor({
         nested: true,
       }),
     ],
-    content: value,
+    content: currentValue,
     editable: !disabled,
-    onUpdate: ({ editor }) => {
-      onValueChange(editor.getHTML());
-    },
+    onUpdate: ({ editor }) => setCurrentValue(editor.getHTML()),
   });
+
+  useDebounce(
+    () => {
+      if (typeof currentValue === 'string') {
+        onValueChange(currentValue);
+      }
+    },
+    500,
+    [currentValue]
+  );
+
+  useEffect(() => {
+    if (typeof value === 'string' && typeof currentValue === 'undefined') {
+      editor?.commands.setContent(value);
+    }
+  }, [value]);
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
@@ -894,21 +851,79 @@ export function TipTapEditor({
     }
   }, [value, editor]);
 
+  const openLinkModal = useCallback(() => {
+    if (!editor) return;
+    const url = editor.getAttributes('link').href;
+    setLinkUrl(url || '');
+    setLinkModal(true);
+  }, [editor]);
+
   const insertLink = useCallback(() => {
     if (!editor) return;
 
     if (linkUrl) {
+      // Validate URL format
+      let finalUrl = linkUrl.trim();
+
+      // If URL doesn't start with http:// or https://, add https://
+      if (!/^https?:\/\//i.test(finalUrl)) {
+        finalUrl = `https://${finalUrl}`;
+      }
+
       editor
         .chain()
         .focus()
         .extendMarkRange('link')
-        .setLink({ href: linkUrl })
+        .setLink({ href: finalUrl })
         .run();
     }
 
     setLinkModal(false);
     setLinkUrl('');
   }, [editor, linkUrl]);
+
+  const removeLink = useCallback(() => {
+    if (!editor) return;
+    editor.chain().focus().unsetLink().run();
+    setLinkModal(false);
+    setLinkUrl('');
+  }, [editor]);
+
+  const handleImageUpload = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (!editor) return;
+
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const src = e.target?.result as string;
+        if (src) {
+          editor.chain().focus().setImage({ src }).run();
+        }
+      };
+      reader.readAsDataURL(file);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    },
+    [editor]
+  );
+
+  const openHtmlEditor = useCallback(() => {
+    if (!editor) return;
+    setHtmlCode(editor.getHTML());
+    setHtmlModal(true);
+  }, [editor]);
+
+  const applyHtmlCode = useCallback(() => {
+    if (!editor) return;
+    editor.commands.setContent(htmlCode);
+    onValueChange(htmlCode);
+    setHtmlModal(false);
+  }, [editor, htmlCode, onValueChange]);
 
   const setFontSize = useCallback(
     (size: string) => {
@@ -930,6 +945,21 @@ export function TipTapEditor({
     [editor]
   );
 
+  // Get current font size from editor
+  const getCurrentFontSize = useCallback((): string => {
+    if (!editor) return '14px';
+
+    const { $from } = editor.state.selection;
+    const marks = $from.marks();
+    const textStyleMark = marks.find((mark) => mark.type.name === 'textStyle');
+
+    if (textStyleMark && textStyleMark.attrs.fontSize) {
+      return textStyleMark.attrs.fontSize;
+    }
+
+    return '14px';
+  }, [editor]);
+
   if (!editor) return null;
 
   function getFormatLabel(): string {
@@ -943,17 +973,9 @@ export function TipTapEditor({
     return 'Paragraph';
   }
 
-  function getAlignmentLabel(): string {
-    if (editor.isActive({ textAlign: 'left' })) return t('left');
-    if (editor.isActive({ textAlign: 'center' })) return t('center');
-    if (editor.isActive({ textAlign: 'right' })) return t('right');
-    if (editor.isActive({ textAlign: 'justify' })) return t('justify');
-    return t('align');
-  }
-
   const theme: ThemeProps = {
     backgroundColor: colors.$1,
-    toolbarBackground: colors.$2,
+    toolbarBackground: colors.$1,
     textColor: colors.$3,
     borderColor: colors.$24,
     iconColor: colors.$16,
@@ -1058,63 +1080,6 @@ export function TipTapEditor({
     { label: '48pt', value: '48pt', onClick: () => setFontSize('48pt') },
   ];
 
-  const listItems: DropdownItem[] = [
-    {
-      label: t('bullet_list'),
-      value: 'bullet',
-      onClick: () => editor.chain().focus().toggleBulletList().run(),
-    },
-    {
-      label: t('numbered_list'),
-      value: 'numbered',
-      onClick: () => editor.chain().focus().toggleOrderedList().run(),
-    },
-    {
-      label: t('check_list'),
-      value: 'tasks',
-      onClick: () => editor.chain().focus().toggleTaskList().run(),
-    },
-  ];
-
-  const alignItems: DropdownItem[] = [
-    {
-      label: t('align_left'),
-      value: 'left',
-      icon: (
-        <Icon element={FaAlignLeft} size={14} style={{ color: colors.$16 }} />
-      ),
-      onClick: () => editor.chain().focus().setTextAlign('left').run(),
-    },
-    {
-      label: t('align_center'),
-      value: 'center',
-      icon: (
-        <Icon element={FaAlignCenter} size={14} style={{ color: colors.$16 }} />
-      ),
-      onClick: () => editor.chain().focus().setTextAlign('center').run(),
-    },
-    {
-      label: t('align_right'),
-      value: 'right',
-      icon: (
-        <Icon element={FaAlignRight} size={14} style={{ color: colors.$16 }} />
-      ),
-      onClick: () => editor.chain().focus().setTextAlign('right').run(),
-    },
-    {
-      label: t('justify'),
-      value: 'justify',
-      icon: (
-        <Icon
-          element={FaAlignJustify}
-          size={14}
-          style={{ color: colors.$16 }}
-        />
-      ),
-      onClick: () => editor.chain().focus().setTextAlign('justify').run(),
-    },
-  ];
-
   return (
     <EditorContainer theme={theme} className={parentBoxClassName}>
       {label && (
@@ -1129,14 +1094,14 @@ export function TipTapEditor({
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
           >
-            <Icon element={FaUndo} size={14} style={{ color: colors.$16 }} />
+            <Icon element={FaUndo} size={13.5} style={{ color: colors.$3 }} />
           </ToolbarButtonComponent>
 
           <ToolbarButtonComponent
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
           >
-            <Icon element={FaRedo} size={14} style={{ color: colors.$16 }} />
+            <Icon element={FaRedo} size={13.5} style={{ color: colors.$3 }} />
           </ToolbarButtonComponent>
 
           <ToolbarDividerComponent />
@@ -1149,7 +1114,7 @@ export function TipTapEditor({
               <Icon
                 element={FaParagraph}
                 size={14}
-                style={{ color: colors.$16 }}
+                style={{ color: colors.$3 }}
               />
             }
             items={formatItems}
@@ -1162,18 +1127,18 @@ export function TipTapEditor({
           <DropdownComponent
             label="Font"
             icon={
-              <Icon element={FaFont} size={14} style={{ color: colors.$16 }} />
+              <Icon element={FaFont} size={14} style={{ color: colors.$3 }} />
             }
             items={fontFamilyItems}
           />
 
           <DropdownComponent
-            label="14px"
+            label={getCurrentFontSize()}
             icon={
               <Icon
                 element={FaTextHeight}
                 size={14}
-                style={{ color: colors.$16 }}
+                style={{ color: colors.$3 }}
               />
             }
             items={fontSizeItems}
@@ -1187,14 +1152,14 @@ export function TipTapEditor({
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={editor.isActive('bold')}
           >
-            <Icon element={FaBold} size={14} style={{ color: colors.$16 }} />
+            <Icon element={FaBold} size={14} style={{ color: colors.$3 }} />
           </ToolbarButtonComponent>
 
           <ToolbarButtonComponent
             onClick={() => editor.chain().focus().toggleItalic().run()}
             isActive={editor.isActive('italic')}
           >
-            <Icon element={FaItalic} size={14} style={{ color: colors.$16 }} />
+            <Icon element={FaItalic} size={14} style={{ color: colors.$3 }} />
           </ToolbarButtonComponent>
 
           <ToolbarButtonComponent
@@ -1204,7 +1169,7 @@ export function TipTapEditor({
             <Icon
               element={FaUnderline}
               size={14}
-              style={{ color: colors.$16 }}
+              style={{ color: colors.$3 }}
             />
           </ToolbarButtonComponent>
 
@@ -1215,7 +1180,7 @@ export function TipTapEditor({
             <Icon
               element={FaStrikethrough}
               size={14}
-              style={{ color: colors.$16 }}
+              style={{ color: colors.$3 }}
             />
           </ToolbarButtonComponent>
           <ToolbarDividerComponent />
@@ -1229,7 +1194,7 @@ export function TipTapEditor({
             <Icon
               element={FaSubscript}
               size={14}
-              style={{ color: colors.$16 }}
+              style={{ color: colors.$3 }}
             />
           </ToolbarButtonComponent>
 
@@ -1240,7 +1205,7 @@ export function TipTapEditor({
             <Icon
               element={FaSuperscript}
               size={14}
-              style={{ color: colors.$16 }}
+              style={{ color: colors.$3 }}
             />
           </ToolbarButtonComponent>
           <ToolbarDividerComponent />
@@ -1253,31 +1218,92 @@ export function TipTapEditor({
               setTextColor(color);
               editor.chain().focus().setColor(color).run();
             }}
+            type="text"
           />
 
           <ColorPickerComponent
-            color={highlightColor}
+            color={backgroundColor}
             onChange={(color) => {
-              setHighlightColor(color);
-              editor.chain().focus().toggleHighlight({ color }).run();
+              setBackgroundColor(color);
+              editor.chain().focus().setBackgroundColor(color).run();
             }}
+            type="background"
           />
 
           <ToolbarDividerComponent />
         </div>
 
-        <ToolbarSection className="flex items-center gap-2">
-          <DropdownComponent
-            label={t('lists')}
-            icon={
-              <Icon
-                element={MdFormatListBulleted}
-                size={14}
-                style={{ color: colors.$16 }}
-              />
-            }
-            items={listItems}
-          />
+        <ToolbarSection>
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            isActive={editor.isActive('bulletList')}
+          >
+            <Icon
+              element={MdFormatListBulleted}
+              size={18}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
+
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            isActive={editor.isActive('orderedList')}
+          >
+            <Icon
+              element={MdFormatListNumbered}
+              size={18}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
+
+          <ToolbarDividerComponent />
+        </ToolbarSection>
+
+        <ToolbarSection>
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+            isActive={editor.isActive({ textAlign: 'left' })}
+          >
+            <Icon
+              element={FaAlignLeft}
+              size={14}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
+
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+            isActive={editor.isActive({ textAlign: 'center' })}
+          >
+            <Icon
+              element={FaAlignCenter}
+              size={14}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
+
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+            isActive={editor.isActive({ textAlign: 'right' })}
+          >
+            <Icon
+              element={FaAlignRight}
+              size={14}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
+
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+            isActive={editor.isActive({ textAlign: 'justify' })}
+          >
+            <Icon
+              element={FaAlignJustify}
+              size={14}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
+
           <ToolbarDividerComponent />
         </ToolbarSection>
 
@@ -1288,57 +1314,51 @@ export function TipTapEditor({
           >
             <Icon
               element={FaQuoteRight}
-              size={14}
-              style={{ color: colors.$16 }}
+              size={13.5}
+              style={{ color: colors.$3 }}
             />
           </ToolbarButtonComponent>
 
-          <ToolbarButtonComponent
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            isActive={editor.isActive('codeBlock')}
-          >
-            <Icon element={FaCode} size={14} style={{ color: colors.$16 }} />
-          </ToolbarButtonComponent>
           <ToolbarDividerComponent />
         </ToolbarSection>
 
         <ToolbarSection>
           <ToolbarButtonComponent
-            onClick={() => {
-              const url = editor.getAttributes('link').href;
-              setLinkUrl(url || '');
-              setLinkModal(true);
-            }}
+            onClick={openLinkModal}
             isActive={editor.isActive('link')}
           >
-            <Icon element={FaLink} size={14} style={{ color: colors.$16 }} />
+            <Icon element={FaLink} size={14} style={{ color: colors.$3 }} />
           </ToolbarButtonComponent>
+
           {editor.isActive('link') && (
-            <ToolbarButtonComponent
-              onClick={() => editor.chain().focus().unsetLink().run()}
-            >
-              <Icon
-                element={FaUnlink}
-                size={14}
-                style={{ color: colors.$16 }}
-              />
+            <ToolbarButtonComponent onClick={removeLink}>
+              <Icon element={FaUnlink} size={14} style={{ color: colors.$3 }} />
             </ToolbarButtonComponent>
           )}
           <ToolbarDividerComponent />
         </ToolbarSection>
 
         <ToolbarSection>
-          <DropdownComponent
-            label={getAlignmentLabel()}
-            icon={
-              <Icon
-                element={FaAlignLeft}
-                size={14}
-                style={{ color: colors.$16 }}
-              />
-            }
-            items={alignItems}
+          <HiddenFileInput
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
           />
+          <ToolbarButtonComponent onClick={() => fileInputRef.current?.click()}>
+            <Icon element={FaImage} size={16} style={{ color: colors.$3 }} />
+          </ToolbarButtonComponent>
+          <ToolbarDividerComponent />
+        </ToolbarSection>
+
+        <ToolbarSection>
+          <ToolbarButtonComponent onClick={openHtmlEditor}>
+            <Icon
+              element={FaFileCode}
+              size={15.5}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
         </ToolbarSection>
       </EditorToolbar>
 
@@ -1346,71 +1366,57 @@ export function TipTapEditor({
         <EditorContent editor={editor} />
       </EditorWrapper>
 
-      {linkModal && (
-        <ModalOverlay>
-          <LinkModal theme={theme}>
-            <h3>{t('insert_link')}</h3>
+      <Modal
+        title={t('insert_link')}
+        visible={linkModal}
+        onClose={() => setLinkModal(false)}
+      >
+        <InputField
+          label={t('url')}
+          value={linkUrl}
+          onValueChange={(value) => setLinkUrl(value)}
+          placeholder="https://example.com"
+        />
 
-            <LinkInput
-              type="url"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://example.com"
-              theme={theme}
-            />
-            <ModalActions>
-              <Button
-                type="button"
-                onClick={() => setLinkModal(false)}
-                theme={{ ...theme, variant: 'secondary' }}
-              >
-                {t('cancel')}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  editor.chain().focus().unsetLink().run();
-                  setLinkModal(false);
-                }}
-                theme={{ ...theme, variant: 'danger' }}
-              >
-                {t('remove')}
-              </Button>
-              <Button
-                type="button"
-                onClick={insertLink}
-                theme={{ ...theme, variant: 'primary' }}
-              >
-                {t('apply')}
-              </Button>
-            </ModalActions>
-          </LinkModal>
-        </ModalOverlay>
-      )}
+        <div className="flex gap-2 justify-end mt-4">
+          <Button type="minimal" onClick={() => setLinkModal(false)}>
+            {t('cancel')}
+          </Button>
 
-      <BubbleMenu editor={editor}>
-        <BubbleButton
-          type="button"
-          onClick={() => {
-            const url = editor.getAttributes('link').href;
-            setLinkUrl(url || '');
-            setLinkModal(true);
-          }}
-          theme={theme}
-        >
-          <Icon element={FaLink} size={14} style={{ color: colors.$16 }} />{' '}
-          {t('edit_link')}
-        </BubbleButton>
+          {editor.isActive('link') && (
+            <Button
+              type="minimal"
+              onClick={removeLink}
+              style={{ color: '#ef4444' }}
+            >
+              {t('remove')}
+            </Button>
+          )}
 
-        <BubbleButton
-          type="button"
-          onClick={() => editor.chain().focus().unsetLink().run()}
-          theme={{ ...theme, isDanger: true }}
-        >
-          <Icon element={FaUnlink} size={14} style={{ color: '#ef4444' }} />{' '}
-          {t('remove_link')}
-        </BubbleButton>
-      </BubbleMenu>
+          <Button onClick={insertLink}>{t('apply')}</Button>
+        </div>
+      </Modal>
+
+      <Modal
+        title={t('source_code')}
+        visible={htmlModal}
+        onClose={() => setHtmlModal(false)}
+        size="regular"
+      >
+        <InputField
+          element="textarea"
+          value={htmlCode}
+          onValueChange={(value) => setHtmlCode(value)}
+        />
+
+        <div className="flex gap-2 justify-end mt-4">
+          <Button type="minimal" onClick={() => setHtmlModal(false)}>
+            {t('cancel')}
+          </Button>
+
+          <Button onClick={applyHtmlCode}>{t('apply')}</Button>
+        </div>
+      </Modal>
     </EditorContainer>
   );
 }
