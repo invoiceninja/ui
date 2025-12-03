@@ -65,6 +65,11 @@ import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 import { MdDragHandle } from 'react-icons/md';
+import {
+  compactLayout,
+  normalizeRowHeights,
+  enforceConstraints,
+} from '../utils/layoutHelpers';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -1088,18 +1093,20 @@ export function ResizableDashboardCards() {
     newItem: GridLayout.Layout
   ) => {
     if (layoutBreakpoint) {
+      // Enforce constraints and normalize row heights
+      let updatedLayout = layout.map((item) => {
+        if (item.i === newItem.i) {
+          return newItem;
+        }
+        return item;
+      });
+
+      updatedLayout = enforceConstraints(updatedLayout);
+      updatedLayout = normalizeRowHeights(updatedLayout);
+
       setLayouts((current) => ({
         ...current,
-        [layoutBreakpoint]: layout.map((item) => ({
-          ...item,
-          h:
-            item.y === newItem.y &&
-            (initialLayouts[
-              layoutBreakpoint as keyof typeof initialLayouts
-            ].find((initial) => initial.i === item.i)?.minH ?? 0) <= newItem.h
-              ? newItem.h
-              : item.h,
-        })),
+        [layoutBreakpoint]: updatedLayout,
       }));
     }
   };
@@ -1107,34 +1114,10 @@ export function ResizableDashboardCards() {
   const onDragStop = (layout: GridLayout.Layout[]) => {
     if (!layoutBreakpoint) return;
 
-    const updatedLayout = cloneDeep(layout);
-
-    const rowGroups: Record<string, GridLayout.Layout[]> = updatedLayout.reduce(
-      (groups, item) => {
-        const existingGroup = Object.keys(groups).find(
-          (y) => Math.abs(Number(y) - item.y) < 10
-        );
-
-        if (existingGroup) {
-          groups[existingGroup].push(item);
-        } else {
-          groups[item.y] = [item];
-        }
-        return groups;
-      },
-      {} as Record<string, GridLayout.Layout[]>
-    );
-
-    Object.values(rowGroups).forEach((items) => {
-      const maxHeight = Math.max(...items.map((item) => item.h));
-      items.forEach(
-        (item) =>
-          (item.h =
-            item.i.length < 5 && item.i !== '0' && item.i !== '1'
-              ? maxHeight
-              : item.h)
-      );
-    });
+    // Apply layout improvements: normalize row heights and compact
+    let updatedLayout = cloneDeep(layout);
+    updatedLayout = normalizeRowHeights(updatedLayout);
+    updatedLayout = compactLayout(updatedLayout);
 
     setLayouts((current) => ({
       ...current,
@@ -1407,13 +1390,13 @@ export function ResizableDashboardCards() {
     },
     1500,
     [layouts]
-  );
+ );
 
-  return (
-    <div className={classNames('w-full', { 'select-none': isEditMode })}>
-      {!totals.isLoading ? (
-        <ResponsiveGridLayout
-          className="layout responsive-grid-box"
+ return (
+    <div className={classNames('w-full', { 'select-none': isEditMode, 'dashboard-edit-mode': isEditMode })}>
+     {!totals.isLoading ? (
+       <ResponsiveGridLayout
+         className="layout responsive-grid-box"
           breakpoints={{
             xxl: 1400,
             xl: 1200,
@@ -1442,16 +1425,17 @@ export function ResizableDashboardCards() {
           onBreakpointChange={(currentBreakPoint) =>
             setLayoutBreakpoint(currentBreakPoint)
           }
-          onResizeStop={onResizeStop}
-          onDragStop={onDragStop}
-          onLayoutChange={(current) =>
-            (areCardsRestored || arePreferenceCardsChanged) &&
-            handleOnLayoutChange(current)
-          }
-          //resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-          resizeHandles={['se']}
-          draggableCancel=".cancelDraggingCards"
-          onDrag={handleOnDrag}
+         onResizeStop={onResizeStop}
+         onDragStop={onDragStop}
+         onLayoutChange={(current) =>
+           (areCardsRestored || arePreferenceCardsChanged) &&
+           handleOnLayoutChange(current)
+         }
+          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+          compactType="vertical"
+          preventCollision={false}
+         draggableCancel=".cancelDraggingCards"
+         onDrag={handleOnDrag}
         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">

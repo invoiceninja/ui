@@ -2,3 +2,157 @@
   background: transparent !important;
   border-color: transparent !important;
 }
+
+/* Enhanced resize handle styling */
+.react-resizable-handle {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.react-grid-item:hover .react-resizable-handle {
+  opacity: 1;
+}
+
+.react-resizable-handle-se {
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+  width: 20px;
+  height: 20px;
+}
+
+.react-resizable-handle-sw {
+  bottom: 0;
+  left: 0;
+  cursor: sw-resize;
+  width: 20px;
+  height: 20px;
+}
+
+.react-resizable-handle-ne {
+  top: 0;
+  right: 0;
+  cursor: ne-resize;
+  width: 20px;
+  height: 20px;
+}
+
+.react-resizable-handle-nw {
+  top: 0;
+  left: 0;
+  cursor: nw-resize;
+  width: 20px;
+  height: 20px;
+}
+
+.react-resizable-handle-e {
+  right: 0;
+  cursor: e-resize;
+  width: 10px;
+}
+
+.react-resizable-handle-w {
+  left: 0;
+  cursor: w-resize;
+  width: 10px;
+}
+
+.react-resizable-handle-n {
+  top: 0;
+  cursor: n-resize;
+  height: 10px;
+}
+
+.react-resizable-handle-s {
+  bottom: 0;
+  cursor: s-resize;
+  height: 10px;
+}
+
+/* Edit mode styling */
+.dashboard-edit-mode .react-grid-item {
+  border: 2px dashed transparent;
+  transition: border-color 0.2s ease;
+}
+
+.dashboard-edit-mode .react-grid-item:hover {
+  border-color: #3b82f6;
+}
+
+/* Drag handle styling */
+.drag-handle {
+  position: relative;
+}
+
+.drag-handle-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-edit-mode .drag-handle:hover .drag-handle-icon {
+  opacity: 1;
+}
+
+.drag-handle-icon:active {
+  cursor: grabbing;
+}
+
+/* Grid overlay in edit mode */
+.dashboard-edit-mode .react-grid-layout {
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(59, 130, 246, 0.1) 19px, rgba(59, 130, 246, 0.1) 20px),
+    repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(59, 130, 246, 0.1) 19px, rgba(59, 130, 246, 0.1) 20px);
+  background-size: 20px 20px;
+}
+
+/* Placeholder styling improvements */
+.react-grid-item.react-grid-placeholder {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border: 2px dashed #3b82f6 !important;
+  border-radius: 8px;
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+/* Dragging state */
+.react-grid-item.react-draggable-dragging {
+  z-index: 100;
+  opacity: 0.8;
+  transition: none;
+}
+
+/* Smooth transitions when not dragging */
+.react-grid-item {
+  transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
+.react-grid-item.react-draggable-dragging,
+.react-grid-item.resizing {
+  transition: none;
+}
+
+/* Preference cards grid specific styling */
+.preference-cards-grid .react-grid-item {
+  transition: all 0.2s ease;
+}
+
+.preference-cards-grid-drag-handle {
+  position: relative;
+  height: 100%;
+}
+
+.dashboard-edit-mode .preference-cards-grid-drag-handle {
+  cursor: grab;
+}
+
+.dashboard-edit-mode .preference-cards-grid-drag-handle:active {
+  cursor: grabbing;
+}
