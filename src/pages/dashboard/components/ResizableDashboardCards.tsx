@@ -1094,20 +1094,9 @@ export function ResizableDashboardCards() {
     newItem: GridLayout.Layout
   ) => {
     if (layoutBreakpoint) {
-      // Enforce constraints and normalize row heights
-      let updatedLayout = layout.map((item) => {
-        if (item.i === newItem.i) {
-          return newItem;
-        }
-        return item;
-      });
-
-      updatedLayout = enforceConstraints(updatedLayout);
-      updatedLayout = normalizeRowHeights(updatedLayout);
-
       setLayouts((current) => ({
         ...current,
-        [layoutBreakpoint]: updatedLayout,
+        [layoutBreakpoint]: layout,
       }));
     }
   };
@@ -1115,18 +1104,9 @@ export function ResizableDashboardCards() {
   const onDragStop = (layout: GridLayout.Layout[]) => {
     if (!layoutBreakpoint) return;
 
-    // Apply row constraints first to snap items to rows
-    let updatedLayout = cloneDeep(layout);
-    
-    // Enforce row constraints - snap to rows and preserve row heights
-    updatedLayout = enforceRowConstraints(updatedLayout);
-    
-    // Compact vertically while preserving row heights
-    updatedLayout = compactLayout(updatedLayout, true);
-
     setLayouts((current) => ({
       ...current,
-      [layoutBreakpoint]: cloneDeep(updatedLayout),
+      [layoutBreakpoint]: layout,
     }));
   };
 
@@ -1436,9 +1416,10 @@ export function ResizableDashboardCards() {
            (areCardsRestored || arePreferenceCardsChanged) &&
            handleOnLayoutChange(current)
          }
-          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-          compactType="vertical"
-          preventCollision={false}
+         resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+          compactType={null}
+          preventCollision={true}
+          allowOverlap={false}
          draggableCancel=".cancelDraggingCards"
          onDrag={handleOnDrag}
         >
