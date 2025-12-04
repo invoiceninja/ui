@@ -215,27 +215,18 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 export const initialLayouts = {
  xxl: [
    {
-     i: '0',
-     x: 300,
-     y: 0,
-     w: 1000,
-     h: 3,
-     isResizable: false,
-     static: true,
-     isDraggable: false,
-   },
-   {
      i: '1',
      x: 0,
-     y: 3,
+     y:  0,
      w: 1000,
-     h: 6,
-     isResizable: false,
+     h: 15,
+     minH: 10,
+      maxH: 25,
    },
    {
      i: '2',
      x: 0,
-     y: 9,
+     y: 15,
      w: 330,
      h: 25,
      minH: 20,
@@ -246,7 +237,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 400,
-      y: 2,
+      y: 15,
       w: 660,
       h: 25,
      minH: 20,
@@ -257,7 +248,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 3,
+      y: 40,
       w: 495,
       h: 20,
       minH: 16,
@@ -268,7 +259,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 3,
+      y: 40,
       w: 495,
       h: 20,
       minH: 16,
@@ -279,7 +270,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 4,
+      y: 60,
       w: 495,
       h: 20,
       minH: 16,
@@ -290,7 +281,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 4,
+      y: 60,
       w: 495,
       h: 20,
       minH: 16,
@@ -301,7 +292,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 5,
+      y: 80,
       w: 495,
       h: 20,
       minH: 16,
@@ -312,7 +303,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 74,
+      y: 80,
       w: 495,
       h: 20,
       minH: 16,
@@ -323,7 +314,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 94,
+      y: 100,
       w: 495,
       h: 20,
       minH: 16,
@@ -334,27 +325,18 @@ export const initialLayouts = {
   ],
   xl: [
     {
-      i: '0',
-      x: 300,
-      y: 0,
-      w: 1000,
-      h: 3,
-      isResizable: false,
-      static: true,
-      isDraggable: false,
-    },
-    {
       i: '1',
       x: 0,
-      y: 3,
+      y:  0,
       w: 1000,
-      h: 6,
-      isResizable: false,
+      h: 15,
+      minH: 10,
+      maxH: 25,
     },
     {
       i: '2',
       x: 0,
-      y: 9,
+      y: 15,
       w: 330,
       h: 25,
       minH: 20,
@@ -365,7 +347,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 400,
-      y: 9,
+      y: 15,
       w: 660,
       h: 25,
       minH: 20,
@@ -376,7 +358,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 34,
+      y: 40,
       w: 495,
       h: 20,
       minH: 16,
@@ -387,7 +369,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 34,
+      y: 40,
       w: 495,
       h: 20,
       minH: 16,
@@ -398,7 +380,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 54,
+      y: 60,
       w: 495,
       h: 20,
       minH: 16,
@@ -409,7 +391,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 54,
+      y: 60,
       w: 495,
       h: 20,
       minH: 16,
@@ -420,7 +402,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 74,
+      y: 80,
       w: 495,
       h: 20,
       minH: 16,
@@ -431,7 +413,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 74,
+      y: 80,
       w: 495,
       h: 20,
       minH: 16,
@@ -442,7 +424,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 94,
+      y: 100,
       w: 495,
       h: 20,
       minH: 16,
@@ -453,27 +435,18 @@ export const initialLayouts = {
   ],
   lg: [
     {
-      i: '0',
-      x: 300,
-      y: 0,
-      w: 1000,
-      h: 3,
-      isResizable: false,
-      static: true,
-      isDraggable: false,
-    },
-    {
       i: '1',
       x: 0,
-      y: 3,
+      y:  0,
       w: 1000,
-      h: 6,
-      isResizable: false,
+      h: 15,
+      minH: 10,
+      maxH: 25,
     },
     {
       i: '2',
       x: 0,
-      y: 9,
+      y: 15,
       w: 330,
       h: 25,
       minH: 20,
@@ -484,7 +457,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 400,
-      y: 9,
+      y: 15,
       w: 660,
       h: 25,
       minH: 20,
@@ -495,7 +468,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 34,
+      y: 40,
       w: 495,
       h: 20,
       minH: 16,
@@ -506,7 +479,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 34,
+      y: 40,
       w: 495,
       h: 20,
       minH: 16,
@@ -517,7 +490,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 54,
+      y: 60,
       w: 495,
       h: 20,
       minH: 16,
@@ -528,7 +501,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 54,
+      y: 60,
       w: 495,
       h: 20,
       minH: 16,
@@ -539,7 +512,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 74,
+      y: 80,
       w: 495,
       h: 20,
       minH: 16,
@@ -550,7 +523,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 74,
+      y: 80,
       w: 495,
       h: 20,
       minH: 16,
@@ -561,7 +534,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 94,
+      y: 100,
       w: 495,
       h: 20,
       minH: 16,
@@ -572,27 +545,18 @@ export const initialLayouts = {
   ],
   md: [
     {
-      i: '0',
-      x: 300,
-      y: 0,
-      w: 1000,
-      h: 3,
-      isResizable: false,
-      static: true,
-      isDraggable: false,
-    },
-    {
       i: '1',
       x: 0,
-      y: 3,
+      y:  0,
       w: 1000,
-      h: 6,
-      isResizable: false,
+      h: 15,
+      minH: 10,
+      maxH: 25,
     },
     {
       i: '2',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -603,7 +567,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -614,7 +578,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -625,7 +589,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -636,7 +600,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -647,7 +611,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -658,7 +622,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -669,7 +633,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -680,7 +644,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 94,
+      y: 100,
       w: 1000,
       h: 20,
       minH: 16,
@@ -691,27 +655,18 @@ export const initialLayouts = {
   ],
   sm: [
     {
-      i: '0',
-      x: 300,
-      y: 0,
-      w: 1000,
-      h: 3,
-      isResizable: false,
-      static: true,
-      isDraggable: false,
-    },
-    {
       i: '1',
       x: 0,
-      y: 3,
+      y:  0,
       w: 1000,
-      h: 6,
-      isResizable: false,
+      h: 15,
+      minH: 10,
+      maxH: 25,
     },
     {
       i: '2',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -722,7 +677,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -733,7 +688,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -744,7 +699,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -755,7 +710,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -766,7 +721,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -777,7 +732,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -788,7 +743,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -799,7 +754,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 94,
+      y: 100,
       w: 1000,
       h: 20,
       minH: 16,
@@ -810,27 +765,18 @@ export const initialLayouts = {
   ],
   xs: [
     {
-      i: '0',
-      x: 300,
-      y: 0,
-      w: 1000,
-      h: 3,
-      isResizable: false,
-      static: true,
-      isDraggable: false,
-    },
-    {
       i: '1',
       x: 0,
-      y: 3,
+      y:  0,
       w: 1000,
-      h: 6,
-      isResizable: false,
+      h: 15,
+      minH: 10,
+      maxH: 25,
     },
     {
       i: '2',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -841,7 +787,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -852,7 +798,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -863,7 +809,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -874,7 +820,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -885,7 +831,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -896,7 +842,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -907,7 +853,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -918,7 +864,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 94,
+      y: 100,
       w: 1000,
       h: 20,
       minH: 16,
@@ -929,27 +875,18 @@ export const initialLayouts = {
   ],
   xxs: [
     {
-      i: '0',
-      x: 300,
-      y: 0,
-      w: 1000,
-      h: 3,
-      isResizable: false,
-      static: true,
-      isDraggable: false,
-    },
-    {
       i: '1',
       x: 0,
-      y: 3,
+      y:  0,
       w: 1000,
-      h: 6,
-      isResizable: false,
+      h: 15,
+      minH: 10,
+      maxH: 25,
     },
     {
       i: '2',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -960,7 +897,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 9,
+      y: 15,
       w: 1000,
       h: 25,
       minH: 20,
@@ -971,7 +908,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -982,7 +919,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 34,
+      y: 40,
       w: 1000,
       h: 20,
       minH: 16,
@@ -993,7 +930,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1004,7 +941,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 54,
+      y: 60,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1015,7 +952,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1026,7 +963,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 74,
+      y: 80,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1037,7 +974,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 94,
+      y: 100,
       w: 1000,
       h: 20,
       minH: 16,
