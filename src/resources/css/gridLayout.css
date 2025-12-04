@@ -112,15 +112,9 @@
 }
 
 /* Make south handle more accessible for Panel 1 with nested structure */
+/* Panel 1 south handle: bigger hit area, no color */
 .dashboard-edit-mode .react-grid-item[style*="flex"] .react-resizable-handle-s {
   height: 15px !important;
-  background: rgba(59, 130, 246, 0.2) !important;
-  border-top: 2px solid rgba(59, 130, 246, 0.5) !important;
-}
-
-.dashboard-edit-mode .react-grid-item[style*="flex"]:hover .react-resizable-handle-s {
-  opacity: 1 !important;
-  background: rgba(59, 130, 246, 0.3) !important;
 }
 
 /* Corner handles get even more prominence */
