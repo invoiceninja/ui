@@ -219,24 +219,25 @@ export const initialLayouts = {
      x: 300,
      y: 0,
      w: 1000,
-      h: 3,
+     h: 3,
      isResizable: false,
      static: true,
+     isDraggable: false,
    },
    {
      i: '1',
      x: 0,
-     y: 1,
+     y: 3,
      w: 1000,
-      h: 6,
+     h: 6,
      isResizable: false,
    },
    {
      i: '2',
      x: 0,
-     y: 2,
+     y: 9,
      w: 330,
-      h: 25,
+     h: 25,
      minH: 20,
       minW: 250,
       maxH: 30,
@@ -311,7 +312,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 5,
+      y: 74,
       w: 495,
       h: 20,
       minH: 16,
@@ -322,7 +323,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 6,
+      y: 94,
       w: 495,
       h: 20,
       minH: 16,
@@ -340,11 +341,12 @@ export const initialLayouts = {
       h: 3,
       isResizable: false,
       static: true,
+      isDraggable: false,
     },
     {
       i: '1',
       x: 0,
-      y: 1,
+      y: 3,
       w: 1000,
       h: 6,
       isResizable: false,
@@ -352,7 +354,7 @@ export const initialLayouts = {
     {
       i: '2',
       x: 0,
-      y: 2,
+      y: 9,
       w: 330,
       h: 25,
       minH: 20,
@@ -363,7 +365,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 400,
-      y: 2,
+      y: 9,
       w: 660,
       h: 25,
       minH: 20,
@@ -374,7 +376,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 3,
+      y: 34,
       w: 495,
       h: 20,
       minH: 16,
@@ -385,7 +387,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 3,
+      y: 34,
       w: 495,
       h: 20,
       minH: 16,
@@ -396,7 +398,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 4,
+      y: 54,
       w: 495,
       h: 20,
       minH: 16,
@@ -407,7 +409,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 4,
+      y: 54,
       w: 495,
       h: 20,
       minH: 16,
@@ -418,7 +420,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 5,
+      y: 74,
       w: 495,
       h: 20,
       minH: 16,
@@ -429,7 +431,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 5,
+      y: 74,
       w: 495,
       h: 20,
       minH: 16,
@@ -440,7 +442,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 6,
+      y: 94,
       w: 495,
       h: 20,
       minH: 16,
@@ -458,19 +460,20 @@ export const initialLayouts = {
       h: 3,
       isResizable: false,
       static: true,
+      isDraggable: false,
     },
     {
       i: '1',
       x: 0,
-      y: 1,
+      y: 3,
       w: 1000,
-      h: 7,
+      h: 6,
       isResizable: false,
     },
     {
       i: '2',
       x: 0,
-      y: 2,
+      y: 9,
       w: 330,
       h: 25,
       minH: 20,
@@ -481,7 +484,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 400,
-      y: 2,
+      y: 9,
       w: 660,
       h: 25,
       minH: 20,
@@ -492,7 +495,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 3,
+      y: 34,
       w: 495,
       h: 20,
       minH: 16,
@@ -503,7 +506,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 3,
+      y: 34,
       w: 495,
       h: 20,
       minH: 16,
@@ -514,7 +517,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 4,
+      y: 54,
       w: 495,
       h: 20,
       minH: 16,
@@ -525,7 +528,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 4,
+      y: 54,
       w: 495,
       h: 20,
       minH: 16,
@@ -536,7 +539,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 5,
+      y: 74,
       w: 495,
       h: 20,
       minH: 16,
@@ -547,7 +550,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 5,
+      y: 74,
       w: 495,
       h: 20,
       minH: 16,
@@ -558,7 +561,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 6,
+      y: 94,
       w: 495,
       h: 20,
       minH: 16,
@@ -576,11 +579,12 @@ export const initialLayouts = {
       h: 3,
       isResizable: false,
       static: true,
+      isDraggable: false,
     },
     {
       i: '1',
       x: 0,
-      y: 1,
+      y: 3,
       w: 1000,
       h: 6,
       isResizable: false,
@@ -588,7 +592,7 @@ export const initialLayouts = {
     {
       i: '2',
       x: 0,
-      y: 1,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -599,7 +603,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 2,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -610,7 +614,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 3,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -621,7 +625,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 4,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -632,7 +636,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 5,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -643,7 +647,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 6,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -654,7 +658,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 7,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -665,7 +669,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 8,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -676,7 +680,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 9,
+      y: 94,
       w: 1000,
       h: 20,
       minH: 16,
@@ -694,11 +698,12 @@ export const initialLayouts = {
       h: 3,
       isResizable: false,
       static: true,
+      isDraggable: false,
     },
     {
       i: '1',
       x: 0,
-      y: 1,
+      y: 3,
       w: 1000,
       h: 6,
       isResizable: false,
@@ -706,7 +711,7 @@ export const initialLayouts = {
     {
       i: '2',
       x: 0,
-      y: 1,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -717,7 +722,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 2,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -728,7 +733,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 3,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -739,7 +744,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 4,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -750,7 +755,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 5,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -761,7 +766,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 6,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -772,7 +777,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 7,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -783,7 +788,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 8,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -794,7 +799,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 9,
+      y: 94,
       w: 1000,
       h: 20,
       minH: 16,
@@ -812,11 +817,12 @@ export const initialLayouts = {
       h: 3,
       isResizable: false,
       static: true,
+      isDraggable: false,
     },
     {
       i: '1',
       x: 0,
-      y: 1,
+      y: 3,
       w: 1000,
       h: 6,
       isResizable: false,
@@ -824,7 +830,7 @@ export const initialLayouts = {
     {
       i: '2',
       x: 0,
-      y: 1,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -835,7 +841,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 2,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -846,7 +852,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 3,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -857,7 +863,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 4,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -868,7 +874,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 5,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -879,7 +885,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 6,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -890,7 +896,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 7,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -901,7 +907,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 8,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -912,7 +918,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 9,
+      y: 94,
       w: 1000,
       h: 20,
       minH: 16,
@@ -930,11 +936,12 @@ export const initialLayouts = {
       h: 3,
       isResizable: false,
       static: true,
+      isDraggable: false,
     },
     {
       i: '1',
       x: 0,
-      y: 1,
+      y: 3,
       w: 1000,
       h: 6,
       isResizable: false,
@@ -942,7 +949,7 @@ export const initialLayouts = {
     {
       i: '2',
       x: 0,
-      y: 1,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -953,7 +960,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 2,
+      y: 9,
       w: 1000,
       h: 25,
       minH: 20,
@@ -964,7 +971,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 3,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -975,7 +982,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 4,
+      y: 34,
       w: 1000,
       h: 20,
       minH: 16,
@@ -986,7 +993,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 5,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -997,7 +1004,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 6,
+      y: 54,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1008,7 +1015,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 7,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1019,7 +1026,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 8,
+      y: 74,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1030,7 +1037,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 9,
+      y: 94,
       w: 1000,
       h: 20,
       minH: 16,
@@ -1964,79 +1971,10 @@ return (
            }}
          />
        ) : (
-         <ResponsiveGridLayout
-           className="layout responsive-grid-box"
-           breakpoints={{
-             xxl: 1400,
-             xl: 1200,
-             lg: 1000,
-             md: 800,
-             sm: 600,
-             xs: 300,
-             xxs: 0,
-           }}
-           layouts={layouts}
-           cols={{
-             xxl: 1000,
-             xl: 1000,
-             lg: 1000,
-             md: 1000,
-             sm: 1000,
-             xs: 1000,
-             xxs: 1000,
-           }}
-           draggableHandle=".drag-handle"
-          margin={[0, 20]}
-           rowHeight={20}
-          isDraggable={isEditMode}
-           isDroppable={isEditMode}
-           isResizable={isEditMode}
-           onBreakpointChange={(newBreakpoint, newCols) => {
-             // Scale layout when breakpoint changes
-             const oldBreakpoint = layoutBreakpoint || 'xxl';
-             const colConfig = { xxl: 1000, xl: 1000, lg: 1000, md: 1000, sm: 1000, xs: 1000, xxs: 1000 };
-             const oldCols = colConfig[oldBreakpoint as keyof typeof colConfig];
-             const currentLayout = layouts[oldBreakpoint];
-             
-             if (currentLayout && oldCols !== newCols) {
-               const scaledLayout = scaleLayoutForBreakpoint(currentLayout, oldCols, newCols);
-               setLayouts(prev => ({
-                 ...prev,
-                 [newBreakpoint]: scaledLayout
-               }));
-             }
-             
-             setLayoutBreakpoint(newBreakpoint);
-           }}
-           onWidthChange={() => {
-             // Trigger layout recalculation on window resize
-             if (layoutBreakpoint && layouts[layoutBreakpoint]) {
-               setLayouts((current) => ({ ...current }));
-             }
-           }}
-           onResize={() => {
-             // Set resize flag to allow layout changes during resize
-             isResizingRef.current = true;
-           }}
-           onResizeStop={onResizeStop}
-           onDragStop={onDragStop}
-           onLayoutChange={handleLayoutChangeWithLock}
-           resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-           compactType={null}
-           preventCollision={true}
-           allowOverlap={false}
-           draggableCancel=".cancelDraggingCards"
-           onDrag={handleOnDrag}
-         >
-          {(totals.isLoading || !isLayoutsInitialized) && (
-            <div className="w-full flex justify-center">
-              <Spinner />
-            </div>
-          )}
-
-          {/* Quick date, currency & date picker. */}
-
-          <div key="0">
+        <>
+          {/* Static controls - outside grid to prevent dragging */}
+          {!totals.isLoading && isLayoutsInitialized && (
+          <div className="mb-4">
             <div className="flex justify-end">
             <div className="flex space-x-2">
               {currencies && (
@@ -2173,6 +2111,77 @@ return (
             </div>
             </div>
           </div>
+          )}
+
+          <ResponsiveGridLayout
+          className="layout responsive-grid-box"
+           breakpoints={{
+             xxl: 1400,
+             xl: 1200,
+             lg: 1000,
+             md: 800,
+             sm: 600,
+             xs: 300,
+             xxs: 0,
+           }}
+           layouts={layouts}
+           cols={{
+             xxl: 1000,
+             xl: 1000,
+             lg: 1000,
+             md: 1000,
+             sm: 1000,
+             xs: 1000,
+             xxs: 1000,
+           }}
+           draggableHandle=".drag-handle"
+          margin={[0, 20]}
+           rowHeight={20}
+          isDraggable={isEditMode}
+           isDroppable={isEditMode}
+           isResizable={isEditMode}
+           onBreakpointChange={(newBreakpoint, newCols) => {
+             // Scale layout when breakpoint changes
+             const oldBreakpoint = layoutBreakpoint || 'xxl';
+             const colConfig = { xxl: 1000, xl: 1000, lg: 1000, md: 1000, sm: 1000, xs: 1000, xxs: 1000 };
+             const oldCols = colConfig[oldBreakpoint as keyof typeof colConfig];
+             const currentLayout = layouts[oldBreakpoint];
+             
+             if (currentLayout && oldCols !== newCols) {
+               const scaledLayout = scaleLayoutForBreakpoint(currentLayout, oldCols, newCols);
+               setLayouts(prev => ({
+                 ...prev,
+                 [newBreakpoint]: scaledLayout
+               }));
+             }
+             
+             setLayoutBreakpoint(newBreakpoint);
+           }}
+           onWidthChange={() => {
+             // Trigger layout recalculation on window resize
+             if (layoutBreakpoint && layouts[layoutBreakpoint]) {
+               setLayouts((current) => ({ ...current }));
+             }
+           }}
+           onResize={() => {
+             // Set resize flag to allow layout changes during resize
+             isResizingRef.current = true;
+           }}
+           onResizeStop={onResizeStop}
+           onDragStop={onDragStop}
+           onLayoutChange={handleLayoutChangeWithLock}
+           resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+           compactType={null}
+           preventCollision={true}
+           allowOverlap={false}
+           draggableCancel=".cancelDraggingCards"
+           onDrag={handleOnDrag}
+         >
+          {(totals.isLoading || !isLayoutsInitialized) && (
+            <div className="w-full flex justify-center">
+              <Spinner />
+            </div>
+          )}
 
           {currentDashboardFields?.length ? (
             <div key="1">
@@ -2583,8 +2592,9 @@ return (
             </div>
           ) : null}
         </ResponsiveGridLayout>
-        )}
         </>
+      )}
+      </>
       ) : (
         <div className="w-full flex justify-center">
           <Spinner />
