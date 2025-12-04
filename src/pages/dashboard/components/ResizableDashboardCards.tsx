@@ -952,21 +952,15 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   });
 
   const onResizeStop = (
-  layout: GridLayout.Layout[],
+layout: GridLayout.Layout[],
 ) => {
-  // Clear resize flag
-  isResizingRef.current = false;
-  
- if (layoutBreakpoint) {
-      setLayouts((current) => {
-        // Preserve heights from current layout to prevent auto-expansion
-        return {
-          ...current,
-          [layoutBreakpoint]: layout,
-        };
-      });
-    }
-  };
+  // Don't clear flag or update layouts here
+  // handleLayoutChangeWithLock already saved the layout during resize
+  // We'll clear the flag after a small delay to ensure all layout updates complete
+  setTimeout(() => {
+    isResizingRef.current = false;
+  }, 50);
+};
 
   const onDragStop = (layout: GridLayout.Layout[]) => {
     // Clear drag flag
