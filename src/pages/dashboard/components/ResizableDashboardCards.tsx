@@ -1483,19 +1483,12 @@ useDebounce(
         // PreferenceCardsGrid
         if (!currentDashboardFields?.length) return null;
         return (
-          <div>
-            <div
-              className={classNames(
-                'absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drag-handle',
-                {
-                  'cursor-grab': isEditMode,
-                  hidden: !isEditMode,
-                }
-              )}
-            >
-              <Icon element={MdDragHandle} size={30} />
-            </div>
-
+          <div 
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+            style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+          >
             <PreferenceCardsGrid
               currentDashboardFields={currentDashboardFields}
               dateRange={dateRange}
@@ -1504,22 +1497,7 @@ useDebounce(
               currencyId={currency.toString()}
               layoutBreakpoint={layoutBreakpoint}
               isEditMode={isEditMode}
-              setMainLayouts={setLayouts}
-              mainLayouts={layouts}
-              isLayoutRestored={isLayoutRestored}
             />
-
-            <div
-              className={classNames(
-                'absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 drag-handle',
-                {
-                  'cursor-grab': isEditMode,
-                  hidden: !isEditMode,
-                }
-              )}
-            >
-              <Icon element={MdDragHandle} size={30} />
-            </div>
           </div>
         );
 
@@ -2107,7 +2085,7 @@ return (
            onResizeStop={onResizeStop}
            onDragStop={onDragStop}
            onLayoutChange={handleLayoutChangeWithLock}
-           resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+           resizeHandles={['s', 'w', 'e', 'se', 'sw']}
            compactType={null}
            preventCollision={true}
            allowOverlap={false}
@@ -2121,43 +2099,22 @@ return (
           )}
 
           {currentDashboardFields?.length ? (
-            <div key="1">
-              <div
-                className={classNames(
-                  'absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drag-handle',
-                  {
-                    'cursor-grab': isEditMode,
-                    hidden: !isEditMode,
-                  }
-                )}
-              >
-                <Icon element={MdDragHandle} size={30} />
-              </div>
-
+            <div 
+              key="1" 
+              className={classNames('drag-handle', {
+                'cursor-grab': isEditMode,
+              })}
+              style={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
+            >
               <PreferenceCardsGrid
-                currentDashboardFields={currentDashboardFields}
-                dateRange={dateRange}
-                startDate={dates.start_date}
-                endDate={dates.end_date}
-                currencyId={currency.toString()}
-                layoutBreakpoint={layoutBreakpoint}
-                isEditMode={isEditMode}
-                setMainLayouts={setLayouts}
-                mainLayouts={layouts}
-                isLayoutRestored={isLayoutRestored}
+               currentDashboardFields={currentDashboardFields}
+               dateRange={dateRange}
+               startDate={dates.start_date}
+               endDate={dates.end_date}
+               currencyId={currency.toString()}
+               layoutBreakpoint={layoutBreakpoint}
+               isEditMode={isEditMode}
               />
-
-              <div
-                className={classNames(
-                  'absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 drag-handle',
-                  {
-                    'cursor-grab': isEditMode,
-                    hidden: !isEditMode,
-                  }
-                )}
-              >
-                <Icon element={MdDragHandle} size={30} />
-              </div>
             </div>
           ) : null}
 
