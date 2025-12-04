@@ -223,15 +223,6 @@ export const initialLayouts = {
      maxH: 25,
    },
    {
-     i: '1',
-     x: 0,
-     y: 0,
-     w: 1000,
-     h: 15,
-     minH: 10,
-     maxH: 25,
-   },
-   {
      i: '2',
      x: 0,
      y: 15,
