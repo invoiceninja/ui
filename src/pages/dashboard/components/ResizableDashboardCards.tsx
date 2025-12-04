@@ -65,6 +65,12 @@ import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 import { MdDragHandle } from 'react-icons/md';
+import {
+  DashboardRowLayout,
+  convertFlatLayoutToRows,
+  convertRowsToFlatLayout,
+} from '../types/DashboardRowTypes';
+import { DashboardRowContainer } from './DashboardRowContainer';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface TotalsRecord {
@@ -1011,10 +1017,16 @@ export function ResizableDashboardCards() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
-  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>();
-  const [layouts, setLayouts] = useState<DashboardGridLayouts>(initialLayouts);
+ const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>();
+ const [layouts, setLayouts] = useState<DashboardGridLayouts>(initialLayouts);
+  
+  // Row-based layouts (Grafana-style)
+  const [rowLayouts, setRowLayouts] = useState<{
+    [breakpoint: string]: DashboardRowLayout;
+  }>({});
+  const [useRowBasedLayout, setUseRowBasedLayout] = useState<boolean>(false);
 
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isLayoutsInitialized, setIsLayoutsInitialized] =
     useState<boolean>(false);
   const [isLayoutRestored, setIsLayoutRestored] = useState<boolean>(false);
@@ -1396,16 +1408,35 @@ export function ResizableDashboardCards() {
   }, [chart.data]);
 
   useEffect(() => {
-    if (layoutBreakpoint) {
-      if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
-        setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
+   if (layoutBreakpoint) {
+     if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
+       setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
 
-        setIsLayoutsInitialized(true);
-      }
+       setIsLayoutsInitialized(true);
+     }
+   }
+ }, [layoutBreakpoint]);
+
+  // Convert flat layouts to row layouts on initialization
+  useEffect(() => {
+    if (!isLayoutsInitialized || Object.keys(rowLayouts).length > 0) {
+      return;
     }
-  }, [layoutBreakpoint]);
 
-  useDebounce(
+    const convertedLayouts: { [breakpoint: string]: DashboardRowLayout } = {};
+
+    Object.keys(layouts).forEach((breakpoint) => {
+      const flatLayout = layouts[breakpoint];
+      convertedLayouts[breakpoint] = {
+        rows: convertFlatLayoutToRows(flatLayout),
+      };
+    });
+
+    setRowLayouts(convertedLayouts);
+    setUseRowBasedLayout(true);
+  }, [isLayoutsInitialized, layouts]);
+
+ useDebounce(
     () => {
       if (
         settings &&
@@ -1424,59 +1455,519 @@ export function ResizableDashboardCards() {
         handleUpdateUserPreferences();
       }
     },
-    1500,
-    [layouts]
- );
+   1500,
+   [layouts]
+);
 
- return (
-    <div className={classNames('w-full', { 'select-none': isEditMode, 'dashboard-edit-mode': isEditMode })}>
-     {!totals.isLoading ? (
-       <ResponsiveGridLayout
-         className="layout responsive-grid-box"
-          breakpoints={{
-            xxl: 1400,
-            xl: 1200,
-            lg: 1000,
-            md: 800,
-            sm: 600,
-            xs: 300,
-            xxs: 0,
-          }}
-          layouts={layouts}
-          cols={{
-            xxl: 1000,
-            xl: 1000,
-            lg: 1000,
-            md: 1000,
-            sm: 1000,
-            xs: 1000,
-            xxs: 1000,
-          }}
-          draggableHandle=".drag-handle"
-          margin={[0, 20]}
-          rowHeight={1}
-          isDraggable={isEditMode}
-          isDroppable={isEditMode}
-          isResizable={isEditMode}
-          onBreakpointChange={(currentBreakPoint) =>
-            setLayoutBreakpoint(currentBreakPoint)
-          }
-          onWidthChange={() => {
-            // Force layout recalculation on window resize
-            if (layoutBreakpoint && layouts[layoutBreakpoint]) {
-              setLayouts((current) => ({ ...current }));
-            }
-          }}
-         onResizeStop={onResizeStop}
-         onDragStop={onDragStop}
-         onLayoutChange={handleLayoutChangeWithLock}
-         resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-          compactType={null}
-          preventCollision={false}
-          allowOverlap={true}
-         draggableCancel=".cancelDraggingCards"
-         onDrag={handleOnDrag}
-        >
+  // Render panel by ID - used in row-based layout
+  const renderPanel = (panelId: string): JSX.Element | null => {
+    switch (panelId) {
+      case '0':
+        // Date/currency selectors (static)
+        return (
+          <div className="flex justify-end">
+            <div className="flex space-x-2">
+              {currencies && (
+                <SelectField
+                  value={currency.toString()}
+                  onValueChange={(value) =>
+                    update(
+                      'preferences.dashboard_charts.currency',
+                      parseInt(value)
+                    )
+                  }
+                >
+                  <option value="999">{t('all')}</option>
+                  {currencies.map((selectedCurrency) => (
+                    <option
+                      key={selectedCurrency.value}
+                      value={selectedCurrency.value}
+                    >
+                      {selectedCurrency.label}
+                    </option>
+                  ))}
+                </SelectField>
+              )}
+              <DropdownDateRangePicker body={body} setBody={setBody} />
+            </div>
+          </div>
+        );
+
+      case '1':
+        // PreferenceCardsGrid
+        if (!currentDashboardFields?.length) return null;
+        return (
+          <div>
+            <div
+              className={classNames(
+                'absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drag-handle',
+                {
+                  'cursor-grab': isEditMode,
+                  hidden: !isEditMode,
+                }
+              )}
+            >
+              <Icon element={MdDragHandle} size={30} />
+            </div>
+
+            <PreferenceCardsGrid
+              currentDashboardFields={currentDashboardFields}
+              dateRange={dateRange}
+              startDate={dates.start_date}
+              endDate={dates.end_date}
+              currencyId={currency.toString()}
+              layoutBreakpoint={layoutBreakpoint}
+              isEditMode={isEditMode}
+              setMainLayouts={setLayouts}
+              mainLayouts={layouts}
+              isLayoutRestored={isLayoutRestored}
+            />
+
+            <div
+              className={classNames(
+                'absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 drag-handle',
+                {
+                  'cursor-grab': isEditMode,
+                  hidden: !isEditMode,
+                }
+              )}
+            >
+              <Icon element={MdDragHandle} size={30} />
+            </div>
+          </div>
+        );
+
+      case '2':
+        // Account login text card
+        if (!company || isCardRemoved('account_login_text')) return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <Card
+              title={t('account_login_text')}
+              height="full"
+              withScrollableBody
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('account_login_text')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            >
+              <div className="pb-8">
+                <div className="flex flex-col space-y-1 px-6">
+                  <span className="text-lg">{`${user?.first_name} ${user?.last_name}`}</span>
+                  <span className="text-sm text-gray-500">
+                    {t('recent_transactions')}
+                  </span>
+                </div>
+                <div className="flex flex-col mt-8">
+                  <div
+                    style={{ borderColor: colors.$4 }}
+                    className="flex justify-between items-center border-b py-3 px-6"
+                  >
+                    <span style={{ fontSize: '0.95rem' }}>{t('invoices')}</span>
+                    <Badge style={{ backgroundColor: TotalColors.Blue }}>
+                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
+                        {formatMoney(
+                          totalsData[currency]?.invoices?.invoiced_amount || 0,
+                          company.settings.country_id,
+                          currency.toString(),
+                          2
+                        )}
+                      </div>
+                    </Badge>
+                  </div>
+                  <div
+                    style={{ borderColor: colors.$4 }}
+                    className="flex justify-between items-center border-b py-3 px-6"
+                  >
+                    <span style={{ fontSize: '0.95rem' }}>{t('payments')}</span>
+                    <Badge style={{ backgroundColor: TotalColors.Green }}>
+                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
+                        {formatMoney(
+                          totalsData[currency]?.revenue?.paid_to_date || 0,
+                          company.settings.country_id,
+                          currency.toString(),
+                          2
+                        )}
+                      </div>
+                    </Badge>
+                  </div>
+                  <div
+                    style={{ borderColor: colors.$4 }}
+                    className="flex justify-between items-center border-b py-3 px-6"
+                  >
+                    <span style={{ fontSize: '0.95rem' }}>{t('expenses')}</span>
+                    <Badge style={{ backgroundColor: TotalColors.Gray }}>
+                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
+                        {formatMoney(
+                          totalsData[currency]?.expenses?.amount || 0,
+                          company.settings.country_id,
+                          currency.toString(),
+                          2
+                        )}
+                      </div>
+                    </Badge>
+                  </div>
+                  <div
+                    style={{ borderColor: colors.$4 }}
+                    className="flex justify-between items-center border-b py-3 px-6"
+                  >
+                    <span style={{ fontSize: '0.95rem' }}>{t('outstanding')}</span>
+                    <Badge style={{ backgroundColor: TotalColors.Red }}>
+                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
+                        {totalsData[currency]?.outstanding?.outstanding_count || 0}
+                      </div>
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        );
+
+      case '3':
+        // Chart (Overview)
+        if (!chartData || isCardRemoved('overview')) return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <Card
+              title={t('overview')}
+              className="col-span-12 xl:col-span-8 pr-4"
+              height="full"
+              withScrollableBody
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('overview')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+              renderFromShadcn
+            >
+              <Chart
+                chartSensitivity={chartScale}
+                dates={{
+                  start_date: dates.start_date,
+                  end_date: dates.end_date,
+                }}
+                data={chartData[currency]}
+                currency={currency.toString()}
+              />
+            </Card>
+          </div>
+        );
+
+      case '4':
+        // Activity
+        if (isCardRemoved('activity')) return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <Activity
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('activity')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          </div>
+        );
+
+      case '5':
+        // Recent Payments
+        if (isCardRemoved('recent_payments')) return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <RecentPayments
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('recent_payments')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          </div>
+        );
+
+      case '6':
+        // Upcoming Invoices
+        if (!enabled(ModuleBitmask.Invoices) || isCardRemoved('upcoming_invoices'))
+          return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <UpcomingInvoices
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('upcoming_invoices')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          </div>
+        );
+
+      case '7':
+        // Past Due Invoices
+        if (!enabled(ModuleBitmask.Invoices) || isCardRemoved('past_due_invoices'))
+          return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <PastDueInvoices
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('past_due_invoices')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          </div>
+        );
+
+      case '8':
+        // Expired Quotes
+        if (!enabled(ModuleBitmask.Quotes) || isCardRemoved('expired_quotes'))
+          return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <ExpiredQuotes
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('expired_quotes')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          </div>
+        );
+
+      case '9':
+        // Upcoming Quotes
+        if (!enabled(ModuleBitmask.Quotes) || isCardRemoved('upcoming_quotes'))
+          return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <UpcomingQuotes
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() => handleRemoveCard('upcoming_quotes')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          </div>
+        );
+
+      case '10':
+        // Upcoming Recurring Invoices
+        if (
+          !enabled(ModuleBitmask.RecurringInvoices) ||
+          isCardRemoved('upcoming_recurring_invoices')
+        )
+          return null;
+        return (
+          <div
+            className={classNames('drag-handle', {
+              'cursor-grab': isEditMode,
+            })}
+          >
+            <UpcomingRecurringInvoices
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    behavior="button"
+                    type="secondary"
+                    onClick={() =>
+                      handleRemoveCard('upcoming_recurring_invoices')
+                    }
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // Handler for row layout changes
+  const handleRowLayoutChange = (newLayout: DashboardRowLayout) => {
+    if (!layoutBreakpoint) return;
+
+    setRowLayouts((prev) => ({
+      ...prev,
+      [layoutBreakpoint]: newLayout,
+    }));
+
+    // Convert row layout back to flat layout for saving
+    const flatLayout = convertRowsToFlatLayout(newLayout.rows);
+    setLayouts((prev) => ({
+      ...prev,
+      [layoutBreakpoint]: flatLayout,
+    }));
+  };
+
+return (
+   <div className={classNames('w-full', { 'select-none': isEditMode, 'dashboard-edit-mode': isEditMode })}>
+    {!totals.isLoading ? (
+       <>
+       {useRowBasedLayout &&
+       layoutBreakpoint &&
+       rowLayouts[layoutBreakpoint] ? (
+         <DashboardRowContainer
+           layout={rowLayouts[layoutBreakpoint]}
+           breakpoint={layoutBreakpoint}
+           isEditMode={isEditMode}
+           onLayoutChange={handleRowLayoutChange}
+           renderPanel={renderPanel}
+           cols={{
+             xxl: 1000,
+             xl: 1000,
+             lg: 1000,
+             md: 1000,
+             sm: 1000,
+             xs: 1000,
+             xxs: 1000,
+           }}
+         />
+       ) : (
+         <ResponsiveGridLayout
+           className="layout responsive-grid-box"
+           breakpoints={{
+             xxl: 1400,
+             xl: 1200,
+             lg: 1000,
+             md: 800,
+             sm: 600,
+             xs: 300,
+             xxs: 0,
+           }}
+           layouts={layouts}
+           cols={{
+             xxl: 1000,
+             xl: 1000,
+             lg: 1000,
+             md: 1000,
+             sm: 1000,
+             xs: 1000,
+             xxs: 1000,
+           }}
+           draggableHandle=".drag-handle"
+           margin={[0, 20]}
+           rowHeight={1}
+           isDraggable={isEditMode}
+           isDroppable={isEditMode}
+           isResizable={isEditMode}
+           onBreakpointChange={(currentBreakPoint) =>
+             setLayoutBreakpoint(currentBreakPoint)
+           }
+           onWidthChange={() => {
+             // Force layout recalculation on window resize
+             if (layoutBreakpoint && layouts[layoutBreakpoint]) {
+               setLayouts((current) => ({ ...current }));
+             }
+           }}
+           onResizeStop={onResizeStop}
+           onDragStop={onDragStop}
+           onLayoutChange={handleLayoutChangeWithLock}
+           resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+           compactType={null}
+           preventCollision={false}
+           allowOverlap={true}
+           draggableCancel=".cancelDraggingCards"
+           onDrag={handleOnDrag}
+         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
               <Spinner />
@@ -2030,6 +2521,8 @@ export function ResizableDashboardCards() {
             </div>
           ) : null}
         </ResponsiveGridLayout>
+        )}
+        </>
       ) : (
         <div className="w-full flex justify-center">
           <Spinner />
