@@ -81,12 +81,15 @@ export function convertFlatLayoutToRows(
   let currentY = 0;
 
   Array.from(grouped.entries())
-    .sort(([a], [b]) => a - b)
-    .forEach(([, items], rowIndex) => {
-      // Calculate row height as max height of all panels in the row
-      const rowHeight = Math.max(...items.map((item) => item.h || 10));
+   .sort(([a], [b]) => a - b)
+   .forEach(([, items], rowIndex) => {
+     // Calculate row height as max height of all panels in the row
+      // Original flat layout uses rowHeight=1, so h values are in pixels
+      // For row-based system, we need reasonable pixel heights
+      // Multiply by a factor to get usable heights (1 unit = 20px minimum)
+      const rowHeight = Math.max(...items.map((item) => (item.h || 10) * 20));
 
-      const panels: DashboardRowPanel[] = items.map((item) => ({
+     const panels: DashboardRowPanel[] = items.map((item) => ({
         i: item.i,
         x: item.x || 0,
         w: item.w || 4,

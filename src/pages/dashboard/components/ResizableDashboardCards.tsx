@@ -1433,8 +1433,7 @@ export function ResizableDashboardCards() {
    });
 
    setRowLayouts(convertedLayouts);
-    // DISABLED: Row-based layout needs height calculation fix
-    // setUseRowBasedLayout(true);
+    setUseRowBasedLayout(true);
  }, [isLayoutsInitialized, layouts]);
 
 useDebounce(
