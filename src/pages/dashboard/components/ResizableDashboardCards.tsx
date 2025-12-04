@@ -1101,66 +1101,62 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     if (!layoutBreakpoint) return;
 
     setLayouts((current) => {
-      // Preserve heights after drag completes
-      const preservedLayout = layout.map((item) => {
-        const existingItem = current[layoutBreakpoint]?.find((i) => i.i === item.i);
-        return {
-          ...item,
-          h: existingItem?.h ?? item.h, // Lock height
-        };
-      });
-      
-      // Optimize row heights to minimize wasted space
-      const optimizedLayout = optimizeRowHeights(preservedLayout);
-      
+      // Just use the layout as-is without height manipulation
       return {
         ...current,
-        [layoutBreakpoint]: optimizedLayout,
+        [layoutBreakpoint]: layout,
       };
     });
   };
 
   // Handler to completely lock heights - called by onLayoutChange to prevent auto-adjustments
   const handleLayoutChangeWithLock = (current: GridLayout.Layout[]) => {
-    // Prevent click-triggered layout changes
-    // Only allow layout changes during explicit drag/resize or card restoration
-    if (!layoutBreakpoint) return;
-    
-    // Ignore layout changes unless we're dragging, resizing, or restoring cards
-    if (!isDraggingRef.current && !isResizingRef.current && !areCardsRestored && !arePreferenceCardsChanged) {
-      return;
-    }
-    
-    if (areCardsRestored || arePreferenceCardsChanged) {
-      handleOnLayoutChange(current);
-    } else {
-      // Lock heights even when layout changes internally
-      setLayouts((prev) => {
-        const lockedLayout = current.map((item) => {
-          const existingItem = prev[layoutBreakpoint]?.find((i) => i.i === item.i);
-          return {
-            ...item,
-            h: existingItem?.h ?? item.h, // Always preserve height
-          };
-        });
-        
-        // Only update if something actually changed (comparing by item.i)
-        const hasChanges = lockedLayout.some((item) => {
-          const existing = prev[layoutBreakpoint]?.find((e) => e.i === item.i);
-          if (!existing) return true;
-          return item.x !== existing.x || item.y !== existing.y || item.w !== existing.w || item.h !== existing.h;
-        });
-        
-        if (hasChanges) {
-          return {
-            ...prev,
-            [layoutBreakpoint]: lockedLayout,
-          };
-        }
-        return prev;
+  // Prevent click-triggered layout changes
+  // Only allow layout changes during explicit drag/resize or card restoration
+  if (!layoutBreakpoint) return;
+  
+  // Ignore layout changes unless we're dragging, resizing, or restoring cards
+  if (!isDraggingRef.current && !isResizingRef.current && !areCardsRestored && !arePreferenceCardsChanged) {
+    return;
+  }
+  
+  if (areCardsRestored || arePreferenceCardsChanged) {
+    handleOnLayoutChange(current);
+  } else if (isResizingRef.current) {
+    // Allow full layout changes during resize (including height)
+    setLayouts((prev) => {
+      return {
+        ...prev,
+        [layoutBreakpoint]: current,
+      };
+    });
+  } else {
+    // During drag, lock heights to prevent vertical expansion
+    setLayouts((prev) => {
+      const dragLockedLayout = current.map((item) => {
+        const existingItem = prev[layoutBreakpoint]?.find((i) => i.i === item.i);
+        return {
+          ...item,
+          h: existingItem?.h ?? item.h, // Preserve height during drag only
+        };
       });
-    }
-  };
+      
+      const hasChanges = dragLockedLayout.some((item) => {
+        const existing = prev[layoutBreakpoint]?.find((e) => e.i === item.i);
+        if (!existing) return true;
+        return item.x !== existing.x || item.y !== existing.y || item.w !== existing.w || item.h !== existing.h;
+      });
+      
+      if (hasChanges) {
+        return {
+          ...prev,
+          [layoutBreakpoint]: dragLockedLayout,
+        };
+      }
+      return prev;
+    });
+  }
+};
 
   const handleUpdateUserPreferences = () => {
     const updatedUser = cloneDeep(user) as User;
@@ -1322,10 +1318,6 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
  ) => {
     // Set drag flag to prevent click-triggered layout changes
     isDraggingRef.current = true;
-    
-    // Lock height to prevent vertical expansion
-    placeholder.h = oldItem.h;
-    newItem.h = oldItem.h;
   };
 
   useEffect(() => {

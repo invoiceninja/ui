@@ -5,7 +5,7 @@
 
 /* Enhanced resize handle styling */
 .react-resizable-handle {
-  opacity: 0;
+  opacity: 0.3;
   transition: opacity 0.2s ease;
 }
 
@@ -67,12 +67,22 @@
   bottom: 0;
   cursor: s-resize;
   height: 10px;
+  width: 100% !important;
+  left: 0 !important;
 }
 
 /* Edit mode styling */
 .dashboard-edit-mode .react-grid-item {
   border: 2px dashed transparent;
   transition: border-color 0.2s ease;
+}
+
+.dashboard-edit-mode .react-resizable-handle {
+  opacity: 0.5;
+}
+
+.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle {
+  opacity: 1;
 }
 
 .dashboard-edit-mode .react-grid-item:hover {
