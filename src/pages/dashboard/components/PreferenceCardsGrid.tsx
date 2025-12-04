@@ -300,7 +300,6 @@ export function PreferenceCardsGrid(props: Props) {
             'cursor-grab': isEditMode,
           })}
           style={{
-            height: '100%',
             pointerEvents: 'auto',
           }}
         >
