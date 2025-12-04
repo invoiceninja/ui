@@ -14,6 +14,7 @@ import '$app/resources/css/gridLayout.css';
 import { Button, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Spinner } from '$app/components/Spinner';
 import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
 import { Card } from '$app/components/cards';
@@ -171,31 +172,31 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 };
 
 export const initialLayouts = {
-  xxl: [
-    {
-      i: '0',
-      x: 300,
-      y: 0,
-      w: 1000,
-      h: 2.8,
-      isResizable: false,
-      static: true,
-    },
-    {
-      i: '1',
-      x: 0,
-      y: 1,
-      w: 1000,
-      h: 6.3,
-      isResizable: false,
-    },
-    {
-      i: '2',
-      x: 0,
-      y: 2,
-      w: 330,
-      h: 25.4,
-      minH: 20,
+ xxl: [
+   {
+     i: '0',
+     x: 300,
+     y: 0,
+     w: 1000,
+      h: 3,
+     isResizable: false,
+     static: true,
+   },
+   {
+     i: '1',
+     x: 0,
+     y: 1,
+     w: 1000,
+      h: 6,
+     isResizable: false,
+   },
+   {
+     i: '2',
+     x: 0,
+     y: 2,
+     w: 330,
+      h: 25,
+     minH: 20,
       minW: 250,
       maxH: 30,
       maxW: 400,
@@ -205,8 +206,8 @@ export const initialLayouts = {
       x: 400,
       y: 2,
       w: 660,
-      h: 25.4,
-      minH: 20,
+      h: 25,
+     minH: 20,
       minW: 400,
       maxH: 30,
       maxW: 1000,
@@ -295,7 +296,7 @@ export const initialLayouts = {
       x: 300,
       y: 0,
       w: 1000,
-      h: 2.8,
+      h: 3,
       isResizable: false,
       static: true,
     },
@@ -304,7 +305,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 6.3,
+      h: 6,
       isResizable: false,
     },
     {
@@ -312,7 +313,7 @@ export const initialLayouts = {
       x: 0,
       y: 2,
       w: 330,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 250,
       maxH: 30,
@@ -323,7 +324,7 @@ export const initialLayouts = {
       x: 400,
       y: 2,
       w: 660,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -413,7 +414,7 @@ export const initialLayouts = {
       x: 300,
       y: 0,
       w: 1000,
-      h: 2.8,
+      h: 3,
       isResizable: false,
       static: true,
     },
@@ -422,7 +423,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 7.3,
+      h: 7,
       isResizable: false,
     },
     {
@@ -430,7 +431,7 @@ export const initialLayouts = {
       x: 0,
       y: 2,
       w: 330,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 250,
       maxH: 30,
@@ -441,7 +442,7 @@ export const initialLayouts = {
       x: 400,
       y: 2,
       w: 660,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -531,7 +532,7 @@ export const initialLayouts = {
       x: 300,
       y: 0,
       w: 1000,
-      h: 2.8,
+      h: 3,
       isResizable: false,
       static: true,
     },
@@ -540,7 +541,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 6.3,
+      h: 6,
       isResizable: false,
     },
     {
@@ -548,7 +549,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -559,7 +560,7 @@ export const initialLayouts = {
       x: 0,
       y: 2,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -649,7 +650,7 @@ export const initialLayouts = {
       x: 300,
       y: 0,
       w: 1000,
-      h: 2.8,
+      h: 3,
       isResizable: false,
       static: true,
     },
@@ -658,7 +659,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 6.3,
+      h: 6,
       isResizable: false,
     },
     {
@@ -666,7 +667,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -677,7 +678,7 @@ export const initialLayouts = {
       x: 0,
       y: 2,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -767,7 +768,7 @@ export const initialLayouts = {
       x: 300,
       y: 0,
       w: 1000,
-      h: 2.8,
+      h: 3,
       isResizable: false,
       static: true,
     },
@@ -776,7 +777,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 6.3,
+      h: 6,
       isResizable: false,
     },
     {
@@ -784,7 +785,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -795,7 +796,7 @@ export const initialLayouts = {
       x: 0,
       y: 2,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -885,7 +886,7 @@ export const initialLayouts = {
       x: 300,
       y: 0,
       w: 1000,
-      h: 2.8,
+      h: 3,
       isResizable: false,
       static: true,
     },
@@ -894,7 +895,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 6.3,
+      h: 6,
       isResizable: false,
     },
     {
@@ -902,7 +903,7 @@ export const initialLayouts = {
       x: 0,
       y: 1,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -913,7 +914,7 @@ export const initialLayouts = {
       x: 0,
       y: 2,
       w: 1000,
-      h: 25.4,
+      h: 25,
       minH: 20,
       minW: 400,
       maxH: 30,
@@ -1026,7 +1027,11 @@ export function ResizableDashboardCards() {
   }>({});
   const [useRowBasedLayout, setUseRowBasedLayout] = useState<boolean>(false);
 
- const [isEditMode, setIsEditMode] = useState<boolean>(false);
+ // Drag state tracking to prevent click-triggered layout changes
+ const isDraggingRef = useRef<boolean>(false);
+ const isResizingRef = useRef<boolean>(false);
+
+const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isLayoutsInitialized, setIsLayoutsInitialized] =
     useState<boolean>(false);
   const [isLayoutRestored, setIsLayoutRestored] = useState<boolean>(false);
@@ -1958,9 +1963,9 @@ return (
              xxs: 1000,
            }}
            draggableHandle=".drag-handle"
-           margin={[0, 20]}
-           rowHeight={1}
-           isDraggable={isEditMode}
+          margin={[0, 20]}
+           rowHeight={20}
+          isDraggable={isEditMode}
            isDroppable={isEditMode}
            isResizable={isEditMode}
            onBreakpointChange={(currentBreakPoint) =>
