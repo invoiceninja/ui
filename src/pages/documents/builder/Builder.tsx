@@ -348,6 +348,7 @@ function Builder() {
     toast.processing();
 
     setIsDocumentSaving(true);
+
     window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
@@ -400,6 +401,10 @@ function Builder() {
       setIsDocumentSaving(false);
     };
 
+    const handleSaveError = () => {
+      setIsDocumentSaving(false);
+    }
+
     window.addEventListener(
       'refetch.docuninja.document',
       refetchDocuninjaDocument
@@ -413,6 +418,11 @@ function Builder() {
     window.addEventListener(
       'builder:document.finalize.save',
       handleFinalizeDocumentSave
+    );
+
+    window.addEventListener(
+      'builder:save.error',
+      handleSaveError
     );
 
     return () => {
@@ -429,6 +439,11 @@ function Builder() {
       window.removeEventListener(
         'builder:document.finalize.save',
         handleFinalizeDocumentSave
+      );
+
+      window.removeEventListener(
+        'builder:save.error',
+        handleSaveError
       );
     };
   }, []);
