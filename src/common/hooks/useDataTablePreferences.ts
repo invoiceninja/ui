@@ -14,7 +14,6 @@ import { useDataTablePreference } from './useDataTablePreference';
 import { PerPage } from '$app/components/DataTable';
 import { cloneDeep, isEqual, set } from 'lodash';
 import { User } from '../interfaces/user';
-import { $refetch } from './useRefetch';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
 import { endpoint } from '../helpers';
@@ -80,7 +79,8 @@ export function useDataTablePreferences(params: Params) {
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
       set(updatedUser, 'company_user', response.data.data);
 
-      $refetch(['company_users']);
+      dispatch(updateUser(updatedUser));
+      dispatch(injectInChangesWithData(updatedUser));
 
       currentUserRef.current = updatedUser;
     });
