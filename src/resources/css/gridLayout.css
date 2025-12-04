@@ -164,13 +164,7 @@
   cursor: grabbing;
 }
 
-/* Grid overlay in edit mode */
-.dashboard-edit-mode .react-grid-layout {
-  background-image: 
-    repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(59, 130, 246, 0.1) 19px, rgba(59, 130, 246, 0.1) 20px),
-    repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(59, 130, 246, 0.1) 19px, rgba(59, 130, 246, 0.1) 20px);
-  background-size: 20px 20px;
-}
+/* Removed edit-mode grid overlay to avoid visual artifacts */
 
 /* Placeholder styling improvements */
 .react-grid-item.react-grid-placeholder {

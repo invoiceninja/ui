@@ -115,6 +115,38 @@ function optimizeRowHeights(layout: GridLayout.Layout[]): GridLayout.Layout[] {
   return layout;
 }
 
+// Collision detection between two layout items
+function isColliding(a: GridLayout.Layout, b: GridLayout.Layout): boolean {
+  const ax2 = (a.x || 0) + (a.w || 0);
+  const ay2 = (a.y || 0) + (a.h || 0);
+  const bx2 = (b.x || 0) + (b.w || 0);
+  const by2 = (b.y || 0) + (b.h || 0);
+  return (
+    (a.x || 0) < bx2 && ax2 > (b.x || 0) && (a.y || 0) < by2 && ay2 > (b.y || 0)
+  );
+}
+
+// Resolve overlaps by pushing items down until no collisions remain.
+function resolveOverlaps(layout: GridLayout.Layout[]): GridLayout.Layout[] {
+  const placed: GridLayout.Layout[] = [];
+  const sorted = [...layout].sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
+
+  for (const item of sorted) {
+    const clone = { ...item } as GridLayout.Layout;
+    // Move down until no collision with already placed items
+    let moved = false;
+    while (placed.some((p) => isColliding(clone, p))) {
+      const blockers = placed.filter((p) => isColliding(clone, p));
+      const maxY = Math.max(...blockers.map((b) => (b.y || 0) + (b.h || 0)));
+      clone.y = Math.max(clone.y || 0, maxY);
+      moved = true;
+    }
+    placed.push(clone);
+  }
+
+  return placed;
+}
+
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
   expenses: { amount: string; code: string };
@@ -954,27 +986,24 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const onResizeStop = (
     layout: GridLayout.Layout[],
   ) => {
-  // Don't clear flag or update layouts here
-  // handleLayoutChangeWithLock already saved the layout during resize
-  // We'll clear the flag after a small delay to ensure all layout updates complete
-  setTimeout(() => {
-    isResizingRef.current = false;
-  }, 50);
-};
+    // Resolve overlaps on resize stop to maintain a clean grid
+    if (!layoutBreakpoint) return;
+    const resolved = resolveOverlaps(layout);
+    setLayouts((current) => ({ ...current, [layoutBreakpoint]: resolved }));
+
+    setTimeout(() => {
+      isResizingRef.current = false;
+    }, 10);
+  };
 
   const onDragStop = (layout: GridLayout.Layout[]) => {
     // Clear drag flag
     isDraggingRef.current = false;
-    
     if (!layoutBreakpoint) return;
 
-    setLayouts((current) => {
-      // Just use the layout as-is without height manipulation
-      return {
-        ...current,
-        [layoutBreakpoint]: layout,
-      };
-    });
+    // Resolve overlaps after dropping to keep a sane grid
+    const resolved = resolveOverlaps(layout);
+    setLayouts((current) => ({ ...current, [layoutBreakpoint]: resolved }));
   };
 
   // Handler to completely lock heights - called by onLayoutChange to prevent auto-adjustments
@@ -999,11 +1028,8 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
       };
     });
   } else {
-    // During drag, allow height to follow natural compaction
-    setLayouts((prev) => ({
-      ...prev,
-      [layoutBreakpoint]: current,
-    }));
+    // During drag, allow free movement; we'll resolve overlaps on drop
+    setLayouts((prev) => ({ ...prev, [layoutBreakpoint]: current }));
   }
 };
 
@@ -1179,6 +1205,20 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
       date_range: dateRange,
     }));
   }, [settings?.preferences?.dashboard_charts?.range]);
+
+  // Normalize minH to allow users to shrink cards vertically
+  useEffect(() => {
+    if (!layoutBreakpoint) return;
+    setLayouts((prev) => {
+      const current = prev[layoutBreakpoint];
+      if (!current) return prev;
+      const normalized = current.map((i) => ({
+        ...i,
+        minH: Math.min(i.minH ?? 10, 10),
+      }));
+      return { ...prev, [layoutBreakpoint]: normalized };
+    });
+  }, [layoutBreakpoint]);
 
   useEffect(() => {
     setArePreferenceCardsChanged(true);
@@ -1977,9 +2017,9 @@ return (
           onDragStop={onDragStop}
          onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-          compactType="vertical"
-         preventCollision={true}
-         allowOverlap={false}
+          compactType={null}
+         preventCollision={false}
+         allowOverlap={true}
          onDrag={handleOnDrag}
        >
           {(totals.isLoading || !isLayoutsInitialized) && (
