@@ -1469,26 +1469,38 @@ export function ResizableDashboardCards() {
             <div className="flex space-x-2">
               {currencies && (
                 <SelectField
-                  value={currency.toString()}
-                  onValueChange={(value) =>
-                    update(
-                      'preferences.dashboard_charts.currency',
-                      parseInt(value)
-                    )
-                  }
-                >
-                  <option value="999">{t('all')}</option>
-                  {currencies.map((selectedCurrency) => (
-                    <option
-                      key={selectedCurrency.value}
-                      value={selectedCurrency.value}
-                    >
-                      {selectedCurrency.label}
-                    </option>
-                  ))}
-                </SelectField>
-              )}
-              <DropdownDateRangePicker body={body} setBody={setBody} />
+                 value={currency.toString()}
+                 onValueChange={(value) =>
+                   update(
+                     'preferences.dashboard_charts.currency',
+                     parseInt(value)
+                   )
+                 }
+               >
+                 <option value="999">{t('all')}</option>
+                 {currencies.map((selectedCurrency) => (
+                   <option
+                     key={selectedCurrency.value}
+                     value={selectedCurrency.value}
+                   >
+                     {selectedCurrency.label}
+                   </option>
+                 ))}
+               </SelectField>
+             )}
+              <DropdownDateRangePicker
+                value={body.date_range}
+                startDate={body.start_date}
+                endDate={body.end_date}
+                handleDateChange={handleDateChange}
+                handleDateRangeChange={(range) => {
+                  setBody({
+                    start_date: GLOBAL_DATE_RANGES[range]?.start || '',
+                    end_date: GLOBAL_DATE_RANGES[range]?.end || '',
+                    date_range: range,
+                  });
+                }}
+              />
             </div>
           </div>
         );
