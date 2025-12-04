@@ -1418,25 +1418,26 @@ export function ResizableDashboardCards() {
  }, [layoutBreakpoint]);
 
   // Convert flat layouts to row layouts on initialization
-  useEffect(() => {
-    if (!isLayoutsInitialized || Object.keys(rowLayouts).length > 0) {
-      return;
-    }
+ useEffect(() => {
+   if (!isLayoutsInitialized || Object.keys(rowLayouts).length > 0) {
+     return;
+   }
 
-    const convertedLayouts: { [breakpoint: string]: DashboardRowLayout } = {};
+   const convertedLayouts: { [breakpoint: string]: DashboardRowLayout } = {};
 
-    Object.keys(layouts).forEach((breakpoint) => {
-      const flatLayout = layouts[breakpoint];
-      convertedLayouts[breakpoint] = {
-        rows: convertFlatLayoutToRows(flatLayout),
-      };
-    });
+   Object.keys(layouts).forEach((breakpoint) => {
+     const flatLayout = layouts[breakpoint];
+     convertedLayouts[breakpoint] = {
+       rows: convertFlatLayoutToRows(flatLayout),
+     };
+   });
 
-    setRowLayouts(convertedLayouts);
-    setUseRowBasedLayout(true);
-  }, [isLayoutsInitialized, layouts]);
+   setRowLayouts(convertedLayouts);
+    // DISABLED: Row-based layout needs height calculation fix
+    // setUseRowBasedLayout(true);
+ }, [isLayoutsInitialized, layouts]);
 
- useDebounce(
+useDebounce(
     () => {
       if (
         settings &&
