@@ -1989,15 +1989,15 @@ return (
              isResizingRef.current = true;
            }}
            onResizeStop={onResizeStop}
-           onDragStop={onDragStop}
-          onLayoutChange={handleLayoutChangeWithLock}
-          resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-          compactType={null}
-          preventCollision={true}
+          onDragStop={onDragStop}
+         onLayoutChange={handleLayoutChangeWithLock}
+         resizeHandles={['s', 'w', 'e', 'se', 'sw']}
+         compactType={null}
+          preventCollision={false}
           allowOverlap={false}
-          verticalCompact={false}
-          onDrag={handleOnDrag}
-        >
+         verticalCompact={false}
+         onDrag={handleOnDrag}
+       >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
               <Spinner />
