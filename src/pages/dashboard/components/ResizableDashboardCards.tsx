@@ -15,27 +15,16 @@ import { Button, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { useEffect, useState } from 'react';
 import { Spinner } from '$app/components/Spinner';
-import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { Badge } from '$app/components/Badge';
-import {
-  ChartsDefaultView,
-  useReactSettings,
-} from '$app/common/hooks/useReactSettings';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
-import { useColorScheme } from '$app/common/colors';
-import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
-import { DashboardCardSelector } from './DashboardCardSelector';
-import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout';
-import { Icon } from '$app/components/icons/Icon';
-import { BiMove } from 'react-icons/bi';
+import GridLayout from 'react-grid-layout';
 import classNames from 'classnames';
 import { ModuleBitmask } from '$app/pages/settings';
 import { UpcomingQuotes } from './UpcomingQuotes';
@@ -60,32 +49,14 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { toast } from '$app/common/helpers/toast/toast';
-import { RestoreCardsModal } from './RestoreCardsModal';
-import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
-import { MdDragHandle } from 'react-icons/md';
-import {
-  compactLayout,
-  normalizeRowHeights,
-  enforceConstraints,
-  enforceRowConstraints,
-} from '../utils/layoutHelpers';
 import {
   DashboardRowLayout,
   convertFlatLayoutToRows,
   convertRowsToFlatLayout,
 } from '../types/DashboardRowTypes';
 import { DashboardRowContainer } from './DashboardRowContainer';
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
-
-interface TotalsRecord {
-  revenue: { paid_to_date: string; code: string };
-  expenses: { amount: string; code: string };
-  invoices: { invoiced_amount: string; code: string; date: string };
-  outstanding: { outstanding_count: number; amount: string; code: string };
-}
 
 interface Currency {
   value: string;
@@ -1009,34 +980,28 @@ export const initialLayouts = {
 export function ResizableDashboardCards() {
   const [t] = useTranslation();
 
-  const { Preferences, update } = usePreferences();
+  const { update } = usePreferences();
 
   const enabled = useEnabled();
   const dispatch = useDispatch();
-  const formatMoney = useFormatMoney();
 
   const user = useCurrentUser();
-  const colors = useColorScheme();
   const company = useCurrentCompany();
   const settings = useReactSettings();
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
-  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>();
+  const [layoutBreakpoint] = useState<string>();
   const [layouts, setLayouts] = useState<DashboardGridLayouts>(initialLayouts);
   const [rowLayouts, setRowLayouts] = useState<{
     [bp: string]: DashboardRowLayout;
   }>({});
 
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isEditMode] = useState<boolean>(false);
   const [isLayoutsInitialized, setIsLayoutsInitialized] =
     useState<boolean>(false);
-  const [isLayoutRestored, setIsLayoutRestored] = useState<boolean>(false);
-  const [areCardsRestored, setAreCardsRestored] = useState<boolean>(false);
-  const [arePreferenceCardsChanged, setArePreferenceCardsChanged] =
-    useState<boolean>(false);
+  const [isLayoutRestored] = useState<boolean>(false);
   const [currentDashboardFields, setCurrentDashboardFields] = useState<
     DashboardField[]
   >([]);
@@ -1062,23 +1027,6 @@ export function ResizableDashboardCards() {
     date_range: dateRange,
   });
 
-  const handleDateChange = (DateSet: string) => {
-    const [startDate, endDate] = DateSet.split(',');
-    if (new Date(startDate) > new Date(endDate)) {
-      setBody({
-        start_date: endDate,
-        end_date: startDate,
-        date_range: 'custom',
-      });
-    } else {
-      setBody({
-        start_date: startDate,
-        end_date: endDate,
-        date_range: 'custom',
-      });
-    }
-  };
-
   const totals = useQuery({
     queryKey: ['/api/v1/charts/totals_v2', body],
     queryFn: () =>
@@ -1096,28 +1044,6 @@ export function ResizableDashboardCards() {
       ),
     staleTime: Infinity,
   });
-
-  const onResizeStop = (
-    layout: GridLayout.Layout[],
-    oldItem: GridLayout.Layout,
-    newItem: GridLayout.Layout
-  ) => {
-    if (layoutBreakpoint) {
-      setLayouts((current) => ({
-        ...current,
-        [layoutBreakpoint]: layout,
-      }));
-    }
-  };
-
-  const onDragStop = (layout: GridLayout.Layout[]) => {
-    if (!layoutBreakpoint) return;
-
-    setLayouts((current) => ({
-      ...current,
-      [layoutBreakpoint]: layout,
-    }));
-  };
 
   const handleUpdateUserPreferences = () => {
     const updatedUser = cloneDeep(user) as User;
@@ -1188,112 +1114,6 @@ export function ResizableDashboardCards() {
     ]?.includes(cardName);
   };
 
-  const handleOnLayoutChange = (currentLayout: GridLayout.Layout[]) => {
-    if (layoutBreakpoint) {
-      let isAnyRestored = false;
-
-      setLayouts((currentLayouts) => ({
-        ...currentLayouts,
-        [layoutBreakpoint]: currentLayout.map((layoutCard) => {
-          if (layoutCard.h === 1 && layoutCard.w === 1) {
-            const initialCardLayout = initialLayouts[
-              layoutBreakpoint as keyof typeof initialLayouts
-            ]?.find((initial) => initial.i === layoutCard.i);
-
-            if (initialCardLayout) {
-              isAnyRestored = true;
-            }
-
-            return initialCardLayout
-              ? {
-                  ...initialCardLayout,
-                  y: initialCardLayout.i === '1' ? 1 : Infinity,
-                }
-              : layoutCard;
-          }
-
-          return layoutCard;
-        }),
-      }));
-
-      arePreferenceCardsChanged && setArePreferenceCardsChanged(false);
-
-      if (!arePreferenceCardsChanged) {
-        setTimeout(() => {
-          if (isAnyRestored) {
-            setAreCardsRestored(false);
-
-            window.scrollTo({
-              top:
-                document.querySelector('.responsive-grid-box')?.scrollHeight ||
-                0,
-              behavior: 'smooth',
-            });
-          }
-        }, 450);
-      }
-    }
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleScroll = (isDraggingDown: boolean) => {
-    const scrollAmount = 15;
-
-    const containerRect = document
-      .querySelector('.responsive-grid-box')
-      ?.getBoundingClientRect();
-    if (!containerRect) return;
-
-    if (isDraggingDown) {
-      window.scrollBy({
-        behavior: 'smooth',
-        top: scrollAmount,
-      });
-    } else {
-      window.scrollBy({
-        behavior: 'smooth',
-        top: -scrollAmount,
-      });
-    }
-  };
-
-  const handleOnDrag = (
-    layout: GridLayout.Layout[],
-    oldItem: GridLayout.Layout,
-    newItem: GridLayout.Layout,
-    placeholder: GridLayout.Layout
-  ) => {
-    const isDraggingDown = newItem.y > placeholder.y;
-
-    //handleScroll(isDraggingDown);
-
-    if (newItem.i.length > 5) return;
-
-    if (!isDraggingDown) return;
-
-    const itemsBelow = layout.filter(
-      (item) => item.y > oldItem.y && item.i !== oldItem.i
-    );
-
-    if (itemsBelow.length) {
-      const closestItem = itemsBelow.reduce((closest, current) => {
-        const isInSameColumn = Math.abs(current.x - oldItem.x) < 10;
-        const isCloserVertically = current.y < closest.y;
-
-        return isInSameColumn && isCloserVertically ? current : closest;
-      }, itemsBelow[0]);
-
-      const isDraggingTallerItem = oldItem.h > closestItem.h * 0.9;
-
-      if (newItem.y > oldItem.h / 1.2 + oldItem.y && isDraggingTallerItem) {
-        const oldX = oldItem.x;
-        const oldY = oldItem.y;
-        closestItem.x = oldX;
-        closestItem.y = oldY;
-      }
-    }
-  };
-
   useEffect(() => {
     setBody((current) => ({
       ...current,
@@ -1301,9 +1121,6 @@ export function ResizableDashboardCards() {
     }));
   }, [settings?.preferences?.dashboard_charts?.range]);
 
-  useEffect(() => {
-    setArePreferenceCardsChanged(true);
-  }, [currentDashboardFields]);
 
   useEffect(() => {
     if (
@@ -1321,7 +1138,6 @@ export function ResizableDashboardCards() {
 
   useEffect(() => {
     if (totals.data) {
-      setTotalsData(totals.data);
 
       const currencies: Currency[] = [];
 
