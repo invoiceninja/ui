@@ -1247,12 +1247,26 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
               isAnyRestored = true;
             }
 
-            return initialCardLayout
-              ? {
-                  ...initialCardLayout,
-                  y: initialCardLayout.i === '1' ? 1 : Infinity,
-                }
-              : layoutCard;
+            if (initialCardLayout) {
+              // Restore card with proper dimensions and placement
+              return {
+                ...initialCardLayout,
+                // Place Panel 1 at top, others at bottom of current layout
+                y: initialCardLayout.i === '1' ? 0 : Infinity,
+              };
+            }
+            
+            // If no initial layout found, give it reasonable default dimensions
+            return {
+              ...layoutCard,
+              w: 495,  // Half width
+              h: 20,   // 400px height
+              minH: 16,
+              minW: 350,
+              maxH: 30,
+              maxW: 700,
+              y: Infinity,  // Place at bottom
+            };
           }
 
           return layoutCard;
@@ -1376,7 +1390,29 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   useEffect(() => {
    if (layoutBreakpoint) {
      if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
-       setLayouts(cloneDeep(settings?.dashboard_cards_configuration));
+       // Clone the saved configuration
+       const savedLayouts = cloneDeep(settings?.dashboard_cards_configuration);
+       
+       // Auto-fix any 1x1 cards (corrupted layouts) by resetting to initial values
+       const fixedLayouts = { ...savedLayouts };
+       Object.keys(savedLayouts).forEach((breakpoint) => {
+         const layoutArray = savedLayouts[breakpoint];
+         if (Array.isArray(layoutArray)) {
+           fixedLayouts[breakpoint] = layoutArray.map((card) => {
+             // If card is 1x1 (corrupted), restore from initial layouts
+             if (card.h === 1 && card.w === 1) {
+               const initialCard = initialLayouts[
+                 breakpoint as keyof typeof initialLayouts
+               ]?.find((initial) => initial.i === card.i);
+               
+               return initialCard || card;
+             }
+             return card;
+           });
+         }
+       });
+       
+       setLayouts(fixedLayouts);
 
        setIsLayoutsInitialized(true);
      }
