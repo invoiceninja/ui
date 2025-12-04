@@ -1433,7 +1433,8 @@ useEffect(() => {
   });
 
   setRowLayouts(convertedLayouts);
-   // TEMPORARILY DISABLED - row heights are too small
+   // DISABLED: Current row-based implementation is fundamentally broken
+   // Issues: Height calculations wrong, cards swap positions on click, window resize broken
    // setUseRowBasedLayout(true);
 }, [isLayoutsInitialized, layouts]);
 
