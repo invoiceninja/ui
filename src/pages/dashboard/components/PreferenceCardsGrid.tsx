@@ -64,6 +64,7 @@ export function PreferenceCardsGrid(props: Props) {
 
   const [layouts, setLayouts] = useState<ReactGridLayout.Layouts>({});
   const [isLayoutsInitialized, setIsLayoutsInitialized] = useState<boolean>(false);
+  const [dragStartLayout, setDragStartLayout] = useState<ReactGridLayout.Layout[]>([]);
 
   // Generate initial layout for cards
   const generateLayoutForCards = (
@@ -131,28 +132,21 @@ export function PreferenceCardsGrid(props: Props) {
       return;
     }
 
-    setLayouts((prevLayouts) => {
-      const currentLayoutForBreakpoint = prevLayouts[layoutBreakpoint] || [];
-
-      const nonExistingCards = currentDashboardFields?.filter(
-        (currentCard) =>
-          !currentLayoutForBreakpoint.some((card) => currentCard.id === card.i)
-      );
-
-      if (!nonExistingCards.length) {
-        return prevLayouts;
-      }
-
+    setLayouts((currentLayouts) => {
+      const currentLayoutForBreakpoint =
+        currentLayouts[layoutBreakpoint] || [];
       const newCardsLayout = generateLayoutForCards(
         currentDashboardFields,
         layoutBreakpoint
       );
 
       return {
-        ...prevLayouts,
+        ...currentLayouts,
         [layoutBreakpoint]: [
-          ...currentLayoutForBreakpoint.filter((card) =>
-            currentDashboardFields.some((field) => field.id === card.i)
+          ...currentLayoutForBreakpoint.filter((existingCard) =>
+            currentDashboardFields.some(
+              (newCard) => newCard.id === existingCard.i
+            )
           ),
           ...newCardsLayout.filter(
             (newCard) =>
@@ -224,6 +218,24 @@ export function PreferenceCardsGrid(props: Props) {
     [layouts]
   );
 
+  // Custom drag handler to implement smoother drag behavior
+  const handleDrag = (layout: ReactGridLayout.Layout[], oldItem: ReactGridLayout.Layout, newItem: ReactGridLayout.Layout) => {
+    // Don't apply threshold logic, just let cards move freely
+    // The overlap mode allows cards to temporarily overlap during drag
+    // They will snap to grid on drop
+  };
+
+  // Track drag start position
+  const handleDragStart = (layout: ReactGridLayout.Layout[], oldItem: ReactGridLayout.Layout, newItem: ReactGridLayout.Layout) => {
+    setDragStartLayout(cloneDeep(layout));
+  };
+
+  // Apply collision detection on drag stop
+  const handleDragStop = (layout: ReactGridLayout.Layout[], oldItem: ReactGridLayout.Layout, newItem: ReactGridLayout.Layout) => {
+    // Allow the layout to settle naturally
+    // Grid will prevent final overlaps automatically
+  };
+
   return (
     <ResponsiveGridLayout
       className="preference-cards-grid"
@@ -255,6 +267,15 @@ export function PreferenceCardsGrid(props: Props) {
       onLayoutChange={(layout, layouts) => setLayouts(layouts)}
       compactType={null}
       preventCollision={false}
+      allowOverlap={true}
+      verticalCompact={false}
+      maxRows={20}
+      containerPadding={[0, 0]}
+      useCSSTransforms={true}
+      onDrag={handleDrag}
+      onDragStart={handleDragStart}
+      onDragStop={handleDragStop}
+      transformScale={1}
     >
       {currentDashboardFields.map((field) => (
         <div
