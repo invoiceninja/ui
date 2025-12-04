@@ -213,20 +213,10 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 };
 
 export const initialLayouts = {
- xxl: [
-   {
-     i: '1',
-     x: 0,
-     y:  0,
-     w: 1000,
-     h: 15,
-     minH: 10,
-      maxH: 25,
-   },
-   {
+ xxl: [   {
      i: '2',
      x: 0,
-     y: 15,
+     y: 0,
      w: 330,
      h: 25,
      minH: 20,
@@ -237,7 +227,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 400,
-      y: 15,
+      y: 0,
       w: 660,
       h: 25,
      minH: 20,
@@ -248,7 +238,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 40,
+      y: 25,
       w: 495,
       h: 20,
       minH: 16,
@@ -259,7 +249,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 40,
+      y: 25,
       w: 495,
       h: 20,
       minH: 16,
@@ -270,7 +260,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 60,
+      y: 45,
       w: 495,
       h: 20,
       minH: 16,
@@ -281,7 +271,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 60,
+      y: 45,
       w: 495,
       h: 20,
       minH: 16,
@@ -292,7 +282,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 80,
+      y: 65,
       w: 495,
       h: 20,
       minH: 16,
@@ -303,7 +293,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 80,
+      y: 65,
       w: 495,
       h: 20,
       minH: 16,
@@ -314,7 +304,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 100,
+      y: 85,
       w: 495,
       h: 20,
       minH: 16,
@@ -358,7 +348,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 40,
+      y: 25,
       w: 495,
       h: 20,
       minH: 16,
@@ -369,7 +359,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 40,
+      y: 25,
       w: 495,
       h: 20,
       minH: 16,
@@ -380,7 +370,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 60,
+      y: 45,
       w: 495,
       h: 20,
       minH: 16,
@@ -391,7 +381,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 60,
+      y: 45,
       w: 495,
       h: 20,
       minH: 16,
@@ -402,7 +392,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 80,
+      y: 65,
       w: 495,
       h: 20,
       minH: 16,
@@ -413,7 +403,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 80,
+      y: 65,
       w: 495,
       h: 20,
       minH: 16,
@@ -424,7 +414,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 100,
+      y: 85,
       w: 495,
       h: 20,
       minH: 16,
@@ -433,20 +423,10 @@ export const initialLayouts = {
       maxW: 700,
     },
   ],
-  lg: [
-    {
-      i: '1',
-      x: 0,
-      y:  0,
-      w: 1000,
-      h: 15,
-      minH: 10,
-      maxH: 25,
-    },
-    {
+  lg: [    {
       i: '2',
       x: 0,
-      y: 15,
+      y: 0,
       w: 330,
       h: 25,
       minH: 20,
@@ -457,7 +437,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 400,
-      y: 15,
+      y: 0,
       w: 660,
       h: 25,
       minH: 20,
@@ -468,7 +448,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 40,
+      y: 25,
       w: 495,
       h: 20,
       minH: 16,
@@ -479,7 +459,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 510,
-      y: 40,
+      y: 25,
       w: 495,
       h: 20,
       minH: 16,
@@ -490,7 +470,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 60,
+      y: 45,
       w: 495,
       h: 20,
       minH: 16,
@@ -501,7 +481,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 510,
-      y: 60,
+      y: 45,
       w: 495,
       h: 20,
       minH: 16,
@@ -512,7 +492,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 80,
+      y: 65,
       w: 495,
       h: 20,
       minH: 16,
@@ -523,7 +503,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 510,
-      y: 80,
+      y: 65,
       w: 495,
       h: 20,
       minH: 16,
@@ -534,7 +514,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 100,
+      y: 85,
       w: 495,
       h: 20,
       minH: 16,
@@ -543,20 +523,10 @@ export const initialLayouts = {
       maxW: 700,
     },
   ],
-  md: [
-    {
-      i: '1',
-      x: 0,
-      y:  0,
-      w: 1000,
-      h: 15,
-      minH: 10,
-      maxH: 25,
-    },
-    {
+  md: [    {
       i: '2',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -567,7 +537,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -578,7 +548,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -589,7 +559,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -600,7 +570,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -611,7 +581,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -622,7 +592,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -633,7 +603,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -644,7 +614,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 100,
+      y: 85,
       w: 1000,
       h: 20,
       minH: 16,
@@ -653,20 +623,10 @@ export const initialLayouts = {
       maxW: 1000,
     },
   ],
-  sm: [
-    {
-      i: '1',
-      x: 0,
-      y:  0,
-      w: 1000,
-      h: 15,
-      minH: 10,
-      maxH: 25,
-    },
-    {
+  sm: [    {
       i: '2',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -677,7 +637,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -688,7 +648,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -699,7 +659,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -710,7 +670,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -721,7 +681,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -732,7 +692,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -743,7 +703,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -754,7 +714,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 100,
+      y: 85,
       w: 1000,
       h: 20,
       minH: 16,
@@ -763,20 +723,10 @@ export const initialLayouts = {
       maxW: 1000,
     },
   ],
-  xs: [
-    {
-      i: '1',
-      x: 0,
-      y:  0,
-      w: 1000,
-      h: 15,
-      minH: 10,
-      maxH: 25,
-    },
-    {
+  xs: [    {
       i: '2',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -787,7 +737,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -798,7 +748,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -809,7 +759,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -820,7 +770,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -831,7 +781,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -842,7 +792,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -853,7 +803,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -864,7 +814,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 100,
+      y: 85,
       w: 1000,
       h: 20,
       minH: 16,
@@ -873,20 +823,10 @@ export const initialLayouts = {
       maxW: 1000,
     },
   ],
-  xxs: [
-    {
-      i: '1',
-      x: 0,
-      y:  0,
-      w: 1000,
-      h: 15,
-      minH: 10,
-      maxH: 25,
-    },
-    {
+  xxs: [    {
       i: '2',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -897,7 +837,7 @@ export const initialLayouts = {
     {
       i: '3',
       x: 0,
-      y: 15,
+      y: 0,
       w: 1000,
       h: 25,
       minH: 20,
@@ -908,7 +848,7 @@ export const initialLayouts = {
     {
       i: '4',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -919,7 +859,7 @@ export const initialLayouts = {
     {
       i: '5',
       x: 0,
-      y: 40,
+      y: 25,
       w: 1000,
       h: 20,
       minH: 16,
@@ -930,7 +870,7 @@ export const initialLayouts = {
     {
       i: '6',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -941,7 +881,7 @@ export const initialLayouts = {
     {
       i: '7',
       x: 0,
-      y: 60,
+      y: 45,
       w: 1000,
       h: 20,
       minH: 16,
@@ -952,7 +892,7 @@ export const initialLayouts = {
     {
       i: '8',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -963,7 +903,7 @@ export const initialLayouts = {
     {
       i: '9',
       x: 0,
-      y: 80,
+      y: 65,
       w: 1000,
       h: 20,
       minH: 16,
@@ -974,7 +914,7 @@ export const initialLayouts = {
     {
       i: '10',
       x: 0,
-      y: 100,
+      y: 85,
       w: 1000,
       h: 20,
       minH: 16,
@@ -2043,6 +1983,33 @@ return (
           </div>
           )}
 
+    {/* PreferenceCardsGrid - OUTSIDE grid for full card interactivity */}
+    {currentDashboardFields?.length ? (
+      <div className="mb-4">
+        <Card
+          title={t('preference_cards')}
+          withContainer
+          style={{ 
+            minHeight: '200px',
+            maxHeight: '500px',
+            overflow: 'auto',
+            resize: 'vertical'
+          }}
+        >
+          <PreferenceCardsGrid
+            currentDashboardFields={currentDashboardFields}
+            dateRange={dateRange}
+            startDate={dates.start_date}
+            endDate={dates.end_date}
+            currencyId={currency.toString()}
+            layoutBreakpoint={layoutBreakpoint}
+            isEditMode={isEditMode}
+          />
+        </Card>
+      </div>
+    ) : null}
+
+
           <ResponsiveGridLayout
           className="layout responsive-grid-box"
            breakpoints={{
@@ -2113,41 +2080,6 @@ return (
             </div>
           )}
 
-         {currentDashboardFields?.length ? (
-          <div key="1" style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            {isEditMode && (
-              <div
-                className="drag-handle"
-                style={{
-                  height: '30px',
-                  cursor: 'grab',
-                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                  border: '2px dashed rgba(59, 130, 246, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  position: 'relative',
-                  zIndex: 10,
-                }}
-              >
-                <Icon element={MdDragHandle} size={20} />
-                <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>Drag to move panel</span>
-              </div>
-            )}
-           <div className="cancelDraggingCards" style={{ flex: 1, overflow: 'auto', minHeight: 0, position: 'relative', zIndex: 1, pointerEvents: 'auto' }}>
-            <PreferenceCardsGrid
-             currentDashboardFields={currentDashboardFields}
-              dateRange={dateRange}
-              startDate={dates.start_date}
-              endDate={dates.end_date}
-              currencyId={currency.toString()}
-              layoutBreakpoint={layoutBreakpoint}
-              isEditMode={isEditMode}
-             />
-             </div>
-           </div>
-         ) : null}
 
          {company && !isCardRemoved('account_login_text') ? (
            <div
