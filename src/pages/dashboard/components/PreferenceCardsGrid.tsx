@@ -265,10 +265,10 @@ export function PreferenceCardsGrid(props: Props) {
       isDroppable={true}
       isResizable={false}
       onLayoutChange={(layout, layouts) => setLayouts(layouts)}
-      compactType={null}
-      preventCollision={false}
-      allowOverlap={true}
-      verticalCompact={false}
+      compactType="vertical"
+      preventCollision={true}
+      allowOverlap={false}
+      verticalCompact={true}
       maxRows={20}
       containerPadding={[0, 0]}
       useCSSTransforms={true}

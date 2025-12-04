@@ -13,6 +13,14 @@
   background-image: none !important;
 }
 
+/* Remove default diagonal stripe pseudo-element from react-resizable */
+.react-resizable-handle::after {
+  content: '' !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+}
+
 .react-grid-item:hover .react-resizable-handle {
   opacity: 0.8;
 }

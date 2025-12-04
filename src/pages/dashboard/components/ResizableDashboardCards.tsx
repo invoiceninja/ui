@@ -999,30 +999,11 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
       };
     });
   } else {
-    // During drag, lock heights to prevent vertical expansion
-    setLayouts((prev) => {
-      const dragLockedLayout = current.map((item) => {
-        const existingItem = prev[layoutBreakpoint]?.find((i) => i.i === item.i);
-        return {
-          ...item,
-          h: existingItem?.h ?? item.h, // Preserve height during drag only
-        };
-      });
-      
-      const hasChanges = dragLockedLayout.some((item) => {
-        const existing = prev[layoutBreakpoint]?.find((e) => e.i === item.i);
-        if (!existing) return true;
-        return item.x !== existing.x || item.y !== existing.y || item.w !== existing.w || item.h !== existing.h;
-      });
-      
-      if (hasChanges) {
-        return {
-          ...prev,
-          [layoutBreakpoint]: dragLockedLayout,
-        };
-      }
-      return prev;
-    });
+    // During drag, allow height to follow natural compaction
+    setLayouts((prev) => ({
+      ...prev,
+      [layoutBreakpoint]: current,
+    }));
   }
 };
 
@@ -1118,7 +1099,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
                 // Place Panel 1 at top, others at bottom of current layout
                 y: initialCardLayout.i === '1' ? 0 : Infinity,
                 // Ensure reasonable starting min/max constraints remain flexible
-                minH: Math.min(16, initialCardLayout.h ?? 20),
+                minH: Math.min(10, initialCardLayout.h ?? 20),
                 maxH: 100,
               };
             }
@@ -1995,10 +1976,10 @@ return (
            onResizeStop={onResizeStop}
           onDragStop={onDragStop}
          onLayoutChange={handleLayoutChangeWithLock}
-        resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-          compactType={null}
+         resizeHandles={['s', 'w', 'e', 'se', 'sw']}
+          compactType="vertical"
          preventCollision={true}
-        allowOverlap={false}
+         allowOverlap={false}
          onDrag={handleOnDrag}
        >
           {(totals.isLoading || !isLayoutsInitialized) && (
