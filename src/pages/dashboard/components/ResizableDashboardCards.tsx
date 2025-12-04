@@ -13,7 +13,6 @@ import 'react-resizable/css/styles.css';
 import '$app/resources/css/gridLayout.css';
 import { Button, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
-import { useEffect, useState } from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { Spinner } from '$app/components/Spinner';
 import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
