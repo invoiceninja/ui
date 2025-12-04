@@ -1483,12 +1483,26 @@ useDebounce(
         // PreferenceCardsGrid
         if (!currentDashboardFields?.length) return null;
         return (
-          <div 
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-            style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-          >
+          <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {isEditMode && (
+              <div
+                className="drag-handle"
+                style={{
+                  height: '30px',
+                  cursor: 'grab',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  border: '2px dashed rgba(59, 130, 246, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Icon element={MdDragHandle} size={20} />
+                <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>Drag to move panel</span>
+              </div>
+            )}
+            <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
             <PreferenceCardsGrid
               currentDashboardFields={currentDashboardFields}
               dateRange={dateRange}
@@ -1498,6 +1512,7 @@ useDebounce(
               layoutBreakpoint={layoutBreakpoint}
               isEditMode={isEditMode}
             />
+            </div>
           </div>
         );
 
@@ -2098,29 +2113,43 @@ return (
             </div>
           )}
 
-          {currentDashboardFields?.length ? (
-            <div 
-              key="1" 
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-              style={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
-            >
-              <PreferenceCardsGrid
-               currentDashboardFields={currentDashboardFields}
-               dateRange={dateRange}
-               startDate={dates.start_date}
-               endDate={dates.end_date}
-               currencyId={currency.toString()}
-               layoutBreakpoint={layoutBreakpoint}
-               isEditMode={isEditMode}
-              />
-            </div>
-          ) : null}
+         {currentDashboardFields?.length ? (
+           <div key="1" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+             {isEditMode && (
+               <div
+                 className="drag-handle"
+                 style={{
+                   height: '30px',
+                   cursor: 'grab',
+                   backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                   border: '2px dashed rgba(59, 130, 246, 0.3)',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   flexShrink: 0,
+                 }}
+               >
+                 <Icon element={MdDragHandle} size={20} />
+                 <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>Drag to move panel</span>
+               </div>
+             )}
+             <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
+             <PreferenceCardsGrid
+              currentDashboardFields={currentDashboardFields}
+              dateRange={dateRange}
+              startDate={dates.start_date}
+              endDate={dates.end_date}
+              currencyId={currency.toString()}
+              layoutBreakpoint={layoutBreakpoint}
+              isEditMode={isEditMode}
+             />
+             </div>
+           </div>
+         ) : null}
 
-          {company && !isCardRemoved('account_login_text') ? (
-            <div
-              key="2"
+         {company && !isCardRemoved('account_login_text') ? (
+           <div
+             key="2"
               className={classNames('drag-handle', {
                 'cursor-grab': isEditMode,
               })}
