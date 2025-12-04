@@ -1992,10 +1992,9 @@ return (
           onDragStop={onDragStop}
          onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-         compactType={null}
-          preventCollision={false}
-          allowOverlap={false}
-         verticalCompact={false}
+          compactType="vertical"
+         preventCollision={false}
+         allowOverlap={false}
          onDrag={handleOnDrag}
        >
           {(totals.isLoading || !isLayoutsInitialized) && (
