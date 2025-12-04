@@ -2072,7 +2072,6 @@ return (
            compactType={null}
            preventCollision={true}
            allowOverlap={false}
-           draggableCancel=".cancelDraggingCards"
            onDrag={handleOnDrag}
          >
           {(totals.isLoading || !isLayoutsInitialized) && (
