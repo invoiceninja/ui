@@ -22,6 +22,7 @@ import {
   FaChevronDown,
   FaImage,
   FaFileCode,
+  FaTable,
 } from 'react-icons/fa';
 import { MdFormatListBulleted, MdFormatListNumbered } from 'react-icons/md';
 import { PiPencilSimpleFill } from 'react-icons/pi';
@@ -36,6 +37,10 @@ import Strike from '@tiptap/extension-strike';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
+import { Table } from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -49,7 +54,7 @@ import { Icon } from './icons/Icon';
 import { Modal } from './Modal';
 import { useColorScheme } from '$app/common/colors';
 import { useTranslation } from 'react-i18next';
-import { useDebounce } from 'react-use';
+import { useClickAway, useDebounce } from 'react-use';
 
 interface ThemeProps {
   backgroundColor: string;
@@ -107,8 +112,9 @@ interface DropdownProps {
 interface ColorPickerProps {
   color: string;
   onChange: (color: string) => void;
+  onApply: () => void;
   title?: string;
-  icon?: React.ReactNode;
+  type?: 'text' | 'background';
 }
 
 const ToolbarSection = styled.div`
@@ -274,6 +280,7 @@ const ColorPickerWrapper = styled.div`
   position: relative;
   display: inline-flex;
   align-items: center;
+  gap: 0;
 `;
 
 const ColorPickerButton = styled.button<{ theme: ThemeProps }>`
@@ -285,7 +292,8 @@ const ColorPickerButton = styled.button<{ theme: ThemeProps }>`
   height: 32px;
   padding: 0;
   border: 1px solid ${(props) => props.theme.borderColor};
-  border-radius: 6px;
+  border-radius: 6px 0 0 6px;
+  border-right: none;
   background: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -296,13 +304,22 @@ const ColorPickerButton = styled.button<{ theme: ThemeProps }>`
   }
 `;
 
-const ColorPickerInput = styled.input`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
+const ColorPickerDropdownButton = styled.button<{ theme: ThemeProps }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid ${(props) => props.theme.borderColor};
+  border-radius: 0 6px 6px 0;
+  background: transparent;
   cursor: pointer;
-  z-index: 1;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${(props) => props.theme.hoverColor};
+  }
 `;
 
 const ColorIconWrapper = styled.div<{ color: string }>`
@@ -387,10 +404,34 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
 
     ul {
       list-style-type: disc;
+
+      &[data-list-style='circle'] {
+        list-style-type: circle;
+      }
+
+      &[data-list-style='square'] {
+        list-style-type: square;
+      }
     }
 
     ol {
       list-style-type: decimal;
+
+      &[data-list-style='lower-alpha'] {
+        list-style-type: lower-alpha;
+      }
+
+      &[data-list-style='upper-alpha'] {
+        list-style-type: upper-alpha;
+      }
+
+      &[data-list-style='lower-roman'] {
+        list-style-type: lower-roman;
+      }
+
+      &[data-list-style='upper-roman'] {
+        list-style-type: upper-roman;
+      }
     }
 
     blockquote {
@@ -439,6 +480,7 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
         border: 1px solid ${(props) => props.theme.dividerColor};
         padding: 8px 12px;
         text-align: left;
+        min-width: 50px;
       }
 
       th {
@@ -676,7 +718,7 @@ function DropdownComponent({ label, icon, items }: DropdownProps) {
         onClick={() => setDropdownOpen((prev) => !prev)}
       >
         {icon && <DropdownIcon>{icon}</DropdownIcon>}
-        <DropdownLabel>{label}</DropdownLabel>
+        {label && <DropdownLabel>{label}</DropdownLabel>}
         <Icon
           element={FaChevronDown}
           style={{ fontSize: '12px', color: colors.$16 }}
@@ -708,10 +750,48 @@ function DropdownComponent({ label, icon, items }: DropdownProps) {
 function ColorPickerComponent({
   color,
   onChange,
+  onApply,
   title,
   type = 'text',
-}: ColorPickerProps & { type?: 'text' | 'background' }) {
+}: ColorPickerProps) {
   const colors = useColorScheme();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pickerWrapperRef = useRef<HTMLDivElement>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
+  useClickAway(pickerWrapperRef, (event) => {
+    if (
+      buttonRef.current?.contains(event.target as Node) ||
+      dropdownButtonRef.current?.contains(event.target as Node)
+    ) {
+      return;
+    }
+    setIsPickerOpen(false);
+  });
+
+  const handleDropdownClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!isPickerOpen) {
+      setIsPickerOpen(true);
+      setTimeout(() => {
+        inputRef.current?.click();
+      }, 10);
+    } else {
+      setIsPickerOpen(false);
+    }
+  };
+
+  const handleApplyClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onApply();
+  };
+
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
+  };
 
   const theme: ThemeProps = {
     backgroundColor: colors.$1,
@@ -731,13 +811,14 @@ function ColorPickerComponent({
   };
 
   return (
-    <ColorPickerWrapper>
-      <ColorPickerButton theme={theme} title={title}>
-        <ColorPickerInput
-          type="color"
-          value={color}
-          onChange={(e) => onChange(e.target.value)}
-        />
+    <ColorPickerWrapper style={{ position: 'relative' }}>
+      <ColorPickerButton
+        ref={buttonRef}
+        theme={theme}
+        title={title}
+        onClick={handleApplyClick}
+        type="button"
+      >
         {type === 'text' ? (
           <ColorIconWrapper color={color}>
             <span className="icon-letter">A</span>
@@ -754,6 +835,44 @@ function ColorPickerComponent({
           </ColorIconWrapper>
         )}
       </ColorPickerButton>
+
+      <ColorPickerDropdownButton
+        ref={dropdownButtonRef}
+        theme={theme}
+        onClick={handleDropdownClick}
+        type="button"
+      >
+        <Icon element={FaChevronDown} size={10} style={{ color: colors.$3 }} />
+      </ColorPickerDropdownButton>
+
+      {isPickerOpen && (
+        <div
+          ref={pickerWrapperRef}
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            left: 0,
+            zIndex: 1000,
+            padding: '1px',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            ref={inputRef}
+            type="color"
+            value={color}
+            onChange={handleColorChange}
+            style={{
+              width: '1px',
+              height: '1px',
+              border: 'none',
+              padding: 0,
+              opacity: 0,
+              position: 'absolute',
+            }}
+          />
+        </div>
+      )}
     </ColorPickerWrapper>
   );
 }
@@ -804,6 +923,12 @@ export function TipTapEditor({
           class: 'editor-image',
         },
       }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
       Underline,
       Strike,
       Subscript,
@@ -862,10 +987,8 @@ export function TipTapEditor({
     if (!editor) return;
 
     if (linkUrl) {
-      // Validate URL format
       let finalUrl = linkUrl.trim();
 
-      // If URL doesn't start with http:// or https://, add https://
       if (!/^https?:\/\//i.test(finalUrl)) {
         finalUrl = `https://${finalUrl}`;
       }
@@ -945,7 +1068,6 @@ export function TipTapEditor({
     [editor]
   );
 
-  // Get current font size from editor
   const getCurrentFontSize = useCallback((): string => {
     if (!editor) return '14px';
 
@@ -1078,6 +1200,96 @@ export function TipTapEditor({
     { label: '24pt', value: '24pt', onClick: () => setFontSize('24pt') },
     { label: '36pt', value: '36pt', onClick: () => setFontSize('36pt') },
     { label: '48pt', value: '48pt', onClick: () => setFontSize('48pt') },
+  ];
+
+  const bulletListItems: DropdownItem[] = [
+    {
+      label: 'Default',
+      value: 'disc',
+      onClick: () => editor.chain().focus().toggleBulletList().run(),
+    },
+    {
+      label: 'Circle',
+      value: 'circle',
+      onClick: () => editor.chain().focus().toggleBulletList().run(),
+    },
+    {
+      label: 'Square',
+      value: 'square',
+      onClick: () => editor.chain().focus().toggleBulletList().run(),
+    },
+  ];
+
+  const numberedListItems: DropdownItem[] = [
+    {
+      label: '1, 2, 3...',
+      value: 'decimal',
+      onClick: () => editor.chain().focus().toggleOrderedList().run(),
+    },
+    {
+      label: 'a, b, c...',
+      value: 'lower-alpha',
+      onClick: () => editor.chain().focus().toggleOrderedList().run(),
+    },
+    {
+      label: 'A, B, C...',
+      value: 'upper-alpha',
+      onClick: () => editor.chain().focus().toggleOrderedList().run(),
+    },
+    {
+      label: 'i, ii, iii...',
+      value: 'lower-roman',
+      onClick: () => editor.chain().focus().toggleOrderedList().run(),
+    },
+    {
+      label: 'I, II, III...',
+      value: 'upper-roman',
+      onClick: () => editor.chain().focus().toggleOrderedList().run(),
+    },
+  ];
+
+  const tableItems: DropdownItem[] = [
+    {
+      label: 'Insert table',
+      value: 'insert',
+      onClick: () =>
+        editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run(),
+    },
+    {
+      label: 'Add column before',
+      value: 'addColumnBefore',
+      onClick: () => editor.chain().focus().addColumnBefore().run(),
+    },
+    {
+      label: 'Add column after',
+      value: 'addColumnAfter',
+      onClick: () => editor.chain().focus().addColumnAfter().run(),
+    },
+    {
+      label: 'Delete column',
+      value: 'deleteColumn',
+      onClick: () => editor.chain().focus().deleteColumn().run(),
+    },
+    {
+      label: 'Add row before',
+      value: 'addRowBefore',
+      onClick: () => editor.chain().focus().addRowBefore().run(),
+    },
+    {
+      label: 'Add row after',
+      value: 'addRowAfter',
+      onClick: () => editor.chain().focus().addRowAfter().run(),
+    },
+    {
+      label: 'Delete row',
+      value: 'deleteRow',
+      onClick: () => editor.chain().focus().deleteRow().run(),
+    },
+    {
+      label: 'Delete table',
+      value: 'deleteTable',
+      onClick: () => editor.chain().focus().deleteTable().run(),
+    },
   ];
 
   return (
@@ -1214,19 +1426,17 @@ export function TipTapEditor({
         <div className="flex items-center gap-2">
           <ColorPickerComponent
             color={textColor}
-            onChange={(color) => {
-              setTextColor(color);
-              editor.chain().focus().setColor(color).run();
-            }}
+            onChange={(color) => setTextColor(color)}
+            onApply={() => editor.chain().focus().setColor(textColor).run()}
             type="text"
           />
 
           <ColorPickerComponent
             color={backgroundColor}
-            onChange={(color) => {
-              setBackgroundColor(color);
-              editor.chain().focus().setBackgroundColor(color).run();
-            }}
+            onChange={(color) => setBackgroundColor(color)}
+            onApply={() =>
+              editor.chain().focus().setBackgroundColor(backgroundColor).run()
+            }
             type="background"
           />
 
@@ -1234,27 +1444,29 @@ export function TipTapEditor({
         </div>
 
         <ToolbarSection>
-          <ToolbarButtonComponent
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            isActive={editor.isActive('bulletList')}
-          >
-            <Icon
-              element={MdFormatListBulleted}
-              size={18}
-              style={{ color: colors.$3 }}
-            />
-          </ToolbarButtonComponent>
+          <DropdownComponent
+            label=""
+            icon={
+              <Icon
+                element={MdFormatListBulleted}
+                size={18}
+                style={{ color: colors.$3 }}
+              />
+            }
+            items={bulletListItems}
+          />
 
-          <ToolbarButtonComponent
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            isActive={editor.isActive('orderedList')}
-          >
-            <Icon
-              element={MdFormatListNumbered}
-              size={18}
-              style={{ color: colors.$3 }}
-            />
-          </ToolbarButtonComponent>
+          <DropdownComponent
+            label=""
+            icon={
+              <Icon
+                element={MdFormatListNumbered}
+                size={18}
+                style={{ color: colors.$3 }}
+              />
+            }
+            items={numberedListItems}
+          />
 
           <ToolbarDividerComponent />
         </ToolbarSection>
@@ -1348,6 +1560,17 @@ export function TipTapEditor({
           <ToolbarButtonComponent onClick={() => fileInputRef.current?.click()}>
             <Icon element={FaImage} size={16} style={{ color: colors.$3 }} />
           </ToolbarButtonComponent>
+          <ToolbarDividerComponent />
+        </ToolbarSection>
+
+        <ToolbarSection>
+          <DropdownComponent
+            label=""
+            icon={
+              <Icon element={FaTable} size={14} style={{ color: colors.$3 }} />
+            }
+            items={tableItems}
+          />
           <ToolbarDividerComponent />
         </ToolbarSection>
 
