@@ -5,12 +5,14 @@
 
 /* Enhanced resize handle styling */
 .react-resizable-handle {
-  opacity: 0.3;
-  transition: opacity 0.2s ease;
+  opacity: 0;
+ transition: opacity 0.2s ease;
+  z-index: 100 !important;
+  pointer-events: auto !important;
 }
 
 .react-grid-item:hover .react-resizable-handle {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .react-resizable-handle-se {
@@ -64,11 +66,12 @@
 }
 
 .react-resizable-handle-s {
-  bottom: 0;
-  cursor: s-resize;
-  height: 10px;
-  width: 100% !important;
-  left: 0 !important;
+ bottom: 0;
+ cursor: s-resize;
+ height: 10px;
+ width: 100% !important;
+ left: 0 !important;
+  z-index: 100 !important;
 }
 
 /* Edit mode styling */
@@ -78,7 +81,7 @@
 }
 
 .dashboard-edit-mode .react-resizable-handle {
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
 .dashboard-edit-mode .react-grid-item:hover .react-resizable-handle {
@@ -86,7 +89,34 @@
 }
 
 .dashboard-edit-mode .react-grid-item:hover {
-  border-color: #3b82f6;
+ border-color: #3b82f6;
+}
+
+/* Make south handle more accessible for Panel 1 with nested structure */
+.dashboard-edit-mode .react-grid-item[style*="flex"] .react-resizable-handle-s {
+  height: 15px !important;
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-top: 2px solid rgba(59, 130, 246, 0.5) !important;
+}
+
+.dashboard-edit-mode .react-grid-item[style*="flex"]:hover .react-resizable-handle-s {
+  opacity: 1 !important;
+  background: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Corner handles get even more prominence */
+.dashboard-edit-mode .react-resizable-handle-se,
+.dashboard-edit-mode .react-resizable-handle-sw {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle-se,
+.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle-sw {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.4) !important;
+  border: 2px solid rgba(59, 130, 246, 0.7) !important;
+  border-radius: 2px;
 }
 
 /* Drag handle styling */

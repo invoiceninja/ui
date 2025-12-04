@@ -1991,10 +1991,10 @@ return (
            onResizeStop={onResizeStop}
           onDragStop={onDragStop}
          onLayoutChange={handleLayoutChangeWithLock}
-         resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-          compactType="vertical"
-         preventCollision={false}
-         allowOverlap={false}
+        resizeHandles={['s', 'w', 'e', 'se', 'sw']}
+          compactType={null}
+         preventCollision={true}
+        allowOverlap={false}
          onDrag={handleOnDrag}
        >
           {(totals.isLoading || !isLayoutsInitialized) && (
@@ -2006,28 +2006,31 @@ return (
          {/* Panel 1 - PreferenceCardsGrid */}
          {currentDashboardFields?.length ? (
            <div
-             key="1"
-              style={{ 
-                height: '100%', 
-                display: 'flex', 
-                flexDirection: 'column',
-                pointerEvents: 'auto',
-                position: 'relative'
-              }}
-           >
-              {isEditMode && (
-                <div
-                  className="drag-handle"
-                  style={{
-                    height: '30px',
-                    cursor: 'grab',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    border: '2px dashed rgba(59, 130, 246, 0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
+            key="1"
+             style={{ 
+               height: '100%', 
+               display: 'flex', 
+               flexDirection: 'column',
+                pointerEvents: 'none',
+               position: 'relative'
+             }}
+          >
+             {isEditMode && (
+               <div
+                 className="drag-handle"
+                 style={{
+                   height: '30px',
+                   cursor: 'grab',
+                   backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                   border: '2px dashed rgba(59, 130, 246, 0.3)',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   flexShrink: 0,
+                    pointerEvents: 'auto',
+                    position: 'relative',
+                    zIndex: 2,
+                 }}
                 >
                   <Icon element={MdDragHandle} size={20} />
                   <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>
@@ -2036,16 +2039,15 @@ return (
                 </div>
               )}
              <div 
-               className="no-drag-zone" 
-                style={{ 
-                  flex: 1, 
-                  overflow: 'auto', 
-                  minHeight: 0, 
-                  cursor: 'default',
-                  pointerEvents: 'auto',
-                  position: 'relative',
-                  zIndex: 1
-                }}
+              className="no-drag-zone" 
+               style={{ 
+                 flex: 1, 
+                 overflow: 'auto', 
+                 minHeight: 0, 
+                 cursor: 'default',
+                 pointerEvents: 'auto',
+                 position: 'relative',
+               }}
              >
                 <PreferenceCardsGrid
                   currentDashboardFields={currentDashboardFields}
