@@ -1442,7 +1442,7 @@ useDebounce(
                 <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>Drag to move panel</span>
               </div>
             )}
-            <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
+            <div className="no-drag-zone" style={{ flex: 1, overflow: 'auto', minHeight: 0, cursor: 'default' }}>
             <PreferenceCardsGrid
               currentDashboardFields={currentDashboardFields}
               dateRange={dateRange}
@@ -2032,6 +2032,7 @@ return (
              xxs: 1000,
            }}
            draggableHandle=".drag-handle"
+           draggableCancel=".no-drag-zone"
           margin={[0, 20]}
            rowHeight={20}
           isDraggable={isEditMode}
