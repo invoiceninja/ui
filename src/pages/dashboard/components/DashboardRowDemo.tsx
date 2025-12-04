@@ -122,7 +122,7 @@ export function DashboardRowDemo() {
           <li>✓ Resize panels horizontally (width only)</li>
           <li>✓ Resize entire row vertically (affects all panels in row)</li>
           <li>✓ Drag rows up/down to reorder</li>
-          <li>✓ Add new rows with "+ Add Row" button</li>
+          <li>✓ Add new rows with &quot;+ Add Row&quot; button</li>
           <li>✓ Delete individual rows</li>
         </ul>
       </div>

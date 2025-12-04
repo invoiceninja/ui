@@ -26,35 +26,60 @@ export function DashboardRow({
 }: DashboardRowProps) {
   // Convert row panels to flat layout for react-grid-layout
   // Memoize to prevent unnecessary recalculations that trigger height changes
-  const panelLayout: GridLayout.Layout[] = useMemo(() => row.panels.map((panel) => ({
-    i: panel.i,
-    x: panel.x,
-    y: 0, // Always 0 within row context
-    w: panel.w,
-    h: row.h, // All panels inherit row height
-    minW: panel.minW,
-    maxW: panel.maxW,
-    static: panel.static,
-    isDraggable: panel.isDraggable !== false && isEditMode,
-    isResizable: panel.isResizable !== false && isEditMode,
-  })), [row.panels, row.h, row.id, isEditMode]);
+  const panelLayout: GridLayout.Layout[] = useMemo(() => {
+    return row.panels.map((panel) => ({
+      i: panel.i,
+      x: panel.x,
+      y: 0, // Always 0 within row context
+      w: panel.w,
+      h: row.h, // All panels inherit row height
+      minW: panel.minW,
+      maxW: panel.maxW,
+      static: panel.static,
+      isDraggable: panel.isDraggable !== false && isEditMode,
+      isResizable: panel.isResizable !== false && isEditMode,
+    }));
+  }, [row.panels, row.h, row.id, isEditMode]);
 
   const handleResizeStop = (
-    layout: GridLayout.Layout[],
-    _oldItem: GridLayout.Layout,
-    newItem: GridLayout.Layout
+    layout: GridLayout.Layout[]
   ) => {
-    // If any panel's height changed, update the entire row's height
-    if (newItem.h !== row.h) {
-      onRowResize(row.id, newItem.h);
-    }
-    onPanelLayoutChange(row.id, layout);
+    // Lock height - never allow panel height changes
+    // Only horizontal resizing is allowed
+    const lockedLayout = layout.map((item) => ({
+      ...item,
+      h: row.h, // Force height back to row height
+      y: 0, // Force y position to 0
+    }));
+
+    // Don't update if widths haven't actually changed
+    const hasChanges = layout.some((item, idx) => {
+      const panel = row.panels[idx];
+      return item.x !== panel?.x || item.w !== panel?.w;
+    });
+
+    if (!hasChanges) return;
+
+    onPanelLayoutChange(row.id, lockedLayout);
   };
 
   const handleDragStop = (layout: GridLayout.Layout[]) => {
-    // On drag stop, ensure heights remain locked to row height
-    // Only update x and w positions
-    onPanelLayoutChange(row.id, layout);
+    // Lock height and y position after drag
+    const lockedLayout = layout.map((item) => ({
+      ...item,
+      h: row.h, // Force height back to row height
+      y: 0, // Force y position to 0
+    }));
+
+    // Don't update if positions haven't actually changed
+    const hasChanges = layout.some((item, idx) => {
+      const panel = row.panels[idx];
+      return item.x !== panel?.x || item.w !== panel?.w;
+    });
+
+    if (!hasChanges) return;
+
+    onPanelLayoutChange(row.id, lockedLayout);
   };
 
   return (
@@ -67,7 +92,9 @@ export function DashboardRow({
         borderRadius: '4px',
         padding: isEditMode ? '8px' : '0',
         height: `${row.h}px`,
-        overflow: 'visible',
+        minHeight: `${row.h}px`,
+        maxHeight: `${row.h}px`,
+        overflow: 'hidden',
       }}
     >
       <ResponsiveGridLayout
@@ -88,6 +115,7 @@ export function DashboardRow({
         containerPadding={[0, 0]}
         isDraggable={isEditMode}
         isResizable={isEditMode}
+        maxRows={1}
         draggableHandle=".drag-handle"
         draggableCancel=".cancelDraggingCards"
         compactType={null}
@@ -96,6 +124,7 @@ export function DashboardRow({
         resizeHandles={['e', 'w']} // Only horizontal resize within row
         onResizeStop={handleResizeStop}
         onDragStop={handleDragStop}
+        onLayoutChange={() => {}} // Prevent any layout changes except through explicit handlers
         autoSize={false}
         verticalCompact={false}
       >

@@ -140,7 +140,7 @@ export function DashboardRowContainer({
 
   return (
     <div className="dashboard-row-container">
-      {layout.rows.map((row, index) => (
+      {layout.rows.map((row) => (
         <div
           key={row.id}
           draggable={isEditMode}

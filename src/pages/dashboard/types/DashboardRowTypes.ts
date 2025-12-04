@@ -82,7 +82,7 @@ export function convertFlatLayoutToRows(
 
   Array.from(grouped.entries())
     .sort(([a], [b]) => a - b)
-    .forEach(([_, items], rowIndex) => {
+    .forEach(([, items], rowIndex) => {
       // Calculate row height as max height of all panels in the row
       const rowHeight = Math.max(...items.map((item) => item.h || 10));
 
