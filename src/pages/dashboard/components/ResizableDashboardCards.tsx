@@ -992,7 +992,7 @@ export function ResizableDashboardCards() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
 
-  const [layoutBreakpoint] = useState<string>();
+  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>('xxl');
   const [layouts, setLayouts] = useState<DashboardGridLayouts>(initialLayouts);
   const [rowLayouts, setRowLayouts] = useState<{
     [bp: string]: DashboardRowLayout;
@@ -1026,6 +1026,32 @@ export function ResizableDashboardCards() {
     end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
     date_range: dateRange,
   });
+
+  // Detect breakpoint changes based on window width
+  useEffect(() => {
+    const getBreakpoint = (width: number): string => {
+      if (width >= 1600) return 'xxl';
+      if (width >= 1200) return 'xl';
+      if (width >= 1000) return 'lg';
+      if (width >= 800) return 'md';
+      if (width >= 600) return 'sm';
+      if (width >= 300) return 'xs';
+      return 'xxs';
+    };
+
+    const handleResize = () => {
+      const newBreakpoint = getBreakpoint(window.innerWidth);
+      if (newBreakpoint !== layoutBreakpoint) {
+        setLayoutBreakpoint(newBreakpoint);
+      }
+    };
+
+    // Set initial breakpoint
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [layoutBreakpoint]);
 
   const totals = useQuery({
     queryKey: ['/api/v1/charts/totals_v2', body],
@@ -1551,6 +1577,7 @@ export function ResizableDashboardCards() {
     setLayouts((current) => ({
       ...current,
       [layoutBreakpoint]: flatLayout,
+
     }));
   };
 

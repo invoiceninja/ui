@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import GridLayout from 'react-grid-layout';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { DashboardRow as DashboardRowType } from '../types/DashboardRowTypes';
@@ -8,58 +8,56 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 interface DashboardRowProps {
   row: DashboardRowType;
   breakpoint: string;
+  cols: { [key: string]: number };
   isEditMode: boolean;
+  renderPanel: (panelId: string) => ReactNode;
   onPanelLayoutChange: (rowId: string, layout: GridLayout.Layout[]) => void;
   onRowResize: (rowId: string, newHeight: number) => void;
-  renderPanel: (panelId: string) => ReactNode;
-  cols: { [key: string]: number };
+  onRowDelete?: (rowId: string) => void;
 }
 
 export function DashboardRow({
   row,
   breakpoint,
+  cols,
   isEditMode,
+  renderPanel,
   onPanelLayoutChange,
   onRowResize,
-  renderPanel,
-  cols,
+  onRowDelete,
 }: DashboardRowProps) {
-  // Convert row panels to flat layout for react-grid-layout
-  // Memoize to prevent unnecessary recalculations that trigger height changes
-  const panelLayout: GridLayout.Layout[] = useMemo(() => {
-    return row.panels.map((panel) => ({
+  // Use controlled state with key to force remounts on height changes
+  const [currentLayout, setCurrentLayout] = useState<GridLayout.Layout[]>([]);
+
+  // Initialize and sync layout from props - use effect to update on prop changes
+  useEffect(() => {
+    const newLayout = row.panels.map((panel) => ({
       i: panel.i,
       x: panel.x,
-      y: 0, // Always 0 within row context
+      y: 0,
       w: panel.w,
-      h: row.h, // All panels inherit row height
+      h: row.h,
       minW: panel.minW,
       maxW: panel.maxW,
       static: panel.static,
       isDraggable: panel.isDraggable !== false && isEditMode,
       isResizable: panel.isResizable !== false && isEditMode,
     }));
-  }, [row.panels, row.h, row.id, isEditMode]);
+    setCurrentLayout(newLayout);
+  }, [row.panels, row.h, row.id, isEditMode, breakpoint]);
 
-  const handleResizeStop = (
-    layout: GridLayout.Layout[]
-  ) => {
+  const handleResizeStop = (layout: GridLayout.Layout[]) => {
     // Lock height - never allow panel height changes
-    // Only horizontal resizing is allowed
     const lockedLayout = layout.map((item) => ({
       ...item,
-      h: row.h, // Force height back to row height
-      y: 0, // Force y position to 0
+      h: row.h,
+      y: 0,
     }));
 
-    // Don't update if widths haven't actually changed
-    const hasChanges = layout.some((item, idx) => {
-      const panel = row.panels[idx];
-      return item.x !== panel?.x || item.w !== panel?.w;
-    });
-
-    if (!hasChanges) return;
-
+    // Update local state
+    setCurrentLayout(lockedLayout);
+    
+    // Notify parent
     onPanelLayoutChange(row.id, lockedLayout);
   };
 
@@ -67,18 +65,14 @@ export function DashboardRow({
     // Lock height and y position after drag
     const lockedLayout = layout.map((item) => ({
       ...item,
-      h: row.h, // Force height back to row height
-      y: 0, // Force y position to 0
+      h: row.h,
+      y: 0,
     }));
 
-    // Don't update if positions haven't actually changed
-    const hasChanges = layout.some((item, idx) => {
-      const panel = row.panels[idx];
-      return item.x !== panel?.x || item.w !== panel?.w;
-    });
-
-    if (!hasChanges) return;
-
+    // Update local state
+    setCurrentLayout(lockedLayout);
+    
+    // Notify parent
     onPanelLayoutChange(row.id, lockedLayout);
   };
 
@@ -87,74 +81,25 @@ export function DashboardRow({
       className="dashboard-row"
       style={{
         position: 'relative',
+        width: '100%',
         marginBottom: '20px',
         border: isEditMode ? '1px dashed rgba(255, 255, 255, 0.2)' : 'none',
         borderRadius: '4px',
         padding: isEditMode ? '8px' : '0',
-        height: `${row.h}px`,
-        minHeight: `${row.h}px`,
-        maxHeight: `${row.h}px`,
-        overflow: 'hidden',
       }}
     >
-      <ResponsiveGridLayout
-        className="dashboard-row-grid"
-        layouts={{ [breakpoint]: panelLayout }}
-        breakpoints={{
-          xxl: 1600,
-          xl: 1200,
-          lg: 1000,
-          md: 800,
-          sm: 600,
-          xs: 300,
-          xxs: 0,
-        }}
-        cols={cols}
-        rowHeight={1}
-        margin={[0, 0]}
-        containerPadding={[0, 0]}
-        isDraggable={isEditMode}
-        isResizable={isEditMode}
-        maxRows={1}
-        draggableHandle=".drag-handle"
-        draggableCancel=".cancelDraggingCards"
-        compactType={null}
-        preventCollision={false}
-        allowOverlap={false}
-        resizeHandles={['e', 'w']} // Only horizontal resize within row
-        onResizeStop={handleResizeStop}
-        onDragStop={handleDragStop}
-        onLayoutChange={() => {}} // Prevent any layout changes except through explicit handlers
-        autoSize={false}
-        verticalCompact={false}
-      >
-        {row.panels.map((panel) => (
-          <div
-            key={panel.i}
-            className="dashboard-panel-wrapper"
-            style={{
-              height: '100%',
-              overflow: 'auto',
-            }}
-          >
-            {renderPanel(panel.i)}
-          </div>
-        ))}
-      </ResponsiveGridLayout>
-
-      {/* Row resize handle - vertical only */}
-      {isEditMode && (
+      {/* Row resize handle (bottom) */}
+      {isEditMode && onRowResize && (
         <div
           className="row-resize-handle"
           style={{
             position: 'absolute',
-            bottom: '-4px',
-            left: '0',
-            right: '0',
+            bottom: 0,
+            left: 0,
+            right: 0,
             height: '8px',
             cursor: 'ns-resize',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '4px',
+            background: 'transparent',
             zIndex: 100,
           }}
           onMouseDown={(e) => {
@@ -176,21 +121,87 @@ export function DashboardRow({
             document.addEventListener('mousemove', handleMouseMove);
             document.addEventListener('mouseup', handleMouseUp);
           }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '2px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '40px',
-              height: '4px',
-              background: 'rgba(255, 255, 255, 0.3)',
-              borderRadius: '2px',
-            }}
-          />
-        </div>
+        />
       )}
+
+      {/* Delete row button */}
+      {isEditMode && onRowDelete && (
+        <button
+          onClick={() => onRowDelete(row.id)}
+          style={{
+            position: 'absolute',
+            top: '4px',
+            right: '4px',
+            zIndex: 100,
+            padding: '4px 8px',
+            background: 'rgba(255, 0, 0, 0.7)',
+            border: 'none',
+            borderRadius: '4px',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '12px',
+          }}
+        >
+          Delete Row
+        </button>
+      )}
+
+      {/* Grid container with FIXED height */}
+      <div
+        style={{
+          height: `${row.h}px`,
+          minHeight: `${row.h}px`,
+          maxHeight: `${row.h}px`,
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      >
+        <ResponsiveGridLayout
+          key={`row-${row.id}-${row.h}-${breakpoint}`} // Force remount on height/breakpoint change
+          className="dashboard-row-grid"
+          layouts={{ [breakpoint]: currentLayout }}
+          breakpoints={{
+            xxl: 1600,
+            xl: 1200,
+            lg: 1000,
+            md: 800,
+            sm: 600,
+            xs: 300,
+            xxs: 0,
+          }}
+          cols={cols}
+          rowHeight={1}
+          margin={[0, 0]}
+          containerPadding={[0, 0]}
+          isDraggable={isEditMode}
+          isResizable={isEditMode}
+          maxRows={1}
+          draggableHandle=".drag-handle"
+          draggableCancel=".cancelDraggingCards"
+          compactType={null}
+          preventCollision={false}
+          allowOverlap={false}
+          resizeHandles={['e', 'w']}
+          onResizeStop={handleResizeStop}
+          onDragStop={handleDragStop}
+          autoSize={false}
+          verticalCompact={false}
+          width={1200} // Will be overridden by WidthProvider
+        >
+          {row.panels.map((panel) => (
+            <div
+              key={panel.i}
+              className="dashboard-panel-wrapper"
+              style={{
+                height: '100%',
+                overflow: 'auto',
+              }}
+            >
+              {renderPanel(panel.i)}
+            </div>
+          ))}
+        </ResponsiveGridLayout>
+      </div>
     </div>
   );
 }
