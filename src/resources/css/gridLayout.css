@@ -156,3 +156,21 @@
 .dashboard-edit-mode .preference-cards-grid-drag-handle:active {
   cursor: grabbing;
 }
+
+/* Ensure cards within no-drag-zone are fully interactive */
+.no-drag-zone,
+.no-drag-zone * {
+  pointer-events: auto !important;
+  cursor: auto;
+}
+
+/* Override react-grid-layout's event blocking for no-drag-zone */
+.react-grid-item .no-drag-zone {
+  pointer-events: auto !important;
+}
+
+/* Ensure drag handle still works */
+.drag-handle {
+  pointer-events: auto !important;
+  cursor: grab;
+}

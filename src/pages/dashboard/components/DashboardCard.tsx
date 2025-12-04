@@ -95,6 +95,7 @@ export function DashboardCard(props: CardProps) {
         'col-span-12':
           props.layoutBreakpoint === 'xs' || props.layoutBreakpoint === 'xxs',
       })}
+      style={{ pointerEvents: 'auto', cursor: 'pointer' }}
     >
       {isFormBusy && (
         <div className="flex items-center justify-center">

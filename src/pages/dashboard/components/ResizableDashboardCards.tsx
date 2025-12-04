@@ -2035,34 +2035,7 @@ return (
             </div>
             </div>
           </div>
-          )}
-
-    {/* PreferenceCardsGrid - OUTSIDE grid for full card interactivity */}
-    {currentDashboardFields?.length ? (
-      <div className="mb-4">
-        <Card
-          title={t('preference_cards')}
-          withContainer
-          style={{ 
-            minHeight: '200px',
-            maxHeight: '500px',
-            overflow: 'auto',
-            resize: 'vertical'
-          }}
-        >
-          <PreferenceCardsGrid
-            currentDashboardFields={currentDashboardFields}
-            dateRange={dateRange}
-            startDate={dates.start_date}
-            endDate={dates.end_date}
-            currencyId={currency.toString()}
-            layoutBreakpoint={layoutBreakpoint}
-            isEditMode={isEditMode}
-          />
-        </Card>
-      </div>
-    ) : null}
-
+         )}
 
           <ResponsiveGridLayout
           className="layout responsive-grid-box"
@@ -2134,6 +2107,62 @@ return (
             </div>
           )}
 
+         {/* Panel 1 - PreferenceCardsGrid */}
+         {currentDashboardFields?.length ? (
+           <div
+             key="1"
+              style={{ 
+                height: '100%', 
+                display: 'flex', 
+                flexDirection: 'column',
+                pointerEvents: 'auto',
+                position: 'relative'
+              }}
+           >
+              {isEditMode && (
+                <div
+                  className="drag-handle"
+                  style={{
+                    height: '30px',
+                    cursor: 'grab',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    border: '2px dashed rgba(59, 130, 246, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon element={MdDragHandle} size={20} />
+                  <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>
+                    Drag to move panel
+                  </span>
+                </div>
+              )}
+             <div 
+               className="no-drag-zone" 
+                style={{ 
+                  flex: 1, 
+                  overflow: 'auto', 
+                  minHeight: 0, 
+                  cursor: 'default',
+                  pointerEvents: 'auto',
+                  position: 'relative',
+                  zIndex: 1
+                }}
+             >
+                <PreferenceCardsGrid
+                  currentDashboardFields={currentDashboardFields}
+                  dateRange={dateRange}
+                  startDate={dates.start_date}
+                  endDate={dates.end_date}
+                  currencyId={currency.toString()}
+                  layoutBreakpoint={layoutBreakpoint}
+                  isEditMode={isEditMode}
+                />
+              </div>
+            </div>
+          ) : null}
 
          {company && !isCardRemoved('account_login_text') ? (
            <div
