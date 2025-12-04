@@ -2114,28 +2114,30 @@ return (
           )}
 
          {currentDashboardFields?.length ? (
-           <div key="1" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-             {isEditMode && (
-               <div
-                 className="drag-handle"
-                 style={{
-                   height: '30px',
-                   cursor: 'grab',
-                   backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                   border: '2px dashed rgba(59, 130, 246, 0.3)',
-                   display: 'flex',
-                   alignItems: 'center',
-                   justifyContent: 'center',
-                   flexShrink: 0,
-                 }}
-               >
-                 <Icon element={MdDragHandle} size={20} />
-                 <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>Drag to move panel</span>
-               </div>
-             )}
-             <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-             <PreferenceCardsGrid
-              currentDashboardFields={currentDashboardFields}
+          <div key="1" style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            {isEditMode && (
+              <div
+                className="drag-handle"
+                style={{
+                  height: '30px',
+                  cursor: 'grab',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  border: '2px dashed rgba(59, 130, 246, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  position: 'relative',
+                  zIndex: 10,
+                }}
+              >
+                <Icon element={MdDragHandle} size={20} />
+                <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>Drag to move panel</span>
+              </div>
+            )}
+           <div className="cancelDraggingCards" style={{ flex: 1, overflow: 'auto', minHeight: 0, position: 'relative', zIndex: 1, pointerEvents: 'auto' }}>
+            <PreferenceCardsGrid
+             currentDashboardFields={currentDashboardFields}
               dateRange={dateRange}
               startDate={dates.start_date}
               endDate={dates.end_date}

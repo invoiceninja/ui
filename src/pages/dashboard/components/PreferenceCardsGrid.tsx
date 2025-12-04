@@ -61,18 +61,19 @@ export function PreferenceCardsGrid(props: Props) {
   };
 
   return (
-    <div
-      className="preference-cards-container"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: getGridColumns(),
-        gap: '20px',
-        padding: '16px',
-        width: '100%',
-        height: '100%',
-        overflow: 'auto',
-      }}
-    >
+   <div
+     className="preference-cards-container"
+     style={{
+       display: 'grid',
+       gridTemplateColumns: getGridColumns(),
+       gap: '20px',
+       padding: '16px',
+       width: '100%',
+       height: '100%',
+       overflow: 'auto',
+       pointerEvents: 'auto',
+     }}
+   >
       {currentDashboardFields.map((field) => (
         <DashboardCard
           key={field.id}
