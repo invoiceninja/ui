@@ -952,8 +952,8 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   });
 
   const onResizeStop = (
-layout: GridLayout.Layout[],
-) => {
+    layout: GridLayout.Layout[],
+  ) => {
   // Don't clear flag or update layouts here
   // handleLayoutChangeWithLock already saved the layout during resize
   // We'll clear the flag after a small delay to ensure all layout updates complete
@@ -1117,18 +1117,22 @@ layout: GridLayout.Layout[],
                 ...initialCardLayout,
                 // Place Panel 1 at top, others at bottom of current layout
                 y: initialCardLayout.i === '1' ? 0 : Infinity,
+                // Ensure reasonable starting min/max constraints remain flexible
+                minH: Math.min(16, initialCardLayout.h ?? 20),
+                maxH: 100,
               };
             }
             
             // If no initial layout found, give it reasonable default dimensions
             return {
               ...layoutCard,
-              w: 495,  // Half width
-              h: 20,   // 400px height
-              minH: 16,
-              minW: 350,
-              maxH: 30,
-              maxW: 700,
+              // Default sensible size for new cards
+              w: 495,  // half width of 1000-col grid
+              h: 20,   // 400px (rowHeight=20 → 20*20)
+              minH: 10,
+              minW: 250,
+              maxH: 100,
+              maxW: 1000,
               y: Infinity,  // Place at bottom
             };
           }

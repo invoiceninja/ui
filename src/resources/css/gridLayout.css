@@ -6,13 +6,24 @@
 /* Enhanced resize handle styling */
 .react-resizable-handle {
   opacity: 0;
- transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
   z-index: 100 !important;
   pointer-events: auto !important;
+  background: transparent !important;
+  background-image: none !important;
 }
 
 .react-grid-item:hover .react-resizable-handle {
   opacity: 0.8;
+}
+
+/* Remove default diagonal stripes from corner handles */
+.react-resizable-handle-se,
+.react-resizable-handle-sw,
+.react-resizable-handle-ne,
+.react-resizable-handle-nw {
+  background: transparent !important;
+  background-image: none !important;
 }
 
 .react-resizable-handle-se {
