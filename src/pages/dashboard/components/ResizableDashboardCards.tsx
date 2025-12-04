@@ -1098,12 +1098,56 @@ export function ResizableDashboardCards() {
   const onDragStop = (layout: GridLayout.Layout[]) => {
     if (!layoutBreakpoint) return;
 
-    // Simply update the layout with what react-grid-layout calculated
-    // The handleLayoutChangeWithLock will handle height preservation
-    setLayouts((current) => ({
-      ...current,
-      [layoutBreakpoint]: layout,
-    }));
+    setLayouts((current) => {
+      // Preserve heights and resolve any overlaps after drag completes
+      const preservedLayout = layout.map((item) => {
+        const existingItem = current[layoutBreakpoint]?.find((i) => i.i === item.i);
+        return {
+          ...item,
+          h: existingItem?.h ?? item.h, // Lock height
+        };
+      });
+      
+      // Sort by Y position to handle compaction properly
+      const sortedLayout = [...preservedLayout].sort((a, b) => {
+        if (a.y === b.y) return a.x - b.x;
+        return a.y - b.y;
+      });
+      
+      // Resolve overlaps by pushing items down
+      const resolvedLayout = sortedLayout.map((item, index) => {
+        // Check if this item overlaps with any previous items
+        const overlaps = sortedLayout.slice(0, index).filter((prev) => {
+          const horizontalOverlap = (
+            (item.x >= prev.x && item.x < prev.x + prev.w) ||
+            (item.x + item.w > prev.x && item.x + item.w <= prev.x + prev.w) ||
+            (item.x <= prev.x && item.x + item.w >= prev.x + prev.w)
+          );
+          const verticalOverlap = (
+            (item.y >= prev.y && item.y < prev.y + prev.h) ||
+            (item.y + item.h > prev.y && item.y + item.h <= prev.y + prev.h) ||
+            (item.y <= prev.y && item.y + item.h >= prev.y + prev.h)
+          );
+          return horizontalOverlap && verticalOverlap;
+        });
+        
+        if (overlaps.length > 0) {
+          // Find the lowest point of overlapping items
+          const maxBottom = Math.max(...overlaps.map((o) => o.y + o.h));
+          return {
+            ...item,
+            y: maxBottom, // Push item below overlaps
+          };
+        }
+        
+        return item;
+      });
+      
+      return {
+        ...current,
+        [layoutBreakpoint]: resolvedLayout,
+      };
+    });
   };
 
   // Handler to completely lock heights - called by onLayoutChange to prevent auto-adjustments
@@ -1428,8 +1472,8 @@ export function ResizableDashboardCards() {
          onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           compactType={null}
-          preventCollision={true}
-          allowOverlap={false}
+          preventCollision={false}
+          allowOverlap={true}
          draggableCancel=".cancelDraggingCards"
          onDrag={handleOnDrag}
         >
