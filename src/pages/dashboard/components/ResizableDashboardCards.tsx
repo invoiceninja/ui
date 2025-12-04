@@ -73,6 +73,48 @@ import {
 import { DashboardRowContainer } from './DashboardRowContainer';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
+// Helper function to scale layouts when breakpoint changes
+function scaleLayoutForBreakpoint(
+  layout: GridLayout.Layout[],
+  oldCols: number,
+  newCols: number
+): GridLayout.Layout[] {
+  if (oldCols === newCols) return layout;
+  
+  const scaleFactor = newCols / oldCols;
+  
+  return layout.map(item => ({
+    ...item,
+    x: Math.round(item.x * scaleFactor),
+    w: Math.max(1, Math.round(item.w * scaleFactor)),
+    // Keep y and h unchanged for vertical stability
+  }));
+}
+
+// Helper function to optimize row heights after drag/drop
+function optimizeRowHeights(layout: GridLayout.Layout[]): GridLayout.Layout[] {
+  // Group items by Y position to identify rows
+  const rows = new Map<number, GridLayout.Layout[]>();
+  
+  layout.forEach(item => {
+    const y = item.y || 0;
+    if (!rows.has(y)) {
+      rows.set(y, []);
+    }
+    rows.get(y)!.push(item);
+  });
+  
+  // For each row, set all items to the max height needed
+  rows.forEach(items => {
+    const maxHeight = Math.max(...items.map(i => i.h || 20));
+    items.forEach(item => {
+      item.h = maxHeight;
+    });
+  });
+  
+  return layout;
+}
+
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
   expenses: { amount: string; code: string };
@@ -1100,7 +1142,10 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const onResizeStop = (
   layout: GridLayout.Layout[],
 ) => {
-  if (layoutBreakpoint) {
+  // Clear resize flag
+  isResizingRef.current = false;
+  
+ if (layoutBreakpoint) {
       setLayouts((current) => {
         // Preserve heights from current layout to prevent auto-expansion
         return {
@@ -1112,10 +1157,13 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   };
 
   const onDragStop = (layout: GridLayout.Layout[]) => {
+    // Clear drag flag
+    isDraggingRef.current = false;
+    
     if (!layoutBreakpoint) return;
 
     setLayouts((current) => {
-      // Preserve heights and resolve any overlaps after drag completes
+      // Preserve heights after drag completes
       const preservedLayout = layout.map((item) => {
         const existingItem = current[layoutBreakpoint]?.find((i) => i.i === item.i);
         return {
@@ -1124,52 +1172,26 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
         };
       });
       
-      // Sort by Y position to handle compaction properly
-      const sortedLayout = [...preservedLayout].sort((a, b) => {
-        if (a.y === b.y) return a.x - b.x;
-        return a.y - b.y;
-      });
-      
-      // Resolve overlaps by pushing items down
-      const resolvedLayout = sortedLayout.map((item, index) => {
-        // Check if this item overlaps with any previous items
-        const overlaps = sortedLayout.slice(0, index).filter((prev) => {
-          const horizontalOverlap = (
-            (item.x >= prev.x && item.x < prev.x + prev.w) ||
-            (item.x + item.w > prev.x && item.x + item.w <= prev.x + prev.w) ||
-            (item.x <= prev.x && item.x + item.w >= prev.x + prev.w)
-          );
-          const verticalOverlap = (
-            (item.y >= prev.y && item.y < prev.y + prev.h) ||
-            (item.y + item.h > prev.y && item.y + item.h <= prev.y + prev.h) ||
-            (item.y <= prev.y && item.y + item.h >= prev.y + prev.h)
-          );
-          return horizontalOverlap && verticalOverlap;
-        });
-        
-        if (overlaps.length > 0) {
-          // Find the lowest point of overlapping items
-          const maxBottom = Math.max(...overlaps.map((o) => o.y + o.h));
-          return {
-            ...item,
-            y: maxBottom, // Push item below overlaps
-          };
-        }
-        
-        return item;
-      });
+      // Optimize row heights to minimize wasted space
+      const optimizedLayout = optimizeRowHeights(preservedLayout);
       
       return {
         ...current,
-        [layoutBreakpoint]: resolvedLayout,
+        [layoutBreakpoint]: optimizedLayout,
       };
     });
   };
 
   // Handler to completely lock heights - called by onLayoutChange to prevent auto-adjustments
   const handleLayoutChangeWithLock = (current: GridLayout.Layout[]) => {
-    // Only allow layout changes during card restoration, but always lock heights
+    // Prevent click-triggered layout changes
+    // Only allow layout changes during explicit drag/resize or card restoration
     if (!layoutBreakpoint) return;
+    
+    // Ignore layout changes unless we're dragging, resizing, or restoring cards
+    if (!isDraggingRef.current && !isResizingRef.current && !areCardsRestored && !arePreferenceCardsChanged) {
+      return;
+    }
     
     if (areCardsRestored || arePreferenceCardsChanged) {
       handleOnLayoutChange(current);
@@ -1341,13 +1363,15 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   };
 
   const handleOnDrag = (
-    layout: GridLayout.Layout[],
-    oldItem: GridLayout.Layout,
-    newItem: GridLayout.Layout,
-    placeholder: GridLayout.Layout
-  ) => {
-    // CRITICAL: Only lock height, DO NOT modify x or y positions
-    // Let react-grid-layout calculate positions correctly
+   layout: GridLayout.Layout[],
+   oldItem: GridLayout.Layout,
+   newItem: GridLayout.Layout,
+   placeholder: GridLayout.Layout
+ ) => {
+    // Set drag flag to prevent click-triggered layout changes
+    isDraggingRef.current = true;
+    
+    // Lock height to prevent vertical expansion
     placeholder.h = oldItem.h;
     newItem.h = oldItem.h;
   };
@@ -1967,22 +1991,40 @@ return (
           isDraggable={isEditMode}
            isDroppable={isEditMode}
            isResizable={isEditMode}
-           onBreakpointChange={(currentBreakPoint) =>
-             setLayoutBreakpoint(currentBreakPoint)
-           }
+           onBreakpointChange={(newBreakpoint, newCols) => {
+             // Scale layout when breakpoint changes
+             const oldBreakpoint = layoutBreakpoint || 'xxl';
+             const colConfig = { xxl: 1000, xl: 1000, lg: 1000, md: 1000, sm: 1000, xs: 1000, xxs: 1000 };
+             const oldCols = colConfig[oldBreakpoint as keyof typeof colConfig];
+             const currentLayout = layouts[oldBreakpoint];
+             
+             if (currentLayout && oldCols !== newCols) {
+               const scaledLayout = scaleLayoutForBreakpoint(currentLayout, oldCols, newCols);
+               setLayouts(prev => ({
+                 ...prev,
+                 [newBreakpoint]: scaledLayout
+               }));
+             }
+             
+             setLayoutBreakpoint(newBreakpoint);
+           }}
            onWidthChange={() => {
-             // Force layout recalculation on window resize
+             // Trigger layout recalculation on window resize
              if (layoutBreakpoint && layouts[layoutBreakpoint]) {
                setLayouts((current) => ({ ...current }));
              }
+           }}
+           onResize={() => {
+             // Set resize flag to allow layout changes during resize
+             isResizingRef.current = true;
            }}
            onResizeStop={onResizeStop}
            onDragStop={onDragStop}
            onLayoutChange={handleLayoutChangeWithLock}
            resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
            compactType={null}
-           preventCollision={false}
-           allowOverlap={true}
+           preventCollision={true}
+           allowOverlap={false}
            draggableCancel=".cancelDraggingCards"
            onDrag={handleOnDrag}
          >
@@ -1994,7 +2036,8 @@ return (
 
           {/* Quick date, currency & date picker. */}
 
-          <div key="0" className="flex justify-end">
+          <div key="0">
+            <div className="flex justify-end">
             <div className="flex space-x-2">
               {currencies && (
                 <SelectField
@@ -2127,6 +2170,7 @@ return (
                   />
                 </>
               )}
+            </div>
             </div>
           </div>
 
