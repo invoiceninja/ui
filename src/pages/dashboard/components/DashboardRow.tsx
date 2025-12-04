@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 import GridLayout from 'react-grid-layout';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { DashboardRow as DashboardRowType } from '../types/DashboardRowTypes';
@@ -25,7 +25,8 @@ export function DashboardRow({
   cols,
 }: DashboardRowProps) {
   // Convert row panels to flat layout for react-grid-layout
-  const panelLayout: GridLayout.Layout[] = row.panels.map((panel) => ({
+  // Memoize to prevent unnecessary recalculations that trigger height changes
+  const panelLayout: GridLayout.Layout[] = useMemo(() => row.panels.map((panel) => ({
     i: panel.i,
     x: panel.x,
     y: 0, // Always 0 within row context
@@ -36,11 +37,7 @@ export function DashboardRow({
     static: panel.static,
     isDraggable: panel.isDraggable !== false && isEditMode,
     isResizable: panel.isResizable !== false && isEditMode,
-  }));
-
-  const handleLayoutChange = (newLayout: GridLayout.Layout[]) => {
-    onPanelLayoutChange(row.id, newLayout);
-  };
+  })), [row.panels, row.h, row.id, isEditMode]);
 
   const handleResizeStop = (
     layout: GridLayout.Layout[],
@@ -54,6 +51,12 @@ export function DashboardRow({
     onPanelLayoutChange(row.id, layout);
   };
 
+  const handleDragStop = (layout: GridLayout.Layout[]) => {
+    // On drag stop, ensure heights remain locked to row height
+    // Only update x and w positions
+    onPanelLayoutChange(row.id, layout);
+  };
+
   return (
     <div
       className="dashboard-row"
@@ -63,7 +66,8 @@ export function DashboardRow({
         border: isEditMode ? '1px dashed rgba(255, 255, 255, 0.2)' : 'none',
         borderRadius: '4px',
         padding: isEditMode ? '8px' : '0',
-        minHeight: `${row.h}px`,
+        height: `${row.h}px`,
+        overflow: 'visible',
       }}
     >
       <ResponsiveGridLayout
@@ -90,11 +94,20 @@ export function DashboardRow({
         preventCollision={false}
         allowOverlap={false}
         resizeHandles={['e', 'w']} // Only horizontal resize within row
-        onLayoutChange={handleLayoutChange}
         onResizeStop={handleResizeStop}
+        onDragStop={handleDragStop}
+        autoSize={false}
+        verticalCompact={false}
       >
         {row.panels.map((panel) => (
-          <div key={panel.i} className="dashboard-panel-wrapper">
+          <div
+            key={panel.i}
+            className="dashboard-panel-wrapper"
+            style={{
+              height: '100%',
+              overflow: 'auto',
+            }}
+          >
             {renderPanel(panel.i)}
           </div>
         ))}
