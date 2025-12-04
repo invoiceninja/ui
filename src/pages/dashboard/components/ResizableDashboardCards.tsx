@@ -999,6 +999,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const onDragStop = (layout: GridLayout.Layout[]) => {
     // Clear drag flag
     isDraggingRef.current = false;
+    setIsDragging(false);
     if (!layoutBreakpoint) return;
 
     // Resolve overlaps after dropping to keep a sane grid
@@ -1197,6 +1198,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
  ) => {
     // Set drag flag to prevent click-triggered layout changes
     isDraggingRef.current = true;
+    setIsDragging(true);
   };
 
   useEffect(() => {
@@ -1205,6 +1207,9 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
       date_range: dateRange,
     }));
   }, [settings?.preferences?.dashboard_charts?.range]);
+
+  // Track dragging for overlap/collision mode
+  const [isDragging, setIsDragging] = useState(false);
 
   // Normalize minH to allow users to shrink cards vertically
   useEffect(() => {
@@ -2018,8 +2023,8 @@ return (
          onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'se', 'sw']}
           compactType={null}
-         preventCollision={false}
-         allowOverlap={true}
+         preventCollision={!isDragging}
+         allowOverlap={isDragging}
          onDrag={handleOnDrag}
        >
           {(totals.isLoading || !isLayoutsInitialized) && (
@@ -2040,22 +2045,21 @@ return (
                position: 'relative'
              }}
           >
-             {isEditMode && (
-               <div
-                 className="drag-handle"
-                 style={{
-                   height: '30px',
-                   cursor: 'grab',
-                   backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                   border: '2px dashed rgba(59, 130, 246, 0.3)',
-                   display: 'flex',
-                   alignItems: 'center',
-                   justifyContent: 'center',
-                   flexShrink: 0,
+              {isEditMode && (
+                <div
+                  className="drag-handle"
+                  style={{
+                    height: '30px',
+                    cursor: 'grab',
+                    backgroundColor: 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
                     pointerEvents: 'auto',
                     position: 'relative',
                     zIndex: 2,
-                 }}
+                  }}
                 >
                   <Icon element={MdDragHandle} size={20} />
                   <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>

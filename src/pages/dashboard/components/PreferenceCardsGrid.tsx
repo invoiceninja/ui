@@ -126,6 +126,21 @@ export function PreferenceCardsGrid(props: Props) {
     return newCards;
   };
 
+  // Normalize any broken 1x1 (or near) items to sane defaults from generator
+  const normalizeTinyItems = (
+    existing: ReactGridLayout.Layout[],
+    generated: ReactGridLayout.Layout[]
+  ): ReactGridLayout.Layout[] => {
+    const tinyW = 20; // in our 1000-col scheme
+    const tinyH = 20; // rowHeight=1 → 20px
+    return existing.map((item) => {
+      const isTiny = (item.w ?? 0) <= tinyW || (item.h ?? 0) <= tinyH;
+      if (!isTiny) return item;
+      const replacement = generated.find((g) => g.i === item.i);
+      return replacement ? { ...replacement } : item;
+    });
+  };
+
   // Update layout when cards or breakpoint change
   const updateLayoutForNewCards = () => {
     if (!layoutBreakpoint) {
@@ -140,21 +155,22 @@ export function PreferenceCardsGrid(props: Props) {
         layoutBreakpoint
       );
 
+      // Keep existing items that are still in fields
+      const kept = currentLayoutForBreakpoint.filter((existingCard) =>
+        currentDashboardFields.some((newCard) => newCard.id === existingCard.i)
+      );
+
+      // Normalize tiny kept items
+      const keptNormalized = normalizeTinyItems(kept, newCardsLayout);
+
+      // Add truly new ones from generator
+      const added = newCardsLayout.filter(
+        (newCard) => !keptNormalized.some((k) => k.i === newCard.i)
+      );
+
       return {
         ...currentLayouts,
-        [layoutBreakpoint]: [
-          ...currentLayoutForBreakpoint.filter((existingCard) =>
-            currentDashboardFields.some(
-              (newCard) => newCard.id === existingCard.i
-            )
-          ),
-          ...newCardsLayout.filter(
-            (newCard) =>
-              !currentLayoutForBreakpoint.some(
-                (existingCard) => existingCard.i === newCard.i
-              )
-          ),
-        ],
+        [layoutBreakpoint]: [...keptNormalized, ...added],
       };
     });
   };
