@@ -174,3 +174,19 @@
   pointer-events: auto !important;
   cursor: grab;
 }
+
+/* Make sure resize handles are visible and grabbable in edit mode */
+.dashboard-edit-mode .react-resizable-handle {
+  opacity: 0.5;
+}
+
+.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle {
+  opacity: 1;
+}
+
+/* Ensure south resize handle spans full width for easier grabbing */
+.react-resizable-handle-s {
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+}
