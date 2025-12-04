@@ -1098,21 +1098,48 @@ export function ResizableDashboardCards() {
   const onDragStop = (layout: GridLayout.Layout[]) => {
     if (!layoutBreakpoint) return;
 
-    setLayouts((current) => {
-      // Preserve heights during drag to prevent expansion
-      const preservedLayout = layout.map((item) => {
-        const existingItem = current[layoutBreakpoint]?.find((i) => i.i === item.i);
-        return {
-          ...item,
-          // Always preserve height during drag
-          h: existingItem?.h ?? item.h,
-        };
+    // Simply update the layout with what react-grid-layout calculated
+    // The handleLayoutChangeWithLock will handle height preservation
+    setLayouts((current) => ({
+      ...current,
+      [layoutBreakpoint]: layout,
+    }));
+  };
+
+  // Handler to completely lock heights - called by onLayoutChange to prevent auto-adjustments
+  const handleLayoutChangeWithLock = (current: GridLayout.Layout[]) => {
+    // Only allow layout changes during card restoration, but always lock heights
+    if (!layoutBreakpoint) return;
+    
+    if (areCardsRestored || arePreferenceCardsChanged) {
+      handleOnLayoutChange(current);
+    } else {
+      // Lock heights even when layout changes internally
+      setLayouts((prev) => {
+        const lockedLayout = current.map((item) => {
+          const existingItem = prev[layoutBreakpoint]?.find((i) => i.i === item.i);
+          return {
+            ...item,
+            h: existingItem?.h ?? item.h, // Always preserve height
+          };
+        });
+        
+        // Only update if something actually changed (comparing by item.i)
+        const hasChanges = lockedLayout.some((item) => {
+          const existing = prev[layoutBreakpoint]?.find((e) => e.i === item.i);
+          if (!existing) return true;
+          return item.x !== existing.x || item.y !== existing.y || item.w !== existing.w || item.h !== existing.h;
+        });
+        
+        if (hasChanges) {
+          return {
+            ...prev,
+            [layoutBreakpoint]: lockedLayout,
+          };
+        }
+        return prev;
       });
-      return {
-        ...current,
-        [layoutBreakpoint]: preservedLayout,
-      };
-    });
+    }
   };
 
   const handleUpdateUserPreferences = () => {
@@ -1259,40 +1286,10 @@ export function ResizableDashboardCards() {
     newItem: GridLayout.Layout,
     placeholder: GridLayout.Layout
   ) => {
-    // Preserve height during drag to prevent expansion
-    if (newItem.h !== oldItem.h) {
-      newItem.h = oldItem.h;
-    }
-
-    const isDraggingDown = newItem.y > placeholder.y;
-
-    //handleScroll(isDraggingDown);
-
-    if (newItem.i.length > 5) return;
-
-    if (!isDraggingDown) return;
-
-    const itemsBelow = layout.filter(
-      (item) => item.y > oldItem.y && item.i !== oldItem.i
-    );
-
-    if (itemsBelow.length) {
-      const closestItem = itemsBelow.reduce((closest, current) => {
-        const isInSameColumn = Math.abs(current.x - oldItem.x) < 10;
-        const isCloserVertically = current.y < closest.y;
-
-        return isInSameColumn && isCloserVertically ? current : closest;
-      }, itemsBelow[0]);
-
-      const isDraggingTallerItem = oldItem.h > closestItem.h * 0.9;
-
-      if (newItem.y > oldItem.h / 1.2 + oldItem.y && isDraggingTallerItem) {
-        const oldX = oldItem.x;
-        const oldY = oldItem.y;
-        closestItem.x = oldX;
-        closestItem.y = oldY;
-      }
-    }
+    // CRITICAL: Only lock height, DO NOT modify x or y positions
+    // Let react-grid-layout calculate positions correctly
+    placeholder.h = oldItem.h;
+    newItem.h = oldItem.h;
   };
 
   useEffect(() => {
@@ -1428,15 +1425,9 @@ export function ResizableDashboardCards() {
           }}
          onResizeStop={onResizeStop}
          onDragStop={onDragStop}
-         onLayoutChange={(current) => {
-           // Only handle layout changes when explicitly restoring cards
-           // This prevents unwanted height changes on clicks
-           if (areCardsRestored || arePreferenceCardsChanged) {
-             handleOnLayoutChange(current);
-           }
-         }}
+         onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-          compactType="vertical"
+          compactType={null}
           preventCollision={true}
           allowOverlap={false}
          draggableCancel=".cancelDraggingCards"
