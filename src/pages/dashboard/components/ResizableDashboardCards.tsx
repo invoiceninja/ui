@@ -220,7 +220,7 @@ export const initialLayouts = {
      w: 1000,
      h: 15,
      minH: 10,
-     maxH: 25,
+     maxH: 100,
    },
    {
      i: '2',
@@ -230,8 +230,6 @@ export const initialLayouts = {
      h: 25,
      minH: 20,
       minW: 250,
-      maxH: 30,
-      maxW: 400,
     },
     {
       i: '3',
@@ -241,8 +239,6 @@ export const initialLayouts = {
       h: 25,
      minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '4',
@@ -252,8 +248,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '5',
@@ -263,8 +257,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '6',
@@ -274,8 +266,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '7',
@@ -285,8 +275,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '8',
@@ -296,8 +284,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '9',
@@ -307,8 +293,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '10',
@@ -318,8 +302,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
   ],
   xl: [
@@ -330,7 +312,7 @@ export const initialLayouts = {
       w: 1000,
       h: 15,
       minH: 10,
-      maxH: 25,
+     maxH: 100,
     },
     {
       i: '2',
@@ -340,8 +322,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 250,
-      maxH: 30,
-      maxW: 400,
     },
     {
       i: '3',
@@ -351,8 +331,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '4',
@@ -362,8 +340,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '5',
@@ -373,8 +349,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '6',
@@ -384,8 +358,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '7',
@@ -395,8 +367,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '8',
@@ -406,8 +376,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '9',
@@ -417,8 +385,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '10',
@@ -428,8 +394,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
   ],
   lg: [   {
@@ -439,7 +403,7 @@ export const initialLayouts = {
      w: 1000,
      h: 15,
      minH: 10,
-     maxH: 25,
+     maxH: 100,
    },
     {
       i: '2',
@@ -449,8 +413,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 250,
-      maxH: 30,
-      maxW: 400,
     },
     {
       i: '3',
@@ -460,8 +422,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '4',
@@ -471,8 +431,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '5',
@@ -482,8 +440,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '6',
@@ -493,8 +449,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '7',
@@ -504,8 +458,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '8',
@@ -515,8 +467,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '9',
@@ -526,8 +476,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
     {
       i: '10',
@@ -537,8 +485,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 350,
-      maxH: 30,
-      maxW: 700,
     },
   ],
   md: [   {
@@ -548,7 +494,7 @@ export const initialLayouts = {
      w: 1000,
      h: 15,
      minH: 10,
-     maxH: 25,
+     maxH: 100,
    },
     {
       i: '2',
@@ -558,8 +504,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '3',
@@ -569,8 +513,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '4',
@@ -580,8 +522,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '5',
@@ -591,8 +531,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '6',
@@ -602,8 +540,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '7',
@@ -613,8 +549,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '8',
@@ -624,8 +558,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '9',
@@ -635,8 +567,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '10',
@@ -646,8 +576,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
   ],
   sm: [   {
@@ -657,7 +585,7 @@ export const initialLayouts = {
      w: 1000,
      h: 15,
      minH: 10,
-     maxH: 25,
+     maxH: 100,
    },
     {
       i: '2',
@@ -667,8 +595,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '3',
@@ -678,8 +604,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '4',
@@ -689,8 +613,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '5',
@@ -700,8 +622,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '6',
@@ -711,8 +631,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '7',
@@ -722,8 +640,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '8',
@@ -733,8 +649,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '9',
@@ -744,8 +658,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '10',
@@ -755,8 +667,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
   ],
   xs: [   {
@@ -766,7 +676,7 @@ export const initialLayouts = {
      w: 1000,
      h: 15,
      minH: 10,
-     maxH: 25,
+     maxH: 100,
    },
     {
       i: '2',
@@ -776,8 +686,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '3',
@@ -787,8 +695,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '4',
@@ -798,8 +704,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '5',
@@ -809,8 +713,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '6',
@@ -820,8 +722,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '7',
@@ -831,8 +731,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '8',
@@ -842,8 +740,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '9',
@@ -853,8 +749,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '10',
@@ -864,8 +758,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
   ],
   xxs: [   {
@@ -875,7 +767,7 @@ export const initialLayouts = {
      w: 1000,
      h: 15,
      minH: 10,
-     maxH: 25,
+     maxH: 100,
    },
     {
       i: '2',
@@ -885,8 +777,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '3',
@@ -896,8 +786,6 @@ export const initialLayouts = {
       h: 25,
       minH: 20,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '4',
@@ -907,8 +795,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '5',
@@ -918,8 +804,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '6',
@@ -929,8 +813,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '7',
@@ -940,8 +822,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '8',
@@ -951,8 +831,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '9',
@@ -962,8 +840,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
     {
       i: '10',
@@ -973,8 +849,6 @@ export const initialLayouts = {
       h: 20,
       minH: 16,
       minW: 400,
-      maxH: 30,
-      maxW: 1000,
     },
   ],
 };
