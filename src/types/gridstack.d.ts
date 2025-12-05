@@ -10,6 +10,7 @@ declare module 'gridstack' {
     setStatic: (staticMode: boolean) => void;
     removeAll: (detachDOM?: boolean) => void;
     load: (layout: any[]) => void;
+    makeWidget: (el: HTMLElement) => GridStackNode;
     engine: {
       nodes: GridStackNode[];
     };

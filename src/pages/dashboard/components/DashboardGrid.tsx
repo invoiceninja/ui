@@ -47,31 +47,16 @@ export function DashboardGrid({
   const instanceRef = useRef<GridStackInstance | null>(null);
 
   const orderedLayout = useMemo(() => {
-    const [staticItems, movableItems] = layout.reduce<
-      [DashboardGridItem[], DashboardGridItem[]]
-    >(
-      (accumulator, item) => {
-        if (item.static) {
-          accumulator[0].push(item);
-        } else {
-          accumulator[1].push(item);
-        }
+    return [...layout].sort((a, b) => {
+      const aNum = Number(a.i);
+      const bNum = Number(b.i);
 
-        return accumulator;
-      },
-      [[], []]
-    );
+      if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
+        return aNum - bNum;
+      }
 
-    const sortByPosition = (items: DashboardGridItem[]) =>
-      [...items].sort((a, b) => {
-        if (a.y === b.y) {
-          return a.x - b.x;
-        }
-
-        return a.y - b.y;
-      });
-
-    return [...sortByPosition(staticItems), ...sortByPosition(movableItems)];
+      return String(a.i).localeCompare(String(b.i));
+    });
   }, [layout]);
 
   const options = useMemo(
@@ -132,6 +117,14 @@ export function DashboardGrid({
 
     const grid = GridStack.init(options, containerRef.current);
     instanceRef.current = grid;
+
+    const items = Array.from(
+      containerRef.current.querySelectorAll<HTMLElement>('.grid-stack-item')
+    );
+
+    items.forEach((item) => {
+      grid.makeWidget(item);
+    });
 
     const handleChange = () => {
       onLayoutChange(toLayout(grid.engine.nodes));
