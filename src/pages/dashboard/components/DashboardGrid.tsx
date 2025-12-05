@@ -47,7 +47,31 @@ export function DashboardGrid({
   const instanceRef = useRef<GridStackInstance | null>(null);
 
   const orderedLayout = useMemo(() => {
-    return [...layout].sort((a, b) => a.i.localeCompare(b.i));
+    const [staticItems, movableItems] = layout.reduce<
+      [DashboardGridItem[], DashboardGridItem[]]
+    >(
+      (accumulator, item) => {
+        if (item.static) {
+          accumulator[0].push(item);
+        } else {
+          accumulator[1].push(item);
+        }
+
+        return accumulator;
+      },
+      [[], []]
+    );
+
+    const sortByPosition = (items: DashboardGridItem[]) =>
+      [...items].sort((a, b) => {
+        if (a.y === b.y) {
+          return a.x - b.x;
+        }
+
+        return a.y - b.y;
+      });
+
+    return [...sortByPosition(staticItems), ...sortByPosition(movableItems)];
   }, [layout]);
 
   const options = useMemo(
