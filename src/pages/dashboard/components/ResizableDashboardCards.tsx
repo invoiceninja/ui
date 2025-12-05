@@ -148,6 +148,47 @@ function resolveOverlaps(layout: GridLayout.Layout[]): GridLayout.Layout[] {
   return placed;
 }
 
+// Check horizontal overlap only (x-axis) between two items
+function isHorizontallyOverlapping(a: GridLayout.Layout, b: GridLayout.Layout): boolean {
+  const ax2 = (a.x || 0) + (a.w || 0);
+  const bx2 = (b.x || 0) + (b.w || 0);
+  return (a.x || 0) < bx2 && ax2 > (b.x || 0);
+}
+
+// Compact items upward to remove vertical gaps, preserving an optional anchor's top (y)
+function compactVertical(
+  layout: GridLayout.Layout[],
+  preserveAnchorId?: string
+): GridLayout.Layout[] {
+  const items = layout.map((i) => ({ ...i }));
+  // Sort by y then x so we compact from top to bottom stably
+  items.sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
+
+  for (let idx = 0; idx < items.length; idx++) {
+    const item = items[idx];
+    if (preserveAnchorId && item.i === preserveAnchorId) {
+      continue; // keep anchor at its y
+    }
+    // Find the highest y this item can occupy without overlapping vertically
+    let targetY = 0;
+    for (let j = 0; j < items.length; j++) {
+      if (j === idx) continue;
+      const other = items[j];
+      if (!isHorizontallyOverlapping(item, other)) continue;
+      const otherBottom = (other.y || 0) + (other.h || 0);
+      if (otherBottom <= (item.y || 0)) {
+        // Other is above current; use its bottom as a candidate floor
+        if (otherBottom > targetY) targetY = otherBottom;
+      }
+    }
+    item.y = targetY;
+  }
+
+  // Resort to stable order by y/x for consistency
+  items.sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
+  return items;
+}
+
 // Resolve overlaps while keeping a specific item (anchor) fixed at its top (y) position.
 function resolveOverlapsAnchored(
   layout: GridLayout.Layout[],
@@ -1035,7 +1076,9 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const resolved = anchorId
       ? resolveOverlapsAnchored(layout, anchorId, anchorTopY)
       : resolveOverlaps(layout);
-    setLayouts((current) => ({ ...current, [layoutBreakpoint]: resolved }));
+    // After resolving overlaps, compact vertically to remove gaps while preserving the anchor's top
+    const compacted = compactVertical(resolved, anchorId || undefined);
+    setLayouts((current) => ({ ...current, [layoutBreakpoint]: compacted }));
 
     setTimeout(() => {
       isResizingRef.current = false;
