@@ -1030,8 +1030,8 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     // Resolve overlaps on resize stop to maintain a clean grid
     if (!layoutBreakpoint) return;
     // Snap to a collision-free layout while keeping the resized item anchored at its original top (y)
-    const anchorId = newItem?.i ?? oldItem?.i ?? '';
-    const anchorTopY = oldItem?.y;
+    const anchorId = resizeAnchorRef.current?.id ?? newItem?.i ?? oldItem?.i ?? '';
+    const anchorTopY = resizeAnchorRef.current?.y ?? oldItem?.y;
     const resolved = anchorId
       ? resolveOverlapsAnchored(layout, anchorId, anchorTopY)
       : resolveOverlaps(layout);
@@ -1040,6 +1040,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     setTimeout(() => {
       isResizingRef.current = false;
       setIsResizing(false);
+      resizeAnchorRef.current = null;
     }, 10);
   };
 
@@ -1255,6 +1256,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   // Track dragging for overlap/collision mode
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const resizeAnchorRef = useRef<{ id: string; y: number } | null>(null);
 
   // Normalize minH to allow users to shrink cards vertically
   useEffect(() => {
@@ -2060,10 +2062,15 @@ useDebounce(
                setLayouts((current) => ({ ...current }));
              }
            }}
-           onResize={() => {
+           onResize={(currentLayout, oldItem, newItem) => {
              // Set resize flag to allow layout changes during resize
              isResizingRef.current = true;
              setIsResizing(true);
+             if (oldItem && newItem) {
+               if (!resizeAnchorRef.current || resizeAnchorRef.current.id !== newItem.i) {
+                 resizeAnchorRef.current = { id: newItem.i, y: oldItem.y ?? 0 };
+               }
+             }
            }}
            onResizeStop={onResizeStop}
           onDragStop={onDragStop}
