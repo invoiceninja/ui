@@ -126,6 +126,9 @@ export function DashboardGrid({
       grid.makeWidget(item);
     });
 
+    grid.batchUpdate();
+    grid.commit();
+
     const handleChange = () => {
       onLayoutChange(toLayout(grid.engine.nodes));
     };
