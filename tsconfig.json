@@ -3,7 +3,11 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -20,12 +24,28 @@
     "downlevelIteration": true,
     "baseUrl": "./",
     "paths": {
-      "$app": ["src"],
-      "$app/*": ["src/*"],
-      "$tests": ["tests"],
-      "$tests/*": ["tests/*"],
-      "~/*": ["./*"]
-    }
+      "$app": [
+        "src"
+      ],
+      "$app/*": [
+        "src/*"
+      ],
+      "$tests": [
+        "tests"
+      ],
+      "$tests/*": [
+        "tests/*"
+      ],
+      "~/*": [
+        "./*"
+      ]
+    },
+    "typeRoots": [
+      "./src/types"
+    ]
   },
-  "exclude": ["node_modules", "public/tinymce_6.4.2"]
+  "exclude": [
+    "node_modules",
+    "public/tinymce_6.4.2"
+  ]
 }
