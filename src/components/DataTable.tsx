@@ -228,6 +228,12 @@ export function DataTable<T extends object>(props: Props<T>) {
   const options = useDataTableOptions();
   const reactSettings = useReactSettings();
 
+  // Memoize style object to prevent MemoizedTr prop changes
+  const tableBorderStyle = useMemo(
+    () => ({ borderColor: colors.$20 }),
+    [colors.$20]
+  );
+
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
@@ -252,7 +258,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     enableSavingFilterPreference = false,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
-    filterColumns = [],
+    filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
     emptyState,
@@ -374,7 +380,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
 
     if (Object.keys(filterColumnsValues).length) {
-      filterColumns.forEach((filterColumn) => {
+      (filterColumns || []).forEach((filterColumn) => {
         if (filterColumnsValues[filterColumn.column_id]) {
           apiEndpoint.searchParams.set(
             filterColumn.query_identifier,
