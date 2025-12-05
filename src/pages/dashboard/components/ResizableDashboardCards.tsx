@@ -1915,7 +1915,7 @@ useDebounce(
        ) : (
         <>
           {/* Static controls - outside grid to prevent dragging */}
-          {!totals.isLoading && isLayoutsInitialized && (
+          {!totals.isLoading && (
           <div className="mb-4">
             <div className="flex justify-end">
             <div className="flex space-x-2">
@@ -2562,16 +2562,18 @@ useDebounce(
           </ResponsiveGridLayout>
           )}
           {/* Enable DndDashboardGrid */}
-          <DndDashboardGrid
-            layout={layouts[layoutBreakpoint || 'xxl'] || []}
-            setLayout={(l) =>
-              setLayouts((curr) => ({ ...curr, [layoutBreakpoint || 'xxl']: l }))
-            }
-            isEditMode={isEditMode}
-            renderPanel={(id) => renderPanel(id)}
-            cols={1000}
-            rowHeight={20}
-          />
+          <div style={{ marginTop: 12 }}>
+            <DndDashboardGrid
+              layout={layouts[layoutBreakpoint || 'xxl'] || []}
+              setLayout={(l) =>
+                setLayouts((curr) => ({ ...curr, [layoutBreakpoint || 'xxl']: l }))
+              }
+              isEditMode={isEditMode}
+              renderPanel={(id) => renderPanel(id)}
+              cols={1000}
+              rowHeight={20}
+            />
+          </div>
         </>
       )}
       </>
