@@ -1514,15 +1514,15 @@ useDebounce(
               </div>
             )}
             <div className="no-drag-zone" style={{ flex: 1, overflow: 'auto', minHeight: 0, cursor: 'default' }}>
-            <PreferenceCardsGrid
-              currentDashboardFields={currentDashboardFields}
-              dateRange={dateRange}
-              startDate={dates.start_date}
-              endDate={dates.end_date}
-              currencyId={currency.toString()}
-              layoutBreakpoint={layoutBreakpoint}
-              isEditMode={isEditMode}
-            />
+              <PreferenceCardsGridDnd
+                currentDashboardFields={currentDashboardFields}
+                dateRange={dateRange}
+                startDate={dates.start_date}
+                endDate={dates.end_date}
+                currencyId={currency.toString()}
+                layoutBreakpoint={layoutBreakpoint}
+                isEditMode={isEditMode}
+              />
             </div>
           </div>
         );
@@ -2055,6 +2055,8 @@ useDebounce(
           </div>
          )}
 
+          {/* Switch to the new dnd-kit grid for full dashboard to unlock correct vertical resizing and non-overlap compaction. */}
+          {false && (
           <ResponsiveGridLayout
           className="layout responsive-grid-box"
            breakpoints={{
@@ -2558,8 +2560,8 @@ useDebounce(
             </div>
           ) : null}
           </ResponsiveGridLayout>
-          {/* Experimental: dnd-kit grid (feature-flag, off by default). To enable, render DndDashboardGrid instead. */}
-          {/*
+          )}
+          {/* Enable DndDashboardGrid */}
           <DndDashboardGrid
             layout={layouts[layoutBreakpoint || 'xxl'] || []}
             setLayout={(l) =>
@@ -2570,7 +2572,6 @@ useDebounce(
             cols={1000}
             rowHeight={20}
           />
-          */}
         </>
       )}
       </>

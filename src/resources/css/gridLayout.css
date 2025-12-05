@@ -14,12 +14,7 @@
 }
 
 /* Remove default diagonal stripe pseudo-element from react-resizable */
-.react-resizable-handle::after {
-  content: '' !important;
-  background: transparent !important;
-  background-image: none !important;
-  border: none !important;
-}
+.react-resizable-handle::after { content: none !important; }
 
 .react-grid-item:hover .react-resizable-handle {
   opacity: 0.8;
@@ -140,12 +135,7 @@
 }
 
 .dashboard-edit-mode .react-grid-item:hover .react-resizable-handle-se,
-.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle-sw {
-  opacity: 1;
-  background: rgba(59, 130, 246, 0.4) !important;
-  border: 2px solid rgba(59, 130, 246, 0.7) !important;
-  border-radius: 2px;
-}
+.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle-sw { opacity: 1; }
 
 /* Drag handle styling */
 .drag-handle {
