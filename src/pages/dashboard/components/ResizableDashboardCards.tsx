@@ -1307,7 +1307,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
    }
  }, [layoutBreakpoint]);
 
-  // Convert flat layouts to row layouts on initialization
+  // Convert flat layouts to row layouts on initialization (feature-flagged)
   useEffect(() => {
     if (!isLayoutsInitialized || Object.keys(rowLayouts).length > 0) {
       return;
@@ -1323,8 +1323,9 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   });
 
     setRowLayouts(convertedLayouts);
-    // Enable row-based layout mode (predictable rows, width-only panel resize, row vertical resize)
-    setUseRowBasedLayout(true);
+    // Keep row-based layout DISABLED by default until we finish stabilization
+    // To enable, flip the flag to true after verifying in QA.
+    setUseRowBasedLayout(false);
   }, [isLayoutsInitialized, layouts]);
 
 useDebounce(
