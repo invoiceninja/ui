@@ -3,7 +3,7 @@
  *
  * Drag-only, no resize. Keeps persisted layout shape, writes back on drop.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -50,7 +50,15 @@ function SortableItem({ id, children }: { id: string; children: React.ReactNode 
   } as React.CSSProperties;
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="sortable-card">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="sortable-card"
+      data-id={id}
+      tabIndex={0}
+    >
       {children}
     </div>
   );
@@ -74,6 +82,8 @@ export function PreferenceCardsGridDnd(props: Props) {
   // Maintain a flat array of ids for ordering within the first row
   const [order, setOrder] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [overlaySize, setOverlaySize] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     // Initialize from saved settings if present; else from fields
@@ -100,11 +110,26 @@ export function PreferenceCardsGridDnd(props: Props) {
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active?.id ?? null);
+    // Measure the active element to size the overlay and prevent jump
+    try {
+      const el = document.querySelector(
+        `.preference-cards-grid .sortable-card[data-id="${event.active?.id}"]`
+      ) as HTMLElement | null;
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        setOverlaySize({ width: rect.width, height: rect.height });
+      } else {
+        setOverlaySize(null);
+      }
+    } catch {
+      setOverlaySize(null);
+    }
   };
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
     setActiveId(null);
+    setOverlaySize(null);
     if (!over || active.id === over.id) return;
 
     const oldIndex = items.indexOf(active.id);
@@ -135,6 +160,9 @@ export function PreferenceCardsGridDnd(props: Props) {
         gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
         gap: 20,
         alignItems: 'start',
+        justifyItems: 'stretch',
+        gridAutoFlow: 'row',
+        alignContent: 'start',
         width: '100%',
         overflowX: 'hidden',
       }}
@@ -151,7 +179,11 @@ export function PreferenceCardsGridDnd(props: Props) {
             if (!field) return null;
             return (
               <SortableItem key={id} id={id}>
-                <div className={isEditMode ? 'cursor-grab' : ''} style={{ width: '100%' }}>
+                <div
+                  className={isEditMode ? 'cursor-grab' : ''}
+                  style={{ width: '100%' }}
+                  onMouseDown={() => setSelectedId(id)}
+                >
                   <DashboardCard
                     field={field}
                     dateRange={dateRange}
@@ -172,7 +204,10 @@ export function PreferenceCardsGridDnd(props: Props) {
               const field = currentDashboardFields.find((f) => f.id === activeId);
               if (!field) return null;
               return (
-                <div style={{ width: 240 }} className="sortable-card overlay">
+                <div
+                  className="sortable-card overlay"
+                  style={{ width: overlaySize?.width ?? 240, height: overlaySize?.height }}
+                >
                   <DashboardCard
                     field={field}
                     dateRange={dateRange}

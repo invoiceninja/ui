@@ -97,13 +97,15 @@
 .dashboard-edit-mode .react-grid-item {
   border: 2px dashed transparent;
   transition: border-color 0.2s ease;
+  min-height: 0; /* allow shrink */
 }
 
 .dashboard-edit-mode .react-resizable-handle {
   opacity: 0.3;
 }
 
-.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle {
+.dashboard-edit-mode .react-grid-item:hover .react-resizable-handle,
+.dashboard-edit-mode .react-grid-item .react-resizable-handle:active {
   opacity: 1;
 }
 
@@ -113,8 +115,21 @@
 
 /* Make south handle more accessible for Panel 1 with nested structure */
 /* Panel 1 south handle: bigger hit area, no color */
-.dashboard-edit-mode .react-grid-item[style*="flex"] .react-resizable-handle-s {
+.dashboard-edit-mode .react-grid-item .react-resizable-handle-s {
   height: 15px !important;
+}
+
+/* Ensure resize handles sit above inner content like no-drag-zone wrappers */
+.dashboard-edit-mode .react-resizable-handle {
+  z-index: 200 !important;
+}
+
+/* Pointer affordance improvements for first row DnD */
+.preference-cards-grid .sortable-card {
+  cursor: grab;
+}
+.preference-cards-grid .sortable-card:active {
+  cursor: grabbing;
 }
 
 /* Corner handles get even more prominence */

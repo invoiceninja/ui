@@ -152,7 +152,7 @@ export function DashboardRow({
           height: `${row.h}px`,
           minHeight: `${row.h}px`,
           maxHeight: `${row.h}px`,
-          overflow: 'hidden',
+          overflow: 'auto',
           position: 'relative',
         }}
       >
@@ -181,7 +181,7 @@ export function DashboardRow({
           compactType={null}
           preventCollision={false}
           allowOverlap={false}
-          resizeHandles={['e', 'w']}
+          resizeHandles={['s', 'e', 'w', 'se', 'sw']}
           onResizeStop={handleResizeStop}
           onDragStop={handleDragStop}
           autoSize={false}

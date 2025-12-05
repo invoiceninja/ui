@@ -1567,6 +1567,7 @@ useDebounce(
               }
               renderFromShadcn
             >
+              <div style={{ height: '100%', display: 'flex' }}>
               <Chart
                 chartSensitivity={chartScale}
                 dates={{
@@ -1576,6 +1577,7 @@ useDebounce(
                 data={chartData[currency]}
                 currency={currency.toString()}
               />
+              </div>
             </Card>
           </div>
         );
