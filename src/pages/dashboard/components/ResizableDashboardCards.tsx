@@ -148,6 +148,44 @@ function resolveOverlaps(layout: GridLayout.Layout[]): GridLayout.Layout[] {
   return placed;
 }
 
+// Resolve overlaps while keeping a specific item (anchor) fixed at its top (y) position.
+function resolveOverlapsAnchored(
+  layout: GridLayout.Layout[],
+  anchorId: string,
+  anchorTopY?: number
+): GridLayout.Layout[] {
+  const itemsById = new Map(layout.map((i) => [i.i, { ...i }]));
+  const anchor = itemsById.get(anchorId);
+  if (!anchor) return resolveOverlaps(layout);
+
+  // Force the anchor to the requested top Y (if provided)
+  if (typeof anchorTopY === 'number') {
+    anchor.y = anchorTopY;
+  }
+
+  const placed: GridLayout.Layout[] = [];
+
+  // Place anchor first
+  placed.push({ ...anchor });
+
+  // Place remaining items, pushing them down as needed, but never moving the anchor
+  const others = layout
+    .filter((i) => i.i !== anchorId)
+    .sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
+
+  for (const item of others) {
+    const clone = { ...item } as GridLayout.Layout;
+    while (placed.some((p) => isColliding(clone, p))) {
+      const blockers = placed.filter((p) => isColliding(clone, p));
+      const maxY = Math.max(...blockers.map((b) => (b.y || 0) + (b.h || 0)));
+      clone.y = Math.max(clone.y || 0, maxY);
+    }
+    placed.push(clone);
+  }
+
+  return placed;
+}
+
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
   expenses: { amount: string; code: string };
@@ -986,11 +1024,17 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   const onResizeStop = (
     layout: GridLayout.Layout[],
+    oldItem?: GridLayout.Layout,
+    newItem?: GridLayout.Layout,
   ) => {
     // Resolve overlaps on resize stop to maintain a clean grid
     if (!layoutBreakpoint) return;
-    // Snap to a collision-free layout without bouncing
-    const resolved = resolveOverlaps(layout);
+    // Snap to a collision-free layout while keeping the resized item anchored at its original top (y)
+    const anchorId = newItem?.i ?? oldItem?.i ?? '';
+    const anchorTopY = oldItem?.y;
+    const resolved = anchorId
+      ? resolveOverlapsAnchored(layout, anchorId, anchorTopY)
+      : resolveOverlaps(layout);
     setLayouts((current) => ({ ...current, [layoutBreakpoint]: resolved }));
 
     setTimeout(() => {
