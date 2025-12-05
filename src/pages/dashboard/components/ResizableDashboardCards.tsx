@@ -1308,10 +1308,10 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
  }, [layoutBreakpoint]);
 
   // Convert flat layouts to row layouts on initialization
-useEffect(() => {
-  if (!isLayoutsInitialized || Object.keys(rowLayouts).length > 0) {
-    return;
-  }
+  useEffect(() => {
+    if (!isLayoutsInitialized || Object.keys(rowLayouts).length > 0) {
+      return;
+    }
 
   const convertedLayouts: { [breakpoint: string]: DashboardRowLayout } = {};
 
@@ -1322,11 +1322,10 @@ useEffect(() => {
     };
   });
 
-  setRowLayouts(convertedLayouts);
-   // DISABLED: Current row-based implementation is fundamentally broken
-   // Issues: Height calculations wrong, cards swap positions on click, window resize broken
-   // setUseRowBasedLayout(true);
-}, [isLayoutsInitialized, layouts]);
+    setRowLayouts(convertedLayouts);
+    // Enable row-based layout mode (predictable rows, width-only panel resize, row vertical resize)
+    setUseRowBasedLayout(true);
+  }, [isLayoutsInitialized, layouts]);
 
 useDebounce(
     () => {
@@ -1796,13 +1795,13 @@ useDebounce(
     }));
   };
 
-return (
+  return (
    <div className={classNames('w-full', { 'select-none': isEditMode, 'dashboard-edit-mode': isEditMode })}>
     {!totals.isLoading ? (
        <>
        {useRowBasedLayout &&
-       layoutBreakpoint &&
-       rowLayouts[layoutBreakpoint] ? (
+         layoutBreakpoint &&
+         rowLayouts[layoutBreakpoint] ? (
          <DashboardRowContainer
            layout={rowLayouts[layoutBreakpoint]}
            breakpoint={layoutBreakpoint}

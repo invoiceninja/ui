@@ -179,7 +179,7 @@ export function DashboardRow({
           draggableHandle=".drag-handle"
           draggableCancel=".cancelDraggingCards"
           compactType={null}
-          preventCollision={false}
+          preventCollision={true}
           allowOverlap={false}
           resizeHandles={['s', 'e', 'w', 'se', 'sw']}
           onResizeStop={handleResizeStop}
