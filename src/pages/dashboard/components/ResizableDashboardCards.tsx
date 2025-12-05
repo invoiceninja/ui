@@ -65,6 +65,7 @@ import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 import { PreferenceCardsGridDnd } from './PreferenceCardsGridDnd';
+import { DndDashboardGrid } from './DndDashboardGrid';
 import { MdDragHandle } from 'react-icons/md';
 import {
   DashboardRowLayout,
@@ -2556,7 +2557,20 @@ useDebounce(
               />
             </div>
           ) : null}
-        </ResponsiveGridLayout>
+          </ResponsiveGridLayout>
+          {/* Experimental: dnd-kit grid (feature-flag, off by default). To enable, render DndDashboardGrid instead. */}
+          {/*
+          <DndDashboardGrid
+            layout={layouts[layoutBreakpoint || 'xxl'] || []}
+            setLayout={(l) =>
+              setLayouts((curr) => ({ ...curr, [layoutBreakpoint || 'xxl']: l }))
+            }
+            isEditMode={isEditMode}
+            renderPanel={(id) => renderPanel(id)}
+            cols={1000}
+            rowHeight={20}
+          />
+          */}
         </>
       )}
       </>
