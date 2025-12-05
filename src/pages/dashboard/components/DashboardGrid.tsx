@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import GridStack from 'gridstack';
+import { GridStack } from 'gridstack';
 import type { GridStackInstance, GridStackNode } from 'gridstack';
 import 'gridstack/dist/gridstack.css';
 import classNames from 'classnames';
@@ -178,4 +178,3 @@ export function DashboardGrid({
     </div>
   );
 }
-
