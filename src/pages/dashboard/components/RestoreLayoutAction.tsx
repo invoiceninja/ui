@@ -12,6 +12,7 @@ import { Dispatch, useState } from 'react';
 import { MdRefresh } from 'react-icons/md';
 import { DashboardGridLayouts } from './DashboardGrid.types';
 import { SetStateAction } from 'react';
+import { DEFAULT_LAYOUTS } from './ResizableDashboardCards';
 import { Icon } from '$app/components/icons/Icon';
 import {
   ConfirmActionModal,
@@ -51,7 +52,11 @@ export function RestoreLayoutAction(props: Props) {
             cloneDeep({
               ...currentLayouts,
               [layoutBreakpoint]:
-                initialLayouts[layoutBreakpoint as keyof typeof initialLayouts],
+                cloneDeep(
+                  DEFAULT_LAYOUTS[
+                    layoutBreakpoint as keyof typeof DEFAULT_LAYOUTS
+                  ] || []
+                ),
             })
           );
 

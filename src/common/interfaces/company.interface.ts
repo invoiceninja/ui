@@ -12,6 +12,17 @@ import { EInvoiceType } from '$app/pages/settings';
 import { BankAccount } from './bank-accounts';
 import { Document } from './document.interface';
 
+export interface CompanyGatewayToken {
+  id: string;
+  gateway?: {
+    currency_id?: string;
+    currency?: {
+      name?: string;
+    };
+  };
+  default_currency?: string;
+}
+
 export interface Company {
   id: string;
   size_id: string;
@@ -68,6 +79,7 @@ export interface Company {
   convert_products: boolean;
   bank_integrations: BankAccount[];
   documents: Document[];
+  gateway_tokens?: CompanyGatewayToken[];
   calculate_expense_tax_by_amount: boolean;
   expense_inclusive_taxes: boolean;
   smtp_host: string;

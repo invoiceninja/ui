@@ -42,6 +42,10 @@
     },
     "typeRoots": [
       "./src/types"
+    ],
+    "types": [
+      "jest",
+      "node"
     ]
   },
   "exclude": [

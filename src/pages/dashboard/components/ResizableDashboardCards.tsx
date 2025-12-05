@@ -119,7 +119,7 @@ const BREAKPOINT_WIDTHS: Record<DashboardBreakpoint, number> = {
   xs: 0,
 };
 
-const DEFAULT_LAYOUTS: DashboardGridLayouts = {
+export const DEFAULT_LAYOUTS: DashboardGridLayouts = {
   xxl: [
     { i: 'toolbar', x: 0, y: 0, w: 48, h: 6, minH: 4, static: true },
     { i: 'preferences', x: 0, y: 6, w: 48, h: 12, minH: 10 },
@@ -344,10 +344,12 @@ export function ResizableDashboardCards() {
 
     const unique: Record<string, Currency> = {};
     companyCurrencies?.forEach((token) => {
-      if (token?.gateway?.currency_id) {
-        unique[token.gateway.currency_id] = {
-          value: token.gateway.currency_id,
-          label: token.gateway.currency?.name || token.gateway.currency_id,
+      const currencyId = token?.gateway?.currency_id;
+
+      if (currencyId && !unique[currencyId]) {
+        unique[currencyId] = {
+          value: currencyId,
+          label: token.gateway?.currency?.name || currencyId,
         };
       }
     });
@@ -355,7 +357,7 @@ export function ResizableDashboardCards() {
     return Object.values(unique);
   }, [company, user]);
 
-  const handleDateChange = (range: string) => {
+  const handleDateChange = (range: string): void => {
     const [start, end] = range.split(',');
     const startDate = dayjs(start);
     const endDate = dayjs(end);
@@ -479,7 +481,6 @@ export function ResizableDashboardCards() {
                 'dashboard-card__drag-handle cursor-grab': isEditMode,
               })}
               withoutBodyPadding
-              shouldWrapBody
               topRight={
                 <div className="flex items-center gap-2">
                   <DashboardCardSelector />
@@ -513,7 +514,6 @@ export function ResizableDashboardCards() {
               className={classNames('h-full flex flex-col', {
                 'dashboard-card__drag-handle cursor-grab': isEditMode,
               })}
-              shouldWrapBody
               withoutBodyPadding
             >
               <div className="flex flex-col gap-3 p-4">
@@ -535,7 +535,7 @@ export function ResizableDashboardCards() {
                   <SelectField
                     label={t('date_range')}
                     value={body.date_range}
-                    onValueChange={(value) =>
+                    onValueChange={(value: string) =>
                       update('preferences.dashboard_charts.range', value)
                     }
                   >
@@ -553,7 +553,7 @@ export function ResizableDashboardCards() {
                       value={body.date_range}
                       startDate={body.start_date}
                       endDate={body.end_date}
-                      handleDateRangeChange={(value) =>
+                      handleDateRangeChange={(value: string) =>
                         setBody((prev) => ({
                           ...prev,
                           date_range: value,
@@ -682,7 +682,7 @@ export function ResizableDashboardCards() {
 
         case 'recent_payments':
           if (
-            !enabled(ModuleBitmask.Payments) ||
+            !enabled(ModuleBitmask.Invoices) ||
             isCardRemoved('recent_payments')
           )
             return null;
@@ -706,7 +706,7 @@ export function ResizableDashboardCards() {
 
         case 'upcoming_recurring_invoices':
           if (
-            !enabled(ModuleBitmask.RecurringInvoices) ||
+            !enabled(ModuleBitmask.Invoices) ||
             isCardRemoved('upcoming_recurring_invoices')
           )
             return null;
@@ -730,7 +730,7 @@ export function ResizableDashboardCards() {
 
         case 'activity':
           if (
-            !enabled(ModuleBitmask.Activities) ||
+            !enabled(ModuleBitmask.Invoices) ||
             isCardRemoved('activity')
           )
             return null;
