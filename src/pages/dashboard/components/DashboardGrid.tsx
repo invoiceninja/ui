@@ -46,6 +46,10 @@ export function DashboardGrid({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const instanceRef = useRef<GridStackInstance | null>(null);
 
+  const orderedLayout = useMemo(() => {
+    return [...layout].sort((a, b) => a.i.localeCompare(b.i));
+  }, [layout]);
+
   const options = useMemo(
     () => ({
       column: metrics.cols,
@@ -113,27 +117,11 @@ export function DashboardGrid({
     grid.on('dragstop', handleChange);
     grid.on('resizestop', handleChange);
 
-    grid.load(
-      layout.map((item) => ({
-        id: item.i,
-        x: item.x,
-        y: item.y,
-        w: item.w,
-        h: item.h,
-        minW: item.minW,
-        minH: item.minH,
-        maxW: item.maxW,
-        maxH: item.maxH,
-        noMove: item.static ?? false,
-        noResize: item.static ?? false,
-      }))
-    );
-
     return () => {
       grid.destroy(false);
       instanceRef.current = null;
     };
-  }, [options]);
+  }, [options, onLayoutChange]);
 
   useEffect(() => {
     if (instanceRef.current) {
@@ -154,7 +142,7 @@ export function DashboardGrid({
         'dashboard-edit-mode': editable,
       })}
     >
-      {layout.map((item) => (
+      {orderedLayout.map((item) => (
         <div
           key={item.i}
           className="grid-stack-item"

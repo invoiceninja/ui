@@ -32,7 +32,7 @@ declare module 'gridstack' {
     animate?: boolean;
   }
 
-  export const GridStack: {
-    init: (options: GridStackOptions, container: HTMLElement) => GridStackInstance;
-  };
+  export class GridStack {
+    static init(options: GridStackOptions, container: HTMLElement): GridStackInstance;
+  }
 }
