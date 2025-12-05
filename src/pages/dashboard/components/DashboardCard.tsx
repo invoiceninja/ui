@@ -30,6 +30,7 @@ interface DashboardCardsProps {
 interface CardProps extends DashboardCardsProps {
   field: DashboardField;
   layoutBreakpoint: string | undefined;
+  fillHeight?: boolean;
 }
 
 export const PERIOD_LABELS = {
@@ -84,7 +85,8 @@ export function DashboardCard(props: CardProps) {
 
   return (
     <ShadcnCard
-      className={classNames('px-6 py-6 h-full', {
+      className={classNames('px-6 py-6', {
+        'h-full': props.fillHeight !== false,
         'col-span-2':
           props.layoutBreakpoint === 'xxl' ||
           props.layoutBreakpoint === 'xl' ||

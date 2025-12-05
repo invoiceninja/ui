@@ -215,8 +215,9 @@ export function Chart(props: Props) {
   };
 
   return (
-    <ResponsiveContainer width="100%" height={330}>
-      <LineChart height={200} data={chartData} margin={{ top: 17, left: 5 }}>
+    <div style={{ width: '100%', height: '100%' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData} margin={{ top: 17, left: 5 }}>
         <Line
           id="invoices"
           type="monotone"
@@ -277,7 +278,8 @@ export function Chart(props: Props) {
           width={yAxisWidth}
           stroke={colors.$3}
         />
-      </LineChart>
-    </ResponsiveContainer>
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

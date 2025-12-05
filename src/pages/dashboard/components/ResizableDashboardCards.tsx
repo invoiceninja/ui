@@ -64,6 +64,7 @@ import { RestoreCardsModal } from './RestoreCardsModal';
 import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
+import { PreferenceCardsGridDnd } from './PreferenceCardsGrid.dnd';
 import { MdDragHandle } from 'react-icons/md';
 import {
   DashboardRowLayout,
@@ -1022,12 +1023,14 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     handleOnLayoutChange(current);
   } else if (isResizingRef.current) {
     // Allow full layout changes during resize (including height)
-    setLayouts((prev) => {
-      return {
-        ...prev,
-        [layoutBreakpoint]: current,
-      };
+    // Force small minH for Totals and Overview
+    const normalized = current.map((i) => {
+      if (i.i === '2' /* Totals */ || i.i === '3' /* Overview */) {
+        return { ...i, minH: 8 };
+      }
+      return i;
     });
+    setLayouts((prev) => ({ ...prev, [layoutBreakpoint]: normalized }));
   } else {
     // During drag, allow free movement; we'll resolve overlaps on drop
     setLayouts((prev) => ({ ...prev, [layoutBreakpoint]: current }));
@@ -1217,10 +1220,12 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     setLayouts((prev) => {
       const current = prev[layoutBreakpoint];
       if (!current) return prev;
-      const normalized = current.map((i) => ({
-        ...i,
-        minH: Math.min(i.minH ?? 10, 10),
-      }));
+      const normalized = current.map((i) => {
+        if (i.i === '2' || i.i === '3') {
+          return { ...i, minH: 8 };
+        }
+        return { ...i, minH: Math.min(i.minH ?? 10, 10) };
+      });
       return { ...prev, [layoutBreakpoint]: normalized };
     });
   }, [layoutBreakpoint]);
@@ -2022,9 +2027,9 @@ return (
           onDragStop={onDragStop}
          onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-          compactType={null}
-         preventCollision={!isDragging}
-         allowOverlap={isDragging}
+          compactType="vertical"
+         preventCollision={true}
+         allowOverlap={false}
          onDrag={handleOnDrag}
        >
           {(totals.isLoading || !isLayoutsInitialized) && (
@@ -2078,7 +2083,8 @@ return (
                  position: 'relative',
                }}
              >
-                <PreferenceCardsGrid
+                {/* Use dnd-kit pilot for the first row */}
+                <PreferenceCardsGridDnd
                   currentDashboardFields={currentDashboardFields}
                   dateRange={dateRange}
                   startDate={dates.start_date}
