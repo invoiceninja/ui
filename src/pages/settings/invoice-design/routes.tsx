@@ -78,11 +78,15 @@ const Includes = lazy(
 const Variables = lazy(
   () => import('./pages/custom-designs/pages/edit/components/Variables')
 );
+const TemplateGallery = lazy(() => import('./builder/TemplateGallery'));
+const InvoiceBuilder = lazy(() => import('./builder/InvoiceBuilder'));
 
 export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
     <Route path="" element={<GeneralSettings />} />
     <Route path="custom_designs" element={<CustomDesigns />} />
+    <Route path="builder/templates" element={<TemplateGallery />} />
+    <Route path="builder/new" element={<InvoiceBuilder />} />
     <Route
       path="custom_designs/:id/edit"
       element={
