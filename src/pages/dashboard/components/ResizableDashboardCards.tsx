@@ -995,6 +995,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
     setTimeout(() => {
       isResizingRef.current = false;
+      setIsResizing(false);
     }, 10);
   };
 
@@ -1209,6 +1210,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Track dragging for overlap/collision mode
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
 
   // Normalize minH to allow users to shrink cards vertically
   useEffect(() => {
@@ -2017,13 +2019,14 @@ useDebounce(
            onResize={() => {
              // Set resize flag to allow layout changes during resize
              isResizingRef.current = true;
+             setIsResizing(true);
            }}
            onResizeStop={onResizeStop}
           onDragStop={onDragStop}
          onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-          compactType="vertical"
-         preventCollision={true}
+          compactType={null}
+         preventCollision={!isResizing}
          allowOverlap={false}
          onDrag={handleOnDrag}
        >
