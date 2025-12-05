@@ -2055,10 +2055,9 @@ useDebounce(
           </div>
          )}
 
-          {/* Switch to the new dnd-kit grid for full dashboard to unlock correct vertical resizing and non-overlap compaction. */}
-          {false && (
+          {/* Main dashboard grid (RGL) */}
           <ResponsiveGridLayout
-          className="layout responsive-grid-box"
+           className="layout responsive-grid-box"
            breakpoints={{
              xxl: 1400,
              xl: 1200,
@@ -2122,11 +2121,11 @@ useDebounce(
           onDragStop={onDragStop}
          onLayoutChange={handleLayoutChangeWithLock}
          resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-          compactType={null}
-         preventCollision={!isResizing}
-         allowOverlap={false}
-         onDrag={handleOnDrag}
-       >
+           compactType={null}
+           preventCollision={!isResizing}
+           allowOverlap={false}
+           onDrag={handleOnDrag}
+         >
           {(totals.isLoading || !isLayoutsInitialized) && (
             <div className="w-full flex justify-center">
               <Spinner />
@@ -2560,20 +2559,7 @@ useDebounce(
             </div>
           ) : null}
           </ResponsiveGridLayout>
-          )}
-          {/* Enable DndDashboardGrid */}
-          <div style={{ marginTop: 12 }}>
-            <DndDashboardGrid
-              layout={layouts[layoutBreakpoint || 'xxl'] || []}
-              setLayout={(l) =>
-                setLayouts((curr) => ({ ...curr, [layoutBreakpoint || 'xxl']: l }))
-              }
-              isEditMode={isEditMode}
-              renderPanel={(id) => renderPanel(id)}
-              cols={1000}
-              rowHeight={20}
-            />
-          </div>
+          
         </>
       )}
       </>

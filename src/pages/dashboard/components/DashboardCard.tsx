@@ -86,7 +86,8 @@ export function DashboardCard(props: CardProps) {
   return (
     <ShadcnCard
       className={classNames('px-6 py-6', {
-        'h-full': props.fillHeight !== false,
+        // ensure content stretches with parent so it remains visible during resize
+        'h-full min-h-0': props.fillHeight !== false,
         'col-span-2':
           props.layoutBreakpoint === 'xxl' ||
           props.layoutBreakpoint === 'xl' ||

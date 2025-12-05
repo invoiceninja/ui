@@ -102,7 +102,10 @@ export function DndDashboardGrid(props: Props) {
   const [working, setWorking] = useState<LayoutItem[]>(layout.map((l) => ({ ...l })));
   useEffect(() => setWorking(layout.map((l) => ({ ...l }))), [layout]);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 120, tolerance: 3 } }));
+  // Keep dnd-kit sensors but increase activation threshold so clicks do not start drags accidentally
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6, delay: 120, tolerance: 4 } })
+  );
   const [dragId, setDragId] = useState<string | null>(null);
   const [resize, setResize] = useState<{ id: string; edge: 's' | 'e' | 'w' | 'se' | 'sw'; originX: number; originY: number; start: LayoutItem } | null>(null);
 
