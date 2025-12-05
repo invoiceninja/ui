@@ -3,7 +3,7 @@
  *
  * Drag-only, no resize. Keeps persisted layout shape, writes back on drop.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -83,7 +83,6 @@ export function PreferenceCardsGridDnd(props: Props) {
   const [order, setOrder] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [overlaySize, setOverlaySize] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     // Initialize from saved settings if present; else from fields
@@ -110,26 +109,11 @@ export function PreferenceCardsGridDnd(props: Props) {
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active?.id ?? null);
-    // Measure the active element to size the overlay and prevent jump
-    try {
-      const el = document.querySelector(
-        `.preference-cards-grid .sortable-card[data-id="${event.active?.id}"]`
-      ) as HTMLElement | null;
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        setOverlaySize({ width: rect.width, height: rect.height });
-      } else {
-        setOverlaySize(null);
-      }
-    } catch {
-      setOverlaySize(null);
-    }
   };
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
     setActiveId(null);
-    setOverlaySize(null);
     if (!over || active.id === over.id) return;
 
     const oldIndex = items.indexOf(active.id);
@@ -182,6 +166,7 @@ export function PreferenceCardsGridDnd(props: Props) {
                 <div
                   className={isEditMode ? 'cursor-grab' : ''}
                   style={{ width: '100%' }}
+                  data-dragging={activeId === id}
                   onMouseDown={() => setSelectedId(id)}
                 >
                   <DashboardCard
@@ -198,30 +183,6 @@ export function PreferenceCardsGridDnd(props: Props) {
             );
           })}
         </SortableContext>
-        <DragOverlay adjustScale style={{ cursor: 'grabbing' }}>
-          {activeId ? (
-            (() => {
-              const field = currentDashboardFields.find((f) => f.id === activeId);
-              if (!field) return null;
-              return (
-                <div
-                  className="sortable-card overlay"
-                  style={{ width: overlaySize?.width ?? 240, height: overlaySize?.height }}
-                >
-                  <DashboardCard
-                    field={field}
-                    dateRange={dateRange}
-                    startDate={startDate}
-                    endDate={endDate}
-                    currencyId={currencyId}
-                    layoutBreakpoint={layoutBreakpoint}
-                    fillHeight={false}
-                  />
-                </div>
-              );
-            })()
-          ) : null}
-        </DragOverlay>
       </DndContext>
     </div>
   );

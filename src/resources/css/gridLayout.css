@@ -186,6 +186,12 @@
   cursor: grab;
 }
 
+/* Keep a silhouette placeholder in-grid during drag so layout does not collapse */
+.dashboard-edit-mode .preference-cards-grid .sortable-card[data-dragging='true'] {
+  opacity: 0.4;
+  border-color: #3b82f6;
+}
+
 .dashboard-edit-mode .preference-cards-grid .sortable-card.overlay {
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59,130,246,0.2) inset;

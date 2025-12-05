@@ -989,6 +989,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
   ) => {
     // Resolve overlaps on resize stop to maintain a clean grid
     if (!layoutBreakpoint) return;
+    // Snap to a collision-free layout without bouncing
     const resolved = resolveOverlaps(layout);
     setLayouts((current) => ({ ...current, [layoutBreakpoint]: resolved }));
 
@@ -1003,7 +1004,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     setIsDragging(false);
     if (!layoutBreakpoint) return;
 
-    // Resolve overlaps after dropping to keep a sane grid
+    // Resolve overlaps after dropping to keep a sane grid and avoid reordering chaos
     const resolved = resolveOverlaps(layout);
     setLayouts((current) => ({ ...current, [layoutBreakpoint]: resolved }));
   };
