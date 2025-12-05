@@ -1,0 +1,41 @@
+.grid-stack {
+  position: relative;
+  width: 100%;
+  transition: height 0.2s ease-in-out;
+}
+
+.grid-stack-item {
+  transition: none;
+}
+
+.grid-stack-item-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-edit-mode .grid-stack-item {
+  border: 2px dashed transparent;
+  transition: border-color 0.2s ease;
+}
+
+.dashboard-edit-mode .grid-stack-item:hover {
+  border-color: #3b82f6;
+}
+
+.dashboard-edit-mode .grid-stack-placeholder {
+  background: rgba(59, 130, 246, 0.15);
+  border: 2px dashed #3b82f6;
+}
+
+.grid-stack-item .resize-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12px;
+  cursor: s-resize;
+  z-index: 20;
+}
+
