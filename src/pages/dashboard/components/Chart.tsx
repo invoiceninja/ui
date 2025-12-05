@@ -215,9 +215,9 @@ export function Chart(props: Props) {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex' }}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 17, left: 5 }}>
+        <LineChart data={chartData} margin={{ top: 8, left: 8, right: 8, bottom: 8 }}>
         <Line
           id="invoices"
           type="monotone"
@@ -263,7 +263,7 @@ export function Chart(props: Props) {
 
         <XAxis
           dataKey="date"
-          tickMargin={8}
+          tickMargin={6}
           tick={{ fontSize: 14 }}
           stroke={colors.$3}
         />
@@ -274,7 +274,7 @@ export function Chart(props: Props) {
           tickFormatter={(value) =>
             formatTooltipValues(value).replace(/ /g, '\u00A0')
           }
-          tick={{ fontSize: 14 }}
+          tick={{ fontSize: 12 }}
           width={yAxisWidth}
           stroke={colors.$3}
         />

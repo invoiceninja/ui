@@ -44,7 +44,7 @@ function SortableItem({ id, children }: { id: string; children: React.ReactNode 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    width: 'auto',
+    width: '100%',
   } as React.CSSProperties;
 
   return (
@@ -121,7 +121,17 @@ export function PreferenceCardsGridDnd(props: Props) {
   };
 
   return (
-    <div className="preference-cards-grid" style={{ display: 'grid', gridAutoFlow: 'column', gap: 20, alignItems: 'start' }}>
+    <div
+      className="preference-cards-grid"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+        gap: 20,
+        alignItems: 'start',
+        width: '100%',
+        overflowX: 'hidden',
+      }}
+    >
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -134,7 +144,7 @@ export function PreferenceCardsGridDnd(props: Props) {
             if (!field) return null;
             return (
               <SortableItem key={id} id={id}>
-                <div className={isEditMode ? 'cursor-grab' : ''} style={{ width: 200 }}>
+                <div className={isEditMode ? 'cursor-grab' : ''} style={{ width: '100%' }}>
                   <DashboardCard
                     field={field}
                     dateRange={dateRange}
