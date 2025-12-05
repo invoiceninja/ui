@@ -94,27 +94,90 @@ function scaleLayoutForBreakpoint(
 }
 
 // Helper function to optimize row heights after drag/drop
-function optimizeRowHeights(layout: GridLayout.Layout[]): GridLayout.Layout[] {
-  // Group items by Y position to identify rows
-  const rows = new Map<number, GridLayout.Layout[]>();
-  
-  layout.forEach(item => {
-    const y = item.y || 0;
-    if (!rows.has(y)) {
-      rows.set(y, []);
+// Normalize rows to stack exactly like Grafana: items sharing vertical space
+// become a contiguous row with uniform height, and rows stack without gaps.
+function normalizeRows(
+  layout: GridLayout.Layout[],
+  anchorId?: string
+): GridLayout.Layout[] {
+  const items = layout.map((item) => ({ ...item }));
+
+  // Sort by top (y) then by x so rows are processed top-down, left-to-right.
+  items.sort((a, b) => (a.y || 0) - (b.y || 0) || (a.x || 0) - (b.x || 0));
+
+  type Row = {
+    top: number;
+    height: number;
+    items: GridLayout.Layout[];
+    hasAnchor: boolean;
+  };
+
+  const rows: Row[] = [];
+
+  const anchorHeight = anchorId
+    ? items.find((item) => item.i === anchorId)?.h ?? null
+    : null;
+
+  const addToRow = (row: Row, item: GridLayout.Layout) => {
+    row.items.push(item);
+    row.height = Math.max(row.height, item.h || 0);
+    if (anchorId && item.i === anchorId) {
+      row.hasAnchor = true;
     }
-    rows.get(y)!.push(item);
-  });
-  
-  // For each row, set all items to the max height needed
-  rows.forEach(items => {
-    const maxHeight = Math.max(...items.map(i => i.h || 20));
-    items.forEach(item => {
-      item.h = maxHeight;
+  };
+
+  for (const item of items) {
+    const itemTop = item.y || 0;
+
+    if (!rows.length) {
+      rows.push({
+        top: itemTop,
+        height: item.h || 0,
+        items: [item],
+        hasAnchor: anchorId ? item.i === anchorId : false,
+      });
+      continue;
+    }
+
+    const currentRow = rows[rows.length - 1];
+    const currentBottom = currentRow.top + currentRow.height;
+
+    if (itemTop >= currentBottom) {
+      rows.push({
+        top: itemTop,
+        height: item.h || 0,
+        items: [item],
+        hasAnchor: anchorId ? item.i === anchorId : false,
+      });
+    } else {
+      addToRow(currentRow, item);
+    }
+  }
+
+  // Now force rows to stack with contiguous tops and uniform heights.
+  let cursor = 0;
+
+  rows.forEach((row) => {
+    const minHeightConstraint = Math.max(
+      ...row.items.map((item) => item.minH || 0),
+      0
+    );
+
+    const targetHeight = row.hasAnchor && anchorHeight
+      ? Math.max(anchorHeight, minHeightConstraint)
+      : Math.max(row.height, minHeightConstraint);
+
+    row.items.forEach((item) => {
+      item.y = cursor;
+      item.h = targetHeight;
     });
+
+    cursor += targetHeight;
   });
-  
-  return layout;
+
+  // Return items sorted back to original order (ReactGridLayout expects stable order by i).
+  items.sort((a, b) => (a.i || '').localeCompare(b.i || ''));
+  return items;
 }
 
 // Collision detection between two layout items
@@ -1083,7 +1146,7 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
       : resolveOverlaps(layout);
 
     const compacted = compactVertical(resolved, anchorId || undefined);
-    const optimized = optimizeRowHeights(compacted.map((item) => ({ ...item })));
+    const optimized = normalizeRows(compacted, anchorId || undefined);
 
     setLayouts((current) => ({ ...current, [layoutBreakpoint]: optimized }));
 
