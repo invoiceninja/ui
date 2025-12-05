@@ -177,7 +177,7 @@ export const recurringinvoiceMap: Record[] = [
     value: 'recurring_invoice.auto_bill_enabled',
     map: 'recurring_invoice',
   },
-
+  { trans: 'subtotal', value: 'recurring_invoice.subtotal', map: 'recurring_invoice' },
   { trans: 'tax_name1', value: 'recurring_invoice.tax_name1', map: 'recurring_invoice' },
   { trans: 'tax_rate1', value: 'recurring_invoice.tax_rate1', map: 'recurring_invoice' },
   { trans: 'tax_name2', value: 'recurring_invoice.tax_name2', map: 'recurring_invoice' },

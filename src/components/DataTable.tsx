@@ -253,7 +253,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     enableSavingFilterPreference = false,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
-    filterColumns = [],
+    filterColumns,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -370,7 +370,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
 
     if (Object.keys(filterColumnsValues).length) {
-      filterColumns.forEach((filterColumn) => {
+      (filterColumns || []).forEach((filterColumn) => {
         if (filterColumnsValues[filterColumn.column_id]) {
           apiEndpoint.searchParams.set(
             filterColumn.query_identifier,
