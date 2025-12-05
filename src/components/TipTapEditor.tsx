@@ -10,6 +10,7 @@ import {
   FaLink,
   FaUnlink,
   FaQuoteRight,
+  FaCode,
   FaAlignLeft,
   FaAlignCenter,
   FaAlignRight,
@@ -381,9 +382,8 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
       font-weight: bold;
     }
 
-    h4,
-    h5,
-    h6 {
+    h4 {
+      font-size: 1em;
       margin: 1em 0;
       font-weight: bold;
     }
@@ -404,34 +404,10 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
 
     ul {
       list-style-type: disc;
-
-      &[data-list-style='circle'] {
-        list-style-type: circle;
-      }
-
-      &[data-list-style='square'] {
-        list-style-type: square;
-      }
     }
 
     ol {
       list-style-type: decimal;
-
-      &[data-list-style='lower-alpha'] {
-        list-style-type: lower-alpha;
-      }
-
-      &[data-list-style='upper-alpha'] {
-        list-style-type: upper-alpha;
-      }
-
-      &[data-list-style='lower-roman'] {
-        list-style-type: lower-roman;
-      }
-
-      &[data-list-style='upper-roman'] {
-        list-style-type: upper-roman;
-      }
     }
 
     blockquote {
@@ -902,7 +878,7 @@ export function TipTapEditor({
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [1, 2, 3, 4, 5, 6],
+          levels: [1, 2, 3, 4],
         },
       }),
       Placeholder.configure({
@@ -1089,8 +1065,6 @@ export function TipTapEditor({
     if (editor.isActive('heading', { level: 2 })) return 'Heading 2';
     if (editor.isActive('heading', { level: 3 })) return 'Heading 3';
     if (editor.isActive('heading', { level: 4 })) return 'Heading 4';
-    if (editor.isActive('heading', { level: 5 })) return 'Heading 5';
-    if (editor.isActive('heading', { level: 6 })) return 'Heading 6';
     if (editor.isActive('codeBlock')) return 'Preformatted';
     return 'Paragraph';
   }
@@ -1138,16 +1112,6 @@ export function TipTapEditor({
       label: t('heading4'),
       value: 'h4',
       onClick: () => editor.chain().focus().toggleHeading({ level: 4 }).run(),
-    },
-    {
-      label: t('heading5'),
-      value: 'h5',
-      onClick: () => editor.chain().focus().toggleHeading({ level: 5 }).run(),
-    },
-    {
-      label: t('heading6'),
-      value: 'h6',
-      onClick: () => editor.chain().focus().toggleHeading({ level: 6 }).run(),
     },
     {
       label: t('preformatted'),
@@ -1200,52 +1164,6 @@ export function TipTapEditor({
     { label: '24pt', value: '24pt', onClick: () => setFontSize('24pt') },
     { label: '36pt', value: '36pt', onClick: () => setFontSize('36pt') },
     { label: '48pt', value: '48pt', onClick: () => setFontSize('48pt') },
-  ];
-
-  const bulletListItems: DropdownItem[] = [
-    {
-      label: 'Default',
-      value: 'disc',
-      onClick: () => editor.chain().focus().toggleBulletList().run(),
-    },
-    {
-      label: 'Circle',
-      value: 'circle',
-      onClick: () => editor.chain().focus().toggleBulletList().run(),
-    },
-    {
-      label: 'Square',
-      value: 'square',
-      onClick: () => editor.chain().focus().toggleBulletList().run(),
-    },
-  ];
-
-  const numberedListItems: DropdownItem[] = [
-    {
-      label: '1, 2, 3...',
-      value: 'decimal',
-      onClick: () => editor.chain().focus().toggleOrderedList().run(),
-    },
-    {
-      label: 'a, b, c...',
-      value: 'lower-alpha',
-      onClick: () => editor.chain().focus().toggleOrderedList().run(),
-    },
-    {
-      label: 'A, B, C...',
-      value: 'upper-alpha',
-      onClick: () => editor.chain().focus().toggleOrderedList().run(),
-    },
-    {
-      label: 'i, ii, iii...',
-      value: 'lower-roman',
-      onClick: () => editor.chain().focus().toggleOrderedList().run(),
-    },
-    {
-      label: 'I, II, III...',
-      value: 'upper-roman',
-      onClick: () => editor.chain().focus().toggleOrderedList().run(),
-    },
   ];
 
   const tableItems: DropdownItem[] = [
@@ -1444,29 +1362,27 @@ export function TipTapEditor({
         </div>
 
         <ToolbarSection>
-          <DropdownComponent
-            label=""
-            icon={
-              <Icon
-                element={MdFormatListBulleted}
-                size={18}
-                style={{ color: colors.$3 }}
-              />
-            }
-            items={bulletListItems}
-          />
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            isActive={editor.isActive('bulletList')}
+          >
+            <Icon
+              element={MdFormatListBulleted}
+              size={18}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
 
-          <DropdownComponent
-            label=""
-            icon={
-              <Icon
-                element={MdFormatListNumbered}
-                size={18}
-                style={{ color: colors.$3 }}
-              />
-            }
-            items={numberedListItems}
-          />
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            isActive={editor.isActive('orderedList')}
+          >
+            <Icon
+              element={MdFormatListNumbered}
+              size={18}
+              style={{ color: colors.$3 }}
+            />
+          </ToolbarButtonComponent>
 
           <ToolbarDividerComponent />
         </ToolbarSection>
@@ -1529,6 +1445,13 @@ export function TipTapEditor({
               size={13.5}
               style={{ color: colors.$3 }}
             />
+          </ToolbarButtonComponent>
+
+          <ToolbarButtonComponent
+            onClick={() => editor.chain().focus().toggleCode().run()}
+            isActive={editor.isActive('code')}
+          >
+            <Icon element={FaCode} size={14} style={{ color: colors.$3 }} />
           </ToolbarButtonComponent>
 
           <ToolbarDividerComponent />
