@@ -40,15 +40,17 @@ interface Props {
 }
 
 function SortableItem({ id, children }: { id: string; children: React.ReactNode }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     width: '100%',
+    cursor: isDragging ? 'grabbing' as const : 'grab' as const,
+    opacity: isDragging ? 0.85 : 1,
   } as React.CSSProperties;
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="sortable-card">
       {children}
     </div>
   );
@@ -159,11 +161,25 @@ export function PreferenceCardsGridDnd(props: Props) {
             );
           })}
         </SortableContext>
-        <DragOverlay>
+        <DragOverlay adjustScale style={{ cursor: 'grabbing' }}>
           {activeId ? (
-            <div style={{ width: 200, opacity: 0.8 }}>
-              {/* Ghost overlay could be improved later */}
-            </div>
+            (() => {
+              const field = currentDashboardFields.find((f) => f.id === activeId);
+              if (!field) return null;
+              return (
+                <div style={{ width: 240 }} className="sortable-card overlay">
+                  <DashboardCard
+                    field={field}
+                    dateRange={dateRange}
+                    startDate={startDate}
+                    endDate={endDate}
+                    currencyId={currencyId}
+                    layoutBreakpoint={layoutBreakpoint}
+                    fillHeight={false}
+                  />
+                </div>
+              );
+            })()
           ) : null}
         </DragOverlay>
       </DndContext>

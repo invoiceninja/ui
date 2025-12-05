@@ -158,6 +158,25 @@
   cursor: grabbing;
 }
 
+/* First row dnd-kit: hover/active outline similar to previous blue outlines */
+.preference-cards-grid .sortable-card {
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-edit-mode .preference-cards-grid .sortable-card:hover {
+  border-color: #3b82f6; /* blue */
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.15) inset;
+  cursor: grab;
+}
+
+.dashboard-edit-mode .preference-cards-grid .sortable-card.overlay {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2) inset;
+  cursor: grabbing;
+}
+
 /* Removed edit-mode grid overlay to avoid visual artifacts */
 
 /* Placeholder styling improvements */
