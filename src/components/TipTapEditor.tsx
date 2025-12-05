@@ -426,11 +426,14 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
     }
 
     code {
-      background: ${(props) => props.theme.toolbarBackground};
-      padding: 2px 4px;
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9em;
+      background: rgba(175, 184, 193, 0.2);
+      padding: 0.2em 0.4em;
+      margin: 0;
+      font-size: 85%;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+        'Liberation Mono', monospace;
+      color: ${(props) => props.theme.textColor};
     }
 
     a {
