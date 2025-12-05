@@ -118,6 +118,40 @@ export const useGenerateActivityElement = () => {
   };
 };
 
+const useCalculateDueDate = (recurringInvoice: RecurringInvoice | null) => {
+  const [t] = useTranslation();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  if (!recurringInvoice) {
+    return null;
+  }
+
+  if (recurringInvoice.client?.settings.payment_terms) {
+    return {
+      label: t('payment_terms'),
+      value: `${recurringInvoice.client?.settings.payment_terms} ${t('days')}`,
+    };
+  }
+
+  if (recurringInvoice.due_date_days) {
+    const dayNumber = parseInt(recurringInvoice.due_date_days);
+    const today = dayjs();
+    let nextDueDate = today.date(dayNumber);
+
+    if (nextDueDate.isBefore(today)) {
+      nextDueDate = nextDueDate.add(1, 'month');
+    }
+
+    return {
+      label: t('due_date'),
+      value: date(nextDueDate.unix(), dateFormat),
+    };
+  }
+
+  return null;
+};
+
 export const RecurringInvoiceSlider = () => {
   const [isVisible, setIsSliderVisible] = useAtom(
     recurringInvoiceSliderVisibilityAtom
@@ -137,6 +171,7 @@ export const RecurringInvoiceSlider = () => {
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
   const dateTime = useDateTime({ withTimezone: true });
+  const dueDate = useCalculateDueDate(recurringInvoice);
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -305,14 +340,26 @@ export const RecurringInvoiceSlider = () => {
             </Element>
 
             <Element
+              className="border-b border-dashed"
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {recurringInvoice ? (
                 <RecurringInvoiceStatus entity={recurringInvoice} />
               ) : null}
             </Element>
+
+            {dueDate && (
+              <Element
+                leftSide={dueDate.label}
+                pushContentToRight
+                noExternalPadding
+              >
+                {dueDate.value}
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
