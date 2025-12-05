@@ -1023,13 +1023,8 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     handleOnLayoutChange(current);
   } else if (isResizingRef.current) {
     // Allow full layout changes during resize (including height)
-    // Force small minH for Totals and Overview
-    const normalized = current.map((i) => {
-      if (i.i === '2' /* Totals */ || i.i === '3' /* Overview */) {
-        return { ...i, minH: 8 };
-      }
-      return i;
-    });
+    // Force small minH for all panels except the first row container
+    const normalized = current.map((i) => (i.i === '1' ? i : { ...i, minH: 4 }));
     setLayouts((prev) => ({ ...prev, [layoutBreakpoint]: normalized }));
   } else {
     // During drag, allow free movement; we'll resolve overlaps on drop
@@ -1221,10 +1216,8 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
       const current = prev[layoutBreakpoint];
       if (!current) return prev;
       const normalized = current.map((i) => {
-        if (i.i === '2' || i.i === '3') {
-          return { ...i, minH: 8 };
-        }
-        return { ...i, minH: Math.min(i.minH ?? 10, 10) };
+        if (i.i === '1') return i; // keep first row container as-is
+        return { ...i, minH: 4 };
       });
       return { ...prev, [layoutBreakpoint]: normalized };
     });
