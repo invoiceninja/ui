@@ -1069,17 +1069,23 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     oldItem?: GridLayout.Layout,
     newItem?: GridLayout.Layout,
   ) => {
-    // Resolve overlaps on resize stop to maintain a clean grid
-    if (!layoutBreakpoint) return;
-    // Snap to a collision-free layout while keeping the resized item anchored at its original top (y)
+    if (!layoutBreakpoint) {
+      isResizingRef.current = false;
+      setIsResizing(false);
+      resizeAnchorRef.current = null;
+      return;
+    }
+
     const anchorId = resizeAnchorRef.current?.id ?? newItem?.i ?? oldItem?.i ?? '';
     const anchorTopY = resizeAnchorRef.current?.y ?? oldItem?.y;
     const resolved = anchorId
       ? resolveOverlapsAnchored(layout, anchorId, anchorTopY)
       : resolveOverlaps(layout);
-    // After resolving overlaps, compact vertically to remove gaps while preserving the anchor's top
+
     const compacted = compactVertical(resolved, anchorId || undefined);
-    setLayouts((current) => ({ ...current, [layoutBreakpoint]: compacted }));
+    const optimized = optimizeRowHeights(compacted.map((item) => ({ ...item })));
+
+    setLayouts((current) => ({ ...current, [layoutBreakpoint]: optimized }));
 
     setTimeout(() => {
       isResizingRef.current = false;
