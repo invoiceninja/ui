@@ -1553,7 +1553,6 @@ useDebounce(
               title={t('overview')}
               className="col-span-12 xl:col-span-8 pr-4"
               height="full"
-              withScrollableBody
               topRight={
                 isEditMode && (
                   <Button

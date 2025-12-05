@@ -88,7 +88,12 @@ export function PreferenceCardsGridDnd(props: Props) {
   }, [currentDashboardFields.length]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 120,
+        tolerance: 4,
+      },
+    })
   );
 
   const items = useMemo(() => order.filter((id) => currentDashboardFields.some((f) => f.id === id)), [order, currentDashboardFields.length]);
