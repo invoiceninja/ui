@@ -1553,6 +1553,7 @@ export function TipTapEditor({
           element="textarea"
           value={htmlCode}
           onValueChange={(value) => setHtmlCode(value)}
+          style={{ minHeight: '25rem' }}
         />
 
         <div className="flex gap-2 justify-end mt-4">
