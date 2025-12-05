@@ -23,7 +23,7 @@ import { MdDragHandle } from 'react-icons/md';
 
 import { Button, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { DropdownDateRangePicker } from '$app/pages/dashboard/components/DropdownDateRangePicker';
+import { DropdownDateRangePicker } from '$app/components/DropdownDateRangePicker';
 import { Card } from '$app/components/cards';
 import { Badge } from '$app/components/Badge';
 import { Spinner } from '$app/components/Spinner';
@@ -340,8 +340,7 @@ export function ResizableDashboardCards() {
 
   const availableCurrencies: Currency[] = useMemo(() => {
     const companyCurrencies =
-      company?.company_gateway_tokens || user?.company_user?.company
-        ?.company_gateway_tokens;
+      company?.gateway_tokens || user?.company_user?.company?.gateway_tokens;
 
     const unique: Record<string, Currency> = {};
     companyCurrencies?.forEach((token) => {
