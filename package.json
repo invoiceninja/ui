@@ -79,7 +79,8 @@
     "tailwind-merge": "^2.5.2",
     "tailwind-scrollbar": "^3.0.0",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "react-grid-layout": "^1.4.4"
   },
   "scripts": {
     "dev": "vite",

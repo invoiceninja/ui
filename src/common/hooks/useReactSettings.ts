@@ -16,7 +16,7 @@ import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
-import { DashboardGridLayouts } from '$app/pages/dashboard/components/ResizableDashboardCards';
+import { DashboardGridLayouts } from '$app/pages/dashboard/components/DashboardGrid.types';
 import { DashboardField } from '../interfaces/company-user';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
