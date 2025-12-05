@@ -8,9 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 import '$app/resources/css/gridLayout.css';
+import '$app/resources/css/gridStack.css';
 import { Button, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { useEffect, useState, useRef } from 'react';
@@ -65,8 +64,8 @@ import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 import { PreferenceCardsGridDnd } from './PreferenceCardsGridDnd';
-import { DndDashboardGrid } from './DndDashboardGrid';
-import { MdDragHandle } from 'react-icons/md';
+import type { GridStack, GridStackNode } from 'gridstack';
+import 'gridstack/dist/gridstack.css';
 import {
   DashboardRowLayout,
   convertFlatLayoutToRows,
@@ -1127,20 +1126,15 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     staleTime: Infinity,
   });
 
-  const onResizeStop = (
+  const applyResizeLayout = (
     layout: GridLayout.Layout[],
-    oldItem?: GridLayout.Layout,
-    newItem?: GridLayout.Layout,
+    anchorId?: string,
+    anchorTopY?: number
   ) => {
     if (!layoutBreakpoint) {
-      isResizingRef.current = false;
-      setIsResizing(false);
-      resizeAnchorRef.current = null;
       return;
     }
 
-    const anchorId = resizeAnchorRef.current?.id ?? newItem?.i ?? oldItem?.i ?? '';
-    const anchorTopY = resizeAnchorRef.current?.y ?? oldItem?.y;
     const resolved = anchorId
       ? resolveOverlapsAnchored(layout, anchorId, anchorTopY)
       : resolveOverlaps(layout);
@@ -1149,6 +1143,17 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const optimized = normalizeRows(compacted, anchorId || undefined);
 
     setLayouts((current) => ({ ...current, [layoutBreakpoint]: optimized }));
+  };
+
+  const onResizeStop = (
+    layout: GridLayout.Layout[],
+    oldItem?: GridLayout.Layout,
+    newItem?: GridLayout.Layout,
+  ) => {
+    const anchorId = resizeAnchorRef.current?.id ?? newItem?.i ?? oldItem?.i ?? '';
+    const anchorTopY = resizeAnchorRef.current?.y ?? oldItem?.y;
+
+    applyResizeLayout(layout, anchorId, anchorTopY);
 
     setTimeout(() => {
       isResizingRef.current = false;
