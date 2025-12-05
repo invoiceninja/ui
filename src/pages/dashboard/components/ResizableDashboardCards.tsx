@@ -64,6 +64,7 @@ import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 import { PreferenceCardsGridDnd } from './PreferenceCardsGridDnd';
+import { MdDragHandle } from 'react-icons/md';
 import type { GridStack, GridStackNode } from 'gridstack';
 import 'gridstack/dist/gridstack.css';
 import {
