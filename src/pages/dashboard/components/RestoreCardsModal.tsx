@@ -29,7 +29,7 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
-import { DashboardGridLayouts } from './ResizableDashboardCards';
+import { DashboardGridLayouts } from './DashboardGrid.types';
 
 const StyledDiv = styled.div`
   &:hover {

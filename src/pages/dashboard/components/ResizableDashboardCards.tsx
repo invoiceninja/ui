@@ -3,293 +3,87 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 import '$app/resources/css/gridLayout.css';
 import '$app/resources/css/gridStack.css';
-import { Button, SelectField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
-import { useEffect, useState, useRef } from 'react';
-import { Spinner } from '$app/components/Spinner';
-import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
-import { Card } from '$app/components/cards';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from 'react-query';
+import { useDebounce } from 'react-use';
+import dayjs from 'dayjs';
+import { cloneDeep, set } from 'lodash';
+import { useDispatch } from 'react-redux';
+import { BiMove } from 'react-icons/bi';
+import { MdDragHandle } from 'react-icons/md';
+
+import { Button, SelectField } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownDateRangePicker } from '$app/pages/dashboard/components/DropdownDateRangePicker';
+import { Card } from '$app/components/cards';
+import { Badge } from '$app/components/Badge';
+import { Spinner } from '$app/components/Spinner';
+
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { toast } from '$app/common/helpers/toast/toast';
+import { diff } from 'deep-object-diff';
+
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { Badge } from '$app/components/Badge';
+import { useColorScheme } from '$app/common/colors';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 import {
   ChartsDefaultView,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { usePreferences } from '$app/common/hooks/usePreferences';
-import collect from 'collect.js';
-import { useColorScheme } from '$app/common/colors';
-import { CurrencySelector } from '$app/components/CurrencySelector';
-import { useQuery } from 'react-query';
-import { DashboardCardSelector } from './DashboardCardSelector';
-import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout';
-import { Icon } from '$app/components/icons/Icon';
-import { BiMove } from 'react-icons/bi';
-import classNames from 'classnames';
-import { ModuleBitmask } from '$app/pages/settings';
-import { UpcomingQuotes } from './UpcomingQuotes';
-import { UpcomingRecurringInvoices } from './UpcomingRecurringInvoices';
-import { ExpiredQuotes } from './ExpiredQuotes';
-import { PastDueInvoices } from './PastDueInvoices';
-import { UpcomingInvoices } from './UpcomingInvoices';
-import { Activity } from './Activity';
-import { RecentPayments } from './RecentPayments';
-import { useEnabled } from '$app/common/guards/guards/enabled';
-import dayjs from 'dayjs';
-import { useDebounce } from 'react-use';
-import { diff } from 'deep-object-diff';
-import { User } from '$app/common/interfaces/user';
-import { cloneDeep, isEqual, set } from 'lodash';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import {
-  CompanyUser,
-  DashboardField,
-} from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
+
+import { CompanyUser, DashboardField } from '$app/common/interfaces/company-user';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { User } from '$app/common/interfaces/user';
+
+import { ModuleBitmask } from '$app/pages/settings';
+
 import { updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { toast } from '$app/common/helpers/toast/toast';
+
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
+import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
+
+import { CurrencySelector } from '$app/components/CurrencySelector';
+
+import { DashboardCardSelector } from './DashboardCardSelector';
+import { PreferenceCardsGridDnd } from './PreferenceCardsGridDnd';
 import { RestoreCardsModal } from './RestoreCardsModal';
 import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
-import { PreferenceCardsGrid } from './PreferenceCardsGrid';
-import { PreferenceCardsGridDnd } from './PreferenceCardsGridDnd';
-import { MdDragHandle } from 'react-icons/md';
-import type { GridStack, GridStackNode } from 'gridstack';
-import 'gridstack/dist/gridstack.css';
+import { Activity } from './Activity';
+import { UpcomingInvoices } from './UpcomingInvoices';
+import { PastDueInvoices } from './PastDueInvoices';
+import { UpcomingQuotes } from './UpcomingQuotes';
+import { ExpiredQuotes } from './ExpiredQuotes';
+import { RecentPayments } from './RecentPayments';
+import { UpcomingRecurringInvoices } from './UpcomingRecurringInvoices';
+
+interface Currency {
+  value: string | number;
+  label: string;
+}
 import {
-  DashboardRowLayout,
-  convertFlatLayoutToRows,
-  convertRowsToFlatLayout,
-} from '../types/DashboardRowTypes';
-import { DashboardRowContainer } from './DashboardRowContainer';
-const ResponsiveGridLayout = WidthProvider(Responsive);
-
-// Helper function to scale layouts when breakpoint changes
-function scaleLayoutForBreakpoint(
-  layout: GridLayout.Layout[],
-  oldCols: number,
-  newCols: number
-): GridLayout.Layout[] {
-  if (oldCols === newCols) return layout;
-  
-  const scaleFactor = newCols / oldCols;
-  
-  return layout.map(item => ({
-    ...item,
-    x: Math.round(item.x * scaleFactor),
-    w: Math.max(1, Math.round(item.w * scaleFactor)),
-    // Keep y and h unchanged for vertical stability
-  }));
-}
-
-// Helper function to optimize row heights after drag/drop
-// Normalize rows to stack exactly like Grafana: items sharing vertical space
-// become a contiguous row with uniform height, and rows stack without gaps.
-function normalizeRows(
-  layout: GridLayout.Layout[],
-  anchorId?: string
-): GridLayout.Layout[] {
-  const items = layout.map((item) => ({ ...item }));
-
-  // Sort by top (y) then by x so rows are processed top-down, left-to-right.
-  items.sort((a, b) => (a.y || 0) - (b.y || 0) || (a.x || 0) - (b.x || 0));
-
-  type Row = {
-    top: number;
-    height: number;
-    items: GridLayout.Layout[];
-    hasAnchor: boolean;
-  };
-
-  const rows: Row[] = [];
-
-  const anchorHeight = anchorId
-    ? items.find((item) => item.i === anchorId)?.h ?? null
-    : null;
-
-  const addToRow = (row: Row, item: GridLayout.Layout) => {
-    row.items.push(item);
-    row.height = Math.max(row.height, item.h || 0);
-    if (anchorId && item.i === anchorId) {
-      row.hasAnchor = true;
-    }
-  };
-
-  for (const item of items) {
-    const itemTop = item.y || 0;
-
-    if (!rows.length) {
-      rows.push({
-        top: itemTop,
-        height: item.h || 0,
-        items: [item],
-        hasAnchor: anchorId ? item.i === anchorId : false,
-      });
-      continue;
-    }
-
-    const currentRow = rows[rows.length - 1];
-    const currentBottom = currentRow.top + currentRow.height;
-
-    if (itemTop >= currentBottom) {
-      rows.push({
-        top: itemTop,
-        height: item.h || 0,
-        items: [item],
-        hasAnchor: anchorId ? item.i === anchorId : false,
-      });
-    } else {
-      addToRow(currentRow, item);
-    }
-  }
-
-  // Now force rows to stack with contiguous tops and uniform heights.
-  let cursor = 0;
-
-  rows.forEach((row) => {
-    const minHeightConstraint = Math.max(
-      ...row.items.map((item) => item.minH || 0),
-      0
-    );
-
-    const targetHeight = row.hasAnchor && anchorHeight
-      ? Math.max(anchorHeight, minHeightConstraint)
-      : Math.max(row.height, minHeightConstraint);
-
-    row.items.forEach((item) => {
-      item.y = cursor;
-      item.h = targetHeight;
-    });
-
-    cursor += targetHeight;
-  });
-
-  // Return items sorted back to original order (ReactGridLayout expects stable order by i).
-  items.sort((a, b) => (a.i || '').localeCompare(b.i || ''));
-  return items;
-}
-
-// Collision detection between two layout items
-function isColliding(a: GridLayout.Layout, b: GridLayout.Layout): boolean {
-  const ax2 = (a.x || 0) + (a.w || 0);
-  const ay2 = (a.y || 0) + (a.h || 0);
-  const bx2 = (b.x || 0) + (b.w || 0);
-  const by2 = (b.y || 0) + (b.h || 0);
-  return (
-    (a.x || 0) < bx2 && ax2 > (b.x || 0) && (a.y || 0) < by2 && ay2 > (b.y || 0)
-  );
-}
-
-// Resolve overlaps by pushing items down until no collisions remain.
-function resolveOverlaps(layout: GridLayout.Layout[]): GridLayout.Layout[] {
-  const placed: GridLayout.Layout[] = [];
-  const sorted = [...layout].sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
-
-  for (const item of sorted) {
-    const clone = { ...item } as GridLayout.Layout;
-    // Move down until no collision with already placed items
-    let moved = false;
-    while (placed.some((p) => isColliding(clone, p))) {
-      const blockers = placed.filter((p) => isColliding(clone, p));
-      const maxY = Math.max(...blockers.map((b) => (b.y || 0) + (b.h || 0)));
-      clone.y = Math.max(clone.y || 0, maxY);
-      moved = true;
-    }
-    placed.push(clone);
-  }
-
-  return placed;
-}
-
-// Check horizontal overlap only (x-axis) between two items
-function isHorizontallyOverlapping(a: GridLayout.Layout, b: GridLayout.Layout): boolean {
-  const ax2 = (a.x || 0) + (a.w || 0);
-  const bx2 = (b.x || 0) + (b.w || 0);
-  return (a.x || 0) < bx2 && ax2 > (b.x || 0);
-}
-
-// Compact items upward to remove vertical gaps, preserving an optional anchor's top (y)
-function compactVertical(
-  layout: GridLayout.Layout[],
-  preserveAnchorId?: string
-): GridLayout.Layout[] {
-  const items = layout.map((i) => ({ ...i }));
-  // Sort by y then x so we compact from top to bottom stably
-  items.sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
-
-  for (let idx = 0; idx < items.length; idx++) {
-    const item = items[idx];
-    if (preserveAnchorId && item.i === preserveAnchorId) {
-      continue; // keep anchor at its y
-    }
-    // Find the highest y this item can occupy without overlapping vertically
-    let targetY = 0;
-    for (let j = 0; j < items.length; j++) {
-      if (j === idx) continue;
-      const other = items[j];
-      if (!isHorizontallyOverlapping(item, other)) continue;
-      const otherBottom = (other.y || 0) + (other.h || 0);
-      if (otherBottom <= (item.y || 0)) {
-        // Other is above current; use its bottom as a candidate floor
-        if (otherBottom > targetY) targetY = otherBottom;
-      }
-    }
-    item.y = targetY;
-  }
-
-  // Resort to stable order by y/x for consistency
-  items.sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
-  return items;
-}
-
-// Resolve overlaps while keeping a specific item (anchor) fixed at its top (y) position.
-function resolveOverlapsAnchored(
-  layout: GridLayout.Layout[],
-  anchorId: string,
-  anchorTopY?: number
-): GridLayout.Layout[] {
-  const itemsById = new Map(layout.map((i) => [i.i, { ...i }]));
-  const anchor = itemsById.get(anchorId);
-  if (!anchor) return resolveOverlaps(layout);
-
-  // Force the anchor to the requested top Y (if provided)
-  if (typeof anchorTopY === 'number') {
-    anchor.y = anchorTopY;
-  }
-
-  const placed: GridLayout.Layout[] = [];
-
-  // Place anchor first
-  placed.push({ ...anchor });
-
-  // Place remaining items, pushing them down as needed, but never moving the anchor
-  const others = layout
-    .filter((i) => i.i !== anchorId)
-    .sort((l1, l2) => (l1.y || 0) - (l2.y || 0) || (l1.x || 0) - (l2.x || 0));
-
-  for (const item of others) {
-    const clone = { ...item } as GridLayout.Layout;
-    while (placed.some((p) => isColliding(clone, p))) {
-      const blockers = placed.filter((p) => isColliding(clone, p));
-      const maxY = Math.max(...blockers.map((b) => (b.y || 0) + (b.h || 0)));
-      clone.y = Math.max(clone.y || 0, maxY);
-    }
-    placed.push(clone);
-  }
-
-  return placed;
-}
+  DashboardBreakpoint,
+  DashboardGridItem,
+  DashboardGridLayouts,
+  DashboardGridMetrics,
+} from './DashboardGrid.types';
+import { DashboardGrid } from './DashboardGrid';
+import { ChartData } from './DashboardGrid.types';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -298,53 +92,53 @@ interface TotalsRecord {
   outstanding: { outstanding_count: number; amount: string; code: string };
 }
 
-interface Currency {
-  value: string;
-  label: string;
-}
+const BREAKPOINT_COLUMNS: Record<DashboardBreakpoint, number> = {
+  xxl: 48,
+  xl: 36,
+  lg: 30,
+  md: 24,
+  sm: 18,
+  xs: 12,
+};
 
-type CardName =
-  | 'account_login_text'
-  | 'upcoming_invoices'
-  | 'upcoming_recurring_invoices'
-  | 'upcoming_quotes'
-  | 'expired_quotes'
-  | 'past_due_invoices'
-  | 'activity'
-  | 'recent_payments'
-  | 'overview';
+const BREAKPOINT_METRICS: Record<DashboardBreakpoint, DashboardGridMetrics> = {
+  xxl: { cols: BREAKPOINT_COLUMNS.xxl, rowHeight: 18 },
+  xl: { cols: BREAKPOINT_COLUMNS.xl, rowHeight: 18 },
+  lg: { cols: BREAKPOINT_COLUMNS.lg, rowHeight: 18 },
+  md: { cols: BREAKPOINT_COLUMNS.md, rowHeight: 18 },
+  sm: { cols: BREAKPOINT_COLUMNS.sm, rowHeight: 20 },
+  xs: { cols: BREAKPOINT_COLUMNS.xs, rowHeight: 22 },
+};
 
-export type DashboardGridLayouts = GridLayout.Layouts;
+const BREAKPOINT_WIDTHS: Record<DashboardBreakpoint, number> = {
+  xxl: 1600,
+  xl: 1400,
+  lg: 1200,
+  md: 1024,
+  sm: 768,
+  xs: 0,
+};
 
-export interface ChartData {
-  invoices: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
-  payments: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
-  outstanding: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
-  expenses: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
-}
-
-export enum TotalColors {
-  Green = '#54B434',
-  Blue = '#2596BE',
-  Red = '#BE4D25',
-  Gray = '#242930',
-}
+const DEFAULT_LAYOUTS: DashboardGridLayouts = {
+  xxl: [
+    { i: 'toolbar', x: 0, y: 0, w: 48, h: 6, minH: 4, static: true },
+    { i: 'preferences', x: 0, y: 6, w: 48, h: 12, minH: 10 },
+    { i: 'totals', x: 0, y: 18, w: 16, h: 20, minH: 12 },
+    { i: 'overview', x: 16, y: 18, w: 32, h: 20, minH: 12 },
+    { i: 'upcoming_invoices', x: 0, y: 38, w: 24, h: 16, minH: 12 },
+    { i: 'past_due_invoices', x: 24, y: 38, w: 24, h: 16, minH: 12 },
+    { i: 'expired_quotes', x: 0, y: 54, w: 24, h: 16, minH: 12 },
+    { i: 'upcoming_quotes', x: 24, y: 54, w: 24, h: 16, minH: 12 },
+    { i: 'recent_payments', x: 0, y: 70, w: 24, h: 16, minH: 12 },
+    { i: 'upcoming_recurring_invoices', x: 24, y: 70, w: 24, h: 16, minH: 12 },
+    { i: 'activity', x: 0, y: 86, w: 48, h: 18, minH: 12 },
+  ],
+  xl: [],
+  lg: [],
+  md: [],
+  sm: [],
+  xs: [],
+};
 
 const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
   last7_days: {
@@ -352,7 +146,7 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
     end: dayjs().format('YYYY-MM-DD'),
   },
   last30_days: {
-    start: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
+    start: dayjs().subtract(30, 'days').format('YYYY-MM-DD'),
     end: dayjs().format('YYYY-MM-DD'),
   },
   last365_days: {
@@ -372,10 +166,7 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
     end: dayjs().endOf('quarter').format('YYYY-MM-DD'),
   },
   last_quarter: {
-    start: dayjs()
-      .subtract(1, 'quarter')
-      .startOf('quarter')
-      .format('YYYY-MM-DD'),
+    start: dayjs().subtract(1, 'quarter').startOf('quarter').format('YYYY-MM-DD'),
     end: dayjs().subtract(1, 'quarter').endOf('quarter').format('YYYY-MM-DD'),
   },
   this_year: {
@@ -388,728 +179,112 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
   },
 };
 
-export const initialLayouts = {
- xxl: [   {
-     i: '1',
-     x: 0,
-     y: 0,
-     w: 1000,
-     h: 15,
-     minH: 10,
-     maxH: 100,
-   },
-   {
-     i: '2',
-     x: 0,
-     y: 15,
-     w: 330,
-     h: 25,
-     minH: 20,
-      minW: 250,
-    },
-    {
-      i: '3',
-      x: 400,
-      y: 15,
-      w: 660,
-      h: 25,
-     minH: 20,
-      minW: 400,
-    },
-    {
-      i: '4',
-      x: 0,
-      y: 40,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '5',
-      x: 510,
-      y: 40,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '6',
-      x: 0,
-      y: 60,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '7',
-      x: 510,
-      y: 60,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '8',
-      x: 0,
-      y: 80,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '9',
-      x: 510,
-      y: 80,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '10',
-      x: 0,
-      y: 100,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-  ],
-  xl: [
-    {
-      i: '1',
-      x: 0,
-      y:  0,
-      w: 1000,
-      h: 15,
-      minH: 10,
-     maxH: 100,
-    },
-    {
-      i: '2',
-      x: 0,
-      y: 15,
-      w: 330,
-      h: 25,
-      minH: 20,
-      minW: 250,
-    },
-    {
-      i: '3',
-      x: 400,
-      y: 15,
-      w: 660,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '4',
-      x: 0,
-      y: 40,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '5',
-      x: 510,
-      y: 40,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '6',
-      x: 0,
-      y: 60,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '7',
-      x: 510,
-      y: 60,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '8',
-      x: 0,
-      y: 80,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '9',
-      x: 510,
-      y: 80,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '10',
-      x: 0,
-      y: 100,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-  ],
-  lg: [   {
-     i: '1',
-     x: 0,
-     y: 15,
-     w: 1000,
-     h: 15,
-     minH: 10,
-     maxH: 100,
-   },
-    {
-      i: '2',
-      x: 0,
-      y: 15,
-      w: 330,
-      h: 25,
-      minH: 20,
-      minW: 250,
-    },
-    {
-      i: '3',
-      x: 400,
-      y: 15,
-      w: 660,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '4',
-      x: 0,
-      y: 40,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '5',
-      x: 510,
-      y: 40,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '6',
-      x: 0,
-      y: 60,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '7',
-      x: 510,
-      y: 60,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '8',
-      x: 0,
-      y: 80,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '9',
-      x: 510,
-      y: 80,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-    {
-      i: '10',
-      x: 0,
-      y: 100,
-      w: 495,
-      h: 20,
-      minH: 16,
-      minW: 350,
-    },
-  ],
-  md: [   {
-     i: '1',
-     x: 0,
-     y: 0,
-     w: 1000,
-     h: 15,
-     minH: 10,
-     maxH: 100,
-   },
-    {
-      i: '2',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '3',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '4',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '5',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '6',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '7',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '8',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '9',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '10',
-      x: 0,
-      y: 100,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-  ],
-  sm: [   {
-     i: '1',
-     x: 0,
-     y: 0,
-     w: 1000,
-     h: 15,
-     minH: 10,
-     maxH: 100,
-   },
-    {
-      i: '2',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '3',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '4',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '5',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '6',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '7',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '8',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '9',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '10',
-      x: 0,
-      y: 100,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-  ],
-  xs: [   {
-     i: '1',
-     x: 0,
-     y: 0,
-     w: 1000,
-     h: 15,
-     minH: 10,
-     maxH: 100,
-   },
-    {
-      i: '2',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '3',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '4',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '5',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '6',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '7',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '8',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '9',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '10',
-      x: 0,
-      y: 100,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-  ],
-  xxs: [   {
-     i: '1',
-     x: 0,
-     y: 0,
-     w: 1000,
-     h: 15,
-     minH: 10,
-     maxH: 100,
-   },
-    {
-      i: '2',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '3',
-      x: 0,
-      y: 15,
-      w: 1000,
-      h: 25,
-      minH: 20,
-      minW: 400,
-    },
-    {
-      i: '4',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '5',
-      x: 0,
-      y: 40,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '6',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '7',
-      x: 0,
-      y: 60,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '8',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '9',
-      x: 0,
-      y: 80,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-    {
-      i: '10',
-      x: 0,
-      y: 100,
-      w: 1000,
-      h: 20,
-      minH: 16,
-      minW: 400,
-    },
-  ],
-};
+const cardOrder = [
+  'preferences',
+  'totals',
+  'overview',
+  'upcoming_invoices',
+  'past_due_invoices',
+  'expired_quotes',
+  'upcoming_quotes',
+  'recent_payments',
+  'upcoming_recurring_invoices',
+  'activity',
+] as const;
+export type DashboardCardKey = (typeof cardOrder)[number];
+
+const preferenceOnlyCards: DashboardCardKey[] = ['preferences'];
+
+function scaleLayout(
+  layout: DashboardGridItem[],
+  fromCols: number,
+  toCols: number
+): DashboardGridItem[] {
+  if (fromCols === toCols) return layout.map((item) => ({ ...item }));
+  const scale = toCols / fromCols;
+  return layout.map((item) => ({
+    ...item,
+    x: Math.round(item.x * scale),
+    w: Math.max(1, Math.round(item.w * scale)),
+  }));
+}
+
+function determineBreakpoint(width: number): DashboardBreakpoint {
+  if (width >= BREAKPOINT_WIDTHS.xxl) return 'xxl';
+  if (width >= BREAKPOINT_WIDTHS.xl) return 'xl';
+  if (width >= BREAKPOINT_WIDTHS.lg) return 'lg';
+  if (width >= BREAKPOINT_WIDTHS.md) return 'md';
+  if (width >= BREAKPOINT_WIDTHS.sm) return 'sm';
+  return 'xs';
+}
+
+function ensureLayouts(initial: DashboardGridLayouts): DashboardGridLayouts {
+  const result: DashboardGridLayouts = { ...initial };
+  (['xl', 'lg', 'md', 'sm', 'xs'] as DashboardBreakpoint[]).forEach(
+    (breakpoint) => {
+      if (!result[breakpoint] || result[breakpoint].length === 0) {
+        const cols = BREAKPOINT_COLUMNS[breakpoint];
+        result[breakpoint] = scaleLayout(
+          result.xxl,
+          BREAKPOINT_COLUMNS.xxl,
+          cols
+        );
+      }
+    }
+  );
+  return result;
+}
 
 export function ResizableDashboardCards() {
   const [t] = useTranslation();
-
-  const { Preferences, update } = usePreferences();
+  const dispatch = useDispatch();
 
   const enabled = useEnabled();
-  const dispatch = useDispatch();
   const formatMoney = useFormatMoney();
-
-  const user = useCurrentUser();
-  const colors = useColorScheme();
   const company = useCurrentCompany();
+  const colors = useColorScheme();
+  const user = useCurrentUser();
   const settings = useReactSettings();
+  const { Preferences, update } = usePreferences();
 
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [layouts, setLayouts] = useState<DashboardGridLayouts>(() =>
+    ensureLayouts(settings?.dashboard_cards_configuration || DEFAULT_LAYOUTS)
+  );
+  const [activeBreakpoint, setActiveBreakpoint] = useState<DashboardBreakpoint>('xxl');
+  const [metrics, setMetrics] = useState<DashboardGridMetrics>(
+    BREAKPOINT_METRICS.xxl
+  );
 
- const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>();
- const [layouts, setLayouts] = useState<DashboardGridLayouts>(initialLayouts);
-  
-  // Row-based layouts (Grafana-style)
-  const [rowLayouts, setRowLayouts] = useState<{
-    [breakpoint: string]: DashboardRowLayout;
-  }>({});
-  const [useRowBasedLayout, setUseRowBasedLayout] = useState<boolean>(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
- // Drag state tracking to prevent click-triggered layout changes
- const isDraggingRef = useRef<boolean>(false);
- const isResizingRef = useRef<boolean>(false);
+  // current dashboard fields for preferences panel
+  const [currentDashboardFields, setCurrentDashboardFields] =
+    useState<DashboardField[]>(
+      settings?.dashboard_fields || user?.company_user?.react_settings
+        ?.dashboard_fields ||
+        []
+    );
 
-const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [isLayoutsInitialized, setIsLayoutsInitialized] =
-    useState<boolean>(false);
-  const [isLayoutRestored, setIsLayoutRestored] = useState<boolean>(false);
-  const [areCardsRestored, setAreCardsRestored] = useState<boolean>(false);
-  const [arePreferenceCardsChanged, setArePreferenceCardsChanged] =
-    useState<boolean>(false);
-  const [currentDashboardFields, setCurrentDashboardFields] = useState<
-    DashboardField[]
-  >([]);
-
-  const chartScale =
+  const chartSensitivity =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
   const currency = settings?.preferences?.dashboard_charts?.currency || 1;
-  const dateRange =
-    settings?.preferences?.dashboard_charts?.range || 'this_month';
+  const dateRange = settings?.preferences?.dashboard_charts?.range || 'this_month';
 
-  const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
-    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
-    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
-  });
+  const [dates, setDates] = useState<{ start_date: string; end_date: string }>(
+    {
+      start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
+      end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
+    }
+  );
 
-  const [body, setBody] = useState<{
-    start_date: string;
-    end_date: string;
-    date_range: string;
-  }>({
+  const [body, setBody] = useState({
     start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
     end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
     date_range: dateRange,
   });
 
-  const handleDateChange = (DateSet: string) => {
-    const [startDate, endDate] = DateSet.split(',');
-    if (new Date(startDate) > new Date(endDate)) {
-      setBody({
-        start_date: endDate,
-        end_date: startDate,
-        date_range: 'custom',
-      });
-    } else {
-      setBody({
-        start_date: startDate,
-        end_date: endDate,
-        date_range: 'custom',
-      });
-    }
-  };
-
-  const totals = useQuery({
+  const totalsQuery = useQuery({
     queryKey: ['/api/v1/charts/totals_v2', body],
     queryFn: () =>
       request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
@@ -1118,130 +293,134 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
     staleTime: Infinity,
   });
 
-  const chart = useQuery({
-    queryKey: ['/api/v1/charts/chart_summary_v2', body],
-    queryFn: () =>
-      request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
-        (response) => response.data
-      ),
-    staleTime: Infinity,
-  });
+  const chartQuery = useQuery<{ data: ChartData }>(
+    ['/api/v1/charts/chart_summary_v2', body],
+    () => request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body),
+    {
+      staleTime: Infinity,
+    }
+  );
 
-  const applyResizeLayout = (
-    layout: GridLayout.Layout[],
-    anchorId?: string,
-    anchorTopY?: number
-  ) => {
-    if (!layoutBreakpoint) {
+  useEffect(() => {
+    if (settings?.preferences?.dashboard_charts?.range) {
+      const range = settings.preferences.dashboard_charts.range;
+      setBody((prev) => ({
+        ...prev,
+        date_range: range,
+        start_date: GLOBAL_DATE_RANGES[range]?.start || prev.start_date,
+        end_date: GLOBAL_DATE_RANGES[range]?.end || prev.end_date,
+      }));
+    }
+  }, [settings?.preferences?.dashboard_charts?.range]);
+
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width || 0;
+      const breakpoint = determineBreakpoint(width);
+      setActiveBreakpoint(breakpoint);
+      setMetrics(BREAKPOINT_METRICS[breakpoint]);
+
+      setLayouts((current) => {
+        if (current[breakpoint]) return current;
+        const scaled = scaleLayout(
+          current.xxl,
+          BREAKPOINT_COLUMNS.xxl,
+          BREAKPOINT_COLUMNS[breakpoint]
+        );
+        return { ...current, [breakpoint]: scaled };
+      });
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const availableCurrencies: Currency[] = useMemo(() => {
+    const companyCurrencies =
+      company?.company_gateway_tokens || user?.company_user?.company
+        ?.company_gateway_tokens;
+
+    const unique: Record<string, Currency> = {};
+    companyCurrencies?.forEach((token) => {
+      if (token?.gateway?.currency_id) {
+        unique[token.gateway.currency_id] = {
+          value: token.gateway.currency_id,
+          label: token.gateway.currency?.name || token.gateway.currency_id,
+        };
+      }
+    });
+
+    return Object.values(unique);
+  }, [company, user]);
+
+  const handleDateChange = (range: string) => {
+    const [start, end] = range.split(',');
+    const startDate = dayjs(start);
+    const endDate = dayjs(end);
+    if (!startDate.isValid() || !endDate.isValid()) {
       return;
     }
 
-    const resolved = anchorId
-      ? resolveOverlapsAnchored(layout, anchorId, anchorTopY)
-      : resolveOverlaps(layout);
+    const normalized = startDate.isAfter(endDate)
+      ? { start_date: end, end_date: start }
+      : { start_date: start, end_date: end };
 
-    const compacted = compactVertical(resolved, anchorId || undefined);
-    const optimized = normalizeRows(compacted, anchorId || undefined);
-
-    setLayouts((current) => ({ ...current, [layoutBreakpoint]: optimized }));
+    setBody({ ...normalized, date_range: 'custom' });
+    setDates(normalized);
   };
 
-  const onResizeStop = (
-    layout: GridLayout.Layout[],
-    oldItem?: GridLayout.Layout,
-    newItem?: GridLayout.Layout,
-  ) => {
-    const anchorId = resizeAnchorRef.current?.id ?? newItem?.i ?? oldItem?.i ?? '';
-    const anchorTopY = resizeAnchorRef.current?.y ?? oldItem?.y;
+  const handleLayoutSave = useCallback(
+    (layout: DashboardGridItem[]) => {
+      setLayouts((current) => ({
+        ...current,
+        [activeBreakpoint]: layout,
+      }));
+    },
+    [activeBreakpoint]
+  );
 
-    applyResizeLayout(layout, anchorId, anchorTopY);
+  useDebounce(
+    () => {
+      if (!user) return;
+      const updated = cloneDeep(user) as User;
+      set(
+        updated,
+        'company_user.react_settings.dashboard_cards_configuration',
+        layouts
+      );
 
-    setTimeout(() => {
-      isResizingRef.current = false;
-      setIsResizing(false);
-      resizeAnchorRef.current = null;
-    }, 10);
-  };
+      if (!diff(user?.company_user?.react_settings?.dashboard_cards_configuration || {}, layouts)) {
+        return;
+      }
 
-  const onDragStop = (layout: GridLayout.Layout[]) => {
-    // Clear drag flag
-    isDraggingRef.current = false;
-    setIsDragging(false);
-    if (!layoutBreakpoint) return;
+      request(
+        'PUT',
+        endpoint('/api/v1/company_users/:id', { id: updated.id }),
+        updated
+      ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+        set(updated, 'company_user', response.data.data);
+        dispatch(updateUser(updated));
+        $refetch(['company_users']);
+      });
+    },
+    1500,
+    [layouts]
+  );
 
-    // Resolve overlaps after dropping to keep a sane grid and avoid reordering chaos
-    const resolved = resolveOverlaps(layout);
-    setLayouts((current) => ({ ...current, [layoutBreakpoint]: resolved }));
-  };
-
-  // Handler to completely lock heights - called by onLayoutChange to prevent auto-adjustments
-  const handleLayoutChangeWithLock = (current: GridLayout.Layout[]) => {
-  // Prevent click-triggered layout changes
-  // Only allow layout changes during explicit drag/resize or card restoration
-  if (!layoutBreakpoint) return;
-  
-  // Ignore layout changes unless we're dragging, resizing, or restoring cards
-  if (!isDraggingRef.current && !isResizingRef.current && !areCardsRestored && !arePreferenceCardsChanged) {
-    return;
-  }
-  
-  if (areCardsRestored || arePreferenceCardsChanged) {
-    handleOnLayoutChange(current);
-  } else if (isResizingRef.current) {
-    // Allow full layout changes during resize (including height)
-    // Force small minH for all panels except the first row container
-    const normalized = current.map((i) => (i.i === '1' ? i : { ...i, minH: 4 }));
-    setLayouts((prev) => ({ ...prev, [layoutBreakpoint]: normalized }));
-  } else {
-    // During drag, allow free movement; we'll resolve overlaps on drop
-    setLayouts((prev) => ({ ...prev, [layoutBreakpoint]: current }));
-  }
-};
-
-  const handleUpdateUserPreferences = () => {
-    const updatedUser = cloneDeep(user) as User;
-
-    set(
-      updatedUser,
-      'company_user.react_settings.dashboard_cards_configuration',
-      cloneDeep(layouts)
-    );
-
-    // delete updatedUser.company_user?.settings?.dashboard_fields;
-
-    // delete updatedUser.company_user?.react_settings
-    //   ?.preference_cards_configuration;
-
-    // delete updatedUser.company_user.react_settings
-    //   .dashboard_cards_configuration;
-
-    // delete updatedUser.company_user.react_settings.removed_dashboard_cards;
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-      updatedUser
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatedUser, 'company_user', response.data.data);
-
-      $refetch(['company_users']);
-
-      dispatch(updateUser(updatedUser));
-    });
-  };
-
-  const handleRemoveCard = (cardName: CardName) => {
+  const handleRemoveCard = (card: DashboardCardKey) => {
     toast.processing();
 
     const updatedUser = cloneDeep(user) as User;
-
     const removedCards =
-      settings?.removed_dashboard_cards?.[layoutBreakpoint || ''] || [];
+      settings?.removed_dashboard_cards?.[activeBreakpoint] || [];
 
     set(
       updatedUser,
-      `company_user.react_settings.removed_dashboard_cards.${layoutBreakpoint}`,
-      [...removedCards, cardName]
+      `company_user.react_settings.removed_dashboard_cards.${activeBreakpoint}`,
+      [...removedCards, card]
     );
 
     request(
@@ -1250,571 +429,177 @@ const [isEditMode, setIsEditMode] = useState<boolean>(false);
       updatedUser
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
       set(updatedUser, 'company_user', response.data.data);
-
       toast.success('removed');
-
       $refetch(['company_users']);
-
       dispatch(updateUser(updatedUser));
     });
   };
 
-  const isCardRemoved = (cardName: CardName) => {
-    if (!layoutBreakpoint) return false;
-
-    return settings?.removed_dashboard_cards?.[
-      layoutBreakpoint || ''
-    ]?.includes(cardName);
-  };
-
-  const handleOnLayoutChange = (currentLayout: GridLayout.Layout[]) => {
-    if (layoutBreakpoint) {
-      let isAnyRestored = false;
-
-      setLayouts((currentLayouts) => ({
-        ...currentLayouts,
-        [layoutBreakpoint]: currentLayout.map((layoutCard) => {
-          if (layoutCard.h === 1 && layoutCard.w === 1) {
-            const initialCardLayout = initialLayouts[
-              layoutBreakpoint as keyof typeof initialLayouts
-            ]?.find((initial) => initial.i === layoutCard.i);
-
-            if (initialCardLayout) {
-              isAnyRestored = true;
-            }
-
-            if (initialCardLayout) {
-              // Restore card with proper dimensions and placement
-              return {
-                ...initialCardLayout,
-                // Place Panel 1 at top, others at bottom of current layout
-                y: initialCardLayout.i === '1' ? 0 : Infinity,
-                // Ensure reasonable starting min/max constraints remain flexible
-                minH: Math.min(10, initialCardLayout.h ?? 20),
-                maxH: 100,
-              };
-            }
-            
-            // If no initial layout found, give it reasonable default dimensions
-            return {
-              ...layoutCard,
-              // Default sensible size for new cards
-              w: 495,  // half width of 1000-col grid
-              h: 20,   // 400px (rowHeight=20 → 20*20)
-              minH: 10,
-              minW: 250,
-              maxH: 100,
-              maxW: 1000,
-              y: Infinity,  // Place at bottom
-            };
-          }
-
-          return layoutCard;
-        }),
-      }));
-
-      arePreferenceCardsChanged && setArePreferenceCardsChanged(false);
-
-      if (!arePreferenceCardsChanged) {
-        setTimeout(() => {
-          if (isAnyRestored) {
-            setAreCardsRestored(false);
-
-            window.scrollTo({
-              top:
-                document.querySelector('.responsive-grid-box')?.scrollHeight ||
-                0,
-              behavior: 'smooth',
-            });
-          }
-        }, 450);
-      }
-    }
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleScroll = (isDraggingDown: boolean) => {
-    const scrollAmount = 15;
-
-    const containerRect = document
-      .querySelector('.responsive-grid-box')
-      ?.getBoundingClientRect();
-    if (!containerRect) return;
-
-    if (isDraggingDown) {
-      window.scrollBy({
-        behavior: 'smooth',
-        top: scrollAmount,
-      });
-    } else {
-      window.scrollBy({
-        behavior: 'smooth',
-        top: -scrollAmount,
-      });
-    }
-  };
-
-  const handleOnDrag = (
-   layout: GridLayout.Layout[],
-   oldItem: GridLayout.Layout,
-   newItem: GridLayout.Layout,
-   placeholder: GridLayout.Layout
- ) => {
-    // Set drag flag to prevent click-triggered layout changes
-    isDraggingRef.current = true;
-    setIsDragging(true);
-  };
-
-  useEffect(() => {
-    setBody((current) => ({
-      ...current,
-      date_range: dateRange,
-    }));
-  }, [settings?.preferences?.dashboard_charts?.range]);
-
-  // Track dragging for overlap/collision mode
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const resizeAnchorRef = useRef<{ id: string; y: number } | null>(null);
-
-  // Normalize minH to allow users to shrink cards vertically
-  useEffect(() => {
-    if (!layoutBreakpoint) return;
-    setLayouts((prev) => {
-      const current = prev[layoutBreakpoint];
-      if (!current) return prev;
-      const normalized = current.map((i) => {
-        if (i.i === '1') return i; // keep first row container as-is
-        return { ...i, minH: 4 };
-      });
-      return { ...prev, [layoutBreakpoint]: normalized };
-    });
-  }, [layoutBreakpoint]);
-
-  useEffect(() => {
-    setArePreferenceCardsChanged(true);
-  }, [currentDashboardFields]);
-
-  useEffect(() => {
-    if (
-      user?.company_user?.react_settings?.dashboard_fields &&
-      !isEqual(
-        user?.company_user?.react_settings?.dashboard_fields,
-        currentDashboardFields
-      )
-    ) {
-      setCurrentDashboardFields(
-        cloneDeep(user?.company_user?.react_settings?.dashboard_fields)
+  const isCardRemoved = useCallback(
+    (cardName: DashboardCardKey) => {
+      return settings?.removed_dashboard_cards?.[activeBreakpoint]?.includes(
+        cardName
       );
-    }
-  }, [user?.company_user?.react_settings?.dashboard_fields]);
-
-  useEffect(() => {
-    if (totals.data) {
-      setTotalsData(totals.data);
-
-      const currencies: Currency[] = [];
-
-      Object.entries(totals.data.currencies).map(([id, name]) => {
-        currencies.push({ value: id, label: name as unknown as string });
-      });
-
-      const $currencies = collect(currencies)
-        .pluck('value')
-        .map((value) => parseInt(value as string))
-        .toArray() as number[];
-
-      if (!$currencies.includes(currency)) {
-        update('preferences.dashboard_charts.currency', $currencies[0]);
-      }
-
-      setCurrencies(currencies);
-    }
-  }, [totals.data]);
-
-  useEffect(() => {
-    if (chart.data) {
-      setDates({
-        start_date: chart.data.start_date,
-        end_date: chart.data.end_date,
-      });
-
-      setChartData(chart.data);
-    }
-  }, [chart.data]);
-
-  useEffect(() => {
-   if (layoutBreakpoint) {
-     if (settings?.dashboard_cards_configuration && !isLayoutsInitialized) {
-       // Clone the saved configuration
-       const savedLayouts = cloneDeep(settings?.dashboard_cards_configuration);
-       
-       // Auto-fix any 1x1 cards (corrupted layouts) by resetting to initial values
-       const fixedLayouts = { ...savedLayouts };
-       Object.keys(savedLayouts).forEach((breakpoint) => {
-         const layoutArray = savedLayouts[breakpoint];
-         if (Array.isArray(layoutArray)) {
-           fixedLayouts[breakpoint] = layoutArray.map((card) => {
-             // If card is 1x1 (corrupted), restore from initial layouts
-             if (card.h === 1 && card.w === 1) {
-               const initialCard = initialLayouts[
-                 breakpoint as keyof typeof initialLayouts
-               ]?.find((initial) => initial.i === card.i);
-               
-               return initialCard || card;
-             }
-             return card;
-           });
-         }
-       });
-       
-       setLayouts(fixedLayouts);
-
-       setIsLayoutsInitialized(true);
-     }
-   }
- }, [layoutBreakpoint]);
-
-  // Convert flat layouts to row layouts on initialization (feature-flagged)
-  useEffect(() => {
-    if (!isLayoutsInitialized || Object.keys(rowLayouts).length > 0) {
-      return;
-    }
-
-  const convertedLayouts: { [breakpoint: string]: DashboardRowLayout } = {};
-
-  Object.keys(layouts).forEach((breakpoint) => {
-    const flatLayout = layouts[breakpoint];
-    convertedLayouts[breakpoint] = {
-      rows: convertFlatLayoutToRows(flatLayout),
-    };
-  });
-
-    setRowLayouts(convertedLayouts);
-    // Keep row-based layout DISABLED by default until we finish stabilization
-    // To enable, flip the flag to true after verifying in QA.
-    setUseRowBasedLayout(false);
-  }, [isLayoutsInitialized, layouts]);
-
-useDebounce(
-    () => {
-      if (
-        settings &&
-        !settings.dashboard_cards_configuration &&
-        Object.keys(diff(initialLayouts, layouts)).length
-      ) {
-        handleUpdateUserPreferences();
-      }
-
-      if (
-        settings &&
-        settings.dashboard_cards_configuration &&
-        Object.keys(diff(settings.dashboard_cards_configuration, layouts))
-          .length
-      ) {
-        handleUpdateUserPreferences();
-      }
     },
-   1500,
-   [layouts]
-);
+    [settings?.removed_dashboard_cards, activeBreakpoint]
+  );
 
-  // Render panel by ID - used in row-based layout
-  const renderPanel = (panelId: string): JSX.Element | null => {
-    switch (panelId) {
-      case '0':
-        // Date/currency selectors (static)
-        return (
-          <div className="flex justify-end">
-            <div className="flex space-x-2">
-              {currencies && (
-                <SelectField
-                 value={currency.toString()}
-                 onValueChange={(value) =>
-                   update(
-                     'preferences.dashboard_charts.currency',
-                     parseInt(value)
-                   )
-                 }
-               >
-                 <option value="999">{t('all')}</option>
-                 {currencies.map((selectedCurrency) => (
-                   <option
-                     key={selectedCurrency.value}
-                     value={selectedCurrency.value}
-                   >
-                     {selectedCurrency.label}
-                   </option>
-                 ))}
-               </SelectField>
-             )}
-              <DropdownDateRangePicker
-                value={body.date_range}
-                startDate={body.start_date}
-                endDate={body.end_date}
-                handleDateChange={handleDateChange}
-                handleDateRangeChange={(range) => {
-                  setBody({
-                    start_date: GLOBAL_DATE_RANGES[range]?.start || '',
-                    end_date: GLOBAL_DATE_RANGES[range]?.end || '',
-                    date_range: range,
-                  });
-                }}
-              />
-            </div>
-          </div>
-        );
-
-      case '1':
-        // PreferenceCardsGrid
-        if (!currentDashboardFields?.length) return null;
-        return (
-          <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {isEditMode && (
-              <div
-                className="drag-handle"
-                style={{
-                  height: '30px',
-                  cursor: 'grab',
-                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                  border: '2px dashed rgba(59, 130, 246, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Icon element={MdDragHandle} size={20} />
-                <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>Drag to move panel</span>
+  const renderCard = useCallback(
+    (card: DashboardCardKey) => {
+      switch (card) {
+        case 'preferences':
+          if (!currentDashboardFields?.length) return null;
+          return (
+            <div className="flex h-full flex-col">
+              {isEditMode && (
+                <div className="dashboard-card__drag-handle flex items-center justify-center gap-2 border border-dashed border-primary-500 bg-primary-500/10 py-1 text-xs text-primary-500">
+                  <Icon element={MdDragHandle} size={16} />
+                  <span>{t('drag_to_move')}</span>
+                </div>
+              )}
+              <div className="flex-1 overflow-auto">
+                <PreferenceCardsGridDnd
+                  currentDashboardFields={currentDashboardFields}
+                  dateRange={dateRange}
+                  startDate={dates.start_date}
+                  endDate={dates.end_date}
+                  currencyId={currency.toString()}
+                  layoutBreakpoint={activeBreakpoint}
+                  isEditMode={isEditMode}
+                />
               </div>
-            )}
-            <div className="no-drag-zone" style={{ flex: 1, overflow: 'auto', minHeight: 0, cursor: 'default' }}>
-              <PreferenceCardsGridDnd
-                currentDashboardFields={currentDashboardFields}
-                dateRange={dateRange}
-                startDate={dates.start_date}
-                endDate={dates.end_date}
-                currencyId={currency.toString()}
-                layoutBreakpoint={layoutBreakpoint}
-                isEditMode={isEditMode}
-              />
             </div>
-          </div>
-        );
+          );
 
-      case '2':
-        // Account login text card
-        if (!company || isCardRemoved('account_login_text')) return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
+        case 'totals':
+          if (!enabled(ModuleBitmask.Invoices)) return null;
+          return (
             <Card
-              title={t('account_login_text')}
-              height="full"
-              withScrollableBody
+              title={t('totals')}
+              className={classNames('h-full flex flex-col', {
+                'dashboard-card__drag-handle cursor-grab': isEditMode,
+              })}
+              withoutBodyPadding
+              shouldWrapBody
               topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    behavior="button"
-                    type="secondary"
-                    onClick={() => handleRemoveCard('account_login_text')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
+                <div className="flex items-center gap-2">
+                  <DashboardCardSelector />
+                  {totalsQuery.isFetching && <Spinner />}
+                </div>
               }
             >
-              <div className="pb-8">
-                <div className="flex flex-col space-y-1 px-6">
-                  <span className="text-lg">{`${user?.first_name} ${user?.last_name}`}</span>
-                  <span className="text-sm text-gray-500">
-                    {t('recent_transactions')}
-                  </span>
-                </div>
-                <div className="flex flex-col mt-8">
-                  <div
-                    style={{ borderColor: colors.$4 }}
-                    className="flex justify-between items-center border-b py-3 px-6"
-                  >
-                    <span style={{ fontSize: '0.95rem' }}>{t('invoices')}</span>
-                    <Badge style={{ backgroundColor: TotalColors.Blue }}>
-                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
-                        {formatMoney(
-                          totalsData[currency]?.invoices?.invoiced_amount || 0,
-                          company.settings.country_id,
-                          currency.toString(),
-                          2
-                        )}
-                      </div>
-                    </Badge>
+              <div className="grid grid-cols-2 gap-4 p-4">
+                {(totalsQuery.data?.data || []).map((total: TotalsRecord, index: number) => (
+                  <div key={index} className="flex flex-col gap-1">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {t(Object.keys(total)[0])}
+                    </span>
+                    <span className="text-lg font-semibold">
+                      {formatMoney(
+                        Number(Object.values(total)[0]?.amount || 0),
+                        company?.settings.country_id,
+                        Object.values(total)[0]?.code || undefined
+                      )}
+                    </span>
                   </div>
-                  <div
-                    style={{ borderColor: colors.$4 }}
-                    className="flex justify-between items-center border-b py-3 px-6"
-                  >
-                    <span style={{ fontSize: '0.95rem' }}>{t('payments')}</span>
-                    <Badge style={{ backgroundColor: TotalColors.Green }}>
-                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
-                        {formatMoney(
-                          totalsData[currency]?.revenue?.paid_to_date || 0,
-                          company.settings.country_id,
-                          currency.toString(),
-                          2
-                        )}
-                      </div>
-                    </Badge>
-                  </div>
-                  <div
-                    style={{ borderColor: colors.$4 }}
-                    className="flex justify-between items-center border-b py-3 px-6"
-                  >
-                    <span style={{ fontSize: '0.95rem' }}>{t('expenses')}</span>
-                    <Badge style={{ backgroundColor: TotalColors.Gray }}>
-                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
-                        {formatMoney(
-                          totalsData[currency]?.expenses?.amount || 0,
-                          company.settings.country_id,
-                          currency.toString(),
-                          2
-                        )}
-                      </div>
-                    </Badge>
-                  </div>
-                  <div
-                    style={{ borderColor: colors.$4 }}
-                    className="flex justify-between items-center border-b py-3 px-6"
-                  >
-                    <span style={{ fontSize: '0.95rem' }}>{t('outstanding')}</span>
-                    <Badge style={{ backgroundColor: TotalColors.Red }}>
-                      <div className="px-1.5 py-0.5" style={{ fontSize: '0.95rem' }}>
-                        {totalsData[currency]?.outstanding?.outstanding_count || 0}
-                      </div>
-                    </Badge>
-                  </div>
-                </div>
+                ))}
               </div>
             </Card>
-          </div>
-        );
+          );
 
-      case '3':
-        // Chart (Overview)
-        if (!chartData || isCardRemoved('overview')) return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
+        case 'overview':
+          return (
             <Card
               title={t('overview')}
-              className="col-span-12 xl:col-span-8 pr-4"
-              height="full"
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    behavior="button"
-                    type="secondary"
-                    onClick={() => handleRemoveCard('overview')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-              renderFromShadcn
+              className={classNames('h-full flex flex-col', {
+                'dashboard-card__drag-handle cursor-grab': isEditMode,
+              })}
+              shouldWrapBody
+              withoutBodyPadding
             >
-              <div style={{ height: '100%', display: 'flex' }}>
-              <Chart
-                chartSensitivity={chartScale}
-                dates={{
-                  start_date: dates.start_date,
-                  end_date: dates.end_date,
-                }}
-                data={chartData[currency]}
-                currency={currency.toString()}
-              />
+              <div className="flex flex-col gap-3 p-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <SelectField
+                    label={t('chart_style')}
+                    value={chartSensitivity}
+                    onValueChange={(value) =>
+                      update(
+                        'preferences.dashboard_charts.default_view',
+                        value as ChartsDefaultView
+                      )
+                    }
+                  >
+                    <option value="day">{t('day')}</option>
+                    <option value="week">{t('week')}</option>
+                    <option value="month">{t('month')}</option>
+                  </SelectField>
+                  <SelectField
+                    label={t('date_range')}
+                    value={body.date_range}
+                    onValueChange={(value) =>
+                      update('preferences.dashboard_charts.range', value)
+                    }
+                  >
+                    {Object.keys(GLOBAL_DATE_RANGES).map((key) => (
+                      <option key={key} value={key}>
+                        {t(key)}
+                      </option>
+                    ))}
+                  </SelectField>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                      {t('custom_range')}
+                    </span>
+                    <DropdownDateRangePicker
+                      value={body.date_range}
+                      startDate={body.start_date}
+                      endDate={body.end_date}
+                      handleDateRangeChange={(value) =>
+                        setBody((prev) => ({
+                          ...prev,
+                          date_range: value,
+                          start_date: GLOBAL_DATE_RANGES[value]?.start || prev.start_date,
+                          end_date: GLOBAL_DATE_RANGES[value]?.end || prev.end_date,
+                        }))
+                      }
+                      handleDateChange={handleDateChange}
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 min-h-[280px]">
+                  {chartQuery.isFetching && (
+                    <div className="flex h-full items-center justify-center">
+                      <Spinner />
+                    </div>
+                  )}
+                  {!chartQuery.isFetching && chartQuery.data?.data && (
+                    <Chart
+                      data={chartQuery.data.data}
+                      dates={dates}
+                      chartSensitivity={chartSensitivity}
+                      currency={currency.toString()}
+                    />
+                  )}
+                </div>
               </div>
             </Card>
-          </div>
-        );
+          );
 
-      case '4':
-        // Activity
-        if (isCardRemoved('activity')) return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
-            <Activity
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    behavior="button"
-                    type="secondary"
-                    onClick={() => handleRemoveCard('activity')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          </div>
-        );
-
-      case '5':
-        // Recent Payments
-        if (isCardRemoved('recent_payments')) return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
-            <RecentPayments
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    behavior="button"
-                    type="secondary"
-                    onClick={() => handleRemoveCard('recent_payments')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          </div>
-        );
-
-      case '6':
-        // Upcoming Invoices
-        if (!enabled(ModuleBitmask.Invoices) || isCardRemoved('upcoming_invoices'))
-          return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
+        case 'upcoming_invoices':
+          if (
+            !enabled(ModuleBitmask.Invoices) ||
+            isCardRemoved('upcoming_invoices')
+          )
+            return null;
+          return (
             <UpcomingInvoices
               isEditMode={isEditMode}
               topRight={
                 isEditMode && (
                   <Button
                     className="cancelDraggingCards"
-                    behavior="button"
                     type="secondary"
+                    behavior="button"
                     onClick={() => handleRemoveCard('upcoming_invoices')}
                   >
                     {t('remove')}
@@ -1822,27 +607,23 @@ useDebounce(
                 )
               }
             />
-          </div>
-        );
+          );
 
-      case '7':
-        // Past Due Invoices
-        if (!enabled(ModuleBitmask.Invoices) || isCardRemoved('past_due_invoices'))
-          return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
+        case 'past_due_invoices':
+          if (
+            !enabled(ModuleBitmask.Invoices) ||
+            isCardRemoved('past_due_invoices')
+          )
+            return null;
+          return (
             <PastDueInvoices
               isEditMode={isEditMode}
               topRight={
                 isEditMode && (
                   <Button
                     className="cancelDraggingCards"
-                    behavior="button"
                     type="secondary"
+                    behavior="button"
                     onClick={() => handleRemoveCard('past_due_invoices')}
                   >
                     {t('remove')}
@@ -1850,27 +631,23 @@ useDebounce(
                 )
               }
             />
-          </div>
-        );
+          );
 
-      case '8':
-        // Expired Quotes
-        if (!enabled(ModuleBitmask.Quotes) || isCardRemoved('expired_quotes'))
-          return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
+        case 'expired_quotes':
+          if (
+            !enabled(ModuleBitmask.Quotes) ||
+            isCardRemoved('expired_quotes')
+          )
+            return null;
+          return (
             <ExpiredQuotes
               isEditMode={isEditMode}
               topRight={
                 isEditMode && (
                   <Button
                     className="cancelDraggingCards"
-                    behavior="button"
                     type="secondary"
+                    behavior="button"
                     onClick={() => handleRemoveCard('expired_quotes')}
                   >
                     {t('remove')}
@@ -1878,27 +655,23 @@ useDebounce(
                 )
               }
             />
-          </div>
-        );
+          );
 
-      case '9':
-        // Upcoming Quotes
-        if (!enabled(ModuleBitmask.Quotes) || isCardRemoved('upcoming_quotes'))
-          return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
+        case 'upcoming_quotes':
+          if (
+            !enabled(ModuleBitmask.Quotes) ||
+            isCardRemoved('upcoming_quotes')
+          )
+            return null;
+          return (
             <UpcomingQuotes
               isEditMode={isEditMode}
               topRight={
                 isEditMode && (
                   <Button
                     className="cancelDraggingCards"
-                    behavior="button"
                     type="secondary"
+                    behavior="button"
                     onClick={() => handleRemoveCard('upcoming_quotes')}
                   >
                     {t('remove')}
@@ -1906,743 +679,166 @@ useDebounce(
                 )
               }
             />
-          </div>
-        );
+          );
 
-      case '10':
-        // Upcoming Recurring Invoices
-        if (
-          !enabled(ModuleBitmask.RecurringInvoices) ||
-          isCardRemoved('upcoming_recurring_invoices')
-        )
-          return null;
-        return (
-          <div
-            className={classNames('drag-handle', {
-              'cursor-grab': isEditMode,
-            })}
-          >
-            <UpcomingRecurringInvoices
+        case 'recent_payments':
+          if (
+            !enabled(ModuleBitmask.Payments) ||
+            isCardRemoved('recent_payments')
+          )
+            return null;
+          return (
+            <RecentPayments
               isEditMode={isEditMode}
               topRight={
                 isEditMode && (
                   <Button
                     className="cancelDraggingCards"
-                    behavior="button"
                     type="secondary"
-                    onClick={() =>
-                      handleRemoveCard('upcoming_recurring_invoices')
-                    }
+                    behavior="button"
+                    onClick={() => handleRemoveCard('recent_payments')}
                   >
                     {t('remove')}
                   </Button>
                 )
               }
             />
+          );
+
+        case 'upcoming_recurring_invoices':
+          if (
+            !enabled(ModuleBitmask.RecurringInvoices) ||
+            isCardRemoved('upcoming_recurring_invoices')
+          )
+            return null;
+          return (
+            <UpcomingRecurringInvoices
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    type="secondary"
+                    behavior="button"
+                    onClick={() => handleRemoveCard('upcoming_recurring_invoices')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          );
+
+        case 'activity':
+          if (
+            !enabled(ModuleBitmask.Activities) ||
+            isCardRemoved('activity')
+          )
+            return null;
+          return (
+            <Activity
+              isEditMode={isEditMode}
+              topRight={
+                isEditMode && (
+                  <Button
+                    className="cancelDraggingCards"
+                    type="secondary"
+                    behavior="button"
+                    onClick={() => handleRemoveCard('activity')}
+                  >
+                    {t('remove')}
+                  </Button>
+                )
+              }
+            />
+          );
+
+        default:
+          return null;
+      }
+    },
+    [
+      isEditMode,
+      currentDashboardFields,
+      dateRange,
+      dates,
+      currency,
+      activeBreakpoint,
+      enabled,
+      settings?.removed_dashboard_cards,
+      totalsQuery.data?.data,
+      totalsQuery.isFetching,
+      chartQuery.data?.data,
+      chartQuery.isFetching,
+      formatMoney,
+      company,
+      t,
+    ]
+  );
+
+  const toolbar = (
+    <Card
+      withoutBodyPadding
+      className="flex h-full items-center justify-end gap-4"
+      title=""
+    >
+      <div className="flex items-center gap-3 px-4 py-2">
+        <Badge variant="light" className="uppercase tracking-wider">
+          {t('dashboard')}
+        </Badge>
+        <SelectField
+          className="w-36"
+          value={currency.toString()}
+          onValueChange={(value) =>
+            update('preferences.dashboard_charts.currency', parseInt(value))
+          }
+        >
+          <option value="999">{t('all')}</option>
+          {availableCurrencies.map((currencyOption) => (
+            <option key={currencyOption.value} value={currencyOption.value}>
+              {currencyOption.label}
+            </option>
+          ))}
+        </SelectField>
+        <div className="flex items-center gap-2">
+          <DashboardCardSelector />
+          <div
+            className="flex cursor-pointer items-center"
+            onClick={() => setIsEditMode((prev) => !prev)}
+          >
+            <Icon element={BiMove} size={20} />
           </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  // Handler for row layout changes
-  const handleRowLayoutChange = (newLayout: DashboardRowLayout) => {
-    if (!layoutBreakpoint) return;
-
-    setRowLayouts((prev) => ({
-      ...prev,
-      [layoutBreakpoint]: newLayout,
-    }));
-
-    // Convert row layout back to flat layout for saving
-    const flatLayout = convertRowsToFlatLayout(newLayout.rows);
-    setLayouts((prev) => ({
-      ...prev,
-      [layoutBreakpoint]: flatLayout,
-    }));
-  };
-
-  return (
-   <div className={classNames('w-full', { 'select-none': isEditMode, 'dashboard-edit-mode': isEditMode })}>
-    {!totals.isLoading ? (
-       <>
-       {useRowBasedLayout &&
-         layoutBreakpoint &&
-         rowLayouts[layoutBreakpoint] ? (
-         <DashboardRowContainer
-           layout={rowLayouts[layoutBreakpoint]}
-           breakpoint={layoutBreakpoint}
-           isEditMode={isEditMode}
-           onLayoutChange={handleRowLayoutChange}
-           renderPanel={renderPanel}
-           cols={{
-             xxl: 1000,
-             xl: 1000,
-             lg: 1000,
-             md: 1000,
-             sm: 1000,
-             xs: 1000,
-             xxs: 1000,
-           }}
-         />
-       ) : (
-        <>
-          {/* Static controls - outside grid to prevent dragging */}
-          {!totals.isLoading && (
-          <div className="mb-4">
-            <div className="flex justify-end">
-            <div className="flex space-x-2">
-              {currencies && (
-                <SelectField
-                  value={currency.toString()}
-                  onValueChange={(value) =>
-                    update(
-                      'preferences.dashboard_charts.currency',
-                      parseInt(value)
-                    )
-                  }
-                >
-                  <option value="999">{t('all')}</option>
-
-                  {currencies.map((currency, index) => (
-                    <option key={index} value={currency.value}>
-                      {currency.label}
-                    </option>
-                  ))}
-                </SelectField>
-              )}
-
-              <div className="flex space-x-2">
-                <Button
-                  key="day-btn"
-                  type={chartScale === 'day' ? 'primary' : 'secondary'}
-                  onClick={() =>
-                    update('preferences.dashboard_charts.default_view', 'day')
-                  }
-                >
-                  {t('day')}
-                </Button>
-
-                <Button
-                  key="week-btn"
-                  type={chartScale === 'week' ? 'primary' : 'secondary'}
-                  onClick={() =>
-                    update('preferences.dashboard_charts.default_view', 'week')
-                  }
-                >
-                  {t('week')}
-                </Button>
-
-                <Button
-                  key="month-btn"
-                  type={chartScale === 'month' ? 'primary' : 'secondary'}
-                  onClick={() =>
-                    update('preferences.dashboard_charts.default_view', 'month')
-                  }
-                >
-                  {t('month')}
-                </Button>
-              </div>
-
-              <DropdownDateRangePicker
-                handleDateChange={handleDateChange}
-                startDate={dates.start_date}
-                endDate={dates.end_date}
-                handleDateRangeChange={(value) =>
-                  update('preferences.dashboard_charts.range', value)
-                }
-                value={body.date_range}
+          {isEditMode && (
+            <div className="flex items-center gap-2">
+              <RestoreCardsModal
+                layoutBreakpoint={activeBreakpoint}
+                setLayouts={setLayouts}
+                setAreCardsRestored={() => undefined}
               />
-
-              <DashboardCardSelector />
-
-              <Preferences>
-                <CurrencySelector
-                  label={t('currency')}
-                  value={currency.toString()}
-                  onChange={(v) =>
-                    update('preferences.dashboard_charts.currency', parseInt(v))
-                  }
-                />
-
-                <SelectField
-                  label={t('range')}
-                  value={chartScale}
-                  onValueChange={(value) =>
-                    update(
-                      'preferences.dashboard_charts.default_view',
-                      value as ChartsDefaultView
-                    )
-                  }
-                >
-                  <option value="day">{t('day')}</option>
-                  <option value="week">{t('week')}</option>
-                  <option value="month">{t('month')}</option>
-                </SelectField>
-
-                <SelectField
-                  label={t('date_range')}
-                  value={dateRange}
-                  onValueChange={(value) =>
-                    update('preferences.dashboard_charts.range', value)
-                  }
-                >
-                  <option value="last7_days">{t('last_7_days')}</option>
-                  <option value="last30_days">{t('last_30_days')}</option>
-                  <option value="this_month">{t('this_month')}</option>
-                  <option value="last_month">{t('last_month')}</option>
-                  <option value="this_quarter">{t('current_quarter')}</option>
-                  <option value="last_quarter">{t('last_quarter')}</option>
-                  <option value="this_year">{t('this_year')}</option>
-                  <option value="last_year">{t('last_year')}</option>
-                  <option value={'last365_days'}>{`${t(
-                    'last365_days'
-                  )}`}</option>
-                </SelectField>
-              </Preferences>
-
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => setIsEditMode((current) => !current)}
-              >
-                <Icon element={BiMove} size={23} />
-              </div>
-
-              {isEditMode && (
-                <>
-                  <RestoreCardsModal
-                    layoutBreakpoint={layoutBreakpoint}
-                    setLayouts={setLayouts}
-                    setAreCardsRestored={setAreCardsRestored}
-                  />
-
-                  <RestoreLayoutAction
-                    layoutBreakpoint={layoutBreakpoint}
-                    setLayouts={setLayouts}
-                    setIsLayoutRestored={setIsLayoutRestored}
-                  />
-                </>
-              )}
-            </div>
-            </div>
-          </div>
-         )}
-
-          {/* Main dashboard grid (RGL) */}
-          <ResponsiveGridLayout
-           className="layout responsive-grid-box"
-           breakpoints={{
-             xxl: 1400,
-             xl: 1200,
-             lg: 1000,
-             md: 800,
-             sm: 600,
-             xs: 300,
-             xxs: 0,
-           }}
-           layouts={layouts}
-           cols={{
-             xxl: 1000,
-             xl: 1000,
-             lg: 1000,
-             md: 1000,
-             sm: 1000,
-             xs: 1000,
-             xxs: 1000,
-           }}
-           draggableHandle=".drag-handle"
-           draggableCancel=".no-drag-zone"
-          margin={[0, 20]}
-           rowHeight={20}
-          isDraggable={isEditMode}
-           isDroppable={isEditMode}
-           isResizable={isEditMode}
-           onBreakpointChange={(newBreakpoint, newCols) => {
-             // Scale layout when breakpoint changes
-             const oldBreakpoint = layoutBreakpoint || 'xxl';
-             const colConfig = { xxl: 1000, xl: 1000, lg: 1000, md: 1000, sm: 1000, xs: 1000, xxs: 1000 };
-             const oldCols = colConfig[oldBreakpoint as keyof typeof colConfig];
-             const currentLayout = layouts[oldBreakpoint];
-             
-             if (currentLayout && oldCols !== newCols) {
-               const scaledLayout = scaleLayoutForBreakpoint(currentLayout, oldCols, newCols);
-               setLayouts(prev => ({
-                 ...prev,
-                 [newBreakpoint]: scaledLayout
-               }));
-             }
-             
-             setLayoutBreakpoint(newBreakpoint);
-           }}
-           onWidthChange={() => {
-             // Trigger layout recalculation on window resize
-             if (layoutBreakpoint && layouts[layoutBreakpoint]) {
-               setLayouts((current) => ({ ...current }));
-             }
-           }}
-           onResize={(currentLayout, oldItem, newItem) => {
-             // Set resize flag to allow layout changes during resize
-             isResizingRef.current = true;
-             setIsResizing(true);
-             if (oldItem && newItem) {
-               if (!resizeAnchorRef.current || resizeAnchorRef.current.id !== newItem.i) {
-                 resizeAnchorRef.current = { id: newItem.i, y: oldItem.y ?? 0 };
-               }
-             }
-           }}
-           onResizeStop={onResizeStop}
-          onDragStop={onDragStop}
-         onLayoutChange={handleLayoutChangeWithLock}
-         resizeHandles={['s', 'w', 'e', 'se', 'sw']}
-           compactType={null}
-           preventCollision={!isResizing}
-           allowOverlap={false}
-           onDrag={handleOnDrag}
-         >
-          {(totals.isLoading || !isLayoutsInitialized) && (
-            <div className="w-full flex justify-center">
-              <Spinner />
+              <RestoreLayoutAction
+                layoutBreakpoint={activeBreakpoint}
+                setLayouts={setLayouts}
+                setIsLayoutRestored={() => undefined}
+              />
             </div>
           )}
-
-         {/* Panel 1 - PreferenceCardsGrid */}
-         {currentDashboardFields?.length ? (
-           <div
-            key="1"
-             style={{ 
-               height: '100%', 
-               display: 'flex', 
-               flexDirection: 'column',
-                pointerEvents: 'none',
-               position: 'relative'
-             }}
-          >
-              {isEditMode && (
-                <div
-                  className="drag-handle"
-                  style={{
-                    height: '30px',
-                    cursor: 'grab',
-                    backgroundColor: 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    pointerEvents: 'auto',
-                    position: 'relative',
-                    zIndex: 2,
-                  }}
-                >
-                  <Icon element={MdDragHandle} size={20} />
-                  <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(59, 130, 246, 0.7)' }}>
-                    Drag to move panel
-                  </span>
-                </div>
-              )}
-             <div 
-              className="no-drag-zone" 
-               style={{ 
-                 flex: 1, 
-                 overflow: 'auto', 
-                 minHeight: 0, 
-                 cursor: 'default',
-                 pointerEvents: 'auto',
-                 position: 'relative',
-               }}
-             >
-                {/* Use dnd-kit pilot for the first row */}
-                <PreferenceCardsGridDnd
-                  currentDashboardFields={currentDashboardFields}
-                  dateRange={dateRange}
-                  startDate={dates.start_date}
-                  endDate={dates.end_date}
-                  currencyId={currency.toString()}
-                  layoutBreakpoint={layoutBreakpoint}
-                  isEditMode={isEditMode}
-                />
-              </div>
-            </div>
-          ) : null}
-
-         {company && !isCardRemoved('account_login_text') ? (
-           <div
-             key="2"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <Card
-                title={t('account_login_text')}
-                height="full"
-                withScrollableBody
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('account_login_text')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              >
-                <div className="pb-8">
-                  <div className="flex flex-col space-y-1 px-6">
-                    <span className="text-lg">{`${user?.first_name} ${user?.last_name}`}</span>
-
-                    <span className="text-sm text-gray-500">
-                      {t('recent_transactions')}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col mt-8">
-                    <div
-                      style={{ borderColor: colors.$4 }}
-                      className="flex justify-between items-center border-b py-3 px-6"
-                    >
-                      <span style={{ fontSize: '0.95rem' }}>
-                        {t('invoices')}
-                      </span>
-
-                      <Badge style={{ backgroundColor: TotalColors.Blue }}>
-                        <div
-                          className="px-1.5 py-0.5"
-                          style={{ fontSize: '0.95rem' }}
-                        >
-                          {formatMoney(
-                            totalsData[currency]?.invoices?.invoiced_amount ||
-                              0,
-                            company.settings.country_id,
-                            currency.toString(),
-                            2
-                          )}
-                        </div>
-                      </Badge>
-                    </div>
-
-                    <div
-                      style={{ borderColor: colors.$4 }}
-                      className="flex justify-between items-center border-b py-3 px-6"
-                    >
-                      <span style={{ fontSize: '0.95rem' }}>
-                        {t('payments')}
-                      </span>
-                      <Badge style={{ backgroundColor: TotalColors.Green }}>
-                        <div
-                          className="px-1.5 py-0.5"
-                          style={{ fontSize: '0.95rem' }}
-                        >
-                          {formatMoney(
-                            totalsData[currency]?.revenue?.paid_to_date || 0,
-                            company.settings.country_id,
-                            currency.toString(),
-                            2
-                          )}
-                        </div>
-                      </Badge>
-                    </div>
-
-                    <div
-                      style={{ borderColor: colors.$4 }}
-                      className="flex justify-between items-center border-b py-3 px-6"
-                    >
-                      <span style={{ fontSize: '0.95rem' }}>
-                        {t('expenses')}
-                      </span>
-                      <Badge style={{ backgroundColor: TotalColors.Gray }}>
-                        <div
-                          className="px-1.5 py-0.5"
-                          style={{ fontSize: '0.95rem' }}
-                        >
-                          {formatMoney(
-                            totalsData[currency]?.expenses?.amount || 0,
-                            company.settings.country_id,
-                            currency.toString(),
-                            2
-                          )}
-                        </div>
-                      </Badge>
-                    </div>
-
-                    <div
-                      style={{ borderColor: colors.$4 }}
-                      className="flex justify-between items-center border-b py-3 px-6"
-                    >
-                      <span style={{ fontSize: '0.95rem' }}>
-                        {t('outstanding')}
-                      </span>
-                      <Badge style={{ backgroundColor: TotalColors.Red }}>
-                        <div
-                          className="px-1.5 py-0.5"
-                          style={{ fontSize: '0.95rem' }}
-                        >
-                          {formatMoney(
-                            totalsData[currency]?.outstanding?.amount || 0,
-                            company.settings.country_id,
-                            currency.toString(),
-                            2
-                          )}
-                        </div>
-                      </Badge>
-                    </div>
-
-                    <div
-                      style={{ borderColor: colors.$4 }}
-                      className="flex justify-between items-center border-b py-3 px-6"
-                    >
-                      <span style={{ fontSize: '0.95rem' }}>
-                        {t('total_invoices_outstanding')}
-                      </span>
-
-                      <Badge variant="white">
-                        <div
-                          className="px-1.5 py-0.5"
-                          style={{ fontSize: '0.95rem' }}
-                        >
-                          {totalsData[currency]?.outstanding
-                            ?.outstanding_count || 0}
-                        </div>
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          ) : null}
-
-          {chartData && !isCardRemoved('overview') ? (
-            <div
-              key="3"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <Card
-                title={t('overview')}
-                className="col-span-12 xl:col-span-8 pr-4"
-                height="full"
-                withScrollableBody
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('overview')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-                renderFromShadcn
-              >
-                <Chart
-                  chartSensitivity={chartScale}
-                  dates={{
-                    start_date: dates.start_date,
-                    end_date: dates.end_date,
-                  }}
-                  data={chartData[currency]}
-                  currency={currency.toString()}
-                />
-              </Card>
-            </div>
-          ) : null}
-
-          {!isCardRemoved('activity') ? (
-            <div
-              key="4"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <Activity
-                isEditMode={isEditMode}
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('activity')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : null}
-
-          {!isCardRemoved('recent_payments') ? (
-            <div
-              key="5"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <RecentPayments
-                isEditMode={isEditMode}
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('recent_payments')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : null}
-
-          {enabled(ModuleBitmask.Invoices) &&
-          !isCardRemoved('upcoming_invoices') ? (
-            <div
-              key="6"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <UpcomingInvoices
-                isEditMode={isEditMode}
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('upcoming_invoices')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : null}
-
-          {enabled(ModuleBitmask.Invoices) &&
-          !isCardRemoved('past_due_invoices') ? (
-            <div
-              key="7"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <PastDueInvoices
-                isEditMode={isEditMode}
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('past_due_invoices')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : null}
-
-          {enabled(ModuleBitmask.Quotes) && !isCardRemoved('expired_quotes') ? (
-            <div
-              key="8"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <ExpiredQuotes
-                isEditMode={isEditMode}
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('expired_quotes')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : null}
-
-          {enabled(ModuleBitmask.Quotes) &&
-          !isCardRemoved('upcoming_quotes') ? (
-            <div
-              key="9"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <UpcomingQuotes
-                isEditMode={isEditMode}
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() => handleRemoveCard('upcoming_quotes')}
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : null}
-
-          {enabled(ModuleBitmask.RecurringInvoices) &&
-          !isCardRemoved('upcoming_recurring_invoices') ? (
-            <div
-              key="10"
-              className={classNames('drag-handle', {
-                'cursor-grab': isEditMode,
-              })}
-            >
-              <UpcomingRecurringInvoices
-                isEditMode={isEditMode}
-                topRight={
-                  isEditMode && (
-                    <Button
-                      className="cancelDraggingCards"
-                      behavior="button"
-                      type="secondary"
-                      onClick={() =>
-                        handleRemoveCard('upcoming_recurring_invoices')
-                      }
-                    >
-                      {t('remove')}
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : null}
-          </ResponsiveGridLayout>
-          
-        </>
-      )}
-      </>
-      ) : (
-        <div className="w-full flex justify-center">
-          <Spinner />
         </div>
-      )}
+      </div>
+    </Card>
+  );
+
+  const gridLayout = layouts[activeBreakpoint] || layouts.xxl;
+
+  return (
+    <div ref={containerRef} className="space-y-4">
+      <div>{toolbar}</div>
+      <DashboardGrid
+        layout={gridLayout}
+        editable={isEditMode}
+        metrics={metrics}
+        onLayoutChange={handleLayoutSave}
+        renderItem={(id) => renderCard(id as DashboardCardKey)}
+      />
     </div>
   );
 }

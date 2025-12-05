@@ -9,9 +9,8 @@
  */
 
 import { Dispatch, useState } from 'react';
-import { initialLayouts } from './ResizableDashboardCards';
 import { MdRefresh } from 'react-icons/md';
-import { DashboardGridLayouts } from './ResizableDashboardCards';
+import { DashboardGridLayouts } from './DashboardGrid.types';
 import { SetStateAction } from 'react';
 import { Icon } from '$app/components/icons/Icon';
 import {
