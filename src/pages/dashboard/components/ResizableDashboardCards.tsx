@@ -64,7 +64,7 @@ import { RestoreCardsModal } from './RestoreCardsModal';
 import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
-import { PreferenceCardsGridDnd } from './PreferenceCardsGrid.dnd';
+import { PreferenceCardsGridDnd } from './PreferenceCardsGridDnd';
 import { MdDragHandle } from 'react-icons/md';
 import {
   DashboardRowLayout,
