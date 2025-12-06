@@ -85,6 +85,11 @@ export function DataTableColumnsPicker(props: Props) {
   const onSave = () => {
     const user = cloneDeep(currentUser) as User;
 
+    // Fix legacy data issue where react_table_columns was incorrectly stored as an array instead of an object. If you see this in 2 years, feel free to remove it.
+    if (Array.isArray(user.company_user?.react_settings.react_table_columns)) {
+      set(user, 'company_user.react_settings.react_table_columns', {});
+    }
+
     set(
       user,
       `company_user.react_settings.react_table_columns.${table}`,
