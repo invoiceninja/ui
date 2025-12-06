@@ -32,7 +32,11 @@ const Box = styled.div`
   }
 `;
 
-export function DocumentCreationDropZone() {
+interface Props {
+  onSelectFiles?: (files: File[]) => void;
+}
+
+export function DocumentCreationDropZone({ onSelectFiles }: Props) {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
@@ -79,6 +83,12 @@ export function DocumentCreationDropZone() {
     
     // Only proceed if there are actually accepted files
     if (acceptedFiles.length === 0) {
+      return;
+    }
+
+    if (onSelectFiles) {
+      onSelectFiles(acceptedFiles);
+     
       return;
     }
     
