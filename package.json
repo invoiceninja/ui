@@ -53,6 +53,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-feather": "^2.0.10",
+    "react-grid-layout": "^1.4.4",
     "react-hot-toast": "^2.4.0",
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",
@@ -79,8 +80,7 @@
     "tailwind-merge": "^2.5.2",
     "tailwind-scrollbar": "^3.0.0",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^9.0.0",
-    "react-grid-layout": "^1.4.4"
+    "uuid": "^9.0.0"
   },
   "scripts": {
     "dev": "vite",
@@ -142,5 +142,6 @@
   "engines": {
     "node": ">=16.0.0"
   },
-  "engineStrict": true
+  "engineStrict": true,
+  "type": "commonjs"
 }

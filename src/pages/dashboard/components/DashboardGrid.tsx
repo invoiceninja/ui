@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { GridStack } from 'gridstack';
+import * as GridStackModule from 'gridstack';
 import type { GridStackInstance, GridStackNode } from 'gridstack';
 import 'gridstack/dist/gridstack.css';
+import 'gridstack/dist/gridstack-extra.css';
 import classNames from 'classnames';
 import type {
   DashboardGridItem,
@@ -45,6 +46,24 @@ export function DashboardGrid({
 }: DashboardGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const instanceRef = useRef<GridStackInstance | null>(null);
+
+  const GridStackCtor = useMemo(() => {
+    if (typeof GridStackModule.GridStack === 'function') {
+      return GridStackModule.GridStack;
+    }
+
+    const fallback = (GridStackModule as unknown as { default?: unknown })?.default;
+
+    if (fallback && typeof (fallback as { GridStack?: unknown }).GridStack === 'function') {
+      return (fallback as { GridStack: typeof GridStackModule.GridStack }).GridStack;
+    }
+
+    if (typeof (GridStackModule as unknown as { default?: unknown })?.def === 'function') {
+      return (GridStackModule as unknown as { def: typeof GridStackModule.GridStack }).def;
+    }
+
+    throw new Error('GridStack constructor not found in module exports.');
+  }, []);
 
   const orderedLayout = useMemo(() => {
     return [...layout].sort((a, b) => {
@@ -115,7 +134,7 @@ export function DashboardGrid({
       return;
     }
 
-    const grid = GridStack.init(options, containerRef.current);
+    const grid = GridStackCtor.init(options, containerRef.current);
     instanceRef.current = grid;
 
     const items = Array.from(
@@ -141,7 +160,7 @@ export function DashboardGrid({
       grid.destroy(false);
       instanceRef.current = null;
     };
-  }, [options, onLayoutChange]);
+  }, [GridStackCtor, options, onLayoutChange]);
 
   useEffect(() => {
     if (instanceRef.current) {
@@ -166,17 +185,17 @@ export function DashboardGrid({
         <div
           key={item.i}
           className="grid-stack-item"
-          data-gs-id={item.i}
-          data-gs-x={item.x}
-          data-gs-y={item.y}
-          data-gs-w={item.w}
-          data-gs-h={item.h}
-          data-gs-min-w={item.minW}
-          data-gs-min-h={item.minH}
-          data-gs-max-w={item.maxW}
-          data-gs-max-h={item.maxH}
-          data-gs-no-move={item.static ? 'true' : undefined}
-          data-gs-no-resize={item.static ? 'true' : undefined}
+          gs-id={item.i}
+          gs-x={item.x}
+          gs-y={item.y}
+          gs-w={item.w}
+          gs-h={item.h}
+          gs-min-w={item.minW}
+          gs-min-h={item.minH}
+          gs-max-w={item.maxW}
+          gs-max-h={item.maxH}
+          gs-no-move={item.static ? 'true' : undefined}
+          gs-no-resize={item.static ? 'true' : undefined}
         >
           <div className="grid-stack-item-content dashboard-grid-item">
             {renderItem(item.i)}
