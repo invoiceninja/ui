@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import * as GridStackModule from 'gridstack';
-import type { GridStackInstance, GridStackNode } from 'gridstack';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { GridStack } from 'gridstack/dist/es5/gridstack';
+import type {
+  GridStack as GridStackClass,
+  GridStackNode,
+} from 'gridstack/dist/es5/gridstack';
 import 'gridstack/dist/gridstack.css';
 import 'gridstack/dist/gridstack-extra.css';
 import classNames from 'classnames';
