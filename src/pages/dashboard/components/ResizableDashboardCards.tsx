@@ -782,7 +782,7 @@ export function ResizableDashboardCards() {
       title=""
     >
       <div className="flex items-center gap-3 px-4 py-2">
-        <Badge variant="light" className="uppercase tracking-wider">
+        <Badge variant="light-blue" className="uppercase tracking-wider">
           {t('dashboard')}
         </Badge>
         <SelectField

@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { GridStack } from 'gridstack/dist/es5/gridstack';
-import type {
-  GridStack as GridStackClass,
-  GridStackNode,
-} from 'gridstack/dist/es5/gridstack';
+import type { GridStackNode } from 'gridstack/dist/es5/gridstack';
 import 'gridstack/dist/gridstack.css';
 import 'gridstack/dist/gridstack-extra.css';
 import classNames from 'classnames';
@@ -13,6 +9,8 @@ import type {
   DashboardGridLayout,
   DashboardGridMetrics,
 } from './DashboardGrid.types';
+
+type GridStackInstance = InstanceType<typeof GridStack>;
 
 interface DashboardGridProps {
   layout: DashboardGridLayout;
@@ -50,24 +48,6 @@ export function DashboardGrid({
 }: DashboardGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const instanceRef = useRef<GridStackInstance | null>(null);
-
-  const GridStackCtor = useMemo(() => {
-    if (typeof GridStackModule.GridStack === 'function') {
-      return GridStackModule.GridStack;
-    }
-
-    const fallback = (GridStackModule as unknown as { default?: unknown })?.default;
-
-    if (fallback && typeof (fallback as { GridStack?: unknown }).GridStack === 'function') {
-      return (fallback as { GridStack: typeof GridStackModule.GridStack }).GridStack;
-    }
-
-    if (typeof (GridStackModule as unknown as { default?: unknown })?.def === 'function') {
-      return (GridStackModule as unknown as { def: typeof GridStackModule.GridStack }).def;
-    }
-
-    throw new Error('GridStack constructor not found in module exports.');
-  }, []);
 
   const orderedLayout = useMemo(() => {
     return [...layout].sort((a, b) => {
@@ -138,7 +118,7 @@ export function DashboardGrid({
       return;
     }
 
-    const grid = GridStackCtor.init(options, containerRef.current);
+    const grid = GridStack.init(options, containerRef.current);
     instanceRef.current = grid;
 
     const items = Array.from(
@@ -164,7 +144,7 @@ export function DashboardGrid({
       grid.destroy(false);
       instanceRef.current = null;
     };
-  }, [GridStackCtor, options, onLayoutChange]);
+  }, [options, onLayoutChange]);
 
   useEffect(() => {
     if (instanceRef.current) {
