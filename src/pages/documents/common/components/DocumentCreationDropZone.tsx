@@ -19,6 +19,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
+import { getPasswordForPdf, isPdfPasswordProtected } from '@docuninja/builder2.0';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -77,7 +78,7 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
     }
   };
 
-  const onDrop = (acceptedFiles: File[]) => {
+  const onDrop = async (acceptedFiles: File[]) => {
     // Clear any previous file rejection errors
     setFileRejectionErrors([]);
     
@@ -86,24 +87,41 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
       return;
     }
 
+    const formData = new FormData();
+
+
+
+    for (const file of acceptedFiles) {
+      const isProtected = await isPdfPasswordProtected(file);
+
+      if (isProtected) {
+        const password = await getPasswordForPdf(file);
+        
+        if (!password) {
+          toast.error(t('pdf_password_required') as string);
+
+          return;
+        }
+
+        formData.append("files[]", file, `${file.name}|${password}`);
+      } else {
+        formData.append("files[]", file);
+      }
+    }
+
+    const files = formData.getAll('files[]') as File[];
+
     if (onSelectFiles) {
-      onSelectFiles(acceptedFiles);
+      onSelectFiles(files);
      
       return;
     }
     
-    const newFormData = new FormData();
-
-    acceptedFiles.forEach((file) => {
-      newFormData.append('files[]', file);
-      
-    });
-
-    newFormData.append(
+    formData.append(
       'description', 'Untitled document'
     );
 
-    handleCreateDocument(newFormData);
+    handleCreateDocument(formData);
   };
 
   const onDropRejected = (fileRejections: any[]) => {
