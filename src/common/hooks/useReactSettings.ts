@@ -50,6 +50,7 @@ export interface Preferences {
   use_legacy_editor: boolean;
   feedback_slider_displayed_at: number;
   feedback_given_at: number;
+  price_increase_banner_dismissed_at: number;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
@@ -111,6 +112,7 @@ export const preferencesDefaults: Preferences = {
   use_legacy_editor: false,
   feedback_slider_displayed_at: 0,
   feedback_given_at: 0,
+  price_increase_banner_dismissed_at: 0,
 };
 
 interface Options {

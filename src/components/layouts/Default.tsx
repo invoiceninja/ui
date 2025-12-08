@@ -65,6 +65,7 @@ import { ChartLine } from '../icons/ChartLine';
 import { ArrowsTransaction } from '../icons/ArrowsTransaction';
 import { Gear } from '../icons/Gear';
 import { Feedback } from '../Feedback';
+import { PriceIncreaseBanner } from '../banners/PriceIncrease';
 
 export interface SaveOption {
   label: string;
@@ -418,6 +419,8 @@ export function Default(props: Props) {
         <VerifyEmail />
         <VerifyPhone />
         <EInvoiceCredits />
+
+        <PriceIncreaseBanner />
       </div>
 
       <MobileSidebar
