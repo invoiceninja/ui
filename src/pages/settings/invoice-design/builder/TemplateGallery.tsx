@@ -11,9 +11,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PlusCircle, Sparkles, FileText, Minimize2, Palette } from 'lucide-react';
+import { PlusCircle, Sparkles, Minimize2, Palette, FileText } from 'lucide-react';
 import { Button } from '$app/components/forms';
-import { Card } from '$app/components/cards';
 import { templates } from './templates/templates';
 import { route } from '$app/common/helpers/route';
 

@@ -11,7 +11,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import GridLayout, { Layout } from 'react-grid-layout';
+import GridLayout from 'react-grid-layout';
+import type { Layout } from 'react-grid-layout';
 import { Undo2, Redo2, Eye, Save, ArrowLeft, Download } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { Block, BuilderState } from './types';
@@ -20,8 +21,14 @@ import { ComponentLibrary } from './components/ComponentLibrary';
 import { PropertyPanel } from './components/PropertyPanel';
 import { BlockRenderer } from './components/BlockRenderer';
 import { route } from '$app/common/helpers/route';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Design } from '$app/common/interfaces/design';
 import 'react-grid-layout/css/styles.css';
-import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import './InvoiceBuilder.css';
 
 export function InvoiceBuilder() {
   const [t] = useTranslation();
@@ -40,6 +47,34 @@ export function InvoiceBuilder() {
 
   const [layout, setLayout] = useState<Layout[]>([]);
 
+  // Drag and drop state
+  const [droppingItem, setDroppingItem] = useState<{ i: string; w: number; h: number } | undefined>();
+  const [currentDragDefinition, setCurrentDragDefinition] = useState<any>(null);
+  const [justDropped, setJustDropped] = useState(false);
+
+  // Add to history when blocks change
+  const addToHistory = useCallback((blocks: Block[], action: string) => {
+    setState((prev) => {
+      const newHistory = prev.history.slice(0, prev.historyIndex + 1);
+      newHistory.push({
+        blocks: JSON.parse(JSON.stringify(blocks)), // Deep copy
+        timestamp: Date.now(),
+        action,
+      });
+
+      // Limit history to 50 entries
+      if (newHistory.length > 50) {
+        newHistory.shift();
+      }
+
+      return {
+        ...prev,
+        history: newHistory,
+        historyIndex: newHistory.length - 1,
+      };
+    });
+  }, []);
+
   // Load template on mount
   useEffect(() => {
     if (templateId) {
@@ -56,23 +91,42 @@ export function InvoiceBuilder() {
 
   // Convert blocks to react-grid-layout format
   useEffect(() => {
-    const newLayout = state.blocks.map((block) => ({
-      i: block.id,
-      x: block.gridPosition.x,
-      y: block.gridPosition.y,
-      w: block.gridPosition.w,
-      h: block.gridPosition.h,
-      minW: 1,
-      minH: 1,
-    }));
+    console.log('🔄 useEffect: Converting blocks to layout format');
+    console.log('  Current state.blocks:', state.blocks.length);
+    const newLayout = state.blocks.map((block) => {
+      const layoutItem = {
+        i: block.id,
+        x: block.gridPosition.x,
+        y: block.gridPosition.y,
+        w: block.gridPosition.w,
+        h: block.gridPosition.h,
+        minW: 2,
+        minH: 1,
+      };
+      console.log(`  Block ${block.id} (${block.type}): x=${layoutItem.x} y=${layoutItem.y} w=${layoutItem.w} h=${layoutItem.h}`);
+      return layoutItem;
+    });
+    console.log('  Setting layout with', newLayout.length, 'items');
     setLayout(newLayout);
   }, [state.blocks]);
 
   const handleLayoutChange = useCallback((newLayout: Layout[]) => {
+    console.log('📐 handleLayoutChange called with:', newLayout);
+
+    // Ignore layout changes immediately after drop to prevent position override
+    if (justDropped) {
+      console.log('⚠️ Ignoring handleLayoutChange - just dropped');
+      return;
+    }
+
     setState((prev) => {
       const updatedBlocks = prev.blocks.map((block) => {
         const layoutItem = newLayout.find((l) => l.i === block.id);
         if (layoutItem) {
+          console.log(`  Updating block ${block.id}:`, {
+            old: block.gridPosition,
+            new: { x: layoutItem.x, y: layoutItem.y, w: layoutItem.w, h: layoutItem.h }
+          });
           return {
             ...block,
             gridPosition: {
@@ -87,15 +141,63 @@ export function InvoiceBuilder() {
       });
       return { ...prev, blocks: updatedBlocks };
     });
+  }, [justDropped]);
+
+  const handleUndo = useCallback(() => {
+    setState((prev) => {
+      if (prev.historyIndex > 0) {
+        const newIndex = prev.historyIndex - 1;
+        return {
+          ...prev,
+          blocks: JSON.parse(JSON.stringify(prev.history[newIndex].blocks)),
+          historyIndex: newIndex,
+        };
+      }
+      return prev;
+    });
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    setState((prev) => {
+      if (prev.historyIndex < prev.history.length - 1) {
+        const newIndex = prev.historyIndex + 1;
+        return {
+          ...prev,
+          blocks: JSON.parse(JSON.stringify(prev.history[newIndex].blocks)),
+          historyIndex: newIndex,
+        };
+      }
+      return prev;
+    });
   }, []);
 
   const handleAddBlock = useCallback((block: Block) => {
-    setState((prev) => ({
-      ...prev,
-      blocks: [...prev.blocks, block],
-      selectedBlockId: block.id,
-    }));
-  }, []);
+    setState((prev) => {
+      // Find the lowest Y position to place the new block
+      const maxY = prev.blocks.length > 0
+        ? Math.max(...prev.blocks.map(b => b.gridPosition.y + b.gridPosition.h))
+        : 0;
+
+      const newBlock = {
+        ...block,
+        gridPosition: {
+          ...block.gridPosition,
+          y: maxY,
+        },
+      };
+
+      const newBlocks = [...prev.blocks, newBlock];
+
+      // Add to history
+      setTimeout(() => addToHistory(newBlocks, `Add ${block.type}`), 0);
+
+      return {
+        ...prev,
+        blocks: newBlocks,
+        selectedBlockId: newBlock.id,
+      };
+    });
+  }, [addToHistory]);
 
   const handleUpdateBlock = useCallback((updatedBlock: Block) => {
     setState((prev) => ({
@@ -143,11 +245,182 @@ export function InvoiceBuilder() {
     }));
   }, []);
 
+  // Set droppingItem immediately when drag definition changes
+  useEffect(() => {
+    if (currentDragDefinition) {
+      const item = {
+        i: '__dropping-elem__',
+        w: currentDragDefinition.defaultSize.w,
+        h: currentDragDefinition.defaultSize.h,
+      };
+      console.log('📌 Setting droppingItem:', item);
+      setDroppingItem(item);
+    } else {
+      // Clear when not dragging
+      console.log('📌 Clearing droppingItem');
+      setDroppingItem(undefined);
+    }
+  }, [currentDragDefinition]);
+
+  const handleDrop = useCallback((layout: Layout[], layoutItem: Layout, event: Event) => {
+    console.log('🎯 DROP EVENT FIRED!');
+    console.log('  layoutItem passed to onDrop:', JSON.stringify(layoutItem, null, 2));
+    console.log('  layout array length:', layout.length);
+    console.log('  currentDragDefinition:', currentDragDefinition);
+
+    const nativeEvent = event as any;
+    const data = nativeEvent.dataTransfer?.getData('application/json');
+
+    // Use currentDragDefinition as the source since dataTransfer might be empty
+    const definition = data ? JSON.parse(data) : currentDragDefinition;
+
+    if (!definition) {
+      console.error('❌ No definition available');
+      setCurrentDragDefinition(null);
+      return;
+    }
+
+    console.log('✅ Using definition with defaultSize:', definition.defaultSize);
+
+    // CRITICAL FIX: Use definition.defaultSize for w/h, layoutItem for x/y position
+    // layoutItem.w/h might be incorrect or the droppingItem placeholder size
+    const newBlockId = `${definition.type}-${Date.now()}`;
+
+    const newBlock: Block = {
+      id: newBlockId,
+      type: definition.type,
+      gridPosition: {
+        x: layoutItem.x,
+        y: layoutItem.y,
+        w: definition.defaultSize.w,  // Use definition, not layoutItem
+        h: definition.defaultSize.h,  // Use definition, not layoutItem
+      },
+      properties: { ...definition.defaultProperties },
+    };
+
+    console.log('✅ Creating block with grid position:', newBlock.gridPosition);
+
+    // Update state with the new block
+    // The layout will be synced via useEffect when state.blocks changes
+    setState((prev) => {
+      const newBlocks = [...prev.blocks, newBlock];
+      setTimeout(() => addToHistory(newBlocks, `Add ${definition.type}`), 0);
+
+      return {
+        ...prev,
+        blocks: newBlocks,
+        selectedBlockId: newBlock.id,
+      };
+    });
+
+    // Set flag to prevent handleLayoutChange from overwriting the drop position
+    setJustDropped(true);
+    setTimeout(() => setJustDropped(false), 100);
+
+    // Clear the drag state
+    setCurrentDragDefinition(null);
+
+    console.log('✅ Drop complete, block added to state');
+  }, [addToHistory, currentDragDefinition]);
+
+  // Called by react-grid-layout during drag over
+  const handleDropDragOver = useCallback(() => {
+    console.log('🔄 DropDragOver called', { droppingItem });
+    // Return the dimensions for the placeholder
+    // This tells react-grid-layout how big the dropping item should be
+    if (droppingItem) {
+      return { w: droppingItem.w, h: droppingItem.h };
+    }
+    return { w: 6, h: 3 }; // Default fallback size
+  }, [droppingItem]);
+
+
   const selectedBlock = state.blocks.find((b) => b.id === state.selectedBlockId);
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log('Saving design...', state.blocks);
+  // Convert blocks to HTML for PDF generation
+  const blocksToHTML = useCallback((blocks: Block[]) => {
+    let html = '<div style="font-family: Arial, sans-serif; padding: 20px;">';
+
+    blocks.forEach((block) => {
+      const { gridPosition, properties, type } = block;
+      const top = gridPosition.y * 30; // rowHeight
+      const left = (gridPosition.x / 12) * 100; // percentage
+      const width = (gridPosition.w / 12) * 100;
+      const height = gridPosition.h * 30;
+
+      html += `<div style="position: absolute; top: ${top}px; left: ${left}%; width: ${width}%; min-height: ${height}px;">`;
+
+      switch (type) {
+        case 'text':
+          html += `<div style="font-size: ${properties.fontSize}; color: ${properties.color}; text-align: ${properties.align};">${properties.content}</div>`;
+          break;
+        case 'logo':
+        case 'image':
+          html += `<img src="${properties.source}" style="max-width: ${properties.maxWidth}; object-fit: ${properties.objectFit};" />`;
+          break;
+        case 'divider':
+          html += `<hr style="border: none; border-top: ${properties.thickness} ${properties.style} ${properties.color}; margin: ${properties.marginTop} 0 ${properties.marginBottom};" />`;
+          break;
+        case 'company-info':
+        case 'client-info':
+        case 'invoice-details':
+          html += `<div style="font-size: ${properties.fontSize}; line-height: ${properties.lineHeight}; color: ${properties.color}; text-align: ${properties.align}; white-space: pre-line;">${properties.content}</div>`;
+          break;
+        default:
+          html += `<div>${type}</div>`;
+      }
+
+      html += '</div>';
+    });
+
+    html += '</div>';
+    return html;
+  }, []);
+
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!state.blocks.length) {
+      toast.error(String(t('add_blocks_first')));
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const designName = prompt(String(t('enter_design_name')), 'Visual Design ' + new Date().toLocaleDateString());
+
+      if (!designName) {
+        setSaving(false);
+        return;
+      }
+
+      const htmlBody = blocksToHTML(state.blocks);
+
+      const design = {
+        name: designName,
+        design: {
+          includes: '',
+          header: '',
+          body: htmlBody,
+          product: '<table><!-- Product rows generated dynamically --></table>',
+          task: '<table><!-- Task rows generated dynamically --></table>',
+          footer: '',
+        },
+        is_custom: true,
+        entities: 'invoice,quote,credit',
+      };
+
+      const response = await request('POST', endpoint('/api/v1/designs'), design) as GenericSingleResourceResponse<Design>;
+
+      toast.success(String(t('saved_design')));
+      navigate(route('/settings/invoice_design/custom_designs/:id/edit', { id: response.data.data.id }));
+    } catch (error: any) {
+      console.error('Save error:', error);
+      toast.error(error?.response?.data?.message || String(t('error_saving_design')));
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handlePreview = () => {
@@ -171,7 +444,10 @@ export function InvoiceBuilder() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
-          <ComponentLibrary onAddBlock={handleAddBlock} />
+          <ComponentLibrary
+            onAddBlock={handleAddBlock}
+            onDragStart={setCurrentDragDefinition}
+          />
         </div>
       </div>
 
@@ -196,8 +472,8 @@ export function InvoiceBuilder() {
               <Button
                 type="secondary"
                 behavior="button"
-                onClick={() => {/* TODO: Undo */}}
-                disabled
+                onClick={handleUndo}
+                disabled={state.historyIndex <= 0}
                 className="p-2"
               >
                 <Undo2 className="w-4 h-4" />
@@ -205,8 +481,8 @@ export function InvoiceBuilder() {
               <Button
                 type="secondary"
                 behavior="button"
-                onClick={() => {/* TODO: Redo */}}
-                disabled
+                onClick={handleRedo}
+                disabled={state.historyIndex >= state.history.length - 1}
                 className="p-2"
               >
                 <Redo2 className="w-4 h-4" />
@@ -234,10 +510,11 @@ export function InvoiceBuilder() {
               type="secondary"
               behavior="button"
               onClick={handleSave}
+              disabled={saving || state.blocks.length === 0}
               className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
             >
               <Save className="w-4 h-4" />
-              {t('save_design')}
+              {saving ? t('saving') : t('save_design')}
             </Button>
           </div>
         </div>
@@ -245,7 +522,7 @@ export function InvoiceBuilder() {
         {/* Canvas Area */}
         <div className="flex-1 overflow-auto p-8 bg-gray-100">
           <div
-            className="mx-auto bg-white shadow-2xl"
+            className={`mx-auto bg-white shadow-2xl relative transition-all canvas-drop-target`}
             style={{
               width: '210mm',
               minHeight: '297mm',
@@ -257,27 +534,39 @@ export function InvoiceBuilder() {
               className="layout"
               layout={layout}
               onLayoutChange={handleLayoutChange}
+              onDrop={handleDrop}
+              onDropDragOver={handleDropDragOver}
               cols={12}
-              rowHeight={20}
+              rowHeight={60}
               width={794} // 210mm in pixels at 96dpi
               margin={[10, 10]}
-              containerPadding={[20, 20]}
+              containerPadding={[30, 30]}
               draggableHandle=".drag-handle"
               isDraggable
               isResizable
-              compactType={null}
-              preventCollision={false}
+              isDroppable
+              droppingItem={droppingItem}
+              compactType={null} // CRITICAL: Disable horizontal/vertical compaction
+              verticalCompact={false} // CRITICAL: Explicitly disable vertical compaction
+              allowOverlap={true} // Allow free positioning with overlaps
+              preventCollision={false} // Don't prevent collisions
+              useCSSTransforms={true} // Better performance with CSS transforms
+              style={{ minHeight: '1000px' }}
             >
               {state.blocks.map((block) => (
                 <div
                   key={block.id}
                   className={`
-                    group relative border-2 rounded transition-all
+                    w-full h-full
+                    group relative border-2 rounded transition-all overflow-visible
                     ${state.selectedBlockId === block.id
-                      ? 'border-blue-500 shadow-lg z-10'
+                      ? 'border-blue-500 shadow-lg z-10 selected'
                       : 'border-transparent hover:border-gray-300'
                     }
                   `}
+                  style={{
+                    backgroundColor: 'rgba(200, 200, 255, 0.1)', // DEBUG: Light background to see size
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleSelectBlock(block.id);
@@ -286,7 +575,7 @@ export function InvoiceBuilder() {
                   {/* Block Toolbar - shows on hover or when selected */}
                   <div
                     className={`
-                      drag-handle absolute -top-8 left-0 right-0 h-7
+                      drag-handle absolute -top-7 left-0 right-0 h-6
                       bg-gray-800 text-white rounded-t px-2
                       flex items-center justify-between text-xs
                       cursor-move
@@ -320,7 +609,7 @@ export function InvoiceBuilder() {
                   </div>
 
                   {/* Block Content */}
-                  <div className="h-full w-full overflow-hidden p-2">
+                  <div className="h-full w-full overflow-hidden p-3">
                     <BlockRenderer block={block} />
                   </div>
                 </div>

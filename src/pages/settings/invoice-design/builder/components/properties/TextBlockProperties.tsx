@@ -8,12 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bold, Italic, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { Bold, Italic, AlignLeft, AlignCenter, AlignRight, Code } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
+import { VariablePicker } from '../VariablePicker';
 
 export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const [showVariablePicker, setShowVariablePicker] = useState(false);
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -26,9 +29,18 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
     <div className="space-y-4">
       {/* Content */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {String(t('content'))}
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            {String(t('content'))}
+          </label>
+          <button
+            onClick={() => setShowVariablePicker(true)}
+            className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+          >
+            <Code className="w-3 h-3" />
+            {String(t('insert_variable'))}
+          </button>
+        </div>
         <textarea
           value={block.properties.content || ''}
           onChange={(e) => updateProperty('content', e.target.value)}
@@ -40,6 +52,16 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
           {String(t('use_variables_like'))} $company.name, $invoice.number
         </p>
       </div>
+
+      {showVariablePicker && (
+        <VariablePicker
+          onInsert={(variable) => {
+            const currentContent = block.properties.content || '';
+            updateProperty('content', currentContent + variable);
+          }}
+          onClose={() => setShowVariablePicker(false)}
+        />
+      )}
 
       {/* Font Size */}
       <div>

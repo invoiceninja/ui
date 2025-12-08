@@ -18,7 +18,6 @@ import {
   QrCode,
   PenTool,
   User,
-  FileText,
   Receipt,
   Space,
 } from 'lucide-react';
@@ -31,7 +30,7 @@ export const blockLibrary: BlockDefinition[] = [
     label: 'Company Logo',
     icon: <Building2 className="w-5 h-5" />,
     description: 'Your company logo',
-    defaultSize: { w: 3, h: 3 },
+    defaultSize: { w: 4, h: 4 },
     defaultProperties: {
       source: '$company.logo',
       align: 'left',
@@ -45,7 +44,7 @@ export const blockLibrary: BlockDefinition[] = [
     label: 'Company Info',
     icon: <Building2 className="w-5 h-5" />,
     description: 'Company name, address, contact',
-    defaultSize: { w: 4, h: 3 },
+    defaultSize: { w: 6, h: 4 },
     defaultProperties: {
       content: '$company.name\n$company.address\n$company.city_state_postal\n$company.phone\n$company.email',
       fontSize: '12px',
@@ -62,10 +61,10 @@ export const blockLibrary: BlockDefinition[] = [
     label: 'Text Block',
     icon: <Type className="w-5 h-5" />,
     description: 'Custom text or headings',
-    defaultSize: { w: 6, h: 2 },
+    defaultSize: { w: 8, h: 3 },
     defaultProperties: {
       content: 'Enter your text...',
-      fontSize: '14px',
+      fontSize: '16px',
       fontWeight: 'normal',
       lineHeight: '1.5',
       color: '#000000',
@@ -78,7 +77,7 @@ export const blockLibrary: BlockDefinition[] = [
     label: 'Invoice Details',
     icon: <Receipt className="w-5 h-5" />,
     description: 'Invoice number, date, due date',
-    defaultSize: { w: 4, h: 3 },
+    defaultSize: { w: 6, h: 4 },
     defaultProperties: {
       content: 'Invoice #: $invoice.number\nDate: $invoice.date\nDue Date: $invoice.due_date\nPO Number: $invoice.po_number',
       fontSize: '12px',
@@ -95,7 +94,7 @@ export const blockLibrary: BlockDefinition[] = [
     label: 'Client Info',
     icon: <User className="w-5 h-5" />,
     description: 'Client name and address',
-    defaultSize: { w: 4, h: 3 },
+    defaultSize: { w: 6, h: 4 },
     defaultProperties: {
       content: '$client.name\n$client.address\n$client.city_state_postal\n$client.phone\n$client.email',
       fontSize: '12px',
@@ -187,7 +186,7 @@ export const blockLibrary: BlockDefinition[] = [
     label: 'Invoice Totals',
     icon: <DollarSign className="w-5 h-5" />,
     description: 'Subtotal, tax, and total',
-    defaultSize: { w: 5, h: 5 },
+    defaultSize: { w: 6, h: 6 },
     defaultProperties: {
       items: [
         { label: 'Subtotal', field: '$invoice.subtotal', show: true },

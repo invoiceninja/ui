@@ -1,0 +1,102 @@
+/**
+ * Invoice Builder Drag & Drop Styles
+ * Provides Grafana-like visual feedback for drag-drop operations
+ */
+
+/* Dropping placeholder - the ghost element shown during drag */
+.react-grid-item.react-grid-placeholder {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border: 2px dashed rgba(59, 130, 246, 0.5) !important;
+  border-radius: 8px !important;
+  opacity: 1 !important;
+  transition: all 200ms ease !important;
+  z-index: 2 !important;
+  /* Account for toolbar that extends above block */
+  margin-top: -28px !important;
+  padding-top: 28px !important;
+}
+
+/* Grid item being dragged */
+.react-grid-item.react-draggable-dragging {
+  transition: none !important;
+  z-index: 100 !important;
+  opacity: 0.8 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Grid item during drop animation */
+.react-grid-item.dropping {
+  transition: all 200ms ease !important;
+}
+
+/* Hide resize handles during drag */
+.react-grid-item.react-draggable-dragging .react-resizable-handle {
+  display: none !important;
+}
+
+/* Smooth transitions for grid items */
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top, width, height;
+  box-sizing: border-box !important;
+}
+
+/* Prevent transition when actively dragging to avoid lag */
+.react-grid-item.react-draggable-dragging,
+.react-grid-item.resizing {
+  transition: none !important;
+}
+
+/* Visual feedback for drop target canvas */
+.canvas-drop-target {
+  position: relative;
+}
+
+.canvas-drop-target::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  opacity: 0;
+}
+
+.canvas-drop-target.drag-over::after {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.05);
+  border: 2px dashed rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+}
+
+/* Resize handle styling */
+.react-resizable-handle {
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.react-grid-item:hover .react-resizable-handle,
+.react-grid-item.selected .react-resizable-handle {
+  opacity: 1;
+}
+
+/* Improve resize handle visibility */
+.react-resizable-handle-se {
+  bottom: 2px !important;
+  right: 2px !important;
+  width: 20px !important;
+  height: 20px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3E%3Cpath d='M 6 0 L 6 6 L 0 6' fill='none' stroke='%233b82f6' stroke-width='1.5'/%3E%3C/svg%3E") !important;
+  background-position: bottom right !important;
+  background-repeat: no-repeat !important;
+  cursor: nwse-resize !important;
+}
+
+/* CRITICAL: Ensure grid item children fill their calculated space */
+.react-grid-item > div {
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}

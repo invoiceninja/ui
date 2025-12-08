@@ -10,14 +10,15 @@
 
 import { useTranslation } from 'react-i18next';
 import { Palette, FileText, Database, LayoutGrid } from 'lucide-react';
-import { blockLibrary, getBlockDefinition } from '../block-library';
+import { blockLibrary } from '../block-library';
 import { Block, BlockDefinition } from '../types';
 
 interface ComponentLibraryProps {
   onAddBlock: (block: Block) => void;
+  onDragStart?: (definition: BlockDefinition) => void;
 }
 
-export function ComponentLibrary({ onAddBlock }: ComponentLibraryProps) {
+export function ComponentLibrary({ onAddBlock, onDragStart }: ComponentLibraryProps) {
   const [t] = useTranslation();
 
   const categories = [
@@ -33,7 +34,7 @@ export function ComponentLibrary({ onAddBlock }: ComponentLibraryProps) {
       type: definition.type,
       gridPosition: {
         x: 0,
-        y: Infinity, // Will be placed at the bottom
+        y: 0, // Will be repositioned by parent
         w: definition.defaultSize.w,
         h: definition.defaultSize.h,
       },
@@ -63,6 +64,7 @@ export function ComponentLibrary({ onAddBlock }: ComponentLibraryProps) {
                   key={definition.type}
                   definition={definition}
                   onClick={() => handleAddBlock(definition)}
+                  onDragStart={onDragStart}
                 />
               ))}
             </div>
@@ -76,18 +78,32 @@ export function ComponentLibrary({ onAddBlock }: ComponentLibraryProps) {
 interface BlockCardProps {
   definition: BlockDefinition;
   onClick: () => void;
+  onDragStart?: (definition: BlockDefinition) => void;
 }
 
-function BlockCard({ definition, onClick }: BlockCardProps) {
+function BlockCard({ definition, onClick, onDragStart: onDragStartProp }: BlockCardProps) {
+  const handleDragStart = (e: React.DragEvent) => {
+    console.log('🚀 Drag started for:', definition.type);
+    // CRITICAL for Firefox compatibility
+    e.dataTransfer.setData('text/plain', '');
+    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.setData('application/json', JSON.stringify(definition));
+    console.log('📋 Set data:', JSON.stringify(definition));
+    onDragStartProp?.(definition);
+    console.log('✅ Called onDragStart prop');
+  };
+
   return (
     <button
       onClick={onClick}
+      draggable
+      onDragStart={handleDragStart}
       className="
         w-full flex items-start gap-3 p-3 rounded-lg
         border border-gray-200 hover:border-blue-500
         bg-white hover:bg-blue-50
         transition-all duration-150
-        text-left group cursor-pointer
+        text-left group cursor-move
         active:scale-95
       "
     >
