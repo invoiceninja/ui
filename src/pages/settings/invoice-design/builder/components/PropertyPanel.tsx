@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Trash2, Copy } from 'lucide-react';
+import { Trash2, Clipboard } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { PropertyPanelProps } from '../types';
 import { getBlockLabel, getBlockDescription } from '../block-library';
@@ -28,12 +28,21 @@ export function PropertyPanel({
 
   return (
     <div className="p-4 space-y-6">
-      {/* Header */}
-      <div>
-        <h3 className="font-semibold text-lg text-gray-900 mb-1">
-          {getBlockLabel(block.type)}
-        </h3>
-        <p className="text-sm text-gray-600">{getBlockDescription(block.type)}</p>
+      {/* Header with Title and Copy Button */}
+      <div className="flex items-start justify-between gap-2 pb-4 border-b">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-lg text-gray-900 mb-1">
+            {getBlockLabel(block.type)}
+          </h3>
+          <p className="text-sm text-gray-600">{getBlockDescription(block.type)}</p>
+        </div>
+        <button
+          onClick={onDuplicate}
+          className="flex-shrink-0 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+          title={t('duplicate')}
+        >
+          <Clipboard className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Block-specific properties */}
@@ -64,17 +73,7 @@ export function PropertyPanel({
       </div>
 
       {/* Actions */}
-      <div className="pt-4 border-t space-y-2">
-        <Button
-          type="secondary"
-          behavior="button"
-          onClick={onDuplicate}
-          className="w-full flex items-center justify-center gap-2"
-        >
-          <Copy className="w-4 h-4" />
-          {t('duplicate')}
-        </Button>
-
+      <div className="pt-4 border-t">
         <Button
           type="secondary"
           behavior="button"

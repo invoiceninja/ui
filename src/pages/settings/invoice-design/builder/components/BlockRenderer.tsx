@@ -10,6 +10,7 @@
 
 import { Block } from '../types';
 import { getBlockLabel } from '../block-library';
+import { SAMPLE_INVOICE_DATA, replaceVariables } from '../utils/variable-replacer';
 
 interface BlockRendererProps {
   block: Block;
@@ -63,6 +64,7 @@ export function BlockRenderer({ block }: BlockRendererProps) {
 // Individual block renderers
 function TextBlockRenderer({ block }: BlockRendererProps) {
   const { content, fontSize, fontWeight, color, align, lineHeight } = block.properties;
+  const displayContent = replaceVariables(content || 'Enter text...', SAMPLE_INVOICE_DATA);
 
   return (
     <div
@@ -72,26 +74,30 @@ function TextBlockRenderer({ block }: BlockRendererProps) {
         color,
         textAlign: align,
         lineHeight,
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
       }}
     >
-      {content || 'Enter text...'}
+      {displayContent}
     </div>
   );
 }
 
 function ImageBlockRenderer({ block }: BlockRendererProps) {
   const { source, align, maxWidth, objectFit } = block.properties;
+  const resolvedSource = replaceVariables(source, SAMPLE_INVOICE_DATA);
 
   return (
-    <div style={{ textAlign: align, height: '100%', display: 'flex', alignItems: 'center' }}>
-      {source ? (
+    <div style={{ textAlign: align, height: '100%', display: 'flex', alignItems: 'center', justifyContent: align }}>
+      {resolvedSource ? (
         <img
-          src={source}
+          src={resolvedSource}
           alt="Block image"
           style={{ maxWidth, objectFit, maxHeight: '100%' }}
         />
       ) : (
-        <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
+        <div className="w-full h-full bg-gray-50 flex items-center justify-center text-gray-400 text-xs border-2 border-dashed border-gray-300 rounded">
           {block.type === 'logo' ? 'Company Logo' : 'Image'}
         </div>
       )}
@@ -101,6 +107,7 @@ function ImageBlockRenderer({ block }: BlockRendererProps) {
 
 function CompanyInfoRenderer({ block }: BlockRendererProps) {
   const { content, fontSize, lineHeight, align, color } = block.properties;
+  const displayContent = replaceVariables(content, SAMPLE_INVOICE_DATA);
 
   return (
     <div
@@ -112,7 +119,7 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
         whiteSpace: 'pre-line',
       }}
     >
-      {content}
+      {displayContent}
     </div>
   );
 }
@@ -120,6 +127,7 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
 function ClientInfoRenderer({ block }: BlockRendererProps) {
   const { content, fontSize, lineHeight, align, color, showTitle, title, titleFontWeight } =
     block.properties;
+  const displayContent = replaceVariables(content, SAMPLE_INVOICE_DATA);
 
   return (
     <div>
@@ -144,7 +152,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
           whiteSpace: 'pre-line',
         }}
       >
-        {content}
+        {displayContent}
       </div>
     </div>
   );
@@ -152,6 +160,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
 
 function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
   const { content, fontSize, lineHeight, align, color } = block.properties;
+  const displayContent = replaceVariables(content, SAMPLE_INVOICE_DATA);
 
   return (
     <div
@@ -163,7 +172,7 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
         whiteSpace: 'pre-line',
       }}
     >
-      {content}
+      {displayContent}
     </div>
   );
 }
@@ -178,7 +187,23 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
     fontSize,
     padding,
     showBorders,
+    rowBg,
+    alternateRowBg,
+    alternateRows,
   } = block.properties;
+
+  const resolveItemValue = (field: string, item: any): string => {
+    const fieldKey = field.replace('$item.', '');
+    const value = item[fieldKey];
+
+    if (typeof value === 'number') {
+      if (fieldKey === 'cost' || fieldKey === 'line_total') {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+      }
+      return String(value);
+    }
+    return String(value || '');
+  };
 
   return (
     <div className="w-full h-full overflow-auto">
@@ -207,35 +232,27 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
           </tr>
         </thead>
         <tbody>
-          {/* Sample rows */}
-          <tr>
-            {columns.map((col: any) => (
-              <td
-                key={col.id}
-                style={{
-                  padding,
-                  textAlign: col.align,
-                  border: showBorders ? `1px solid ${borderColor}` : 'none',
-                }}
-              >
-                Sample
-              </td>
-            ))}
-          </tr>
-          <tr style={{ backgroundColor: block.properties.alternateRows ? block.properties.alternateRowBg : block.properties.rowBg }}>
-            {columns.map((col: any) => (
-              <td
-                key={col.id}
-                style={{
-                  padding,
-                  textAlign: col.align,
-                  border: showBorders ? `1px solid ${borderColor}` : 'none',
-                }}
-              >
-                Data
-              </td>
-            ))}
-          </tr>
+          {SAMPLE_INVOICE_DATA.line_items.map((item, index) => (
+            <tr
+              key={index}
+              style={{
+                backgroundColor: alternateRows && index % 2 === 1 ? alternateRowBg : rowBg,
+              }}
+            >
+              {columns.map((col: any) => (
+                <td
+                  key={col.id}
+                  style={{
+                    padding,
+                    textAlign: col.align,
+                    border: showBorders ? `1px solid ${borderColor}` : 'none',
+                  }}
+                >
+                  {resolveItemValue(col.field, item)}
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -263,6 +280,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
         .map((item: any, index: number) => {
           const isTotal = item.isTotal;
           const isBalance = item.isBalance;
+          const displayValue = replaceVariables(item.field, SAMPLE_INVOICE_DATA);
 
           return (
             <div
@@ -284,7 +302,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                   textAlign: 'right',
                 }}
               >
-                {item.field}
+                {displayValue}
               </span>
             </div>
           );

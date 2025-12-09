@@ -11,9 +11,6 @@
   opacity: 1 !important;
   transition: all 200ms ease !important;
   z-index: 2 !important;
-  /* Account for toolbar that extends above block */
-  margin-top: -28px !important;
-  padding-top: 28px !important;
 }
 
 /* Grid item being dragged */
@@ -92,11 +89,31 @@
   cursor: nwse-resize !important;
 }
 
-/* CRITICAL: Ensure grid item children fill their calculated space */
-.react-grid-item > div {
+/* Ensure grid items have no background */
+.react-grid-item {
+  background: transparent !important;
+}
+
+/* Block wrapper should use flexbox for proper layout */
+.react-grid-item > .block-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
   width: 100% !important;
   height: 100% !important;
   box-sizing: border-box !important;
   min-width: 0 !important;
   min-height: 0 !important;
+  background: transparent !important;
+}
+
+/* Top bar should not shrink */
+.react-grid-item > .block-wrapper > .block-topbar {
+  flex-shrink: 0 !important;
+}
+
+/* Content should fill remaining space */
+.react-grid-item > .block-wrapper > .block-content {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
 }

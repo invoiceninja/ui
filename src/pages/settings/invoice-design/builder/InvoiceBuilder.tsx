@@ -13,13 +13,15 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GridLayout from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
-import { Undo2, Redo2, Eye, Save, ArrowLeft, Download } from 'lucide-react';
+import { Undo2, Redo2, Eye, Save, ArrowLeft, Download, FileJson, Clipboard, GripVertical } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { Block, BuilderState } from './types';
 import { getTemplateById } from './templates/templates';
 import { ComponentLibrary } from './components/ComponentLibrary';
 import { PropertyPanel } from './components/PropertyPanel';
 import { BlockRenderer } from './components/BlockRenderer';
+import { PreviewModal } from './components/PreviewModal';
+import { getBlockLabel } from './block-library';
 import { route } from '$app/common/helpers/route';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -238,10 +240,10 @@ export function InvoiceBuilder() {
     });
   }, []);
 
-  const handleSelectBlock = useCallback((blockId: string) => {
+  const handleSelectBlock = useCallback((blockId: string | null) => {
     setState((prev) => ({
       ...prev,
-      selectedBlockId: blockId,
+      selectedBlockId: blockId || null,
     }));
   }, []);
 
@@ -309,7 +311,8 @@ export function InvoiceBuilder() {
       return {
         ...prev,
         blocks: newBlocks,
-        selectedBlockId: newBlock.id,
+        // Don't auto-select after drop to avoid toolbar showing immediately
+        selectedBlockId: null,
       };
     });
 
@@ -378,6 +381,7 @@ export function InvoiceBuilder() {
   }, []);
 
   const [saving, setSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleSave = async () => {
     if (!state.blocks.length) {
@@ -424,8 +428,7 @@ export function InvoiceBuilder() {
   };
 
   const handlePreview = () => {
-    // TODO: Implement preview
-    console.log('Preview...', state.blocks);
+    setShowPreview(true);
   };
 
   const handleGoBack = () => {
@@ -511,10 +514,37 @@ export function InvoiceBuilder() {
               behavior="button"
               onClick={handleSave}
               disabled={saving || state.blocks.length === 0}
+              disableWithoutIcon={!saving}
               className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
             >
               <Save className="w-4 h-4" />
               {saving ? t('saving') : t('save_design')}
+            </Button>
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() => {
+                const json = JSON.stringify({
+                  blocks: state.blocks,
+                  templateId: state.templateId,
+                }, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `invoice-design-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                toast.success('JSON downloaded');
+              }}
+              disabled={state.blocks.length === 0}
+              disableWithoutIcon
+              className="flex items-center gap-2"
+              title="Download JSON"
+            >
+              <FileJson className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -529,92 +559,125 @@ export function InvoiceBuilder() {
               transform: `scale(${state.zoom / 100})`,
               transformOrigin: 'top center',
             }}
+            onClick={(e) => {
+              // Deselect when clicking on canvas background (not on a block)
+              const target = e.target as HTMLElement;
+              if (
+                target === e.currentTarget || 
+                target.classList.contains('react-grid-layout') ||
+                target.classList.contains('layout')
+              ) {
+                handleSelectBlock(null);
+              }
+            }}
           >
-            <GridLayout
-              className="layout"
-              layout={layout}
-              onLayoutChange={handleLayoutChange}
-              onDrop={handleDrop}
-              onDropDragOver={handleDropDragOver}
-              cols={12}
-              rowHeight={60}
-              width={794} // 210mm in pixels at 96dpi
-              margin={[10, 10]}
-              containerPadding={[30, 30]}
-              draggableHandle=".drag-handle"
-              isDraggable
-              isResizable
-              isDroppable
-              droppingItem={droppingItem}
-              compactType={null} // CRITICAL: Disable horizontal/vertical compaction
-              verticalCompact={false} // CRITICAL: Explicitly disable vertical compaction
-              allowOverlap={true} // Allow free positioning with overlaps
-              preventCollision={false} // Don't prevent collisions
-              useCSSTransforms={true} // Better performance with CSS transforms
-              style={{ minHeight: '1000px' }}
-            >
+              <GridLayout
+                className="layout"
+                layout={layout}
+                onLayoutChange={handleLayoutChange}
+                onDrop={handleDrop}
+                onDropDragOver={handleDropDragOver}
+                cols={12}
+                rowHeight={60}
+                width={794} // 210mm in pixels at 96dpi
+                margin={[10, 10]}
+                containerPadding={[30, 30]}
+                draggableHandle=".drag-handle"
+                isDraggable
+                isResizable
+                isDroppable
+                droppingItem={droppingItem}
+                compactType={null} // CRITICAL: Disable horizontal/vertical compaction
+                verticalCompact={false} // CRITICAL: Explicitly disable vertical compaction
+                allowOverlap={true} // Allow free positioning with overlaps
+                preventCollision={false} // Don't prevent collisions
+                useCSSTransforms={true} // Better performance with CSS transforms
+                style={{ minHeight: '1000px' }}
+                onDragStart={() => {
+                  // Don't select when dragging starts
+                }}
+              >
               {state.blocks.map((block) => (
                 <div
                   key={block.id}
                   className={`
-                    w-full h-full
-                    group relative border-2 rounded transition-all overflow-visible
+                    block-wrapper
+                    group border-2 rounded transition-all
                     ${state.selectedBlockId === block.id
                       ? 'border-blue-500 shadow-lg z-10 selected'
                       : 'border-transparent hover:border-gray-300'
                     }
                   `}
-                  style={{
-                    backgroundColor: 'rgba(200, 200, 255, 0.1)', // DEBUG: Light background to see size
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSelectBlock(block.id);
-                  }}
                 >
-                  {/* Block Toolbar - shows on hover or when selected */}
+                  {/* Top Bar - Always visible with drag handle, title, and actions */}
                   <div
-                    className={`
-                      drag-handle absolute -top-7 left-0 right-0 h-6
-                      bg-gray-800 text-white rounded-t px-2
-                      flex items-center justify-between text-xs
-                      cursor-move
-                      ${state.selectedBlockId === block.id || 'opacity-0 group-hover:opacity-100'}
-                      transition-opacity
-                    `}
+                    className="block-topbar drag-handle h-7 bg-gray-800 text-white rounded-t px-2 flex items-center justify-between text-xs cursor-move"
                   >
-                    <span className="font-medium truncate">
-                      {block.type}
-                    </span>
-                    <div className="flex gap-1">
+                    {/* Drag Handle Icon */}
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <GripVertical className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                      <span className="font-medium truncate">
+                        {getBlockLabel(block.type)}
+                      </span>
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="flex gap-1 items-center flex-shrink-0">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          e.preventDefault();
+                          // Copy block JSON to clipboard
+                          const blockJson = JSON.stringify(block, null, 2);
+                          navigator.clipboard.writeText(blockJson);
+                          toast.success('Block copied to clipboard');
+                        }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        className="hover:bg-gray-700 p-1 rounded transition-colors"
+                        title="Copy block to clipboard"
+                      >
+                        <Clipboard className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
                           handleDuplicateBlock(block.id);
                         }}
-                        className="hover:bg-gray-700 px-1 rounded"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        className="hover:bg-gray-700 p-1 rounded transition-colors"
+                        title="Duplicate block"
                       >
                         ⎘
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          e.preventDefault();
                           handleDeleteBlock(block.id);
                         }}
-                        className="hover:bg-red-600 px-1 rounded"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        className="hover:bg-red-600 p-1 rounded transition-colors"
+                        title="Delete block"
                       >
                         ×
                       </button>
                     </div>
                   </div>
 
-                  {/* Block Content */}
-                  <div className="h-full w-full overflow-hidden p-3">
+                  {/* Block Content - clicking here selects the block */}
+                  <div 
+                    className="block-content p-3 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelectBlock(block.id);
+                    }}
+                  >
                     <BlockRenderer block={block} />
                   </div>
                 </div>
               ))}
-            </GridLayout>
+              </GridLayout>
 
             {/* Empty State */}
             {state.blocks.length === 0 && (
@@ -658,6 +721,14 @@ export function InvoiceBuilder() {
           )}
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <PreviewModal
+          blocks={state.blocks}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 }
