@@ -8,29 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Default } from '../../components/layouts/Default';
-// import { GrafanaWorkingDashboard } from './components/GrafanaWorkingDashboard';
-// import { TestDragDashboard } from './components/TestDragDashboard';
-// import { SmoothDragDashboard } from './components/SmoothDragDashboard';
-import { FlexibleDragDashboard } from './components/FlexibleDragDashboard';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { lazy } from 'react';
+import './components/dashboard-grafana.css';
+
+const GrafanaFixedDashboard = lazy(() => import('./components/GrafanaFixedDashboard'));
 
 export default function Dashboard() {
-  const { documentTitle } = useTitle('dashboard');
-
-  useSocketEvent({
-    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
-    callback: () => $refetch(['invoices']),
-  });
-
-  return (
-    <Default title={documentTitle} breadcrumbs={[]}>
-      {/* <GrafanaWorkingDashboard /> */}
-      {/* <TestDragDashboard /> */}
-      {/* <SmoothDragDashboard /> */}
-      <FlexibleDragDashboard />
-    </Default>
-  );
+  return <GrafanaFixedDashboard />;
 }
