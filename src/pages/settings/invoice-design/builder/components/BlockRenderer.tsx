@@ -11,19 +11,22 @@
 import { Block } from '../types';
 import { getBlockLabel } from '../block-library';
 import { SAMPLE_INVOICE_DATA, replaceVariables } from '../utils/variable-replacer';
+import { useLogo } from '$app/common/hooks/useLogo';
 
 interface BlockRendererProps {
   block: Block;
 }
 
 export function BlockRenderer({ block }: BlockRendererProps) {
+  const companyLogo = useLogo();
+  
   switch (block.type) {
     case 'text':
       return <TextBlockRenderer block={block} />;
 
     case 'logo':
     case 'image':
-      return <ImageBlockRenderer block={block} />;
+      return <ImageBlockRenderer block={block} companyLogo={companyLogo} />;
 
     case 'company-info':
       return <CompanyInfoRenderer block={block} />;
@@ -84,16 +87,27 @@ function TextBlockRenderer({ block }: BlockRendererProps) {
   );
 }
 
-function ImageBlockRenderer({ block }: BlockRendererProps) {
+interface ImageBlockRendererProps extends BlockRendererProps {
+  companyLogo?: string;
+}
+
+function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
   const { source, align, maxWidth, objectFit } = block.properties;
-  const resolvedSource = replaceVariables(source, SAMPLE_INVOICE_DATA);
+  
+  // If source is $company.logo, use the actual company logo
+  let resolvedSource = source;
+  if (source === '$company.logo' && companyLogo) {
+    resolvedSource = companyLogo;
+  } else {
+    resolvedSource = replaceVariables(source, SAMPLE_INVOICE_DATA);
+  }
 
   return (
     <div style={{ textAlign: align, height: '100%', display: 'flex', alignItems: 'center', justifyContent: align }}>
       {resolvedSource ? (
         <img
           src={resolvedSource}
-          alt="Block image"
+          alt={block.type === 'logo' ? 'Company Logo' : 'Block image'}
           style={{ maxWidth, objectFit, maxHeight: '100%' }}
         />
       ) : (

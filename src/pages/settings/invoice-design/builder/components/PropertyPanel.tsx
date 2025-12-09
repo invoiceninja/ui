@@ -17,6 +17,9 @@ import { TextBlockProperties } from './properties/TextBlockProperties';
 import { ImageBlockProperties } from './properties/ImageBlockProperties';
 import { TableBlockProperties } from './properties/TableBlockProperties';
 import { TotalBlockProperties } from './properties/TotalBlockProperties';
+import { CompanyInfoBlockProperties } from './properties/CompanyInfoBlockProperties';
+import { ClientInfoBlockProperties } from './properties/ClientInfoBlockProperties';
+import { InvoiceDetailsBlockProperties } from './properties/InvoiceDetailsBlockProperties';
 
 export function PropertyPanel({
   block,
@@ -47,8 +50,20 @@ export function PropertyPanel({
 
       {/* Block-specific properties */}
       <div className="space-y-4">
-        {(block.type === 'text' || block.type === 'company-info' || block.type === 'client-info' || block.type === 'invoice-details') && (
+        {block.type === 'text' && (
           <TextBlockProperties block={block} onChange={onChange} />
+        )}
+
+        {block.type === 'company-info' && (
+          <CompanyInfoBlockProperties block={block} onChange={onChange} />
+        )}
+
+        {block.type === 'client-info' && (
+          <ClientInfoBlockProperties block={block} onChange={onChange} />
+        )}
+
+        {block.type === 'invoice-details' && (
+          <InvoiceDetailsBlockProperties block={block} onChange={onChange} />
         )}
 
         {(block.type === 'logo' || block.type === 'image') && (

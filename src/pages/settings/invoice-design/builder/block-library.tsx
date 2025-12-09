@@ -132,14 +132,14 @@ export const blockLibrary: BlockDefinition[] = [
     defaultProperties: {
       columns: [
         {
-          id: 'item',
+          id: 'product_key',
           header: 'Item',
           field: 'item.product_key',
-          width: '30%',
+          width: '25%',
           align: 'left',
         },
         {
-          id: 'description',
+          id: 'notes',
           header: 'Description',
           field: 'item.notes',
           width: '30%',
@@ -153,14 +153,14 @@ export const blockLibrary: BlockDefinition[] = [
           align: 'center',
         },
         {
-          id: 'rate',
+          id: 'cost',
           header: 'Rate',
           field: 'item.cost',
           width: '15%',
           align: 'right',
         },
         {
-          id: 'amount',
+          id: 'line_total',
           header: 'Amount',
           field: 'item.line_total',
           width: '15%',

@@ -8,11 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GripVertical } from 'lucide-react';
+import { ChevronUp, ChevronDown, Settings2, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 
 // Available columns that can be added to the table
+// Maps field to canonical ID for consistent matching
 const AVAILABLE_COLUMNS = [
   { id: 'product_key', header: 'Item', field: 'item.product_key', width: '25%', align: 'left' as const },
   { id: 'notes', header: 'Description', field: 'item.notes', width: '30%', align: 'left' as const },
@@ -27,6 +29,7 @@ const AVAILABLE_COLUMNS = [
 
 export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const [expandedColumn, setExpandedColumn] = useState<string | null>(null);
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -35,74 +38,125 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
     });
   };
 
-  const toggleColumn = (columnDef: typeof AVAILABLE_COLUMNS[0], enabled: boolean) => {
-    const currentColumns = [...(block.properties.columns || [])];
-    
-    if (enabled) {
-      // Add column if not already present
-      if (!currentColumns.find((c: any) => c.id === columnDef.id)) {
-        currentColumns.push({ ...columnDef });
-      }
-    } else {
-      // Remove column
-      const index = currentColumns.findIndex((c: any) => c.id === columnDef.id);
-      if (index > -1) {
-        currentColumns.splice(index, 1);
-      }
-    }
-    
-    updateProperty('columns', currentColumns);
+  // Get current columns from block
+  const currentColumns = block.properties.columns || [];
+
+  // Find available column definition by field
+  const findColumnDef = (field: string) => {
+    return AVAILABLE_COLUMNS.find(c => c.field === field);
   };
 
-  const updateColumn = (columnId: string, field: string, value: any) => {
-    const currentColumns = [...(block.properties.columns || [])];
-    const index = currentColumns.findIndex((c: any) => c.id === columnId);
-    if (index > -1) {
-      currentColumns[index] = { ...currentColumns[index], [field]: value };
-      updateProperty('columns', currentColumns);
+  // Check if a column is enabled
+  const isColumnEnabled = (field: string) => {
+    return currentColumns.some((c: any) => c.field === field);
+  };
+
+  // Add a column
+  const addColumn = (columnDef: typeof AVAILABLE_COLUMNS[0]) => {
+    if (!isColumnEnabled(columnDef.field)) {
+      updateProperty('columns', [...currentColumns, { ...columnDef }]);
     }
   };
 
-  const isColumnEnabled = (columnId: string) => {
-    return block.properties.columns?.some((c: any) => c.id === columnId) || false;
+  // Remove a column by index
+  const removeColumn = (index: number) => {
+    const newColumns = [...currentColumns];
+    newColumns.splice(index, 1);
+    updateProperty('columns', newColumns);
   };
 
-  const getColumn = (columnId: string) => {
-    return block.properties.columns?.find((c: any) => c.id === columnId);
+  // Move column up
+  const moveColumnUp = (index: number) => {
+    if (index === 0) return;
+    const newColumns = [...currentColumns];
+    [newColumns[index - 1], newColumns[index]] = [newColumns[index], newColumns[index - 1]];
+    updateProperty('columns', newColumns);
   };
+
+  // Move column down
+  const moveColumnDown = (index: number) => {
+    if (index >= currentColumns.length - 1) return;
+    const newColumns = [...currentColumns];
+    [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
+    updateProperty('columns', newColumns);
+  };
+
+  // Update a column property
+  const updateColumnProp = (index: number, prop: string, value: any) => {
+    const newColumns = [...currentColumns];
+    newColumns[index] = { ...newColumns[index], [prop]: value };
+    updateProperty('columns', newColumns);
+  };
+
+  // Get columns not yet added
+  const availableToAdd = AVAILABLE_COLUMNS.filter(col => !isColumnEnabled(col.field));
 
   return (
     <div className="space-y-4">
-      {/* Columns to Display */}
+      {/* Active Columns - Reorderable */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-3">
-          {t('columns_to_display')}
+          {t('column_order')}
         </label>
-        <div className="space-y-2">
-          {AVAILABLE_COLUMNS.map((colDef) => {
-            const enabled = isColumnEnabled(colDef.id);
-            const column = getColumn(colDef.id);
+        <div className="space-y-1">
+          {currentColumns.map((column: any, index: number) => {
+            const colDef = findColumnDef(column.field);
+            const isExpanded = expandedColumn === column.field;
             
             return (
-              <div key={colDef.id} className="border border-gray-200 rounded-md">
-                <div className="flex items-center gap-2 p-2">
-                  <input
-                    type="checkbox"
-                    id={`col-${colDef.id}`}
-                    checked={enabled}
-                    onChange={(e) => toggleColumn(colDef, e.target.checked)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <label htmlFor={`col-${colDef.id}`} className="flex-1 text-sm text-gray-700">
-                    {colDef.header}
-                  </label>
-                  {enabled && (
-                    <GripVertical className="w-4 h-4 text-gray-400" />
-                  )}
+              <div key={`${column.field}-${index}`} className="border border-gray-200 rounded-md bg-white">
+                <div className="flex items-center gap-1 p-2">
+                  {/* Reorder buttons */}
+                  <div className="flex flex-col">
+                    <button
+                      onClick={() => moveColumnUp(index)}
+                      disabled={index === 0}
+                      className={`p-0.5 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                      title={t('move_up')}
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveColumnDown(index)}
+                      disabled={index >= currentColumns.length - 1}
+                      className={`p-0.5 rounded ${index >= currentColumns.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                      title={t('move_down')}
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  {/* Column info */}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium text-gray-700 truncate block">
+                      {column.header}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {column.width} · {column.align}
+                    </span>
+                  </div>
+                  
+                  {/* Settings toggle */}
+                  <button
+                    onClick={() => setExpandedColumn(isExpanded ? null : column.field)}
+                    className={`p-1.5 rounded transition-colors ${isExpanded ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-500'}`}
+                    title={t('settings')}
+                  >
+                    <Settings2 className="w-4 h-4" />
+                  </button>
+                  
+                  {/* Remove button */}
+                  <button
+                    onClick={() => removeColumn(index)}
+                    className="p-1.5 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
+                    title={t('remove')}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
                 
-                {/* Column settings when enabled */}
-                {enabled && column && (
+                {/* Expanded settings */}
+                {isExpanded && (
                   <div className="px-2 pb-2 pt-1 border-t border-gray-100 bg-gray-50 space-y-2">
                     <div className="flex gap-2">
                       <div className="flex-1">
@@ -110,7 +164,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                         <input
                           type="text"
                           value={column.header}
-                          onChange={(e) => updateColumn(colDef.id, 'header', e.target.value)}
+                          onChange={(e) => updateColumnProp(index, 'header', e.target.value)}
                           className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
                         />
                       </div>
@@ -119,7 +173,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                         <input
                           type="text"
                           value={column.width}
-                          onChange={(e) => updateColumn(colDef.id, 'width', e.target.value)}
+                          onChange={(e) => updateColumnProp(index, 'width', e.target.value)}
                           className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
                           placeholder="15%"
                         />
@@ -131,7 +185,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                         {['left', 'center', 'right'].map((align) => (
                           <button
                             key={align}
-                            onClick={() => updateColumn(colDef.id, 'align', align)}
+                            onClick={() => updateColumnProp(index, 'align', align)}
                             className={`flex-1 px-2 py-1 text-xs rounded border transition-all ${
                               column.align === align
                                 ? 'border-blue-500 bg-blue-50 text-blue-700'
@@ -148,8 +202,34 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
               </div>
             );
           })}
+          
+          {currentColumns.length === 0 && (
+            <div className="text-center py-4 text-gray-500 text-sm border border-dashed border-gray-300 rounded-md">
+              {t('no_columns_selected')}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Add Columns */}
+      {availableToAdd.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('add_column')}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {availableToAdd.map((colDef) => (
+              <button
+                key={colDef.id}
+                onClick={() => addColumn(colDef)}
+                className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors"
+              >
+                + {colDef.header}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Font Size */}
       <div>
