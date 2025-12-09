@@ -50,6 +50,7 @@ import { Activity } from './Activity';
 import { UpcomingInvoices } from './UpcomingInvoices';
 import { PastDueInvoices } from './PastDueInvoices';
 import { RecentPayments } from './RecentPayments';
+import { Modal } from '$app/components/Modal';
 
 interface Currency {
   value: string | number;
@@ -295,7 +296,15 @@ export function ResizableDashboardCards() {
                   >
                     Add Cards
                   </Button>
-                  <Button onClick={() => setIsRestoreModalOpen(true)}>Restore Defaults</Button>
+                  <Button 
+                    behavior="button"
+                    onClick={() => {
+                      setLayouts(DEFAULT_LAYOUTS);
+                      toast.success('Layout restored to defaults');
+                    }}
+                  >
+                    Restore Defaults
+                  </Button>
                 </>
               )}
             </div>
@@ -594,18 +603,84 @@ export function ResizableDashboardCards() {
         </div>
       )}
       
-      {/* Modals */}
-      
-      {isRestoreModalOpen && (
-        <RestoreCardsModal
-          layoutBreakpoint={'lg'}
-          setLayouts={setLayouts}
-          setAreCardsRestored={() => {
-            setLayouts(DEFAULT_LAYOUTS);
-            setIsRestoreModalOpen(false);
-            toast.success('Layout restored');
-          }}
-        />
+      {/* Add Cards Modal */}
+      {isCardsModalOpen && (
+        <Modal
+          title={t('add_cards')}
+          visible={isCardsModalOpen}
+          onClose={() => setIsCardsModalOpen(false)}
+        >
+          <div className="flex flex-col space-y-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t('select_cards_to_add')}
+            </p>
+            
+            {/* List of available cards */}
+            <div className="space-y-2">
+              {['totals', 'chart', 'activity', 'recent_payments', 'upcoming_invoices', 'past_due_invoices'].map((cardType) => {
+                const cardIds = Object.values(layouts).flatMap(layout => layout.map(item => item.i));
+                const isInLayout = cardIds.includes(cardType);
+                
+                return (
+                  <div
+                    key={cardType}
+                    className="flex items-center justify-between p-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <span className="capitalize">{t(cardType)}</span>
+                    <Button
+                      behavior="button"
+                      onClick={() => {
+                        if (isInLayout) {
+                          // Remove from all breakpoints
+                          const newLayouts = { ...layouts };
+                          Object.keys(newLayouts).forEach((breakpoint) => {
+                            newLayouts[breakpoint] = newLayouts[breakpoint].filter(
+                              (item) => item.i !== cardType
+                            );
+                          });
+                          setLayouts(newLayouts);
+                          toast.success(`${t(cardType)} removed`);
+                        } else {
+                          // Add to all breakpoints at bottom
+                          const newLayouts = { ...layouts };
+                          Object.keys(newLayouts).forEach((breakpoint) => {
+                            const maxY = Math.max(
+                              ...newLayouts[breakpoint].map((item) => item.y + item.h),
+                              0
+                            );
+                            const cols = COLS[breakpoint as keyof typeof COLS] || 12;
+                            newLayouts[breakpoint].push({
+                              i: cardType,
+                              x: 0,
+                              y: maxY,
+                              w: Math.min(6, cols),
+                              h: 8,
+                              static: false,
+                            });
+                          });
+                          setLayouts(newLayouts);
+                          toast.success(`${t(cardType)} added`);
+                        }
+                      }}
+                      className="text-sm"
+                    >
+                      {isInLayout ? t('remove') : t('add')}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+            
+            <div className="flex justify-end mt-4">
+              <Button
+                behavior="button"
+                onClick={() => setIsCardsModalOpen(false)}
+              >
+                {t('close')}
+              </Button>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );
