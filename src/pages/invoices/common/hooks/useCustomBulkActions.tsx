@@ -21,8 +21,7 @@ import {
   MdPaid,
   MdPrint,
   MdArchive,
-  MdRestore,
-  MdRefresh
+  MdRestore
 } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
@@ -153,7 +152,11 @@ export const useCustomBulkActions = () => {
       return invoices.every((invoice) => invoice.archived_at > 0 && !invoice.is_deleted);
     }
 
-    return invoices.every((invoice) => getEntityState(invoice) === EntityState.Archived);
+    return !invoices.some(
+      ({ status_id, archived_at }) =>
+        !archived_at ||
+        status_id === InvoiceStatus.Cancelled
+    );
   };
 
   const showArchiveBulkAction = (invoices: Invoice[]) => {
@@ -260,19 +263,19 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
-    ({ selectedResources, setSelected }) =>
-      showReverseOption(selectedResources) &&
-      hasPermission('create_credit') && (
-        <DropdownElement
-          onClick={() => {
-            reverseInvoice(selectedResources[0]);
-            setSelected([]);
-          }}
-          icon={<Icon element={MdRefresh} />}
-        >
-          {t('reverse')}
-        </DropdownElement>
-      ),
+    // ({ selectedResources, setSelected }) =>
+    //   showReverseOption(selectedResources) &&
+    //   hasPermission('create_credit') && (
+    //     <DropdownElement
+    //       onClick={() => {
+    //         reverseInvoice(selectedResources[0]);
+    //         setSelected([]);
+    //       }}
+    //       icon={<Icon element={MdRefresh} />}
+    //     >
+    //       {t('reverse')}
+    //     </DropdownElement>
+    //   ),
     ({ selectedIds, selectedResources, setSelected }) =>
       showCancelOption(selectedResources) && (
         <CancelInvoiceBulkAction

@@ -171,9 +171,9 @@ export default function Invoice() {
                 onSaveClick={() => setSaveChanges(true)}
                 disableSaveButton={
                   (invoice &&
-                    (invoice.status_id === InvoiceStatus.Cancelled ||
-                      invoice.is_deleted)) ||
-                  isFormBusy
+                    (invoice.status_id === InvoiceStatus.Cancelled)) ||
+                  isFormBusy || 
+                  invoice.is_locked
                 }
                 disableSaveButtonOnly={invoice.is_locked}
                 cypressRef="invoiceActionDropdown"
