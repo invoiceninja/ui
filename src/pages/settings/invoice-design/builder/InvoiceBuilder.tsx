@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GridLayout from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
@@ -22,21 +22,65 @@ import { PropertyPanel } from './components/PropertyPanel';
 import { BlockRenderer } from './components/BlockRenderer';
 import { PreviewModal } from './components/PreviewModal';
 import { getBlockLabel } from './block-library';
+import { generateInvoiceHTML } from './utils/html-generator';
+import { SAMPLE_INVOICE_DATA } from './utils/variable-replacer';
 import { route } from '$app/common/helpers/route';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Design } from '$app/common/interfaces/design';
+import { useDesignQuery } from '$app/common/queries/designs';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './InvoiceBuilder.css';
 
+// Visual builder metadata marker
+const VISUAL_BUILDER_MARKER = '<!-- VISUAL_BUILDER_BLOCKS:';
+const VISUAL_BUILDER_MARKER_END = ':END_BLOCKS -->';
+
+/**
+ * Extract blocks JSON from design includes field
+ */
+function extractBlocksFromDesign(design: Design): Block[] | null {
+  try {
+    const includes = design.design?.includes || '';
+    const startMarker = includes.indexOf(VISUAL_BUILDER_MARKER);
+    if (startMarker === -1) return null;
+    
+    const jsonStart = startMarker + VISUAL_BUILDER_MARKER.length;
+    const jsonEnd = includes.indexOf(VISUAL_BUILDER_MARKER_END, jsonStart);
+    if (jsonEnd === -1) return null;
+    
+    const jsonString = includes.slice(jsonStart, jsonEnd);
+    const parsed = JSON.parse(jsonString);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (e) {
+    console.error('Failed to parse blocks from design:', e);
+    return null;
+  }
+}
+
+/**
+ * Encode blocks JSON for storage in design includes field
+ */
+function encodeBlocksForDesign(blocks: Block[]): string {
+  return `${VISUAL_BUILDER_MARKER}${JSON.stringify(blocks)}${VISUAL_BUILDER_MARKER_END}`;
+}
+
 export function InvoiceBuilder() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const { id: designId } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get('template');
+  
+  // Load existing design if editing
+  const { data: existingDesign, isLoading: isLoadingDesign } = useDesignQuery({
+    id: designId,
+    enabled: Boolean(designId),
+  });
 
   const [state, setState] = useState<BuilderState>({
     blocks: [],
@@ -46,6 +90,9 @@ export function InvoiceBuilder() {
     zoom: 100,
     templateId: templateId || undefined,
   });
+  
+  const [designName, setDesignName] = useState<string>('');
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [layout, setLayout] = useState<Layout[]>([]);
 
@@ -53,6 +100,25 @@ export function InvoiceBuilder() {
   const [droppingItem, setDroppingItem] = useState<{ i: string; w: number; h: number } | undefined>();
   const [currentDragDefinition, setCurrentDragDefinition] = useState<any>(null);
   const [justDropped, setJustDropped] = useState(false);
+  
+  // Load existing design when editing
+  useEffect(() => {
+    if (existingDesign && designId) {
+      const blocks = extractBlocksFromDesign(existingDesign);
+      if (blocks && blocks.length > 0) {
+        setState(prev => ({
+          ...prev,
+          blocks,
+        }));
+        setDesignName(existingDesign.name);
+        setIsEditMode(true);
+      } else {
+        // Design exists but wasn't created with visual builder
+        toast.error('This design was not created with the visual builder');
+        navigate(route('/settings/invoice_design/custom_designs'));
+      }
+    }
+  }, [existingDesign, designId, navigate]);
 
   // Add to history when blocks change
   const addToHistory = useCallback((blocks: Block[], action: string) => {
@@ -112,23 +178,18 @@ export function InvoiceBuilder() {
     setLayout(newLayout);
   }, [state.blocks]);
 
+  // Simple layout change handler - let react-grid-layout handle all the logic
   const handleLayoutChange = useCallback((newLayout: Layout[]) => {
-    console.log('📐 handleLayoutChange called with:', newLayout);
-
-    // Ignore layout changes immediately after drop to prevent position override
+    // Ignore layout changes immediately after external drop
     if (justDropped) {
-      console.log('⚠️ Ignoring handleLayoutChange - just dropped');
       return;
     }
-
+      
+    // Update block positions to match the layout
     setState((prev) => {
       const updatedBlocks = prev.blocks.map((block) => {
         const layoutItem = newLayout.find((l) => l.i === block.id);
         if (layoutItem) {
-          console.log(`  Updating block ${block.id}:`, {
-            old: block.gridPosition,
-            new: { x: layoutItem.x, y: layoutItem.y, w: layoutItem.w, h: layoutItem.h }
-          });
           return {
             ...block,
             gridPosition: {
@@ -382,6 +443,7 @@ export function InvoiceBuilder() {
 
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(false);
 
   const handleSave = async () => {
     if (!state.blocks.length) {
@@ -389,36 +451,52 @@ export function InvoiceBuilder() {
       return;
     }
 
+    // For new designs, prompt for name
+    if (!isEditMode && !designName) {
+      const name = prompt(String(t('enter_design_name')), 'Visual Design ' + new Date().toLocaleDateString());
+      if (!name) return;
+      setDesignName(name);
+    }
+
+    const nameToUse = designName || 'Visual Design ' + new Date().toLocaleDateString();
+
     setSaving(true);
 
     try {
-      const designName = prompt(String(t('enter_design_name')), 'Visual Design ' + new Date().toLocaleDateString());
+      // Generate HTML using the proper HTML generator
+      const htmlBody = generateInvoiceHTML(state.blocks, SAMPLE_INVOICE_DATA);
+      
+      // Encode blocks JSON for storage
+      const blocksJson = encodeBlocksForDesign(state.blocks);
 
-      if (!designName) {
-        setSaving(false);
-        return;
-      }
-
-      const htmlBody = blocksToHTML(state.blocks);
-
-      const design = {
-        name: designName,
+      const designPayload = {
+        name: nameToUse,
         design: {
-          includes: '',
+          includes: blocksJson, // Store blocks JSON in includes field
           header: '',
           body: htmlBody,
-          product: '<table><!-- Product rows generated dynamically --></table>',
-          task: '<table><!-- Task rows generated dynamically --></table>',
+          product: '', // Will be generated server-side
+          task: '', // Will be generated server-side
           footer: '',
         },
         is_custom: true,
         entities: 'invoice,quote,credit',
       };
 
-      const response = await request('POST', endpoint('/api/v1/designs'), design) as GenericSingleResourceResponse<Design>;
-
-      toast.success(String(t('saved_design')));
-      navigate(route('/settings/invoice_design/custom_designs/:id/edit', { id: response.data.data.id }));
+      if (isEditMode && designId) {
+        // Update existing design
+        await request('PUT', endpoint('/api/v1/designs/:id', { id: designId }), designPayload);
+        $refetch(['designs']);
+        toast.success(String(t('updated_design')));
+      } else {
+        // Create new design
+        const response = await request('POST', endpoint('/api/v1/designs'), designPayload) as GenericSingleResourceResponse<Design>;
+        $refetch(['designs']);
+        toast.success(String(t('saved_design')));
+        // Navigate to edit mode for the new design
+        navigate(route('/settings/invoice_design/builder/:id', { id: response.data.data.id }));
+        setIsEditMode(true);
+      }
     } catch (error: any) {
       console.error('Save error:', error);
       toast.error(error?.response?.data?.message || String(t('error_saving_design')));
@@ -434,6 +512,18 @@ export function InvoiceBuilder() {
   const handleGoBack = () => {
     navigate(route('/settings/invoice_design/custom_designs'));
   };
+
+  // Show loading state when loading existing design
+  if (isLoadingDesign && designId) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">{t('loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -497,6 +587,16 @@ export function InvoiceBuilder() {
             <span className="text-sm text-gray-600">
               {t('zoom')}: {state.zoom}%
             </span>
+            
+            {/* Design name */}
+            {(isEditMode || designName) && (
+              <>
+                <div className="h-6 w-px bg-gray-300" />
+                <span className="text-sm font-medium text-gray-900">
+                  {designName || t('untitled')}
+                </span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -587,25 +687,20 @@ export function InvoiceBuilder() {
                 isResizable
                 isDroppable
                 droppingItem={droppingItem}
-                compactType={null} // CRITICAL: Disable horizontal/vertical compaction
-                verticalCompact={false} // CRITICAL: Explicitly disable vertical compaction
-                allowOverlap={true} // Allow free positioning with overlaps
-                preventCollision={false} // Don't prevent collisions
-                useCSSTransforms={true} // Better performance with CSS transforms
+                compactType="vertical" // Pack items toward top (Grafana-style)
+                preventCollision={false} // Allow items to push each other
+                useCSSTransforms={true}
                 style={{ minHeight: '1000px' }}
-                onDragStart={() => {
-                  // Don't select when dragging starts
-                }}
               >
               {state.blocks.map((block) => (
                 <div
                   key={block.id}
                   className={`
                     block-wrapper
-                    group border-2 rounded transition-all
+                    group border-2 border-dashed rounded transition-all
                     ${state.selectedBlockId === block.id
-                      ? 'border-blue-500 shadow-lg z-10 selected'
-                      : 'border-transparent hover:border-gray-300'
+                      ? 'border-blue-500 border-solid shadow-lg z-10 selected'
+                      : 'border-gray-300 hover:border-gray-400'
                     }
                   `}
                 >

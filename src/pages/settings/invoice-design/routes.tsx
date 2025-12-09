@@ -87,6 +87,7 @@ export const invoiceDesignRoutes = (
     <Route path="custom_designs" element={<CustomDesigns />} />
     <Route path="builder/templates" element={<TemplateGallery />} />
     <Route path="builder/new" element={<InvoiceBuilder />} />
+    <Route path="builder/:id" element={<InvoiceBuilder />} />
     <Route
       path="custom_designs/:id/edit"
       element={

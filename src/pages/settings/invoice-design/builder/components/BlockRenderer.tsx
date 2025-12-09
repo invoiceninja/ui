@@ -193,7 +193,8 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
   } = block.properties;
 
   const resolveItemValue = (field: string, item: any): string => {
-    const fieldKey = field.replace('$item.', '');
+    // Extract field from item.field format (e.g., "item.product_key" -> "product_key")
+    const fieldKey = field.startsWith('item.') ? field.replace('item.', '') : field;
     const value = item[fieldKey];
 
     if (typeof value === 'number') {

@@ -9,15 +9,25 @@
  */
 
 import { Block } from '../types';
-import { getBlockPositionStyles, calculateDocumentHeight, GRID_CONFIG } from './grid-converter';
+import { GRID_CONFIG } from './grid-converter';
 import { InvoiceData, replaceVariables, resolveVariable } from './variable-replacer';
 
 /**
- * Generate complete HTML document from blocks
+ * Generate complete HTML document from blocks using flow-based layout
+ * This ensures content can grow and push other elements down naturally
  */
 export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string {
-  const documentHeight = calculateDocumentHeight(blocks);
-  const blockHTML = blocks.map(block => renderBlock(block, data)).join('\n');
+  // Sort blocks by Y position, then by X position for same row
+  const sortedBlocks = [...blocks].sort((a, b) => {
+    if (a.gridPosition.y !== b.gridPosition.y) {
+      return a.gridPosition.y - b.gridPosition.y;
+    }
+    return a.gridPosition.x - b.gridPosition.x;
+  });
+
+  // Group blocks into rows based on Y position
+  const rows = groupBlocksIntoRows(sortedBlocks);
+  const rowsHTML = rows.map(row => renderRow(row, data)).join('\n');
 
   return `
 <!DOCTYPE html>
@@ -47,15 +57,35 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
     }
 
     .invoice-container {
-      position: relative;
       width: ${GRID_CONFIG.canvasWidth}px;
-      min-height: ${documentHeight}px;
       background: white;
       margin: 0 auto;
+      padding: ${GRID_CONFIG.containerPadding[1]}px ${GRID_CONFIG.containerPadding[0]}px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: nowrap;
+      margin-bottom: ${GRID_CONFIG.margin[1]}px;
+      width: 100%;
     }
 
     .block {
-      overflow: hidden;
+      flex-shrink: 0;
+      min-height: 0; /* Allow content to determine height */
+      overflow: visible; /* Allow content to show fully */
+      box-sizing: border-box;
+    }
+
+    /* Full-width blocks should not have margins */
+    .block.full-width {
+      width: 100% !important;
+      margin: 0;
+    }
+
+    /* Tables should not be constrained */
+    .block table {
+      width: 100%;
     }
 
     @media print {
@@ -67,12 +97,17 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
       .invoice-container {
         margin: 0;
       }
+
+      /* Avoid breaking inside blocks */
+      .block {
+        break-inside: avoid;
+      }
     }
   </style>
 </head>
 <body>
   <div class="invoice-container">
-    ${blockHTML}
+    ${rowsHTML}
   </div>
 </body>
 </html>
@@ -80,13 +115,71 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
 }
 
 /**
- * Render a single block to HTML
+ * Group blocks into rows based on similar Y positions
+ */
+function groupBlocksIntoRows(blocks: Block[]): Block[][] {
+  const rows: Block[][] = [];
+  let currentRow: Block[] = [];
+  let currentY = -1;
+
+  for (const block of blocks) {
+    // If this block is on a new row (different Y position with some tolerance)
+    if (currentY === -1 || Math.abs(block.gridPosition.y - currentY) >= 1) {
+      if (currentRow.length > 0) {
+        rows.push(currentRow);
+      }
+      currentRow = [block];
+      currentY = block.gridPosition.y;
+    } else {
+      // Same row
+      currentRow.push(block);
+    }
+  }
+
+  // Don't forget the last row
+  if (currentRow.length > 0) {
+    rows.push(currentRow);
+  }
+
+  return rows;
+}
+
+/**
+ * Render a row of blocks
+ */
+function renderRow(blocks: Block[], data: InvoiceData): string {
+  const blocksHTML = blocks.map(block => renderBlock(block, data)).join('\n');
+  
+  // For rows with multiple blocks, add gap styling
+  const rowStyle = blocks.length > 1 
+    ? `gap: ${GRID_CONFIG.margin[0]}px;` 
+    : '';
+  
+  return `<div class="row" style="${rowStyle}">${blocksHTML}</div>`;
+}
+
+/**
+ * Render a single block to HTML with flow-based layout
  */
 function renderBlock(block: Block, data: InvoiceData): string {
-  const positionStyles = getBlockPositionStyles(block);
   const content = renderBlockContent(block, data);
+  
+  // Calculate width as percentage of available space (12 columns)
+  const widthPercent = (block.gridPosition.w / GRID_CONFIG.cols) * 100;
+  const isFullWidth = block.gridPosition.w === GRID_CONFIG.cols;
+  
+  // Calculate minimum height from grid (but allow content to grow)
+  const minHeight = block.gridPosition.h * GRID_CONFIG.rowHeight;
+  
+  // Full-width blocks don't need margin adjustments
+  const widthStyle = isFullWidth 
+    ? 'width: 100%' 
+    : `width: ${widthPercent}%`;
+  
+  const className = isFullWidth ? 'block full-width' : 'block';
+  const styles = `${widthStyle}; min-height: ${minHeight}px;`;
 
-  return `<div class="block" style="${positionStyles}">${content}</div>`;
+  return `<div class="${className}" style="${styles}">${content}</div>`;
 }
 
 /**

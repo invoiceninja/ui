@@ -165,8 +165,8 @@ export function replaceVariables(template: string, data: InvoiceData): string {
 /**
  * Resolve a single variable path to its value
  *
- * @param variable - Variable like "$item.product_key" or "$client.name"
- * @param itemData - Line item data (for $item variables)
+ * @param variable - Variable like "item.product_key" or "item.quantity"
+ * @param itemData - Line item data (for item variables)
  * @param invoiceData - Full invoice data
  * @returns Resolved value
  */
@@ -175,9 +175,9 @@ export function resolveVariable(
   itemData: InvoiceData['line_items'][0] | null,
   invoiceData: InvoiceData
 ): string {
-  // Handle line item variables
-  if (variable.startsWith('$item.') && itemData) {
-    const field = variable.replace('$item.', '') as keyof typeof itemData;
+  // Handle item.field format (e.g., "item.product_key")
+  if (variable.startsWith('item.') && itemData) {
+    const field = variable.replace('item.', '') as keyof typeof itemData;
     const value = itemData[field];
 
     if (typeof value === 'number') {
