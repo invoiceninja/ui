@@ -9,9 +9,15 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { AlignLeft, AlignCenter, AlignRight, Building2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import { useLogo } from '$app/common/hooks/useLogo';
+import {
+  TextInput,
+  AlignmentInput,
+  SelectInput,
+  SectionDivider,
+} from './PropertyInputs';
 
 export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
@@ -71,85 +77,64 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
       )}
 
       {/* Image Source */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {block.type === 'logo' ? t('logo_source') : t('image_source')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.source || ''}
-          onChange={(e) => updateProperty('source', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-          placeholder={block.type === 'logo' ? '$company.logo' : 'https://...'}
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          {block.type === 'logo'
-            ? t('use_variable_or_url')
-            : t('enter_image_url')
-          }
-        </p>
-      </div>
+      <TextInput
+        label={block.type === 'logo' ? t('logo_source') : t('image_source')}
+        value={block.properties.source}
+        onChange={(value) => updateProperty('source', value)}
+        placeholder={block.type === 'logo' ? '$company.logo' : 'https://...'}
+        hint={block.type === 'logo' ? t('use_variable_or_url') : t('enter_image_url')}
+      />
+
+      <SectionDivider label={t('dimensions')} />
 
       {/* Max Width */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('max_width')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.maxWidth || ''}
-          onChange={(e) => updateProperty('maxWidth', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="150px"
-        />
-      </div>
+      <TextInput
+        label={t('max_width')}
+        value={block.properties.maxWidth}
+        onChange={(value) => updateProperty('maxWidth', value)}
+        placeholder="150px"
+      />
+
+      {/* Max Height */}
+      <TextInput
+        label={t('max_height')}
+        value={block.properties.maxHeight}
+        onChange={(value) => updateProperty('maxHeight', value)}
+        placeholder="auto"
+      />
+
+      <SectionDivider label={t('layout')} />
 
       {/* Alignment */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('alignment')}
-        </label>
-        <div className="flex gap-2">
-          {[
-            { value: 'left', icon: AlignLeft, label: t('left') },
-            { value: 'center', icon: AlignCenter, label: t('center') },
-            { value: 'right', icon: AlignRight, label: t('right') },
-          ].map(({ value, icon: Icon, label }) => (
-            <button
-              key={value}
-              onClick={() => updateProperty('align', value)}
-              className={`
-                flex-1 flex items-center justify-center px-3 py-2 border rounded-md transition-all
-                ${
-                  block.properties.align === value
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-gray-300 hover:border-gray-400'
-                }
-              `}
-              title={label}
-            >
-              <Icon className="w-4 h-4" />
-            </button>
-          ))}
-        </div>
-      </div>
+      <AlignmentInput
+        label={t('alignment')}
+        value={block.properties.align}
+        onChange={(value) => updateProperty('align', value)}
+      />
 
       {/* Object Fit */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('object_fit')}
-        </label>
-        <select
-          value={block.properties.objectFit || 'contain'}
-          onChange={(e) => updateProperty('objectFit', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-        >
-          <option value="contain">{t('contain')}</option>
-          <option value="cover">{t('cover')}</option>
-          <option value="fill">{t('fill')}</option>
-          <option value="none">{t('none')}</option>
-        </select>
-      </div>
+      <SelectInput
+        label={t('object_fit')}
+        value={block.properties.objectFit || 'contain'}
+        onChange={(value) => updateProperty('objectFit', value)}
+        options={[
+          { value: 'contain', label: t('contain') },
+          { value: 'cover', label: t('cover') },
+          { value: 'fill', label: t('fill') },
+          { value: 'none', label: t('none') },
+        ]}
+      />
+
+      <SectionDivider label={t('spacing')} />
+
+      {/* Padding */}
+      <TextInput
+        label={t('padding')}
+        value={block.properties.padding}
+        onChange={(value) => updateProperty('padding', value)}
+        placeholder="0px"
+        hint={t('css_padding_format')}
+      />
     </div>
   );
 }

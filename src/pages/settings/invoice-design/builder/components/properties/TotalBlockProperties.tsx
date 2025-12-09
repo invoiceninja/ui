@@ -11,6 +11,12 @@
 import { useTranslation } from 'react-i18next';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
+import {
+  ColorInput,
+  TextInput,
+  AlignmentInput,
+  SectionDivider,
+} from './PropertyInputs';
 
 export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
@@ -88,196 +94,111 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         </div>
       </div>
 
+      <SectionDivider label={t('alignment')} />
+
+      {/* Alignment */}
+      <AlignmentInput
+        label={t('alignment')}
+        value={block.properties.align}
+        onChange={(value) => updateProperty('align', value)}
+      />
+
+      <SectionDivider label={t('typography')} />
+
       {/* Font Size */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('font_size')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.fontSize || '13px'}
-          onChange={(e) => updateProperty('fontSize', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="13px"
-        />
-      </div>
-
-      {/* Label Color */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('label_color')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="color"
-            value={block.properties.labelColor || '#6B7280'}
-            onChange={(e) => updateProperty('labelColor', e.target.value)}
-            className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-          />
-          <input
-            type="text"
-            value={block.properties.labelColor || '#6B7280'}
-            onChange={(e) => updateProperty('labelColor', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-          />
-        </div>
-      </div>
-
-      {/* Amount Color */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('amount_color')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="color"
-            value={block.properties.amountColor || '#111827'}
-            onChange={(e) => updateProperty('amountColor', e.target.value)}
-            className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-          />
-          <input
-            type="text"
-            value={block.properties.amountColor || '#111827'}
-            onChange={(e) => updateProperty('amountColor', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-          />
-        </div>
-      </div>
+      <TextInput
+        label={t('font_size')}
+        value={block.properties.fontSize}
+        onChange={(value) => updateProperty('fontSize', value)}
+        placeholder="13px"
+      />
 
       {/* Total Font Size */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('total_font_size')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.totalFontSize || '18px'}
-          onChange={(e) => updateProperty('totalFontSize', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="18px"
-        />
-      </div>
+      <TextInput
+        label={t('total_font_size')}
+        value={block.properties.totalFontSize}
+        onChange={(value) => updateProperty('totalFontSize', value)}
+        placeholder="18px"
+      />
+
+      <SectionDivider label={t('colors')} />
+
+      {/* Label Color */}
+      <ColorInput
+        label={t('label_color')}
+        value={block.properties.labelColor}
+        onChange={(value) => updateProperty('labelColor', value)}
+        defaultValue="#6B7280"
+      />
+
+      {/* Amount Color */}
+      <ColorInput
+        label={t('amount_color')}
+        value={block.properties.amountColor}
+        onChange={(value) => updateProperty('amountColor', value)}
+        defaultValue="#111827"
+      />
 
       {/* Total Color */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('total_color')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="color"
-            value={block.properties.totalColor || '#111827'}
-            onChange={(e) => updateProperty('totalColor', e.target.value)}
-            className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-          />
-          <input
-            type="text"
-            value={block.properties.totalColor || '#111827'}
-            onChange={(e) => updateProperty('totalColor', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label={t('total_color')}
+        value={block.properties.totalColor}
+        onChange={(value) => updateProperty('totalColor', value)}
+        defaultValue="#111827"
+      />
 
       {/* Balance Color */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('balance_color')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="color"
-            value={block.properties.balanceColor || '#DC2626'}
-            onChange={(e) => updateProperty('balanceColor', e.target.value)}
-            className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-          />
-          <input
-            type="text"
-            value={block.properties.balanceColor || '#DC2626'}
-            onChange={(e) => updateProperty('balanceColor', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label={t('balance_color')}
+        value={block.properties.balanceColor}
+        onChange={(value) => updateProperty('balanceColor', value)}
+        defaultValue="#DC2626"
+      />
+
+      <SectionDivider label={t('spacing')} />
 
       {/* Row Spacing */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('row_spacing')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.spacing || '8px'}
-          onChange={(e) => updateProperty('spacing', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="8px"
-        />
-      </div>
+      <TextInput
+        label={t('row_spacing')}
+        value={block.properties.spacing}
+        onChange={(value) => updateProperty('spacing', value)}
+        placeholder="8px"
+      />
 
       {/* Label Padding */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('label_padding')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.labelPadding || '0px'}
-          onChange={(e) => updateProperty('labelPadding', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="0px"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          {t('padding_hint')} (e.g., 5px, 10px 5px, 5px 10px 5px 10px)
-        </p>
-      </div>
+      <TextInput
+        label={t('label_padding')}
+        value={block.properties.labelPadding}
+        onChange={(value) => updateProperty('labelPadding', value)}
+        placeholder="0px"
+        hint={t('css_padding_format')}
+      />
 
       {/* Value Padding */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('value_padding')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.valuePadding || '0px'}
-          onChange={(e) => updateProperty('valuePadding', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="0px"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          {t('padding_hint')} (e.g., 5px, 10px 5px, 5px 10px 5px 10px)
-        </p>
-      </div>
+      <TextInput
+        label={t('value_padding')}
+        value={block.properties.valuePadding}
+        onChange={(value) => updateProperty('valuePadding', value)}
+        placeholder="0px"
+        hint={t('css_padding_format')}
+      />
 
       {/* Gap Between Label and Value */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('label_value_gap')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.labelValueGap || '20px'}
-          onChange={(e) => updateProperty('labelValueGap', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="20px"
-        />
-      </div>
+      <TextInput
+        label={t('label_value_gap')}
+        value={block.properties.labelValueGap}
+        onChange={(value) => updateProperty('labelValueGap', value)}
+        placeholder="20px"
+      />
 
       {/* Value Column Min Width */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('value_min_width')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.valueMinWidth || ''}
-          onChange={(e) => updateProperty('valueMinWidth', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder={t('auto')}
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          {t('leave_empty_for_auto')}
-        </p>
-      </div>
+      <TextInput
+        label={t('value_min_width')}
+        value={block.properties.valueMinWidth}
+        onChange={(value) => updateProperty('valueMinWidth', value)}
+        placeholder={t('auto')}
+        hint={t('leave_empty_for_auto')}
+      />
     </div>
   );
 }

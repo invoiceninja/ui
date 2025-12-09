@@ -12,6 +12,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronUp, ChevronDown, Settings2, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
+import {
+  TextInput,
+  ColorInput,
+  CheckboxInput,
+  SectionDivider,
+} from './PropertyInputs';
 
 // Available columns that can be added to the table
 // Maps field to canonical ID for consistent matching
@@ -40,11 +46,6 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
   // Get current columns from block
   const currentColumns = block.properties.columns || [];
-
-  // Find available column definition by field
-  const findColumnDef = (field: string) => {
-    return AVAILABLE_COLUMNS.find(c => c.field === field);
-  };
 
   // Check if a column is enabled
   const isColumnEnabled = (field: string) => {
@@ -100,7 +101,6 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         </label>
         <div className="space-y-1">
           {currentColumns.map((column: any, index: number) => {
-            const colDef = findColumnDef(column.field);
             const isExpanded = expandedColumn === column.field;
             
             return (
@@ -231,147 +231,82 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         </div>
       )}
 
+      <SectionDivider label={t('typography')} />
+
       {/* Font Size */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('font_size')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.fontSize || '12px'}
-          onChange={(e) => updateProperty('fontSize', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="12px"
-        />
-      </div>
+      <TextInput
+        label={t('font_size')}
+        value={block.properties.fontSize}
+        onChange={(value) => updateProperty('fontSize', value)}
+        placeholder="12px"
+      />
+
+      <SectionDivider label={t('header_style')} />
 
       {/* Header Background */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('header_background')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="color"
-            value={block.properties.headerBg || '#F3F4F6'}
-            onChange={(e) => updateProperty('headerBg', e.target.value)}
-            className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-          />
-          <input
-            type="text"
-            value={block.properties.headerBg || '#F3F4F6'}
-            onChange={(e) => updateProperty('headerBg', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label={t('header_background')}
+        value={block.properties.headerBg}
+        onChange={(value) => updateProperty('headerBg', value)}
+        defaultValue="#F3F4F6"
+      />
 
       {/* Header Text Color */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('header_text_color')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="color"
-            value={block.properties.headerColor || '#111827'}
-            onChange={(e) => updateProperty('headerColor', e.target.value)}
-            className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-          />
-          <input
-            type="text"
-            value={block.properties.headerColor || '#111827'}
-            onChange={(e) => updateProperty('headerColor', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label={t('header_text_color')}
+        value={block.properties.headerColor}
+        onChange={(value) => updateProperty('headerColor', value)}
+        defaultValue="#111827"
+      />
+
+      <SectionDivider label={t('row_style')} />
 
       {/* Alternate Rows */}
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="alternateRows"
-          checked={block.properties.alternateRows || false}
-          onChange={(e) => updateProperty('alternateRows', e.target.checked)}
-          className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-        />
-        <label htmlFor="alternateRows" className="text-sm font-medium text-gray-700">
-          {t('alternate_row_colors')}
-        </label>
-      </div>
+      <CheckboxInput
+        id="alternateRows"
+        label={t('alternate_row_colors')}
+        value={block.properties.alternateRows}
+        onChange={(value) => updateProperty('alternateRows', value)}
+      />
 
       {block.properties.alternateRows && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('alternate_row_background')}
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="color"
-              value={block.properties.alternateRowBg || '#F9FAFB'}
-              onChange={(e) => updateProperty('alternateRowBg', e.target.value)}
-              className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-            />
-            <input
-              type="text"
-              value={block.properties.alternateRowBg || '#F9FAFB'}
-              onChange={(e) => updateProperty('alternateRowBg', e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-            />
-          </div>
-        </div>
+        <ColorInput
+          label={t('alternate_row_background')}
+          value={block.properties.alternateRowBg}
+          onChange={(value) => updateProperty('alternateRowBg', value)}
+          defaultValue="#F9FAFB"
+        />
       )}
+
+      <SectionDivider label={t('borders')} />
 
       {/* Show Borders */}
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="showBorders"
-          checked={block.properties.showBorders || false}
-          onChange={(e) => updateProperty('showBorders', e.target.checked)}
-          className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-        />
-        <label htmlFor="showBorders" className="text-sm font-medium text-gray-700">
-          {t('show_borders')}
-        </label>
-      </div>
+      <CheckboxInput
+        id="showBorders"
+        label={t('show_borders')}
+        value={block.properties.showBorders}
+        onChange={(value) => updateProperty('showBorders', value)}
+      />
 
       {block.properties.showBorders && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('border_color')}
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="color"
-              value={block.properties.borderColor || '#E5E7EB'}
-              onChange={(e) => updateProperty('borderColor', e.target.value)}
-              className="h-10 w-20 border border-gray-300 rounded-md cursor-pointer"
-            />
-            <input
-              type="text"
-              value={block.properties.borderColor || '#E5E7EB'}
-              onChange={(e) => updateProperty('borderColor', e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
-            />
-          </div>
-        </div>
+        <ColorInput
+          label={t('border_color')}
+          value={block.properties.borderColor}
+          onChange={(value) => updateProperty('borderColor', value)}
+          defaultValue="#E5E7EB"
+        />
       )}
 
+      <SectionDivider label={t('spacing')} />
+
       {/* Cell Padding */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('cell_padding')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.padding || '8px'}
-          onChange={(e) => updateProperty('padding', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="8px"
-        />
-      </div>
+      <TextInput
+        label={t('cell_padding')}
+        value={block.properties.padding}
+        onChange={(value) => updateProperty('padding', value)}
+        placeholder="8px"
+        hint={t('css_padding_format')}
+      />
     </div>
   );
 }
