@@ -56,6 +56,7 @@ import { Modal } from './Modal';
 import { useColorScheme } from '$app/common/colors';
 import { useTranslation } from 'react-i18next';
 import { useClickAway, useDebounce } from 'react-use';
+import HardBreak from '@tiptap/extension-hard-break';
 
 interface ThemeProps {
   backgroundColor: string;
@@ -926,6 +927,13 @@ export function TipTapEditor({
       TaskList,
       TaskItem.configure({
         nested: true,
+      }),
+      HardBreak.extend({
+        addKeyboardShortcuts() {
+          return {
+            Enter: () => this.editor.commands.setHardBreak(),
+          };
+        },
       }),
     ],
     content: currentValue,
