@@ -9,9 +9,9 @@ export function TestDragDashboard() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [layouts, setLayouts] = useState({
     lg: [
-      { i: 'a', x: 0, y: 0, w: 4, h: 2 },
-      { i: 'b', x: 4, y: 0, w: 4, h: 2 },
-      { i: 'c', x: 8, y: 0, w: 4, h: 2 },
+      { i: 'a', x: 0, y: 0, w: 4, h: 3, static: false },
+      { i: 'b', x: 4, y: 0, w: 4, h: 3, static: false },
+      { i: 'c', x: 8, y: 0, w: 4, h: 3, static: false },
     ]
   });
 
@@ -46,12 +46,19 @@ export function TestDragDashboard() {
         layouts={layouts}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight={60}
+        rowHeight={30}
         onLayoutChange={handleLayoutChange}
         isDraggable={isEditMode}
         isResizable={isEditMode}
         compactType={null}
         preventCollision={false}
+        allowOverlap={true}
+        margin={[10, 10]}
+        containerPadding={[10, 10]}
+        useCSSTransforms={true}
+        transformScale={1}
+        verticalCompact={false}
+        droppingItem={{ i: '__dropping-elem__', h: 1, w: 1 }}
       >
         <div key="a" style={{ 
           backgroundColor: '#ff6b6b', 

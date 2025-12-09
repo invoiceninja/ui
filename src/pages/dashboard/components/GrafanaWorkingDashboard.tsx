@@ -31,6 +31,7 @@ import { ExpiredQuotes } from './ExpiredQuotes';
 import { UpcomingQuotes } from './UpcomingQuotes';
 import { UpcomingRecurringInvoices } from './UpcomingRecurringInvoices';
 import { Chart } from './Chart';
+import './dashboard-smooth.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -287,7 +288,7 @@ export function GrafanaWorkingDashboard() {
   }, [visibleCards]);
 
   return (
-    <div className="dashboard-container">
+    <div className={`dashboard-container ${isEditMode ? 'edit-mode' : ''}`}>
       {/* Toolbar */}
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -319,19 +320,20 @@ export function GrafanaWorkingDashboard() {
         layouts={layouts}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight={60}
+        rowHeight={30}
         onLayoutChange={handleLayoutChange}
         isDraggable={isEditMode}
         isResizable={isEditMode}
         compactType={null} 
-        preventCollision={false} 
-       allowOverlap={false} 
-       margin={[16, 16]}
-       containerPadding={[0, 0]}
-        draggableHandle={undefined}
+        preventCollision={true} 
+       allowOverlap={false}
+       margin={[12, 12]}
+       containerPadding={[10, 10]}
        useCSSTransforms={true} 
        transformScale={1}
        verticalCompact={false} 
+       autoSize={true}
+       resizeHandles={['se', 'sw', 'ne', 'nw']}
       >
         {cardsToRender.map(cardId => renderCard(cardId))}
       </ResponsiveGridLayout>
