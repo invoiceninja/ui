@@ -325,7 +325,7 @@ export function GrafanaWorkingDashboard() {
         isDraggable={isEditMode}
         isResizable={isEditMode}
         compactType={null} 
-        preventCollision={true} 
+        preventCollision={false} 
        allowOverlap={false}
        margin={[12, 12]}
        containerPadding={[10, 10]}

@@ -52,13 +52,12 @@ export function TestDragDashboard() {
         isResizable={isEditMode}
         compactType={null}
         preventCollision={false}
-        allowOverlap={true}
+        allowOverlap={false}
         margin={[10, 10]}
         containerPadding={[10, 10]}
         useCSSTransforms={true}
         transformScale={1}
         verticalCompact={false}
-        droppingItem={{ i: '__dropping-elem__', h: 1, w: 1 }}
       >
         <div key="a" style={{ 
           backgroundColor: '#ff6b6b', 
