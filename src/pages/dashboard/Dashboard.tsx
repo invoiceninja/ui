@@ -10,7 +10,8 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Default } from '../../components/layouts/Default';
-import { SimpleDashboard } from './components/SimpleDashboard';
+// import { GrafanaWorkingDashboard } from './components/GrafanaWorkingDashboard';
+import { TestDragDashboard } from './components/TestDragDashboard';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -24,7 +25,8 @@ export default function Dashboard() {
 
   return (
     <Default title={documentTitle} breadcrumbs={[]}>
-      <SimpleDashboard />
+      {/* <GrafanaWorkingDashboard /> */}
+      <TestDragDashboard />
     </Default>
   );
 }

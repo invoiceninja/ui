@@ -1,0 +1,90 @@
+/* Smooth animations for Grafana-like experience */
+.react-grid-layout {
+  position: relative;
+  transition: height 200ms ease;
+}
+
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top, width, height;
+}
+
+.react-grid-item.cssTransforms {
+  transition-property: transform, width, height;
+}
+
+.react-grid-item.resizing {
+  transition: none;
+  z-index: 1;
+  will-change: transform;
+}
+
+.react-grid-item.react-draggable-dragging {
+  transition: none;
+  z-index: 3;
+  will-change: transform;
+  cursor: grabbing !important;
+}
+
+.react-grid-item:not(.react-draggable-dragging):not(.resizing) {
+  /* Smooth animation when other items move to make space */
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Drag handle styling */
+.drag-handle {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  cursor: grab;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  transition: background 200ms;
+}
+
+.drag-handle:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Edit mode indicator */
+.react-grid-item.edit-mode {
+  border: 1px dashed rgba(59, 130, 246, 0.5);
+  background: rgba(59, 130, 246, 0.03);
+}
+
+/* Resize handle improvements */
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTYgMTRMMTQgNiIgc3Ryb2tlPSIjQTBBRUM0IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTEwIDE0TDE0IDEwIiBzdHJva2U9IiNBMEFFQzQiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4=');
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-size: 12px 12px;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+
+/* Placeholder styling when dragging */
+.react-grid-placeholder {
+  background: rgba(59, 130, 246, 0.15);
+  opacity: 1;
+  transition-duration: 200ms;
+  z-index: 2;
+  border: 2px dashed rgba(59, 130, 246, 0.5);
+  border-radius: 8px;
+}

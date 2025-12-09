@@ -13,6 +13,8 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Card } from '$app/components/cards';
+import { Icon } from '$app/components/icons/Icon';
+import { MdDragIndicator } from 'react-icons/md';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -32,6 +34,11 @@ export function SimpleDashboard() {
       { i: 'card1', x: 0, y: 0, w: 6, h: 4 },
       { i: 'card2', x: 0, y: 4, w: 6, h: 4 },
       { i: 'card3', x: 0, y: 8, w: 6, h: 6 },
+    ],
+    xs: [
+      { i: 'card1', x: 0, y: 0, w: 4, h: 4 },
+      { i: 'card2', x: 0, y: 4, w: 4, h: 4 },
+      { i: 'card3', x: 0, y: 8, w: 4, h: 6 },
     ],
   });
 
@@ -57,18 +64,25 @@ export function SimpleDashboard() {
       <ResponsiveGridLayout
         className="layout"
         layouts={layouts}
-        breakpoints={{ lg: 1200, md: 996, sm: 768 }}
-        cols={{ lg: 12, md: 10, sm: 6 }}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
+        cols={{ lg: 12, md: 10, sm: 6, xs: 4 }}
         rowHeight={60}
         onLayoutChange={handleLayoutChange}
         isDraggable={isEditMode}
         isResizable={isEditMode}
-        compactType="vertical"
+        compactType={null}
         preventCollision={false}
+        allowOverlap={false}
         margin={[16, 16]}
+        draggableHandle={isEditMode ? '.drag-handle' : ''}
       >
         <div key="card1">
-          <Card className="h-full p-4">
+          <Card className={`h-full p-4 ${isEditMode ? 'border border-dashed border-blue-400' : ''}`}>
+            {isEditMode && (
+              <div className="drag-handle absolute top-2 right-2 cursor-grab p-1 bg-gray-200 rounded hover:bg-gray-300">
+                <Icon element={MdDragIndicator} />
+              </div>
+            )}
             <h2 className="text-lg font-bold mb-2">Card 1 - Test Content</h2>
             <p>This is a test card to verify the grid is working.</p>
             <div className="mt-2 p-2 bg-gray-100 rounded">
@@ -77,7 +91,12 @@ export function SimpleDashboard() {
           </Card>
         </div>
         <div key="card2">
-          <Card className="h-full p-4">
+          <Card className={`h-full p-4 ${isEditMode ? 'border border-dashed border-blue-400' : ''}`}>
+            {isEditMode && (
+              <div className="drag-handle absolute top-2 right-2 cursor-grab p-1 bg-gray-200 rounded hover:bg-gray-300">
+                <Icon element={MdDragIndicator} />
+              </div>
+            )}
             <h2 className="text-lg font-bold mb-2">Card 2 - Another Test</h2>
             <p>Drag me when edit mode is enabled!</p>
             <div className="mt-2">
@@ -88,7 +107,12 @@ export function SimpleDashboard() {
           </Card>
         </div>
         <div key="card3">
-          <Card className="h-full p-4">
+          <Card className={`h-full p-4 ${isEditMode ? 'border border-dashed border-blue-400' : ''}`}>
+            {isEditMode && (
+              <div className="drag-handle absolute top-2 right-2 cursor-grab p-1 bg-gray-200 rounded hover:bg-gray-300">
+                <Icon element={MdDragIndicator} />
+              </div>
+            )}
             <h2 className="text-lg font-bold mb-2">Card 3 - Large Card</h2>
             <p>This card is wider and shows that the layout is working.</p>
             <div className="mt-4 grid grid-cols-3 gap-2">

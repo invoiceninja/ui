@@ -1,0 +1,347 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import React, { useState, useEffect } from 'react';
+import { Responsive, WidthProvider } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import { Card } from '$app/components/cards';
+import { useQuery } from 'react-query';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { AxiosResponse } from 'axios';
+import { Chart } from './Chart';
+import { Activity } from './Activity';
+import { RecentPayments } from './RecentPayments';
+import { UpcomingInvoices } from './UpcomingInvoices';
+import { PastDueInvoices } from './PastDueInvoices';
+import { DropdownDateRangePicker } from '$app/components/DropdownDateRangePicker';
+import dayjs from 'dayjs';
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
+
+export function GrafanaWorkingDashboard() {
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [customDateRange, setCustomDateRange] = useState<string>('');
+  
+  // Fetch dashboard data
+  const { data: dashboardData } = useQuery(
+    ['dashboard', customDateRange],
+    () => request('POST', endpoint('/api/v1/dashboard'), {
+      date_range: customDateRange || 'last30_days'
+    }).then((response: AxiosResponse) => response.data),
+    {
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  // Fetch chart data
+  const { data: chartData } = useQuery(
+    ['chart', customDateRange],
+    () => request('POST', endpoint('/api/v1/charts/chart_summary'), {
+      date_range: customDateRange || 'last30_days'
+    }).then((response: AxiosResponse) => response.data),
+    {
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    }
+  );
+  
+  // Default layouts without static property - will be added dynamically
+  const defaultLayouts = {
+    lg: [
+      { i: 'toolbar', x: 0, y: 0, w: 12, h: 1, minW: 12, minH: 1 },
+      { i: 'totals', x: 0, y: 1, w: 12, h: 3, minW: 6, minH: 2 },
+      { i: 'chart', x: 0, y: 4, w: 8, h: 6, minW: 4, minH: 4 },
+      { i: 'activity', x: 8, y: 4, w: 4, h: 6, minW: 3, minH: 4 },
+      { i: 'recent_payments', x: 0, y: 10, w: 4, h: 5, minW: 3, minH: 3 },
+      { i: 'upcoming_invoices', x: 4, y: 10, w: 4, h: 5, minW: 3, minH: 3 },
+      { i: 'past_due_invoices', x: 8, y: 10, w: 4, h: 5, minW: 3, minH: 3 },
+    ],
+    md: [
+      { i: 'toolbar', x: 0, y: 0, w: 10, h: 1, minW: 10, minH: 1 },
+      { i: 'totals', x: 0, y: 1, w: 10, h: 3, minW: 6, minH: 2 },
+      { i: 'chart', x: 0, y: 4, w: 6, h: 6, minW: 4, minH: 4 },
+      { i: 'activity', x: 6, y: 4, w: 4, h: 6, minW: 3, minH: 4 },
+      { i: 'recent_payments', x: 0, y: 10, w: 5, h: 5, minW: 3, minH: 3 },
+      { i: 'upcoming_invoices', x: 5, y: 10, w: 5, h: 5, minW: 3, minH: 3 },
+      { i: 'past_due_invoices', x: 0, y: 15, w: 10, h: 5, minW: 3, minH: 3 },
+    ],
+    sm: [
+      { i: 'toolbar', x: 0, y: 0, w: 6, h: 1, minW: 6, minH: 1 },
+      { i: 'totals', x: 0, y: 1, w: 6, h: 3, minW: 6, minH: 2 },
+      { i: 'chart', x: 0, y: 4, w: 6, h: 6, minW: 4, minH: 4 },
+      { i: 'activity', x: 0, y: 10, w: 6, h: 5, minW: 3, minH: 4 },
+      { i: 'recent_payments', x: 0, y: 15, w: 6, h: 5, minW: 3, minH: 3 },
+      { i: 'upcoming_invoices', x: 0, y: 20, w: 6, h: 5, minW: 3, minH: 3 },
+      { i: 'past_due_invoices', x: 0, y: 25, w: 6, h: 5, minW: 3, minH: 3 },
+    ],
+    xs: [
+      { i: 'toolbar', x: 0, y: 0, w: 4, h: 1, minW: 4, minH: 1 },
+      { i: 'totals', x: 0, y: 1, w: 4, h: 4, minW: 4, minH: 2 },
+      { i: 'chart', x: 0, y: 5, w: 4, h: 6, minW: 4, minH: 4 },
+      { i: 'activity', x: 0, y: 11, w: 4, h: 5, minW: 3, minH: 4 },
+      { i: 'recent_payments', x: 0, y: 16, w: 4, h: 5, minW: 3, minH: 3 },
+      { i: 'upcoming_invoices', x: 0, y: 21, w: 4, h: 5, minW: 3, minH: 3 },
+      { i: 'past_due_invoices', x: 0, y: 26, w: 4, h: 5, minW: 3, minH: 3 },
+    ],
+    xxs: [
+      { i: 'toolbar', x: 0, y: 0, w: 2, h: 1, minW: 2, minH: 1 },
+      { i: 'totals', x: 0, y: 1, w: 2, h: 5, minW: 2, minH: 2 },
+      { i: 'chart', x: 0, y: 6, w: 2, h: 6, minW: 2, minH: 4 },
+      { i: 'activity', x: 0, y: 12, w: 2, h: 5, minW: 2, minH: 4 },
+      { i: 'recent_payments', x: 0, y: 17, w: 2, h: 5, minW: 2, minH: 3 },
+      { i: 'upcoming_invoices', x: 0, y: 22, w: 2, h: 5, minW: 2, minH: 3 },
+      { i: 'past_due_invoices', x: 0, y: 27, w: 2, h: 5, minW: 2, minH: 3 },
+    ]
+  };
+
+  const [layouts, setLayouts] = useState(defaultLayouts);
+
+  const handleLayoutChange = (layout: any, allLayouts: any) => {
+    console.log('Layout changed:', allLayouts);
+    setLayouts(allLayouts);
+  };
+
+  const handleDateRangeChange = (startDate: string, endDate: string) => {
+    setCustomDateRange(`${startDate},${endDate}`);
+  };
+
+  const renderCard = (cardId: string) => {
+    // Toolbar
+    if (cardId === 'toolbar') {
+      return (
+        <Card className="h-full flex items-center px-4">
+          <div className="flex items-center gap-2">
+            <DropdownDateRangePicker
+              startDate={customDateRange.split(',')[0] || dayjs().subtract(30, 'days').format('YYYY-MM-DD')}
+              endDate={customDateRange.split(',')[1] || dayjs().format('YYYY-MM-DD')}
+              handleDateChange={(date: string, dateRange: string) => setCustomDateRange(dateRange)}
+              handleDateRangeChange={handleDateRangeChange}
+            />
+          </div>
+        </Card>
+      );
+    }
+
+    // Totals
+    if (cardId === 'totals' && dashboardData) {
+      const totals = dashboardData.totals || {};
+      return (
+        <Card className="h-full p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 h-full">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{totals.invoices || 0}</div>
+              <div className="text-sm text-gray-600">Invoices</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{totals.payments || 0}</div>
+              <div className="text-sm text-gray-600">Payments</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{totals.active_invoices || 0}</div>
+              <div className="text-sm text-gray-600">Active</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{totals.outstanding_invoices || 0}</div>
+              <div className="text-sm text-gray-600">Outstanding</div>
+            </div>
+          </div>
+        </Card>
+      );
+    }
+
+    // Chart
+    if (cardId === 'chart' && chartData) {
+      return (
+        <Card className="h-full">
+          <Chart
+            data={chartData as any}
+            dates={[]}
+            currency="USD"
+            chartSensitivity={5}
+          />
+        </Card>
+      );
+    }
+
+    // Activity
+    if (cardId === 'activity' && dashboardData) {
+      return (
+        <Card className="h-full">
+          <Activity activities={dashboardData.activities || []} />
+        </Card>
+      );
+    }
+
+    // Recent Payments
+    if (cardId === 'recent_payments' && dashboardData) {
+      return (
+        <Card className="h-full">
+          <RecentPayments
+            payments={dashboardData.payments || []}
+            isEditMode={false}
+          />
+        </Card>
+      );
+    }
+
+    // Upcoming Invoices
+    if (cardId === 'upcoming_invoices' && dashboardData) {
+      return (
+        <Card className="h-full">
+          <UpcomingInvoices
+            invoices={dashboardData.upcoming_invoices || []}
+            isEditMode={false}
+          />
+        </Card>
+      );
+    }
+
+    // Past Due Invoices
+    if (cardId === 'past_due_invoices' && dashboardData) {
+      return (
+        <Card className="h-full">
+          <PastDueInvoices
+            invoices={dashboardData.past_due_invoices || []}
+            isEditMode={false}
+          />
+        </Card>
+      );
+    }
+
+    // Default placeholder
+    return (
+      <Card className="h-full flex items-center justify-center">
+        <div className="text-gray-400">
+          Loading {cardId}...
+        </div>
+      </Card>
+    );
+  };
+
+  // Define cards to render
+  const cardIds = ['toolbar', 'totals', 'chart', 'activity', 'recent_payments', 'upcoming_invoices', 'past_due_invoices'];
+
+  return (
+    <div className="p-4">
+      <div className="mb-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <button
+          onClick={() => setIsEditMode(!isEditMode)}
+          className={`px-4 py-2 rounded transition-all duration-200 ${
+            isEditMode 
+              ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg' 
+              : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+          }`}
+        >
+          {isEditMode ? '\u2713 Save Layout' : '\u270f\ufe0f Edit Layout'}
+        </button>
+      </div>
+
+      {isEditMode && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>\ud83d\udccc Edit Mode:</strong> Drag cards to reposition. Drag corners/edges to resize.
+          </p>
+        </div>
+      )}
+
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={layouts}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        rowHeight={60}
+        onLayoutChange={handleLayoutChange}
+        isDraggable={isEditMode}
+        isResizable={isEditMode}
+        compactType={null}
+        preventCollision={false}
+        allowOverlap={false}
+        margin={[16, 16]}
+        containerPadding={[0, 0]}
+        useCSSTransforms={true}
+      >
+        {cardIds.map((cardId) => (
+          <div key={cardId} className={isEditMode ? 'cursor-move' : ''}>
+            {renderCard(cardId)}
+          </div>
+        ))}
+      </ResponsiveGridLayout>
+    </div>
+  );
+}
+              </div>
+            ) : card.type === 'activity' ? (
+              <div className="w-full space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <div className="text-3xl font-bold text-gray-700">{card.value}</div>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
+  return (
+    <div className="p-4">
+      <div className="mb-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Grafana-Style Dashboard</h1>
+        <button
+          onClick={() => setIsEditMode(!isEditMode)}
+          className={`px-4 py-2 rounded transition-all duration-200 ${
+            isEditMode 
+              ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg' 
+              : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+          }`}
+        >
+          {isEditMode ? '✓ Save Layout' : '✏️ Edit Layout'}
+        </button>
+      </div>
+
+      {isEditMode && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>📌 Edit Mode:</strong> Drag cards to reposition. Drag corners/edges to resize.
+          </p>
+        </div>
+      )}
+
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={layouts}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        rowHeight={60}
+        onLayoutChange={handleLayoutChange}
+        isDraggable={isEditMode}
+        isResizable={isEditMode}
+        compactType={null}
+        preventCollision={false}
+        allowOverlap={false}
+        margin={[16, 16]}
+        containerPadding={[0, 0]}
+        useCSSTransforms={true}
+      >
+        {cardIds.map((card) => (
+          <div key={card.id}>
+            {renderCard(cardId)}
+          </div>
+        ))}
+      </ResponsiveGridLayout>
+    </div>
+  );
+}
