@@ -21,7 +21,8 @@ import {
   MdPaid,
   MdPrint,
   MdArchive,
-  MdRestore
+  MdRestore,
+  MdRefresh
 } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
@@ -259,19 +260,19 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
-    // ({ selectedResources, setSelected }) =>
-    //   showReverseOption(selectedResources) &&
-    //   hasPermission('create_credit') && (
-    //     <DropdownElement
-    //       onClick={() => {
-    //         reverseInvoice(selectedResources[0]);
-    //         setSelected([]);
-    //       }}
-    //       icon={<Icon element={MdRefresh} />}
-    //     >
-    //       {t('reverse')}
-    //     </DropdownElement>
-    //   ),
+    ({ selectedResources, setSelected }) =>
+      showReverseOption(selectedResources) &&
+      hasPermission('create_credit') && (
+        <DropdownElement
+          onClick={() => {
+            reverseInvoice(selectedResources[0]);
+            setSelected([]);
+          }}
+          icon={<Icon element={MdRefresh} />}
+        >
+          {t('reverse')}
+        </DropdownElement>
+      ),
     ({ selectedIds, selectedResources, setSelected }) =>
       showCancelOption(selectedResources) && (
         <CancelInvoiceBulkAction
