@@ -330,7 +330,7 @@ export function ResizableDashboardCards() {
       case 'totals':
         if (isTotalsLoading) {
           return (
-            <Card className="h-full flex items-center justify-center">
+            <Card height="full" className="flex items-center justify-center">
               <Spinner />
             </Card>
           );
@@ -339,15 +339,15 @@ export function ResizableDashboardCards() {
         if (!totals) {
           // Return a placeholder to show something is there
           return (
-            <Card className="h-full p-4">
+            <Card height="full" className="p-4">
               <div className="text-center text-gray-500">Loading totals...</div>
             </Card>
           );
         }
         
         return (
-          <Card className="h-full p-4">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+          <Card height="full" className="p-4 overflow-hidden">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 h-full items-center">
               <div className="flex flex-col justify-center">
                 <div className="text-sm text-gray-500 dark:text-gray-400">Revenue</div>
                 <div className="text-2xl font-bold text-green-600">
@@ -385,7 +385,7 @@ export function ResizableDashboardCards() {
        // Don't render chart if we don't have chart data with proper structure
        if (!chartResults || typeof chartResults !== 'object' || !('invoices' in chartResults)) {
          return (
-           <Card className="h-full">
+           <Card height="full">
              <div className="flex items-center justify-center h-full text-gray-500">
                Loading chart data...
              </div>
@@ -394,7 +394,7 @@ export function ResizableDashboardCards() {
        }
        
        // Calculate proper date range from dateRange or customDateRange
-       let chartDates;
+       let chartDates: { start_date: string; end_date: string };
        {
          if (dateRange === 'custom' && customDateRange[0] && customDateRange[1]) {
            chartDates = { start_date: customDateRange[0], end_date: customDateRange[1] };
@@ -436,7 +436,7 @@ export function ResizableDashboardCards() {
        }
        
       return (
-      <Card className="h-full">
+      <Card height="full">
         <Chart
            data={chartResults as any}
            dates={chartDates}
@@ -450,7 +450,7 @@ export function ResizableDashboardCards() {
         // Temporarily always show for debugging
         // if (!currentDashboardFields.includes(DashboardField.DashActivity)) return null;
         return (
-          <Card className="h-full">
+          <Card height="full" withScrollableBody>
             <Activity isEditMode={isEditMode} />
           </Card>
         );
@@ -459,7 +459,7 @@ export function ResizableDashboardCards() {
         // Temporarily always show for debugging
         // if (!currentDashboardFields.includes(DashboardField.DashRecentPayments)) return null;
         return (
-          <Card className="h-full">
+          <Card height="full" withScrollableBody>
             <RecentPayments isEditMode={isEditMode} />
           </Card>
         );
@@ -468,7 +468,7 @@ export function ResizableDashboardCards() {
         // Temporarily always show for debugging
        // if (!currentDashboardFields.includes(DashboardField.DashUpcomingInvoices)) return null;
        return (
-         <Card className="h-full">
+         <Card height="full" withScrollableBody>
             <UpcomingInvoices isEditMode={isEditMode} />
          </Card>
        );
@@ -477,7 +477,7 @@ export function ResizableDashboardCards() {
         // Temporarily always show for debugging
        // if (!currentDashboardFields.includes(DashboardField.DashPastDueInvoices)) return null;
        return (
-         <Card className="h-full">
+         <Card height="full" withScrollableBody>
             <PastDueInvoices isEditMode={isEditMode} />
          </Card>
        );
@@ -563,6 +563,15 @@ export function ResizableDashboardCards() {
           return (
             <div
               key={cardId}
+              style={{
+                height: '100%',
+                width: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                border: isEditMode ? '2px dashed #ccc' : 'none',
+                padding: isEditMode ? '4px' : '0',
+              }}
               className={classNames(
                 'dashboard-grid-item',
                 {
@@ -570,10 +579,6 @@ export function ResizableDashboardCards() {
                   'pointer-events-none': isDragging,
                 }
               )}
-              style={{
-                border: isEditMode ? '2px dashed #ccc' : 'none',
-                padding: isEditMode ? '4px' : '0',
-              }}
             >
               {content}
             </div>

@@ -236,7 +236,7 @@ export function Chart(props: Props) {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', minHeight: 0, minWidth: 0 }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData} margin={{ top: 8, left: 8, right: 8, bottom: 24 }}>
         <Line

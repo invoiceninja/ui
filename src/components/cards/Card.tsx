@@ -80,10 +80,12 @@ export function Card(props: Props) {
       <ShadcnCard
         title={props.title || undefined}
         className={classNames(
-          `border shadow overflow-visible ${props.className}`,
+          `border shadow ${props.className}`,
           {
             'overflow-y-auto': props.withScrollableBody,
+            'overflow-hidden': !props.withScrollableBody && height === 'full',
             'h-full': height === 'full',
+            'flex flex-col': height === 'full',
           }
         )}
       >
@@ -113,10 +115,12 @@ export function Card(props: Props) {
   return (
     <div
       className={classNames(
-        `border shadow rounded overflow-visible ${props.className}`,
+        `border shadow rounded ${props.className}`,
         {
           'overflow-y-auto': props.withScrollableBody,
+          'overflow-hidden': !props.withScrollableBody && height === 'full',
           'h-full': height === 'full',
+          'flex flex-col': height === 'full',
         }
       )}
       style={{
@@ -128,7 +132,10 @@ export function Card(props: Props) {
     >
       <form
         onSubmit={props.onFormSubmit}
-        className={classNames({ 'h-full': height === 'full' })}
+        className={classNames({ 
+          'h-full': height === 'full',
+          'flex flex-col': height === 'full',
+        })}
       >
         {props.title && (
           <div
@@ -184,6 +191,8 @@ export function Card(props: Props) {
             'py-0': props.withoutBodyPadding,
             'py-4': padding === 'regular' && !props.withoutBodyPadding,
             'py-2': padding === 'small' && !props.withoutBodyPadding,
+            'flex-1': height === 'full',
+            'min-h-0': height === 'full',
           })}
         >
           {props.isLoading && <Element leftSide={<Spinner />} />}
