@@ -75,7 +75,7 @@ const COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
 // Default layouts for all breakpoints - simple visible cards
 const DEFAULT_LAYOUTS: Layouts = {
   lg: [
-    { i: 'toolbar', x: 0, y: 0, w: 12, h: 2, static: false },
+    { i: 'toolbar', x: 0, y: 0, w: 12, h: 2, static: true },
     { i: 'totals', x: 0, y: 2, w: 12, h: 4, static: false },
     { i: 'chart', x: 0, y: 6, w: 6, h: 8, static: false },
     { i: 'activity', x: 6, y: 6, w: 6, h: 8, static: false },
@@ -84,7 +84,7 @@ const DEFAULT_LAYOUTS: Layouts = {
     { i: 'past_due_invoices', x: 8, y: 14, w: 4, h: 8, static: false },
   ],
   md: [
-    { i: 'toolbar', x: 0, y: 0, w: 10, h: 2, static: false },
+    { i: 'toolbar', x: 0, y: 0, w: 10, h: 2, static: true },
     { i: 'totals', x: 0, y: 2, w: 10, h: 4, static: false },
     { i: 'chart', x: 0, y: 6, w: 5, h: 8, static: false },
     { i: 'activity', x: 5, y: 6, w: 5, h: 8, static: false },
@@ -93,7 +93,7 @@ const DEFAULT_LAYOUTS: Layouts = {
     { i: 'past_due_invoices', x: 0, y: 22, w: 5, h: 8, static: false },
   ],
   sm: [
-    { i: 'toolbar', x: 0, y: 0, w: 6, h: 2, static: false },
+    { i: 'toolbar', x: 0, y: 0, w: 6, h: 2, static: true },
     { i: 'totals', x: 0, y: 2, w: 6, h: 4, static: false },
     { i: 'chart', x: 0, y: 6, w: 6, h: 8, static: false },
     { i: 'activity', x: 0, y: 14, w: 6, h: 8, static: false },
@@ -102,7 +102,7 @@ const DEFAULT_LAYOUTS: Layouts = {
     { i: 'past_due_invoices', x: 0, y: 38, w: 6, h: 8, static: false },
   ],
   xs: [
-    { i: 'toolbar', x: 0, y: 0, w: 4, h: 2, static: false },
+    { i: 'toolbar', x: 0, y: 0, w: 4, h: 2, static: true },
     { i: 'totals', x: 0, y: 2, w: 4, h: 4, static: false },
     { i: 'chart', x: 0, y: 6, w: 4, h: 8, static: false },
     { i: 'activity', x: 0, y: 14, w: 4, h: 8, static: false },
@@ -111,7 +111,7 @@ const DEFAULT_LAYOUTS: Layouts = {
     { i: 'past_due_invoices', x: 0, y: 38, w: 4, h: 8, static: false },
   ],
   xxs: [
-    { i: 'toolbar', x: 0, y: 0, w: 2, h: 2, static: false },
+    { i: 'toolbar', x: 0, y: 0, w: 2, h: 2, static: true },
     { i: 'totals', x: 0, y: 2, w: 2, h: 4, static: false },
     { i: 'chart', x: 0, y: 6, w: 2, h: 8, static: false },
     { i: 'activity', x: 0, y: 14, w: 2, h: 8, static: false },
@@ -274,15 +274,31 @@ export function ResizableDashboardCards() {
   const renderCard = (cardId: string) => {
     console.log('Rendering card:', cardId);
     
+    // Debug logging
+    if (cardId === 'totals') {
+      console.log('=== TOTALS DEBUG ===');
+      console.log('totalsResponse:', totalsResponse);
+      console.log('totals:', totals);
+      console.log('isTotalsLoading:', isTotalsLoading);
+    }
+    
+    if (cardId === 'chart') {
+      console.log('=== CHART DEBUG ===');
+      console.log('chartResponse:', chartResponse);
+      console.log('chartResults:', chartResults);
+      console.log('isChartLoading:', isChartLoading);
+    }
+    
     switch (cardId) {
       case 'toolbar':
         return (
           <div className="h-full flex flex-col lg:flex-row gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded">
-            <div className="flex gap-2 items-center flex-1">
+            <div className="flex gap-2 items-center flex-1" style={{ pointerEvents: 'auto' }}>
               <Button
                 behavior="button"
                 onClick={() => setIsEditMode(!isEditMode)}
                 className="flex items-center gap-2"
+                style={{ pointerEvents: 'auto' }}
               >
                 <Icon element={isEditMode ? MdDragHandle : BiMove} size={18} />
                 <span>{isEditMode ? 'Done Editing' : 'Edit Layout'}</span>
@@ -293,6 +309,7 @@ export function ResizableDashboardCards() {
                   <Button
                     behavior="button"
                     onClick={() => setIsCardsModalOpen(true)}
+                    style={{ pointerEvents: 'auto' }}
                   >
                     Add Cards
                   </Button>
@@ -302,6 +319,7 @@ export function ResizableDashboardCards() {
                       setLayouts(DEFAULT_LAYOUTS);
                       toast.success('Layout restored to defaults');
                     }}
+                    style={{ pointerEvents: 'auto' }}
                   >
                     Restore Defaults
                   </Button>
@@ -345,11 +363,14 @@ export function ResizableDashboardCards() {
           );
         }
         
-        if (!totals) {
+        if (!totals || typeof totals !== 'object') {
           // Return a placeholder to show something is there
           return (
             <Card height="full" className="p-4">
-              <div className="text-center text-gray-500">Loading totals...</div>
+              <div className="text-center text-gray-500">
+                <div>No totals data available</div>
+                <div className="text-xs mt-2">Response: {JSON.stringify(totalsResponse).substring(0, 100)}</div>
+              </div>
             </Card>
           );
         }
@@ -360,25 +381,25 @@ export function ResizableDashboardCards() {
               <div className="flex flex-col justify-center">
                 <div className="text-sm text-gray-500 dark:text-gray-400">Revenue</div>
                 <div className="text-2xl font-bold text-green-600">
-                  {formatMoney(parseFloat(totals.revenue.paid_to_date || '0'), totals.revenue.code, company?.settings?.country_id)}
+                  {formatMoney(parseFloat(totals.revenue?.paid_to_date || '0'), totals.revenue?.code || 'USD', company?.settings?.country_id)}
                 </div>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="text-sm text-gray-500 dark:text-gray-400">Expenses</div>
                 <div className="text-2xl font-bold text-red-600">
-                  {formatMoney(parseFloat(totals.expenses.amount || '0'), totals.expenses.code, company?.settings?.country_id)}
+                  {formatMoney(parseFloat(totals.expenses?.amount || '0'), totals.expenses?.code || 'USD', company?.settings?.country_id)}
                 </div>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="text-sm text-gray-500 dark:text-gray-400">Invoiced</div>
                 <div className="text-2xl font-bold text-blue-600">
-                  {formatMoney(parseFloat(totals.invoices.invoiced_amount || '0'), totals.invoices.code, company?.settings?.country_id)}
+                  {formatMoney(parseFloat(totals.invoices?.invoiced_amount || '0'), totals.invoices?.code || 'USD', company?.settings?.country_id)}
                 </div>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="text-sm text-gray-500 dark:text-gray-400">Outstanding</div>
                 <div className="text-2xl font-bold text-orange-600">
-                  {formatMoney(parseFloat(totals.outstanding.amount || '0'), totals.outstanding.code, company?.settings?.country_id)}
+                  {formatMoney(parseFloat(totals.outstanding?.amount || '0'), totals.outstanding?.code || 'USD', company?.settings?.country_id)}
                 </div>
                 <div className="text-xs text-gray-500">
                   {totals.outstanding.outstanding_count || 0} invoices
@@ -580,14 +601,21 @@ export function ResizableDashboardCards() {
                 flexDirection: 'column',
                 border: isEditMode ? '2px dashed #ccc' : 'none',
                 padding: isEditMode ? '4px' : '0',
+                // Always allow pointer events for toolbar
+                pointerEvents: cardId === 'toolbar' ? 'auto' : (isDragging ? 'none' : 'auto'),
               }}
               className={classNames(
                 'dashboard-grid-item',
                 {
-                  'cursor-move': isEditMode,
-                  'pointer-events-none': isDragging,
+                  'cursor-move': isEditMode && cardId !== 'toolbar',
                 }
               )}
+              onClick={(e) => {
+                // Ensure clicks work in toolbar even during drag
+                if (cardId === 'toolbar') {
+                  e.stopPropagation();
+                }
+              }}
             >
               {content}
             </div>
