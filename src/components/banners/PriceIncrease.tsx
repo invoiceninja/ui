@@ -26,6 +26,7 @@ import { Link } from '../forms';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEffect, useState } from 'react';
+import { useCompanyUsers } from '$app/common/hooks/useCompanyUsers';
 
 export function PriceIncreaseBanner() {
   const [t] = useTranslation();
@@ -35,6 +36,7 @@ export function PriceIncreaseBanner() {
   const { isOwner } = useAdmin();
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
+  const companyUsers = useCompanyUsers();
   const reactSettings = useReactSettings();
 
   const [shouldDisplayBanner, setShouldDisplayBanner] = useState<boolean>();
@@ -73,12 +75,16 @@ export function PriceIncreaseBanner() {
   };
 
   useEffect(() => {
-    if (reactSettings && typeof shouldDisplayBanner === 'undefined') {
-      setShouldDisplayBanner(
-        !reactSettings.preferences?.price_increase_banner_dismissed_at
+    if (companyUsers.length > 0 && typeof shouldDisplayBanner === 'undefined') {
+      const isAnyCompanyUserHasPriceIncreaseBannerDismissed = companyUsers.some(
+        (companyUser) =>
+          companyUser.react_settings?.preferences
+            ?.price_increase_banner_dismissed_at
       );
+
+      setShouldDisplayBanner(!isAnyCompanyUserHasPriceIncreaseBannerDismissed);
     }
-  }, [reactSettings?.preferences?.price_increase_banner_dismissed_at]);
+  }, [companyUsers]);
 
   if (!isHosted()) {
     return null;
