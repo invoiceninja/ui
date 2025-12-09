@@ -8,27 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  CompanyUser,
-  DashboardField,
-} from '$app/common/interfaces/company-user';
+import { DashboardField } from '$app/common/interfaces/company-user';
 import classNames from 'classnames';
 import { DashboardCard } from './DashboardCard';
 import ReactGridLayout, { Responsive } from 'react-grid-layout';
 import { WidthProvider } from 'react-grid-layout';
 import { useEffect, useState } from 'react';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDispatch } from 'react-redux';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { cloneDeep } from 'lodash';
 import { useDebounce } from 'react-use';
 import { diff } from 'deep-object-diff';
-import { cloneDeep } from 'lodash';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import { updateUser } from '$app/common/stores/slices/user';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { User } from '$app/common/interfaces/user';
-import { useDispatch } from 'react-redux';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -64,7 +61,6 @@ export function PreferenceCardsGrid(props: Props) {
 
   const [layouts, setLayouts] = useState<ReactGridLayout.Layouts>({});
   const [isLayoutsInitialized, setIsLayoutsInitialized] = useState<boolean>(false);
-  const [dragStartLayout, setDragStartLayout] = useState<ReactGridLayout.Layout[]>([]);
 
   // Generate initial layout for cards
   const generateLayoutForCards = (
@@ -175,13 +171,14 @@ export function PreferenceCardsGrid(props: Props) {
     });
   };
 
-  // Save layout to backend
- const handleUpdateUserPreferences = () => {
-    if (!user) return;
-    
+  const handleUpdateUserPreferences = () => {
+    if (!user) {
+      return;
+    }
+
     request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), {
-     react_settings: {
-       ...reactSettings,
+      react_settings: {
+        ...reactSettings,
         preference_cards_configuration: cloneDeep(layouts),
       },
     })
@@ -194,9 +191,7 @@ export function PreferenceCardsGrid(props: Props) {
         );
         $refetch(['users']);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   // Initialize layouts from saved settings
@@ -235,19 +230,18 @@ export function PreferenceCardsGrid(props: Props) {
   );
 
   // Custom drag handler to implement smoother drag behavior
-  const handleDrag = (layout: ReactGridLayout.Layout[], oldItem: ReactGridLayout.Layout, newItem: ReactGridLayout.Layout) => {
+  const handleDrag = () => {
     // Don't apply threshold logic, just let cards move freely
     // The overlap mode allows cards to temporarily overlap during drag
     // They will snap to grid on drop
   };
 
   // Track drag start position
-  const handleDragStart = (layout: ReactGridLayout.Layout[], oldItem: ReactGridLayout.Layout, newItem: ReactGridLayout.Layout) => {
-    setDragStartLayout(cloneDeep(layout));
+  const handleDragStart = () => {
   };
 
   // Apply collision detection on drag stop
-  const handleDragStop = (layout: ReactGridLayout.Layout[], oldItem: ReactGridLayout.Layout, newItem: ReactGridLayout.Layout) => {
+  const handleDragStop = () => {
     // Allow the layout to settle naturally
     // Grid will prevent final overlaps automatically
   };

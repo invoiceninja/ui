@@ -29,7 +29,7 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
-import { DashboardGridLayouts } from './DashboardGrid.types';
+// any type defined locally
 
 const StyledDiv = styled.div`
   &:hover {
@@ -41,7 +41,7 @@ const StyledDiv = styled.div`
 
 interface Props {
   layoutBreakpoint: string | undefined;
-  setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
+  setLayouts: Dispatch<SetStateAction<any>>;
   setAreCardsRestored: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -98,7 +98,7 @@ export function RestoreCardsModal(props: Props) {
             props.setLayouts(
               cloneDeep(
                 response.data.data.react_settings
-                  .dashboard_cards_configuration as DashboardGridLayouts
+                  .dashboard_cards_configuration as any
               )
             );
 

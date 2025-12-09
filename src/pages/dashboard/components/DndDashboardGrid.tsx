@@ -202,7 +202,6 @@ export function DndDashboardGrid(props: Props) {
           if (edge.includes('e')) w = Math.max(start.w + dxu, it.minW || 1);
           if (edge.includes('w')) {
             const newW = Math.max(start.w - dxu, it.minW || 1);
-            const delta = (start.w - newW);
             x = Math.max(0, start.x + dxu);
             w = newW;
           }
@@ -214,7 +213,6 @@ export function DndDashboardGrid(props: Props) {
     const onUp = () => {
       // Resolve and compact while anchoring the resized item top
       setWorking((prev) => {
-        const curr = prev.find((i) => i.i === id)!;
         const anchored = resolveOverlapsAnchored(prev, id, start.y);
         const compacted = compactVertical(anchored, id);
         setLayout(compacted);

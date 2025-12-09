@@ -12,7 +12,28 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate, useParseDayjs } from '$app/common/helpers';
-import { ChartData, TotalColors } from './DashboardGrid.types';
+
+// Define types locally
+interface ChartDataItem {
+  value: number;
+  currency: string;
+  date: string;
+}
+
+interface ChartData {
+  invoices: ChartDataItem[];
+  payments: ChartDataItem[];
+  expenses: ChartDataItem[];
+  outstanding: ChartDataItem[];
+}
+
+const TotalColors = {
+  invoice: 'rgb(147, 197, 253)',
+  outstanding: 'rgb(252, 211, 77)',
+  payment: 'rgb(134, 239, 172)',
+  expense: 'rgb(252, 165, 165)',
+};
+
 import {
   Line,
   CartesianGrid,
@@ -164,7 +185,7 @@ export function Chart(props: Props) {
       expenses: 0,
     }));
 
-    props.data?.invoices.forEach((invoice) => {
+    props.data?.invoices.forEach((invoice: any) => {
       const date = formatDate(invoice.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -173,7 +194,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.outstanding.forEach((outstanding) => {
+    props.data?.outstanding.forEach((outstanding: any) => {
       const date = formatDate(outstanding.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -182,7 +203,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.payments.forEach((payment) => {
+    props.data?.payments.forEach((payment: any) => {
       const date = formatDate(payment.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -191,7 +212,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.expenses.forEach((expense) => {
+    props.data?.expenses.forEach((expense: any) => {
       const date = formatDate(expense.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -223,7 +244,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('invoices') || ''}
           dataKey="invoices"
-          stroke={TotalColors.Blue}
+          stroke={'rgb(147, 197, 253)'}
           dot={false}
           strokeWidth={2}
         />
@@ -233,7 +254,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('payments') || ''}
           dataKey="payments"
-          stroke={TotalColors.Green}
+          stroke={'rgb(134, 239, 172)'}
           dot={false}
           strokeWidth={2}
         />
@@ -243,7 +264,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('outstanding') || ''}
           dataKey="outstanding"
-          stroke={TotalColors.Red}
+          stroke={'rgb(252, 165, 165)'}
           dot={false}
           strokeWidth={2}
         />
@@ -253,7 +274,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('expenses') || ''}
           dataKey="expenses"
-          stroke={TotalColors.Gray}
+          stroke={'rgb(156, 163, 175)'}
           dot={false}
           strokeWidth={2}
         />

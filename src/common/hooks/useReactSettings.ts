@@ -16,7 +16,6 @@ import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
-import { DashboardGridLayouts } from '$app/pages/dashboard/components/DashboardGrid.types';
 import { DashboardField } from '../interfaces/company-user';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
@@ -91,10 +90,10 @@ export interface ReactSettings {
   show_table_footer?: boolean;
   dark_mode?: boolean;
   color_theme?: ColorTheme;
-  dashboard_cards_configuration?: DashboardGridLayouts;
+  dashboard_cards_configuration?: any;
   removed_dashboard_cards?: Record<string, string[]>;
   dashboard_fields?: DashboardField[];
-  preference_cards_configuration?: DashboardGridLayouts;
+  preference_cards_configuration?: any;
 }
 
 export type ReactTableColumns =

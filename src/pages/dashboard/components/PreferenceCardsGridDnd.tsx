@@ -10,7 +10,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -82,7 +81,6 @@ export function PreferenceCardsGridDnd(props: Props) {
   // Maintain a flat array of ids for ordering within the first row
   const [order, setOrder] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     // Initialize from saved settings if present; else from fields
@@ -167,7 +165,7 @@ export function PreferenceCardsGridDnd(props: Props) {
                   className={isEditMode ? 'cursor-grab' : ''}
                   style={{ width: '100%' }}
                   data-dragging={activeId === id}
-                  onMouseDown={() => setSelectedId(id)}
+                  onMouseDown={() => {}}
                 >
                   <DashboardCard
                     field={field}

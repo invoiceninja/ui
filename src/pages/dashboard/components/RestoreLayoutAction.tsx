@@ -10,7 +10,7 @@
 
 import { Dispatch, useState } from 'react';
 import { MdRefresh } from 'react-icons/md';
-import { DashboardGridLayouts } from './DashboardGrid.types';
+// RestoreLayoutAction type defined locally
 import { SetStateAction } from 'react';
 import { DEFAULT_LAYOUTS } from './ResizableDashboardCards';
 import { Icon } from '$app/components/icons/Icon';
@@ -23,7 +23,7 @@ import { cloneDeep } from 'lodash';
 
 interface Props {
   layoutBreakpoint: string | undefined;
-  setLayouts: Dispatch<SetStateAction<DashboardGridLayouts>>;
+  setLayouts: Dispatch<SetStateAction<any>>;
   setIsLayoutRestored: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -48,7 +48,7 @@ export function RestoreLayoutAction(props: Props) {
 
           setIsLayoutRestored(true);
 
-          setLayouts((currentLayouts) =>
+          setLayouts((currentLayouts: any) =>
             cloneDeep({
               ...currentLayouts,
               [layoutBreakpoint]:

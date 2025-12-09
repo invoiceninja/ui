@@ -9,60 +9,49 @@
  */
 
 import '$app/resources/css/gridLayout.css';
-import '$app/resources/css/gridStack.css';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useDebounce } from 'react-use';
-import dayjs from 'dayjs';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { useDispatch } from 'react-redux';
 import { BiMove } from 'react-icons/bi';
 import { MdDragHandle } from 'react-icons/md';
+
+// React Grid Layout imports
+import { Responsive, WidthProvider, Layout, Layouts } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
 import { Button, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownDateRangePicker } from '$app/components/DropdownDateRangePicker';
 import { Card } from '$app/components/cards';
-import { Badge } from '$app/components/Badge';
 import { Spinner } from '$app/components/Spinner';
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { diff } from 'deep-object-diff';
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useEnabled } from '$app/common/guards/guards/enabled';
-import { usePreferences } from '$app/common/hooks/usePreferences';
 import {
   ChartsDefaultView,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { $refetch } from '$app/common/hooks/useRefetch';
 
-import { CompanyUser, DashboardField } from '$app/common/interfaces/company-user';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { User } from '$app/common/interfaces/user';
 
+// Export DEFAULT_LAYOUTS for other components
+export { DEFAULT_LAYOUTS };
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import { ModuleBitmask } from '$app/pages/settings';
-
 import { updateUser } from '$app/common/stores/slices/user';
 
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
-import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
-
-import { CurrencySelector } from '$app/components/CurrencySelector';
-
 import { DashboardCardSelector } from './DashboardCardSelector';
-import { PreferenceCardsGridDnd } from './PreferenceCardsGridDnd';
 import { RestoreCardsModal } from './RestoreCardsModal';
-import { RestoreLayoutAction } from './RestoreLayoutAction';
 import { Chart } from './Chart';
 import { Activity } from './Activity';
 import { UpcomingInvoices } from './UpcomingInvoices';
@@ -76,14 +65,6 @@ interface Currency {
   value: string | number;
   label: string;
 }
-import {
-  DashboardBreakpoint,
-  DashboardGridItem,
-  DashboardGridLayouts,
-  DashboardGridMetrics,
-} from './DashboardGrid.types';
-import { DashboardGrid } from './DashboardGrid';
-import { ChartData } from './DashboardGrid.types';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -92,752 +73,490 @@ interface TotalsRecord {
   outstanding: { outstanding_count: number; amount: string; code: string };
 }
 
-const BREAKPOINT_COLUMNS: Record<DashboardBreakpoint, number> = {
-  xxl: 48,
-  xl: 36,
-  lg: 30,
-  md: 24,
-  sm: 18,
-  xs: 12,
-};
+// Create ResponsiveGridLayout with WidthProvider
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const BREAKPOINT_METRICS: Record<DashboardBreakpoint, DashboardGridMetrics> = {
-  xxl: { cols: BREAKPOINT_COLUMNS.xxl, rowHeight: 18 },
-  xl: { cols: BREAKPOINT_COLUMNS.xl, rowHeight: 18 },
-  lg: { cols: BREAKPOINT_COLUMNS.lg, rowHeight: 18 },
-  md: { cols: BREAKPOINT_COLUMNS.md, rowHeight: 18 },
-  sm: { cols: BREAKPOINT_COLUMNS.sm, rowHeight: 20 },
-  xs: { cols: BREAKPOINT_COLUMNS.xs, rowHeight: 22 },
-};
+// Map react-grid-layout breakpoints
+const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
+const COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
 
-const BREAKPOINT_WIDTHS: Record<DashboardBreakpoint, number> = {
-  xxl: 1600,
-  xl: 1400,
-  lg: 1200,
-  md: 1024,
-  sm: 768,
-  xs: 0,
-};
 
-export const DEFAULT_LAYOUTS: DashboardGridLayouts = {
-  xxl: [
-    { i: 'toolbar', x: 0, y: 0, w: 48, h: 6, minH: 4, static: true },
-    { i: 'preferences', x: 0, y: 6, w: 48, h: 12, minH: 10 },
-    { i: 'totals', x: 0, y: 18, w: 16, h: 20, minH: 12 },
-    { i: 'overview', x: 16, y: 18, w: 32, h: 20, minH: 12 },
-    { i: 'upcoming_invoices', x: 0, y: 38, w: 24, h: 16, minH: 12 },
-    { i: 'past_due_invoices', x: 24, y: 38, w: 24, h: 16, minH: 12 },
-    { i: 'expired_quotes', x: 0, y: 54, w: 24, h: 16, minH: 12 },
-    { i: 'upcoming_quotes', x: 24, y: 54, w: 24, h: 16, minH: 12 },
-    { i: 'recent_payments', x: 0, y: 70, w: 24, h: 16, minH: 12 },
-    { i: 'upcoming_recurring_invoices', x: 24, y: 70, w: 24, h: 16, minH: 12 },
-    { i: 'activity', x: 0, y: 86, w: 48, h: 18, minH: 12 },
+// Default layouts for all breakpoints - simple visible cards
+const DEFAULT_LAYOUTS: Layouts = {
+  lg: [
+    { i: 'toolbar', x: 0, y: 0, w: 12, h: 2, static: false },
+    { i: 'totals', x: 0, y: 2, w: 12, h: 4, static: false },
+    { i: 'chart', x: 0, y: 6, w: 6, h: 8, static: false },
+    { i: 'activity', x: 6, y: 6, w: 6, h: 8, static: false },
+    { i: 'recent_payments', x: 0, y: 14, w: 4, h: 8, static: false },
+    { i: 'upcoming_invoices', x: 4, y: 14, w: 4, h: 8, static: false },
+    { i: 'past_due_invoices', x: 8, y: 14, w: 4, h: 8, static: false },
   ],
-  xl: [],
-  lg: [],
-  md: [],
-  sm: [],
-  xs: [],
+  md: [
+    { i: 'toolbar', x: 0, y: 0, w: 10, h: 2, static: false },
+    { i: 'totals', x: 0, y: 2, w: 10, h: 4, static: false },
+    { i: 'chart', x: 0, y: 6, w: 5, h: 8, static: false },
+    { i: 'activity', x: 5, y: 6, w: 5, h: 8, static: false },
+    { i: 'recent_payments', x: 0, y: 14, w: 5, h: 8, static: false },
+    { i: 'upcoming_invoices', x: 5, y: 14, w: 5, h: 8, static: false },
+    { i: 'past_due_invoices', x: 0, y: 22, w: 5, h: 8, static: false },
+  ],
+  sm: [
+    { i: 'toolbar', x: 0, y: 0, w: 6, h: 2, static: false },
+    { i: 'totals', x: 0, y: 2, w: 6, h: 4, static: false },
+    { i: 'chart', x: 0, y: 6, w: 6, h: 8, static: false },
+    { i: 'activity', x: 0, y: 14, w: 6, h: 8, static: false },
+    { i: 'recent_payments', x: 0, y: 22, w: 6, h: 8, static: false },
+    { i: 'upcoming_invoices', x: 0, y: 30, w: 6, h: 8, static: false },
+    { i: 'past_due_invoices', x: 0, y: 38, w: 6, h: 8, static: false },
+  ],
+  xs: [
+    { i: 'toolbar', x: 0, y: 0, w: 4, h: 2, static: false },
+    { i: 'totals', x: 0, y: 2, w: 4, h: 4, static: false },
+    { i: 'chart', x: 0, y: 6, w: 4, h: 8, static: false },
+    { i: 'activity', x: 0, y: 14, w: 4, h: 8, static: false },
+    { i: 'recent_payments', x: 0, y: 22, w: 4, h: 8, static: false },
+    { i: 'upcoming_invoices', x: 0, y: 30, w: 4, h: 8, static: false },
+    { i: 'past_due_invoices', x: 0, y: 38, w: 4, h: 8, static: false },
+  ],
+  xxs: [
+    { i: 'toolbar', x: 0, y: 0, w: 2, h: 2, static: false },
+    { i: 'totals', x: 0, y: 2, w: 2, h: 4, static: false },
+    { i: 'chart', x: 0, y: 6, w: 2, h: 8, static: false },
+    { i: 'activity', x: 0, y: 14, w: 2, h: 8, static: false },
+    { i: 'recent_payments', x: 0, y: 22, w: 2, h: 8, static: false },
+    { i: 'upcoming_invoices', x: 0, y: 30, w: 2, h: 8, static: false },
+    { i: 'past_due_invoices', x: 0, y: 38, w: 2, h: 8, static: false },
+  ],
 };
-
-const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
-  last7_days: {
-    start: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
-    end: dayjs().format('YYYY-MM-DD'),
-  },
-  last30_days: {
-    start: dayjs().subtract(30, 'days').format('YYYY-MM-DD'),
-    end: dayjs().format('YYYY-MM-DD'),
-  },
-  last365_days: {
-    start: dayjs().subtract(365, 'days').format('YYYY-MM-DD'),
-    end: dayjs().format('YYYY-MM-DD'),
-  },
-  this_month: {
-    start: dayjs().startOf('month').format('YYYY-MM-DD'),
-    end: dayjs().endOf('month').format('YYYY-MM-DD'),
-  },
-  last_month: {
-    start: dayjs().startOf('month').subtract(1, 'month').format('YYYY-MM-DD'),
-    end: dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
-  },
-  this_quarter: {
-    start: dayjs().startOf('quarter').format('YYYY-MM-DD'),
-    end: dayjs().endOf('quarter').format('YYYY-MM-DD'),
-  },
-  last_quarter: {
-    start: dayjs().subtract(1, 'quarter').startOf('quarter').format('YYYY-MM-DD'),
-    end: dayjs().subtract(1, 'quarter').endOf('quarter').format('YYYY-MM-DD'),
-  },
-  this_year: {
-    start: dayjs().startOf('year').format('YYYY-MM-DD'),
-    end: dayjs().format('YYYY-MM-DD'),
-  },
-  last_year: {
-    start: dayjs().subtract(1, 'year').startOf('year').format('YYYY-MM-DD'),
-    end: dayjs().subtract(1, 'year').endOf('year').format('YYYY-MM-DD'),
-  },
-};
-
-const cardOrder = [
-  'preferences',
-  'totals',
-  'overview',
-  'upcoming_invoices',
-  'past_due_invoices',
-  'expired_quotes',
-  'upcoming_quotes',
-  'recent_payments',
-  'upcoming_recurring_invoices',
-  'activity',
-] as const;
-export type DashboardCardKey = (typeof cardOrder)[number];
-
-const preferenceOnlyCards: DashboardCardKey[] = ['preferences'];
-
-function scaleLayout(
-  layout: DashboardGridItem[],
-  fromCols: number,
-  toCols: number
-): DashboardGridItem[] {
-  if (fromCols === toCols) return layout.map((item) => ({ ...item }));
-  const scale = toCols / fromCols;
-  return layout.map((item) => ({
-    ...item,
-    x: Math.round(item.x * scale),
-    w: Math.max(1, Math.round(item.w * scale)),
-  }));
-}
-
-function determineBreakpoint(width: number): DashboardBreakpoint {
-  if (width >= BREAKPOINT_WIDTHS.xxl) return 'xxl';
-  if (width >= BREAKPOINT_WIDTHS.xl) return 'xl';
-  if (width >= BREAKPOINT_WIDTHS.lg) return 'lg';
-  if (width >= BREAKPOINT_WIDTHS.md) return 'md';
-  if (width >= BREAKPOINT_WIDTHS.sm) return 'sm';
-  return 'xs';
-}
-
-function ensureLayouts(initial: DashboardGridLayouts): DashboardGridLayouts {
-  const result: DashboardGridLayouts = { ...initial };
-  (['xl', 'lg', 'md', 'sm', 'xs'] as DashboardBreakpoint[]).forEach(
-    (breakpoint) => {
-      if (!result[breakpoint] || result[breakpoint].length === 0) {
-        const cols = BREAKPOINT_COLUMNS[breakpoint];
-        result[breakpoint] = scaleLayout(
-          result.xxl,
-          BREAKPOINT_COLUMNS.xxl,
-          cols
-        );
-      }
-    }
-  );
-  return result;
-}
 
 export function ResizableDashboardCards() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-
-  const enabled = useEnabled();
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
-  const colors = useColorScheme();
   const user = useCurrentUser();
-  const settings = useReactSettings();
-  const { Preferences, update } = usePreferences();
+  const company = useCurrentCompany();
+  const enabled = useEnabled();
+  const reactSettings = useReactSettings();
 
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [layouts, setLayouts] = useState<DashboardGridLayouts>(() =>
-    ensureLayouts(settings?.dashboard_cards_configuration || DEFAULT_LAYOUTS)
-  );
-  const [activeBreakpoint, setActiveBreakpoint] = useState<DashboardBreakpoint>('xxl');
-  const [metrics, setMetrics] = useState<DashboardGridMetrics>(
-    BREAKPOINT_METRICS.xxl
-  );
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState<boolean>(false);
+  const [layouts, setLayouts] = useState<Layouts>(DEFAULT_LAYOUTS);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [dateRange, setDateRange] = useState<string>('this_month');
+  const [customDateRange, setCustomDateRange] = useState<[string, string]>(['', '']);
+  const [selectedCurrencyId, setSelectedCurrencyId] = useState<string>('999');
+  const [chartsView, setChartsView] = useState<string>('total');
+  const [chartResults, setChartResults] = useState<Record<string, unknown>>({});
+  const [currentDashboardFields, setCurrentDashboardFields] = useState<string[]>(['chart', 'activity', 'recent_payments', 'upcoming_invoices', 'past_due_invoices']);
+  const [companyUser, setCompanyUser] = useState<CompanyUser>();
 
-  // current dashboard fields for preferences panel
-  const [currentDashboardFields, setCurrentDashboardFields] =
-    useState<DashboardField[]>(
-      settings?.dashboard_fields || user?.company_user?.react_settings
-        ?.dashboard_fields ||
-        []
-    );
 
-  const chartSensitivity =
-    settings?.preferences?.dashboard_charts?.default_view || 'month';
-  const currency = settings?.preferences?.dashboard_charts?.currency || 1;
-  const dateRange = settings?.preferences?.dashboard_charts?.range || 'this_month';
-
-  const [dates, setDates] = useState<{ start_date: string; end_date: string }>(
-    {
-      start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
-      end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
-    }
-  );
-
-  const [body, setBody] = useState({
-    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
-    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
-    date_range: dateRange,
-  });
-
-  const totalsQuery = useQuery({
-    queryKey: ['/api/v1/charts/totals_v2', body],
-    queryFn: () =>
-      request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
-        (response) => response.data
-      ),
-    staleTime: Infinity,
-  });
-
-  const chartQuery = useQuery<{ data: ChartData }>(
-    ['/api/v1/charts/chart_summary_v2', body],
-    () => request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body),
-    {
-      staleTime: Infinity,
-    }
-  );
-
-  useEffect(() => {
-    if (settings?.preferences?.dashboard_charts?.range) {
-      const range = settings.preferences.dashboard_charts.range;
-      setBody((prev) => ({
-        ...prev,
-        date_range: range,
-        start_date: GLOBAL_DATE_RANGES[range]?.start || prev.start_date,
-        end_date: GLOBAL_DATE_RANGES[range]?.end || prev.end_date,
-      }));
-    }
-  }, [settings?.preferences?.dashboard_charts?.range]);
-
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width || 0;
-      const breakpoint = determineBreakpoint(width);
-      setActiveBreakpoint(breakpoint);
-      setMetrics(BREAKPOINT_METRICS[breakpoint]);
-
-      setLayouts((current) => {
-        if (current[breakpoint]) return current;
-        const scaled = scaleLayout(
-          current.xxl,
-          BREAKPOINT_COLUMNS.xxl,
-          BREAKPOINT_COLUMNS[breakpoint]
-        );
-        return { ...current, [breakpoint]: scaled };
-      });
-    });
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  const availableCurrencies: Currency[] = useMemo(() => {
-    const companyCurrencies =
-      company?.gateway_tokens || user?.company_user?.company?.gateway_tokens;
-
-    const unique: Record<string, Currency> = {};
-    companyCurrencies?.forEach((token) => {
-      const currencyId = token?.gateway?.currency_id;
-
-      if (currencyId && !unique[currencyId]) {
-        unique[currencyId] = {
-          value: currencyId,
-          label: token.gateway?.currency?.name || currencyId,
-        };
+  // Query for dashboard data
+  const { data: totalsResponse, isLoading: isTotalsLoading } = useQuery({
+    queryKey: ['dashboard', 'totals', dateRange, customDateRange, selectedCurrencyId],
+    queryFn: () => {
+      let url = `/api/v1/dashboard?currency_id=${selectedCurrencyId}`;
+      
+      if (dateRange && dateRange !== 'custom') {
+        url += `&date_range=${dateRange}`;
       }
-    });
-
-    return Object.values(unique);
-  }, [company, user]);
-
-  const handleDateChange = (range: string): void => {
-    const [start, end] = range.split(',');
-    const startDate = dayjs(start);
-    const endDate = dayjs(end);
-    if (!startDate.isValid() || !endDate.isValid()) {
-      return;
-    }
-
-    const normalized = startDate.isAfter(endDate)
-      ? { start_date: end, end_date: start }
-      : { start_date: start, end_date: end };
-
-    setBody({ ...normalized, date_range: 'custom' });
-    setDates(normalized);
-  };
-
-  const handleLayoutSave = useCallback(
-    (layout: DashboardGridItem[]) => {
-      setLayouts((current) => ({
-        ...current,
-        [activeBreakpoint]: layout,
-      }));
+      
+      if (dateRange === 'custom' && customDateRange[0] && customDateRange[1]) {
+        url += `&start_date=${customDateRange[0]}&end_date=${customDateRange[1]}`;
+      }
+      
+      return request('GET', endpoint(url));
     },
-    [activeBreakpoint]
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: chartResponse, isLoading: isChartLoading } = useQuery({
+    queryKey: ['dashboard', 'chart', dateRange, customDateRange, chartsView],
+    queryFn: () => {
+      let url = `/api/v1/charts/chart_summary`;
+      const params = new URLSearchParams();
+      
+      if (dateRange && dateRange !== 'custom') {
+        params.append('date_range', dateRange);
+      }
+      
+      if (dateRange === 'custom' && customDateRange[0] && customDateRange[1]) {
+        params.append('start_date', customDateRange[0]);
+        params.append('end_date', customDateRange[1]);
+      }
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+      
+      return request('GET', endpoint(url));
+    },
+    onSuccess: (data) => {
+      setChartResults(data.data);
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Load user dashboard settings
+  useEffect(() => {
+    if (user && company) {
+      const cu = ((company as any).company_users || []).find((cu: any) => cu.user_id === user.id);
+      if (cu) {
+        setCompanyUser(cu);
+        if (cu.settings?.dashboard_fields) {
+          setCurrentDashboardFields(cu.settings.dashboard_fields);
+        }
+        
+        // Load saved layouts if they exist
+        if (cu.settings?.dashboard_layout) {
+          try {
+            const savedLayouts = JSON.parse(cu.settings.dashboard_layout);
+            setLayouts(savedLayouts);
+          } catch (e) {
+            console.error('Failed to parse saved layouts:', e);
+          }
+        }
+      }
+    }
+  }, [user, company]);
+
+  // Save layout changes
+  const saveLayouts = useCallback(
+    async (newLayouts: Layouts) => {
+      if (!companyUser) return;
+      
+      try {
+        const settings = {
+          ...companyUser.settings,
+          dashboard_layout: JSON.stringify(newLayouts),
+        };
+        
+        await request('PUT', endpoint('/api/v1/company_users/:id', { id: (companyUser as any).id }), {
+          settings,
+        });
+        
+        toast.success('Layout saved');
+      } catch (error) {
+        console.error('Failed to save layout:', error);
+        toast.error('Error saving layout');
+      }
+    },
+    [companyUser]
   );
 
+  // Debounce layout saving
   useDebounce(
     () => {
-      if (!user) return;
-      const updated = cloneDeep(user) as User;
-      set(
-        updated,
-        'company_user.react_settings.dashboard_cards_configuration',
-        layouts
-      );
-
-      if (!diff(user?.company_user?.react_settings?.dashboard_cards_configuration || {}, layouts)) {
-        return;
+      if (isEditMode && layouts !== DEFAULT_LAYOUTS) {
+        saveLayouts(layouts);
       }
-
-      request(
-        'PUT',
-        endpoint('/api/v1/company_users/:id', { id: updated.id }),
-        updated
-      ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-        set(updated, 'company_user', response.data.data);
-        dispatch(updateUser(updated));
-        $refetch(['company_users']);
-      });
     },
-    1500,
-    [layouts]
+    2000,
+    [layouts, isEditMode]
   );
 
-  const handleRemoveCard = (card: DashboardCardKey) => {
-    toast.processing();
-
-    const updatedUser = cloneDeep(user) as User;
-    const removedCards =
-      settings?.removed_dashboard_cards?.[activeBreakpoint] || [];
-
-    set(
-      updatedUser,
-      `company_user.react_settings.removed_dashboard_cards.${activeBreakpoint}`,
-      [...removedCards, card]
-    );
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-      updatedUser
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatedUser, 'company_user', response.data.data);
-      toast.success('removed');
-      $refetch(['company_users']);
-      dispatch(updateUser(updatedUser));
-    });
+  const handleLayoutChange = (currentLayout: Layout[], allLayouts: Layouts) => {
+    setLayouts(allLayouts);
   };
 
-  const isCardRemoved = useCallback(
-    (cardName: DashboardCardKey) => {
-      return settings?.removed_dashboard_cards?.[activeBreakpoint]?.includes(
-        cardName
-      );
-    },
-    [settings?.removed_dashboard_cards, activeBreakpoint]
-  );
+  const totals = useMemo(() => {
+    if (!totalsResponse) return null;
+    return (totalsResponse as any).data?.data as TotalsRecord;
+  }, [totalsResponse]);
 
-  const renderCard = useCallback(
-    (card: DashboardCardKey) => {
-      switch (card) {
-        case 'preferences':
-          if (!currentDashboardFields?.length) return null;
-          return (
-            <div className="flex h-full flex-col">
+  const currencies = useMemo(() => {
+    if (!totalsResponse) return [];
+    const data = (totalsResponse as any).data?.data;
+    if (!data?.currencies) return [];
+    
+    return Object.entries(data.currencies).map(([id, currency]: [string, any]) => ({
+      value: id,
+      label: `${currency.name} (${currency.code})`,
+    }));
+  }, [totalsResponse]);
+
+
+  // Render individual cards
+  const renderCard = (cardId: string) => {
+    console.log('Rendering card:', cardId);
+    
+    switch (cardId) {
+      case 'toolbar':
+        return (
+          <div className="h-full flex flex-col lg:flex-row gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded">
+            <div className="flex gap-2 items-center flex-1">
+              <Button
+                behavior="button"
+                onClick={() => setIsEditMode(!isEditMode)}
+                className="flex items-center gap-2"
+              >
+                <Icon element={isEditMode ? MdDragHandle : BiMove} size={18} />
+                <span>{isEditMode ? 'Done Editing' : 'Edit Layout'}</span>
+              </Button>
+              
               {isEditMode && (
-                <div className="dashboard-card__drag-handle flex items-center justify-center gap-2 border border-dashed border-primary-500 bg-primary-500/10 py-1 text-xs text-primary-500">
-                  <Icon element={MdDragHandle} size={16} />
-                  <span>{t('drag_to_move')}</span>
-                </div>
+                <>
+                  <Button
+                    behavior="button"
+                    onClick={() => setIsCardsModalOpen(true)}
+                  >
+                    Add Cards
+                  </Button>
+                  <Button onClick={() => setIsRestoreModalOpen(true)}>Restore Defaults</Button>
+                </>
               )}
-              <div className="flex-1 overflow-auto">
-                <PreferenceCardsGridDnd
-                  currentDashboardFields={currentDashboardFields}
-                  dateRange={dateRange}
-                  startDate={dates.start_date}
-                  endDate={dates.end_date}
-                  currencyId={currency.toString()}
-                  layoutBreakpoint={activeBreakpoint}
-                  isEditMode={isEditMode}
-                />
-              </div>
             </div>
-          );
-
-        case 'totals':
-          if (!enabled(ModuleBitmask.Invoices)) return null;
-          return (
-            <Card
-              title={t('totals')}
-              className={classNames('h-full flex flex-col', {
-                'dashboard-card__drag-handle cursor-grab': isEditMode,
-              })}
-              withoutBodyPadding
-              topRight={
-                <div className="flex items-center gap-2">
-                  <DashboardCardSelector />
-                  {totalsQuery.isFetching && <Spinner />}
-                </div>
-              }
-            >
-              <div className="grid grid-cols-2 gap-4 p-4">
-                {(totalsQuery.data?.data || []).map((total: TotalsRecord, index: number) => (
-                  <div key={index} className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {t(Object.keys(total)[0])}
-                    </span>
-                    <span className="text-lg font-semibold">
-                      {formatMoney(
-                        Number(Object.values(total)[0]?.amount || 0),
-                        company?.settings.country_id,
-                        Object.values(total)[0]?.code || undefined
-                      )}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          );
-
-        case 'overview':
-          return (
-            <Card
-              title={t('overview')}
-              className={classNames('h-full flex flex-col', {
-                'dashboard-card__drag-handle cursor-grab': isEditMode,
-              })}
-              withoutBodyPadding
-            >
-              <div className="flex flex-col gap-3 p-4">
-                <div className="grid grid-cols-3 gap-3">
-                  <SelectField
-                    label={t('chart_style')}
-                    value={chartSensitivity}
-                    onValueChange={(value) =>
-                      update(
-                        'preferences.dashboard_charts.default_view',
-                        value as ChartsDefaultView
-                      )
-                    }
-                  >
-                    <option value="day">{t('day')}</option>
-                    <option value="week">{t('week')}</option>
-                    <option value="month">{t('month')}</option>
-                  </SelectField>
-                  <SelectField
-                    label={t('date_range')}
-                    value={body.date_range}
-                    onValueChange={(value: string) =>
-                      update('preferences.dashboard_charts.range', value)
-                    }
-                  >
-                    {Object.keys(GLOBAL_DATE_RANGES).map((key) => (
-                      <option key={key} value={key}>
-                        {t(key)}
-                      </option>
-                    ))}
-                  </SelectField>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                      {t('custom_range')}
-                    </span>
-                    <DropdownDateRangePicker
-                      value={body.date_range}
-                      startDate={body.start_date}
-                      endDate={body.end_date}
-                      handleDateRangeChange={(value: string) =>
-                        setBody((prev) => ({
-                          ...prev,
-                          date_range: value,
-                          start_date: GLOBAL_DATE_RANGES[value]?.start || prev.start_date,
-                          end_date: GLOBAL_DATE_RANGES[value]?.end || prev.end_date,
-                        }))
-                      }
-                      handleDateChange={handleDateChange}
-                    />
-                  </div>
-                </div>
-                <div className="flex-1 min-h-[280px]">
-                  {chartQuery.isFetching && (
-                    <div className="flex h-full items-center justify-center">
-                      <Spinner />
-                    </div>
-                  )}
-                  {!chartQuery.isFetching && chartQuery.data?.data && (
-                    <Chart
-                      data={chartQuery.data.data}
-                      dates={dates}
-                      chartSensitivity={chartSensitivity}
-                      currency={currency.toString()}
-                    />
-                  )}
-                </div>
-              </div>
-            </Card>
-          );
-
-        case 'upcoming_invoices':
-          if (
-            !enabled(ModuleBitmask.Invoices) ||
-            isCardRemoved('upcoming_invoices')
-          )
-            return null;
-          return (
-            <UpcomingInvoices
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => handleRemoveCard('upcoming_invoices')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          );
-
-        case 'past_due_invoices':
-          if (
-            !enabled(ModuleBitmask.Invoices) ||
-            isCardRemoved('past_due_invoices')
-          )
-            return null;
-          return (
-            <PastDueInvoices
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => handleRemoveCard('past_due_invoices')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          );
-
-        case 'expired_quotes':
-          if (
-            !enabled(ModuleBitmask.Quotes) ||
-            isCardRemoved('expired_quotes')
-          )
-            return null;
-          return (
-            <ExpiredQuotes
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => handleRemoveCard('expired_quotes')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          );
-
-        case 'upcoming_quotes':
-          if (
-            !enabled(ModuleBitmask.Quotes) ||
-            isCardRemoved('upcoming_quotes')
-          )
-            return null;
-          return (
-            <UpcomingQuotes
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => handleRemoveCard('upcoming_quotes')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          );
-
-        case 'recent_payments':
-          if (
-            !enabled(ModuleBitmask.Invoices) ||
-            isCardRemoved('recent_payments')
-          )
-            return null;
-          return (
-            <RecentPayments
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => handleRemoveCard('recent_payments')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          );
-
-        case 'upcoming_recurring_invoices':
-          if (
-            !enabled(ModuleBitmask.Invoices) ||
-            isCardRemoved('upcoming_recurring_invoices')
-          )
-            return null;
-          return (
-            <UpcomingRecurringInvoices
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => handleRemoveCard('upcoming_recurring_invoices')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          );
-
-        case 'activity':
-          if (
-            !enabled(ModuleBitmask.Invoices) ||
-            isCardRemoved('activity')
-          )
-            return null;
-          return (
-            <Activity
-              isEditMode={isEditMode}
-              topRight={
-                isEditMode && (
-                  <Button
-                    className="cancelDraggingCards"
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => handleRemoveCard('activity')}
-                  >
-                    {t('remove')}
-                  </Button>
-                )
-              }
-            />
-          );
-
-        default:
-          return null;
-      }
-    },
-    [
-      isEditMode,
-      currentDashboardFields,
-      dateRange,
-      dates,
-      currency,
-      activeBreakpoint,
-      enabled,
-      settings?.removed_dashboard_cards,
-      totalsQuery.data?.data,
-      totalsQuery.isFetching,
-      chartQuery.data?.data,
-      chartQuery.isFetching,
-      formatMoney,
-      company,
-      t,
-    ]
-  );
-
-  const toolbar = (
-    <Card
-      withoutBodyPadding
-      className="flex h-full items-center justify-end gap-4"
-      title=""
-    >
-      <div className="flex items-center gap-3 px-4 py-2">
-        <Badge variant="light-blue" className="uppercase tracking-wider">
-          {t('dashboard')}
-        </Badge>
-        <SelectField
-          className="w-36"
-          value={currency.toString()}
-          onValueChange={(value) =>
-            update('preferences.dashboard_charts.currency', parseInt(value))
-          }
-        >
-          <option value="999">{t('all')}</option>
-          {availableCurrencies.map((currencyOption) => (
-            <option key={currencyOption.value} value={currencyOption.value}>
-              {currencyOption.label}
-            </option>
-          ))}
-        </SelectField>
-        <div className="flex items-center gap-2">
-          <DashboardCardSelector />
-          <div
-            className="flex cursor-pointer items-center"
-            onClick={() => setIsEditMode((prev) => !prev)}
-          >
-            <Icon element={BiMove} size={20} />
+            
+            <div className="flex gap-2 items-center">
+              <DropdownDateRangePicker
+                value={dateRange}
+                startDate={customDateRange[0]}
+                endDate={customDateRange[1]}
+                handleDateChange={setDateRange}
+                handleDateRangeChange={(value) => setCustomDateRange([value, value])}
+              />
+              
+              {currencies.length > 0 && (
+                <SelectField
+                  value={selectedCurrencyId}
+                  onValueChange={setSelectedCurrencyId}
+                  className="w-48"
+                >
+                  <option value="999">All</option>
+                  {currencies.map((currency) => (
+                    <option key={currency.value} value={currency.value}>
+                      {currency.label}
+                    </option>
+                  ))}
+                </SelectField>
+              )}
+            </div>
           </div>
-          {isEditMode && (
-            <div className="flex items-center gap-2">
-              <RestoreCardsModal
-                layoutBreakpoint={activeBreakpoint}
-                setLayouts={setLayouts}
-                setAreCardsRestored={() => undefined}
-              />
-              <RestoreLayoutAction
-                layoutBreakpoint={activeBreakpoint}
-                setLayouts={setLayouts}
-                setIsLayoutRestored={() => undefined}
-              />
+        );
+        
+      case 'totals':
+        if (isTotalsLoading) {
+          return (
+            <Card className="h-full flex items-center justify-center">
+              <Spinner />
+            </Card>
+          );
+        }
+        
+        if (!totals) {
+          // Return a placeholder to show something is there
+          return (
+            <Card className="h-full p-4">
+              <div className="text-center text-gray-500">Loading totals...</div>
+            </Card>
+          );
+        }
+        
+        return (
+          <Card className="h-full p-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+              <div className="flex flex-col justify-center">
+                <div className="text-sm text-gray-500 dark:text-gray-400">Revenue</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {formatMoney(parseFloat(totals.revenue.paid_to_date || '0'), totals.revenue.code, company?.settings?.country_id)}
+                </div>
+              </div>
+              <div className="flex flex-col justify-center">
+                <div className="text-sm text-gray-500 dark:text-gray-400">Expenses</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {formatMoney(parseFloat(totals.expenses.amount || '0'), totals.expenses.code, company?.settings?.country_id)}
+                </div>
+              </div>
+              <div className="flex flex-col justify-center">
+                <div className="text-sm text-gray-500 dark:text-gray-400">Invoiced</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {formatMoney(parseFloat(totals.invoices.invoiced_amount || '0'), totals.invoices.code, company?.settings?.country_id)}
+                </div>
+              </div>
+              <div className="flex flex-col justify-center">
+                <div className="text-sm text-gray-500 dark:text-gray-400">Outstanding</div>
+                <div className="text-2xl font-bold text-orange-600">
+                  {formatMoney(parseFloat(totals.outstanding.amount || '0'), totals.outstanding.code, company?.settings?.country_id)}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {totals.outstanding.outstanding_count || 0} invoices
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
-    </Card>
-  );
+          </Card>
+        );
+        
+      case 'chart':
+        // Temporarily always show for debugging
+      // if (!currentDashboardFields.includes(DashboardField.DashChart)) return null;
+     return (
+      <Card className="h-full">
+        <Chart
+           data={chartResults as any}
+            dates={{ start_date: customDateRange[0] || '', end_date: customDateRange[1] || '' }}
+           currency={company?.settings?.currency_id || ''}
+            chartSensitivity="day"
+        />
+       </Card>
+       );
+        
+      case 'activity':
+        // Temporarily always show for debugging
+        // if (!currentDashboardFields.includes(DashboardField.DashActivity)) return null;
+        return (
+          <Card className="h-full">
+            <Activity isEditMode={isEditMode} />
+          </Card>
+        );
+        
+      case 'recent_payments':
+        // Temporarily always show for debugging
+        // if (!currentDashboardFields.includes(DashboardField.DashRecentPayments)) return null;
+        return (
+          <Card className="h-full">
+            <RecentPayments isEditMode={isEditMode} />
+          </Card>
+        );
+        
+      case 'upcoming_invoices':
+        // Temporarily always show for debugging
+       // if (!currentDashboardFields.includes(DashboardField.DashUpcomingInvoices)) return null;
+       return (
+         <Card className="h-full">
+            <UpcomingInvoices isEditMode={isEditMode} />
+         </Card>
+       );
+        
+      case 'past_due_invoices':
+        // Temporarily always show for debugging
+       // if (!currentDashboardFields.includes(DashboardField.DashPastDueInvoices)) return null;
+       return (
+         <Card className="h-full">
+            <PastDueInvoices isEditMode={isEditMode} />
+         </Card>
+       );
+        
+      default:
+        return (
+          <Card className="h-full flex items-center justify-center">
+            <span className="text-gray-400">Unknown Card: {cardId}</span>
+          </Card>
+        );
+    }
+  };
 
-  const gridLayout = layouts[activeBreakpoint] || layouts.xxl;
+
+  // Use state to manage window width for SSR compatibility
+  const [windowWidth, setWindowWidth] = useState<number | null>(null);
+  
+  useEffect(() => {
+    // Set initial width on client mount
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      
+      // Update on resize
+      const handleResize = () => setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  // Get all card IDs from current layout
+  const cardIds = useMemo(() => {
+    // Default to lg breakpoint for SSR or initial render
+    const width = windowWidth ?? 1200;
+    const currentBreakpoint = width >= 1200 ? 'lg' : 
+                            width >= 996 ? 'md' :
+                            width >= 768 ? 'sm' :
+                            width >= 480 ? 'xs' : 'xxs';
+    const currentLayout = layouts[currentBreakpoint] || layouts.lg || [];
+    return currentLayout.map(item => item.i);
+  }, [layouts, windowWidth]);
 
   return (
-    <div ref={containerRef} className="space-y-4">
-      <div>{toolbar}</div>
-      <DashboardGrid
-        layout={gridLayout}
-        editable={isEditMode}
-        metrics={metrics}
-        onLayoutChange={handleLayoutSave}
-        renderItem={(id) => renderCard(id as DashboardCardKey)}
-      />
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      
+      {/* Debug Info */}
+      <div className="mb-4 p-2 bg-yellow-100 dark:bg-yellow-900 rounded">
+        <div className="text-sm">
+          Debug: Edit Mode = {isEditMode ? 'ON' : 'OFF'}, 
+          Cards to render = {cardIds.join(', ')}
+        </div>
+      </div>
+      
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={layouts}
+        onLayoutChange={handleLayoutChange}
+        breakpoints={BREAKPOINTS}
+        cols={COLS}
+        rowHeight={30}
+        isDraggable={isEditMode}
+        isResizable={isEditMode}
+        preventCollision={false}
+        compactType="vertical"
+        margin={[16, 16]}
+        containerPadding={[0, 0]}
+        onDragStart={() => setIsDragging(true)}
+        onDragStop={() => setIsDragging(false)}
+        onResizeStart={() => setIsDragging(true)}
+        onResizeStop={() => setIsDragging(false)}
+        useCSSTransforms={true}
+      >
+        {cardIds.map((cardId) => {
+          const content = renderCard(cardId);
+          
+          if (!content) {
+            console.log('Card returned null:', cardId);
+            return null;
+          }
+          
+          return (
+            <div
+              key={cardId}
+              className={classNames(
+                'dashboard-grid-item',
+                {
+                  'cursor-move': isEditMode,
+                  'pointer-events-none': isDragging,
+                }
+              )}
+              style={{
+                border: isEditMode ? '2px dashed #ccc' : 'none',
+                padding: isEditMode ? '4px' : '0',
+              }}
+            >
+              {content}
+            </div>
+          );
+        })}
+      </ResponsiveGridLayout>
+      
+      {/* Always show test cards to verify grid is working */}
+      {cardIds.length === 0 && (
+        <div className="mt-8 p-4 bg-red-100 dark:bg-red-900 rounded">
+          <h3 className="text-lg font-bold mb-2">No cards in layout!</h3>
+          <p>This is a fallback to show the grid is working.</p>
+        </div>
+      )}
+      
+      {/* Modals */}
+      
+      {isRestoreModalOpen && (
+        <RestoreCardsModal
+          layoutBreakpoint={'lg'}
+          setLayouts={setLayouts}
+          setAreCardsRestored={() => {
+            setLayouts(DEFAULT_LAYOUTS);
+            setIsRestoreModalOpen(false);
+            toast.success('Layout restored');
+          }}
+        />
+      )}
     </div>
   );
 }

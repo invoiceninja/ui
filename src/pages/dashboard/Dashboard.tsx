@@ -10,7 +10,7 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Default } from '../../components/layouts/Default';
-import { ResizableDashboardCards } from './components/ResizableDashboardCards';
+import { SimpleDashboard } from './components/SimpleDashboard';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -24,7 +24,7 @@ export default function Dashboard() {
 
   return (
     <Default title={documentTitle} breadcrumbs={[]}>
-      <ResizableDashboardCards />
+      <SimpleDashboard />
     </Default>
   );
 }
