@@ -382,11 +382,64 @@ export function ResizableDashboardCards() {
       case 'chart':
         // Temporarily always show for debugging
       // if (!currentDashboardFields.includes(DashboardField.DashChart)) return null;
-     return (
+       // Don't render chart if we don't have chart data with proper structure
+       if (!chartResults || typeof chartResults !== 'object' || !('invoices' in chartResults)) {
+         return (
+           <Card className="h-full">
+             <div className="flex items-center justify-center h-full text-gray-500">
+               Loading chart data...
+             </div>
+           </Card>
+         );
+       }
+       
+       // Calculate proper date range from dateRange or customDateRange
+       let chartDates;
+       {
+         if (dateRange === 'custom' && customDateRange[0] && customDateRange[1]) {
+           chartDates = { start_date: customDateRange[0], end_date: customDateRange[1] };
+         } else {
+           // For non-custom ranges, compute dates from current date
+           const now = new Date();
+           let end = new Date();
+           let start = new Date();
+           
+           switch (dateRange) {
+             case 'this_month':
+               start.setDate(1);
+               break;
+             case 'last_month': {
+               start.setMonth(start.getMonth() - 1);
+               start.setDate(1);
+               end.setMonth(end.getMonth() - 1);
+               const lastDay = new Date(end.getFullYear(), end.getMonth() + 1, 0);
+               end.setDate(lastDay.getDate());
+               break;
+             }
+             case 'this_year':
+               start = new Date(now.getFullYear(), 0, 1);
+               break;
+             case 'last_year':
+               start = new Date(now.getFullYear() - 1, 0, 1);
+               end = new Date(now.getFullYear() - 1, 11, 31);
+               break;
+             default:
+               // Default to this month
+               start.setDate(1);
+           }
+           
+           chartDates = {
+             start_date: start.toISOString().split('T')[0],
+             end_date: end.toISOString().split('T')[0],
+           };
+         }
+       }
+       
+      return (
       <Card className="h-full">
         <Chart
            data={chartResults as any}
-            dates={{ start_date: customDateRange[0] || '', end_date: customDateRange[1] || '' }}
+           dates={chartDates}
            currency={company?.settings?.currency_id || ''}
             chartSensitivity="day"
         />

@@ -185,7 +185,7 @@ export function Chart(props: Props) {
       expenses: 0,
     }));
 
-    props.data?.invoices.forEach((invoice: any) => {
+    props.data?.invoices?.forEach((invoice: any) => {
       const date = formatDate(invoice.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -194,7 +194,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.outstanding.forEach((outstanding: any) => {
+    props.data?.outstanding?.forEach((outstanding: any) => {
       const date = formatDate(outstanding.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -203,7 +203,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.payments.forEach((payment: any) => {
+    props.data?.payments?.forEach((payment: any) => {
       const date = formatDate(payment.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -212,7 +212,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.expenses.forEach((expense: any) => {
+    props.data?.expenses?.forEach((expense: any) => {
       const date = formatDate(expense.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
