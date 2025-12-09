@@ -237,37 +237,49 @@ export default function GrafanaFixedDashboard() {
             </div>
           );
 
-       case 'chart':
-         return chartData?.data ? (
-           <Chart
-             data={chartData.data as any}
+        case 'chart':
+          // Ensure chart data has the expected structure
+          if (chartLoading) {
+            return <Spinner />;
+          }
+          
+          // Create safe chart data with default empty arrays if properties don't exist
+          const safeChartData = {
+            invoices: chartData?.data?.invoices || [],
+            outstanding: chartData?.data?.outstanding || [],
+            payments: chartData?.data?.payments || [],
+            expenses: chartData?.data?.expenses || [],
+            ...chartData?.data
+          };
+          
+          return (
+            <Chart
+              data={safeChartData}
               dates={{ start_date: '', end_date: '' }}
               currency={company?.settings?.currency_id || 'USD'}
               chartSensitivity="day"
-           />
-         ) : (
-            <div>Loading chart...</div>
+            />
           );
 
         case 'activity':
           return <Activity isEditMode={isEditMode} />;  
 
-       case 'recent_payments':
+        case 'recent_payments':
           return <RecentPayments isEditMode={isEditMode} />;
 
-       case 'upcoming_invoices':
+        case 'upcoming_invoices':
           return <UpcomingInvoices isEditMode={isEditMode} />;
 
-       case 'past_due_invoices':
+        case 'past_due_invoices':
           return <PastDueInvoices isEditMode={isEditMode} />;
 
         case 'expired_quotes':
           return <ExpiredQuotes isEditMode={isEditMode} />;
 
-       case 'upcoming_quotes':
+        case 'upcoming_quotes':
           return <UpcomingQuotes isEditMode={isEditMode} />;
 
-       case 'upcoming_recurring_invoices':
+        case 'upcoming_recurring_invoices':
           return <UpcomingRecurringInvoices isEditMode={isEditMode} />;
 
         default:
