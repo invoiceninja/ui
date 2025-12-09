@@ -457,9 +457,20 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
     totalColor,
     balanceColor,
     spacing,
+    labelPadding,
+    valuePadding,
+    labelValueGap,
+    valueMinWidth,
   } = block.properties;
 
-  let html = `<div style="text-align: ${align};">`;
+  // Use a table for proper label/value alignment
+  const tableAlign = align === 'right' ? 'margin-left: auto;' : 
+                     align === 'center' ? 'margin: 0 auto;' : '';
+  const gap = labelValueGap || '20px';
+  const minWidthStyle = valueMinWidth ? `min-width: ${valueMinWidth};` : '';
+
+  let html = `<table style="border-collapse: collapse; ${tableAlign}">`;
+  html += '<tbody>';
 
   items
     .filter((item: any) => item.show)
@@ -467,29 +478,40 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
       const isTotal = item.isTotal;
       const isBalance = item.isBalance;
       const value = replaceVariables(item.field, data);
+      const itemFontSize = isTotal ? totalFontSize : fontSize;
+      const itemFontWeight = isTotal ? totalFontWeight : 'normal';
+      const valueColor = isBalance ? balanceColor : isTotal ? totalColor : amountColor;
+
+      // Build label cell padding (user padding + gap on right)
+      const labelPaddingStyle = labelPadding 
+        ? `padding: ${labelPadding}; padding-right: ${gap};`
+        : `padding-right: ${gap}; padding-bottom: ${spacing};`;
+
+      // Build value cell padding
+      const valuePaddingStyle = valuePadding
+        ? `padding: ${valuePadding};`
+        : `padding-bottom: ${spacing};`;
 
       html += `
-        <div style="
-          display: flex;
-          justify-content: flex-end;
-          gap: 20px;
-          margin-bottom: ${spacing};
-          font-size: ${isTotal ? totalFontSize : fontSize};
-          font-weight: ${isTotal ? totalFontWeight : 'normal'};
-        ">
-          <span style="color: ${labelColor};">${escapeHtml(item.label)}:</span>
-          <span style="
-            color: ${isBalance ? balanceColor : isTotal ? totalColor : amountColor};
-            min-width: 100px;
+        <tr style="font-size: ${itemFontSize}; font-weight: ${itemFontWeight};">
+          <td style="
+            color: ${labelColor};
+            ${labelPaddingStyle}
             text-align: right;
-          ">
-            ${value}
-          </span>
-        </div>
+            white-space: nowrap;
+          ">${escapeHtml(item.label)}:</td>
+          <td style="
+            color: ${valueColor};
+            ${valuePaddingStyle}
+            text-align: right;
+            white-space: nowrap;
+            ${minWidthStyle}
+          ">${value}</td>
+        </tr>
       `;
     });
 
-  html += '</div>';
+  html += '</tbody></table>';
   return html;
 }
 

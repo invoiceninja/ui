@@ -286,43 +286,69 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
     totalColor,
     balanceColor,
     spacing,
+    labelPadding,
+    valuePadding,
+    labelValueGap,
+    valueMinWidth,
   } = block.properties;
 
-  return (
-    <div style={{ textAlign: align }}>
-      {items
-        .filter((item: any) => item.show)
-        .map((item: any, index: number) => {
-          const isTotal = item.isTotal;
-          const isBalance = item.isBalance;
-          const displayValue = replaceVariables(item.field, SAMPLE_INVOICE_DATA);
+  // Use table for proper label/value alignment
+  const tableStyle: React.CSSProperties = {
+    borderCollapse: 'collapse',
+    ...(align === 'right' ? { marginLeft: 'auto' } : {}),
+    ...(align === 'center' ? { margin: '0 auto' } : {}),
+  };
 
-          return (
-            <div
-              key={index}
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '20px',
-                marginBottom: spacing,
-                fontSize: isTotal ? totalFontSize : fontSize,
-                fontWeight: isTotal ? totalFontWeight : 'normal',
-              }}
-            >
-              <span style={{ color: labelColor }}>{item.label}:</span>
-              <span
+  const gap = labelValueGap || '20px';
+
+  return (
+    <table style={tableStyle}>
+      <tbody>
+        {items
+          .filter((item: any) => item.show)
+          .map((item: any, index: number) => {
+            const isTotal = item.isTotal;
+            const isBalance = item.isBalance;
+            const displayValue = replaceVariables(item.field, SAMPLE_INVOICE_DATA);
+
+            return (
+              <tr
+                key={index}
                 style={{
-                  color: isBalance ? balanceColor : isTotal ? totalColor : amountColor,
-                  minWidth: '100px',
-                  textAlign: 'right',
+                  fontSize: isTotal ? totalFontSize : fontSize,
+                  fontWeight: isTotal ? totalFontWeight : 'normal',
                 }}
               >
-                {displayValue}
-              </span>
-            </div>
-          );
-        })}
-    </div>
+                <td
+                  style={{
+                    color: labelColor,
+                    paddingRight: gap,
+                    paddingBottom: spacing,
+                    padding: labelPadding || undefined,
+                    paddingRight: gap, // Override right padding with gap
+                    textAlign: 'right',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {item.label}:
+                </td>
+                <td
+                  style={{
+                    color: isBalance ? balanceColor : isTotal ? totalColor : amountColor,
+                    paddingBottom: spacing,
+                    padding: valuePadding || undefined,
+                    textAlign: 'right',
+                    whiteSpace: 'nowrap',
+                    ...(valueMinWidth ? { minWidth: valueMinWidth } : {}),
+                  }}
+                >
+                  {displayValue}
+                </td>
+              </tr>
+            );
+          })}
+      </tbody>
+    </table>
   );
 }
 

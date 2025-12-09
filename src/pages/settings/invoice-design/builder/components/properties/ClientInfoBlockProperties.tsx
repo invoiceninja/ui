@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 
 // Available client info fields
@@ -31,11 +31,19 @@ const AVAILABLE_FIELDS = [
 export function ClientInfoBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
 
-  // Parse current content to determine which fields are enabled
+  // Parse current content to get fields in order
   const currentContent = block.properties.content || '';
-  const enabledFields = AVAILABLE_FIELDS.filter(field => 
-    currentContent.includes(field.variable)
-  ).map(f => f.id);
+  const contentLines = currentContent.split('\n').filter((line: string) => line.trim());
+  
+  // Get enabled fields in their current order
+  const enabledFieldsOrdered = contentLines
+    .map((line: string) => AVAILABLE_FIELDS.find(f => f.variable === line.trim()))
+    .filter(Boolean) as typeof AVAILABLE_FIELDS;
+
+  // Get fields not yet added
+  const availableToAdd = AVAILABLE_FIELDS.filter(
+    field => !contentLines.includes(field.variable)
+  );
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -44,30 +52,32 @@ export function ClientInfoBlockProperties({ block, onChange }: PropertyEditorPro
     });
   };
 
-  const toggleField = (fieldId: string, enabled: boolean) => {
-    const field = AVAILABLE_FIELDS.find(f => f.id === fieldId);
-    if (!field) return;
-
-    let newContent = currentContent;
-    
-    if (enabled) {
-      // Add field if not already present
-      if (!newContent.includes(field.variable)) {
-        newContent = newContent ? `${newContent}\n${field.variable}` : field.variable;
-      }
-    } else {
-      // Remove field - handle both with and without newline
-      newContent = newContent
-        .split('\n')
-        .filter(line => line.trim() !== field.variable)
-        .join('\n');
-    }
-    
-    updateProperty('content', newContent);
+  const rebuildContent = (fields: typeof AVAILABLE_FIELDS) => {
+    updateProperty('content', fields.map(f => f.variable).join('\n'));
   };
 
-  const isFieldEnabled = (fieldId: string) => {
-    return enabledFields.includes(fieldId);
+  const addField = (field: typeof AVAILABLE_FIELDS[0]) => {
+    rebuildContent([...enabledFieldsOrdered, field]);
+  };
+
+  const removeField = (index: number) => {
+    const newFields = [...enabledFieldsOrdered];
+    newFields.splice(index, 1);
+    rebuildContent(newFields);
+  };
+
+  const moveFieldUp = (index: number) => {
+    if (index === 0) return;
+    const newFields = [...enabledFieldsOrdered];
+    [newFields[index - 1], newFields[index]] = [newFields[index], newFields[index - 1]];
+    rebuildContent(newFields);
+  };
+
+  const moveFieldDown = (index: number) => {
+    if (index >= enabledFieldsOrdered.length - 1) return;
+    const newFields = [...enabledFieldsOrdered];
+    [newFields[index], newFields[index + 1]] = [newFields[index + 1], newFields[index]];
+    rebuildContent(newFields);
   };
 
   return (
@@ -101,28 +111,73 @@ export function ClientInfoBlockProperties({ block, onChange }: PropertyEditorPro
         </div>
       )}
 
-      {/* Fields to Display */}
+      {/* Active Fields - Reorderable */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-3">
-          {t('fields_to_display')}
+          {t('field_order')}
         </label>
-        <div className="space-y-2">
-          {AVAILABLE_FIELDS.map((field) => (
-            <div key={field.id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={`client-${field.id}`}
-                checked={isFieldEnabled(field.id)}
-                onChange={(e) => toggleField(field.id, e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-              />
-              <label htmlFor={`client-${field.id}`} className="text-sm text-gray-700">
-                {field.label}
-              </label>
+        <div className="space-y-1">
+          {enabledFieldsOrdered.map((field, index) => (
+            <div key={field.id} className="flex items-center gap-1 p-2 border border-gray-200 rounded-md bg-white">
+              {/* Reorder buttons */}
+              <div className="flex flex-col">
+                <button
+                  onClick={() => moveFieldUp(index)}
+                  disabled={index === 0}
+                  className={`p-0.5 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                  title={t('move_up')}
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => moveFieldDown(index)}
+                  disabled={index >= enabledFieldsOrdered.length - 1}
+                  className={`p-0.5 rounded ${index >= enabledFieldsOrdered.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                  title={t('move_down')}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <span className="flex-1 text-sm text-gray-700">{field.label}</span>
+              
+              <button
+                onClick={() => removeField(index)}
+                className="p-1 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
+                title={t('remove')}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           ))}
+          
+          {enabledFieldsOrdered.length === 0 && (
+            <div className="text-center py-4 text-gray-500 text-sm border border-dashed border-gray-300 rounded-md">
+              {t('no_fields_selected')}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Add Fields */}
+      {availableToAdd.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('add_field')}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {availableToAdd.map((field) => (
+              <button
+                key={field.id}
+                onClick={() => addField(field)}
+                className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors"
+              >
+                + {field.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Font Size */}
       <div>
