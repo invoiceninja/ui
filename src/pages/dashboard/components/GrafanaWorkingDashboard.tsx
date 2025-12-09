@@ -13,7 +13,6 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Card } from '$app/components/cards';
-import { Icon } from '$app/components/icons/Icon';
 import { Button } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';

@@ -13,10 +13,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Card } from '$app/components/cards';
-import { Icon } from '$app/components/icons/Icon';
 import { Button } from '$app/components/forms';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -170,7 +167,7 @@ export default function GrafanaFixedDashboard() {
     }
   }, []);
 
-  const handleDragStop = useCallback((layout: any, oldItem: any, newItem: any, placeholder: any, e: any, element: any) => {
+  const handleDragStop = useCallback(() => {
     console.log('Drag stopped');
     
     // Keep the justDropped flag active for a short time to prevent immediate layout updates
@@ -237,7 +234,7 @@ export default function GrafanaFixedDashboard() {
             </div>
           );
 
-        case 'chart':
+        case 'chart': {
           // Ensure chart data has the expected structure
           if (chartLoading) {
             return <Spinner />;
@@ -260,6 +257,7 @@ export default function GrafanaFixedDashboard() {
               chartSensitivity="day"
             />
           );
+        }
 
         case 'activity':
           return <Activity isEditMode={isEditMode} />;  
@@ -360,7 +358,7 @@ export default function GrafanaFixedDashboard() {
           <p className="text-sm text-blue-700">
             <strong>Edit Mode Active:</strong> Drag cards to reposition them. 
             Cards will swap positions when you drag one over another.
-            Resize cards by dragging their corners. Click "Save Layout" when done.
+            Resize cards by dragging their corners. Click &quot;Save Layout&quot; when done.
           </p>
         </div>
       )}

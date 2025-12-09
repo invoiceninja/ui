@@ -248,7 +248,7 @@ export function WorkingDashboard() {
               data={chartData?.data as any}
               dates={{ start_date: customDateRange[0], end_date: customDateRange[1] }}
               currency={selectedCurrencyId}
-              chartSensitivity={'month' as 'month'}
+              chartSensitivity={'month' as const}
             />
           </Card>
         );

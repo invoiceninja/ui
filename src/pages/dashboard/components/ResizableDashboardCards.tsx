@@ -9,12 +9,11 @@
  */
 
 import '$app/resources/css/gridLayout.css';
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useDebounce } from 'react-use';
-import { cloneDeep } from 'lodash';
 import { useDispatch } from 'react-redux';
 import { BiMove } from 'react-icons/bi';
 import { MdDragHandle } from 'react-icons/md';
@@ -38,28 +37,19 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useEnabled } from '$app/common/guards/guards/enabled';
-import {
-  ChartsDefaultView,
-  useReactSettings,
-} from '$app/common/hooks/useReactSettings';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 
 // Export DEFAULT_LAYOUTS for other components
 export { DEFAULT_LAYOUTS };
 import { CompanyUser } from '$app/common/interfaces/company-user';
-import { ModuleBitmask } from '$app/pages/settings';
-import { updateUser } from '$app/common/stores/slices/user';
 
-import { DashboardCardSelector } from './DashboardCardSelector';
 import { RestoreCardsModal } from './RestoreCardsModal';
 import { Chart } from './Chart';
 import { Activity } from './Activity';
 import { UpcomingInvoices } from './UpcomingInvoices';
 import { PastDueInvoices } from './PastDueInvoices';
-import { UpcomingQuotes } from './UpcomingQuotes';
-import { ExpiredQuotes } from './ExpiredQuotes';
 import { RecentPayments } from './RecentPayments';
-import { UpcomingRecurringInvoices } from './UpcomingRecurringInvoices';
 
 interface Currency {
   value: string | number;
@@ -498,7 +488,9 @@ export function ResizableDashboardCards() {
         isDraggable={isEditMode}
         isResizable={isEditMode}
         preventCollision={false}
-        compactType="vertical"
+        compactType={null}
+        verticalCompact={false}
+        allowOverlap={true}
         margin={[16, 16]}
         containerPadding={[0, 0]}
         onDragStart={() => setIsDragging(true)}
