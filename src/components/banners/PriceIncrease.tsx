@@ -10,13 +10,11 @@
 
 import { useTranslation } from 'react-i18next';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import dayjs from 'dayjs';
 import { cloneDeep, set } from 'lodash';
-import { User } from '$app/common/interfaces/user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
@@ -26,37 +24,46 @@ import { Icon } from '../icons/Icon';
 import { MdClose } from 'react-icons/md';
 import { Link } from '../forms';
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useEffect, useState } from 'react';
 
 export function PriceIncreaseBanner() {
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
-  const { isOwner } = useAdmin();
-
   const dispatch = useDispatch();
 
-  const company = useCurrentCompany();
+  const { isOwner } = useAdmin();
+  const colors = useColorScheme();
   const currentUser = useCurrentUser();
+  const reactSettings = useReactSettings();
+
+  const [shouldDisplayBanner, setShouldDisplayBanner] = useState<boolean>();
 
   const handleDismiss = () => {
-    const user = cloneDeep(currentUser) as User;
+    setShouldDisplayBanner(false);
+
+    const currentUnixTime = dayjs().utc().unix();
+
+    const updatedReactSettings = cloneDeep(reactSettings);
 
     set(
-      user,
-      'company_user.react_settings.price_increase_banner_dismissed_at',
-      dayjs().unix()
+      updatedReactSettings,
+      'preferences.price_increase_banner_dismissed_at',
+      currentUnixTime
     );
 
     request(
       'PUT',
-      endpoint('/api/v1/company_users/:id', { id: user.id }),
-      user
+      endpoint('/api/v1/company_users/:id/preferences?include=company_user', {
+        id: currentUser?.id,
+      }),
+      {
+        react_settings: updatedReactSettings,
+      }
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(user, 'company_user', response.data.data);
-
       $refetch(['company_users']);
 
-      dispatch(updateUser(user));
+      dispatch(updateUser(response.data.data));
       dispatch(resetChanges());
     });
   };
@@ -65,23 +72,32 @@ export function PriceIncreaseBanner() {
     handleDismiss();
   };
 
-  // // Don't show if not hosted
-  // if (!isHosted()) {
-  //   return null;
-  // }
+  useEffect(() => {
+    if (reactSettings && typeof shouldDisplayBanner === 'undefined') {
+      setShouldDisplayBanner(
+        !reactSettings.preferences?.price_increase_banner_dismissed_at
+      );
+    }
+  }, [reactSettings?.preferences?.price_increase_banner_dismissed_at]);
 
-  // // Only show to owner
-  // if (!isOwner) {
-  //   return null;
-  // }
+  if (!isHosted()) {
+    return null;
+  }
 
-  // // Only show in December 2025
-  // const now = dayjs();
-  // const isDecember2025 = now.year() === 2025 && now.month() === 11; // month is 0-indexed
+  if (!isOwner) {
+    return null;
+  }
 
-  // if (!isDecember2025) {
-  //   return null;
-  // }
+  if (!shouldDisplayBanner || typeof shouldDisplayBanner === 'undefined') {
+    return null;
+  }
+
+  const now = dayjs();
+  const isDecember2025 = now.year() === 2025 && now.month() === 11;
+
+  if (!isDecember2025) {
+    return null;
+  }
 
   return (
     <div className="max-w-max rounded-lg bg-[#DBEAFE] px-6 py-4 shadow-lg">
@@ -99,8 +115,11 @@ export function PriceIncreaseBanner() {
         </button>
 
         <div
-          className="cursor-pointer hover:opacity-80"
-          onClick={handleDismiss}
+          className="cursor-pointer hover:opacity-75 pl-4"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDismiss();
+          }}
         >
           <Icon element={MdClose} style={{ color: colors.$3 }} />
         </div>

@@ -420,6 +420,7 @@ export function Default(props: Props) {
         <VerifyPhone />
         <EInvoiceCredits />
 
+        {/* This component is only created for December 2025 if you see it in 2026 you can remove and delete it */}
         <PriceIncreaseBanner />
       </div>
 

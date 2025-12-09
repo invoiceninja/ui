@@ -50,7 +50,7 @@ export interface Preferences {
   use_legacy_editor: boolean;
   feedback_slider_displayed_at: number;
   feedback_given_at: number;
-  price_increase_banner_dismissed_at: number;
+  price_increase_banner_dismissed_at?: number;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
