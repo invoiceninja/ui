@@ -27,11 +27,13 @@ import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEffect, useState } from 'react';
 import { useCompanyUsers } from '$app/common/hooks/useCompanyUsers';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 export function PriceIncreaseBanner() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+  const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const { isOwner } = useAdmin();
   const colors = useColorScheme();
@@ -67,6 +69,8 @@ export function PriceIncreaseBanner() {
 
       dispatch(updateUser(response.data.data));
       dispatch(resetChanges());
+
+      refreshCompanyUsers();
     });
   };
 
