@@ -64,28 +64,58 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
     }
 
     .row {
-      display: flex;
-      flex-wrap: nowrap;
+      display: block; /* Use block layout for natural flow */
       margin-bottom: ${GRID_CONFIG.margin[1]}px;
       width: 100%;
+      clear: both;
+    }
+
+    .row::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .row.flex-row {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-start; /* Align items to top */
     }
 
     .block {
-      flex-shrink: 0;
-      min-height: 0; /* Allow content to determine height */
-      overflow: visible; /* Allow content to show fully */
       box-sizing: border-box;
+      overflow: visible; /* Content can overflow and push elements */
     }
 
-    /* Full-width blocks should not have margins */
+    /* Full-width blocks - natural block flow */
     .block.full-width {
       width: 100% !important;
-      margin: 0;
+      display: block;
+      float: none;
+      clear: both;
     }
 
-    /* Tables should not be constrained */
+    /* Partial-width blocks in flex rows */
+    .row.flex-row .block {
+      flex-shrink: 0;
+      flex-grow: 0;
+    }
+
+    /* Tables should expand to fit content */
     .block table {
       width: 100%;
+      border-collapse: collapse;
+    }
+
+    /* Ensure table rows don't get cut off */
+    .block table tr {
+      page-break-inside: avoid;
+    }
+
+    /* Text content should wrap naturally */
+    .block p, .block div {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     @media print {
@@ -150,12 +180,40 @@ function groupBlocksIntoRows(blocks: Block[]): Block[][] {
 function renderRow(blocks: Block[], data: InvoiceData): string {
   const blocksHTML = blocks.map(block => renderBlock(block, data)).join('\n');
   
-  // For rows with multiple blocks, add gap styling
-  const rowStyle = blocks.length > 1 
-    ? `gap: ${GRID_CONFIG.margin[0]}px;` 
-    : '';
+  // Determine row alignment based on block positions
+  let rowClass = 'row';
+  let rowStyle = '';
   
-  return `<div class="row" style="${rowStyle}">${blocksHTML}</div>`;
+  if (blocks.length > 1) {
+    // Multiple blocks - use flex with gap
+    rowClass = 'row flex-row';
+    rowStyle = `gap: ${GRID_CONFIG.margin[0]}px;`;
+  } else if (blocks.length === 1) {
+    // Single block - check if it needs alignment
+    const block = blocks[0];
+    const xPos = block.gridPosition.x;
+    const width = block.gridPosition.w;
+    
+    if (xPos > 0) {
+      // Block is not at left edge - use flex for positioning
+      rowClass = 'row flex-row';
+      
+      // Determine alignment based on position
+      if (xPos + width >= GRID_CONFIG.cols) {
+        // Block is at right edge
+        rowStyle = 'justify-content: flex-end;';
+      } else if (xPos >= (GRID_CONFIG.cols - width) / 2 - 1 && xPos <= (GRID_CONFIG.cols - width) / 2 + 1) {
+        // Block is roughly centered
+        rowStyle = 'justify-content: center;';
+      } else {
+        // Block has specific left offset - use margin
+        const leftPercent = (xPos / GRID_CONFIG.cols) * 100;
+        rowStyle = `padding-left: ${leftPercent}%;`;
+      }
+    }
+  }
+  
+  return `<div class="${rowClass}" style="${rowStyle}">${blocksHTML}</div>`;
 }
 
 /**
@@ -168,18 +226,24 @@ function renderBlock(block: Block, data: InvoiceData): string {
   const widthPercent = (block.gridPosition.w / GRID_CONFIG.cols) * 100;
   const isFullWidth = block.gridPosition.w === GRID_CONFIG.cols;
   
-  // Calculate minimum height from grid (but allow content to grow)
-  const minHeight = block.gridPosition.h * GRID_CONFIG.rowHeight;
+  // Full-width blocks (like tables) should NOT have min-height constraints
+  // This allows them to expand naturally based on content
+  const isExpandableBlock = block.type === 'table' || block.type === 'total';
   
-  // Full-width blocks don't need margin adjustments
+  // Only set min-height for non-expandable blocks
+  const minHeight = isExpandableBlock ? 0 : block.gridPosition.h * GRID_CONFIG.rowHeight;
+  
+  // Full-width blocks don't need width specification
   const widthStyle = isFullWidth 
-    ? 'width: 100%' 
-    : `width: ${widthPercent}%`;
+    ? '' 
+    : `width: ${widthPercent}%;`;
+  
+  const heightStyle = minHeight > 0 ? `min-height: ${minHeight}px;` : '';
   
   const className = isFullWidth ? 'block full-width' : 'block';
-  const styles = `${widthStyle}; min-height: ${minHeight}px;`;
+  const styles = `${widthStyle} ${heightStyle}`.trim();
 
-  return `<div class="${className}" style="${styles}">${content}</div>`;
+  return `<div class="${className}"${styles ? ` style="${styles}"` : ''}>${content}</div>`;
 }
 
 /**
