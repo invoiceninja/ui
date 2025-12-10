@@ -36,6 +36,7 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
 import { DashboardCardSelector } from './DashboardCardSelector';
 import GridLayout from 'react-grid-layout';
+import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 import { Icon } from '$app/components/icons/Icon';
 import { BiMove } from 'react-icons/bi';
 import classNames from 'classnames';
@@ -118,6 +119,7 @@ export function ResizableDashboardCards() {
   const company = useCurrentCompany();
   const settings = useReactSettings();
 
+  const currentDashboardFields = user?.company_user?.react_settings?.dashboard_fields || [];
   const [width, setWidth] = useState<number>(1000);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -413,7 +415,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 1,
+                y: 6,
                 w: 9.5,
                 h: 3.2,
                 isResizable: isEditMode,
@@ -531,7 +533,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 11,
-                y: 1,
+                y: 6,
                 w: 14.2,
                 h: 3.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -564,7 +566,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 0,
-              y: 2,
+              y: 6,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -582,7 +584,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 13,
-              y: 2,
+              y: 6,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -601,7 +603,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 3,
+                y: 6,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -621,7 +623,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 3,
+                y: 6,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -641,7 +643,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 4,
+                y: 6,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -661,7 +663,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 4,
+                y: 6,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -681,7 +683,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 5,
+                y: 6,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -691,6 +693,34 @@ export function ResizableDashboardCards() {
             >
               <UpcomingRecurringInvoices isEditMode={isEditMode} />
             </div>
+
+          {/* Preference Cards Row */}
+          {currentDashboardFields && currentDashboardFields.length > 0 && (
+            <div
+              key="preference_cards"
+              className="w-full"
+              data-grid={{
+                x: 0,
+                y: 1,
+                w: 24,
+                h: 1,
+                isResizable: isEditMode,
+                resizeHandles: isEditMode ? ['s'] : [],
+                isDraggable: false,
+                static: !isEditMode,
+              }}
+            >
+              <PreferenceCardsGrid
+                currentDashboardFields={currentDashboardFields}
+                dateRange={dateRange}
+                startDate={dates.start_date}
+                endDate={dates.end_date}
+                currencyId={currency.toString()}
+                layoutBreakpoint="lg"
+                isEditMode={isEditMode}
+              />
+            </div>
+          )}
           )}
         </GridLayout>
       ) : (
