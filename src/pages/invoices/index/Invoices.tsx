@@ -119,7 +119,7 @@ export default function Invoices() {
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
-        withoutDefaultBulkActions={Boolean(verifactuEnabled)}
+        withoutDefaultBulkActions
         customActions={actions}
         bottomActionsKeys={['cancel_invoice']}
         customBulkActions={customBulkActions}
@@ -161,8 +161,14 @@ export default function Invoices() {
           setSelectedInvoiceIds(selected);
           setIsConfirmActionModalOpen(true);
         }}
-        showDelete={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
-        showRestore={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
+        showDelete={(invoice) =>
+          Boolean(!verifactuEnabled) ||
+          (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)
+        }
+        showRestore={(invoice) =>
+          Boolean(!verifactuEnabled) ||
+          (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)
+        }
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
