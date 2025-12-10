@@ -112,7 +112,7 @@ export function PriceIncreaseBanner() {
   return (
     <div className="max-w-max rounded-lg bg-[#DBEAFE] px-6 py-4 shadow-lg">
       <div className="flex items-center justify-center space-x-2">
-        <span className="text-sm font-medium">{t('price_increase')}</span>
+        <span className="text-sm font-medium">{t('price_changes')}</span>
 
         <button type="button" onClick={handleClick}>
           <Link
