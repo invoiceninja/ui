@@ -693,6 +693,7 @@ export function ResizableDashboardCards() {
             >
               <UpcomingRecurringInvoices isEditMode={isEditMode} />
             </div>
+          )}
 
           {/* Preference Cards Row */}
           {currentDashboardFields && currentDashboardFields.length > 0 && (
@@ -720,7 +721,6 @@ export function ResizableDashboardCards() {
                 isEditMode={isEditMode}
               />
             </div>
-          )}
           )}
         </GridLayout>
       ) : (
