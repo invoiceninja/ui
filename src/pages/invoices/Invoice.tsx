@@ -171,8 +171,7 @@ export default function Invoice() {
                 onSaveClick={() => setSaveChanges(true)}
                 disableSaveButton={
                   (invoice &&
-                    (invoice.status_id === InvoiceStatus.Cancelled ||
-                      invoice.is_deleted)) ||
+                    (invoice.status_id === InvoiceStatus.Cancelled)) ||
                   isFormBusy
                 }
                 disableSaveButtonOnly={invoice.is_locked}
