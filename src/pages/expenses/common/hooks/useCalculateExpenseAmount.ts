@@ -10,8 +10,28 @@
 
 import { Expense } from '$app/common/interfaces/expense';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 
 export function useCalculateExpenseAmount() {
+  const company = useCurrentCompany();
+  const resolveCurrency = useResolveCurrency();
+
+  const roundToPrecision = (number: number, precision: number) => {
+    const isNegative = number < 0;
+    if (isNegative) {
+      number = number * -1;
+    }
+
+    number = Number(Math.round(Number(number + `e+${precision}`)) + `e-${precision}`);
+
+    if (isNegative) {
+      number = number * -1;
+    }
+
+    return number;
+  };
+
   return (expense: Expense | RecurringExpense) => {
     if (expense.uses_inclusive_taxes) {
       return expense.amount;
@@ -26,18 +46,25 @@ export function useCalculateExpenseAmount() {
       );
     }
 
+    const currencyId = expense.currency_id || company?.settings.currency_id;
+    const currency = resolveCurrency(currencyId);
+    const precision = currency?.precision || 2;
+
     let finalAmount = expense.amount;
 
     if (expense.tax_name1) {
-      finalAmount += expense.amount * (expense.tax_rate1 / 100);
+      const taxAmount = expense.amount * (expense.tax_rate1 / 100);
+      finalAmount += roundToPrecision(taxAmount, precision);
     }
 
     if (expense.tax_name2) {
-      finalAmount += expense.amount * (expense.tax_rate2 / 100);
+      const taxAmount = expense.amount * (expense.tax_rate2 / 100);
+      finalAmount += roundToPrecision(taxAmount, precision);
     }
 
     if (expense.tax_name3) {
-      finalAmount += expense.amount * (expense.tax_rate3 / 100);
+      const taxAmount = expense.amount * (expense.tax_rate3 / 100);
+      finalAmount += roundToPrecision(taxAmount, precision);
     }
 
     return finalAmount;
@@ -45,6 +72,24 @@ export function useCalculateExpenseAmount() {
 }
 
 export function useCalculateExpenseExclusiveAmount() {
+  const company = useCurrentCompany();
+  const resolveCurrency = useResolveCurrency();
+
+  const roundToPrecision = (number: number, precision: number) => {
+    const isNegative = number < 0;
+    if (isNegative) {
+      number = number * -1;
+    }
+
+    number = Number(Math.round(Number(number + `e+${precision}`)) + `e-${precision}`);
+
+    if (isNegative) {
+      number = number * -1;
+    }
+
+    return number;
+  };
+
   return (expense: Expense | RecurringExpense) => {
     if (!expense.uses_inclusive_taxes) {
       return expense.amount;
@@ -59,18 +104,31 @@ export function useCalculateExpenseExclusiveAmount() {
       );
     }
 
+    const currencyId = expense.currency_id || company?.settings.currency_id;
+    const currency = resolveCurrency(currencyId);
+    const precision = currency?.precision || 2;
+
     let exclusiveAmount = expense.amount;
 
     if (expense.tax_rate1 > 0 || expense.tax_rate1 < 0) {
-      exclusiveAmount = exclusiveAmount / (1 + expense.tax_rate1 / 100);
+      exclusiveAmount = roundToPrecision(
+        exclusiveAmount / (1 + expense.tax_rate1 / 100),
+        precision
+      );
     }
 
     if (expense.tax_rate2 > 0 || expense.tax_rate2 < 0) {
-      exclusiveAmount = exclusiveAmount / (1 + expense.tax_rate2 / 100);
+      exclusiveAmount = roundToPrecision(
+        exclusiveAmount / (1 + expense.tax_rate2 / 100),
+        precision
+      );
     }
 
     if (expense.tax_rate3 > 0 || expense.tax_rate3 < 0) {
-      exclusiveAmount = exclusiveAmount / (1 + expense.tax_rate3 / 100);
+      exclusiveAmount = roundToPrecision(
+        exclusiveAmount / (1 + expense.tax_rate3 / 100),
+        precision
+      );
     }
 
     return exclusiveAmount;
