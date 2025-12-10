@@ -1,61 +1,53 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import '$app/resources/css/gridLayout.css';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useDebounce } from 'react-use';
-import { useDispatch } from 'react-redux';
-import { BiMove } from 'react-icons/bi';
-import { MdDragHandle } from 'react-icons/md';
-
-// React Grid Layout imports
-import { Responsive, WidthProvider, Layout, Layouts } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-
+import '$app/resources/css/gridLayout.css';
 import { Button, SelectField } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { DropdownDateRangePicker } from '$app/components/DropdownDateRangePicker';
-import { Card } from '$app/components/cards';
-import { Spinner } from '$app/components/Spinner';
-
 import { endpoint } from '$app/common/helpers';
+import { Chart } from '$app/pages/dashboard/components/Chart';
+import { useEffect, useRef, useState } from 'react';
+import { Spinner } from '$app/components/Spinner';
+import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
+import { Card } from '$app/components/cards';
+import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useEnabled } from '$app/common/guards/guards/enabled';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-
-
-// Export DEFAULT_LAYOUTS for other components
-export { DEFAULT_LAYOUTS };
-import { CompanyUser } from '$app/common/interfaces/company-user';
-
-import { RestoreCardsModal } from './RestoreCardsModal';
-import { Chart } from './Chart';
-import { Activity } from './Activity';
-import { UpcomingInvoices } from './UpcomingInvoices';
+import { Badge } from '$app/components/Badge';
+import {
+  ChartsDefaultView,
+  useReactSettings,
+} from '$app/common/hooks/useReactSettings';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import collect from 'collect.js';
+import { useColorScheme } from '$app/common/colors';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useQuery } from 'react-query';
+import { DashboardCardSelector } from './DashboardCardSelector';
+import GridLayout from 'react-grid-layout';
+import { Icon } from '$app/components/icons/Icon';
+import { BiMove } from 'react-icons/bi';
+import classNames from 'classnames';
+import { ModuleBitmask } from '$app/pages/settings';
+import { UpcomingQuotes } from './UpcomingQuotes';
+import { UpcomingRecurringInvoices } from './UpcomingRecurringInvoices';
+import { ExpiredQuotes } from './ExpiredQuotes';
 import { PastDueInvoices } from './PastDueInvoices';
+import { UpcomingInvoices } from './UpcomingInvoices';
+import { Activity } from './Activity';
 import { RecentPayments } from './RecentPayments';
-import { Modal } from '$app/components/Modal';
-
-interface Currency {
-  value: string | number;
-  label: string;
-}
+import { useEnabled } from '$app/common/guards/guards/enabled';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -64,651 +56,647 @@ interface TotalsRecord {
   outstanding: { outstanding_count: number; amount: string; code: string };
 }
 
-// Create ResponsiveGridLayout with WidthProvider
-const ResponsiveGridLayout = WidthProvider(Responsive);
+interface Currency {
+  value: string;
+  label: string;
+}
 
-// Map react-grid-layout breakpoints
-const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
-const COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
+export interface ChartData {
+  invoices: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+  payments: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+  outstanding: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+  expenses: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+}
 
+interface GridItem {
+  i: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  content: string;
+}
 
-// Default layouts for all breakpoints - simple visible cards
-const DEFAULT_LAYOUTS: Layouts = {
-  lg: [
-    { i: 'toolbar', x: 0, y: 0, w: 12, h: 2, static: true },
-    { i: 'totals', x: 0, y: 2, w: 12, h: 4, static: false },
-    { i: 'chart', x: 0, y: 6, w: 6, h: 8, static: false },
-    { i: 'activity', x: 6, y: 6, w: 6, h: 8, static: false },
-    { i: 'recent_payments', x: 0, y: 14, w: 4, h: 8, static: false },
-    { i: 'upcoming_invoices', x: 4, y: 14, w: 4, h: 8, static: false },
-    { i: 'past_due_invoices', x: 8, y: 14, w: 4, h: 8, static: false },
-  ],
-  md: [
-    { i: 'toolbar', x: 0, y: 0, w: 10, h: 2, static: true },
-    { i: 'totals', x: 0, y: 2, w: 10, h: 4, static: false },
-    { i: 'chart', x: 0, y: 6, w: 5, h: 8, static: false },
-    { i: 'activity', x: 5, y: 6, w: 5, h: 8, static: false },
-    { i: 'recent_payments', x: 0, y: 14, w: 5, h: 8, static: false },
-    { i: 'upcoming_invoices', x: 5, y: 14, w: 5, h: 8, static: false },
-    { i: 'past_due_invoices', x: 0, y: 22, w: 5, h: 8, static: false },
-  ],
-  sm: [
-    { i: 'toolbar', x: 0, y: 0, w: 6, h: 2, static: true },
-    { i: 'totals', x: 0, y: 2, w: 6, h: 4, static: false },
-    { i: 'chart', x: 0, y: 6, w: 6, h: 8, static: false },
-    { i: 'activity', x: 0, y: 14, w: 6, h: 8, static: false },
-    { i: 'recent_payments', x: 0, y: 22, w: 6, h: 8, static: false },
-    { i: 'upcoming_invoices', x: 0, y: 30, w: 6, h: 8, static: false },
-    { i: 'past_due_invoices', x: 0, y: 38, w: 6, h: 8, static: false },
-  ],
-  xs: [
-    { i: 'toolbar', x: 0, y: 0, w: 4, h: 2, static: true },
-    { i: 'totals', x: 0, y: 2, w: 4, h: 4, static: false },
-    { i: 'chart', x: 0, y: 6, w: 4, h: 8, static: false },
-    { i: 'activity', x: 0, y: 14, w: 4, h: 8, static: false },
-    { i: 'recent_payments', x: 0, y: 22, w: 4, h: 8, static: false },
-    { i: 'upcoming_invoices', x: 0, y: 30, w: 4, h: 8, static: false },
-    { i: 'past_due_invoices', x: 0, y: 38, w: 4, h: 8, static: false },
-  ],
-  xxs: [
-    { i: 'toolbar', x: 0, y: 0, w: 2, h: 2, static: true },
-    { i: 'totals', x: 0, y: 2, w: 2, h: 4, static: false },
-    { i: 'chart', x: 0, y: 6, w: 2, h: 8, static: false },
-    { i: 'activity', x: 0, y: 14, w: 2, h: 8, static: false },
-    { i: 'recent_payments', x: 0, y: 22, w: 2, h: 8, static: false },
-    { i: 'upcoming_invoices', x: 0, y: 30, w: 2, h: 8, static: false },
-    { i: 'past_due_invoices', x: 0, y: 38, w: 2, h: 8, static: false },
-  ],
-};
+// Export default layouts for RestoreLayoutAction
+export const DEFAULT_LAYOUTS = {};
+
+export enum TotalColors {
+  Green = '#54B434',
+  Blue = '#2596BE',
+  Red = '#BE4D25',
+  Gray = '#242930',
+}
 
 export function ResizableDashboardCards() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
-  const formatMoney = useFormatMoney();
-  const user = useCurrentUser();
-  const company = useCurrentCompany();
+
+  const { Preferences, update } = usePreferences();
+
   const enabled = useEnabled();
-  const reactSettings = useReactSettings();
+  const formatMoney = useFormatMoney();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const user = useCurrentUser();
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const settings = useReactSettings();
+
+  const [width, setWidth] = useState<number>(1000);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
-  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState<boolean>(false);
-  const [layouts, setLayouts] = useState<Layouts>(DEFAULT_LAYOUTS);
-  const [isDragging, setIsDragging] = useState(false);
 
-  const [dateRange, setDateRange] = useState<string>('this_month');
-  const [customDateRange, setCustomDateRange] = useState<[string, string]>(['', '']);
-  const [selectedCurrencyId, setSelectedCurrencyId] = useState<string>('999');
-  const [chartsView, setChartsView] = useState<string>('total');
-  const [chartResults, setChartResults] = useState<Record<string, unknown>>({});
-  const [currentDashboardFields, setCurrentDashboardFields] = useState<string[]>(['chart', 'activity', 'recent_payments', 'upcoming_invoices', 'past_due_invoices']);
-  const [companyUser, setCompanyUser] = useState<CompanyUser>();
+  const chartScale =
+    settings?.preferences?.dashboard_charts?.default_view || 'month';
+  const currency = settings?.preferences?.dashboard_charts?.currency || 1;
+  const dateRange =
+    settings?.preferences?.dashboard_charts?.range || 'this_month';
 
-
-  // Query for dashboard data
-  const { data: totalsResponse, isLoading: isTotalsLoading } = useQuery({
-    queryKey: ['dashboard', 'totals', dateRange, customDateRange, selectedCurrencyId],
-    queryFn: () => {
-      let url = `/api/v1/dashboard?currency_id=${selectedCurrencyId}`;
-      
-      if (dateRange && dateRange !== 'custom') {
-        url += `&date_range=${dateRange}`;
-      }
-      
-      if (dateRange === 'custom' && customDateRange[0] && customDateRange[1]) {
-        url += `&start_date=${customDateRange[0]}&end_date=${customDateRange[1]}`;
-      }
-      
-      return request('GET', endpoint(url));
-    },
-    staleTime: 5 * 60 * 1000,
+  const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
+    start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      .toISOString()
+      .split('T')[0],
+    end_date: new Date().toISOString().split('T')[0],
   });
 
-  const { data: chartResponse, isLoading: isChartLoading } = useQuery({
-    queryKey: ['dashboard', 'chart', dateRange, customDateRange, chartsView],
-    queryFn: () => {
-      let url = `/api/v1/charts/chart_summary`;
-      const params = new URLSearchParams();
-      
-      if (dateRange && dateRange !== 'custom') {
-        params.append('date_range', dateRange);
-      }
-      
-      if (dateRange === 'custom' && customDateRange[0] && customDateRange[1]) {
-        params.append('start_date', customDateRange[0]);
-        params.append('end_date', customDateRange[1]);
-      }
-      
-      if (params.toString()) {
-        url += `?${params.toString()}`;
-      }
-      
-      return request('GET', endpoint(url));
-    },
-    onSuccess: (data) => {
-      setChartResults(data.data);
-    },
-    staleTime: 5 * 60 * 1000,
+  const [body, setBody] = useState<{
+    start_date: string;
+    end_date: string;
+    date_range: string;
+  }>({
+    start_date: '',
+    end_date: '',
+    date_range: dateRange,
   });
 
-  // Load user dashboard settings
-  useEffect(() => {
-    if (user && company) {
-      const cu = ((company as any).company_users || []).find((cu: any) => cu.user_id === user.id);
-      if (cu) {
-        setCompanyUser(cu);
-        if (cu.settings?.dashboard_fields) {
-          setCurrentDashboardFields(cu.settings.dashboard_fields);
-        }
-        
-        // Load saved layouts if they exist
-        if (cu.settings?.dashboard_layout) {
-          try {
-            const savedLayouts = JSON.parse(cu.settings.dashboard_layout);
-            setLayouts(savedLayouts);
-          } catch (e) {
-            console.error('Failed to parse saved layouts:', e);
-          }
-        }
-      }
+  const handleDateChange = (DateSet: string) => {
+    const [startDate, endDate] = DateSet.split(',');
+    if (new Date(startDate) > new Date(endDate)) {
+      setBody({
+        start_date: endDate,
+        end_date: startDate,
+        date_range: 'custom',
+      });
+    } else {
+      setBody({
+        start_date: startDate,
+        end_date: endDate,
+        date_range: 'custom',
+      });
     }
-  }, [user, company]);
-
-  // Save layout changes
-  const saveLayouts = useCallback(
-    async (newLayouts: Layouts) => {
-      if (!companyUser) return;
-      
-      try {
-        const settings = {
-          ...companyUser.settings,
-          dashboard_layout: JSON.stringify(newLayouts),
-        };
-        
-        await request('PUT', endpoint('/api/v1/company_users/:id', { id: (companyUser as any).id }), {
-          settings,
-        });
-        
-        toast.success('Layout saved');
-      } catch (error) {
-        console.error('Failed to save layout:', error);
-        toast.error('Error saving layout');
-      }
-    },
-    [companyUser]
-  );
-
-  // Debounce layout saving
-  useDebounce(
-    () => {
-      if (isEditMode && layouts !== DEFAULT_LAYOUTS) {
-        saveLayouts(layouts);
-      }
-    },
-    2000,
-    [layouts, isEditMode]
-  );
-
-  const handleLayoutChange = (currentLayout: Layout[], allLayouts: Layouts) => {
-    setLayouts(allLayouts);
   };
 
-  const totals = useMemo(() => {
-    if (!totalsResponse) return null;
-    return (totalsResponse as any).data?.data as TotalsRecord;
-  }, [totalsResponse]);
+  const totals = useQuery({
+    queryKey: ['/api/v1/charts/totals_v2', body],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
+        (response) => response.data
+      ),
+    staleTime: Infinity,
+  });
 
-  const currencies = useMemo(() => {
-    if (!totalsResponse) return [];
-    const data = (totalsResponse as any).data?.data;
-    if (!data?.currencies) return [];
-    
-    return Object.entries(data.currencies).map(([id, currency]: [string, any]) => ({
-      value: id,
-      label: `${currency.name} (${currency.code})`,
+  const chart = useQuery({
+    queryKey: ['/api/v1/charts/chart_summary_v2', body],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
+        (response) => response.data
+      ),
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    setBody((current) => ({
+      ...current,
+      date_range: dateRange,
     }));
-  }, [totalsResponse]);
+  }, [settings?.preferences?.dashboard_charts?.range]);
 
+  useEffect(() => {
+    if (totals.data) {
+      setTotalsData(totals.data);
 
-  // Render individual cards
-  const renderCard = (cardId: string) => {
-    console.log('Rendering card:', cardId);
-    
-    // Debug logging
-    if (cardId === 'totals') {
-      console.log('=== TOTALS DEBUG ===');
-      console.log('totalsResponse:', totalsResponse);
-      console.log('totals:', totals);
-      console.log('isTotalsLoading:', isTotalsLoading);
+      const currencies: Currency[] = [];
+
+      Object.entries(totals.data.currencies).map(([id, name]) => {
+        currencies.push({ value: id, label: name as unknown as string });
+      });
+
+      const $currencies = collect(currencies)
+        .pluck('value')
+        .map((value) => parseInt(value as string))
+        .toArray() as number[];
+
+      if (!$currencies.includes(currency)) {
+        update('preferences.dashboard_charts.currency', $currencies[0]);
+      }
+
+      setCurrencies(currencies);
     }
-    
-    if (cardId === 'chart') {
-      console.log('=== CHART DEBUG ===');
-      console.log('chartResponse:', chartResponse);
-      console.log('chartResults:', chartResults);
-      console.log('isChartLoading:', isChartLoading);
+  }, [totals.data]);
+
+  useEffect(() => {
+    if (chart.data) {
+      setDates({
+        start_date: chart.data.start_date,
+        end_date: chart.data.end_date,
+      });
+
+      setChartData(chart.data);
     }
-    
-    switch (cardId) {
-      case 'toolbar':
-        return (
-          <div className="h-full flex flex-col lg:flex-row gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded">
-            <div className="flex gap-2 items-center flex-1" style={{ pointerEvents: 'auto' }}>
-              <Button
-                behavior="button"
-                onClick={() => setIsEditMode(!isEditMode)}
-                className="flex items-center gap-2"
-                style={{ pointerEvents: 'auto' }}
-              >
-                <Icon element={isEditMode ? MdDragHandle : BiMove} size={18} />
-                <span>{isEditMode ? 'Done Editing' : 'Edit Layout'}</span>
-              </Button>
-              
-              {isEditMode && (
-                <>
-                  <Button
-                    behavior="button"
-                    onClick={() => setIsCardsModalOpen(true)}
-                    style={{ pointerEvents: 'auto' }}
-                  >
-                    Add Cards
-                  </Button>
-                  <Button 
-                    behavior="button"
-                    onClick={() => {
-                      setLayouts(DEFAULT_LAYOUTS);
-                      toast.success('Layout restored to defaults');
-                    }}
-                    style={{ pointerEvents: 'auto' }}
-                  >
-                    Restore Defaults
-                  </Button>
-                </>
-              )}
+  }, [chart.data]);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        setWidth(entries[0].contentRect.width);
+      }
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        resizeObserver.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      className={classNames({ 'select-none': isEditMode })}
+      ref={containerRef}
+      style={{ width: '100%' }}
+    >
+      {!totals.isLoading ? (
+        <GridLayout
+          cols={24}
+          width={width}
+          draggableHandle=".drag-handle"
+          margin={[0, 20]}
+          isDraggable={isEditMode}
+          isDroppable={isEditMode}
+          compactType="vertical"
+          preventCollision={false}
+          useCSSTransforms={true}
+        >
+          {totals.isLoading && (
+            <div className="w-full flex justify-center">
+              <Spinner />
             </div>
-            
-            <div className="flex gap-2 items-center">
-              <DropdownDateRangePicker
-                value={dateRange}
-                startDate={customDateRange[0]}
-                endDate={customDateRange[1]}
-                handleDateChange={setDateRange}
-                handleDateRangeChange={(value) => setCustomDateRange([value, value])}
-              />
-              
-              {currencies.length > 0 && (
+          )}
+
+          {/* Quick date, currency & date picker. */}
+          <div
+            key="1"
+            className="flex justify-end"
+            data-grid={{
+              x: 16,
+              y: 0,
+              w: 24,
+              h: 0.25,
+              isResizable: false,
+              static: true,
+            }}
+          >
+            <div className="flex space-x-2">
+              {currencies && (
                 <SelectField
-                  value={selectedCurrencyId}
-                  onValueChange={setSelectedCurrencyId}
-                  className="w-48"
+                  value={currency.toString()}
+                  onValueChange={(value) =>
+                    update(
+                      'preferences.dashboard_charts.currency',
+                      parseInt(value)
+                    )
+                  }
                 >
-                  <option value="999">All</option>
-                  {currencies.map((currency) => (
-                    <option key={currency.value} value={currency.value}>
+                  <option value="999">{t('all')}</option>
+
+                  {currencies.map((currency, index) => (
+                    <option key={index} value={currency.value}>
                       {currency.label}
                     </option>
                   ))}
                 </SelectField>
               )}
+
+              <div className="flex space-x-2">
+                <Button
+                  key="day-btn"
+                  type={chartScale === 'day' ? 'primary' : 'secondary'}
+                  onClick={() =>
+                    update('preferences.dashboard_charts.default_view', 'day')
+                  }
+                >
+                  {t('day')}
+                </Button>
+
+                <Button
+                  key="week-btn"
+                  type={chartScale === 'week' ? 'primary' : 'secondary'}
+                  onClick={() =>
+                    update('preferences.dashboard_charts.default_view', 'week')
+                  }
+                >
+                  {t('week')}
+                </Button>
+
+                <Button
+                  key="month-btn"
+                  type={chartScale === 'month' ? 'primary' : 'secondary'}
+                  onClick={() =>
+                    update('preferences.dashboard_charts.default_view', 'month')
+                  }
+                >
+                  {t('month')}
+                </Button>
+              </div>
+
+              <DropdownDateRangePicker
+                handleDateChange={handleDateChange}
+                startDate={dates.start_date}
+                endDate={dates.end_date}
+                handleDateRangeChange={(value) =>
+                  update('preferences.dashboard_charts.range', value)
+                }
+                value={body.date_range}
+              />
+
+              <DashboardCardSelector />
+
+              <Preferences>
+                <CurrencySelector
+                  label={t('currency')}
+                  value={currency.toString()}
+                  onChange={(v) =>
+                    update('preferences.dashboard_charts.currency', parseInt(v))
+                  }
+                />
+
+                <SelectField
+                  label={t('range')}
+                  value={chartScale}
+                  onValueChange={(value) =>
+                    update(
+                      'preferences.dashboard_charts.default_view',
+                      value as ChartsDefaultView
+                    )
+                  }
+                >
+                  <option value="day">{t('day')}</option>
+                  <option value="week">{t('week')}</option>
+                  <option value="month">{t('month')}</option>
+                </SelectField>
+
+                <SelectField
+                  label={t('date_range')}
+                  value={dateRange}
+                  onValueChange={(value) =>
+                    update('preferences.dashboard_charts.range', value)
+                  }
+                >
+                  <option value="last7_days">{t('last_7_days')}</option>
+                  <option value="last30_days">{t('last_30_days')}</option>
+                  <option value="this_month">{t('this_month')}</option>
+                  <option value="last_month">{t('last_month')}</option>
+                  <option value="this_quarter">{t('current_quarter')}</option>
+                  <option value="last_quarter">{t('last_quarter')}</option>
+                  <option value="this_year">{t('this_year')}</option>
+                  <option value="last_year">{t('last_year')}</option>
+                  <option value={'last365_days'}>{`${t(
+                    'last365_days'
+                  )}`}</option>
+                </SelectField>
+              </Preferences>
+
+              <div
+                className="flex items-center cursor-pointer"
+                onClick={() => setIsEditMode((current) => !current)}
+              >
+                <Icon element={BiMove} size={23} />
+              </div>
             </div>
           </div>
-        );
-        
-      case 'totals':
-        if (isTotalsLoading) {
-          return (
-            <Card height="full" className="flex items-center justify-center">
-              <Spinner />
-            </Card>
-          );
-        }
-        
-        if (!totals || typeof totals !== 'object') {
-          // Return a placeholder to show something is there
-          return (
-            <Card height="full" className="p-4">
-              <div className="text-center text-gray-500">
-                <div>No totals data available</div>
-                <div className="text-xs mt-2">Response: {JSON.stringify(totalsResponse).substring(0, 100)}</div>
-              </div>
-            </Card>
-          );
-        }
-        
-        return (
-          <Card height="full" className="p-4 overflow-hidden">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 h-full items-center">
-              <div className="flex flex-col justify-center">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Revenue</div>
-                <div className="text-2xl font-bold text-green-600">
-                  {formatMoney(parseFloat(totals.revenue?.paid_to_date || '0'), totals.revenue?.code || 'USD', company?.settings?.country_id)}
-                </div>
-              </div>
-              <div className="flex flex-col justify-center">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Expenses</div>
-                <div className="text-2xl font-bold text-red-600">
-                  {formatMoney(parseFloat(totals.expenses?.amount || '0'), totals.expenses?.code || 'USD', company?.settings?.country_id)}
-                </div>
-              </div>
-              <div className="flex flex-col justify-center">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Invoiced</div>
-                <div className="text-2xl font-bold text-blue-600">
-                  {formatMoney(parseFloat(totals.invoices?.invoiced_amount || '0'), totals.invoices?.code || 'USD', company?.settings?.country_id)}
-                </div>
-              </div>
-              <div className="flex flex-col justify-center">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Outstanding</div>
-                <div className="text-2xl font-bold text-orange-600">
-                  {formatMoney(parseFloat(totals.outstanding?.amount || '0'), totals.outstanding?.code || 'USD', company?.settings?.country_id)}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {totals.outstanding.outstanding_count || 0} invoices
-                </div>
-              </div>
-            </div>
-          </Card>
-        );
-        
-      case 'chart':
-        // Temporarily always show for debugging
-      // if (!currentDashboardFields.includes(DashboardField.DashChart)) return null;
-       // Don't render chart if we don't have chart data with proper structure
-       if (!chartResults || typeof chartResults !== 'object' || !('invoices' in chartResults)) {
-         return (
-           <Card height="full">
-             <div className="flex items-center justify-center h-full text-gray-500">
-               Loading chart data...
-             </div>
-           </Card>
-         );
-       }
-       
-       // Calculate proper date range from dateRange or customDateRange
-       let chartDates: { start_date: string; end_date: string };
-       {
-         if (dateRange === 'custom' && customDateRange[0] && customDateRange[1]) {
-           chartDates = { start_date: customDateRange[0], end_date: customDateRange[1] };
-         } else {
-           // For non-custom ranges, compute dates from current date
-           const now = new Date();
-           let end = new Date();
-           let start = new Date();
-           
-           switch (dateRange) {
-             case 'this_month':
-               start.setDate(1);
-               break;
-             case 'last_month': {
-               start.setMonth(start.getMonth() - 1);
-               start.setDate(1);
-               end.setMonth(end.getMonth() - 1);
-               const lastDay = new Date(end.getFullYear(), end.getMonth() + 1, 0);
-               end.setDate(lastDay.getDate());
-               break;
-             }
-             case 'this_year':
-               start = new Date(now.getFullYear(), 0, 1);
-               break;
-             case 'last_year':
-               start = new Date(now.getFullYear() - 1, 0, 1);
-               end = new Date(now.getFullYear() - 1, 11, 31);
-               break;
-             default:
-               // Default to this month
-               start.setDate(1);
-           }
-           
-           chartDates = {
-             start_date: start.toISOString().split('T')[0],
-             end_date: end.toISOString().split('T')[0],
-           };
-         }
-       }
-       
-      return (
-      <Card height="full">
-        <Chart
-           data={chartResults as any}
-           dates={chartDates}
-           currency={company?.settings?.currency_id || ''}
-            chartSensitivity="day"
-        />
-       </Card>
-       );
-        
-      case 'activity':
-        // Temporarily always show for debugging
-        // if (!currentDashboardFields.includes(DashboardField.DashActivity)) return null;
-        return (
-          <Card height="full" withScrollableBody>
-            <Activity isEditMode={isEditMode} />
-          </Card>
-        );
-        
-      case 'recent_payments':
-        // Temporarily always show for debugging
-        // if (!currentDashboardFields.includes(DashboardField.DashRecentPayments)) return null;
-        return (
-          <Card height="full" withScrollableBody>
-            <RecentPayments isEditMode={isEditMode} />
-          </Card>
-        );
-        
-      case 'upcoming_invoices':
-        // Temporarily always show for debugging
-       // if (!currentDashboardFields.includes(DashboardField.DashUpcomingInvoices)) return null;
-       return (
-         <Card height="full" withScrollableBody>
-            <UpcomingInvoices isEditMode={isEditMode} />
-         </Card>
-       );
-        
-      case 'past_due_invoices':
-        // Temporarily always show for debugging
-       // if (!currentDashboardFields.includes(DashboardField.DashPastDueInvoices)) return null;
-       return (
-         <Card height="full" withScrollableBody>
-            <PastDueInvoices isEditMode={isEditMode} />
-         </Card>
-       );
-        
-      default:
-        return (
-          <Card className="h-full flex items-center justify-center">
-            <span className="text-gray-400">Unknown Card: {cardId}</span>
-          </Card>
-        );
-    }
-  };
 
+          {/* <DashboardCards
+        dateRange={dateRange}
+        startDate={dates.start_date}
+        endDate={dates.end_date}
+        currencyId={currency.toString()}
+      /> */}
 
-  // Use state to manage window width for SSR compatibility
-  const [windowWidth, setWindowWidth] = useState<number | null>(null);
-  
-  useEffect(() => {
-    // Set initial width on client mount
-    if (typeof window !== 'undefined') {
-      setWindowWidth(window.innerWidth);
-      
-      // Update on resize
-      const handleResize = () => setWindowWidth(window.innerWidth);
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
-
-  // Get all card IDs from current layout
-  const cardIds = useMemo(() => {
-    // Default to lg breakpoint for SSR or initial render
-    const width = windowWidth ?? 1200;
-    const currentBreakpoint = width >= 1200 ? 'lg' : 
-                            width >= 996 ? 'md' :
-                            width >= 768 ? 'sm' :
-                            width >= 480 ? 'xs' : 'xxs';
-    const currentLayout = layouts[currentBreakpoint] || layouts.lg || [];
-    return currentLayout.map(item => item.i);
-  }, [layouts, windowWidth]);
-
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      
-      {/* Debug Info */}
-      <div className="mb-4 p-2 bg-yellow-100 dark:bg-yellow-900 rounded">
-        <div className="text-sm">
-          Debug: Edit Mode = {isEditMode ? 'ON' : 'OFF'}, 
-          Cards to render = {cardIds.join(', ')}
-        </div>
-      </div>
-      
-      <ResponsiveGridLayout
-        className="layout"
-        layouts={layouts}
-        onLayoutChange={handleLayoutChange}
-        breakpoints={BREAKPOINTS}
-        cols={COLS}
-        rowHeight={30}
-        isDraggable={isEditMode}
-        isResizable={isEditMode}
-        preventCollision={false}
-        compactType={null}
-        verticalCompact={false}
-        allowOverlap={true}
-        margin={[16, 16]}
-        containerPadding={[0, 0]}
-        onDragStart={() => setIsDragging(true)}
-        onDragStop={() => setIsDragging(false)}
-        onResizeStart={() => setIsDragging(true)}
-        onResizeStop={() => setIsDragging(false)}
-        useCSSTransforms={true}
-      >
-        {cardIds.map((cardId) => {
-          const content = renderCard(cardId);
-          
-          if (!content) {
-            console.log('Card returned null:', cardId);
-            return null;
-          }
-          
-          return (
+          {company && (
             <div
-              key={cardId}
-              style={{
-                height: '100%',
-                width: '100%',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                border: isEditMode ? '2px dashed #ccc' : 'none',
-                padding: isEditMode ? '4px' : '0',
-                // Always allow pointer events for toolbar
-                pointerEvents: cardId === 'toolbar' ? 'auto' : (isDragging ? 'none' : 'auto'),
-              }}
-              className={classNames(
-                'dashboard-grid-item',
-                {
-                  'cursor-move': isEditMode && cardId !== 'toolbar',
-                }
-              )}
-              onClick={(e) => {
-                // Ensure clicks work in toolbar even during drag
-                if (cardId === 'toolbar') {
-                  e.stopPropagation();
-                }
+              key="2"
+              className={classNames('drag-handle mt-4', {
+                'cursor-grab': isEditMode,
+              })}
+              data-grid={{
+                x: 0,
+                y: 1,
+                w: 9.5,
+                h: 3.2,
+                isResizable: isEditMode,
+                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+                isDraggable: isEditMode,
               }}
             >
-              {content}
-            </div>
-          );
-        })}
-      </ResponsiveGridLayout>
-      
-      {/* Always show test cards to verify grid is working */}
-      {cardIds.length === 0 && (
-        <div className="mt-8 p-4 bg-red-100 dark:bg-red-900 rounded">
-          <h3 className="text-lg font-bold mb-2">No cards in layout!</h3>
-          <p>This is a fallback to show the grid is working.</p>
-        </div>
-      )}
-      
-      {/* Add Cards Modal */}
-      {isCardsModalOpen && (
-        <Modal
-          title={t('add_cards')}
-          visible={isCardsModalOpen}
-          onClose={() => setIsCardsModalOpen(false)}
-        >
-          <div className="flex flex-col space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('select_cards_to_add')}
-            </p>
-            
-            {/* List of available cards */}
-            <div className="space-y-2">
-              {['totals', 'chart', 'activity', 'recent_payments', 'upcoming_invoices', 'past_due_invoices'].map((cardType) => {
-                const cardIds = Object.values(layouts).flatMap(layout => layout.map(item => item.i));
-                const isInLayout = cardIds.includes(cardType);
-                
-                return (
-                  <div
-                    key={cardType}
-                    className="flex items-center justify-between p-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    <span className="capitalize">{t(cardType)}</span>
-                    <Button
-                      behavior="button"
-                      onClick={() => {
-                        if (isInLayout) {
-                          // Remove from all breakpoints
-                          const newLayouts = { ...layouts };
-                          Object.keys(newLayouts).forEach((breakpoint) => {
-                            newLayouts[breakpoint] = newLayouts[breakpoint].filter(
-                              (item) => item.i !== cardType
-                            );
-                          });
-                          setLayouts(newLayouts);
-                          toast.success(`${t(cardType)} removed`);
-                        } else {
-                          // Add to all breakpoints at bottom
-                          const newLayouts = { ...layouts };
-                          Object.keys(newLayouts).forEach((breakpoint) => {
-                            const maxY = Math.max(
-                              ...newLayouts[breakpoint].map((item) => item.y + item.h),
-                              0
-                            );
-                            const cols = COLS[breakpoint as keyof typeof COLS] || 12;
-                            newLayouts[breakpoint].push({
-                              i: cardType,
-                              x: 0,
-                              y: maxY,
-                              w: Math.min(6, cols),
-                              h: 8,
-                              static: false,
-                            });
-                          });
-                          setLayouts(newLayouts);
-                          toast.success(`${t(cardType)} added`);
-                        }
-                      }}
-                      className="text-sm"
-                    >
-                      {isInLayout ? t('remove') : t('add')}
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-            
-            <div className="flex justify-end mt-4">
-              <Button
-                behavior="button"
-                onClick={() => setIsCardsModalOpen(false)}
+              <Card
+                title={t('account_login_text')}
+                className="col-span-12 xl:col-span-4"
+                height="full"
               >
-                {t('close')}
-              </Button>
+                <div className="pb-8">
+                  <div className="flex flex-col space-y-2 px-6">
+                    <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
+
+                    <span className="text-sm">{t('recent_transactions')}</span>
+                  </div>
+
+                  <div className="flex flex-col mt-8">
+                    <div
+                      style={{ borderColor: colors.$4 }}
+                      className="flex justify-between items-center border-b py-3 px-6"
+                    >
+                      <span>{t('invoices')}</span>
+
+                      <Badge style={{ backgroundColor: TotalColors.Blue }}>
+                        <span className="mx-2 text-base">
+                          {formatMoney(
+                            totalsData[currency]?.invoices?.invoiced_amount ||
+                              0,
+                            company.settings.country_id,
+                            currency.toString(),
+                            2
+                          )}
+                        </span>
+                      </Badge>
+                    </div>
+
+                    <div
+                      style={{ borderColor: colors.$4 }}
+                      className="flex justify-between items-center border-b py-3 px-6"
+                    >
+                      <span>{t('payments')}</span>
+                      <Badge style={{ backgroundColor: TotalColors.Green }}>
+                        <span className="mx-2 text-base">
+                          {formatMoney(
+                            totalsData[currency]?.revenue?.paid_to_date || 0,
+                            company.settings.country_id,
+                            currency.toString(),
+                            2
+                          )}
+                        </span>
+                      </Badge>
+                    </div>
+
+                    <div
+                      style={{ borderColor: colors.$4 }}
+                      className="flex justify-between items-center border-b py-3 px-6"
+                    >
+                      <span>{t('expenses')}</span>
+                      <Badge style={{ backgroundColor: TotalColors.Gray }}>
+                        <span className="mx-2 text-base">
+                          {formatMoney(
+                            totalsData[currency]?.expenses?.amount || 0,
+                            company.settings.country_id,
+                            currency.toString(),
+                            2
+                          )}
+                        </span>
+                      </Badge>
+                    </div>
+
+                    <div
+                      style={{ borderColor: colors.$4 }}
+                      className="flex justify-between items-center border-b py-3 px-6"
+                    >
+                      <span>{t('outstanding')}</span>
+                      <Badge style={{ backgroundColor: TotalColors.Red }}>
+                        <span className="mx-2 text-base">
+                          {formatMoney(
+                            totalsData[currency]?.outstanding?.amount || 0,
+                            company.settings.country_id,
+                            currency.toString(),
+                            2
+                          )}
+                        </span>
+                      </Badge>
+                    </div>
+
+                    <div
+                      style={{ borderColor: colors.$4 }}
+                      className="flex justify-between items-center border-b py-3 px-6"
+                    >
+                      <span>{t('total_invoices_outstanding')}</span>
+
+                      <Badge variant="white">
+                        <span className="mx-2 text-base">
+                          {totalsData[currency]?.outstanding
+                            ?.outstanding_count || 0}
+                        </span>
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </div>
+          )}
+
+          {chartData && (
+            <div
+              key="3"
+              className={classNames('drag-handle mt-4', {
+                'cursor-grab': isEditMode,
+              })}
+              data-grid={{
+                x: 11,
+                y: 1,
+                w: 14.2,
+                h: 3.2,
+                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+                isResizable: isEditMode,
+                isDraggable: isEditMode,
+              }}
+            >
+              <Card
+                title={t('overview')}
+                className="col-span-12 xl:col-span-8 pr-4"
+                height="full"
+              >
+                <Chart
+                  chartSensitivity={chartScale}
+                  dates={{
+                    start_date: dates.start_date,
+                    end_date: dates.end_date,
+                  }}
+                  data={chartData[currency]}
+                  currency={currency.toString()}
+                />
+              </Card>
+            </div>
+          )}
+
+          <div
+            key="4"
+            className={classNames('drag-handle mt-4', {
+              'cursor-grab': isEditMode,
+            })}
+            data-grid={{
+              x: 0,
+              y: 2,
+              w: 11.85,
+              h: 2.2,
+              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+              isResizable: isEditMode,
+              isDraggable: isEditMode,
+            }}
+          >
+            <Activity isEditMode={isEditMode} />
           </div>
-        </Modal>
+
+          <div
+            key="5"
+            className={classNames('drag-handle mt-4', {
+              'cursor-grab': isEditMode,
+            })}
+            data-grid={{
+              x: 13,
+              y: 2,
+              w: 11.85,
+              h: 2.2,
+              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+              isResizable: isEditMode,
+              isDraggable: isEditMode,
+            }}
+          >
+            <RecentPayments isEditMode={isEditMode} />
+          </div>
+
+          {enabled(ModuleBitmask.Invoices) && (
+            <div
+              key="6"
+              className={classNames('drag-handle mt-4', {
+                'cursor-grab': isEditMode,
+              })}
+              data-grid={{
+                x: 0,
+                y: 3,
+                w: 11.85,
+                h: 2.2,
+                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+                isResizable: isEditMode,
+                isDraggable: isEditMode,
+              }}
+            >
+              <UpcomingInvoices isEditMode={isEditMode} />
+            </div>
+          )}
+
+          {enabled(ModuleBitmask.Invoices) && (
+            <div
+              key="7"
+              className={classNames('drag-handle mt-4', {
+                'cursor-grab': isEditMode,
+              })}
+              data-grid={{
+                x: 13,
+                y: 3,
+                w: 11.85,
+                h: 2.2,
+                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+                isResizable: isEditMode,
+                isDraggable: isEditMode,
+              }}
+            >
+              <PastDueInvoices isEditMode={isEditMode} />
+            </div>
+          )}
+
+          {enabled(ModuleBitmask.Quotes) && (
+            <div
+              key="8"
+              className={classNames('drag-handle mt-4', {
+                'cursor-grab': isEditMode,
+              })}
+              data-grid={{
+                x: 0,
+                y: 4,
+                w: 11.85,
+                h: 2.2,
+                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+                isResizable: isEditMode,
+                isDraggable: isEditMode,
+              }}
+            >
+              <ExpiredQuotes isEditMode={isEditMode} />
+            </div>
+          )}
+
+          {enabled(ModuleBitmask.Quotes) && (
+            <div
+              key="9"
+              className={classNames('drag-handle mt-4', {
+                'cursor-grab': isEditMode,
+              })}
+              data-grid={{
+                x: 13,
+                y: 4,
+                w: 11.85,
+                h: 2.2,
+                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+                isResizable: isEditMode,
+                isDraggable: isEditMode,
+              }}
+            >
+              <UpcomingQuotes isEditMode={isEditMode} />
+            </div>
+          )}
+
+          {enabled(ModuleBitmask.RecurringInvoices) && (
+            <div
+              key="10"
+              className={classNames('drag-handle mt-4', {
+                'cursor-grab': isEditMode,
+              })}
+              data-grid={{
+                x: 0,
+                y: 5,
+                w: 11.85,
+                h: 2.2,
+                resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+                isResizable: isEditMode,
+                isDraggable: isEditMode,
+              }}
+            >
+              <UpcomingRecurringInvoices isEditMode={isEditMode} />
+            </div>
+          )}
+        </GridLayout>
+      ) : (
+        <div className="w-full flex justify-center">
+          <Spinner />
+        </div>
       )}
     </div>
   );

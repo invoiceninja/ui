@@ -12,28 +12,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate, useParseDayjs } from '$app/common/helpers';
-
-// Define types locally
-interface ChartDataItem {
-  value: number;
-  currency: string;
-  date: string;
-}
-
-interface ChartData {
-  invoices: ChartDataItem[];
-  payments: ChartDataItem[];
-  expenses: ChartDataItem[];
-  outstanding: ChartDataItem[];
-}
-
-const TotalColors = {
-  invoice: 'rgb(147, 197, 253)',
-  outstanding: 'rgb(252, 211, 77)',
-  payment: 'rgb(134, 239, 172)',
-  expense: 'rgb(252, 165, 165)',
-};
-
+import { ChartData, TotalColors } from './ResizableDashboardCards';
 import {
   Line,
   CartesianGrid,
@@ -48,11 +27,10 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
-import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
 
 type Props = {
   data: ChartData;
-  dates: { start_date: string; end_date: string };
+  dates: any;
   chartSensitivity: 'day' | 'week' | 'month';
   currency: string;
 };
@@ -66,7 +44,7 @@ type LineChartData = {
 }[];
 
 export function Chart(props: Props) {
-  const [t] = useTranslation();
+  const { t } = useTranslation();
   const { currency, chartSensitivity } = props;
 
   const company = useCurrentCompany();
@@ -104,14 +82,27 @@ export function Chart(props: Props) {
         break;
 
       case 'month':
-        dates = generateMonthDateRange(start, end);
+        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+          if (currentDate.isSame(start, 'day')) {
+            dates.push(start.toDate());
+          }
+
+          dates.push(currentDate.endOf('month').toDate());
+          currentDate = currentDate.add(1, 'month');
+        }
         break;
 
       default:
         return [];
     }
 
-    return ensureUniqueDates(dates, end);
+    const lengthOfDates = dates.length;
+
+    if (dayjs.utc(dates[lengthOfDates - 1]).isAfter(end)) {
+      dates[lengthOfDates - 1] = end.toDate();
+    }
+
+    return dates;
   };
 
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
@@ -156,9 +147,7 @@ export function Chart(props: Props) {
     const largestTick = chartData.reduce((maxTick, data) => {
       return properties.reduce((currentMax, property) => {
         const currentTickLength = formatMoney(
-          typeof data[property as keyof typeof data] === 'number'
-            ? Number((data[property as keyof typeof data] as number) * 10)
-            : 0,
+          Number(data[property as keyof typeof data]) ?? 0,
           company?.settings.country_id,
           currency
         ).toString().length;
@@ -185,7 +174,7 @@ export function Chart(props: Props) {
       expenses: 0,
     }));
 
-    props.data?.invoices?.forEach((invoice: any) => {
+    props.data?.invoices.forEach((invoice) => {
       const date = formatDate(invoice.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -194,7 +183,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.outstanding?.forEach((outstanding: any) => {
+    props.data?.outstanding.forEach((outstanding) => {
       const date = formatDate(outstanding.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -203,7 +192,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.payments?.forEach((payment: any) => {
+    props.data?.payments.forEach((payment) => {
       const date = formatDate(payment.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -212,7 +201,7 @@ export function Chart(props: Props) {
       }
     });
 
-    props.data?.expenses?.forEach((expense: any) => {
+    props.data?.expenses.forEach((expense) => {
       const date = formatDate(expense.date, dateFormat);
       const recordIndex = getRecordIndex(data, date);
 
@@ -222,7 +211,7 @@ export function Chart(props: Props) {
     });
 
     setChartData(data);
-  }, [props.data, props.dates, props.chartSensitivity]);
+  }, [props]);
 
   const colors = useColorScheme();
 
@@ -236,15 +225,14 @@ export function Chart(props: Props) {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 8, left: 8, right: 8, bottom: 24 }}>
+    <ResponsiveContainer width="100%" height={330}>
+      <LineChart height={200} data={chartData} margin={{ top: 17, left: 5 }}>
         <Line
           id="invoices"
           type="monotone"
           name={t('invoices') || ''}
           dataKey="invoices"
-          stroke={'rgb(147, 197, 253)'}
+          stroke={TotalColors.Blue}
           dot={false}
           strokeWidth={2}
         />
@@ -254,7 +242,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('payments') || ''}
           dataKey="payments"
-          stroke={'rgb(134, 239, 172)'}
+          stroke={TotalColors.Green}
           dot={false}
           strokeWidth={2}
         />
@@ -264,7 +252,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('outstanding') || ''}
           dataKey="outstanding"
-          stroke={'rgb(252, 165, 165)'}
+          stroke={TotalColors.Red}
           dot={false}
           strokeWidth={2}
         />
@@ -274,7 +262,7 @@ export function Chart(props: Props) {
           type="monotone"
           name={t('expenses') || ''}
           dataKey="expenses"
-          stroke={'rgb(156, 163, 175)'}
+          stroke={TotalColors.Gray}
           dot={false}
           strokeWidth={2}
         />
@@ -284,7 +272,7 @@ export function Chart(props: Props) {
 
         <XAxis
           dataKey="date"
-          tickMargin={6}
+          tickMargin={8}
           tick={{ fontSize: 14 }}
           stroke={colors.$3}
         />
@@ -295,12 +283,11 @@ export function Chart(props: Props) {
           tickFormatter={(value) =>
             formatTooltipValues(value).replace(/ /g, '\u00A0')
           }
-          tick={{ fontSize: 12 }}
+          tick={{ fontSize: 14 }}
           width={yAxisWidth}
           stroke={colors.$3}
         />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+      </LineChart>
+    </ResponsiveContainer>
   );
 }
