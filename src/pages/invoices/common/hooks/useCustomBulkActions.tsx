@@ -42,6 +42,7 @@ import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
 import { CancelInvoiceBulkAction } from '../components/CancelInvoiceBulkAction';
+import { Divider } from '$app/components/cards/Divider';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -151,7 +152,11 @@ export const useCustomBulkActions = () => {
       return invoices.every((invoice) => invoice.archived_at > 0 && !invoice.is_deleted);
     }
 
-    return invoices.every((invoice) => getEntityState(invoice) === EntityState.Archived);
+    return !invoices.some(
+      ({ status_id, archived_at }) =>
+        !archived_at ||
+        status_id === InvoiceStatus.Cancelled
+    );
   };
 
   const showArchiveBulkAction = (invoices: Invoice[]) => {
@@ -271,14 +276,14 @@ export const useCustomBulkActions = () => {
     //       {t('reverse')}
     //     </DropdownElement>
     //   ),
-    ({ selectedIds, selectedResources, setSelected }) => (
+    ({ selectedIds, selectedResources, setSelected }) =>
       showCancelOption(selectedResources) && (
-      <CancelInvoiceBulkAction
-        selectedIds={selectedIds}
-        selectedResources={selectedResources}
-        setSelected={setSelected}
-      />
-    )),
+        <CancelInvoiceBulkAction
+          selectedIds={selectedIds}
+          selectedResources={selectedResources}
+          setSelected={setSelected}
+        />
+      ),
     ({ selectedResources }) => (
       <DropdownElement
         onClick={() => {
@@ -295,45 +300,51 @@ export const useCustomBulkActions = () => {
       </DropdownElement>
     ),
 
+    ({ selectedResources }) =>
+      Boolean(
+        showArchiveBulkAction(selectedResources) ||
+          showDeleteBulkAction(selectedResources) ||
+          showRestoreBulkAction(selectedResources)
+      ) && <Divider withoutPadding />,
 
-    ({ selectedIds, selectedResources, setSelected }) => (
+    ({ selectedIds, selectedResources, setSelected }) =>
       showArchiveBulkAction(selectedResources) && (
-      <DropdownElement
-        onClick={() => {
-          bulk(selectedIds, 'archive');
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'archive');
             setSelected([]);
-        }} 
-        icon={<Icon element={MdArchive} />}
-      >
-        {t('archive')}
-      </DropdownElement>
-    )),
-
-    ({ selectedIds, selectedResources, setSelected }) => (
-      showDeleteBulkAction(selectedResources) && (
-      <DropdownElement
-        onClick={() => {
-          bulk(selectedIds, 'delete');
-              setSelected([]);
           }}
-        icon={<Icon element={MdDelete} />}
-      >
-        {t('delete')}
-      </DropdownElement>
-    )),
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
 
-    ({ selectedIds, selectedResources, setSelected }) => (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      showDeleteBulkAction(selectedResources) && (
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'delete');
+            setSelected([]);
+          }}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
+
+    ({ selectedIds, selectedResources, setSelected }) =>
       showRestoreBulkAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'restore');
-              setSelected([]);
-            }}
+            setSelected([]);
+          }}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
         </DropdownElement>
-      )),
+      ),
   ];
 
   return customBulkActions;
