@@ -21,9 +21,11 @@ import { Credit } from '$app/common/interfaces/credit';
 import { useAllCreditColumns } from '$app/pages/credits/common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { PaymentOnCreation } from '../Create';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { cloneDeep, set } from 'lodash';
 import { TableNumberInputField } from '../../common/components/TableNumberInputField';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { Client } from '$app/common/interfaces/client';
 
 interface UseCreditColumnsProps {
   payment: PaymentOnCreation | undefined;
@@ -43,9 +45,19 @@ export function useCreditColumns({
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatMoney = useFormatMoney();
+  const clientResolver = useClientResolver();
   const disableNavigation = useDisableNavigation();
 
-  const formatMoney = useFormatMoney();
+  const [resolvedClient, setResolvedClient] = useState<Client>();
+
+  useEffect(() => {
+    if (payment?.client_id) {
+      clientResolver
+        .find(payment.client_id)
+        .then((client) => setResolvedClient(client));
+    }
+  }, [payment?.client_id]);
 
   const columns: DataTableColumnsExtended<Credit, CreditColumns> = [
     {
@@ -71,11 +83,11 @@ export function useCreditColumns({
       column: 'balance',
       id: 'balance',
       label: t('balance'),
-      format: (value, credit) =>
+      format: (value) =>
         formatMoney(
           value,
-          credit.client?.country_id,
-          credit.client?.settings.currency_id
+          resolvedClient?.country_id,
+          resolvedClient?.settings.currency_id
         ),
     },
     {
