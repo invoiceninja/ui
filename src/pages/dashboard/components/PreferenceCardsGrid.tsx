@@ -112,7 +112,10 @@ export function PreferenceCardsGrid(props: Props) {
           x: j * cardWidth,
           y: i * 2,  // Each row is 2 units high
           w: cardWidth,
-          h: 2,  // Height of 2 units to maintain ratio with narrower width
+          h: 2,  // Height of 2 units for rectangular shape
+          minW: 4,  // Minimum width to prevent too narrow cards
+          maxW: 8,  // Maximum width to prevent too wide cards
+          static: false,  // Cards can be moved
         });
       }
     }
@@ -267,16 +270,16 @@ export function PreferenceCardsGrid(props: Props) {
         xxs: 24,
       }}
       draggableHandle=".preference-card-drag-handle"
-      margin={[0, 20]}
+      margin={[10, 10]}
       rowHeight={80}
       isDraggable={isEditMode}
       isDroppable={true}
       isResizable={false}
       onLayoutChange={(layout, layouts) => setLayouts(layouts)}
-      compactType={null}
-      preventCollision={false}
-      allowOverlap={true}
-      verticalCompact={false}
+      compactType="horizontal"
+      preventCollision={true}
+      allowOverlap={false}
+      verticalCompact={true}
       maxRows={20}
       containerPadding={[0, 0]}
       useCSSTransforms={true}
