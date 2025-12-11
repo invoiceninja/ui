@@ -59,7 +59,7 @@ export function PreferenceCardsGrid(props: Props) {
 
   // Update order when currentDashboardFields change
   useEffect(() => {
-    const savedOrder = reactSettings?.preference_cards_order;
+    const savedOrder = (reactSettings as any)?.preference_cards_order;
     if (savedOrder && Array.isArray(savedOrder)) {
       // Use saved order but filter to only include current fields
       const validOrder = savedOrder.filter(id => 

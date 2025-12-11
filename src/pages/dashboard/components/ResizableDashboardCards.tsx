@@ -283,25 +283,24 @@ export function ResizableDashboardCards() {
           width={width}
           draggableHandle=".drag-handle"
           margin={[0, 20]}
-          isDraggable={false}
-         isDroppable={isEditMode}
-         compactType="vertical"
-         preventCollision={false}
-         useCSSTransforms={true}
-         static={true}
-       >
-          {/* Quick date, currency & date picker. */}
-          <div
-            key="1"
-            className="flex justify-end"
-            data-grid={{
-              x: 16,
-              y: 0,
-              w: 24,
-              h: 0.25,
-              isResizable: false,
-              static: true,
-            }}
+         isDraggable={false}
+        isDroppable={isEditMode}
+        compactType="vertical"
+        preventCollision={false}
+        useCSSTransforms={true}
+      >
+         {/* Quick date, currency & date picker. */}
+         <div
+           key="1"
+           className="flex justify-end"
+           data-grid={{
+             x: 16,
+             y: 0,
+             w: 24,
+             h: 0.25,
+             isResizable: false,
+             static: true,
+           }}
           >
             <div className="flex space-x-2">
               {currencies && (
