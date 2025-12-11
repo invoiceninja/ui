@@ -147,8 +147,8 @@ export function ResizableDashboardCards() {
     const cardsPerRow = 4;
     const rows = Math.ceil(numCards / cardsPerRow);
     
-    // 1.5 units per row (matching card height) + small padding
-    return rows * 1.5 + 0.2;
+    // Tight height: 1.2 units per row (cards are 1.5 but overlap slightly)
+    return Math.max(1.5, rows * 1.2);
   };
 
  const chartScale =
