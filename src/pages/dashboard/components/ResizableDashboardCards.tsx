@@ -147,10 +147,9 @@ export function ResizableDashboardCards() {
     const cardsPerRow = 4;
     const rows = Math.ceil(numCards / cardsPerRow);
     
-    // Each card in PreferenceCardsGrid has height of 1.5 units at 60px rowHeight = 90px
-    // Parent grid has rowHeight of 30px, so 90px = 3 units in parent grid
-    // Add small padding for the container itself
-    return rows * 3 + 0.5;
+    console.log(`Calculating container height for ${numCards} cards at breakpoint ${breakpoint}: ${rows} rows`);
+    // Tight height: 1.2 units per row (cards are 1.5 but overlap slightly)
+    return Math.max(1.5, rows * 1.2);
   };
 
  const chartScale =
@@ -278,12 +277,11 @@ export function ResizableDashboardCards() {
     >
       {!totals.isLoading ? (
         <GridLayout
-         cols={24}
-         width={width}
-         rowHeight={30}
-         draggableHandle=".drag-handle"
-          margin={[0, 10]}
-         isDraggable={isEditMode}
+          cols={24}
+          width={width}
+          draggableHandle=".drag-handle"
+          margin={[0, 20]}
+          isDraggable={isEditMode}
          isDroppable={isEditMode}
          compactType="vertical"
          preventCollision={false}
