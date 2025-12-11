@@ -69,19 +69,19 @@ export function PreferenceCardsGrid(props: Props) {
   ) => {
     const totalCards = cards?.length || 0;
     // Using a 24-column grid system for better card layout
-    let cardsPerRow = 3;
-    let cardWidth = 8; // Each card takes 8 columns (3 cards per row)
+    let cardsPerRow = 4;
+    let cardWidth = 6; // Each card takes 6 columns (4 cards per row)
 
     switch (breakpoint) {
       case 'xxl':
       case 'xl':
       case 'lg':
-        cardsPerRow = 2;
-        cardWidth = 11;
+        cardsPerRow = 4;
+        cardWidth = 6;
         break;
       case 'md':
-        cardsPerRow = 2;
-        cardWidth = 12;
+        cardsPerRow = 3;
+        cardWidth = 8;
         break;
       case 'sm':
       case 'xs':
@@ -90,8 +90,8 @@ export function PreferenceCardsGrid(props: Props) {
         cardWidth = 24;
         break;
       default:
-        cardsPerRow = 2;
-        cardWidth = 11;
+        cardsPerRow = 4;
+        cardWidth = 6;
     }
 
     // const cardsPerRow is now defined above based on breakpoint
@@ -110,9 +110,9 @@ export function PreferenceCardsGrid(props: Props) {
         newCards.push({
           i: card.id,
           x: j * cardWidth,
-          y: i * 3,  // Each row is 3 units high
+          y: i * 2,  // Each row is 2 units high
           w: cardWidth,
-          h: 3,  // Height of 3 units for more rectangular cards
+          h: 2,  // Height of 2 units to maintain ratio with narrower width
         });
       }
     }
@@ -125,8 +125,8 @@ export function PreferenceCardsGrid(props: Props) {
     existing: ReactGridLayout.Layout[],
     generated: ReactGridLayout.Layout[]
   ): ReactGridLayout.Layout[] => {
-    const tinyW = 2; // in our 24-col scheme
-    const tinyH = 1; // rowHeight=80 → 20px
+    const tinyW = 5; // in our 24-col scheme - adjusted for smaller cards
+    const tinyH = 1; // rowHeight=80 → 80px - adjusted for smaller cards
     return existing.map((item) => {
       const isTiny = (item.w ?? 0) <= tinyW || (item.h ?? 0) <= tinyH;
       if (!isTiny) return item;

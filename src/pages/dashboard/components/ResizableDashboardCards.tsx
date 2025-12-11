@@ -470,7 +470,7 @@ export function ResizableDashboardCards() {
                x: 0,
                y: 1,
                w: 24,
-               h: 4,  // Increased height to accommodate larger rectangular cards
+               h: 2,  // Height adjusted for smaller cards
                isResizable: false,  // Row height is fixed
                resizeHandles: [],   // No resize handles
                isDraggable: false,  // Never movable
