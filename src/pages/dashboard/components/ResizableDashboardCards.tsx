@@ -125,9 +125,10 @@ export function ResizableDashboardCards() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+ const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [currentLayout, setCurrentLayout] = useState<any[]>([]);
 
-  const chartScale =
+ const chartScale =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
   const currency = settings?.preferences?.dashboard_charts?.currency || 1;
   const dateRange =
@@ -257,12 +258,16 @@ export function ResizableDashboardCards() {
           draggableHandle=".drag-handle"
           margin={[0, 20]}
           isDraggable={isEditMode}
-          isDroppable={isEditMode}
-          compactType="vertical"
-          preventCollision={false}
-          useCSSTransforms={true}
-        >
-          {totals.isLoading && (
+         isDroppable={isEditMode}
+         compactType="vertical"
+         preventCollision={false}
+         useCSSTransforms={true}
+         onLayoutChange={(layout) => {
+           // Store the current layout positions
+           setCurrentLayout(layout);
+         }}
+       >
+         {totals.isLoading && (
             <div className="w-full flex justify-center">
               <Spinner />
             </div>
@@ -394,11 +399,23 @@ export function ResizableDashboardCards() {
               <div
                 className="flex items-center cursor-pointer"
                 onClick={() => setIsEditMode((current) => !current)}
+             >
+               <Icon element={BiMove} size={23} />
+             </div>
+
+             {isEditMode && (
+               <Button
+                 className="ml-2"
+                onClick={() => {
+                  // Reset dashboard to default positions
+                  window.location.reload();
+                }}
               >
-                <Icon element={BiMove} size={23} />
-              </div>
-            </div>
-          </div>
+                {t('reset')}
+              </Button>
+             )}
+           </div>
+         </div>
 
           {/* <DashboardCards
         dateRange={dateRange}
@@ -697,9 +714,12 @@ export function ResizableDashboardCards() {
 
           {/* Preference Cards Row */}
           {currentDashboardFields && currentDashboardFields.length > 0 && (
-            <div
-              key="preference_cards"
-             className="w-full"
+           <div
+             key="preference_cards"
+             className={classNames('w-full', {
+               'drag-handle': isEditMode,
+               'cursor-grab': isEditMode,
+             })}
              data-grid={{
                x: 0,
                y: 1,
@@ -707,8 +727,8 @@ export function ResizableDashboardCards() {
                h: 2,  // Increased height to accommodate rectangular cards
                isResizable: isEditMode,
                resizeHandles: isEditMode ? ['s'] : [],
-               isDraggable: false,  // Never draggable (can't move horizontally or vertically)
-               static: true,  // Always static - prevents vertical compaction from moving it
+               isDraggable: isEditMode,  // Can be moved vertically in edit mode
+               static: false,  // Not static - participates in layout
              }}
            >
              <PreferenceCardsGrid
