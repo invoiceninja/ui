@@ -475,11 +475,12 @@ export function ResizableDashboardCards() {
          </div>
           {currentDashboardFields && currentDashboardFields.length > 0 && (
            <div
-             key="preference_cards"
-             className={classNames('w-full', {
-               'drag-handle': isEditMode,
-               'cursor-grab': isEditMode,
-             })}
+            key="preference_cards"
+            className={classNames('w-full', {
+              'drag-handle': isEditMode,
+              'cursor-grab': isEditMode,
+              'border-2 border-dotted border-gray-400': isEditMode,
+            })}
              data-grid={{
                x: 0,
                y: 1,
