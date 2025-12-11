@@ -415,7 +415,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 6,
+                y: 2,
                 w: 9.5,
                 h: 3.2,
                 isResizable: isEditMode,
@@ -533,7 +533,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 11,
-                y: 6,
+                y: 2,
                 w: 14.2,
                 h: 3.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -566,7 +566,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 0,
-              y: 6,
+              y: 3,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -584,7 +584,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 13,
-              y: 6,
+              y: 3,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -603,7 +603,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 6,
+                y: 4,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -623,7 +623,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 6,
+                y: 4,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -643,7 +643,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 6,
+                y: 5,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -663,7 +663,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 6,
+                y: 5,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
