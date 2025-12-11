@@ -434,6 +434,7 @@ export function ResizableDashboardCards() {
                    request(
                      'PUT',
                      endpoint('/api/v1/company_users/:id', { id: updatedUser.company_user.id }),
+                     endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
                      updatedUser
                    )
                    .then((response: GenericSingleResourceResponse<CompanyUser>) => {
@@ -466,8 +467,13 @@ export function ResizableDashboardCards() {
          </div>
 
          {/* <DashboardCards
+         dateRange={dateRange}
+         startDate={dates.start_date}
+         endDate={dates.end_date}
+         currencyId={currency.toString()}
+         /> */}
 
-          {/* Preference Cards Row - Must be second in DOM order for y=1 positioning */}
+         {/* Preference Cards Row - Must be second in DOM order for y=1 positioning */}
           {currentDashboardFields && currentDashboardFields.length > 0 && (
            <div
              key="preference_cards"
@@ -495,16 +501,10 @@ export function ResizableDashboardCards() {
                 layoutBreakpoint="lg"
                 isEditMode={isEditMode}
               />
-            </div>
-          )}
+           </div>
+         )}
 
-        dateRange={dateRange}
-        startDate={dates.start_date}
-        endDate={dates.end_date}
-        currencyId={currency.toString()}
-      /> */}
-
-          {company && (
+         {company && (
             <div
               key="2"
               className={classNames('drag-handle mt-4', {
