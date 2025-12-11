@@ -137,20 +137,6 @@ export function ResizableDashboardCards() {
  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [currentLayout, setCurrentLayout] = useState<any[]>([]);
   const [isResetting, setIsResetting] = useState<boolean>(false);
-  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>('lg');
-
-  // Calculate container height based on number of cards
-  const getContainerHeight = (numCards: number, breakpoint: string) => {
-    if (!numCards || numCards === 0) return 0;
-    
-    // Fixed 4 cards per row
-    const cardsPerRow = 4;
-    const rows = Math.ceil(numCards / cardsPerRow);
-    
-    console.log(`Calculating container height for ${numCards} cards at breakpoint ${breakpoint}: ${rows} rows`);
-    // Tight height: 1.2 units per row (cards are 1.5 but overlap slightly)
-    return Math.max(1.5, rows * 1.2);
-  };
 
  const chartScale =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
@@ -484,7 +470,7 @@ export function ResizableDashboardCards() {
                x: 0,
                y: 1,
                w: 24,
-               h: getContainerHeight(currentDashboardFields.length, layoutBreakpoint),
+               h: Math.max(2, Math.ceil(currentDashboardFields.length / 4) * 2.5),  // Dynamic height: 2.5 units per row of cards
                isResizable: false,  // Row height is fixed
                resizeHandles: [],   // No resize handles
                isDraggable: false,  // Never movable

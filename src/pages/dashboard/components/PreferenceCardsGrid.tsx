@@ -64,7 +64,8 @@ export function PreferenceCardsGrid(props: Props) {
 
   // Generate initial layout for cards
   const generateLayoutForCards = (
-    cards: DashboardField[]
+    cards: DashboardField[],
+    breakpoint: string
   ) => {
     const totalCards = cards?.length || 0;
     // Use static fixed size - always 4 cards per row at 6 columns each
@@ -131,7 +132,8 @@ export function PreferenceCardsGrid(props: Props) {
       const currentLayoutForBreakpoint =
         currentLayouts[layoutBreakpoint] || [];
       const newCardsLayout = generateLayoutForCards(
-        currentDashboardFields
+        currentDashboardFields,
+        layoutBreakpoint
       );
 
       // Keep existing items that are still in fields
@@ -174,7 +176,7 @@ export function PreferenceCardsGrid(props: Props) {
         );
         $refetch(['users']);
       })
-      .catch(() => {});
+      .catch((error) => console.error(error));
   };
 
   // Initialize layouts from saved settings
@@ -187,7 +189,7 @@ export function PreferenceCardsGrid(props: Props) {
         // Load saved layouts but enforce fixed sizes
         const savedLayouts = cloneDeep(reactSettings?.preference_cards_configuration);
         const fixedLayouts = Object.keys(savedLayouts).reduce((acc, key) => {
-          acc[key] = savedLayouts[key].map((item: any) => ({
+          acc[key] = savedLayouts[key].map(item => ({
             ...item,
             w: 6,  // Force fixed width
             h: 1.5,  // Force fixed height  
@@ -273,7 +275,7 @@ export function PreferenceCardsGrid(props: Props) {
       isResizable={false}
       onLayoutChange={(layout, layouts) => {
         // Enforce fixed sizes on layout changes
-        layout.map(item => ({
+        const fixedLayout = layout.map(item => ({
           ...item,
           w: 6,  // Force fixed width
           h: 1.5,  // Force fixed height

@@ -36,7 +36,6 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
 import { DashboardCardSelector } from './DashboardCardSelector';
 import GridLayout from 'react-grid-layout';
-import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 import { Icon } from '$app/components/icons/Icon';
 import { BiMove } from 'react-icons/bi';
 import classNames from 'classnames';
@@ -49,14 +48,6 @@ import { UpcomingInvoices } from './UpcomingInvoices';
 import { Activity } from './Activity';
 import { RecentPayments } from './RecentPayments';
 import { useEnabled } from '$app/common/guards/guards/enabled';
-import { set, cloneDeep } from 'lodash';
-import { updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { User } from '$app/common/interfaces/user';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -116,7 +107,6 @@ export function ResizableDashboardCards() {
   const [t] = useTranslation();
 
   const { Preferences, update } = usePreferences();
-  const dispatch = useDispatch();
 
   const enabled = useEnabled();
   const formatMoney = useFormatMoney();
@@ -128,31 +118,14 @@ export function ResizableDashboardCards() {
   const company = useCurrentCompany();
   const settings = useReactSettings();
 
-  const currentDashboardFields = user?.company_user?.react_settings?.dashboard_fields || [];
   const [width, setWidth] = useState<number>(1000);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
- const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [currentLayout, setCurrentLayout] = useState<any[]>([]);
-  const [isResetting, setIsResetting] = useState<boolean>(false);
-  const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>('lg');
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
-  // Calculate container height based on number of cards
-  const getContainerHeight = (numCards: number, breakpoint: string) => {
-    if (!numCards || numCards === 0) return 0;
-    
-    // Fixed 4 cards per row
-    const cardsPerRow = 4;
-    const rows = Math.ceil(numCards / cardsPerRow);
-    
-    console.log(`Calculating container height for ${numCards} cards at breakpoint ${breakpoint}: ${rows} rows`);
-    // Tight height: 1.2 units per row (cards are 1.5 but overlap slightly)
-    return Math.max(1.5, rows * 1.2);
-  };
-
- const chartScale =
+  const chartScale =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
   const currency = settings?.preferences?.dashboard_charts?.currency || 1;
   const dateRange =
@@ -282,16 +255,12 @@ export function ResizableDashboardCards() {
           draggableHandle=".drag-handle"
           margin={[0, 20]}
           isDraggable={isEditMode}
-         isDroppable={isEditMode}
-         compactType="vertical"
-         preventCollision={false}
-         useCSSTransforms={true}
-         onLayoutChange={(layout) => {
-           // Store the current layout positions
-           setCurrentLayout(layout);
-         }}
-       >
-         {totals.isLoading && (
+          isDroppable={isEditMode}
+          compactType="vertical"
+          preventCollision={false}
+          useCSSTransforms={true}
+        >
+          {totals.isLoading && (
             <div className="w-full flex justify-center">
               <Spinner />
             </div>
@@ -423,96 +392,20 @@ export function ResizableDashboardCards() {
               <div
                 className="flex items-center cursor-pointer"
                 onClick={() => setIsEditMode((current) => !current)}
-             >
-               <Icon element={BiMove} size={23} />
-             </div>
+              >
+                <Icon element={BiMove} size={23} />
+              </div>
+            </div>
+          </div>
 
-             {isEditMode && (
-              <Button
-                className="ml-2"
-                disabled={isResetting}
-               onClick={() => {
-                 // Clear dashboard fields and reset preferences
-                 setIsResetting(true);
-                 const updatedUser = cloneDeep(user) as User;
-                 
-                 if (updatedUser && updatedUser.company_user) {
-                   // Clear dashboard fields
-                   set(updatedUser, 'company_user.react_settings.dashboard_fields', []);
-                   // Make API request to save changes
-                   request(
-                     'PUT',
-                     endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-                     updatedUser
-                   )
-                   .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-                      toast.success('reset_successfully');
-                      set(updatedUser, 'company_user', response.data.data);
-                      $refetch(['company_users']);
-                      dispatch(updateUser(updatedUser));
-                      
-                      // Reset chart preferences to defaults
-                      update('preferences.dashboard_charts.default_view', 'day');
-                      update('preferences.dashboard_charts.range', 'last30_days');
-                      
-                      // Exit edit mode
-                      setIsEditMode(false);
-                      
-                      // Reload to reset card positions
-                      setTimeout(() => window.location.reload(), 500);
-                    })
-                    .catch(() => {
-                      toast.error('error_title');
-                      setIsResetting(false);
-                    });
-                  }
-               }}
-             >
-                {isResetting ? t('processing') : t('reset')}
-              </Button>
-             )}
-           </div>
-         </div>
-          {currentDashboardFields && currentDashboardFields.length > 0 && (
-           <div
-             key="preference_cards"
-             className={classNames('w-full', {
-               'drag-handle': isEditMode,
-               'cursor-grab': isEditMode,
-             })}
-             data-grid={{
-               x: 0,
-               y: 1,
-               w: 24,
-               h: getContainerHeight(currentDashboardFields.length, layoutBreakpoint),
-               isResizable: false,  // Row height is fixed
-               resizeHandles: [],   // No resize handles
-               isDraggable: false,  // Never movable
-               static: true,        // Always pinned in place
-             }}
-           >
-             <PreferenceCardsGrid
-                currentDashboardFields={currentDashboardFields}
-                dateRange={dateRange}
-                startDate={dates.start_date}
-                endDate={dates.end_date}
-                currencyId={currency.toString()}
-                layoutBreakpoint="lg"
-                isEditMode={isEditMode}
-              />
-           </div>
-         )}
+          {/* <DashboardCards
+        dateRange={dateRange}
+        startDate={dates.start_date}
+        endDate={dates.end_date}
+        currencyId={currency.toString()}
+      /> */}
 
-         {/* <DashboardCards
-         dateRange={dateRange}
-         startDate={dates.start_date}
-         endDate={dates.end_date}
-         currencyId={currency.toString()}
-         /> */}
-
-         {/* Preference Cards Row - Must be second in DOM order for y=1 positioning */}
-
-         {company && (
+          {company && (
             <div
               key="2"
               className={classNames('drag-handle mt-4', {
@@ -520,7 +413,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 2,
+                y: 1,
                 w: 9.5,
                 h: 3.2,
                 isResizable: isEditMode,
@@ -638,7 +531,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 11,
-                y: 2,
+                y: 1,
                 w: 14.2,
                 h: 3.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -671,7 +564,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 0,
-              y: 3,
+              y: 2,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -689,7 +582,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 13,
-              y: 3,
+              y: 2,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -708,7 +601,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 4,
+                y: 3,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -728,7 +621,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 4,
+                y: 3,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -748,7 +641,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 5,
+                y: 4,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -768,7 +661,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 5,
+                y: 4,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -788,7 +681,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 6,
+                y: 5,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -799,7 +692,6 @@ export function ResizableDashboardCards() {
               <UpcomingRecurringInvoices isEditMode={isEditMode} />
             </div>
           )}
-
         </GridLayout>
       ) : (
         <div className="w-full flex justify-center">

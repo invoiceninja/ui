@@ -37,12 +37,22 @@ import { permission } from './guards/guards/permission';
 
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
 const NotFound = lazy(() => import('$app/components/NotFound'));
+const DashboardRowDemo = lazy(() => import('$app/pages/dashboard/components/DashboardRowDemo').then(m => ({ default: m.DashboardRowDemo })));
 
 export const routes = (
   <Routes>
     <Route path="/" element={<Index />} />
     {authenticationRoutes}
     <Route element={<PrivateRoute />}>
+      <Route
+        path="/dashboard-row-demo"
+        element={
+          <Guard
+            guards={[permission('view_dashboard')]}
+            component={<DashboardRowDemo />}
+          />
+        }
+      />
       <Route
         path="/dashboard"
         element={
