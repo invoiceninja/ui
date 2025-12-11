@@ -275,6 +275,25 @@ export function ResizableDashboardCards() {
       ref={containerRef}
       style={{ width: '100%' }}
     >
+      {/* Preference Cards Row - Fixed position outside grid */}
+      {!totals.isLoading && currentDashboardFields && currentDashboardFields.length > 0 && (
+        <div 
+          className={classNames('w-full mb-5 preference-cards-fixed-container', {
+            'border-2 border-dotted border-gray-400': isEditMode,
+          })}
+        >
+          <PreferenceCardsGrid
+            currentDashboardFields={currentDashboardFields}
+            dateRange={dateRange}
+            startDate={dates.start_date}
+            endDate={dates.end_date}
+            currencyId={currency.toString()}
+            layoutBreakpoint="lg"
+            isEditMode={isEditMode}
+          />
+        </div>
+      )}
+      
       {!totals.isLoading ? (
         <GridLayout
           cols={24}
@@ -473,36 +492,6 @@ export function ResizableDashboardCards() {
              )}
            </div>
          </div>
-          {currentDashboardFields && currentDashboardFields.length > 0 && (
-           <div
-           key="preference_cards"
-           className={classNames('w-full preference-cards-container', {
-             'drag-handle': isEditMode,
-             'cursor-grab': isEditMode,
-             'border-2 border-dotted border-gray-400': isEditMode,
-           })}
-             data-grid={{
-               x: 0,
-               y: 1,
-               w: 24,
-               h: getContainerHeight(currentDashboardFields.length, layoutBreakpoint),
-               isResizable: false,  // Row height is fixed
-               resizeHandles: [],   // No resize handles
-               isDraggable: false,  // Never movable
-               static: true,        // Always pinned in place
-             }}
-           >
-             <PreferenceCardsGrid
-                currentDashboardFields={currentDashboardFields}
-                dateRange={dateRange}
-                startDate={dates.start_date}
-                endDate={dates.end_date}
-                currencyId={currency.toString()}
-                layoutBreakpoint="lg"
-                isEditMode={isEditMode}
-              />
-           </div>
-         )}
 
          {/* <DashboardCards
          dateRange={dateRange}
@@ -521,7 +510,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 2,
+                y: 1,
                 w: 9.5,
                 h: 3.2,
                 isResizable: isEditMode,
@@ -639,7 +628,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 11,
-                y: 2,
+                y: 1,
                 w: 14.2,
                 h: 3.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -672,7 +661,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 0,
-              y: 3,
+              y: 2,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -690,7 +679,7 @@ export function ResizableDashboardCards() {
             })}
             data-grid={{
               x: 13,
-              y: 3,
+              y: 2,
               w: 11.85,
               h: 2.2,
               resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -709,7 +698,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 4,
+                y: 3,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -729,7 +718,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 4,
+                y: 3,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -749,7 +738,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 5,
+                y: 4,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -769,7 +758,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 13,
-                y: 5,
+                y: 4,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -789,7 +778,7 @@ export function ResizableDashboardCards() {
               })}
               data-grid={{
                 x: 0,
-                y: 6,
+                y: 5,
                 w: 11.85,
                 h: 2.2,
                 resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
