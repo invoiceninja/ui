@@ -699,19 +699,19 @@ export function ResizableDashboardCards() {
           {currentDashboardFields && currentDashboardFields.length > 0 && (
             <div
               key="preference_cards"
-              className="w-full"
-              data-grid={{
-                x: 0,
-                y: 1,
-                w: 24,
-                h: 2,  // Increased height to accommodate rectangular cards
-                isResizable: isEditMode,
-                resizeHandles: isEditMode ? ['s'] : [],
-                isDraggable: false,
-                static: !isEditMode,
-              }}
-            >
-              <PreferenceCardsGrid
+             className="w-full"
+             data-grid={{
+               x: 0,
+               y: 1,
+               w: 24,
+               h: 2,  // Increased height to accommodate rectangular cards
+               isResizable: isEditMode,
+               resizeHandles: isEditMode ? ['s'] : [],
+               isDraggable: false,  // Never draggable (can't move horizontally or vertically)
+               static: true,  // Always static - prevents vertical compaction from moving it
+             }}
+           >
+             <PreferenceCardsGrid
                 currentDashboardFields={currentDashboardFields}
                 dateRange={dateRange}
                 startDate={dates.start_date}
