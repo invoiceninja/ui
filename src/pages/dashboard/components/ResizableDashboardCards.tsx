@@ -49,6 +49,13 @@ import { UpcomingInvoices } from './UpcomingInvoices';
 import { Activity } from './Activity';
 import { RecentPayments } from './RecentPayments';
 import { useEnabled } from '$app/common/guards/guards/enabled';
+import { set } from 'lodash';
+import { updateUser } from '$app/common/stores/slices/user';
+import { useDispatch } from 'react-redux';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -108,6 +115,7 @@ export function ResizableDashboardCards() {
   const [t] = useTranslation();
 
   const { Preferences, update } = usePreferences();
+  const dispatch = useDispatch();
 
   const enabled = useEnabled();
   const formatMoney = useFormatMoney();
@@ -127,6 +135,7 @@ export function ResizableDashboardCards() {
 
  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [currentLayout, setCurrentLayout] = useState<any[]>([]);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
 
  const chartScale =
     settings?.preferences?.dashboard_charts?.default_view || 'month';
@@ -404,14 +413,49 @@ export function ResizableDashboardCards() {
              </div>
 
              {isEditMode && (
-               <Button
-                 className="ml-2"
-                onClick={() => {
-                  // Reset dashboard to default positions
-                  window.location.reload();
-                }}
-              >
-                {t('reset')}
+              <Button
+                className="ml-2"
+                disabled={isResetting}
+               onClick={() => {
+                  // Clear dashboard fields and reset preferences
+                  setIsResetting(true);
+                  
+                  const updatedUser = { ...user };
+                  
+                  if (updatedUser && updatedUser.id) {
+                    // Clear dashboard fields
+                    set(updatedUser, 'company_user.react_settings.dashboard_fields', []);
+                    
+                    // Make API request to save changes
+                    request(
+                      'PUT',
+                      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+                      updatedUser
+                    )
+                    .then((response: GenericSingleResourceResponse<CompanyUser>) => {
+                      toast.success('reset_successfully');
+                      set(updatedUser, 'company_user', response.data.data);
+                      $refetch(['company_users']);
+                      dispatch(updateUser(updatedUser));
+                      
+                      // Reset chart preferences to defaults
+                      update('preferences.dashboard_charts.default_view', 'day');
+                      update('preferences.dashboard_charts.range', 'last30_days');
+                      
+                      // Exit edit mode
+                      setIsEditMode(false);
+                      
+                      // Reload to reset card positions
+                      setTimeout(() => window.location.reload(), 500);
+                    })
+                    .catch(() => {
+                      toast.error('error_title');
+                      setIsResetting(false);
+                    });
+                  }
+               }}
+             >
+                {isResetting ? t('processing') : t('reset')}
               </Button>
              )}
            </div>
@@ -725,10 +769,10 @@ export function ResizableDashboardCards() {
                y: 1,
                w: 24,
                h: 2,  // Increased height to accommodate rectangular cards
-               isResizable: isEditMode,
-               resizeHandles: isEditMode ? ['s'] : [],
-               isDraggable: isEditMode,  // Can be moved vertically in edit mode
-               static: false,  // Not static - participates in layout
+               isResizable: false,  // Row height is fixed
+               resizeHandles: [],   // No resize handles
+               isDraggable: false,  // Never movable
+               static: true,        // Always pinned in place
              }}
            >
              <PreferenceCardsGrid
