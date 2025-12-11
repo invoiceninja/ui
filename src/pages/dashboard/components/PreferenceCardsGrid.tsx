@@ -8,26 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
 import { DashboardField } from '$app/common/interfaces/company-user';
 import classNames from 'classnames';
 import { DashboardCard } from './DashboardCard';
-import ReactGridLayout, { Responsive } from 'react-grid-layout';
-import { WidthProvider } from 'react-grid-layout';
-import { useEffect, useState } from 'react';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDispatch } from 'react-redux';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { cloneDeep } from 'lodash';
-import { useDebounce } from 'react-use';
-import { diff } from 'deep-object-diff';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { updateUser } from '$app/common/stores/slices/user';
 import { $refetch } from '$app/common/hooks/useRefetch';
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
+import { useDebounce } from 'react-use';
 
 interface Props {
   currentDashboardFields: DashboardField[];
@@ -40,9 +34,7 @@ interface Props {
 }
 
 /**
- * PreferenceCardsGrid - Nested ResponsiveGridLayout for individual card drag/drop
- * 
- * NO HEIGHT MANIPULATION - Heights controlled by parent ResponsiveGridLayout only
+ * PreferenceCardsGrid - Simple flexbox layout with drag and drop for preference cards
  */
 export function PreferenceCardsGrid(props: Props) {
   const {
@@ -59,102 +51,29 @@ export function PreferenceCardsGrid(props: Props) {
   const user = useCurrentUser();
   const reactSettings = useReactSettings();
 
-  const [layouts, setLayouts] = useState<ReactGridLayout.Layouts>({});
-  const [isLayoutsInitialized, setIsLayoutsInitialized] = useState<boolean>(false);
+  const [cardOrder, setCardOrder] = useState<string[]>(
+    currentDashboardFields.map(field => field.id)
+  );
+  const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
-  // Generate initial layout for cards
-  const generateLayoutForCards = (
-    cards: DashboardField[],
-    breakpoint: string
-  ) => {
-    const totalCards = cards?.length || 0;
-    // Use static fixed size - always 4 cards per row at 6 columns each
-    const cardsPerRow = 4;
-    const cardWidth = 6; // Each card takes 6 columns (4 cards per row)
-
-    const rows = Math.ceil(totalCards / cardsPerRow);
-    const newCards = [];
-    const cardsToAdd = [...cards];
-
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cardsPerRow; j++) {
-        const card = cardsToAdd.shift();
-
-        if (!card) {
-          break;
-        }
-
-        newCards.push({
-          i: card.id,
-          x: j * cardWidth,
-          y: i * 1.5,  // Compact row spacing at 1.5 units
-          w: cardWidth,
-          h: 1.5,  // Compact height for rectangular shape
-          minW: cardWidth,  // Fixed width
-          maxW: cardWidth,  // Fixed width
-          minH: 1.5,  // Fixed height
-          maxH: 1.5,  // Fixed height
-          static: false,  // Cards can be moved within grid
-        });
-      }
+  // Update order when currentDashboardFields change
+  useEffect(() => {
+    const savedOrder = reactSettings?.preference_cards_order;
+    if (savedOrder && Array.isArray(savedOrder)) {
+      // Use saved order but filter to only include current fields
+      const validOrder = savedOrder.filter(id => 
+        currentDashboardFields.some(field => field.id === id)
+      );
+      // Add any new fields not in saved order
+      const newFields = currentDashboardFields.filter(
+        field => !validOrder.includes(field.id)
+      );
+      setCardOrder([...validOrder, ...newFields.map(f => f.id)]);
+    } else {
+      setCardOrder(currentDashboardFields.map(field => field.id));
     }
-
-    return newCards;
-  };
-
-  // Normalize all items to fixed sizes
-  const normalizeTinyItems = (
-    existing: ReactGridLayout.Layout[],
-    generated: ReactGridLayout.Layout[]
-  ): ReactGridLayout.Layout[] => {
-    return existing.map((item) => {
-      const replacement = generated.find((g) => g.i === item.i);
-      // Always use the generated layout with fixed sizes
-      return replacement ? { ...replacement } : {
-        ...item,
-        w: 6,
-        h: 1.5,
-        minW: 6,
-        maxW: 6,
-        minH: 1.5,
-        maxH: 1.5,
-      };
-    });
-  };
-
-  // Update layout when cards or breakpoint change
-  const updateLayoutForNewCards = () => {
-    if (!layoutBreakpoint) {
-      return;
-    }
-
-    setLayouts((currentLayouts) => {
-      const currentLayoutForBreakpoint =
-        currentLayouts[layoutBreakpoint] || [];
-      const newCardsLayout = generateLayoutForCards(
-        currentDashboardFields,
-        layoutBreakpoint
-      );
-
-      // Keep existing items that are still in fields
-      const kept = currentLayoutForBreakpoint.filter((existingCard) =>
-        currentDashboardFields.some((newCard) => newCard.id === existingCard.i)
-      );
-
-      // Normalize tiny kept items
-      const keptNormalized = normalizeTinyItems(kept, newCardsLayout);
-
-      // Add truly new ones from generator
-      const added = newCardsLayout.filter(
-        (newCard) => !keptNormalized.some((k) => k.i === newCard.i)
-      );
-
-      return {
-        ...currentLayouts,
-        [layoutBreakpoint]: [...keptNormalized, ...added],
-      };
-    });
-  };
+  }, [currentDashboardFields, reactSettings]);
 
   const handleUpdateUserPreferences = () => {
     if (!user) {
@@ -164,7 +83,7 @@ export function PreferenceCardsGrid(props: Props) {
     request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), {
       react_settings: {
         ...reactSettings,
-        preference_cards_configuration: cloneDeep(layouts),
+        preference_cards_order: cardOrder,
       },
     })
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
@@ -179,147 +98,103 @@ export function PreferenceCardsGrid(props: Props) {
       .catch((error) => console.error(error));
   };
 
-  // Initialize layouts from saved settings
-  useEffect(() => {
-    if (layoutBreakpoint) {
-      if (
-        reactSettings?.preference_cards_configuration &&
-        !isLayoutsInitialized
-      ) {
-        // Load saved layouts but enforce fixed sizes
-        const savedLayouts = cloneDeep(reactSettings?.preference_cards_configuration);
-        const fixedLayouts = Object.keys(savedLayouts).reduce((acc, key) => {
-          acc[key] = savedLayouts[key].map(item => ({
-            ...item,
-            w: 6,  // Force fixed width
-            h: 1.5,  // Force fixed height  
-            minW: 6,
-            maxW: 6,
-            minH: 1.5,
-            maxH: 1.5,
-          }));
-          return acc;
-        }, {} as ReactGridLayout.Layouts);
-        setLayouts(fixedLayouts);
-        setIsLayoutsInitialized(true);
-      }
-
-      setTimeout(() => {
-        updateLayoutForNewCards();
-      }, 50);
-    }
-  }, [layoutBreakpoint, currentDashboardFields.length]);
-
-  // Save layout changes with debounce
+  // Save order changes with debounce
   useDebounce(
     () => {
       if (
         reactSettings &&
-        ((reactSettings.preference_cards_configuration &&
-          Object.keys(
-            diff(reactSettings.preference_cards_configuration, layouts)
-          ).length) ||
-          !reactSettings.preference_cards_configuration)
+        JSON.stringify(reactSettings.preference_cards_order) !== JSON.stringify(cardOrder)
       ) {
         handleUpdateUserPreferences();
       }
     },
     1500,
-    [layouts]
+    [cardOrder]
   );
 
-  // Custom drag handler to implement smoother drag behavior
-  const handleDrag = () => {
-    // Don't apply threshold logic, just let cards move freely
-    // The overlap mode allows cards to temporarily overlap during drag
-    // They will snap to grid on drop
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, cardId: string) => {
+    if (!isEditMode) return;
+    setDraggedCardId(cardId);
+    e.dataTransfer.effectAllowed = 'move';
   };
 
-  // Track drag start position
-  const handleDragStart = () => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
   };
 
-  // Apply collision detection on drag stop
-  const handleDragStop = () => {
-    // Allow the layout to settle naturally
-    // Grid will prevent final overlaps automatically
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, cardId: string) => {
+    if (!isEditMode) return;
+    setDragOverId(cardId);
   };
+
+  const handleDragLeave = () => {
+    setDragOverId(null);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropCardId: string) => {
+    e.preventDefault();
+    if (!isEditMode || !draggedCardId) return;
+
+    const draggedIndex = cardOrder.indexOf(draggedCardId);
+    const dropIndex = cardOrder.indexOf(dropCardId);
+
+    if (draggedIndex !== dropIndex) {
+      const newOrder = [...cardOrder];
+      // Remove dragged card
+      newOrder.splice(draggedIndex, 1);
+      // Insert at new position
+      newOrder.splice(dropIndex, 0, draggedCardId);
+      setCardOrder(newOrder);
+    }
+
+    setDraggedCardId(null);
+    setDragOverId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedCardId(null);
+    setDragOverId(null);
+  };
+
+  // Get ordered cards
+  const orderedCards = cardOrder
+    .map(id => currentDashboardFields.find(field => field.id === id))
+    .filter(Boolean) as DashboardField[];
 
   return (
-    <ResponsiveGridLayout
-      className="preference-cards-grid"
-      breakpoints={{
-        xxl: 1400,
-        xl: 1200,
-        lg: 1000,
-        md: 800,
-        sm: 600,
-        xs: 300,
-        xxs: 0,
+    <div 
+      className="preference-cards-flexbox-grid"
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '1rem',
+        padding: '0.5rem',
       }}
-      layouts={layouts}
-      cols={{
-        xxl: 24,
-        xl: 24,
-        lg: 24,
-        md: 24,
-        sm: 24,
-        xs: 24,
-        xxs: 24,
-      }}
-      draggableHandle=".preference-card-drag-handle"
-      margin={[5, 5]}
-      rowHeight={60}
-      isDraggable={isEditMode}
-      isDroppable={true}
-      isResizable={false}
-      onLayoutChange={(layout, layouts) => {
-        // Enforce fixed sizes on layout changes
-        const fixedLayout = layout.map(item => ({
-          ...item,
-          w: 6,  // Force fixed width
-          h: 1.5,  // Force fixed height
-          minW: 6,
-          maxW: 6,
-          minH: 1.5,
-          maxH: 1.5,
-        }));
-        
-        const fixedLayouts = Object.keys(layouts).reduce((acc, key) => {
-          acc[key] = layouts[key].map(item => ({
-            ...item,
-            w: 6,
-            h: 1.5,
-            minW: 6,
-            maxW: 6,
-            minH: 1.5,
-            maxH: 1.5,
-          }));
-          return acc;
-        }, {} as ReactGridLayout.Layouts);
-        
-        setLayouts(fixedLayouts);
-      }}
-      compactType="horizontal"
-      preventCollision={true}
-      allowOverlap={false}
-      verticalCompact={false}
-      maxRows={20}
-      containerPadding={[0, 0]}
-      useCSSTransforms={true}
-      onDrag={handleDrag}
-      onDragStart={handleDragStart}
-      onDragStop={handleDragStop}
-      transformScale={1}
     >
-      {currentDashboardFields.map((field) => (
+      {orderedCards.map((field) => (
         <div
           key={field.id}
-          className={classNames('preference-card-drag-handle', {
+          className={classNames('preference-card-drag-container', {
             'cursor-grab': isEditMode,
+            'dragging': draggedCardId === field.id,
+            'drag-over': dragOverId === field.id,
           })}
+          draggable={isEditMode}
+          onDragStart={(e) => handleDragStart(e, field.id)}
+          onDragOver={handleDragOver}
+          onDragEnter={(e) => handleDragEnter(e, field.id)}
+          onDragLeave={handleDragLeave}
+          onDrop={(e) => handleDrop(e, field.id)}
+          onDragEnd={handleDragEnd}
           style={{
-            pointerEvents: 'auto',
+            width: 'calc(25% - 0.75rem)', // 4 cards per row with gap
+            minWidth: '200px',
+            height: '150px',
+            opacity: draggedCardId === field.id ? 0.5 : 1,
+            transform: dragOverId === field.id ? 'scale(1.05)' : 'scale(1)',
+            transition: 'transform 0.2s ease',
+            position: 'relative',
           }}
         >
           <DashboardCard
@@ -332,6 +207,6 @@ export function PreferenceCardsGrid(props: Props) {
           />
         </div>
       ))}
-    </ResponsiveGridLayout>
+    </div>
   );
 }
