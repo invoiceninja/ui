@@ -251,3 +251,20 @@
   pointer-events: auto !important;
   cursor: grab;
 }
+
+/* Preference cards container specific styling */
+.preference-cards-container {
+  /* Remove any default padding */
+  padding: 0 !important;
+}
+
+/* Reduce top margin for preference cards container when it's the first item after toolbar */
+.react-grid-item[data-grid-y="1"] {
+  margin-top: 0 !important;
+}
+
+/* Zero out vertical padding inside preference cards grid */
+.preference-cards-container .react-grid-layout {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
