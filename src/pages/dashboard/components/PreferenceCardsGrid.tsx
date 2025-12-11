@@ -76,8 +76,8 @@ export function PreferenceCardsGrid(props: Props) {
       case 'xxl':
       case 'xl':
       case 'lg':
-        cardsPerRow = 3;
-        cardWidth = 8;
+        cardsPerRow = 2;
+        cardWidth = 11;
         break;
       case 'md':
         cardsPerRow = 2;
@@ -90,8 +90,8 @@ export function PreferenceCardsGrid(props: Props) {
         cardWidth = 24;
         break;
       default:
-        cardsPerRow = 3;
-        cardWidth = 8;
+        cardsPerRow = 2;
+        cardWidth = 11;
     }
 
     // const cardsPerRow is now defined above based on breakpoint
@@ -110,9 +110,9 @@ export function PreferenceCardsGrid(props: Props) {
         newCards.push({
           i: card.id,
           x: j * cardWidth,
-          y: i * 2,  // Each row is 2 units high
+          y: i * 3,  // Each row is 3 units high
           w: cardWidth,
-          h: 2,  // Height of 2 units for rectangular cards
+          h: 3,  // Height of 3 units for more rectangular cards
         });
       }
     }
