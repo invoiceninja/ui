@@ -268,7 +268,7 @@ export function PreferenceCardsGrid(props: Props) {
         xxs: 24,
       }}
       draggableHandle=".preference-card-drag-handle"
-      margin={[5, 5]}
+      margin={[10, 0]}
       rowHeight={60}
       isDraggable={isEditMode}
       isDroppable={true}
