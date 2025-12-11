@@ -275,47 +275,21 @@ export function ResizableDashboardCards() {
       ref={containerRef}
       style={{ width: '100%' }}
     >
-      {/* Preference Cards Row - Fixed position outside grid */}
-      {!totals.isLoading && currentDashboardFields && currentDashboardFields.length > 0 && (
-        <div 
-          className={classNames('w-full mb-5 preference-cards-fixed-container', {
-            'border-2 border-dotted border-gray-400': isEditMode,
-          })}
-        >
-          <PreferenceCardsGrid
-            currentDashboardFields={currentDashboardFields}
-            dateRange={dateRange}
-            startDate={dates.start_date}
-            endDate={dates.end_date}
-            currencyId={currency.toString()}
-            layoutBreakpoint="lg"
-            isEditMode={isEditMode}
-          />
-        </div>
-      )}
-      
       {!totals.isLoading ? (
+        <>
+        {/* Toolbar/Menu Grid - Only contains the toolbar */}
         <GridLayout
           cols={24}
           width={width}
           draggableHandle=".drag-handle"
           margin={[0, 20]}
-          isDraggable={isEditMode}
+          isDraggable={false}
          isDroppable={isEditMode}
          compactType="vertical"
          preventCollision={false}
          useCSSTransforms={true}
-         onLayoutChange={(layout) => {
-           // Store the current layout positions
-           setCurrentLayout(layout);
-         }}
+         static={true}
        >
-         {totals.isLoading && (
-            <div className="w-full flex justify-center">
-              <Spinner />
-            </div>
-          )}
-
           {/* Quick date, currency & date picker. */}
           <div
             key="1"
@@ -492,6 +466,44 @@ export function ResizableDashboardCards() {
              )}
            </div>
          </div>
+
+        </GridLayout>
+        
+        {/* Preference Cards Row - Fixed position between toolbar and main cards */}
+        {currentDashboardFields && currentDashboardFields.length > 0 && (
+          <div 
+            className={classNames('w-full mt-5 mb-5 preference-cards-fixed-container', {
+              'border-2 border-dotted border-gray-400': isEditMode,
+            })}
+          >
+            <PreferenceCardsGrid
+              currentDashboardFields={currentDashboardFields}
+              dateRange={dateRange}
+              startDate={dates.start_date}
+              endDate={dates.end_date}
+              currencyId={currency.toString()}
+              layoutBreakpoint="lg"
+              isEditMode={isEditMode}
+            />
+          </div>
+        )}
+        
+        {/* Main Dashboard Cards Grid */}
+        <GridLayout
+          cols={24}
+          width={width}
+          draggableHandle=".drag-handle"
+          margin={[0, 20]}
+          isDraggable={isEditMode}
+          isDroppable={isEditMode}
+          compactType="vertical"
+          preventCollision={false}
+          useCSSTransforms={true}
+          onLayoutChange={(layout) => {
+            // Store the current layout positions
+            setCurrentLayout(layout);
+          }}
+        >
 
          {/* <DashboardCards
          dateRange={dateRange}
@@ -791,6 +803,7 @@ export function ResizableDashboardCards() {
           )}
 
         </GridLayout>
+      </>
       ) : (
         <div className="w-full flex justify-center">
           <Spinner />
