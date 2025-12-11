@@ -704,7 +704,7 @@ export function ResizableDashboardCards() {
                 x: 0,
                 y: 1,
                 w: 24,
-                h: 1,
+                h: 2,  // Increased height to accommodate rectangular cards
                 isResizable: isEditMode,
                 resizeHandles: isEditMode ? ['s'] : [],
                 isDraggable: false,

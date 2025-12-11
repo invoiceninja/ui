@@ -68,35 +68,33 @@ export function PreferenceCardsGrid(props: Props) {
     breakpoint: string
   ) => {
     const totalCards = cards?.length || 0;
-    let widthPerScreenSize = 0;
+    // Using a 24-column grid system for better card layout
+    let cardsPerRow = 3;
+    let cardWidth = 8; // Each card takes 8 columns (3 cards per row)
 
     switch (breakpoint) {
       case 'xxl':
-        widthPerScreenSize = 150;
-        break;
       case 'xl':
-        widthPerScreenSize = 200;
-        break;
       case 'lg':
-        widthPerScreenSize = 250;
+        cardsPerRow = 3;
+        cardWidth = 8;
         break;
       case 'md':
-        widthPerScreenSize = 300;
+        cardsPerRow = 2;
+        cardWidth = 12;
         break;
       case 'sm':
-        widthPerScreenSize = 350;
-        break;
       case 'xs':
-        widthPerScreenSize = 500;
-        break;
       case 'xxs':
-        widthPerScreenSize = 1000;
+        cardsPerRow = 1;
+        cardWidth = 24;
         break;
       default:
-        widthPerScreenSize = 200;
+        cardsPerRow = 3;
+        cardWidth = 8;
     }
 
-    const cardsPerRow = Math.floor(1000 / (widthPerScreenSize + 20));
+    // const cardsPerRow is now defined above based on breakpoint
     const rows = Math.ceil(totalCards / cardsPerRow);
     const newCards = [];
     const cardsToAdd = [...cards];
@@ -111,10 +109,10 @@ export function PreferenceCardsGrid(props: Props) {
 
         newCards.push({
           i: card.id,
-          x: j * (widthPerScreenSize + 20),
-          y: i * (140 + 20),
-          w: widthPerScreenSize,
-          h: 140,
+          x: j * cardWidth,
+          y: i * 2,  // Each row is 2 units high
+          w: cardWidth,
+          h: 2,  // Height of 2 units for rectangular cards
         });
       }
     }
@@ -127,8 +125,8 @@ export function PreferenceCardsGrid(props: Props) {
     existing: ReactGridLayout.Layout[],
     generated: ReactGridLayout.Layout[]
   ): ReactGridLayout.Layout[] => {
-    const tinyW = 20; // in our 1000-col scheme
-    const tinyH = 20; // rowHeight=1 → 20px
+    const tinyW = 2; // in our 24-col scheme
+    const tinyH = 1; // rowHeight=80 → 20px
     return existing.map((item) => {
       const isTiny = (item.w ?? 0) <= tinyW || (item.h ?? 0) <= tinyH;
       if (!isTiny) return item;
@@ -260,17 +258,17 @@ export function PreferenceCardsGrid(props: Props) {
       }}
       layouts={layouts}
       cols={{
-        xxl: 1000,
-        xl: 1000,
-        lg: 1000,
-        md: 1000,
-        sm: 1000,
-        xs: 1000,
-        xxs: 1000,
+        xxl: 24,
+        xl: 24,
+        lg: 24,
+        md: 24,
+        sm: 24,
+        xs: 24,
+        xxs: 24,
       }}
       draggableHandle=".preference-card-drag-handle"
       margin={[0, 20]}
-      rowHeight={1}
+      rowHeight={80}
       isDraggable={isEditMode}
       isDroppable={true}
       isResizable={false}
