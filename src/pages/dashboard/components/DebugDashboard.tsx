@@ -107,7 +107,7 @@ export function DebugDashboard() {
           layouts={layouts}
           breakpoints={{ lg: 1200, md: 996, sm: 768 }}
           cols={{ lg: 12, md: 10, sm: 6 }}
-          rowHeight={60}
+          rowHeight={30}
           isDraggable={isEditMode}
           isResizable={isEditMode}
           compactType={null}
