@@ -139,33 +139,16 @@ export function ResizableDashboardCards() {
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [layoutBreakpoint, setLayoutBreakpoint] = useState<string>('lg');
 
-  // Calculate container height based on breakpoint
+  // Calculate container height based on number of cards
   const getContainerHeight = (numCards: number, breakpoint: string) => {
     if (!numCards || numCards === 0) return 0;
     
-    let cardsPerRow = 4;
-    
-    switch (breakpoint) {
-      case 'xxl':
-      case 'xl':
-      case 'lg':
-        cardsPerRow = 4;
-        break;
-      case 'md':
-        cardsPerRow = 3;
-        break;
-      case 'sm':
-      case 'xs':
-      case 'xxs':
-        cardsPerRow = 1;
-        break;
-      default:
-        cardsPerRow = 4;
-    }
-    
+    // Fixed 4 cards per row
+    const cardsPerRow = 4;
     const rows = Math.ceil(numCards / cardsPerRow);
-    // 2 units per card height + some margin space
-    return Math.max(2, rows * 2.25);
+    
+    // 1.5 units per row (matching card height) + small padding
+    return rows * 1.5 + 0.2;
   };
 
  const chartScale =

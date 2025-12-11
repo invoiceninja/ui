@@ -68,33 +68,10 @@ export function PreferenceCardsGrid(props: Props) {
     breakpoint: string
   ) => {
     const totalCards = cards?.length || 0;
-    // Using a 24-column grid system for better card layout
-    let cardsPerRow = 4;
-    let cardWidth = 6; // Each card takes 6 columns (4 cards per row)
+    // Use static fixed size - always 4 cards per row at 6 columns each
+    const cardsPerRow = 4;
+    const cardWidth = 6; // Each card takes 6 columns (4 cards per row)
 
-    switch (breakpoint) {
-      case 'xxl':
-      case 'xl':
-      case 'lg':
-        cardsPerRow = 4;
-        cardWidth = 6;
-        break;
-      case 'md':
-        cardsPerRow = 3;
-        cardWidth = 8;
-        break;
-      case 'sm':
-      case 'xs':
-      case 'xxs':
-        cardsPerRow = 1;
-        cardWidth = 24;
-        break;
-      default:
-        cardsPerRow = 4;
-        cardWidth = 6;
-    }
-
-    // const cardsPerRow is now defined above based on breakpoint
     const rows = Math.ceil(totalCards / cardsPerRow);
     const newCards = [];
     const cardsToAdd = [...cards];
@@ -110,12 +87,14 @@ export function PreferenceCardsGrid(props: Props) {
         newCards.push({
           i: card.id,
           x: j * cardWidth,
-          y: i * 2,  // Each row is 2 units high
+          y: i * 1.5,  // Compact row spacing at 1.5 units
           w: cardWidth,
-          h: 2,  // Height of 2 units for rectangular shape
-          minW: 4,  // Minimum width to prevent too narrow cards
-          maxW: 8,  // Maximum width to prevent too wide cards
-          static: false,  // Cards can be moved
+          h: 1.5,  // Compact height for rectangular shape
+          minW: cardWidth,  // Fixed width
+          maxW: cardWidth,  // Fixed width
+          minH: 1.5,  // Fixed height
+          maxH: 1.5,  // Fixed height
+          static: false,  // Cards can be moved within grid
         });
       }
     }
@@ -270,8 +249,8 @@ export function PreferenceCardsGrid(props: Props) {
         xxs: 24,
       }}
       draggableHandle=".preference-card-drag-handle"
-      margin={[10, 10]}
-      rowHeight={80}
+      margin={[5, 5]}
+      rowHeight={60}
       isDraggable={isEditMode}
       isDroppable={true}
       isResizable={false}
@@ -279,7 +258,7 @@ export function PreferenceCardsGrid(props: Props) {
       compactType="horizontal"
       preventCollision={true}
       allowOverlap={false}
-      verticalCompact={true}
+      verticalCompact={false}
       maxRows={20}
       containerPadding={[0, 0]}
       useCSSTransforms={true}
