@@ -261,7 +261,8 @@
 /* Override the position for preference cards to reduce gap from toolbar */
 .preference-cards-container.react-grid-item {
   /* Force position closer to toolbar - override grid calculation */
-  transform: translate(0px, 50px) !important; /* Move to 50px from top instead of 150px */
+  transform: translate(0px, 70px) !important; /* 50px toolbar + 20px padding = 70px from top */
+  margin-bottom: 20px !important; /* Add 20px padding below */
 }
 
 /* Zero out vertical padding inside preference cards grid */
