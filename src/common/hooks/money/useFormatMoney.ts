@@ -40,9 +40,8 @@ export function useFormatMoney() {
         currency,
         country,
         {
-          showCurrencyCode: currency?.symbol
-            ? showCurrencyCode ?? company.settings.show_currency_code
-            : true,
+          showCurrencyCode:
+            showCurrencyCode ?? company.settings.show_currency_code,
         }
       );
     }
