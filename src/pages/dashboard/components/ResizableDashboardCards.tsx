@@ -420,20 +420,14 @@ export function ResizableDashboardCards() {
                onClick={() => {
                  // Clear dashboard fields and reset preferences
                  setIsResetting(true);
-                 console.log('Current user structure:', user);
-                 console.log('Dashboard fields path:', user?.company_user?.react_settings?.dashboard_fields);
-                 
                  const updatedUser = cloneDeep(user) as User;
                  
                  if (updatedUser && updatedUser.company_user) {
                    // Clear dashboard fields
                    set(updatedUser, 'company_user.react_settings.dashboard_fields', []);
-                   console.log('Updated user after clearing:', updatedUser);
-                   
                    // Make API request to save changes
                    request(
                      'PUT',
-                     endpoint('/api/v1/company_users/:id', { id: updatedUser.company_user.id }),
                      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
                      updatedUser
                    )
@@ -465,15 +459,6 @@ export function ResizableDashboardCards() {
              )}
            </div>
          </div>
-
-         {/* <DashboardCards
-         dateRange={dateRange}
-         startDate={dates.start_date}
-         endDate={dates.end_date}
-         currencyId={currency.toString()}
-         /> */}
-
-         {/* Preference Cards Row - Must be second in DOM order for y=1 positioning */}
           {currentDashboardFields && currentDashboardFields.length > 0 && (
            <div
              key="preference_cards"
@@ -503,6 +488,15 @@ export function ResizableDashboardCards() {
               />
            </div>
          )}
+
+         {/* <DashboardCards
+         dateRange={dateRange}
+         startDate={dates.start_date}
+         endDate={dates.end_date}
+         currencyId={currency.toString()}
+         /> */}
+
+         {/* Preference Cards Row - Must be second in DOM order for y=1 positioning */}
 
          {company && (
             <div
