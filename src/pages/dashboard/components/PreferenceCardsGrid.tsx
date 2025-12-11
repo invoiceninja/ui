@@ -57,12 +57,18 @@ export function PreferenceCardsGrid(props: Props) {
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('PreferenceCardsGrid - isEditMode:', isEditMode);
+    console.log('PreferenceCardsGrid - cardOrder:', cardOrder);
+  }, [isEditMode, cardOrder]);
+
   // Update order when currentDashboardFields change
   useEffect(() => {
     const savedOrder = (reactSettings as any)?.preference_cards_order;
     if (savedOrder && Array.isArray(savedOrder)) {
       // Use saved order but filter to only include current fields
-      const validOrder = savedOrder.filter(id => 
+      const validOrder = savedOrder.filter((id: string) => 
         currentDashboardFields.some(field => field.id === id)
       );
       // Add any new fields not in saved order
@@ -114,17 +120,24 @@ export function PreferenceCardsGrid(props: Props) {
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, cardId: string) => {
     if (!isEditMode) return;
+    e.stopPropagation();
+    console.log('Drag started:', cardId);
     setDraggedCardId(cardId);
     e.dataTransfer.effectAllowed = 'move';
+    // Set dummy data to make drag work in Firefox
+    e.dataTransfer.setData('text/plain', cardId);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
   };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, cardId: string) => {
     if (!isEditMode) return;
+    e.stopPropagation();
+    console.log('Drag enter:', cardId);
     setDragOverId(cardId);
   };
 
@@ -134,6 +147,8 @@ export function PreferenceCardsGrid(props: Props) {
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropCardId: string) => {
     e.preventDefault();
+    e.stopPropagation();
+    console.log('Drop on:', dropCardId, 'dragged:', draggedCardId);
     if (!isEditMode || !draggedCardId) return;
 
     const draggedIndex = cardOrder.indexOf(draggedCardId);
@@ -195,16 +210,19 @@ export function PreferenceCardsGrid(props: Props) {
             transform: dragOverId === field.id ? 'scale(1.05)' : 'scale(1)',
             transition: 'transform 0.2s ease',
             position: 'relative',
+            pointerEvents: isEditMode ? 'auto' : 'none',
           }}
         >
-          <DashboardCard
-            field={field}
-            dateRange={dateRange}
-            startDate={startDate}
-            endDate={endDate}
-            currencyId={currencyId}
-            layoutBreakpoint={layoutBreakpoint}
-          />
+          <div style={{ pointerEvents: isEditMode ? 'none' : 'auto', width: '100%', height: '100%' }}>
+            <DashboardCard
+              field={field}
+              dateRange={dateRange}
+              startDate={startDate}
+              endDate={endDate}
+              currencyId={currencyId}
+              layoutBreakpoint={layoutBreakpoint}
+            />
+          </div>
         </div>
       ))}
     </div>

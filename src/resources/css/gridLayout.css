@@ -286,3 +286,25 @@
   background-color: rgba(59, 130, 246, 0.1);
   border-radius: 8px;
 }
+
+/* Ensure preference cards are draggable in edit mode */
+.preference-card-drag-container[draggable="true"] {
+  cursor: move;
+  user-select: none;
+}
+
+.preference-card-drag-container[draggable="true"]:active {
+  cursor: grabbing;
+  opacity: 0.8;
+}
+
+/* Visual feedback during drag */
+.preference-card-drag-container.dragging {
+  opacity: 0.4 !important;
+  cursor: grabbing !important;
+}
+
+.preference-card-drag-container.drag-over {
+  border: 2px dashed #3b82f6;
+  background-color: rgba(59, 130, 246, 0.05);
+}
