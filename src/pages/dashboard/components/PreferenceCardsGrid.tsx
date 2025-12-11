@@ -83,7 +83,6 @@ export function PreferenceCardsGrid(props: Props) {
         setCardOrder(currentFieldIds);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDashboardFields.length]); // Only re-run when number of fields changes
 
   const handleUpdateUserPreferences = () => {
