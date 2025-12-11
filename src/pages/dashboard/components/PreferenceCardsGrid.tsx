@@ -83,7 +83,7 @@ export function PreferenceCardsGrid(props: Props) {
     request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), {
       react_settings: {
         ...reactSettings,
-        preference_cards_order: cardOrder,
+        preference_cards_order: cardOrder as any, // TypeScript type mismatch with ReactSettings
       },
     })
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
@@ -103,7 +103,7 @@ export function PreferenceCardsGrid(props: Props) {
     () => {
       if (
         reactSettings &&
-        JSON.stringify(reactSettings.preference_cards_order) !== JSON.stringify(cardOrder)
+        JSON.stringify((reactSettings as any).preference_cards_order) !== JSON.stringify(cardOrder)
       ) {
         handleUpdateUserPreferences();
       }
