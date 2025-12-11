@@ -19,14 +19,10 @@ import { useOutletContext } from 'react-router-dom';
 import { Details } from '../../edit/components/Details';
 import { Footer } from '../../edit/components/Footer';
 import { VendorSelector } from '../../edit/components/VendorSelector';
-import { useHandleCreateLineItem } from '../../edit/hooks/useHandleCreateLineItem';
-import { useHandleDeleteLineItem } from '../../edit/hooks/useHandleDeleteLineItem';
-import { useHandleInvitationChange } from '../../edit/hooks/useHandleInvitationChange';
-import { useHandleLineItemPropertyChange } from '../../edit/hooks/useHandleLineItemPropertyChange';
-import { useHandleProductChange } from '../../edit/hooks/useHandleProductChange';
 import { Card } from '$app/components/cards';
 import { PurchaseOrderContext } from '../Create';
 import { useColorScheme } from '$app/common/colors';
+import { usePurchaseOrderUtilities } from '../../edit/hooks/usePurchaseOrderUtilities';
 
 export default function Create() {
   const colors = useColorScheme();
@@ -46,21 +42,14 @@ export default function Create() {
 
   const productColumns = useProductColumns();
 
-  const handleChange = <T extends keyof PurchaseOrder>(
-    property: T,
-    value: PurchaseOrder[typeof property]
-  ) => {
-    setPurchaseOrder((current) => current && { ...current, [property]: value });
-  };
-
-  const handleInvitationChange = useHandleInvitationChange(handleChange);
-  const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
-  const handleDeleteLineItem = useHandleDeleteLineItem(setPurchaseOrder);
-
-  const handleProductChange = useHandleProductChange(setPurchaseOrder);
-
-  const handleLineItemPropertyChange =
-    useHandleLineItemPropertyChange(setPurchaseOrder);
+  const {
+    handleChange,
+    handleInvitationChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+    handleProductChange,
+    handleLineItemPropertyChange,
+  } = usePurchaseOrderUtilities({ purchaseOrder, setPurchaseOrder });
 
   return (
     <>
