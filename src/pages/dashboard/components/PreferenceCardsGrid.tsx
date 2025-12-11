@@ -102,18 +102,23 @@ export function PreferenceCardsGrid(props: Props) {
     return newCards;
   };
 
-  // Normalize any broken 1x1 (or near) items to sane defaults from generator
+  // Normalize all items to fixed sizes
   const normalizeTinyItems = (
     existing: ReactGridLayout.Layout[],
     generated: ReactGridLayout.Layout[]
   ): ReactGridLayout.Layout[] => {
-    const tinyW = 5; // in our 24-col scheme - adjusted for smaller cards
-    const tinyH = 1; // rowHeight=80 → 80px - adjusted for smaller cards
     return existing.map((item) => {
-      const isTiny = (item.w ?? 0) <= tinyW || (item.h ?? 0) <= tinyH;
-      if (!isTiny) return item;
       const replacement = generated.find((g) => g.i === item.i);
-      return replacement ? { ...replacement } : item;
+      // Always use the generated layout with fixed sizes
+      return replacement ? { ...replacement } : {
+        ...item,
+        w: 6,
+        h: 1.5,
+        minW: 6,
+        maxW: 6,
+        minH: 1.5,
+        maxH: 1.5,
+      };
     });
   };
 
@@ -181,7 +186,21 @@ export function PreferenceCardsGrid(props: Props) {
         reactSettings?.preference_cards_configuration &&
         !isLayoutsInitialized
       ) {
-        setLayouts(cloneDeep(reactSettings?.preference_cards_configuration));
+        // Load saved layouts but enforce fixed sizes
+        const savedLayouts = cloneDeep(reactSettings?.preference_cards_configuration);
+        const fixedLayouts = Object.keys(savedLayouts).reduce((acc, key) => {
+          acc[key] = savedLayouts[key].map(item => ({
+            ...item,
+            w: 6,  // Force fixed width
+            h: 1.5,  // Force fixed height  
+            minW: 6,
+            maxW: 6,
+            minH: 1.5,
+            maxH: 1.5,
+          }));
+          return acc;
+        }, {} as ReactGridLayout.Layouts);
+        setLayouts(fixedLayouts);
         setIsLayoutsInitialized(true);
       }
 
@@ -254,7 +273,33 @@ export function PreferenceCardsGrid(props: Props) {
       isDraggable={isEditMode}
       isDroppable={true}
       isResizable={false}
-      onLayoutChange={(layout, layouts) => setLayouts(layouts)}
+      onLayoutChange={(layout, layouts) => {
+        // Enforce fixed sizes on layout changes
+        const fixedLayout = layout.map(item => ({
+          ...item,
+          w: 6,  // Force fixed width
+          h: 1.5,  // Force fixed height
+          minW: 6,
+          maxW: 6,
+          minH: 1.5,
+          maxH: 1.5,
+        }));
+        
+        const fixedLayouts = Object.keys(layouts).reduce((acc, key) => {
+          acc[key] = layouts[key].map(item => ({
+            ...item,
+            w: 6,
+            h: 1.5,
+            minW: 6,
+            maxW: 6,
+            minH: 1.5,
+            maxH: 1.5,
+          }));
+          return acc;
+        }, {} as ReactGridLayout.Layouts);
+        
+        setLayouts(fixedLayouts);
+      }}
       compactType="horizontal"
       preventCollision={true}
       allowOverlap={false}
