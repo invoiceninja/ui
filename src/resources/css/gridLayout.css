@@ -308,3 +308,15 @@
   border: 2px dashed #3b82f6;
   background-color: rgba(59, 130, 246, 0.05);
 }
+
+/* Ensure cards are draggable but content is not selectable during edit mode */
+.preference-card-drag-container[draggable="true"] > * {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Allow interaction with cards when not in edit mode */
+.preference-card-drag-container[draggable="false"] > * {
+  pointer-events: auto;
+  user-select: auto;
+}

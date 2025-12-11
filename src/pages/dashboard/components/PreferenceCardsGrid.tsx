@@ -57,29 +57,34 @@ export function PreferenceCardsGrid(props: Props) {
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('PreferenceCardsGrid - isEditMode:', isEditMode);
-    console.log('PreferenceCardsGrid - cardOrder:', cardOrder);
-  }, [isEditMode, cardOrder]);
-
   // Update order when currentDashboardFields change
   useEffect(() => {
     const savedOrder = (reactSettings as any)?.preference_cards_order;
+    const currentFieldIds = currentDashboardFields.map(field => field.id);
+    
     if (savedOrder && Array.isArray(savedOrder)) {
       // Use saved order but filter to only include current fields
       const validOrder = savedOrder.filter((id: string) => 
-        currentDashboardFields.some(field => field.id === id)
+        currentFieldIds.includes(id)
       );
       // Add any new fields not in saved order
-      const newFields = currentDashboardFields.filter(
-        field => !validOrder.includes(field.id)
+      const newFields = currentFieldIds.filter(
+        id => !validOrder.includes(id)
       );
-      setCardOrder([...validOrder, ...newFields.map(f => f.id)]);
+      const newOrder = [...validOrder, ...newFields];
+      
+      // Only update if the order actually changed
+      if (JSON.stringify(newOrder) !== JSON.stringify(cardOrder)) {
+        setCardOrder(newOrder);
+      }
     } else {
-      setCardOrder(currentDashboardFields.map(field => field.id));
+      // Only update if different from current
+      if (JSON.stringify(currentFieldIds) !== JSON.stringify(cardOrder)) {
+        setCardOrder(currentFieldIds);
+      }
     }
-  }, [currentDashboardFields, reactSettings]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentDashboardFields.length]); // Only re-run when number of fields changes
 
   const handleUpdateUserPreferences = () => {
     if (!user) {
@@ -121,7 +126,6 @@ export function PreferenceCardsGrid(props: Props) {
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, cardId: string) => {
     if (!isEditMode) return;
     e.stopPropagation();
-    console.log('Drag started:', cardId);
     setDraggedCardId(cardId);
     e.dataTransfer.effectAllowed = 'move';
     // Set dummy data to make drag work in Firefox
@@ -137,7 +141,6 @@ export function PreferenceCardsGrid(props: Props) {
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, cardId: string) => {
     if (!isEditMode) return;
     e.stopPropagation();
-    console.log('Drag enter:', cardId);
     setDragOverId(cardId);
   };
 
@@ -148,7 +151,6 @@ export function PreferenceCardsGrid(props: Props) {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropCardId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Drop on:', dropCardId, 'dragged:', draggedCardId);
     if (!isEditMode || !draggedCardId) return;
 
     const draggedIndex = cardOrder.indexOf(draggedCardId);
@@ -212,21 +214,6 @@ export function PreferenceCardsGrid(props: Props) {
             position: 'relative',
           }}
         >
-          {isEditMode && (
-            <div 
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 10,
-                cursor: 'grab',
-                backgroundColor: 'transparent',
-              }}
-            />
-          )}
-          <div style={{ pointerEvents: !isEditMode ? 'auto' : 'none', width: '100%', height: '100%' }}>
             <DashboardCard
               field={field}
               dateRange={dateRange}
@@ -235,7 +222,6 @@ export function PreferenceCardsGrid(props: Props) {
               currencyId={currencyId}
               layoutBreakpoint={layoutBreakpoint}
             />
-          </div>
         </div>
       ))}
     </div>
