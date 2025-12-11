@@ -49,13 +49,14 @@ import { UpcomingInvoices } from './UpcomingInvoices';
 import { Activity } from './Activity';
 import { RecentPayments } from './RecentPayments';
 import { useEnabled } from '$app/common/guards/guards/enabled';
-import { set } from 'lodash';
+import { set, cloneDeep } from 'lodash';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
+import { User } from '$app/common/interfaces/user';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -417,22 +418,25 @@ export function ResizableDashboardCards() {
                 className="ml-2"
                 disabled={isResetting}
                onClick={() => {
-                  // Clear dashboard fields and reset preferences
-                  setIsResetting(true);
-                  
-                  const updatedUser = { ...user };
-                  
-                  if (updatedUser && updatedUser.id) {
-                    // Clear dashboard fields
-                    set(updatedUser, 'company_user.react_settings.dashboard_fields', []);
-                    
-                    // Make API request to save changes
-                    request(
-                      'PUT',
-                      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-                      updatedUser
-                    )
-                    .then((response: GenericSingleResourceResponse<CompanyUser>) => {
+                 // Clear dashboard fields and reset preferences
+                 setIsResetting(true);
+                 console.log('Current user structure:', user);
+                 console.log('Dashboard fields path:', user?.company_user?.react_settings?.dashboard_fields);
+                 
+                 const updatedUser = cloneDeep(user) as User;
+                 
+                 if (updatedUser && updatedUser.company_user) {
+                   // Clear dashboard fields
+                   set(updatedUser, 'company_user.react_settings.dashboard_fields', []);
+                   console.log('Updated user after clearing:', updatedUser);
+                   
+                   // Make API request to save changes
+                   request(
+                     'PUT',
+                     endpoint('/api/v1/company_users/:id', { id: updatedUser.company_user.id }),
+                     updatedUser
+                   )
+                   .then((response: GenericSingleResourceResponse<CompanyUser>) => {
                       toast.success('reset_successfully');
                       set(updatedUser, 'company_user', response.data.data);
                       $refetch(['company_users']);
@@ -461,7 +465,39 @@ export function ResizableDashboardCards() {
            </div>
          </div>
 
-          {/* <DashboardCards
+         {/* <DashboardCards
+
+          {/* Preference Cards Row - Must be second in DOM order for y=1 positioning */}
+          {currentDashboardFields && currentDashboardFields.length > 0 && (
+           <div
+             key="preference_cards"
+             className={classNames('w-full', {
+               'drag-handle': isEditMode,
+               'cursor-grab': isEditMode,
+             })}
+             data-grid={{
+               x: 0,
+               y: 1,
+               w: 24,
+               h: 2,  // Increased height to accommodate rectangular cards
+               isResizable: false,  // Row height is fixed
+               resizeHandles: [],   // No resize handles
+               isDraggable: false,  // Never movable
+               static: true,        // Always pinned in place
+             }}
+           >
+             <PreferenceCardsGrid
+                currentDashboardFields={currentDashboardFields}
+                dateRange={dateRange}
+                startDate={dates.start_date}
+                endDate={dates.end_date}
+                currencyId={currency.toString()}
+                layoutBreakpoint="lg"
+                isEditMode={isEditMode}
+              />
+            </div>
+          )}
+
         dateRange={dateRange}
         startDate={dates.start_date}
         endDate={dates.end_date}
@@ -756,36 +792,6 @@ export function ResizableDashboardCards() {
             </div>
           )}
 
-          {/* Preference Cards Row */}
-          {currentDashboardFields && currentDashboardFields.length > 0 && (
-           <div
-             key="preference_cards"
-             className={classNames('w-full', {
-               'drag-handle': isEditMode,
-               'cursor-grab': isEditMode,
-             })}
-             data-grid={{
-               x: 0,
-               y: 1,
-               w: 24,
-               h: 2,  // Increased height to accommodate rectangular cards
-               isResizable: false,  // Row height is fixed
-               resizeHandles: [],   // No resize handles
-               isDraggable: false,  // Never movable
-               static: true,        // Always pinned in place
-             }}
-           >
-             <PreferenceCardsGrid
-                currentDashboardFields={currentDashboardFields}
-                dateRange={dateRange}
-                startDate={dates.start_date}
-                endDate={dates.end_date}
-                currencyId={currency.toString()}
-                layoutBreakpoint="lg"
-                isEditMode={isEditMode}
-              />
-            </div>
-          )}
         </GridLayout>
       ) : (
         <div className="w-full flex justify-center">
