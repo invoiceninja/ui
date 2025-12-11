@@ -13,24 +13,27 @@ import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 
+const roundToPrecision = (number: number, precision: number) => {
+  const isNegative = number < 0;
+  
+  if (isNegative) {
+    number = number * -1;
+  }
+
+  number = Number(
+    Math.round(Number(number + `e+${precision}`)) + `e-${precision}`
+  );
+
+  if (isNegative) {
+    number = number * -1;
+  }
+
+  return number;
+};
+
 export function useCalculateExpenseAmount() {
   const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
-
-  const roundToPrecision = (number: number, precision: number) => {
-    const isNegative = number < 0;
-    if (isNegative) {
-      number = number * -1;
-    }
-
-    number = Number(Math.round(Number(number + `e+${precision}`)) + `e-${precision}`);
-
-    if (isNegative) {
-      number = number * -1;
-    }
-
-    return number;
-  };
 
   return (expense: Expense | RecurringExpense) => {
     if (expense.uses_inclusive_taxes) {
@@ -74,21 +77,6 @@ export function useCalculateExpenseAmount() {
 export function useCalculateExpenseExclusiveAmount() {
   const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
-
-  const roundToPrecision = (number: number, precision: number) => {
-    const isNegative = number < 0;
-    if (isNegative) {
-      number = number * -1;
-    }
-
-    number = Number(Math.round(Number(number + `e+${precision}`)) + `e-${precision}`);
-
-    if (isNegative) {
-      number = number * -1;
-    }
-
-    return number;
-  };
 
   return (expense: Expense | RecurringExpense) => {
     if (!expense.uses_inclusive_taxes) {
