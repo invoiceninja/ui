@@ -210,10 +210,23 @@ export function PreferenceCardsGrid(props: Props) {
             transform: dragOverId === field.id ? 'scale(1.05)' : 'scale(1)',
             transition: 'transform 0.2s ease',
             position: 'relative',
-            pointerEvents: isEditMode ? 'auto' : 'none',
           }}
         >
-          <div style={{ pointerEvents: isEditMode ? 'none' : 'auto', width: '100%', height: '100%' }}>
+          {isEditMode && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 10,
+                cursor: 'grab',
+                backgroundColor: 'transparent',
+              }}
+            />
+          )}
+          <div style={{ pointerEvents: !isEditMode ? 'auto' : 'none', width: '100%', height: '100%' }}>
             <DashboardCard
               field={field}
               dateRange={dateRange}
