@@ -35,6 +35,7 @@ export interface Preferences {
     default_view: 'day' | 'week' | 'month';
     range: string;
     currency: number;
+    include_drafts: boolean;
   };
   datatables: {
     clients: {
@@ -97,6 +98,7 @@ export const preferencesDefaults: Preferences = {
     default_view: 'month',
     currency: 1,
     range: 'this_month',
+    include_drafts: false,
   },
   datatables: {
     clients: {
