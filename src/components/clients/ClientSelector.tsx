@@ -65,7 +65,7 @@ export function ClientSelector(props: ClientSelectorProps) {
               .join(',');
             const idNumber = client.id_number;
 
-            return `${contactEmails},${idNumber}`;
+            return idNumber ? `${contactEmails},${idNumber}` : contactEmails;
           },
           dropdownLabelFn,
         }}
