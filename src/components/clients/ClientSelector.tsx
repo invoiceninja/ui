@@ -59,8 +59,14 @@ export function ClientSelector(props: ClientSelectorProps) {
           id: 'id',
           label: 'display_name',
           value: 'id',
-          customSearchableValue: (client) =>
-            client.contacts.map(({ email }) => email).join(','),
+          customSearchableValue: (client) => {
+            const contactEmails = client.contacts
+              .map(({ email }) => email)
+              .join(',');
+            const idNumber = client.id_number;
+
+            return `${contactEmails},${idNumber}`;
+          },
           dropdownLabelFn,
         }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
