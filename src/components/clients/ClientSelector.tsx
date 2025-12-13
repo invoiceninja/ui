@@ -18,6 +18,7 @@ import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { ErrorMessage } from '../ErrorMessage';
+import { ClientContact } from '$app/common/interfaces/client-contact';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -60,12 +61,24 @@ export function ClientSelector(props: ClientSelectorProps) {
           label: 'display_name',
           value: 'id',
           customSearchableValue: (client) => {
-            const contactEmails = client.contacts
-              .map(({ email }) => email)
-              .join(',');
-            const idNumber = client.id_number;
+            const contactFields = ['first_name', 'last_name', 'email', 'phone']
+              .map((field) =>
+                client.contacts
+                  .map((c) => c[field as keyof ClientContact])
+                  .join(',')
+              )
+              .filter(Boolean);
 
-            return idNumber ? `${contactEmails},${idNumber}` : contactEmails;
+            const clientFields = [
+              client.id_number,
+              client.number,
+              client.custom_value1,
+              client.custom_value2,
+              client.custom_value3,
+              client.custom_value4,
+            ].filter(Boolean);
+
+            return [...contactFields, ...clientFields].join(',');
           },
           dropdownLabelFn,
         }}
