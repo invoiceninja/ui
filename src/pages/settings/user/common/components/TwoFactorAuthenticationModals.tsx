@@ -189,7 +189,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
         onClose={setIsEnableModalOpen}
       >
         <div className="flex flex-col items-center pb-8 space-y-4">
-          <div className="p-4 bg-white rounded">
+         <div className="p-4 bg-white rounded">
           <QRCode 
             size={156} 
             value={qrCode} 
