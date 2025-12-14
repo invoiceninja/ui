@@ -46,6 +46,8 @@ import { Banner } from '$app/components/Banner';
 import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { Client } from '$app/common/interfaces/client';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -79,6 +81,7 @@ export default function Create() {
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const creditResolver = useCreditResolver();
+  const clientResolver = useClientResolver();
   const invoiceResolver = useInvoiceResolver();
 
   const formatMoney = useFormatMoney();
@@ -91,6 +94,7 @@ export default function Create() {
     company?.settings?.client_manual_payment_notification
   );
   const [convertCurrency, setConvertCurrency] = useState(false);
+  const [client, setClient] = useState<Client>();
 
   const { data: blankPayment } = useBlankPaymentQuery();
 
@@ -204,6 +208,14 @@ export default function Create() {
 
   const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
+  useEffect(() => {
+    if (payment?.client_id && payment.client_id !== client?.id) {
+      clientResolver
+        .find(payment.client_id)
+        .then((client) => setClient(client));
+    }
+  }, [payment?.client_id]);
+
   return (
     <Default
       title={documentTitle}
@@ -228,6 +240,8 @@ export default function Create() {
           <Element leftSide={t('client')}>
             <ClientSelector
               onChange={(client) => {
+                setClient(client);
+
                 handleChange('client_id', client?.id as string);
                 handleChange(
                   'currency_id',
@@ -237,6 +251,8 @@ export default function Create() {
                 handleChange('credits', []);
               }}
               onClearButtonClick={() => {
+                setClient(undefined);
+
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
                 handleChange('invoices', []);
@@ -297,8 +313,8 @@ export default function Create() {
                             'balance'
                           )} ${formatMoney(
                             invoice.balance,
-                            payment.client?.country_id,
-                            payment.client?.settings.currency_id
+                            client?.country_id,
+                            client?.settings.currency_id
                           )}`,
                         inputLabelFn: (invoice) => {
                           return invoice
@@ -377,8 +393,8 @@ export default function Create() {
                       'balance'
                     )} ${formatMoney(
                       invoice.balance,
-                      payment.client?.country_id,
-                      payment.client?.settings.currency_id
+                      client?.country_id,
+                      client?.settings.currency_id
                     )}`,
                 }}
                 onChange={({ resource }) =>
@@ -426,8 +442,8 @@ export default function Create() {
                             'balance'
                           )} ${formatMoney(
                             credit.balance,
-                            payment.client?.country_id,
-                            payment.client?.settings.currency_id
+                            client?.country_id,
+                            client?.settings.currency_id
                           )}`,
                       }}
                       onChange={(entry) =>
@@ -501,8 +517,8 @@ export default function Create() {
                       'balance'
                     )} ${formatMoney(
                       credit.balance,
-                      payment.client?.country_id,
-                      payment.client?.settings.currency_id
+                      client?.country_id,
+                      client?.settings.currency_id
                     )}`,
                 }}
                 onChange={(entry) =>
