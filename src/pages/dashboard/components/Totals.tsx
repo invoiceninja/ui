@@ -32,6 +32,7 @@ import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import Toggle from '$app/components/forms/Toggle';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -146,6 +147,8 @@ export function Totals() {
   const currency = settings?.preferences?.dashboard_charts?.currency || 1;
   const dateRange =
     settings?.preferences?.dashboard_charts?.range || 'this_month';
+  const includeDrafts =
+    settings?.preferences?.dashboard_charts?.include_drafts || false;
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
     start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
@@ -187,20 +190,31 @@ export function Totals() {
   };
 
   const totals = useQuery({
-    queryKey: ['/api/v1/charts/totals_v2', body],
+    queryKey: ['/api/v1/charts/totals_v2', body, includeDrafts],
     queryFn: () =>
-      request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
-        (response) => response.data
-      ),
+      request(
+        'POST',
+        endpoint('/api/v1/charts/totals_v2?include_drafts=:includeDrafts', {
+          includeDrafts,
+        }),
+        body
+      ).then((response) => response.data),
     staleTime: Infinity,
   });
 
   const chart = useQuery({
-    queryKey: ['/api/v1/charts/chart_summary_v2', body],
+    queryKey: ['/api/v1/charts/chart_summary_v2', body, includeDrafts],
     queryFn: () =>
-      request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
-        (response) => response.data
-      ),
+      request(
+        'POST',
+        endpoint(
+          '/api/v1/charts/chart_summary_v2?include_drafts=:includeDrafts',
+          {
+            includeDrafts,
+          }
+        ),
+        body
+      ).then((response) => response.data),
     staleTime: Infinity,
   });
 
@@ -404,6 +418,14 @@ export function Totals() {
                 <option value="last_year">{t('last_year')}</option>
                 <option value={'last365_days'}>{`${t('last365_days')}`}</option>
               </SelectField>
+
+              <Toggle
+                label={t('include_drafts')}
+                checked={includeDrafts}
+                onValueChange={(value) =>
+                  update('preferences.dashboard_charts.include_drafts', value)
+                }
+              />
             </Preferences>
           </div>
         </div>

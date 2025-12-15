@@ -31,8 +31,8 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { Tab, Tabs } from '$app/components/Tabs';
-import { useCalculateInvoiceSum } from '../edit/hooks/useCalculateInvoiceSum';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { usePurchaseOrderUtilities } from '../edit/hooks/usePurchaseOrderUtilities';
 
 export interface PurchaseOrderContext {
   purchaseOrder: PurchaseOrder | undefined;
@@ -95,14 +95,11 @@ export default function Create() {
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
-  const handleChange = <T extends keyof PurchaseOrder>(
-    property: T,
-    value: PurchaseOrder[typeof property]
-  ) => {
-    setPurchaseOrder((current) => current && { ...current, [property]: value });
-  };
-
-  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
+  const { calculateInvoiceSum, handleChange } = usePurchaseOrderUtilities({
+    purchaseOrder,
+    setPurchaseOrder,
+    setInvoiceSum,
+  });
 
   const onSave = useCreate({
     setErrors,
