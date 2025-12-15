@@ -76,7 +76,6 @@ export default function Create() {
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const creditResolver = useCreditResolver();
-  const clientResolver = useClientResolver();
   const invoiceResolver = useInvoiceResolver();
 
   const paymentTypes = usePaymentTypes();
@@ -239,14 +238,6 @@ export default function Create() {
 
   const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
-  useEffect(() => {
-    if (payment?.client_id && payment.client_id !== client?.id) {
-      clientResolver
-        .find(payment.client_id)
-        .then((client) => setClient(client));
-    }
-  }, [payment?.client_id]);
-
   return (
     <Default
       title={documentTitle}
@@ -287,8 +278,6 @@ export default function Create() {
                 }, 25);
               }}
               onClearButtonClick={() => {
-                setClient(undefined);
-
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
                 handleChange('invoices', []);
