@@ -21,7 +21,10 @@ import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { Alertbox } from '$app/pages/documents/builder/Builder';
+import {
+  Alertbox,
+  ImportFromGoogleDrive,
+} from '$app/pages/documents/builder/Builder';
 import {
   Builder as Builder$,
   BuilderContext,
@@ -62,11 +65,7 @@ function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
 
   return (
-    <Modal
-      title={t('send_confirmation')}
-      visible={open}
-      onClose={onOpenChange}
-    >
+    <Modal title={t('send_confirmation')} visible={open} onClose={onOpenChange}>
       {content}
 
       <div
@@ -474,7 +473,7 @@ function BlueprintBuilder() {
       setBlueprint(blueprintResponse.data.data);
     }
   }, [blueprintResponse]);
-  
+
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
@@ -543,7 +542,6 @@ function BlueprintBuilder() {
 
   const navigate = useNavigate();
 
-  
   return (
     <Default
       title={t('')}
@@ -551,23 +549,25 @@ function BlueprintBuilder() {
       navigationTopRight={
         <div className="flex items-center gap-2">
           {blueprint?.is_template && blueprint?.template && (
-          <Button
-            type="secondary"  
-            behavior="button"
-            onClick={() => {
-              navigate(route('/docuninja/templates/:id/editor', { 
-                id, 
-                state: { 
-                  templateHtml: blueprint.template, 
-                  blueprintName: blueprint.name 
-                } 
-              }));
-            }}
-            disabled={isDocumentSaving}
-            disableWithoutIcon
-          >
-            {t('edit_template')}
-          </Button>
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() => {
+                navigate(
+                  route('/docuninja/templates/:id/editor', {
+                    id,
+                    state: {
+                      templateHtml: blueprint.template,
+                      blueprintName: blueprint.name,
+                    },
+                  })
+                );
+              }}
+              disabled={isDocumentSaving}
+              disableWithoutIcon
+            >
+              {t('edit_template')}
+            </Button>
           )}
 
           <Button
@@ -638,6 +638,9 @@ function BlueprintBuilder() {
               toolboxContext: ToolboxContext,
               helper: () => null,
               alert: Alertbox,
+              imports: {
+                googleDrive: ImportFromGoogleDrive,
+              },
             },
             styles: {
               frame: {
@@ -689,7 +692,13 @@ function BlueprintBuilder() {
             company:
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
-              readonly: false,
+            readonly: false,
+            services: {
+              google: {
+                appId: import.meta.env.VITE_GOOGLE_APP_ID,
+                clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+              },
+            },
           }}
         >
           <Builder$ />
