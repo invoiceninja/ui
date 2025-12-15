@@ -20,15 +20,11 @@ import { useOutletContext } from 'react-router-dom';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
 import { VendorSelector } from './components/VendorSelector';
-import { useHandleCreateLineItem } from './hooks/useHandleCreateLineItem';
-import { useHandleDeleteLineItem } from './hooks/useHandleDeleteLineItem';
-import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
-import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemPropertyChange';
-import { useHandleProductChange } from './hooks/useHandleProductChange';
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { useColorScheme } from '$app/common/colors';
 import { PurchaseOrderContext } from '../create/Create';
+import { usePurchaseOrderUtilities } from './hooks/usePurchaseOrderUtilities';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -56,14 +52,16 @@ export default function Edit() {
     setPurchaseOrder((current) => current && { ...current, [property]: value });
   };
 
-  const handleInvitationChange = useHandleInvitationChange(handleChange);
-  const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
-  const handleDeleteLineItem = useHandleDeleteLineItem(setPurchaseOrder);
-
-  const handleProductChange = useHandleProductChange(setPurchaseOrder);
-
-  const handleLineItemPropertyChange =
-    useHandleLineItemPropertyChange(setPurchaseOrder);
+  const {
+    handleInvitationChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+    handleProductChange,
+    handleLineItemPropertyChange,
+  } = usePurchaseOrderUtilities({
+    purchaseOrder,
+    setPurchaseOrder,
+  });
 
   return (
     <>
