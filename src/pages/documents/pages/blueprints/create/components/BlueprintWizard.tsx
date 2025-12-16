@@ -137,6 +137,7 @@ function SelectionStep({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
         {options.map((option) => (
           <button
+            type="button"
             key={option.id}
             onClick={option.onClick}
             className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group"
