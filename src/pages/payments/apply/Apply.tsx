@@ -179,7 +179,7 @@ export default function Apply() {
 
             <DataTable<Invoice>
               resource="invoice"
-              endpoint={`/api/v1/invoices?payable=${payment?.client_id}&per_page=100&sort=date|desc&per_page=1000`}
+              endpoint={`/api/v1/invoices?include=client&payable=${payment?.client_id}&per_page=100&sort=date|desc&per_page=1000`}
               columns={columns}
               onSelectedResourcesChange={(selectedResources) => {
                 if (selectedResources.length > 0) {

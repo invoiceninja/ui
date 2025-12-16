@@ -43,6 +43,7 @@ import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
 import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
 import { useCreditColumns } from './hooks/useCreditColumns';
+import { TableTotalFooter } from './components/TableTotalFooter';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -197,14 +198,14 @@ export default function Create() {
         !searchParams.get('client'))
     ) {
       setInitialEndpoints({
-        invoices: `/api/v1/invoices?payable=${
+        invoices: `/api/v1/invoices?include=client&payable=${
           payment?.client_id
         }&per_page=100&sort=date|desc&per_page=1000${
           searchParams.get('invoice')
             ? `&with=${searchParams.get('invoice')}`
             : ''
         }`,
-        credits: `/api/v1/credits?client_id=${
+        credits: `/api/v1/credits?include=client&client_id=${
           payment?.client_id
         }&per_page=100&applicable=true${
           searchParams.get('credit')
@@ -315,7 +316,7 @@ export default function Create() {
           {payment?.client_id && <Divider />}
 
           {payment?.client_id && initialEndpoints.invoices && (
-            <div className="block px-4 sm:px-6 gap-y-2 mt-4">
+            <div className="block px-4 sm:px-6 mt-4">
               <DataTable<Invoice>
                 resource="invoice"
                 queryIdentificator="/api/v1/invoices"
@@ -367,7 +368,14 @@ export default function Create() {
                   </div>
                 }
                 beforeFilterInput={<InputLabel>{t('invoices')}</InputLabel>}
+                styleOptions={{
+                  withoutBottomBorder: Boolean(payment?.invoices.length),
+                }}
+                withoutBottomPadding={Boolean(payment?.invoices.length)}
+                withoutBottomRounding={Boolean(payment?.invoices.length)}
               />
+
+              <TableTotalFooter resource="invoice" payment={payment} />
             </div>
           )}
 
@@ -434,7 +442,14 @@ export default function Create() {
                   </div>
                 }
                 beforeFilterInput={<InputLabel>{t('credits')}</InputLabel>}
+                styleOptions={{
+                  withoutBottomBorder: Boolean(payment?.credits.length),
+                }}
+                withoutBottomPadding={Boolean(payment?.credits.length)}
+                withoutBottomRounding={Boolean(payment?.credits.length)}
               />
+
+              <TableTotalFooter resource="credit" payment={payment} />
             </div>
           )}
 

@@ -181,6 +181,8 @@ interface Props<T> extends CommonProps {
   preSelected?: string[];
   emptyState?: ReactNode;
   beforeFilterInput?: ReactNode;
+  withoutBottomRounding?: boolean;
+  withoutBottomPadding?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -263,6 +265,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     preSelected = [],
     emptyState,
     beforeFilterInput,
+    withoutBottomRounding = false,
+    withoutBottomPadding = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -829,6 +833,8 @@ export function DataTable<T extends object>(props: Props<T>) {
           isDataLoading={isLoading}
           style={props.style}
           resizable={apiEndpoint.pathname}
+          withoutBottomRounding={withoutBottomRounding}
+          withoutBottomPadding={withoutBottomPadding}
         >
           <Thead
             backgroundColor={styleOptions?.headerBackgroundColor}

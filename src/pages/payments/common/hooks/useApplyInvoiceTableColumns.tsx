@@ -22,13 +22,11 @@ import {
   useAllInvoiceColumns,
 } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { PaymentOnCreation } from '../..';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { cloneDeep, set } from 'lodash';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { FormikProps } from 'formik';
 import { TableNumberInputField } from '../components/TableNumberInputField';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
-import { Client } from '$app/common/interfaces/client';
 
 export interface ApplyInvoice {
   _id: string;
@@ -61,18 +59,7 @@ export function useApplyInvoiceTableColumns({
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const clientResolver = useClientResolver();
   const disableNavigation = useDisableNavigation();
-
-  const [resolvedClient, setResolvedClient] = useState<Client>();
-
-  useEffect(() => {
-    if (payment?.client_id) {
-      clientResolver
-        .find(payment.client_id)
-        .then((client) => setResolvedClient(client));
-    }
-  }, [payment?.client_id]);
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
@@ -98,11 +85,11 @@ export function useApplyInvoiceTableColumns({
       column: 'balance',
       id: 'balance',
       label: t('balance'),
-      format: (value) =>
+      format: (value, invoice) =>
         formatMoney(
           value,
-          resolvedClient?.country_id,
-          resolvedClient?.settings.currency_id
+          invoice?.client?.country_id,
+          invoice?.client?.settings.currency_id
         ),
     },
     {
