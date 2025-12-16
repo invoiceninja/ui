@@ -37,6 +37,7 @@ import {
   PreviewResponse,
   previewAtom,
 } from '../common/components/Preview';
+import { EnhancedPreview } from '../common/components/EnhancedPreview';
 import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
 import { StatusSelector } from '../common/components/StatusSelector';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
@@ -738,7 +739,7 @@ export default function Reports() {
         />
       )}
 
-      {preview && <Preview />}
+      {preview && <EnhancedPreview enableMultiSort={true} enableNaturalSort={true} />}
     </Default>
   );
 }
