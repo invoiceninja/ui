@@ -216,6 +216,7 @@ export function EnhancedPreview({
   };
 
   const data = filtered?.rows || preview.rows;
+  console.log("EnhancedPreview data:", data?.length, "rows", preview ? "preview loaded" : "no preview");
 
   const downloadCsv = () => {
     const rows = [
@@ -300,7 +301,7 @@ export function EnhancedPreview({
   };
 
   return (
-    <div id="preview-table my-4">
+    <div id="preview-table" className="my-4">
       <div className="flex justify-between mb-4">
         <div className="flex gap-2">
           {sortConfigs.length > 0 && (
