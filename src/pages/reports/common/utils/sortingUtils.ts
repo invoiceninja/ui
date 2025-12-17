@@ -236,16 +236,3 @@ export function groupRows(
   
   return groups;
 }
-
-export function localeCompare(
-  a: string,
-  b: string,
-  locale: string = 'en',
-  options?: Intl.CollatorOptions
-): number {
-  return a.localeCompare(b, locale, {
-    numeric: true,
-    sensitivity: 'base',
-    ...options
-  });
-}
