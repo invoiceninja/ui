@@ -214,7 +214,7 @@ export function EnhancedPreview({
     
     groups.forEach((rows, groupName) => {
       elements.push(
-        <Tr key={`group-${groupName}`} className="bg-gray-100">
+        <Tr key={`group-${groupName}`} style={{ backgroundColor: colors.$5 }}>
           <Td colSpan={preview.columns.length}>
             <strong>{groupName}</strong> ({rows.length} items)
           </Td>
