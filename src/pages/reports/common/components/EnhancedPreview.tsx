@@ -91,7 +91,7 @@ export function EnhancedPreview({
     }
     
     return copy;
-  }, [preview, filterValues, sortConfigs]);
+  }, [preview, filterValues, sortConfigs]); // Dependencies ensure re-computation when any change
   
   const filter = (column: string, value: string) => {
     setFilterValues(prev => ({
@@ -326,6 +326,7 @@ export function EnhancedPreview({
             {preview.columns.map((column, i) => (
               <Td key={i}>
                 <InputField
+                  value={filterValues[column.identifier] || ''}
                   onValueChange={(value) => filter(column.identifier, value)}
                   changeOverride
                 />
