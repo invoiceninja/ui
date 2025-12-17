@@ -87,7 +87,7 @@ export function EnhancedPreview({
     });
     
     const firstCell = firstRow?.find(c => c.identifier === column);
-    const detectedType = firstCell ? detectSortType(column, String(firstCell.display_value)) : 'case-insensitive';
+    const detectedType = firstCell ? detectSortType(column, firstCell.display_value) : 'case-insensitive';
     const sortType = sortTypeOverrides[column] || detectedType;
 
     if (enableMultiSort && shiftKey) {

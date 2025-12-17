@@ -95,26 +95,55 @@ function parseNumericValue(value: string | number): number {
 }
 
 export function detectSortType(column: string, sampleValue: string | number): SortType {
+  // If the value is already a number type, sort numerically
+  if (typeof sampleValue === 'number') {
+    return 'numeric';
+  }
+  
+  // Check column names that should be numeric
   if (numberFormattableColumns.some(col => column.endsWith(col))) {
     return 'numeric';
   }
   
+  // Check for date columns
   if (column.includes('date') || column.includes('_at') || column.includes('created') || column.includes('updated')) {
     return 'date';
   }
   
-  if (sampleValue === 'true' || sampleValue === 'false') {
-    return 'boolean';
+  // For string values, detect the type
+  if (typeof sampleValue === 'string') {
+    // Boolean check
+    if (sampleValue === 'true' || sampleValue === 'false') {
+      return 'boolean';
+    }
+    
+    // Currency check (starts with currency symbol)
+    if (/^[$\u20AC\u00A3\u00A5]/.test(sampleValue)) {
+      return 'currency';
+    }
+    
+    // Remove common formatting from numbers (commas, spaces)
+    const cleaned = sampleValue.replace(/[,\s]/g, '').trim();
+    
+    // Check if it's a pure numeric string (including decimals and negatives)
+    // Examples: "123", "123.45", "-123", "-123.45", "1,234.56"
+    if (cleaned !== '' && /^-?\d+(\.\d+)?$/.test(cleaned)) {
+      return 'numeric';
+    }
+    
+    // If it contains both letters and numbers (like "Invoice-123", "Room 2A")
+    // This is for natural sorting
+    if (/\d/.test(sampleValue) && /[a-zA-Z]/.test(sampleValue)) {
+      return 'natural';
+    }
+    
+    // Pure numeric strings without formatting
+    if (/^\d+$/.test(sampleValue.trim())) {
+      return 'numeric';
+    }
   }
   
-  if (typeof sampleValue === 'string' && /^[$\u20AC\u00A3\u00A5]/.test(sampleValue)) {
-    return 'currency';
-  }
-  
-  if (typeof sampleValue === 'string' && /\d/.test(sampleValue)) {
-    return 'natural';
-  }
-  
+  // Default to case-insensitive text sorting
   return 'case-insensitive';
 }
 
