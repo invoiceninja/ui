@@ -37,6 +37,7 @@ import {
   DeleteDialogButtonProps,
   DeleteDialogProps,
   Document,
+  ImportFromButtonProps,
   SendDialogButtonProps,
   SendDialogProps,
   ToolboxContextProps,
@@ -321,6 +322,19 @@ export function Alertbox({ children }: AlertProps) {
   );
 }
 
+export function ImportFromGoogleDrive({
+  onClick,
+  isSubmitting,
+}: ImportFromButtonProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button behavior="button" type="secondary" onClick={onClick} className="w-full">
+      {isSubmitting ? `${t("Importing")}...` : t("google_drive")}
+    </Button>
+  );
+}
+
 function Builder() {
   const [t] = useTranslation();
 
@@ -403,7 +417,7 @@ function Builder() {
 
     const handleSaveError = () => {
       setIsDocumentSaving(false);
-    }
+    };
 
     window.addEventListener(
       'refetch.docuninja.document',
@@ -420,10 +434,7 @@ function Builder() {
       handleFinalizeDocumentSave
     );
 
-    window.addEventListener(
-      'builder:save.error',
-      handleSaveError
-    );
+    window.addEventListener('builder:save.error', handleSaveError);
 
     return () => {
       window.removeEventListener(
@@ -441,10 +452,7 @@ function Builder() {
         handleFinalizeDocumentSave
       );
 
-      window.removeEventListener(
-        'builder:save.error',
-        handleSaveError
-      );
+      window.removeEventListener('builder:save.error', handleSaveError);
     };
   }, []);
 
@@ -566,6 +574,9 @@ function Builder() {
               toolboxContext: ToolboxContext,
               helper: () => null,
               alert: Alertbox,
+              imports: {
+                googleDrive: ImportFromGoogleDrive,
+              }
             },
             styles: {
               frame: {
@@ -623,6 +634,12 @@ function Builder() {
               undefined,
             readonly: false,
             onEntityReady: (entity) => setEntity(entity as Document),
+            services: {
+              google: {
+                appId: import.meta.env.VITE_GOOGLE_APP_ID,
+                clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+              },
+            },
           }}
         >
           <Builder$ />
