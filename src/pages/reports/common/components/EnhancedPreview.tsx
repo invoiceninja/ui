@@ -12,11 +12,11 @@ import { useColorScheme } from '$app/common/colors';
 import { Button, InputField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { cloneDeep } from 'lodash';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { sortRows, SortConfig, SortType, detectSortType, groupRows } from '../utils/sortingUtils';
 // Import the preview types and hook from Preview.tsx
-import { Preview, usePreview } from './Preview';
+import { usePreview } from './Preview';
 
 interface EnhancedPreviewProps {
   enableMultiSort?: boolean;
@@ -35,7 +35,7 @@ export function EnhancedPreview({
   const colors = useColorScheme();
 
   const [sortConfigs, setSortConfigs] = useState<SortConfig[]>([]);
-  const [filtered, setFiltered] = useState<Preview | null>(null);
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({});
   const [sortTypeOverrides, setSortTypeOverrides] = useState<Record<string, SortType>>({});
   const [groupByColumn, setGroupByColumn] = useState<string | null>(null);
 
@@ -43,35 +43,61 @@ export function EnhancedPreview({
     return null;
   }
 
-  const filter = (column: string, value: string) => {
+  // Apply cumulative filters to the original data
+  const filtered = useMemo(() => {
+    // Always start with the preview data
     const copy = cloneDeep(preview);
-
-    copy.rows = copy.rows.filter((sub) =>
-      sub.some((item) => {
-        if (item.identifier !== column) {
+    
+    // Apply filters only if there are any active filters with values
+    const hasActiveFilters = Object.values(filterValues).some(value => value.trim() !== '');
+    
+    if (hasActiveFilters) {
+      copy.rows = copy.rows.filter((row) => {
+        // Row must match ALL filters
+        return Object.entries(filterValues).every(([column, value]) => {
+          if (!value || value.trim() === '') return true; // Skip empty filters
+          
+          const cell = row.find((item) => item.identifier === column);
+          if (!cell) return false;
+          
+          const searchValue = value.toLowerCase();
+          
+          if (typeof cell.display_value === 'number') {
+            return cell.display_value
+              .toString()
+              .toLowerCase()
+              .includes(searchValue);
+          }
+          
+          if (typeof cell.display_value === 'string') {
+            return cell.display_value.toLowerCase().includes(searchValue);
+          }
+          
+          if (typeof cell.display_value === 'object' && cell.display_value?.props?.children) {
+            const childContent = typeof cell.display_value.props.children === 'string' 
+              ? cell.display_value.props.children
+              : String(cell.display_value.props.children || '');
+            return childContent.toLowerCase().includes(searchValue);
+          }
+          
           return false;
-        }
-
-        if (typeof item.display_value === 'number') {
-          return item.display_value
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }
-
-        if (typeof item.display_value === 'string') {
-          return item.display_value.toLowerCase().includes(value.toLowerCase());
-        }
-
-        if (typeof item.display_value === 'object') {
-          return item.display_value.props.children
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }
-      })
-    );
-
-    setFiltered(copy);
+        });
+      });
+    }
+    
+    // Apply sorting after filtering
+    if (sortConfigs.length > 0) {
+      copy.rows = sortRows(copy.rows, sortConfigs);
+    }
+    
+    return copy;
+  }, [preview, filterValues, sortConfigs]);
+  
+  const filter = (column: string, value: string) => {
+    setFilterValues(prev => ({
+      ...prev,
+      [column]: value
+    }));
   };
 
   const handleSort = (column: string, shiftKey: boolean = false) => {
@@ -81,13 +107,14 @@ export function EnhancedPreview({
     const direction = existingConfig?.direction === 'asc' ? 'desc' : 'asc';
     
     // Detect sort type based on first non-empty value
-    const firstRow = (filtered || preview).rows.find(row => {
+    const dataToSort = filtered;
+    const firstRow = dataToSort.rows.find(row => {
       const cell = row.find(c => c.identifier === column);
       return cell && cell.display_value !== '' && cell.display_value !== null;
     });
     
     const firstCell = firstRow?.find(c => c.identifier === column);
-    const detectedType = firstCell ? detectSortType(column, firstCell.display_value) : 'case-insensitive';
+    const detectedType = firstCell ? detectSortType(column, String(firstCell.display_value)) : 'case-insensitive';
     const sortType = sortTypeOverrides[column] || detectedType;
 
     if (enableMultiSort && shiftKey) {
@@ -107,28 +134,15 @@ export function EnhancedPreview({
     }
 
     setSortConfigs(newConfigs);
-
-    const copy = cloneDeep(filtered || preview);
-    copy.rows = sortRows(copy.rows, newConfigs);
-    setFiltered(copy);
   };
 
   const removeSortColumn = (column: string) => {
     const newConfigs = sortConfigs.filter(config => config.column !== column);
     setSortConfigs(newConfigs);
-    
-    if (newConfigs.length > 0) {
-      const copy = cloneDeep(filtered || preview);
-      copy.rows = sortRows(copy.rows, newConfigs);
-      setFiltered(copy);
-    } else {
-      setFiltered(null);
-    }
   };
 
   const clearAllSorts = () => {
     setSortConfigs([]);
-    setFiltered(null);
   };
 
   const setSortType = (column: string, sortType: SortType) => {
@@ -140,21 +154,22 @@ export function EnhancedPreview({
       const newConfigs = [...sortConfigs];
       newConfigs[configIndex] = { ...newConfigs[configIndex], sortType };
       setSortConfigs(newConfigs);
-      
-      const copy = cloneDeep(filtered || preview);
-      copy.rows = sortRows(copy.rows, newConfigs);
-      setFiltered(copy);
     }
   };
 
-  const data = filtered?.rows || preview.rows;
+  // Use filtered data if any filters are applied, otherwise use preview
+  const data = filtered;
 
   const downloadCsv = () => {
+    if (!data || !data.rows || data.rows.length === 0) {
+      return;
+    }
+    
     const rows = [
       preview.columns.map((column) => column.display_value).join(','),
     ];
 
-    const dataToExport = filtered ? filtered.rows : preview.rows;
+    const dataToExport = data.rows;
 
     dataToExport.map((row) => {
       rows.push(
@@ -188,7 +203,7 @@ export function EnhancedPreview({
   const renderGroupedData = () => {
     if (!groupByColumn) return renderNormalData();
     
-    const groups = groupRows(data, groupByColumn);
+    const groups = groupRows(data.rows, groupByColumn);
     const elements: JSX.Element[] = [];
     
     groups.forEach((rows, groupName) => {
@@ -219,7 +234,7 @@ export function EnhancedPreview({
   };
 
   const renderNormalData = () => {
-    return data.map((row, i) => (
+    return data.rows.map((row, i) => (
       <Tr
         key={i}
         className="border-b"
