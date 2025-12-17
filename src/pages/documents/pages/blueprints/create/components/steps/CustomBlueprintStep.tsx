@@ -31,7 +31,10 @@ interface Payload {
   description: string;
 }
 
-export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepProps) {
+export function CustomBlueprintStep({
+  onComplete,
+  onBack,
+}: CustomBlueprintStepProps) {
   const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
   const [payload, setPayload] = useState<Payload>({
@@ -44,36 +47,26 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
 
     setErrors(undefined);
 
-     request(
-        'POST',
-        docuNinjaEndpoint('/api/blueprints'),
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      ).then((response: GenericSingleResourceResponse<Document>) =>{
+    request('POST', docuNinjaEndpoint('/api/blueprints'), payload, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+      },
+    })
+      .then((response: GenericSingleResourceResponse<Document>) => {
+        toast.success('template_created');
+        $refetch(['blueprints']);
 
-          toast.success('template_created');
-          $refetch(['blueprints']);
-          
-          onComplete(response.data.data.id);
-
-      }).catch((error: AxiosError<ValidationBag>) => {
-      
+        onComplete(response.data.data.id);
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        }
-        else {
+        } else {
           toast.error('Error creating blueprint:');
         }
-
       });
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -95,19 +88,20 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
         <InputField
           element="textarea"
           value={payload.description}
-          onValueChange={(value) => setPayload({ ...payload, description: value })}
+          onValueChange={(value) =>
+            setPayload({ ...payload, description: value })
+          }
           errorMessage={errors?.errors.description}
           placeholder={t('description')}
         />
       </Element>
 
       <div className="flex justify-between p-6">
-        <Button 
-          type="primary"
-          onClick={onBack}>
+        <Button type="primary" onClick={onBack} behavior="button">
           {t('back')}
         </Button>
         <Button
+          behavior="button"
           type="primary"
           onClick={handleCreateBlueprint}
         >
