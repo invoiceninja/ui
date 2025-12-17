@@ -151,18 +151,6 @@ export function EnhancedPreview({
     setSortConfigs([]);
   };
 
-  const setSortType = (column: string, sortType: SortType) => {
-    setSortTypeOverrides(current => ({ ...current, [column]: sortType }));
-    
-    // Re-sort if this column is already in sort configs
-    const configIndex = sortConfigs.findIndex(config => config.column === column);
-    if (configIndex !== -1) {
-      const newConfigs = [...sortConfigs];
-      newConfigs[configIndex] = { ...newConfigs[configIndex], sortType };
-      setSortConfigs(newConfigs);
-    }
-  };
-
   // Use filtered data if any filters are applied, otherwise use preview
   const data = filtered;
 
