@@ -86,7 +86,7 @@ function parseNumericValue(value: string | number): number {
   if (typeof value === 'number') return value;
   
   const cleaned = String(value)
-    .replace(/[\$\u20AC\u00A3\u00A5,]/g, '')
+    .replace(/[$\u20AC\u00A3\u00A5,]/g, '')
     .replace(/\s/g, '')
     .trim();
   
@@ -107,7 +107,7 @@ export function detectSortType(column: string, sampleValue: string | number): So
     return 'boolean';
   }
   
-  if (typeof sampleValue === 'string' && /^[\$\u20AC\u00A3\u00A5]/.test(sampleValue)) {
+  if (typeof sampleValue === 'string' && /^[$\u20AC\u00A3\u00A5]/.test(sampleValue)) {
     return 'currency';
   }
   
@@ -140,11 +140,12 @@ export function compareValues(
       result = parseDateValue(a) - parseDateValue(b);
       break;
       
-    case 'boolean':
+    case 'boolean': {
       const aBool = String(a).toLowerCase() === 'true' ? 1 : 0;
       const bBool = String(b).toLowerCase() === 'true' ? 1 : 0;
       result = aBool - bBool;
       break;
+    }
       
     case 'case-sensitive':
       result = String(a) < String(b) ? -1 : String(a) > String(b) ? 1 : 0;
