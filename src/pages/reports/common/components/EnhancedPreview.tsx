@@ -39,12 +39,13 @@ export function EnhancedPreview({
   const [sortTypeOverrides, setSortTypeOverrides] = useState<Record<string, SortType>>({});
   const [groupByColumn, setGroupByColumn] = useState<string | null>(null);
 
-  if (!preview) {
-    return null;
-  }
-
   // Apply cumulative filters to the original data
   const filtered = useMemo(() => {
+    // If no preview data, return empty structure
+    if (!preview) {
+      return { columns: [], rows: [] };
+    }
+    
     // Always start with the preview data
     const copy = cloneDeep(preview);
     
@@ -92,6 +93,11 @@ export function EnhancedPreview({
     
     return copy;
   }, [preview, filterValues, sortConfigs]); // Dependencies ensure re-computation when any change
+  
+  // Early return AFTER all hooks have been called
+  if (!preview) {
+    return null;
+  }
   
   const filter = (column: string, value: string) => {
     setFilterValues(prev => ({
