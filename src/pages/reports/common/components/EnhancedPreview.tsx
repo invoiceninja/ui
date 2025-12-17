@@ -9,82 +9,14 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { Button, InputField, Link } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { sortRows, SortConfig, SortType, detectSortType, groupRows } from '../utils/sortingUtils';
-
-export const previewAtom = atom<Preview | null>(null);
-
-export interface PreviewResponse {
-  columns: Column[];
-  [key: number]: Cell[];
-}
-
-export interface Preview {
-  columns: Column[];
-  rows: Cell[][];
-}
-
-export interface Column {
-  identifier: string;
-  display_value: string;
-}
-
-export interface Cell {
-  entity: string;
-  id: string;
-  hashed_id: null;
-  value: string;
-  display_value: string | JSX.Element | number;
-  identifier: string;
-}
-
-interface Replacement {
-  identifier: string;
-  format: (cell: Cell) => string | number | JSX.Element;
-}
-
-export function usePreview() {
-  const [preview] = useAtom(previewAtom);
-  const [processed, setProcessed] = useState<Preview | null>(null);
-
-  const replacements: Replacement[] = [
-    {
-      identifier: 'credit.number',
-      format: (cell) => (
-        <Link to={`/credits/${cell.value}`}>{cell.display_value}</Link>
-      ),
-    },
-  ];
-
-  useEffect(() => {
-    if (!preview) {
-      return;
-    }
-
-    const copy = cloneDeep(preview);
-
-    copy.rows.map((row) => {
-      row.map((cell) => {
-        const replacement = replacements.find(
-          (replacement) => replacement.identifier === cell.identifier
-        );
-
-        if (replacement) {
-          cell.display_value = replacement.format(cell);
-        }
-      });
-    });
-
-    setProcessed(copy);
-  }, [preview]);
-
-  return processed;
-}
+// Import the preview types and hook from Preview.tsx
+import { Preview, usePreview } from './Preview';
 
 interface EnhancedPreviewProps {
   enableMultiSort?: boolean;
@@ -216,7 +148,6 @@ export function EnhancedPreview({
   };
 
   const data = filtered?.rows || preview.rows;
-  console.log("EnhancedPreview data:", data?.length, "rows", preview ? "preview loaded" : "no preview");
 
   const downloadCsv = () => {
     const rows = [
@@ -229,15 +160,16 @@ export function EnhancedPreview({
       rows.push(
         row
           .map((cell) => {
-            if (cell.display_value.toString() === 'true') {
+            const displayStr = String(cell.display_value || '');
+            if (displayStr === 'true') {
               return 'Yes';
             }
 
-            if (cell.display_value.toString() === 'false') {
+            if (displayStr === 'false') {
               return 'No';
             }
 
-            return `"${cell.display_value}"`;
+            return `"${displayStr || ""}"`; 
           })
           .join(',')
       );

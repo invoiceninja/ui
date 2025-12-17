@@ -34,7 +34,6 @@ import { useAtom } from 'jotai';
 import {
   Cell,
 
-  Preview,
   PreviewResponse,
   previewAtom,
 } from '../common/components/Preview';
