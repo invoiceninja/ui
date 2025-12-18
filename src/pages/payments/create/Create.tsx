@@ -30,7 +30,6 @@ import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { v4 } from 'uuid';
 import { useSave } from './hooks/useSave';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { useAtom } from 'jotai';
@@ -154,7 +153,7 @@ export default function Create() {
                 ...current,
                 invoices: [
                   {
-                    _id: v4(),
+                    _id: window.crypto.randomUUID(),
                     invoice_id: invoice.id,
                     amount:
                       invoice.balance > 0 ? invoice.balance : invoice.amount,
@@ -173,7 +172,7 @@ export default function Create() {
               ...current,
               credits: [
                 {
-                  _id: v4(),
+                  _id: window.crypto.randomUUID(),
                   credit_id: credit.id,
                   amount: credit.balance > 0 ? credit.balance : credit.amount,
                 },
@@ -332,7 +331,7 @@ export default function Create() {
                       );
 
                       newInvoices.push({
-                        _id: v4(),
+                        _id: window.crypto.randomUUID(),
                         amount: existingInvoice
                           ? existingInvoice.amount
                           : resource.balance > 0
@@ -406,7 +405,7 @@ export default function Create() {
                       );
 
                       newCredits.push({
-                        _id: v4(),
+                        _id: window.crypto.randomUUID(),
                         amount: existingCredit
                           ? existingCredit.amount
                           : resource.balance > 0
