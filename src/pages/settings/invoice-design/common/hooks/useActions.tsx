@@ -60,6 +60,8 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
         action: 'clone',
       })
         .then((response: GenericSingleResourceResponse<Design>) => {
+          toast.success('design_cloned');
+
           refetch(['designs']);
 
           navigate(
