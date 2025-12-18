@@ -24,9 +24,8 @@ import { diff } from 'deep-object-diff';
 import { useDebounce } from 'react-use';
 import { Quote } from '../interfaces/quote';
 import { PurchaseOrder } from '../interfaces/purchase-order';
-import { Design } from '../interfaces/design';
 
-type Entity = Invoice | Quote | PurchaseOrder | Design;
+type Entity = Invoice | Quote | PurchaseOrder;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 
 export const changesAtom = atom<any | null>(null);
