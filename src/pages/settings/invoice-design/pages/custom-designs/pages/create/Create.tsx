@@ -27,13 +27,10 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Editor } from '@monaco-editor/react';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useColorScheme } from '$app/common/colors';
-import { atom } from 'jotai';
-import { cloneDeep } from 'lodash';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export const templateEntites = [
   'invoice',
@@ -47,42 +44,30 @@ export const templateEntites = [
   'expense',
 ];
 
-export const invoiceDesignAtom = atom<Design>();
-
 export default function Create() {
   const { t } = useTranslation();
 
-  const navigate = useNavigate();
-
   const colors = useColorScheme();
-  const { data } = useBlankDesignQuery();
-  const [searchParams] = useSearchParams();
 
+  const { data } = useBlankDesignQuery();
+
+  const [design, setDesign] = useState<Design | null>(null);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
-  const [design, setDesign] = useAtomWithPrevent(invoiceDesignAtom);
 
   const handleChange = <T extends keyof Design>(key: T, value: Design[T]) => {
     setDesign((current) => current && { ...current, [key]: value });
   };
 
   useEffect(() => {
-    setDesign((current) => {
-      let value = current;
+    if (data) {
+      setDesign(data);
+    }
 
-      const isClone = searchParams.get('action') === 'clone';
-
-      if (!isClone && data) {
-        value = cloneDeep(data);
-      }
-
-      if (isClone) {
-        value = design;
-      }
-
-      return value;
-    });
+    return () => setDesign(null);
   }, [data]);
+
+  const navigate = useNavigate();
 
   useSaveBtn(
     {

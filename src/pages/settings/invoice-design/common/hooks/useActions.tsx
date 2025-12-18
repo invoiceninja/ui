@@ -9,13 +9,12 @@
  */
 
 import { EntityState } from '$app/common/enums/entity-state';
-import { getEntityState } from '$app/common/helpers';
+import { endpoint, getEntityState } from '$app/common/helpers';
 import { Design } from '$app/common/interfaces/design';
 import { useBulkAction } from '$app/common/queries/invoice-design';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -25,9 +24,14 @@ import {
   MdRestore,
 } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
-import { invoiceDesignAtom } from '../../pages/custom-designs/pages/create/Create';
 import { useExportInvoiceDesign } from '../../pages/custom-designs/hooks/useExportInvoiceDesign';
 import { Divider } from '$app/components/cards/Divider';
+import { useRefetch } from '$app/common/hooks/useRefetch';
+import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { route } from '$app/common/helpers/route';
+import { useState } from 'react';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Params {
   withoutExportAction?: boolean;
@@ -38,16 +42,34 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
 
   const { id } = useParams();
 
+  const refetch = useRefetch();
+
   const bulk = useBulkAction();
   const navigate = useNavigate();
   const exportInvoiceDesign = useExportInvoiceDesign();
 
-  const setInvoiceDesign = useSetAtom(invoiceDesignAtom);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const cloneToInvoiceDesign = (invoiceDesign: Design) => {
-    setInvoiceDesign({ ...invoiceDesign, id: '' });
+    if (!isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
 
-    navigate('/settings/invoice_design/custom_designs/create?action=clone');
+      request('POST', endpoint('/api/v1/designs/bulk'), {
+        ids: [invoiceDesign.id],
+        action: 'clone',
+      })
+        .then((response: GenericSingleResourceResponse<Design>) => {
+          refetch(['designs']);
+
+          navigate(
+            route('/settings/invoice_design/custom_designs/:id/edit', {
+              id: response.data.data.id,
+            })
+          );
+        })
+        .finally(() => setIsFormBusy(false));
+    }
   };
 
   const actions: Action<Design>[] = [
@@ -55,6 +77,7 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
       <DropdownElement
         onClick={() => cloneToInvoiceDesign(invoiceDesign)}
         icon={<Icon element={MdControlPointDuplicate} />}
+        disabled={isFormBusy}
       >
         {t('clone')}
       </DropdownElement>
@@ -64,6 +87,7 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
         <DropdownElement
           onClick={() => exportInvoiceDesign(invoiceDesign)}
           icon={<Icon element={MdDownload} />}
+          disabled={isFormBusy}
         >
           {t('export')}
         </DropdownElement>
@@ -74,6 +98,7 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
         <DropdownElement
           onClick={() => bulk([invoiceDesign.id], 'archive')}
           icon={<Icon element={MdArchive} />}
+          disabled={isFormBusy}
         >
           {t('archive')}
         </DropdownElement>
@@ -87,6 +112,7 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
         <DropdownElement
           onClick={() => bulk([invoiceDesign.id], 'restore')}
           icon={<Icon element={MdRestore} />}
+          disabled={isFormBusy}
         >
           {t('restore')}
         </DropdownElement>
@@ -100,6 +126,7 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
         <DropdownElement
           onClick={() => bulk([invoiceDesign.id], 'delete')}
           icon={<Icon element={MdDelete} />}
+          disabled={isFormBusy}
         >
           {t('delete')}
         </DropdownElement>
