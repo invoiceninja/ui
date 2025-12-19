@@ -944,7 +944,7 @@ export function TipTapEditor({
   useDebounce(
     () => {
       if (typeof currentValue === 'string') {
-        onValueChange(currentValue);
+        onValueChange(editor?.getText() ? currentValue : '');
       }
     },
     500,
