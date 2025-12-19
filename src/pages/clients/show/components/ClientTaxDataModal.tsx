@@ -1,68 +1,134 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useRefetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
-import { Button } from '$app/components/forms';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Button, InputField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Modal } from '$app/components/Modal';
-import { useMemo, useState } from 'react';
+import { AxiosError } from 'axios';
+import { cloneDeep, set } from 'lodash';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
   client: Client | undefined;
 }
 
+export interface TaxDataPayload {
+  geoPostalCode: string;
+  geoCity: string;
+  geoCounty: string;
+  geoState: string;
+  taxSales: number;
+  taxUse: number;
+}
+
+const INITIAL_TAX_DATA_PAYLOAD: TaxDataPayload = {
+  geoPostalCode: '',
+  geoCity: '',
+  geoCounty: '',
+  geoState: '',
+  taxSales: 0,
+  taxUse: 0,
+};
+
 export function ClientTaxDataModal({ client }: Props) {
   const [t] = useTranslation();
+
+  const refetch = useRefetch();
 
   const colors = useColorScheme();
   const currentCompany = useCurrentCompany();
 
+  const [errors, setErrors] = useState<ValidationBag>();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [isEnteringData, setIsEnteringData] = useState<boolean>(false);
+  const [taxDataPayload, setTaxDataPayload] = useState<TaxDataPayload>(
+    INITIAL_TAX_DATA_PAYLOAD
+  );
 
   const handleClose = () => {
     setIsModalOpen(false);
+    setIsEnteringData(false);
+    setTaxDataPayload(INITIAL_TAX_DATA_PAYLOAD);
+    setErrors(undefined);
+  };
+
+  const handleChange = (key: keyof TaxDataPayload, value: any) => {
+    const updatedPayload = cloneDeep(taxDataPayload);
+    set(updatedPayload, key, value);
+    setTaxDataPayload(updatedPayload);
+  };
+
+  const handleSave = () => {
+    if (!isFormBusy) {
+      toast.processing();
+
+      setErrors(undefined);
+      setIsFormBusy(true);
+
+      request(
+        'POST',
+        endpoint('/api/v1/clients/:id/updateTaxData', { id: client?.id }),
+        taxDataPayload
+      )
+        .then(() => {
+          refetch(['clients']);
+
+          toast.success('tax_data_saved');
+
+          handleClose();
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
   };
 
   const PROPERTY_LABELS = useMemo(
     () => ({
-      geoPostalCode: t('geo_postal_code'),
-      geoCity: t('geo_city'),
-      geoCounty: t('geo_county'),
-      geoState: t('geo_state'),
-      geoSales: t('geo_sales'),
-      taxUse: t('tax_use'),
-      txbService: t('txb_service'),
-      txbFreight: t('txb_freight'),
-      stateSalesTax: t('state_sales_tax'),
-      stateUseTax: t('state_use_tax'),
-      citySalesTax: t('city_sales_tax'),
-      cityUseTax: t('city_use_tax'),
-      cityTaxCode: t('city_tax_code'),
-      countySalesTax: t('county_sales_tax'),
-      countyUseTax: t('county_use_tax'),
-      countyTaxCode: t('county_tax_code'),
-      districtSalesTax: t('district_sales_tax'),
-      districtUseTax: t('district_use_tax'),
-      district1Code: t('district1_code'),
-      district1SalesTax: t('district1_sales_tax'),
-      district1UseTax: t('district1_use_tax'),
-      district2Code: t('district2_code'),
-      district2SalesTax: t('district2_sales_tax'),
-      district2UseTax: t('district2_use_tax'),
-      district3Code: t('district3_code'),
-      district3SalesTax: t('district3_sales_tax'),
-      district3UseTax: t('district3_use_tax'),
-      district4Code: t('district4_code'),
-      district4SalesTax: t('district4_sales_tax'),
-      district4UseTax: t('district4_use_tax'),
-      district5Code: t('district5_code'),
-      district5SalesTax: t('district5_sales_tax'),
-      district5UseTax: t('district5_use_tax'),
-      originDestination: t('origin_destination'),
+      geoPostalCode: 'ZIP',
+      geoCity: 'City',
+      geoCounty: 'County',
+      geoState: 'State',
+      taxSales: 'Sales Tax',
+      taxUse: 'Use Tax',
     }),
     []
   );
 
-  console.log(Object.entries(client?.tax_info || {}));
+  useEffect(() => {
+    if (!isModalOpen) {
+      setIsEnteringData(false);
+      setTaxDataPayload(INITIAL_TAX_DATA_PAYLOAD);
+      setErrors(undefined);
+    }
+  }, [isModalOpen]);
+
+  const TAX_INFO_DATA = useMemo(() => {
+    return Object.entries(client?.tax_info || {}).filter(
+      ([key]) => PROPERTY_LABELS[key as keyof typeof PROPERTY_LABELS]
+    );
+  }, [client?.tax_info]);
 
   if (
     currentCompany?.settings.country_id !== '840' ||
@@ -85,12 +151,12 @@ export function ClientTaxDataModal({ client }: Props) {
         title={t('tax_data')}
         visible={isModalOpen}
         onClose={handleClose}
-        size="regular"
+        size={TAX_INFO_DATA.length ? 'small' : 'extraSmall'}
+        disableClosing={isFormBusy}
       >
-        <div className="grid grid-cols-2 gap-4">
-          {Object.entries(client?.tax_info || {})
-            .filter(([key]) => key.length > 2)
-            .map(([key, value]) => (
+        {TAX_INFO_DATA.length ? (
+          <div className="grid grid-cols-2 gap-4">
+            {TAX_INFO_DATA.map(([key, value]) => (
               <div key={key} className="flex items-center gap-x-2">
                 <span
                   className="text-sm font-medium"
@@ -104,7 +170,81 @@ export function ClientTaxDataModal({ client }: Props) {
                 </span>
               </div>
             ))}
-        </div>
+          </div>
+        ) : (
+          <>
+            {isEnteringData ? (
+              <div className="flex flex-col gap-y-4 w-full">
+                <InputField
+                  label="ZIP"
+                  value={taxDataPayload.geoPostalCode}
+                  onValueChange={(value) =>
+                    handleChange('geoPostalCode', value)
+                  }
+                  errorMessage={errors?.errors?.geoPostalCode}
+                />
+
+                <InputField
+                  label="City"
+                  value={taxDataPayload.geoCity}
+                  onValueChange={(value) => handleChange('geoCity', value)}
+                  errorMessage={errors?.errors?.geoCity}
+                />
+
+                <InputField
+                  label="County"
+                  value={taxDataPayload.geoCounty}
+                  onValueChange={(value) => handleChange('geoCounty', value)}
+                  errorMessage={errors?.errors?.geoCounty}
+                />
+
+                <InputField
+                  label="State"
+                  value={taxDataPayload.geoState}
+                  onValueChange={(value) => handleChange('geoState', value)}
+                  errorMessage={errors?.errors?.geoState}
+                />
+
+                <NumberInputField
+                  label="Sales Tax"
+                  value={taxDataPayload.taxSales}
+                  onValueChange={(value) => handleChange('taxSales', value)}
+                  precision={5}
+                  errorMessage={errors?.errors?.taxSales}
+                />
+
+                <NumberInputField
+                  label="Use Tax"
+                  value={taxDataPayload.taxUse}
+                  onValueChange={(value) => handleChange('taxUse', value)}
+                  precision={5}
+                  errorMessage={errors?.errors?.taxUse}
+                />
+
+                <Button
+                  type="primary"
+                  behavior="button"
+                  onClick={() => handleSave()}
+                  disabled={isFormBusy}
+                >
+                  {t('save')}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-y-4 w-full">
+                <div className="text-center text-sm">{t('no_tax_data')}</div>
+
+                <Button
+                  className="w-full"
+                  behavior="button"
+                  onClick={() => setIsEnteringData(true)}
+                >
+                  {t('enter_tax_data')}
+                </Button>
+              </div>
+            )}
+          </>
+        )}
       </Modal>
     </>
   );
