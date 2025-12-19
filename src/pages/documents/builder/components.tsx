@@ -25,6 +25,15 @@ import {
   DeleteDialogButtonProps,
   DeleteDialogProps,
   ImportFromButtonProps,
+  RectangleSettingsDialogProps,
+  RectangleSettingsDialogButtonProps,
+  RectangleSettingsInputProps,
+  RectangleSettingsLabelProps,
+  RectangleSettingsCheckboxProps,
+  RectangleSettingsSelectProps,
+  RectangleSettingsRemoveButtonProps,
+  RectangleSettingsOptionItemProps,
+  RectangleSettingsOptionsListProps,
   ToolboxContextProps,
   UninviteDialogButtonProps,
   UninviteDialogProps,
@@ -43,7 +52,11 @@ export function Loading() {
   );
 }
 
-export function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
+export function DeleteDialog({
+  open,
+  onOpenChange,
+  action,
+}: DeleteDialogProps) {
   const [t] = useTranslation();
 
   return (
@@ -75,7 +88,11 @@ export function Upload({ ...props }: UploadProps) {
   );
 }
 
-export function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
+export function UploadDialog({
+  open,
+  onOpenChange,
+  content,
+}: UploadDialogProps) {
   const [t] = useTranslation();
 
   return (
@@ -108,7 +125,9 @@ export function ConfirmationDialog({
   );
 }
 
-export function ConfirmationDialogButton({ ...props }: ConfirmationDialogButtonProps) {
+export function ConfirmationDialogButton({
+  ...props
+}: ConfirmationDialogButtonProps) {
   const [t] = useTranslation();
 
   return (
@@ -174,7 +193,10 @@ export function UninviteDialog({
   );
 }
 
-export function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
+export function UninviteButton({
+  isSubmitting,
+  form,
+}: UninviteDialogButtonProps) {
   return (
     <Button form={form} behavior="button" disabled={isSubmitting}>
       Continue
@@ -250,8 +272,148 @@ export function ImportFromGoogleDrive({
   const [t] = useTranslation();
 
   return (
-    <Button behavior="button" type="secondary" onClick={onClick} className="w-full">
-      {isSubmitting ? `${t("Importing")}...` : t("google_drive")}
+    <Button
+      behavior="button"
+      type="secondary"
+      onClick={onClick}
+      className="w-full"
+    >
+      {isSubmitting ? `${t('Importing')}...` : t('google_drive')}
     </Button>
+  );
+}
+
+export function RectangleSettingsDialog({
+  open,
+  onOpenChange,
+  title,
+  children,
+}: RectangleSettingsDialogProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Modal title={title} visible={open} onClose={onOpenChange}>
+      {children}
+    </Modal>
+  );
+}
+
+export function RectangleSettingsSaveButton({
+  onClick,
+  label,
+  id,
+}: RectangleSettingsDialogButtonProps) {
+  return (
+    <Button behavior="button" onClick={onClick} id={id} className="w-full">
+      {label}
+    </Button>
+  );
+}
+
+export function RectangleSettingsButton({
+  onClick,
+  label,
+  id,
+}: RectangleSettingsDialogButtonProps) {
+  return (
+    <Button behavior="button" onClick={onClick} id={id} type="secondary">
+      {label}
+    </Button>
+  );
+}
+
+export function RectangleSettingsInput({
+  id,
+  type = 'text',
+  value,
+  onChange,
+  placeholder,
+  maxLength,
+  step,
+}: RectangleSettingsInputProps) {
+  return (
+    <InputField
+      id={id}
+      type={type}
+      value={value as string}
+      onValueChange={onChange}
+      placeholder={placeholder}
+      maxLength={maxLength}
+      step={step}
+    />
+  );
+}
+
+export function RectangleSettingsLabel({
+  htmlFor,
+  children,
+}: RectangleSettingsLabelProps) {
+  return (
+    <label htmlFor={htmlFor} className="block text-sm font-medium mb-1">
+      {children}
+    </label>
+  );
+}
+
+export function RectangleSettingsCheckbox({
+  id,
+  checked,
+  onChange,
+  label,
+}: RectangleSettingsCheckboxProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <Toggle id={id} checked={checked} onValueChange={onChange} />
+      <label htmlFor={id} className="text-sm">
+        {label}
+      </label>
+    </div>
+  );
+}
+
+export function RectangleSettingsSelect({
+  id,
+  value,
+  onChange,
+  children,
+}: RectangleSettingsSelectProps) {
+  return (
+    <select
+      id={id}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      {children}
+    </select>
+  );
+}
+
+export function RectangleSettingsRemoveButton({
+  onClick,
+}: RectangleSettingsRemoveButtonProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button behavior="button" onClick={onClick} type="secondary">
+      {t('remove')}
+    </Button>
+  );
+}
+
+export function RectangleSettingsOptionItem({
+  children,
+}: RectangleSettingsOptionItemProps) {
+  return <div className="py-2 px-3 hover:bg-gray-50">{children}</div>;
+}
+
+export function RectangleSettingsOptionsList({
+  id,
+  children,
+}: RectangleSettingsOptionsListProps) {
+  return (
+    <div id={id} className="border border-gray-300 rounded-md divide-y">
+      {children}
+    </div>
   );
 }
