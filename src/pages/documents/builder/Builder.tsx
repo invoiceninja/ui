@@ -50,6 +50,16 @@ import {
   DeleteDialog,
   ImportFromGoogleDrive,
   Loading,
+  RectangleSettingsButton,
+  RectangleSettingsCheckbox,
+  RectangleSettingsDialog,
+  RectangleSettingsInput,
+  RectangleSettingsLabel,
+  RectangleSettingsOptionItem,
+  RectangleSettingsOptionsList,
+  RectangleSettingsRemoveButton,
+  RectangleSettingsSaveButton,
+  RectangleSettingsSelect,
   ToolboxContext,
   UninviteButton,
   UninviteDialog,
@@ -351,7 +361,19 @@ function Builder() {
               alert: Alertbox,
               imports: {
                 googleDrive: ImportFromGoogleDrive,
-              }
+              },
+              rectangleSettings: {
+                dialog: RectangleSettingsDialog,
+                save: RectangleSettingsSaveButton,
+                button: RectangleSettingsButton,
+                input: RectangleSettingsInput,
+                label: RectangleSettingsLabel,
+                checkbox: RectangleSettingsCheckbox,
+                select: RectangleSettingsSelect,
+                removeButton: RectangleSettingsRemoveButton,
+                optionItem: RectangleSettingsOptionItem,
+                optionsList: RectangleSettingsOptionsList,
+              },
             },
             styles: {
               frame: {
