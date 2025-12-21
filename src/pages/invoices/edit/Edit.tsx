@@ -47,6 +47,7 @@ import { ExternalLink } from 'react-feather';
 import { InputLabel } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 import { TasksTabLabel } from '../common/components/TasksTabLabel';
+import { TaxDataBadge } from './components/TaxDataBadge';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -164,6 +165,7 @@ export default function Edit() {
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly
+              afterClientName={<TaxDataBadge invoice={invoice} />}
             />
           </div>
         </Card>

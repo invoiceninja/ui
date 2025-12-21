@@ -43,7 +43,6 @@ import CardsCustomizationModal, {
   ClientShowCard,
 } from './components/CardsCustomizationModal';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { ClientTaxDataModal } from './components/ClientTaxDataModal';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -177,13 +176,9 @@ export default function Client() {
       }
       afterBreadcrumbs={
         <div className="flex flex-1 justify-end items-center gap-2">
-          <ClientTaxDataModal client={client} />
+          <PreviousNextNavigation entity="client" />
 
-          <div className="flex items-center gap-2">
-            <PreviousNextNavigation entity="client" />
-
-            <CardsCustomizationModal />
-          </div>
+          <CardsCustomizationModal />
         </div>
       }
     >

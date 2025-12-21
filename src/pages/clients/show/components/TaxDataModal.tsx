@@ -14,8 +14,11 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useRefetch } from '$app/common/hooks/useRefetch';
-import { Client } from '$app/common/interfaces/client';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import {
+  resetChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import { Button, InputField } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Modal } from '$app/components/Modal';
@@ -23,9 +26,15 @@ import { AxiosError } from 'axios';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 interface Props {
-  client: Client | undefined;
+  resourceId?: string;
+  resourceType?: 'client' | 'company';
+  taxData: TaxDataPayload | undefined;
+  refetchInvoices?: boolean;
+  buttonClassName?: string;
+  buttonType?: 'minimal' | 'secondary';
 }
 
 export interface TaxDataPayload {
@@ -46,10 +55,18 @@ const INITIAL_TAX_DATA_PAYLOAD: TaxDataPayload = {
   taxUse: 0,
 };
 
-export function ClientTaxDataModal({ client }: Props) {
+export function TaxDataModal({
+  resourceId,
+  resourceType,
+  taxData,
+  refetchInvoices,
+  buttonClassName,
+  buttonType = 'minimal',
+}: Props) {
   const [t] = useTranslation();
 
   const refetch = useRefetch();
+  const dispatch = useDispatch();
 
   const colors = useColorScheme();
   const currentCompany = useCurrentCompany();
@@ -82,13 +99,28 @@ export function ClientTaxDataModal({ client }: Props) {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request(
-        'POST',
-        endpoint('/api/v1/clients/:id/updateTaxData', { id: client?.id }),
-        taxDataPayload
-      )
-        .then(() => {
-          refetch(['clients']);
+      let endpointURL = '/api/v1/clients/:id/updateTaxData';
+
+      if (resourceType === 'company') {
+        endpointURL = '/api/v1/companies/updateOriginTaxData/:id';
+      }
+
+      request('POST', endpoint(endpointURL, { id: resourceId }), taxDataPayload)
+        .then((response) => {
+          console.log(response);
+
+          if (resourceType === 'client') {
+            refetch(['clients']);
+          } else if (resourceType === 'company') {
+            dispatch(
+              updateRecord({ object: 'company', data: response.data.data })
+            );
+            dispatch(resetChanges('company'));
+          }
+
+          if (refetchInvoices) {
+            refetch(['invoices']);
+          }
 
           toast.success('tax_data_saved');
 
@@ -125,10 +157,10 @@ export function ClientTaxDataModal({ client }: Props) {
   }, [isModalOpen]);
 
   const TAX_INFO_DATA = useMemo(() => {
-    return Object.entries(client?.tax_info || {}).filter(
+    return Object.entries(taxData || {}).filter(
       ([key]) => PROPERTY_LABELS[key as keyof typeof PROPERTY_LABELS]
     );
-  }, [client?.tax_info]);
+  }, [taxData]);
 
   if (
     currentCompany?.settings.country_id !== '840' ||
@@ -140,9 +172,10 @@ export function ClientTaxDataModal({ client }: Props) {
   return (
     <>
       <Button
-        type="secondary"
+        type={buttonType}
         behavior="button"
         onClick={() => setIsModalOpen(true)}
+        className={buttonClassName}
       >
         {t('tax_data')}
       </Button>
@@ -151,10 +184,14 @@ export function ClientTaxDataModal({ client }: Props) {
         title={t('tax_data')}
         visible={isModalOpen}
         onClose={handleClose}
-        size={TAX_INFO_DATA.length ? 'small' : 'extraSmall'}
+        size={
+          TAX_INFO_DATA.length && TAX_INFO_DATA.every(([key, value]) => value)
+            ? 'small'
+            : 'extraSmall'
+        }
         disableClosing={isFormBusy}
       >
-        {TAX_INFO_DATA.length ? (
+        {TAX_INFO_DATA.length && TAX_INFO_DATA.every(([, value]) => value) ? (
           <div className="grid grid-cols-2 gap-4">
             {TAX_INFO_DATA.map(([key, value]) => (
               <div key={key} className="flex items-center gap-x-2">

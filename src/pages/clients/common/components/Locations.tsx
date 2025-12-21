@@ -36,6 +36,10 @@ import {
 import { useSetAtom } from 'jotai';
 import { useCustomField } from '$app/components/CustomField';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  TaxDataModal,
+  TaxDataPayload,
+} from '../../show/components/TaxDataModal';
 
 const StyledIconBox = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -262,6 +266,15 @@ export default function Locations() {
                       </div>
                     )}
                   </div>
+
+                  {Object.entries(currentLocation.tax_data || {}).length && (
+                    <TaxDataModal
+                      buttonClassName="mt-2 w-max"
+                      taxData={
+                        currentLocation.tax_data as unknown as TaxDataPayload
+                      }
+                    />
+                  )}
                 </div>
 
                 <div className="flex flex-col justify-between">
