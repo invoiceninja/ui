@@ -24,6 +24,7 @@ import { Tooltip } from '$app/components/Tooltip';
 enum IntegrationType {
   Yodlee = 'YODLEE',
   Nordigen = 'NORDIGEN',
+  EnableBanking = 'ENABLEBANKING',
 }
 
 export const useBankAccountColumns = () => {
@@ -60,6 +61,19 @@ export const useBankAccountColumns = () => {
     });
   };
 
+  const handleConnectEnableBanking = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'enablebanking',
+      platform: 'react',
+    }).then((tokenResponse) => {
+      window.open(
+        endpoint('/enablebanking/connect/:hash', {
+          hash: tokenResponse?.data?.hash,
+        })
+      );
+    });
+  }
+
   const columns: DataTableColumns<BankAccount> = [
     {
       id: 'bank_account_name',
@@ -75,7 +89,8 @@ export const useBankAccountColumns = () => {
           </Link>
 
           {(bankAccount.integration_type === IntegrationType.Nordigen ||
-            bankAccount.integration_type === IntegrationType.Yodlee) &&
+            bankAccount.integration_type === IntegrationType.Yodlee ||
+              bankAccount.integration_type === IntegrationType.EnableBanking) &&
             bankAccount.disabled_upstream && (
               <Tooltip
                 message={t('reconnect') as string}
@@ -99,6 +114,12 @@ export const useBankAccountColumns = () => {
                       bankAccount.integration_type === IntegrationType.Yodlee
                     ) {
                       handleConnectYodlee();
+                    }
+
+                    if (
+                      bankAccount.integration_type === IntegrationType.EnableBanking
+                    ) {
+                      handleConnectEnableBanking();
                     }
                   }}
                 >
