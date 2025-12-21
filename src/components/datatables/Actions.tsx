@@ -64,6 +64,7 @@ interface Props extends CommonProps {
   filter: string;
   withoutStatusFilter?: boolean;
   customFilter: string[] | undefined;
+  beforeFilterInput?: ReactNode;
 }
 
 export const ResetButton = styled.button`
@@ -399,6 +400,8 @@ export function Actions(props: Props) {
         }}
       >
         {props.children}
+
+        {props.beforeFilterInput}
 
         <div className="relative">
           <InputField

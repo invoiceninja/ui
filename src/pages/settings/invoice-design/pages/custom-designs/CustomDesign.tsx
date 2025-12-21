@@ -48,7 +48,7 @@ export const payloadAtom = atom<PreviewPayload>({
 export default function CustomDesign() {
   useTitle('invoice_design');
 
-  const actions = useActions();
+  const actions = useActions({ withoutExportAction: true });
 
   const tabs = useTabs();
   const location = useLocation();

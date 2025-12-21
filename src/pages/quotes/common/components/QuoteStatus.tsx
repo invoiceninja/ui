@@ -37,7 +37,7 @@ export function QuoteStatus(props: Props) {
   const isViewed = checkQuoteInvitationsViewedDate();
 
   const statusExpired = status_id === QuoteStatusEnum.Expired;
-
+  const statusRejected = status_id === QuoteStatusEnum.Rejected;
   if (is_deleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
   if (archived_at) return <Badge variant="orange">{t('archived')}</Badge>;
@@ -54,6 +54,14 @@ export function QuoteStatus(props: Props) {
     return (
       <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
         {t('expired')}
+      </Badge>
+    );
+  }
+
+  if (statusRejected) {
+    return (
+      <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
+        {t('rejected')}
       </Badge>
     );
   }
