@@ -21,7 +21,9 @@ export function TaxDataBadge({ invoice }: Props) {
   return (
     <>
       {Object.entries(invoice.client?.tax_info || {}).length ? (
-        <Badge variant="yellow">{invoice.client?.tax_info?.taxSales} %</Badge>
+        <Badge variant="yellow">
+          {(invoice.client?.tax_info?.taxSales || 0) * 100} %
+        </Badge>
       ) : (
         <TaxDataModal
           resourceId={invoice.client?.id as string}
