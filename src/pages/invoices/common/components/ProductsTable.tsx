@@ -66,7 +66,6 @@ interface LineItemRowProps {
   draggableProps: any;
 }
 
-// Memoizovana row komponenta (identična logika kao MemoizedTr)
 const LineItemRow = ({
   lineItem,
   lineItemIndex,
@@ -79,6 +78,10 @@ const LineItemRow = ({
   innerRef,
   draggableProps,
 }: LineItemRowProps) => {
+  if (lineItemIndex === -1) {
+    return null;
+  }
+
   return (
     <Tr innerRef={innerRef} tabIndex={tabIndex} {...draggableProps}>
       {columns.map((column, columnIndex, { length }) => (
@@ -122,7 +125,6 @@ const LineItemRow = ({
   );
 };
 
-// Memoizacija identična kao kod MemoizedTr - samo po resource (lineItem)
 const MemoizedLineItemRow = memo(LineItemRow, (prev, next) =>
   isEqual(prev.lineItem, next.lineItem)
 );
@@ -191,19 +193,21 @@ export function ProductsTable({
     }
   }, [isAnyLineItemEmpty, onCreateItemClick]);
 
-  // Update currentItems sa debounce-om za performance
   useEffect(() => {
     setAreRowsRendered(false);
+  }, [resource?.updated_at]);
 
+  useEffect(() => {
     const timer = setTimeout(() => {
-      setCurrentItems(items);
-      setAreRowsRendered(true);
+      if (resource) {
+        setCurrentItems(items);
+        !areRowsRendered && setAreRowsRendered(true);
+      }
     }, 10);
 
     return () => clearTimeout(timer);
   }, [items]);
 
-  // Memoizovani thead
   const tableHeader = useMemo(
     () => (
       <Thead backgroundColor={themeColors.$5}>
@@ -214,7 +218,7 @@ export function ProductsTable({
         ))}
       </Thead>
     ),
-    [columns, themeColors.$5, themeColors.$6, resolveTranslation]
+    [columns]
   );
 
   return (
