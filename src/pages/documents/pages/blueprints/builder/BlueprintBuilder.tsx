@@ -516,6 +516,18 @@ function BlueprintBuilder() {
                 clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
               },
             },
+            translations: {
+              element: t('element'),
+              tips_and_notes: t('tips_and_notes'),
+              default_checkbox_label: t('default_checkbox_label'),
+              empty_checkbox_label: t('empty_checkbox_label'),
+              select_needs_two_options: t('select_needs_two_options'),
+              default_select_label: t('default_select_label'),
+              radio_needs_two_options: t('radio_needs_two_options'),
+              default_radio_group_label: t('default_radio_group_label'),
+              multiselect_needs_two_options: t('multiselect_needs_two_options'),
+              default_multiselect_label: t('default_multiselect_label'),
+            },
           }}
         >
           <Builder$ />
