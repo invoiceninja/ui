@@ -65,7 +65,6 @@ export default function Tasks() {
       showEdit={(task: Task) => showEditOption(task)}
       linkToCreateGuards={[permission('create_task')]}
       hideEditableOptions={!hasPermission('edit_task')}
-      withoutPerPageAsPreference
       withoutPageAsPreference
     />
   );
