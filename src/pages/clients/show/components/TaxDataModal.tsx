@@ -14,28 +14,15 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useRefetch } from '$app/common/hooks/useRefetch';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
-import { Button, InputField } from '$app/components/forms';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { AxiosError } from 'axios';
-import { cloneDeep, set } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-
-interface Props {
-  resourceId?: string;
-  resourceType?: 'client' | 'company';
-  taxData: TaxDataPayload | undefined;
-  refetchInvoices?: boolean;
-  buttonClassName?: string;
-  buttonType?: 'minimal' | 'secondary';
-}
 
 export interface TaxDataPayload {
   geoPostalCode: string;
@@ -46,14 +33,14 @@ export interface TaxDataPayload {
   taxUse: number;
 }
 
-const INITIAL_TAX_DATA_PAYLOAD: TaxDataPayload = {
-  geoPostalCode: '',
-  geoCity: '',
-  geoCounty: '',
-  geoState: '',
-  taxSales: 0,
-  taxUse: 0,
-};
+interface Props {
+  resourceId?: string;
+  resourceType?: 'client' | 'company';
+  taxData: TaxDataPayload | undefined;
+  refetchInvoices?: boolean;
+  buttonClassName?: string;
+  buttonType?: 'minimal' | 'secondary';
+}
 
 export function TaxDataModal({
   resourceId,
@@ -71,32 +58,17 @@ export function TaxDataModal({
   const colors = useColorScheme();
   const currentCompany = useCurrentCompany();
 
-  const [errors, setErrors] = useState<ValidationBag>();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [isEnteringData, setIsEnteringData] = useState<boolean>(false);
-  const [taxDataPayload, setTaxDataPayload] = useState<TaxDataPayload>(
-    INITIAL_TAX_DATA_PAYLOAD
-  );
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleClose = () => {
     setIsModalOpen(false);
-    setIsEnteringData(false);
-    setTaxDataPayload(INITIAL_TAX_DATA_PAYLOAD);
-    setErrors(undefined);
-  };
-
-  const handleChange = (key: keyof TaxDataPayload, value: any) => {
-    const updatedPayload = cloneDeep(taxDataPayload);
-    set(updatedPayload, key, value);
-    setTaxDataPayload(updatedPayload);
   };
 
   const handleSave = () => {
     if (!isFormBusy) {
       toast.processing();
 
-      setErrors(undefined);
       setIsFormBusy(true);
 
       let endpointURL = '/api/v1/clients/:id/updateTaxData';
@@ -105,10 +77,8 @@ export function TaxDataModal({
         endpointURL = '/api/v1/companies/updateOriginTaxData/:id';
       }
 
-      request('POST', endpoint(endpointURL, { id: resourceId }), taxDataPayload)
+      request('POST', endpoint(endpointURL, { id: resourceId }))
         .then((response) => {
-          console.log(response);
-
           if (resourceType === 'client') {
             refetch(['clients']);
           } else if (resourceType === 'company') {
@@ -122,15 +92,9 @@ export function TaxDataModal({
             refetch(['invoices']);
           }
 
-          toast.success('tax_data_saved');
+          toast.success('updated_tax_data');
 
           handleClose();
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          if (error.response?.status === 422) {
-            toast.dismiss();
-            setErrors(error.response.data);
-          }
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -147,14 +111,6 @@ export function TaxDataModal({
     }),
     []
   );
-
-  useEffect(() => {
-    if (!isModalOpen) {
-      setIsEnteringData(false);
-      setTaxDataPayload(INITIAL_TAX_DATA_PAYLOAD);
-      setErrors(undefined);
-    }
-  }, [isModalOpen]);
 
   const TAX_INFO_DATA = useMemo(() => {
     return Object.entries(taxData || {}).filter(
@@ -209,78 +165,9 @@ export function TaxDataModal({
             ))}
           </div>
         ) : (
-          <>
-            {isEnteringData ? (
-              <div className="flex flex-col gap-y-4 w-full">
-                <InputField
-                  label="ZIP"
-                  value={taxDataPayload.geoPostalCode}
-                  onValueChange={(value) =>
-                    handleChange('geoPostalCode', value)
-                  }
-                  errorMessage={errors?.errors?.geoPostalCode}
-                />
-
-                <InputField
-                  label="City"
-                  value={taxDataPayload.geoCity}
-                  onValueChange={(value) => handleChange('geoCity', value)}
-                  errorMessage={errors?.errors?.geoCity}
-                />
-
-                <InputField
-                  label="County"
-                  value={taxDataPayload.geoCounty}
-                  onValueChange={(value) => handleChange('geoCounty', value)}
-                  errorMessage={errors?.errors?.geoCounty}
-                />
-
-                <InputField
-                  label="State"
-                  value={taxDataPayload.geoState}
-                  onValueChange={(value) => handleChange('geoState', value)}
-                  errorMessage={errors?.errors?.geoState}
-                />
-
-                <NumberInputField
-                  label="Sales Tax"
-                  value={taxDataPayload.taxSales}
-                  onValueChange={(value) => handleChange('taxSales', value)}
-                  precision={5}
-                  errorMessage={errors?.errors?.taxSales}
-                />
-
-                <NumberInputField
-                  label="Use Tax"
-                  value={taxDataPayload.taxUse}
-                  onValueChange={(value) => handleChange('taxUse', value)}
-                  precision={5}
-                  errorMessage={errors?.errors?.taxUse}
-                />
-
-                <Button
-                  type="primary"
-                  behavior="button"
-                  onClick={() => handleSave()}
-                  disabled={isFormBusy}
-                >
-                  {t('save')}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-y-4 w-full">
-                <div className="text-center text-sm">{t('no_tax_data')}</div>
-
-                <Button
-                  className="w-full"
-                  behavior="button"
-                  onClick={() => setIsEnteringData(true)}
-                >
-                  {t('enter_tax_data')}
-                </Button>
-              </div>
-            )}
-          </>
+          <Button className="w-full" behavior="button" onClick={handleSave}>
+            {t('update_tax_data')}
+          </Button>
         )}
       </Modal>
     </>
