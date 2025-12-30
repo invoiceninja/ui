@@ -63,7 +63,6 @@ export default function Invoices() {
           setSelectedInvoiceIds(selected);
           setIsConfirmActionModalOpen(true);
         }}
-        withoutPerPageAsPreference
         withoutPageAsPreference
         showDelete={(invoice) =>
           Boolean(!verifactuEnabled) ||
