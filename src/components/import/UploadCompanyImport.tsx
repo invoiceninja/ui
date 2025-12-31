@@ -757,7 +757,7 @@ export function UploadCompanyImport(props: Props) {
               style={{ width: `${uploadProgress}%` }}
             ></div>
             <div className="text-sm text-gray-500 mt-1">
-              {Math.round(uploadProgress)}% uploaded
+              {Math.round(uploadProgress)}% {t('uploaded')}
             </div>
           </div>
         </div>
