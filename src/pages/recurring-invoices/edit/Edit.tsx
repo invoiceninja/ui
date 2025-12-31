@@ -34,6 +34,7 @@ import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-stat
 import { Tooltip } from '$app/components/Tooltip';
 import { Icon } from '$app/components/icons/Icon';
 import { MdInfo } from 'react-icons/md';
+import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -69,29 +70,35 @@ export default function Edit() {
         >
           <div className="flex flex-col space-y-4">
             {recurringInvoice && (
-              <div className="flex items-center space-x-9">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: colors.$22 }}
-                >
-                  {t('status')}
-                </span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-9">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.$22 }}
+                  >
+                    {t('status')}
+                  </span>
 
-                <div className="flex items-center space-x-1">
-                  <RecurringInvoiceStatusBadge entity={recurringInvoice} />
+                  <div className="flex items-center space-x-1">
+                    <RecurringInvoiceStatusBadge entity={recurringInvoice} />
 
-                  {recurringInvoice.status_id ===
-                    RecurringInvoiceStatus.PAUSED && (
-                    <Tooltip
-                      placement="top"
-                      message={t('paused_recurring_invoice_helper') as string}
-                      withoutArrow
-                      width="auto"
-                    >
-                      <Icon element={MdInfo} size={20} />
-                    </Tooltip>
-                  )}
+                    {recurringInvoice.status_id ===
+                      RecurringInvoiceStatus.PAUSED && (
+                      <Tooltip
+                        placement="top"
+                        message={t('paused_recurring_invoice_helper') as string}
+                        withoutArrow
+                        width="auto"
+                      >
+                        <Icon element={MdInfo} size={20} />
+                      </Tooltip>
+                    )}
+                  </div>
                 </div>
+
+                <TaxExemptBadge
+                  isTaxExempt={Boolean(recurringInvoice.client?.is_tax_exempt)}
+                />
               </div>
             )}
 
