@@ -943,8 +943,12 @@ export function TipTapEditor({
 
   useDebounce(
     () => {
-      if (typeof currentValue === 'string') {
-        onValueChange(editor?.getText() ? currentValue : '');
+      if (typeof currentValue === 'string' && editor) {
+        const htmlContent = editor.getText() ? currentValue : '';
+
+        if (htmlContent !== value) {
+          onValueChange(htmlContent);
+        }
       }
     },
     500,
@@ -952,14 +956,15 @@ export function TipTapEditor({
   );
 
   useEffect(() => {
-    if (typeof value === 'string' && typeof currentValue === 'undefined') {
-      editor?.commands.setContent(value);
-    }
-  }, [value]);
+    if (!editor) return;
 
-  useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || '');
+    const editorHTML = editor.getHTML();
+    const shouldUpdate =
+      value !== undefined && value !== editorHTML && !editor.isFocused;
+
+    if (shouldUpdate) {
+      editor.commands.setContent(value);
+      setCurrentValue(value);
     }
   }, [value, editor]);
 
