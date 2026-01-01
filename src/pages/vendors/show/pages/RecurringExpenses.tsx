@@ -43,7 +43,6 @@ export default function RecurringExpenses() {
       excludeColumns={['vendor_id']}
       linkToCreateGuards={[permission('create_recurring_expense')]}
       hideEditableOptions={!hasPermission('edit_recurring_expense')}
-      withoutPerPageAsPreference
       withoutPageAsPreference
     />
   );

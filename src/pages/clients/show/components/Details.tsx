@@ -23,6 +23,7 @@ import { InfoCard } from '$app/components/InfoCard';
 import { CurrencyCodeBadge } from './CurrencyCodeBadge';
 import { PaymentTermsBadge } from './PaymentTermsBadge';
 import { TaxDataModal } from './TaxDataModal';
+import { TaxExemptBadge } from './TaxExemptBadge';
 
 interface Props {
   client: Client;
@@ -72,6 +73,8 @@ export function Details(props: Props) {
                 <PaymentTermsBadge
                   payment_terms={client.settings?.payment_terms}
                 />
+
+                <TaxExemptBadge isTaxExempt={client.is_tax_exempt} />
               </div>
             </div>
           }

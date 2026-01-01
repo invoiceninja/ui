@@ -111,6 +111,7 @@ export function CreditDetails(props: Props) {
         <Element leftSide={t('credit_number')}>
           <InputField
             id="number"
+            placeholder={t('auto_generate')}
             onValueChange={(value) => handleChange('number', value)}
             value={credit?.number || ''}
             errorMessage={errors?.errors.number}
