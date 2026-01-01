@@ -44,6 +44,7 @@ export function Notifications(props: Props) {
     { id: 'quote_viewed', label: 'quote_viewed' },
     { id: 'quote_approved', label: 'quote_approved' },
     { id: 'quote_expired', label: 'quote_expired' },
+    { id: 'quote_rejected', label: 'quote_rejected' },
     { id: 'credit_created', label: 'credit_created' },
     { id: 'credit_sent', label: 'credit_sent' },
     { id: 'credit_viewed', label: 'credit_viewed' },
