@@ -133,11 +133,11 @@ export function TaxDataModal({
         onClick={() => setIsModalOpen(true)}
         className={buttonClassName}
       >
-        {t('tax_data')}
+        {t('tax_details')}
       </Button>
 
       <Modal
-        title={t('tax_data')}
+        title={t('tax_details')}
         visible={isModalOpen}
         onClose={handleClose}
         size={
@@ -166,7 +166,7 @@ export function TaxDataModal({
           </div>
         ) : (
           <Button className="w-full" behavior="button" onClick={handleSave}>
-            {t('update_tax_data')}
+            {t('update_tax_details')}
           </Button>
         )}
       </Modal>

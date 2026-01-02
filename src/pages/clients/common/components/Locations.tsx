@@ -267,7 +267,9 @@ export default function Locations() {
                     )}
                   </div>
 
-                  {Object.entries(currentLocation.tax_data || {}).length && (
+                  {Boolean(
+                    Object.entries(currentLocation.tax_data || {}).length
+                  ) && (
                     <TaxDataModal
                       buttonClassName="mt-2 w-max"
                       taxData={
