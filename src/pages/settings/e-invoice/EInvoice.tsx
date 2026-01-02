@@ -48,6 +48,7 @@ import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { useColorScheme } from '$app/common/colors';
+import { freePlan } from '$app/common/guards/guards/free-plan';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -81,7 +82,7 @@ export function EInvoice() {
   const company = useInjectCompanyChanges();
   const [t] = useTranslation();
 
-  const shouldShowPEPPOLOption = () => {
+  const shouldShowPEPPOLOption = (skipPlanCheck: boolean = false) => {
     if (import.meta.env.DEV) {
       return true;
     }
@@ -90,7 +91,7 @@ export function EInvoice() {
       (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
 
     return (
-      isPlanActive &&
+      (isPlanActive || skipPlanCheck) &&
       PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
     );
   };
@@ -104,8 +105,7 @@ export function EInvoice() {
       return false;
     }
 
-    const isPlanActive =
-      (isHosted());
+    const isPlanActive = isHosted();
 
     return isPlanActive && company?.settings.country_id === '724';
   };
@@ -239,12 +239,12 @@ export function EInvoice() {
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
         >
-          <Element
-            leftSide={t('help')}>
-              <Link external to="https://invoiceninja.github.io/en/einvoicing">
-                {t('learn_more')}
-              </Link>
+          <Element leftSide={t('help')}>
+            <Link external to="https://invoiceninja.github.io/en/einvoicing">
+              {t('learn_more')}
+            </Link>
           </Element>
+
           <Element
             leftSide={
               <PropertyCheckbox
@@ -289,7 +289,6 @@ export function EInvoice() {
                   labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
                 />
               }
-              
             >
               <Toggle
                 checked={Boolean(company?.settings.enable_e_invoice)}
@@ -302,74 +301,93 @@ export function EInvoice() {
           ) : null}
 
           {company?.settings.e_invoice_type === 'VERIFACTU' ? (
-           <div className="flex flex-col space-y-4 p-5">
-           <h3>Activar envío VERI*FACTU</h3>
-           <p>
-             <strong>Declaración responsable:</strong> los registros de facturación generados por esta plataforma se
-             enviarán a la Agencia Estatal de Administración Tributaria (AEAT), garantizando su
-             <strong> integridad, trazabilidad, conservación y accesibilidad</strong>, conforme a la normativa vigente
-             sobre sistemas de facturación VERI*FACTU.
-           </p>
-         
-           <hr className="my-4"/>
-         
-           <h4>Dar permiso para presentar facturas en su nombre</h4>
-           <p>
-             Para poder remitir sus facturas a la AEAT en su representación, necesitamos que nos otorgue un
-             <strong> apoderamiento (autorización)</strong>.
-           </p>
-         
-           <p>
-             Siga estos pasos para concederlo de forma segura:
-           </p>
-         
-           <ol className="list-decimal list-inside space-y-2">
-             <li>
-               Acceda a la página de apoderamientos de la AEAT:<br/>
-               <Link
-                 external
-                 to="https://sede.agenciatributaria.gob.es/Sede/colaborar-agencia-tributaria/registro-apoderamientos.html"
-               >
-                 👉 Otorgar apoderamiento (AEAT) →
-               </Link>
-             </li>
-             <li>
-               Identifíquese con <strong>Cl@ve</strong>, <strong>certificado electrónico</strong>, <strong>DNIe</strong> o <strong>eIDAS</strong>.
-             </li>
+            <div className="flex flex-col space-y-4 p-5">
+              <h3>Activar envío VERI*FACTU</h3>
+              <p>
+                <strong>Declaración responsable:</strong> los registros de
+                facturación generados por esta plataforma se enviarán a la
+                Agencia Estatal de Administración Tributaria (AEAT),
+                garantizando su
+                <strong>
+                  {' '}
+                  integridad, trazabilidad, conservación y accesibilidad
+                </strong>
+                , conforme a la normativa vigente sobre sistemas de facturación
+                VERI*FACTU.
+              </p>
 
-              <li>
-                Acceda a la página de apoderamientos de la AEAT:<br/>
-                <Link
-                  external
-                  to="https://www1.agenciatributaria.gob.es/wlpl/ITTI-APOD/ApodAltaEspecifico?"
-                >
-                  👉 Acceder a la página de apoderamientos (AEAT) →
-                </Link>
-              </li>
+              <hr className="my-4" />
 
-             <li>
-               Elija la opción <em>“Otorgar apoderamiento”</em> e introduzca nuestro <strong>NIF: N0384863G</strong>.
-             </li>
-             <li>
-               Seleccione el ámbito correspondiente, por ejemplo:<br/>
-               <em>IZ860 - Remisión y consulta de registros de facturación por servicio web</em>
-             </li>
-             <li>
-               Confirme la operación y, una vez completada, envíenos el <strong>número de justificante</strong> o una
-               <strong> captura de pantalla del registro</strong>.
-             </li>
-           </ol>
-         
-           <p>
-             Si lo prefiere, también puede otorgar un <strong>poder notarial (documento público)</strong> y presentarlo
-             a través del <strong>Registro Electrónico de la AEAT</strong>.
-           </p>
-           <p>
-             Si necesita este formulario, <strong><a href="mailto:contact@invoiceninja.com">contáctenos</a></strong> y le enviaremos una plantilla en PDF.
-           </p>
-         </div>
-         
+              <h4>Dar permiso para presentar facturas en su nombre</h4>
+              <p>
+                Para poder remitir sus facturas a la AEAT en su representación,
+                necesitamos que nos otorgue un
+                <strong> apoderamiento (autorización)</strong>.
+              </p>
 
+              <p>Siga estos pasos para concederlo de forma segura:</p>
+
+              <ol className="list-decimal list-inside space-y-2">
+                <li>
+                  Acceda a la página de apoderamientos de la AEAT:
+                  <br />
+                  <Link
+                    external
+                    to="https://sede.agenciatributaria.gob.es/Sede/colaborar-agencia-tributaria/registro-apoderamientos.html"
+                  >
+                    👉 Otorgar apoderamiento (AEAT) →
+                  </Link>
+                </li>
+                <li>
+                  Identifíquese con <strong>Cl@ve</strong>,{' '}
+                  <strong>certificado electrónico</strong>,{' '}
+                  <strong>DNIe</strong> o <strong>eIDAS</strong>.
+                </li>
+
+                <li>
+                  Acceda a la página de apoderamientos de la AEAT:
+                  <br />
+                  <Link
+                    external
+                    to="https://www1.agenciatributaria.gob.es/wlpl/ITTI-APOD/ApodAltaEspecifico?"
+                  >
+                    👉 Acceder a la página de apoderamientos (AEAT) →
+                  </Link>
+                </li>
+
+                <li>
+                  Elija la opción <em>“Otorgar apoderamiento”</em> e introduzca
+                  nuestro <strong>NIF: N0384863G</strong>.
+                </li>
+                <li>
+                  Seleccione el ámbito correspondiente, por ejemplo:
+                  <br />
+                  <em>
+                    IZ860 - Remisión y consulta de registros de facturación por
+                    servicio web
+                  </em>
+                </li>
+                <li>
+                  Confirme la operación y, una vez completada, envíenos el{' '}
+                  <strong>número de justificante</strong> o una
+                  <strong> captura de pantalla del registro</strong>.
+                </li>
+              </ol>
+
+              <p>
+                Si lo prefiere, también puede otorgar un{' '}
+                <strong>poder notarial (documento público)</strong> y
+                presentarlo a través del{' '}
+                <strong>Registro Electrónico de la AEAT</strong>.
+              </p>
+              <p>
+                Si necesita este formulario,{' '}
+                <strong>
+                  <a href="mailto:contact@invoiceninja.com">contáctenos</a>
+                </strong>{' '}
+                y le enviaremos una plantilla en PDF.
+              </p>
+            </div>
           ) : null}
 
           {company?.settings.e_invoice_type === 'PEPPOL' ? (
@@ -495,20 +513,23 @@ export function EInvoice() {
       )}
 
       {company?.settings.e_invoice_type === 'PEPPOL' &&
-      shouldShowPEPPOLOption() &&
+      shouldShowPEPPOLOption(true) &&
       company.legal_entity_id ? (
         <Preferences />
       ) : null}
 
-      <PaymentMeans
-        ref={eInvoiceRef}
-        currentEInvoice={company?.e_invoice || {}}
-        entity="company"
-      />
+      {!freePlan() && (
+        <PaymentMeans
+          ref={eInvoiceRef}
+          currentEInvoice={company?.e_invoice || {}}
+          entity="company"
+        />
+      )}
 
       {company?.settings.enable_e_invoice &&
       company?.legal_entity_id &&
-      shouldShowPEPPOLOption() ? (
+      shouldShowPEPPOLOption() &&
+      !freePlan() ? (
         <EUTaxDetails />
       ) : null}
     </Settings>
