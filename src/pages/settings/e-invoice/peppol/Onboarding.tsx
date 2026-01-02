@@ -373,6 +373,7 @@ function Form({ onContinue, businessType }: FormProps) {
   const account = useCurrentAccount();
 
   const [errors, setErrors] = useState<ValidationBag | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const form = useFormik({
     initialValues: {
@@ -417,6 +418,10 @@ function Form({ onContinue, businessType }: FormProps) {
             return;
           }
 
+          if (e.response?.status === 401 && e.response.data?.message) {
+            setErrorMessage(e.response.data.message);
+          }
+
           toast.error();
         })
         .finally(() => setSubmitting(false));
@@ -429,6 +434,8 @@ function Form({ onContinue, businessType }: FormProps) {
       <p>{t('details_update_info')}</p>
 
       <div className="my-4">
+        {errorMessage ? <ErrorMessage>{errorMessage}</ErrorMessage> : null}
+
         {errors ? (
           <ErrorMessage>
             {errors.message ?? get(errors, 'errors.0.details')}
