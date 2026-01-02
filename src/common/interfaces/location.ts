@@ -29,4 +29,5 @@ export interface Location {
   updated_at: number;
   archived_at: number;
   created_at: number;
+  tax_data: Record<string, string | number>;
 }

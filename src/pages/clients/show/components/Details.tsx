@@ -22,6 +22,7 @@ import { useColorScheme } from '$app/common/colors';
 import { InfoCard } from '$app/components/InfoCard';
 import { CurrencyCodeBadge } from './CurrencyCodeBadge';
 import { PaymentTermsBadge } from './PaymentTermsBadge';
+import { TaxDataModal } from './TaxDataModal';
 import { TaxExemptBadge } from './TaxExemptBadge';
 
 interface Props {
@@ -57,10 +58,16 @@ export function Details(props: Props) {
       {client && (
         <InfoCard
           title={
-            <div className="flex items-center gap-x-2 justify-between">
+            <div className="flex items-start gap-x-2 justify-between">
               <span className="text-xl font-medium">{t('details')}</span>
 
-              <div className="flex items-center gap-x-2">
+              <div className="flex flex-wrap items-center gap-2 justify-end">
+                <TaxDataModal
+                  resourceId={client.id}
+                  resourceType="client"
+                  taxData={client.tax_info}
+                />
+
                 <CurrencyCodeBadge currency_id={client.settings?.currency_id} />
 
                 <PaymentTermsBadge

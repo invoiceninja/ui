@@ -13,7 +13,7 @@ import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
@@ -35,6 +35,7 @@ interface Props {
   disableWithSpinner?: boolean;
   textOnly?: boolean;
   onLocationChange?: (locationId: string) => void;
+  afterClientName?: ReactNode;
 }
 
 export function ClientSelector(props: Props) {
@@ -46,7 +47,7 @@ export function ClientSelector(props: Props) {
 
   const [client, setClient] = useState<Client>();
 
-  const { resource } = props;
+  const { resource, afterClientName } = props;
 
   const handleCheckedState = (contactId: string) => {
     const potential = resource?.invitations.find(
@@ -79,14 +80,21 @@ export function ClientSelector(props: Props) {
         style={{ color: colors.$3 }}
       >
         {props.textOnly ? (
-          <div className="flex space-x-10">
-            <span className="text-sm font-medium" style={{ color: colors.$22 }}>
-              {t('client')}
-            </span>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex space-x-10">
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$22 }}
+              >
+                {t('client')}
+              </span>
 
-            <span className="text-sm font-medium">
-              {resource?.client?.display_name}
-            </span>
+              <span className="text-sm font-medium">
+                {resource?.client?.display_name}
+              </span>
+            </div>
+
+            {afterClientName}
           </div>
         ) : (
           <Selector
