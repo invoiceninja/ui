@@ -82,7 +82,7 @@ export function EInvoice() {
   const company = useInjectCompanyChanges();
   const [t] = useTranslation();
 
-  const shouldShowPEPPOLOption = () => {
+  const shouldShowPEPPOLOption = (skipPlanCheck: boolean = false) => {
     if (import.meta.env.DEV) {
       return true;
     }
@@ -91,7 +91,7 @@ export function EInvoice() {
       (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
 
     return (
-      isPlanActive &&
+      (isPlanActive || skipPlanCheck) &&
       PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
     );
   };
@@ -105,8 +105,7 @@ export function EInvoice() {
       return false;
     }
 
-    const isPlanActive =
-      (isHosted());
+    const isPlanActive = isHosted();
 
     return isPlanActive && company?.settings.country_id === '724';
   };
@@ -245,6 +244,7 @@ export function EInvoice() {
               {t('learn_more')}
             </Link>
           </Element>
+
           <Element
             leftSide={
               <PropertyCheckbox
@@ -513,7 +513,7 @@ export function EInvoice() {
       )}
 
       {company?.settings.e_invoice_type === 'PEPPOL' &&
-      shouldShowPEPPOLOption() &&
+      shouldShowPEPPOLOption(true) &&
       company.legal_entity_id ? (
         <Preferences />
       ) : null}
