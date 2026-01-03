@@ -44,7 +44,9 @@ export function useAddTasksOnInvoice(params: Params) {
   const navigate = useNavigate();
   const numericFormatter = useNumericFormatter();
   const getCurrencySeparators = useGetCurrencySeparators(undefined, tasks?.[0]);
-  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat(tasks?.[0]);
+  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat(
+    tasks?.[0]
+  );
 
   const company = useCurrentCompany();
   const { timeFormat } = useCompanyTimeFormat();
@@ -175,6 +177,8 @@ export function useAddTasksOnInvoice(params: Params) {
 
         if (parsed.length) {
           item.notes = projectName + task?.description + ' ' + parsed.join(' ');
+        } else {
+          item.notes = projectName + task?.description;
         }
 
         if (typeof updatedInvoice.line_items === 'string') {

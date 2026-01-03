@@ -54,7 +54,8 @@ export function useInvoiceTask(params?: Params) {
 
   const setInvoice = useSetAtom(invoiceAtom);
 
-  const resolveDateAndTimeClientFormat = useResolveDateAndTimeClientFormat(undefined);
+  const resolveDateAndTimeClientFormat =
+    useResolveDateAndTimeClientFormat(undefined);
 
   const calculateTaskHours = (timeLog: string, precision?: number) => {
     const parsedTimeLogs = parseTimeLog(timeLog);
@@ -72,13 +73,11 @@ export function useInvoiceTask(params?: Params) {
           const unixStop = dayjs.unix(stop);
 
           hoursSum += unixStop.diff(unixStart, 'seconds');
-          
         }
       });
     }
 
     return Number((hoursSum / 3600).toFixed(3));
-
   };
 
   return async (tasks: Task[]) => {
@@ -233,6 +232,8 @@ export function useInvoiceTask(params?: Params) {
 
         if (parsed.length) {
           item.notes = projectName + task?.description + ' ' + parsed.join(' ');
+        } else {
+          item.notes = projectName + task?.description;
         }
 
         if (typeof invoice.line_items === 'string') {
