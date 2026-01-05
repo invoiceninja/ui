@@ -102,6 +102,9 @@ function EmailSettings() {
           toast.success('templates_updated');
           $refetch(['docuninja_templates']);
         })
+        .catch(() => {
+          toast.error();
+        })
         .finally(() => setIsFormBusy(false));
     }
   };
