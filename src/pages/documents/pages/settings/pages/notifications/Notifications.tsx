@@ -119,7 +119,7 @@ function Notifications() {
       onClick: handleSave,
       disableSaveButton: isFormBusy,
     },
-    []
+    [isFormBusy]
   );
 
   return (

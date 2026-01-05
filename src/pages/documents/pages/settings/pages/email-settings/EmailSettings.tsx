@@ -120,7 +120,7 @@ function EmailSettings() {
       onClick: handleSave,
       disableSaveButton: isFormBusy,
     },
-    [currentTemplates]
+    [currentTemplates, isFormBusy]
   );
 
   const colors = useColorScheme();
