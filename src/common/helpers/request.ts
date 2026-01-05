@@ -40,6 +40,10 @@ client.interceptors.response.use(
   (error: AxiosError<ValidationBag>) => {
     const url = error.response?.config.url;
 
+    if (url?.includes('login') && error.response?.status === 401) {
+      return Promise.reject(error);
+    }
+
     if (
       url?.includes('einvoice') &&
       (error.response?.status === 401 ||
