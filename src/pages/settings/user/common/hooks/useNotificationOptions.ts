@@ -85,6 +85,10 @@ export function useNotificationOptions() {
       label: t('quote_expired'),
     },
     {
+      key: 'quote_rejected',
+      label: t('quote_rejected'),
+    },
+    {
       key: 'credit_created',
       label: t('credit_created'),
     },
