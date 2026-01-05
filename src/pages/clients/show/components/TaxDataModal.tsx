@@ -112,6 +112,14 @@ export function TaxDataModal({
     []
   );
 
+  const getFormattedValue = (key: string, value: string | number) => {
+    if (key === 'taxSales' || key === 'taxUse') {
+      return `${((value || 0) as number) * 100} %`;
+    }
+
+    return value;
+  };
+
   const TAX_INFO_DATA = useMemo(() => {
     return Object.entries(taxData || {}).filter(
       ([key]) => PROPERTY_LABELS[key as keyof typeof PROPERTY_LABELS]
@@ -159,7 +167,7 @@ export function TaxDataModal({
                 </span>
 
                 <span className="text-sm" style={{ color: colors.$3 }}>
-                  {value}
+                  {getFormattedValue(key, value)}
                 </span>
               </div>
             ))}
