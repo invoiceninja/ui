@@ -15,13 +15,16 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Template } from '$app/common/interfaces/docuninja/api';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
+import { AxiosError } from 'axios';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +35,7 @@ function EmailSettings() {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [currentTemplates, setCurrentTemplates] = useState<Template[]>([]);
+  const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const { data: templates, isLoading } = useQuery({
     queryKey: ['/api/templates/docuninja'],
@@ -101,9 +105,14 @@ function EmailSettings() {
         .then(() => {
           toast.success('templates_updated');
           $refetch(['docuninja_templates']);
+          setErrors(null);
         })
-        .catch(() => {
+        .catch((error: AxiosError<ValidationBag>) => {
           toast.error();
+
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+          }
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -127,6 +136,8 @@ function EmailSettings() {
 
   return (
     <>
+      {errors && <ValidationAlert errors={errors} />}
+
       <Card
         title={t('email_templates')}
         className="shadow-sm"
