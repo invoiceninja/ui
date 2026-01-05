@@ -518,13 +518,11 @@ export function EInvoice() {
         <Preferences />
       ) : null}
 
-      {!freePlan() && (
-        <PaymentMeans
-          ref={eInvoiceRef}
-          currentEInvoice={company?.e_invoice || {}}
-          entity="company"
-        />
-      )}
+      <PaymentMeans
+        ref={eInvoiceRef}
+        currentEInvoice={company?.e_invoice || {}}
+        entity="company"
+      />
 
       {company?.settings.enable_e_invoice &&
       company?.legal_entity_id &&
