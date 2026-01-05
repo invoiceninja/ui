@@ -13,7 +13,7 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Element } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import Toggle from '$app/components/forms/Toggle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { useAtom } from 'jotai';
@@ -23,9 +23,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 import { Settings } from '$app/common/interfaces/docuninja/api';
+import { useColorScheme } from '$app/common/colors';
 
 function Notifications() {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
@@ -117,8 +119,12 @@ function Notifications() {
   );
 
   return (
-    <div className="flex flex-col pt-2 pb-2">
-
+    <Card
+      title={t('notifications')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
       <Element
         leftSide={
           <div className="flex flex-col">
@@ -217,8 +223,7 @@ function Notifications() {
           disabled={isFormBusy}
         />
       </Element>
-      
-    </div>
+    </Card>
   );
 }
 

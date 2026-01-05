@@ -15,7 +15,7 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Template } from '$app/common/interfaces/docuninja/api';
-import { Element } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
@@ -124,58 +124,59 @@ function EmailSettings() {
 
 
   return (
-    <>
+    <Card
+      title={t('email_templates')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
+        <div className="flex flex-col items-center">
+          <h3 className="px-2 py-1 rounded m-1 font-bold">
+            {t('company')}
+          </h3>
+          {variables.docu_company.map((variable, index) => (
+            <Variable key={index}>{variable}</Variable>
+          ))}
+        </div>
+        
+        <div className="flex flex-col items-center">
+          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+            {t('document')}
+          </h3>
+          {variables.docu_document.map((variable, index) => (
+            <Variable key={index}>{variable}</Variable>
+          ))}
+        </div>
+        
+        <div className="flex flex-col items-center">
+          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+            {t('sender')}
+          </h3>
+          {variables.docu_sender.map((variable, index) => (
+            <Variable key={index}>{variable}</Variable>
+          ))}
+        </div>
+        
+        <div className="flex flex-col items-center">
+          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+            {t('user')}
+          </h3>
+          {variables.docu_user.map((variable, index) => (
+            <Variable key={index}>{variable}</Variable>
+          ))}
+        </div>
     
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
-            
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 font-bold">
-          {t('company')}
-        </h3>
-        {variables.docu_company.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('document')}
-        </h3>
-        {variables.docu_document.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('sender')}
-        </h3>
-        {variables.docu_sender.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('user')}
-        </h3>
-        {variables.docu_user.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-  
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('contact')}
-        </h3>
-        {variables.docu_contact.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
+        <div className="flex flex-col items-center">
+          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+            {t('contact')}
+          </h3>
+          {variables.docu_contact.map((variable, index) => (
+            <Variable key={index}>{variable}</Variable>
+          ))}
+        </div>
       </div>
 
-    </div>
-
-    <div className="flex flex-col pt-2 pb-2">
       {isLoading && (
         <div className="flex justify-center items-center py-8">
           <Spinner />
@@ -191,30 +192,27 @@ function EmailSettings() {
       {templates &&
         !isLoading &&
         templates.map((template: Template, index: number) => (
-    
-        <>  
-        <Element leftSide={template.name} key={template.id}>
-          <div className="flex flex-col gap-4 mb-4 mt-4">
-            <InputField
-              label={t('subject')}
-              value={template.subject}
-              onValueChange={(value) => handleChangeSubject(index, value)}
-            />
+          <div key={template.id}>  
+            <Element leftSide={template.name}>
+              <div className="flex flex-col gap-4 mb-4 mt-4">
+                <InputField
+                  label={t('subject')}
+                  value={template.subject}
+                  onValueChange={(value) => handleChangeSubject(index, value)}
+                />
 
-            <InputField
-              label={t('body')}
-              element="textarea"
-              value={template.body}
-              onValueChange={(value) => handleChangeBody(index, value)}
-            />
+                <InputField
+                  label={t('body')}
+                  element="textarea"
+                  value={template.body}
+                  onValueChange={(value) => handleChangeBody(index, value)}
+                />
+              </div>
+            </Element>
+            <Divider withoutPadding borderColor={colors.$20} />
           </div>
-        </Element>
-        <Divider withoutPadding borderColor={colors.$20} />
-        </>
-    
-      ))}
-    </div>
-  </>
+        ))}
+    </Card>
   );
 }
 

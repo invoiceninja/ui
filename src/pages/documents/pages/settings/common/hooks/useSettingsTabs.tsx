@@ -8,18 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+
+interface SettingsRoute {
+  name: string;
+  href: string;
+  current: boolean;
+  enabled: boolean;
+}
 
 export function useSettingsTabs() {
   const [t] = useTranslation();
+  const location = useLocation();
 
-  const tabs: Tab[] = [
-    // { name: t('company_details'), href: '/documents/settings' },
-    // { name: t('logo'), href: '/documents/settings/logo' },
-    { name: t('email_templates'), href: '/docuninja/settings/email_templates' },
-    { name: t('notifications'), href: '/docuninja/settings/notifications' },
+  const routes: SettingsRoute[] = [
+    {
+      name: t('email_templates'),
+      href: '/docuninja/settings/email_templates',
+      current: location.pathname === '/docuninja/settings/email_templates',
+      enabled: true,
+    },
+    {
+      name: t('notifications'),
+      href: '/docuninja/settings/notifications',
+      current: location.pathname === '/docuninja/settings/notifications',
+      enabled: true,
+    },
   ];
 
-  return tabs;
+  return routes;
 }
