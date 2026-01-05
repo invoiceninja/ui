@@ -15,11 +15,11 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Template } from '$app/common/interfaces/docuninja/api';
-import { Card, Element } from '$app/components/cards';
-import { Divider } from '$app/components/cards/Divider';
+import { Card } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
 import { cloneDeep } from 'lodash';
@@ -122,58 +122,61 @@ function EmailSettings() {
 
   const colors = useColorScheme();
 
-
   return (
     <Card
       title={t('email_templates')}
       className="shadow-sm"
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
+      withoutBodyPadding
+      withoutHeaderBorder
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
-        <div className="flex flex-col items-center">
-          <h3 className="px-2 py-1 rounded m-1 font-bold">
-            {t('company')}
-          </h3>
-          {variables.docu_company.map((variable, index) => (
-            <Variable key={index}>{variable}</Variable>
-          ))}
-        </div>
-        
-        <div className="flex flex-col items-center">
-          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-            {t('document')}
-          </h3>
-          {variables.docu_document.map((variable, index) => (
-            <Variable key={index}>{variable}</Variable>
-          ))}
-        </div>
-        
-        <div className="flex flex-col items-center">
-          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-            {t('sender')}
-          </h3>
-          {variables.docu_sender.map((variable, index) => (
-            <Variable key={index}>{variable}</Variable>
-          ))}
-        </div>
-        
-        <div className="flex flex-col items-center">
-          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-            {t('user')}
-          </h3>
-          {variables.docu_user.map((variable, index) => (
-            <Variable key={index}>{variable}</Variable>
-          ))}
-        </div>
-    
-        <div className="flex flex-col items-center">
-          <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-            {t('contact')}
-          </h3>
-          {variables.docu_contact.map((variable, index) => (
-            <Variable key={index}>{variable}</Variable>
-          ))}
+      <div className="px-4 sm:px-6 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
+          <div className="flex flex-col items-center">
+            <h3 className="px-2 py-1 rounded m-1 font-bold">
+              {t('company')}
+            </h3>
+            {variables.docu_company.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+              {t('document')}
+            </h3>
+            {variables.docu_document.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+              {t('sender')}
+            </h3>
+            {variables.docu_sender.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+              {t('user')}
+            </h3>
+            {variables.docu_user.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+      
+          <div className="flex flex-col items-center">
+            <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
+              {t('contact')}
+            </h3>
+            {variables.docu_contact.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -189,12 +192,17 @@ function EmailSettings() {
         </div>
       )}
 
-      {templates &&
-        !isLoading &&
-        templates.map((template: Template, index: number) => (
-          <div key={template.id}>  
-            <Element leftSide={template.name}>
-              <div className="flex flex-col gap-4 mb-4 mt-4">
+      {!isLoading && currentTemplates.length > 0 && (
+        <TabGroup 
+          tabs={currentTemplates.map(template => template.name)}
+          horizontalPaddingWidth="1.5rem"
+          withHorizontalPadding
+          fullRightPadding
+          withoutVerticalMargin
+        >
+          {currentTemplates.map((template, index) => (
+            <div key={template.id} className="px-4 sm:px-6 pt-4 pb-6">
+              <div className="flex flex-col gap-4">
                 <InputField
                   label={t('subject')}
                   value={template.subject}
@@ -208,10 +216,10 @@ function EmailSettings() {
                   onValueChange={(value) => handleChangeBody(index, value)}
                 />
               </div>
-            </Element>
-            <Divider withoutPadding borderColor={colors.$20} />
-          </div>
-        ))}
+            </div>
+          ))}
+        </TabGroup>
+      )}
     </Card>
   );
 }
