@@ -16,6 +16,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import Toggle from '$app/components/forms/Toggle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { cloneDeep } from 'lodash';
@@ -94,8 +95,11 @@ function Notifications() {
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
-            toast.dismiss();
             setErrors(error.response.data);
+            const errorMessage = error.response.data.message || 'validation_errors';
+            toast.error(errorMessage);
+          } else {
+            toast.error('error_title');
           }
         })
         .finally(() => setIsFormBusy(false));
@@ -119,12 +123,15 @@ function Notifications() {
   );
 
   return (
-    <Card
-      title={t('notifications')}
-      className="shadow-sm"
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
-    >
+    <>
+      {errors && <ValidationAlert errors={errors} />}
+      
+      <Card
+        title={t('notifications')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
       <Element
         leftSide={
           <div className="flex flex-col">
@@ -224,6 +231,7 @@ function Notifications() {
         />
       </Element>
     </Card>
+  </>
   );
 }
 
