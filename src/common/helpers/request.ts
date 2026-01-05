@@ -45,6 +45,13 @@ client.interceptors.response.use(
     }
 
     if (
+      url?.includes('einvoice/peppol/setup') &&
+      error.response?.status === 401
+    ) {
+      return Promise.reject(error);
+    }
+
+    if (
       url?.includes('einvoice') &&
       (error.response?.status === 401 ||
         error.response?.status === 403 ||
