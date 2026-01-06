@@ -44,11 +44,10 @@ const Div = styled.div`
 
 export default function Index() {
   const params = useParams();
-
   const colors = useColorScheme();
 
   return (
-    <div>
+    <div className="max-w-[90rem] mx-auto">
       {/* @ts-expect-error - TODO: fix this */}
       <SignContext.Provider
         value={{
