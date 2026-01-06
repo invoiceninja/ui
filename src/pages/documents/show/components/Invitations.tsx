@@ -160,7 +160,7 @@ function Invitation({ invitation, document }: InvitationProps) {
   };
 
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/documents/sign/${document.id}/${invitation.id}`;
+    const link = `${window.location.origin}/docuninja/sign/${document.id}/${invitation.id}`;
     navigator.clipboard.writeText(link);
     toast.success(t('link_copied') || 'Link copied to clipboard');
   };
