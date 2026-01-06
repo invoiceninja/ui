@@ -114,6 +114,11 @@ export function useProductColumns() {
       entity: 'product',
     });
 
+  const normalizeLabel = (label: string): string => {
+    if (!label) return '';
+    return label.trimEnd().replace(/\/+$/, '');
+  };
+
   const columns: DataTableColumnsExtended<Product, ProductColumns> = [
     {
       column: 'product_key',
@@ -188,27 +193,27 @@ export function useProductColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: firstCustom,
+      column: normalizeLabel(firstCustom),
       id: 'custom_value1',
-      label: firstCustom,
+      label: normalizeLabel(firstCustom),
       format: (value) => formatCustomFieldValue('product1', value?.toString()),
     },
     {
-      column: secondCustom,
+      column: normalizeLabel(secondCustom),
       id: 'custom_value2',
-      label: secondCustom,
+      label: normalizeLabel(secondCustom),
       format: (value) => formatCustomFieldValue('product2', value?.toString()),
     },
     {
-      column: thirdCustom,
+      column: normalizeLabel(thirdCustom),
       id: 'custom_value3',
-      label: thirdCustom,
+      label: normalizeLabel(thirdCustom),
       format: (value) => formatCustomFieldValue('product3', value?.toString()),
     },
     {
-      column: fourthCustom,
+      column: normalizeLabel(fourthCustom),
       id: 'custom_value4',
-      label: fourthCustom,
+      label: normalizeLabel(fourthCustom),
       format: (value) => formatCustomFieldValue('product4', value?.toString()),
     },
     {
@@ -284,8 +289,12 @@ export function useProductColumns() {
     reactSettings?.react_table_columns?.product || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeLabel(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeLabel(a.column)) -
+        list.indexOf(normalizeLabel(b.column))
+    );
 }
 
 export function useActions() {
