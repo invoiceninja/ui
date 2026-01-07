@@ -34,6 +34,7 @@
     "deep-object-diff": "^1.1.9",
     "dompurify": "^3.2.4",
     "dotenv": "^16.4.7",
+    "driver.js": "^1.4.0",
     "font-awesome": "^4.7.0",
     "formik": "^2.4.6",
     "grapesjs": "^0.22.13",
