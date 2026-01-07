@@ -27,6 +27,8 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { memo, useCallback, useMemo, useRef } from 'react';
+import { isEqual } from 'lodash';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -51,58 +53,148 @@ interface Props {
   shouldCreateInitialLineItem?: boolean;
 }
 
-export function ProductsTable(props: Props) {
+interface LineItemRowProps {
+  lineItem: InvoiceItem;
+  lineItemIndex: number;
+  columns: string[];
+  resolveInputField: (column: string, index: number) => React.ReactNode;
+  onDeleteClick: () => void;
+  dragHandleProps: any;
+  colors: ReturnType<typeof useColorScheme>;
+  tabIndex: number;
+  innerRef: any;
+  draggableProps: any;
+}
+
+const LineItemRow = ({
+  lineItem,
+  lineItemIndex,
+  columns,
+  resolveInputField,
+  onDeleteClick,
+  dragHandleProps,
+  colors,
+  tabIndex,
+  innerRef,
+  draggableProps,
+}: LineItemRowProps) => {
+  if (lineItemIndex === -1) {
+    return null;
+  }
+
+  return (
+    <Tr innerRef={innerRef} tabIndex={tabIndex} {...draggableProps}>
+      {columns.map((column, columnIndex, { length }) => (
+        <Td width={resolveColumnWidth(column)} key={columnIndex}>
+          {length - 1 !== columnIndex && (
+            <div
+              className={classNames({
+                'flex justify-between items-center space-x-3':
+                  columnIndex === 0,
+              })}
+            >
+              {columnIndex === 0 ? (
+                <button
+                  {...dragHandleProps}
+                  onMouseEnter={(e) => e.currentTarget.focus()}
+                >
+                  <AlignJustify size={18} />
+                </button>
+              ) : null}
+
+              {resolveInputField(column, lineItemIndex)}
+            </div>
+          )}
+
+          {length - 1 === columnIndex && (
+            <div className="flex justify-between items-center">
+              {resolveInputField(column, lineItemIndex)}
+
+              <button
+                style={{ color: colors.$3 }}
+                className="ml-2 text-gray-600 hover:text-red-600"
+                onClick={onDeleteClick}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          )}
+        </Td>
+      ))}
+    </Tr>
+  );
+};
+
+const MemoizedLineItemRow = memo(LineItemRow, (prev, next) =>
+  isEqual(prev.lineItem, next.lineItem)
+);
+
+export function ProductsTable({
+  type,
+  resource,
+  items,
+  columns,
+  relationType,
+  onLineItemChange,
+  onLineItemPropertyChange,
+  onCreateItemClick,
+  onDeleteRowClick,
+  onSort,
+}: Props) {
   const [t] = useTranslation();
+
   const colors = useColorScheme();
-
   const themeColors = useThemeColorScheme();
-
-  const { resource, items, columns, relationType } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  const resolveTranslation = useResolveTranslation({ type: props.type });
+  const previousItemsRef = useRef<InvoiceItem[]>([]);
+  const isInitialMount = useRef(true);
+
+  const resolveTranslation = useResolveTranslation({ type: type });
 
   const resolveInputField = useResolveInputField({
-    type: props.type,
-    resource: props.resource,
-    onLineItemChange: props.onLineItemChange,
-    onLineItemPropertyChange: props.onLineItemPropertyChange,
+    type: type,
+    resource: resource,
+    onLineItemChange: onLineItemChange,
+    onLineItemPropertyChange: onLineItemPropertyChange,
     relationType,
-    createItem: props.onCreateItemClick,
-    deleteLineItem: props.onDeleteRowClick,
+    createItem: onCreateItemClick,
+    deleteLineItem: onDeleteRowClick,
   });
 
   const onDragEnd = useHandleSortingRows({
-    resource: props.resource,
-    onSort: props.onSort,
+    resource: resource,
+    onSort: onSort,
   });
 
-  const isAnyLineItemEmpty = () => {
+  const isAnyLineItemEmpty = useCallback(() => {
     return items.some((lineItem) => isLineItemEmpty(lineItem));
-  };
+  }, [items]);
 
-  const getLineItemIndex = (lineItem: InvoiceItem) => {
-    return resource.line_items.indexOf(lineItem);
-  };
+  const getLineItemIndex = useCallback(
+    (lineItem: InvoiceItem) => {
+      return resource.line_items.indexOf(lineItem);
+    },
+    [resource.line_items]
+  );
 
-  // This portion of the code pertains to the automatic creation of line items.
-  // Currently, we do not support this functionality, and we will comment it out until we begin providing support for it.
+  const handleDeleteClick = useCallback(
+    (lineItemIndex: number) => {
+      setIsDeleteActionTriggered(true);
+      onDeleteRowClick(lineItemIndex);
+    },
+    [onDeleteRowClick, setIsDeleteActionTriggered]
+  );
 
-  /*useEffect(() => {
-    if (
-      (resource.client_id || resource.vendor_id) &&
-      !resource.line_items.length &&
-      (shouldCreateInitialLineItem ||
-        typeof shouldCreateInitialLineItem === 'undefined') &&
-      !isEditPage
-    ) {
-      props.onCreateItemClick();
+  const handleAddItemClick = useCallback(() => {
+    if (!isAnyLineItemEmpty()) {
+      onCreateItemClick();
     }
-  }, [resource.client_id, resource.vendor_id]); */
+  }, [isAnyLineItemEmpty, onCreateItemClick]);
 
-  return (
-    <Table>
+  const tableHeader = useMemo(
+    () => (
       <Thead backgroundColor={themeColors.$5}>
         {columns.map((column, index) => (
           <Th key={index} textColor={themeColors.$6}>
@@ -110,95 +202,74 @@ export function ProductsTable(props: Props) {
           </Th>
         ))}
       </Thead>
+    ),
+    [columns, themeColors]
+  );
+
+  const rowCommonProps = useMemo(
+    () => ({
+      columns,
+      resolveInputField,
+      colors,
+      getLineItemIndex,
+    }),
+    [columns, resolveInputField, colors, getLineItemIndex]
+  );
+
+  const renderRows = useMemo(() => {
+    return items.map((lineItem, index) => {
+      const lineItemIndex = getLineItemIndex(lineItem);
+
+      return (
+        <Draggable
+          key={`${lineItemIndex}-${lineItem._id || lineItemIndex}`}
+          draggableId={lineItemIndex.toString()}
+          index={lineItemIndex}
+        >
+          {(provided) => (
+            <MemoizedLineItemRow
+              lineItem={lineItem}
+              lineItemIndex={lineItemIndex}
+              onDeleteClick={() => handleDeleteClick(lineItemIndex)}
+              dragHandleProps={provided.dragHandleProps}
+              tabIndex={index + 1}
+              innerRef={provided.innerRef}
+              draggableProps={provided.draggableProps}
+              {...rowCommonProps}
+            />
+          )}
+        </Draggable>
+      );
+    });
+  }, [items, rowCommonProps, handleDeleteClick]);
+
+  return (
+    <Table>
+      {tableHeader}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="product-table">
           {(provided) => (
-            <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
-              {items.map((lineItem, index) => (
-                <Draggable
-                  key={getLineItemIndex(lineItem)}
-                  draggableId={getLineItemIndex(lineItem).toString()}
-                  index={getLineItemIndex(lineItem)}
-                >
-                  {(provided) => (
-                    <Tr
-                      innerRef={provided.innerRef}
-                      key={getLineItemIndex(lineItem)}
-                      tabIndex={index + 1}
-                      {...provided.draggableProps}
-                    >
-                      {columns.map((column, columnIndex, { length }) => (
-                        <Td
-                          width={resolveColumnWidth(column)}
-                          key={columnIndex}
-                        >
-                          {length - 1 !== columnIndex && (
-                            <div
-                              className={classNames({
-                                'flex justify-between items-center space-x-3':
-                                  columnIndex === 0,
-                              })}
-                            >
-                              {columnIndex === 0 ? (
-                                <button
-                                  {...provided.dragHandleProps}
-                                  onMouseEnter={(e) => e.currentTarget.focus()}
-                                >
-                                  <AlignJustify size={18} />
-                                </button>
-                              ) : null}
-
-                              {resolveInputField(
-                                column,
-                                getLineItemIndex(lineItem)
-                              )}
-                            </div>
-                          )}
-
-                          {length - 1 === columnIndex && (
-                            <div className="flex justify-between items-center">
-                              {resolveInputField(
-                                column,
-                                getLineItemIndex(lineItem)
-                              )}
-
-                              {resource && (
-                                <button
-                                  style={{ color: colors.$3 }}
-                                  className="ml-2 text-gray-600 hover:text-red-600"
-                                  onClick={() => {
-                                    setIsDeleteActionTriggered(true);
-
-                                    props.onDeleteRowClick(
-                                      getLineItemIndex(lineItem)
-                                    );
-                                  }}
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </Td>
-                      ))}
-                    </Tr>
-                  )}
-                </Draggable>
-              ))}
-
+            <Tbody
+              {...provided.droppableProps}
+              innerRef={provided.innerRef}
+              style={{
+                opacity: 1,
+                pointerEvents: 'auto',
+                cursor: 'default',
+              }}
+            >
+              {renderRows}
               {provided.placeholder}
 
               <Tr className="bg-slate-100 hover:bg-slate-200">
                 <Td colSpan={100}>
                   <button
-                    onClick={() =>
-                      !isAnyLineItemEmpty() && props.onCreateItemClick()
-                    }
+                    onClick={handleAddItemClick}
                     className="w-full py-2 inline-flex justify-center items-center space-x-2"
                   >
                     <Plus size={18} />
                     <span>
-                      {props.type === 'product' ? t('add_item') : t('add_line')}
+                      {type === 'product' ? t('add_item') : t('add_line')}
                     </span>
                   </button>
                 </Td>
