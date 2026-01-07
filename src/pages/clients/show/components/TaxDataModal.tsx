@@ -42,6 +42,15 @@ interface Props {
   buttonType?: 'minimal' | 'secondary';
 }
 
+const PROPERTY_LABELS = {
+  geoPostalCode: 'ZIP',
+  geoCity: 'City',
+  geoCounty: 'County',
+  geoState: 'State',
+  taxSales: 'Sales Tax',
+  taxUse: 'Use Tax',
+};
+
 export function TaxDataModal({
   resourceId,
   resourceType,
@@ -99,18 +108,6 @@ export function TaxDataModal({
         .finally(() => setIsFormBusy(false));
     }
   };
-
-  const PROPERTY_LABELS = useMemo(
-    () => ({
-      geoPostalCode: 'ZIP',
-      geoCity: 'City',
-      geoCounty: 'County',
-      geoState: 'State',
-      taxSales: 'Sales Tax',
-      taxUse: 'Use Tax',
-    }),
-    []
-  );
 
   const getFormattedValue = (key: string, value: string | number) => {
     if (key === 'taxSales' || key === 'taxUse') {
