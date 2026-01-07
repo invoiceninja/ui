@@ -47,6 +47,7 @@ import { ExternalLink } from 'react-feather';
 import { InputLabel } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 import { TasksTabLabel } from '../common/components/TasksTabLabel';
+import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -105,17 +106,23 @@ export default function Edit() {
         >
           <div className="flex flex-col space-y-4">
             {invoice && (
-              <div className="flex items-center space-x-9">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: colors.$22 }}
-                >
-                  {t('status')}
-                </span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-9">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.$22 }}
+                  >
+                    {t('status')}
+                  </span>
 
-                <div>
-                  <InvoiceStatusBadge entity={invoice} />
+                  <div>
+                    <InvoiceStatusBadge entity={invoice} />
+                  </div>
                 </div>
+
+                <TaxExemptBadge
+                  isTaxExempt={Boolean(invoice.client?.is_tax_exempt)}
+                />
               </div>
             )}
 
