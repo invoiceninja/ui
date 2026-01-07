@@ -27,7 +27,7 @@ import {
   SendDialogButtonProps,
   SendDialogProps,
 } from '@docuninja/builder2.0';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
@@ -67,6 +67,8 @@ import {
   UploadDialog,
   ValidationErrors,
 } from './components';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { runBuilderTourAtom } from '../atoms';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -132,8 +134,45 @@ function Builder() {
   const [entity, setEntity] = useState<Document | null>(null);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
+  const [runTour, setRunTour] = useAtom(runBuilderTourAtom);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
+
+  const steps = [
+    {
+      target: '.builder-signatorySelector',
+      content:
+        'This is signatory selector. Use it to manage your document signatories. Select a signatory to continue.',
+      disableBeacon: true,
+      data: { waitForInteraction: true, buttonText: 'Continue' },
+    },
+    {
+      target: '.lucide-signature',
+      content:
+        'This is the toolbox. Here you can find various fields and elements to add to your document for signatories to interact with. We have already picked signature. Click to continue.',
+    },
+    {
+      target: '[data-builder-canvas]',
+      content:
+        'This is your document canvas. You can draw and place fields for your signatories here.',
+      data: { waitForInteraction: true, buttonText: 'Continue' },
+    },
+    {
+      target: '.builder-save-button',
+      content: 'Once you are done, click here to save your document.',
+    },
+  ];
+
+  useDriverTour({
+    steps,
+    run: runTour && entity !== null,
+    onFinish: () => setRunTour(false),
+    delay: 1500,
+    continueEvents: [
+      'builder:signatory-selected',
+      'builder:first-rectangle-drawn',
+    ],
+  });
 
   const pages: Page[] = [
     { name: t('docuninja'), href: '/docuninja' },
@@ -300,6 +339,7 @@ function Builder() {
             onClick={handleSave}
             disabled={isDocumentSaving}
             disableWithoutIcon
+            className="builder-save-button"
           >
             {t('save')}
           </Button>
@@ -445,9 +485,15 @@ function Builder() {
               select_needs_two_options: t('select_needs_two_options') as string,
               default_select_label: t('default_select_label') as string,
               radio_needs_two_options: t('radio_needs_two_options') as string,
-              default_radio_group_label: t('default_radio_group_label') as string,
-              multiselect_needs_two_options: t('multiselect_needs_two_options') as string,
-              default_multiselect_label: t('default_multiselect_label') as string,
+              default_radio_group_label: t(
+                'default_radio_group_label'
+              ) as string,
+              multiselect_needs_two_options: t(
+                'multiselect_needs_two_options'
+              ) as string,
+              default_multiselect_label: t(
+                'default_multiselect_label'
+              ) as string,
             },
           }}
         >
