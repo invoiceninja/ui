@@ -55,7 +55,10 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import {
+  useCalculateExpenseAmount,
+  useCalculateExpenseExclusiveAmount,
+} from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
 import {
   extractTextFromHTML,
   sanitizeHTML,
@@ -63,6 +66,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import dayjs from 'dayjs';
 import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'status',
@@ -126,7 +130,7 @@ export function useAllRecurringExpenseColumns() {
     'next_send_date',
   ] as const;
 
-  return recurringExpenseColumns;
+  return recurringExpenseColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useRecurringExpenseColumns() {
@@ -450,8 +454,12 @@ export function useRecurringExpenseColumns() {
     reactSettings?.react_table_columns?.recurringExpense || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useToggleStartStop() {

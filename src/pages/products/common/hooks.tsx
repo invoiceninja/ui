@@ -51,6 +51,7 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -92,7 +93,7 @@ export function useAllProductColumns() {
     'updated_at',
   ] as const;
 
-  return productColumns;
+  return productColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useProductColumns() {
@@ -113,11 +114,6 @@ export function useProductColumns() {
     useEntityCustomFields({
       entity: 'product',
     });
-
-  const normalizeLabel = (label: string): string => {
-    if (!label) return '';
-    return label.trimEnd().replace(/\/+$/, '');
-  };
 
   const columns: DataTableColumnsExtended<Product, ProductColumns> = [
     {
@@ -193,27 +189,27 @@ export function useProductColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: normalizeLabel(firstCustom),
+      column: firstCustom,
       id: 'custom_value1',
-      label: normalizeLabel(firstCustom),
+      label: firstCustom,
       format: (value) => formatCustomFieldValue('product1', value?.toString()),
     },
     {
-      column: normalizeLabel(secondCustom),
+      column: secondCustom,
       id: 'custom_value2',
-      label: normalizeLabel(secondCustom),
+      label: secondCustom,
       format: (value) => formatCustomFieldValue('product2', value?.toString()),
     },
     {
-      column: normalizeLabel(thirdCustom),
+      column: thirdCustom,
       id: 'custom_value3',
-      label: normalizeLabel(thirdCustom),
+      label: thirdCustom,
       format: (value) => formatCustomFieldValue('product3', value?.toString()),
     },
     {
-      column: normalizeLabel(fourthCustom),
+      column: fourthCustom,
       id: 'custom_value4',
-      label: normalizeLabel(fourthCustom),
+      label: fourthCustom,
       format: (value) => formatCustomFieldValue('product4', value?.toString()),
     },
     {
@@ -289,11 +285,11 @@ export function useProductColumns() {
     reactSettings?.react_table_columns?.product || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(normalizeLabel(column.column)))
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
     .sort(
       (a, b) =>
-        list.indexOf(normalizeLabel(a.column)) -
-        list.indexOf(normalizeLabel(b.column))
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
     );
 }
 
