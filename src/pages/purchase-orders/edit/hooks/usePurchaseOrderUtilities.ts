@@ -10,6 +10,7 @@
 
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import {
   Invitation,
@@ -33,6 +34,7 @@ export function usePurchaseOrderUtilities({
   setPurchaseOrder,
   setInvoiceSum,
 }: Props) {
+  const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
 
   const handleChange = <T extends keyof PurchaseOrder>(
@@ -73,10 +75,11 @@ export function usePurchaseOrderUtilities({
 
   const calculateInvoiceSum = async (purchaseOrder: PurchaseOrder) => {
     const currency = await resolveCurrency(purchaseOrder.vendor_id);
+    const eInvoiceType = company?.settings.e_invoice_type;
 
     const invoiceSum = purchaseOrder.uses_inclusive_taxes
-      ? new InvoiceSumInclusive(purchaseOrder, currency!).build()
-      : new InvoiceSum(purchaseOrder, currency!).build();
+      ? new InvoiceSumInclusive(purchaseOrder, currency!, eInvoiceType).build()
+      : new InvoiceSum(purchaseOrder, currency!, eInvoiceType).build();
 
     if (setInvoiceSum) {
       setInvoiceSum(invoiceSum);
