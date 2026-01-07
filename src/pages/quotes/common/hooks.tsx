@@ -200,9 +200,11 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     );
 
     if (currency && quote) {
+      const eInvoiceType = company?.settings.e_invoice_type;
+
       const invoiceSum = quote.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(quote, currency).build()
-        : new InvoiceSum(quote, currency).build();
+        ? new InvoiceSumInclusive(quote, currency, eInvoiceType).build()
+        : new InvoiceSum(quote, currency, eInvoiceType).build();
 
       setInvoiceSum(invoiceSum);
     }
