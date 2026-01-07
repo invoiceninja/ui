@@ -193,7 +193,6 @@ export function ProductsTable({
     }
   }, [isAnyLineItemEmpty, onCreateItemClick]);
 
-  // Memoizirane vrijednosti koje se ne mijenjaju često
   const tableHeader = useMemo(
     () => (
       <Thead backgroundColor={themeColors.$5}>
@@ -207,7 +206,6 @@ export function ProductsTable({
     [columns, themeColors]
   );
 
-  // Memoizirane props za redove
   const rowCommonProps = useMemo(
     () => ({
       columns,
