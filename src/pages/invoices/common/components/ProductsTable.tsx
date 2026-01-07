@@ -27,7 +27,7 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { isEqual } from 'lodash';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
@@ -148,8 +148,8 @@ export function ProductsTable({
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  const [currentItems, setCurrentItems] = useState<InvoiceItem[]>([]);
-  const [areRowsRendered, setAreRowsRendered] = useState<boolean>(false);
+  const previousItemsRef = useRef<InvoiceItem[]>([]);
+  const isInitialMount = useRef(true);
 
   const resolveTranslation = useResolveTranslation({ type: type });
 
@@ -169,8 +169,8 @@ export function ProductsTable({
   });
 
   const isAnyLineItemEmpty = useCallback(() => {
-    return currentItems.some((lineItem) => isLineItemEmpty(lineItem));
-  }, [currentItems]);
+    return items.some((lineItem) => isLineItemEmpty(lineItem));
+  }, [items]);
 
   const getLineItemIndex = useCallback(
     (lineItem: InvoiceItem) => {
@@ -193,21 +193,7 @@ export function ProductsTable({
     }
   }, [isAnyLineItemEmpty, onCreateItemClick]);
 
-  useEffect(() => {
-    setAreRowsRendered(false);
-  }, [resource?.updated_at]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (resource) {
-        setCurrentItems(items);
-        !areRowsRendered && setAreRowsRendered(true);
-      }
-    }, 10);
-
-    return () => clearTimeout(timer);
-  }, [items]);
-
+  // Memoizirane vrijednosti koje se ne mijenjaju često
   const tableHeader = useMemo(
     () => (
       <Thead backgroundColor={themeColors.$5}>
@@ -218,8 +204,46 @@ export function ProductsTable({
         ))}
       </Thead>
     ),
-    [columns]
+    [columns, themeColors]
   );
+
+  // Memoizirane props za redove
+  const rowCommonProps = useMemo(
+    () => ({
+      columns,
+      resolveInputField,
+      colors,
+      getLineItemIndex,
+    }),
+    [columns, resolveInputField, colors, getLineItemIndex]
+  );
+
+  const renderRows = useMemo(() => {
+    return items.map((lineItem, index) => {
+      const lineItemIndex = getLineItemIndex(lineItem);
+
+      return (
+        <Draggable
+          key={`${lineItemIndex}-${lineItem._id || lineItemIndex}`}
+          draggableId={lineItemIndex.toString()}
+          index={lineItemIndex}
+        >
+          {(provided) => (
+            <MemoizedLineItemRow
+              lineItem={lineItem}
+              lineItemIndex={lineItemIndex}
+              onDeleteClick={() => handleDeleteClick(lineItemIndex)}
+              dragHandleProps={provided.dragHandleProps}
+              tabIndex={index + 1}
+              innerRef={provided.innerRef}
+              draggableProps={provided.draggableProps}
+              {...rowCommonProps}
+            />
+          )}
+        </Draggable>
+      );
+    });
+  }, [items, rowCommonProps, handleDeleteClick]);
 
   return (
     <Table>
@@ -231,42 +255,12 @@ export function ProductsTable({
               {...provided.droppableProps}
               innerRef={provided.innerRef}
               style={{
-                opacity: areRowsRendered || !currentItems.length ? 1 : 0.5,
-                pointerEvents:
-                  areRowsRendered || !currentItems.length ? 'auto' : 'none',
-                cursor:
-                  areRowsRendered || !currentItems.length
-                    ? 'default'
-                    : 'progress',
+                opacity: 1,
+                pointerEvents: 'auto',
+                cursor: 'default',
               }}
             >
-              {currentItems.map((lineItem, index) => {
-                const lineItemIndex = getLineItemIndex(lineItem);
-
-                return (
-                  <Draggable
-                    key={lineItemIndex}
-                    draggableId={lineItemIndex.toString()}
-                    index={lineItemIndex}
-                  >
-                    {(provided) => (
-                      <MemoizedLineItemRow
-                        lineItem={lineItem}
-                        lineItemIndex={lineItemIndex}
-                        columns={columns}
-                        resolveInputField={resolveInputField}
-                        onDeleteClick={() => handleDeleteClick(lineItemIndex)}
-                        dragHandleProps={provided.dragHandleProps}
-                        colors={colors}
-                        tabIndex={index + 1}
-                        innerRef={provided.innerRef}
-                        draggableProps={provided.draggableProps}
-                      />
-                    )}
-                  </Draggable>
-                );
-              })}
-
+              {renderRows}
               {provided.placeholder}
 
               <Tr className="bg-slate-100 hover:bg-slate-200">
