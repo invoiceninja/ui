@@ -165,7 +165,7 @@ export function useDataTablePreferences(params: Params) {
       !withoutStoringPerPage &&
         setPerPage((getPreference('perPage') as PerPage) || '10');
       setCurrentPage((getPreference('currentPage') as number) || 1);
-      setSort((getPreference('sort') as string) || 'id|asc');
+      setSort((getPreference('sort') as string) || apiEndpoint.searchParams.get('sort') || 'id|asc');
       setSortedBy((getPreference('sortedBy') as string) || undefined);
       if ((getPreference('status') as string[]).length) {
         setStatus(getPreference('status') as string[]);
