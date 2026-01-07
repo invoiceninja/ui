@@ -29,7 +29,7 @@ import {
   docuNinjaAtom
 } from '$app/common/atoms/docuninja';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
-import { isPaidDocuninjaUserAtom } from '../atoms';
+import { isPaidDocuninjaUserAtom, runDocumentsTourAtom } from '../atoms';
 import { 
   LoadingState, 
   UpgradePlan, 
@@ -41,6 +41,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
 import { useActions } from '../common/hooks/useActions';
 import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
 
 export default function Documents() {
   useTitle('documents');
@@ -58,6 +59,7 @@ export default function Documents() {
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [runTour, setRunTour] = useAtom(runDocumentsTourAtom);
 
   const [docuData] = useAtom(docuNinjaAtom);
   
@@ -116,6 +118,20 @@ export default function Documents() {
     },
   ];
 
+  const steps = [
+    {
+      target: '.document-creation-dropzone',
+      content: 'To start signing documents, you can upload them here. Simply drag and drop your files into this area.',
+      disableBeacon: true,
+    },
+  ];
+
+  useDriverTour({
+    steps,
+    run: runTour && canCreateDocumentPermission,
+    onFinish: () => setRunTour(false),
+  });
+
   // Show loading state only if we don't have any specific state to show
   if (!docuData && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
     return <LoadingState pages={pages} />;
@@ -164,7 +180,9 @@ export default function Documents() {
       <div className="flex flex-col gap-y-4">
 
         {canCreateDocumentPermission && (
-          <DocumentCreationDropZone />
+          <div className="document-creation-dropzone">
+            <DocumentCreationDropZone />
+          </div>
         )}
 
         <DataTable<DocumentType>
