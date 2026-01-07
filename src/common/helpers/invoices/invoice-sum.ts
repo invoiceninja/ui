@@ -37,9 +37,14 @@ export class InvoiceSum {
 
   constructor(
     public invoice: Invoice | RecurringInvoice | PurchaseOrder | Credit | Quote,
-    protected currency: Currency
+    protected currency: Currency,
+    protected eInvoiceType?: string
   ) {
-    this.invoiceItems = new InvoiceItemSum(this.invoice, this.currency);
+    this.invoiceItems = new InvoiceItemSum(this.invoice, this.currency, this.eInvoiceType);
+  }
+
+  public get isPeppol(): boolean {
+    return this.eInvoiceType === 'PEPPOL';
   }
 
   public build() {

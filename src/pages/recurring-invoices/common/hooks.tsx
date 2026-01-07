@@ -197,9 +197,11 @@ export function useRecurringInvoiceUtilities(
     );
 
     if (currency && recurringInvoice) {
+      const eInvoiceType = company?.settings.e_invoice_type;
+
       const invoiceSum = recurringInvoice.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(recurringInvoice, currency).build()
-        : new InvoiceSum(recurringInvoice, currency).build();
+        ? new InvoiceSumInclusive(recurringInvoice, currency, eInvoiceType).build()
+        : new InvoiceSum(recurringInvoice, currency, eInvoiceType).build();
 
       setInvoiceSum(invoiceSum);
     }
