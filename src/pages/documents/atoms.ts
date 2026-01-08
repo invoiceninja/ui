@@ -11,7 +11,3 @@
 import { atom } from 'jotai';
 
 export const isPaidDocuninjaUserAtom = atom<boolean>(false);
-
-export const runDocumentsTourAtom = atom<boolean>(true);
-
-export const runBuilderTourAtom = atom<boolean>(true);
