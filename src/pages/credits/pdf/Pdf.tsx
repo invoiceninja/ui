@@ -22,10 +22,13 @@ import { MdDownload, MdSend } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCreditQuery } from '../common/queries';
 import { Page } from '$app/components/Breadcrumbs';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Pdf() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const { documentTitle } = useTitle('view_pdf');
   const { id } = useParams();
@@ -46,7 +49,7 @@ export default function Pdf() {
     {
       name: t('pdf'),
       href: route('/credits/:id/pdf', { id }),
-    }
+    },
   ];
 
   return (
@@ -56,19 +59,21 @@ export default function Pdf() {
       navigationTopRight={
         credit && (
           <div className="flex space-x-3">
-            <Button
-              className="flex items-center space-x-1"
-              onClick={() =>
-                navigate(
-                  route('/credits/:id/email', {
-                    id: credit.id,
-                  })
-                )
-              }
-            >
-              <Icon element={MdSend} color="white" />
-              <span>{t('email_credit')}</span>
-            </Button>
+            {hasPermission('edit_credit') && (
+              <Button
+                className="flex items-center space-x-1"
+                onClick={() =>
+                  navigate(
+                    route('/credits/:id/email', {
+                      id: credit.id,
+                    })
+                  )
+                }
+              >
+                <Icon element={MdSend} color="white" />
+                <span>{t('email_credit')}</span>
+              </Button>
+            )}
 
             <Button
               className="flex items-center space-x-1"
