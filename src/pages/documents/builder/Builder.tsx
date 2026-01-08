@@ -68,7 +68,7 @@ import {
   ValidationErrors,
 } from './components';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
-import { runBuilderTourAtom } from '../atoms';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -134,44 +134,82 @@ function Builder() {
   const [entity, setEntity] = useState<Document | null>(null);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
-  const [runTour, setRunTour] = useAtom(runBuilderTourAtom);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
-  const steps = [
-    {
-      target: '.builder-signatorySelector',
-      content:
-        'This is signatory selector. Use it to manage your document signatories. Select a signatory to continue.',
-      disableBeacon: true,
-      data: { waitForInteraction: true, buttonText: 'Continue' },
-    },
-    {
-      target: '.lucide-signature',
-      content:
-        'This is the toolbox. Here you can find various fields and elements to add to your document for signatories to interact with. We have already picked signature. Click to continue.',
-    },
-    {
-      target: '[data-builder-canvas]',
-      content:
-        'This is your document canvas. You can draw and place fields for your signatories here.',
-      data: { waitForInteraction: true, buttonText: 'Continue' },
-    },
-    {
-      target: '.builder-save-button',
-      content: 'Once you are done, click here to save your document.',
-    },
-  ];
+  const { preferences, update, save } = usePreferences();
 
   useDriverTour({
-    steps,
-    run: runTour && entity !== null,
-    onFinish: () => setRunTour(false),
-    delay: 1500,
-    continueEvents: [
-      'builder:signatory-selected',
-      'builder:first-rectangle-drawn',
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-rightSide',
+        popover: {
+          description:
+            'This is signatory selector. Use it to manage your document signatories. Select a signatory to continue.',
+          nextBtnText: 'Continue and select a signatory',
+        },
+      },
     ],
+    eventName: 'builder:loaded',
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+    },
+  });
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-toolbox',
+        popover: {
+          description:
+            'On the right you can see the toolbox. There you can find various fields and elements to add to your document for signatories to interact with. We have already picked signature. Click to continue.',
+        },
+      },
+      {
+        element: '.builder-central',
+        popover: {
+          description:
+            'This is your document canvas. You can draw and place fields for your signatories here.',
+        },
+      },
+    ],
+    eventName: 'builder:signatory-selected',
+    options: {
+      showProgress: true,
+      allowClose: false,
+      disableActiveInteraction: true,
+    },
+    delay: 500,
+  });
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-save-button',
+        popover: {
+          description: 'Finally, click here to save your document.',
+        },
+      },
+    ],
+    eventName: 'builder:first-rectangle-drawn',
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.document_builder_tour_shown) {
+          update('preferences.document_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
+    },
   });
 
   const pages: Page[] = [
