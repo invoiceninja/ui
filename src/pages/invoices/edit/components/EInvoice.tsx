@@ -42,6 +42,8 @@ import { useQuery } from 'react-query';
 import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
 import { cloneDeep, get, set } from 'lodash';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -56,7 +58,7 @@ export interface Context {
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
-const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
+export const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
 const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
@@ -65,6 +67,8 @@ export default function EInvoice() {
 
   const location = useLocation();
   const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const verifactuEnabled = useCompanyVerifactu();
 
   const context: Context = useOutletContext();
 
@@ -75,6 +79,10 @@ export default function EInvoice() {
     setInvoice,
     errors,
   } = context;
+
+  const displayEInvoiceAndStatusCard =
+    (company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.tax_data?.acts_as_sender) || verifactuEnabled;
 
   const { data: activities } = useQuery({
     queryKey: ['/api/v1/activities/entity', invoice?.id],
@@ -116,7 +124,6 @@ export default function EInvoice() {
     }
   };
 
-  console.log(activities);
   const getActivityText = (activityTypeId: number) => {
     let text = trans(
       `activity_${activityTypeId}`,
@@ -153,7 +160,7 @@ export default function EInvoice() {
 
   return (
     <>
-      <Card
+      {displayEInvoiceAndStatusCard ?<Card
         title={t('e_invoice')}
         topRight={
           <Button
@@ -176,7 +183,7 @@ export default function EInvoice() {
               {VALIDATION_ENTITIES.map((entity, index) =>
                 (
                   eInvoiceValidationEntityResponse?.[
-                    entity as keyof ValidationEntityResponse
+                  entity as keyof ValidationEntityResponse
                   ] as Array<EntityError | string>
                 ).length ? (
                   <div
@@ -191,15 +198,15 @@ export default function EInvoice() {
                       <div className="flex flex-col space-y-2.5">
                         {(
                           eInvoiceValidationEntityResponse?.[
-                            entity as keyof ValidationEntityResponse
+                          entity as keyof ValidationEntityResponse
                           ] as Array<EntityError>
                         ).map((message, index) => (
                           <span key={index}>
                             {entity === 'invoice'
                               ? (message as unknown as string)
                               : message.label
-                              ? `${message.label} (${t('required')})`
-                              : message.field}
+                                ? `${message.label} (${t('required')})`
+                                : message.field}
                           </span>
                         ))}
                       </div>
@@ -249,9 +256,9 @@ export default function EInvoice() {
             </div>
           </div>
         )}
-      </Card>
+      </Card>: null}
 
-      {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Paid, InvoiceStatus.Partial].includes((invoice?.status_id?.toString() ?? InvoiceStatus.Draft) as InvoiceStatus)) && (
+      {Boolean([InvoiceStatus.Sent, InvoiceStatus.Draft, InvoiceStatus.Paid, InvoiceStatus.Partial].includes((invoice?.status_id?.toString() ?? InvoiceStatus.Draft) as InvoiceStatus)) && displayEInvoiceAndStatusCard && (
         <Card title={t('status')}>
           <div className="px-6 text-sm">
             <div
@@ -297,8 +304,6 @@ export default function EInvoice() {
           </div>
         </Card>
       )}
-
-     
 
       <Card title={t('date_range')}>
         <Element leftSide={t('start_date')}>
