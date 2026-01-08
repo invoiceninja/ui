@@ -27,7 +27,7 @@ import {
   SendDialogButtonProps,
   SendDialogProps,
 } from '@docuninja/builder2.0';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
