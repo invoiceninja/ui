@@ -29,7 +29,7 @@ import {
   docuNinjaAtom
 } from '$app/common/atoms/docuninja';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
-import { isPaidDocuninjaUserAtom, runDocumentsTourAtom } from '../atoms';
+import { isPaidDocuninjaUserAtom } from '../atoms';
 import { 
   LoadingState, 
   UpgradePlan, 
@@ -42,6 +42,7 @@ import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from 
 import { useActions } from '../common/hooks/useActions';
 import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 export default function Documents() {
   useTitle('documents');
@@ -59,7 +60,6 @@ export default function Documents() {
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [runTour, setRunTour] = useAtom(runDocumentsTourAtom);
 
   const [docuData] = useAtom(docuNinjaAtom);
   
@@ -110,6 +110,7 @@ export default function Documents() {
   });
 
   const columns = useTableColumns();
+  const { preferences } = usePreferences();
 
   const pages: Page[] = [
     {
@@ -118,19 +119,24 @@ export default function Documents() {
     },
   ];
 
-  const steps = [
-    {
-      target: '.document-creation-dropzone',
-      content: 'To start signing documents, you can upload them here. Simply drag and drop your files into this area.',
-      disableBeacon: true,
-    },
-  ];
-
   useDriverTour({
-    steps,
-    run: runTour && canCreateDocumentPermission,
-    onFinish: () => setRunTour(false),
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.document-creation-dropzone',
+        popover: {
+          description:
+            'To start signing documents, you can upload them here. Simply drag and drop your files into this area.',
+        },
+      },
+    ],
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+    },
   });
+
 
   // Show loading state only if we don't have any specific state to show
   if (!docuData && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
