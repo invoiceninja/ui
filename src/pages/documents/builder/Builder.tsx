@@ -145,8 +145,8 @@ function Builder() {
       {
         element: '.builder-rightSide',
         popover: {
-          description: t('tour_signatory_selector'),
-          nextBtnText: t('tour_continue_select_signatory'),
+          description: t('tour_signatory_selector') as string,
+          nextBtnText: t('tour_continue_select_signatory') as string,
         },
       },
     ],
