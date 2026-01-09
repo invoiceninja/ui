@@ -165,13 +165,13 @@ function Builder() {
       {
         element: '.builder-toolbox',
         popover: {
-          description: t('tour_toolbox_description'),
+          description: t('tour_toolbox_description') as string,
         },
       },
       {
         element: '.builder-central',
         popover: {
-          description: t('tour_document_canvas'),
+          description: t('tour_document_canvas') as string,
         },
       },
     ],
@@ -190,7 +190,7 @@ function Builder() {
       {
         element: '.builder-save-button',
         popover: {
-          description: t('tour_save_document'),
+          description: t('tour_save_document') as string,
         },
       },
     ],

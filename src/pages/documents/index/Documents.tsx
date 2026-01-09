@@ -125,7 +125,7 @@ export default function Documents() {
       {
         element: '.document-creation-dropzone',
         popover: {
-          description: t('tour_document_upload'),
+          description: t('tour_document_upload') as string,
         },
       },
     ],
