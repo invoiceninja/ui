@@ -67,6 +67,8 @@ import {
   UploadDialog,
   ValidationErrors,
 } from './components';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -134,6 +136,78 @@ function Builder() {
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
+
+  const { preferences, update, save } = usePreferences();
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-rightSide',
+        popover: {
+          description: t('tour_signatory_selector') as string,
+          nextBtnText: t('tour_continue_select_signatory') as string,
+        },
+      },
+    ],
+    eventName: 'builder:loaded',
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+    },
+  });
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-toolbox',
+        popover: {
+          description: t('tour_toolbox_description') as string,
+        },
+      },
+      {
+        element: '.builder-central',
+        popover: {
+          description: t('tour_document_canvas') as string,
+        },
+      },
+    ],
+    eventName: 'builder:signatory-selected',
+    options: {
+      showProgress: true,
+      allowClose: false,
+      disableActiveInteraction: true,
+    },
+    delay: 500,
+  });
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-save-button',
+        popover: {
+          description: t('tour_save_document') as string,
+        },
+      },
+    ],
+    eventName: 'builder:first-rectangle-drawn',
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.document_builder_tour_shown) {
+          update('preferences.document_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
+    },
+  });
 
   const pages: Page[] = [
     { name: t('docuninja'), href: '/docuninja' },
@@ -300,6 +374,7 @@ function Builder() {
             onClick={handleSave}
             disabled={isDocumentSaving}
             disableWithoutIcon
+            className="builder-save-button"
           >
             {t('save')}
           </Button>
@@ -445,9 +520,15 @@ function Builder() {
               select_needs_two_options: t('select_needs_two_options') as string,
               default_select_label: t('default_select_label') as string,
               radio_needs_two_options: t('radio_needs_two_options') as string,
-              default_radio_group_label: t('default_radio_group_label') as string,
-              multiselect_needs_two_options: t('multiselect_needs_two_options') as string,
-              default_multiselect_label: t('default_multiselect_label') as string,
+              default_radio_group_label: t(
+                'default_radio_group_label'
+              ) as string,
+              multiselect_needs_two_options: t(
+                'multiselect_needs_two_options'
+              ) as string,
+              default_multiselect_label: t(
+                'default_multiselect_label'
+              ) as string,
             },
           }}
         >
