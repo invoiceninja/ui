@@ -125,8 +125,7 @@ export default function Documents() {
       {
         element: '.document-creation-dropzone',
         popover: {
-          description:
-            'To start signing documents, you can upload them here. Simply drag and drop your files into this area.',
+          description: t('tour_document_upload'),
         },
       },
     ],

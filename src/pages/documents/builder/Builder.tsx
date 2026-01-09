@@ -145,9 +145,8 @@ function Builder() {
       {
         element: '.builder-rightSide',
         popover: {
-          description:
-            'This is signatory selector. Use it to manage your document signatories. Select a signatory to continue.',
-          nextBtnText: 'Continue and select a signatory',
+          description: t('tour_signatory_selector'),
+          nextBtnText: t('tour_continue_select_signatory'),
         },
       },
     ],
@@ -166,15 +165,13 @@ function Builder() {
       {
         element: '.builder-toolbox',
         popover: {
-          description:
-            'On the right you can see the toolbox. There you can find various fields and elements to add to your document for signatories to interact with. We have already picked signature. Click to continue.',
+          description: t('tour_toolbox_description'),
         },
       },
       {
         element: '.builder-central',
         popover: {
-          description:
-            'This is your document canvas. You can draw and place fields for your signatories here.',
+          description: t('tour_document_canvas'),
         },
       },
     ],
@@ -193,7 +190,7 @@ function Builder() {
       {
         element: '.builder-save-button',
         popover: {
-          description: 'Finally, click here to save your document.',
+          description: t('tour_save_document'),
         },
       },
     ],
