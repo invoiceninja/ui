@@ -23,7 +23,6 @@ import { VALIDATION_ENTITIES } from '$app/pages/invoices/edit/components/EInvoic
 import { EntityError, ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { route } from '$app/common/helpers/route';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export default function EInvoice() {
   const [t] = useTranslation();
@@ -31,11 +30,10 @@ export default function EInvoice() {
   const colors = useColorScheme();
 
   const company = useCurrentCompany();
-  const verifactuEnabled = useCompanyVerifactu();
 
   const displayEInvoiceAndStatusCard =
     (company?.settings.e_invoice_type === 'PEPPOL' &&
-    company?.tax_data?.acts_as_sender) || verifactuEnabled;
+    company?.tax_data?.acts_as_sender);
 
   const context: RecurringInvoiceContext = useOutletContext();
   const { recurringInvoice, errors, setRecurringInvoice, eInvoiceValidationEntityResponse, setTriggerValidationQuery } = context;

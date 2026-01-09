@@ -43,7 +43,6 @@ import { Banner } from '$app/components/Banner';
 import { refreshEntityDataBannerAtom } from '$app/App';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -53,7 +52,6 @@ export default function RecurringInvoice() {
   const actions = useActions();
 
   const company = useCurrentCompany();
-  const verifactuEnabled = useCompanyVerifactu();
 
   const { data } = useRecurringInvoiceQuery({ id: id! });
 
@@ -90,9 +88,8 @@ export default function RecurringInvoice() {
     entity: 'recurring_invoice',
     resource: recurringInvoice,
     enableQuery:
-      ((company?.settings.e_invoice_type === 'PEPPOL' &&
-        company?.tax_data?.acts_as_sender) ||
-        verifactuEnabled) &&
+      (company?.settings.e_invoice_type === 'PEPPOL' &&
+        company?.tax_data?.acts_as_sender) &&
       triggerValidationQuery &&
       id === recurringInvoice?.id,
     onFinished: () => {

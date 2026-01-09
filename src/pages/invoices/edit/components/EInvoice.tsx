@@ -43,7 +43,6 @@ import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
 import { cloneDeep, get, set } from 'lodash';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -68,7 +67,6 @@ export default function EInvoice() {
   const location = useLocation();
   const colors = useColorScheme();
   const company = useCurrentCompany();
-  const verifactuEnabled = useCompanyVerifactu();
 
   const context: Context = useOutletContext();
 
@@ -82,7 +80,7 @@ export default function EInvoice() {
 
   const displayEInvoiceAndStatusCard =
     (company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.tax_data?.acts_as_sender) || verifactuEnabled;
+      company?.tax_data?.acts_as_sender);
 
   const { data: activities } = useQuery({
     queryKey: ['/api/v1/activities/entity', invoice?.id],
