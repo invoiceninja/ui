@@ -79,6 +79,7 @@ import {
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'status',
@@ -125,7 +126,7 @@ export function useAllTaskColumns() {
     'assigned_user',
   ] as const;
 
-  return taskColumns;
+  return taskColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useTaskColumns() {
@@ -388,8 +389,12 @@ export function useTaskColumns() {
     reactSettings?.react_table_columns?.task || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useSave() {

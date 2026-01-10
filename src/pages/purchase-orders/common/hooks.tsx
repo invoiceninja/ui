@@ -79,6 +79,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Dispatch, SetStateAction } from 'react';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -199,7 +200,7 @@ export function useAllPurchaseOrderColumns() {
     'exchange_rate',
   ] as const;
 
-  return purchaseOrderColumns;
+  return purchaseOrderColumns.map((column) => normalizeColumnName(column));
 }
 
 export function usePurchaseOrderColumns() {
@@ -397,8 +398,12 @@ export function usePurchaseOrderColumns() {
     reactSettings?.react_table_columns?.purchaseOrder || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function usePurchaseOrderFilters() {

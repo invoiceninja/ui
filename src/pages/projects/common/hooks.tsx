@@ -53,6 +53,7 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'name',
@@ -96,7 +97,7 @@ export function useAllProjectColumns() {
     'total_hours',
   ] as const;
 
-  return projectColumns;
+  return projectColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useProjectColumns() {
@@ -299,8 +300,12 @@ export function useProjectColumns() {
     reactSettings?.react_table_columns?.project || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useActions() {
