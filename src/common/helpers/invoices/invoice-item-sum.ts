@@ -27,8 +27,13 @@ export class InvoiceItemSum {
 
   constructor(
     protected invoice: Invoice | RecurringInvoice | PurchaseOrder,
-    protected currency: Currency
+    protected currency: Currency,
+    protected eInvoiceType?: string
   ) {}
+
+  public get isPeppol(): boolean {
+    return this.eInvoiceType === 'PEPPOL';
+  }
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
@@ -158,8 +163,9 @@ export class InvoiceItemSum {
   protected calculateAmountLineTax(rate: number, amount: number) {
     const result = (amount * rate) / 100;
     
-
-    if(result > 0){
+    if(this.isPeppol){
+      return result;
+    }else if(result > 0){
       return Math.round((result * 1000) / 10) / 100; // for positive numbers, we need to round towards zero
     }else{
       return Math.floor((result * 1000) / 10) / 100; // for negative numbers, we need to round away from zero
