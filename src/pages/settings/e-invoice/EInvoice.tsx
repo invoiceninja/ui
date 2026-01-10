@@ -83,9 +83,9 @@ export function EInvoice() {
   const [t] = useTranslation();
 
   const shouldShowPEPPOLOption = (skipPlanCheck: boolean = false) => {
-    if (import.meta.env.DEV) {
-      return true;
-    }
+    // if (import.meta.env.DEV) {
+    //   return true;
+    // }
 
     const isPlanActive =
       (isHosted() && enterprisePlan()) || (isSelfHosted() && whiteLabelPlan());
