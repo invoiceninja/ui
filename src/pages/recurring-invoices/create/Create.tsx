@@ -36,6 +36,7 @@ import {
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Tab, Tabs } from '$app/components/Tabs';
+import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 
 export interface RecurringInvoiceContext {
   recurringInvoice: RecurringInvoice | undefined;
@@ -43,6 +44,8 @@ export interface RecurringInvoiceContext {
   errors: ValidationBag | undefined;
   client: Client | undefined;
   invoiceSum: InvoiceSum | InvoiceSumInclusive | undefined;
+  eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
+  setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function Create() {
