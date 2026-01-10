@@ -198,9 +198,11 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
 
     if (currency && credit) {
+      const eInvoiceType = company?.settings.e_invoice_type;
+
       const invoiceSum = credit.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(credit, currency).build()
-        : new InvoiceSum(credit, currency).build();
+        ? new InvoiceSumInclusive(credit, currency, eInvoiceType).build()
+        : new InvoiceSum(credit, currency, eInvoiceType).build();
 
       setInvoiceSum(invoiceSum);
     }

@@ -86,10 +86,10 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
-import { confirmActionModalAtom } from './components/ConfirmActionModal';
 import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { SendNowAction } from './components/SendNowAction';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -198,9 +198,15 @@ export function useRecurringInvoiceUtilities(
     );
 
     if (currency && recurringInvoice) {
+      const eInvoiceType = company?.settings.e_invoice_type;
+
       const invoiceSum = recurringInvoice.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(recurringInvoice, currency).build()
-        : new InvoiceSum(recurringInvoice, currency).build();
+        ? new InvoiceSumInclusive(
+            recurringInvoice,
+            currency,
+            eInvoiceType
+          ).build()
+        : new InvoiceSum(recurringInvoice, currency, eInvoiceType).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -221,10 +227,11 @@ interface RecurringInvoiceSaveProps {
   setErrors: (errors: ValidationBag | undefined) => unknown;
   setIsFormBusy: Dispatch<SetStateAction<boolean>>;
   isFormBusy: boolean;
+  onSuccess?: () => void;
 }
 
 export function useSave(props: RecurringInvoiceSaveProps) {
-  const { setErrors, setIsFormBusy, isFormBusy } = props;
+  const { setErrors, setIsFormBusy, isFormBusy, onSuccess } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -253,6 +260,8 @@ export function useSave(props: RecurringInvoiceSaveProps) {
         $refetch(['recurring_invoices']);
 
         toast.success('updated_recurring_invoice');
+
+        onSuccess?.();
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -318,7 +327,6 @@ export function useActions(params?: Params) {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const toggleStartStop = useToggleStartStop();
-  const setSendConfirmationVisible = useSetAtom(confirmActionModalAtom);
 
   const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
@@ -378,19 +386,20 @@ export function useActions(params?: Params) {
 
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'send_now',
-          })}
-          entity="recurring_invoice"
-          actionKey="send_now"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('start')}
-          onClick={() => setSendConfirmationVisible(true)}
-          icon={MdSend}
-        >
-          {t('send_now')}
-        </EntityActionElement>
+        <SendNowAction recurringInvoice={recurringInvoice}>
+          <EntityActionElement
+            {...(!dropdown && {
+              key: 'send_now',
+            })}
+            entity="recurring_invoice"
+            actionKey="send_now"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('start')}
+            icon={MdSend}
+          >
+            {t('send_now')}
+          </EntityActionElement>
+        </SendNowAction>
       ),
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (

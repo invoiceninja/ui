@@ -24,9 +24,9 @@ const Create = lazy(() => import('$app/pages/invoices/create/Create'));
 const Edit = lazy(() => import('$app/pages/invoices/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/invoices/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/invoices/email/Email'));
-  const EInvoice = lazy(
-    () => import('$app/pages/invoices/edit/components/EInvoice')
-  );
+const EInvoice = lazy(
+  () => import('$app/pages/invoices/edit/components/EInvoice')
+);
 const Verifactu = lazy(
   () => import('$app/pages/invoices/edit/components/Verifactu')
 );
@@ -137,7 +137,11 @@ export const invoiceRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Invoices),
-            or(permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+            or(
+              permission('view_invoice'),
+              permission('edit_invoice'),
+              assigned('/api/v1/invoices/:id')
+            ),
           ]}
           component={<Pdf />}
         />
