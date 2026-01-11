@@ -201,8 +201,8 @@ const PAYMENT_MEANS_FORM_ELEMENTS = {
   '55': ['card_type', 'card_number', 'card_holder'], // Debit card
   '56': ['account_holder'], // Bankgiro
   '57': ['iban', 'bic_swift'], // Standing agreement
-  '58': ['iban', 'bic_swift'], // SEPA credit transfer
-  '59': ['payer_bank_account', 'iban', 'bic_swift'], // SEPA direct debit
+  '58': ['account_holder', 'iban', 'bic_swift'], // SEPA credit transfer
+  '59': ['account_holder', 'iban', 'bic_swift'], // SEPA direct debit
   '60': [], // Promissory note
   '61': [], // Promissory note signed by debtor
   '62': ['bic_swift'], // Promissory note signed by debtor and endorsed by bank
