@@ -51,7 +51,7 @@ export function useTabs(params: Params) {
     {
       name: t('e_invoice'),
       href: route('/invoices/:id/e_invoice', { id }),
-      enabled: company?.settings.enable_e_invoice === true,
+      enabled: company?.settings.enable_e_invoice === true || company?.settings.e_invoice_type === 'PEPPOL',
       formatName: () => (
         <div className="flex space-x-1">
           <span>{t('e_invoice')}</span>
