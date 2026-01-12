@@ -40,6 +40,7 @@ import classNames from 'classnames';
 import { MediaPlay } from '$app/components/icons/MediaPlay';
 import { MediaPause } from '$app/components/icons/MediaPause';
 import { useMediaQuery } from 'react-responsive';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 
 dayjs.extend(duration);
 
@@ -357,7 +358,17 @@ export function TaskDetails(props: Props) {
             label={t('description')}
             element="textarea"
             value={task.description}
-            onValueChange={(value) => handleChange('description', value)}
+            onValueChange={(value) =>
+              handleChange(
+                'description',
+                sanitizeHTML(value, {
+                  ALLOWED_TAGS: [],
+                  ALLOWED_ATTR: [],
+                  KEEP_CONTENT: true,
+                  USE_PROFILES: { html: false },
+                })
+              )
+            }
             errorMessage={errors?.errors.description}
             width="100%"
           />
