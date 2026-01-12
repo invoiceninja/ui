@@ -41,6 +41,8 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
 import { useActions } from '../common/hooks/useActions';
 import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 export default function Documents() {
   useTitle('documents');
@@ -108,6 +110,7 @@ export default function Documents() {
   });
 
   const columns = useTableColumns();
+  const { preferences } = usePreferences();
 
   const pages: Page[] = [
     {
@@ -115,6 +118,24 @@ export default function Documents() {
       href: '/docuninja',
     },
   ];
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.document-creation-dropzone',
+        popover: {
+          description: t('tour_document_upload') as string,
+        },
+      },
+    ],
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+    },
+  });
+
 
   // Show loading state only if we don't have any specific state to show
   if (!docuData && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
@@ -164,7 +185,9 @@ export default function Documents() {
       <div className="flex flex-col gap-y-4">
 
         {canCreateDocumentPermission && (
-          <DocumentCreationDropZone />
+          <div className="document-creation-dropzone">
+            <DocumentCreationDropZone />
+          </div>
         )}
 
         <DataTable<DocumentType>
