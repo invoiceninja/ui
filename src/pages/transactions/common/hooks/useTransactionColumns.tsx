@@ -14,11 +14,9 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Transaction } from '$app/common/interfaces/transactions';
-import { useExpensesQuery } from '$app/common/queries/expenses';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { Tooltip } from '$app/components/Tooltip';
 import { Link } from '$app/components/forms';
-import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useCleanDescriptionText } from './useCleanDescription';
@@ -49,18 +47,6 @@ export function useTransactionColumns() {
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
   const cleanDescriptionText = useCleanDescriptionText();
-
-  const { data: invoices } = useInvoicesQuery({ perPage: 1000 });
-
-  const { data: expenses } = useExpensesQuery({ perPage: 1000 });
-
-  const getInvoiceNumber = (invoiceId: string) => {
-    return invoices?.find((invoice) => invoice.id === invoiceId)?.number || '';
-  };
-
-  const getExpenseNumber = (expenseId: string) => {
-    return expenses?.find((expense) => expense.id === expenseId)?.number || '';
-  };
 
   const columns: DataTableColumnsExtended<Transaction, TransactionColumns> = [
     {
@@ -171,37 +157,37 @@ export function useTransactionColumns() {
       column: 'invoices',
       id: 'invoice_ids',
       label: t('invoices'),
-      format: (value) =>
-        value && (
+      format: (value) => {
+        if (!value) return null;
+
+        const ids = value.toString().split(',');
+
+        return (
           <div className="flex space-x-2">
-            {value
-              .toString()
-              .split(',')
-              .map((id) => (
-                <Link key={id} to={route('/invoices/:id/edit', { id })}>
-                  {getInvoiceNumber(id)}
-                </Link>
-              ))}
+            {ids.map((id, index) => (
+              <Link key={id} to={route('/invoices/:id/edit', { id })}>
+                {t('invoice')} #${index + 1}
+              </Link>
+            ))}
           </div>
-        ),
+        );
+      },
     },
     {
       column: 'expense',
       id: 'expense_id',
       label: t('expense'),
-      format: (value) =>
-        value && (
+      format: (value) => {
+        if (!value) return null;
+
+        return (
           <div className="flex space-x-2">
-            {value
-              .toString()
-              .split(',')
-              .map((id) => (
-                <Link key={id} to={route('/expenses/:id/edit', { id })}>
-                  {getExpenseNumber(id)}
-                </Link>
-              ))}
+            <Link to={route('/expenses/:id/edit', { id: value })}>
+              {t('link')}
+            </Link>
           </div>
-        ),
+        );
+      },
     },
   ];
 
