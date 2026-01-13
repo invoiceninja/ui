@@ -157,8 +157,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const isPeppolEnabled = () => {
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
-      currentCompany.settings.enable_e_invoice
+      currentCompany.settings.e_invoice_type === 'PEPPOL' 
     );
   };
 
