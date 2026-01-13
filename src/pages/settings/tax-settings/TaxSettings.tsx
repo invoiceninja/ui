@@ -37,6 +37,7 @@ import { CalculateTaxesNotificationModal } from './components/calculate-taxes/co
 import { useColorScheme } from '$app/common/colors';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { DefaultLineItemTaxes } from './components/DefaultLineItemTaxes';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -51,6 +52,7 @@ export function TaxSettings() {
 
   const colors = useColorScheme();
   const isPaidOrSelfHost = usePaidOrSelfHost();
+  const verifactuEnabled = useCompanyVerifactu();
 
   const calculateTaxesRegion = useCalculateTaxesRegion();
 
@@ -178,7 +180,8 @@ export function TaxSettings() {
             )}
 
             {isPaidOrSelfHost &&
-              calculateTaxesRegion(companyChanges?.settings?.country_id) && (
+              calculateTaxesRegion(companyChanges?.settings?.country_id) &&
+              !verifactuEnabled && (
                 <>
                   <div className="px-4 sm:px-6 pt-4 pb-2">
                     <Divider
