@@ -42,6 +42,7 @@ import { Assigned } from '$app/components/Assigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -123,7 +124,7 @@ export function useAllInvoiceColumns() {
     'project',
   ] as const;
 
-  return invoiceColumns;
+  return invoiceColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
@@ -207,19 +208,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
             </button>
           )}
 
-          {peppolSendingSuccess(invoice) && (
-            <Tooltip
-              message={
-                t('peppol_sending_success') as string
-              }
-              width="auto"
-              placement="top"
-            >
-              <MdSend color="#22c55e" size={18} style={{ transform: 'rotate(-45deg)' }} />
-            </Tooltip>   
-          )}
-
-          {['R1','R2'].includes(invoice.backup?.document_type ?? '') && (
+          {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (
             <Assigned
               entityId={invoice.backup?.parent_invoice_id}
               cacheEndpoint="/api/v1/invoices"
@@ -234,41 +223,38 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                   color={accentColor}
                   onClick={() =>
                     navigate(
-                      route('/invoices/:id/edit', { id: invoice.backup?.parent_invoice_id })
+                      route('/invoices/:id/edit', {
+                        id: invoice.backup?.parent_invoice_id,
+                      })
                     )
                   }
                 />
               }
             />
-            
-
           )}
 
-          {invoice.backup?.document_type === 'F1' && (invoice.backup?.child_invoice_ids?.length ?? 0) > 0 && (
-
+          {invoice.backup?.document_type === 'F1' &&
+            (invoice.backup?.child_invoice_ids?.length ?? 0) > 0 &&
             invoice.backup?.child_invoice_ids?.map((id) => (
               <Assigned
-              entityId={id}
-              cacheEndpoint="/api/v1/invoices"
-              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
-              preCheck={
-                hasPermission('view_invoice') || hasPermission('edit_invoice')
-              }
-              component={
-                <MdTextSnippet
-                  className="cursor-pointer"
-                  fontSize={19}
-                  color={accentColor}
-                  onClick={() =>
-                    navigate(
-                      route('/invoices/:id/edit', { id })
-                    )
-                  }
-                />
-              }
-            />
-            ))
-          )}
+                entityId={id}
+                cacheEndpoint="/api/v1/invoices"
+                apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+                preCheck={
+                  hasPermission('view_invoice') || hasPermission('edit_invoice')
+                }
+                component={
+                  <MdTextSnippet
+                    className="cursor-pointer"
+                    fontSize={19}
+                    color={accentColor}
+                    onClick={() =>
+                      navigate(route('/invoices/:id/edit', { id }))
+                    }
+                  />
+                }
+              />
+            ))}
         </div>
       ),
     },
@@ -324,12 +310,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'project',
       id: 'project_id',
       label: t('project'),
-      format: (value, invoice) =>(
+      format: (value, invoice) => (
         <DynamicLink
           to={route('/projects/:id', { id: invoice.project_id })}
           renderSpan={disableNavigation('invoice', invoice.project)}
         >
-          {invoice?.project?.name ?? ''} 
+          {invoice?.project?.name ?? ''}
         </DynamicLink>
       ),
     },
@@ -635,6 +621,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     reactSettings?.react_table_columns?.invoice || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }

@@ -304,7 +304,6 @@ export function Actions(props: Props) {
       return props.onCustomFilterChange(values);
     } else if (props.onCustomFilterChange && customFilterDropdowns.length > 1) {
       const values: string[] = [];
-
       (options as SelectOption[]).map((option: SelectOption) =>
         values.push(option.value)
       );
@@ -312,19 +311,18 @@ export function Actions(props: Props) {
       if (!customFilter?.length) {
         return props.onCustomFilterChange(values);
       } else {
-        const otherDropdownsOptions =
-          props.customFilters?.filter(
-            (option) =>
-              option.dropdownKey !== currentDropdownKey &&
-              customFilter.some(
-                (currentFilter) => currentFilter === option.value
-              )
-          ) || [];
+        return props.onCustomFilterChange((prev) => {
+          const filteredPrevValues = (prev || []).filter((value) => {
+            const option = props.customFilters?.find(
+              (opt) => opt.value === value
+            );
+            return option?.dropdownKey !== currentDropdownKey;
+          });
 
-        return props.onCustomFilterChange([
-          ...otherDropdownsOptions.map((option) => option.value),
-          ...values,
-        ]);
+          const finalValues = [...filteredPrevValues, ...values];
+
+          return finalValues;
+        });
       }
     }
   };

@@ -41,6 +41,8 @@ import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { Banner } from '$app/components/Banner';
 import { refreshEntityDataBannerAtom } from '$app/App';
+import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -48,6 +50,8 @@ export default function RecurringInvoice() {
 
   const { id } = useParams();
   const actions = useActions();
+
+  const company = useCurrentCompany();
 
   const { data } = useRecurringInvoiceQuery({ id: id! });
 
@@ -72,11 +76,26 @@ export default function RecurringInvoice() {
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [triggerValidationQuery, setTriggerValidationQuery] =
+    useState<boolean>(true);
 
   const save = useSave({ setErrors, setIsFormBusy, isFormBusy });
   const tabs = useTabs({ recurringInvoice });
 
   const { calculateInvoiceSum } = useRecurringInvoiceUtilities({ client });
+
+  const { validationResponse } = useCheckEInvoiceValidation({
+    entity: 'recurring_invoice',
+    resource: recurringInvoice,
+    enableQuery:
+      (company?.settings.e_invoice_type === 'PEPPOL' &&
+        company?.tax_data?.acts_as_sender) &&
+      triggerValidationQuery &&
+      id === recurringInvoice?.id,
+    onFinished: () => {
+      setTriggerValidationQuery(false);
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -145,6 +164,8 @@ export default function RecurringInvoice() {
               setRecurringInvoice,
               errors,
               client,
+              eInvoiceValidationEntityResponse: validationResponse,
+              setTriggerValidationQuery,
             }}
           />
         </div>

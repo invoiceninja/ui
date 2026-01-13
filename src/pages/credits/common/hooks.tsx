@@ -98,6 +98,7 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -769,7 +770,7 @@ export function useAllCreditColumns() {
     // 'vendor', @Todo: Need to fetch the relationship
   ] as const;
 
-  return creditColumns;
+  return creditColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useCreditColumns() {
@@ -1093,6 +1094,10 @@ export function useCreditColumns() {
     reactSettings?.react_table_columns?.credit || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
