@@ -37,7 +37,7 @@ import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import classNames from 'classnames';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
-import { MdTextSnippet } from 'react-icons/md';
+import { MdSend, MdTextSnippet, MdWarning } from 'react-icons/md';
 import { Assigned } from '$app/components/Assigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useNavigate } from 'react-router-dom';
@@ -158,18 +158,23 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const isPeppolEnabled = () => {
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
-      currentCompany.settings.enable_e_invoice
+      currentCompany.settings.e_invoice_type === 'PEPPOL' 
     );
   };
 
-  const isEInvoiceSuccessfullySent = (currentInvoice: Invoice) => {
+  const peppolSendingFailed = (currentInvoice: Invoice) => {
     return (
       isPeppolEnabled() &&
       currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
       !currentInvoice.backup?.guid &&
       !currentInvoice.is_deleted &&
       !currentInvoice.archived_at
+    );
+  };
+
+  const peppolSendingSuccess = (currentInvoice: Invoice) => {
+    return (
+      isPeppolEnabled() && currentInvoice.backup?.guid
     );
   };
 
@@ -180,7 +185,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('status'),
       format: (_value, invoice) => (
         <div className="flex items-center gap-x-2">
-          {isEInvoiceSuccessfullySent(invoice) ? (
+
+          <InvoiceStatus entity={invoice} />
+
+          {peppolSendingFailed(invoice) && (
             <button
               type="button"
               onClick={(event) => {
@@ -188,13 +196,16 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                 navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
               }}
             >
-              <InvoiceStatus
-                entity={invoice}
-                style={{ textDecoration: 'underline' }}
-              />
+              <Tooltip
+                message={
+                  t('peppol_sending_failed') as string
+                }
+                width="auto"
+                placement="top"
+              >
+                <MdWarning color="red" size={20} />
+              </Tooltip>        
             </button>
-          ) : (
-            <InvoiceStatus entity={invoice} />
           )}
 
           {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (
