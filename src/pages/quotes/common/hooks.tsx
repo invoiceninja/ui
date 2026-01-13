@@ -104,6 +104,7 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { AiOutlineFileText } from 'react-icons/ai';
 import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -816,7 +817,7 @@ export function useAllQuoteColumns() {
     // 'vendor', @Todo: Need to resolve relationship
   ] as const;
 
-  return quoteColumns;
+  return quoteColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useQuoteColumns() {
@@ -1183,8 +1184,12 @@ export function useQuoteColumns() {
     reactSettings?.react_table_columns?.quote || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useQuoteFilters() {

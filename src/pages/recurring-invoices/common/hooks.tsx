@@ -88,6 +88,7 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { SendNowAction } from './components/SendNowAction';
 
 interface RecurringInvoiceUtilitiesProps {
@@ -672,7 +673,7 @@ export function useAllRecurringInvoiceColumns() {
     'updated_at',
   ] as const;
 
-  return recurringInvoiceColumns;
+  return recurringInvoiceColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useRecurringInvoiceColumns() {
@@ -960,8 +961,12 @@ export function useRecurringInvoiceColumns() {
     reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useRecurringInvoiceFilters() {
