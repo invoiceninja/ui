@@ -208,6 +208,18 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
             </button>
           )}
 
+          {peppolSendingSuccess(invoice) && (
+            <Tooltip
+              message={
+                t('peppol_sending_success') as string
+              }
+              width="auto"
+              placement="top"
+            >
+              <MdSend color="#22c55e" size={18} style={{ transform: 'rotate(-45deg)' }} />
+            </Tooltip>   
+          )}
+
           {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (
             <Assigned
               entityId={invoice.backup?.parent_invoice_id}
