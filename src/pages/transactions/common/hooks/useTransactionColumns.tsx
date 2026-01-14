@@ -166,7 +166,7 @@ export function useTransactionColumns() {
           <div className="flex space-x-2">
             {ids.map((id, index) => (
               <Link key={id} to={route('/invoices/:id/edit', { id })}>
-                {t('invoice')} #${index + 1}
+                {t('invoice')} #{index + 1}
               </Link>
             ))}
           </div>
