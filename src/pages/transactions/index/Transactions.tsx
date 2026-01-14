@@ -20,7 +20,11 @@ import { Slider } from '$app/components/cards/Slider';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useTransactionFilters } from '../common/hooks/useTransactionFilters';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date as formatDate } from '$app/common/helpers';
+import {
+  date as formatDate,
+  isHosted,
+  isSelfHosted,
+} from '$app/common/helpers';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
@@ -32,16 +36,26 @@ import {
   defaultColumns,
   useAllTransactionColumns,
 } from '../common/hooks/useAllTransactionColumns';
+import { Button } from '$app/components/forms';
+import { useNavigate } from 'react-router-dom';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { Icon } from '$app/components/icons/Icon';
+import { MdRuleFolder } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Transactions() {
   useTitle('transactions');
 
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
   const hasPermission = useHasPermission();
 
   const pages = [{ name: t('transactions'), href: '/transactions' }];
 
   const actions = useActions();
+  const colors = useColorScheme();
   const filters = useTransactionFilters();
   const columns = useTransactionColumns();
   const customBulkActions = useCustomBulkActions();
@@ -98,6 +112,27 @@ export default function Transactions() {
           customFilterPlaceholder="status"
           rightSide={
             <div className="flex items-center space-x-2">
+              {((isHosted() && (proPlan() || enterprisePlan())) ||
+                isSelfHosted()) && (
+                <Button
+                  type="secondary"
+                  onClick={() =>
+                    navigate('/settings/bank_accounts/transaction_rules')
+                  }
+                >
+                  <span className="mr-2">
+                    {
+                      <Icon
+                        element={MdRuleFolder}
+                        size={20}
+                        color={colors.$3}
+                      />
+                    }
+                  </span>
+                  {t('rules')}
+                </Button>
+              )}
+
               <DataTableColumnsPicker
                 table="transaction"
                 columns={transactionColumns as unknown as string[]}
