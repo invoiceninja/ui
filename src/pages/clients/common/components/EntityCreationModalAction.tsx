@@ -41,19 +41,35 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const handleCreateInvoice = () => {
-    navigate(route('/invoices/create?client=:id', { id: client.id }));
+    setIsModalVisible(false);
+
+    setTimeout(() => {
+      navigate(route('/invoices/create?client=:id', { id: client.id }));
+    }, 150);
   };
 
   const handleCreatePayment = () => {
-    navigate(route('/payments/create?client=:id', { id: client.id }));
+    setIsModalVisible(false);
+
+    setTimeout(() => {
+      navigate(route('/payments/create?client=:id', { id: client.id }));
+    }, 150);
   };
 
   const handleCreateQuote = () => {
-    navigate(route('/quotes/create?client=:id', { id: client.id }));
+    setIsModalVisible(false);
+
+    setTimeout(() => {
+      navigate(route('/quotes/create?client=:id', { id: client.id }));
+    }, 150);
   };
 
   const handleCreateCredit = () => {
-    navigate(route('/credits/create?client=:id', { id: client.id }));
+    setIsModalVisible(false);
+
+    setTimeout(() => {
+      navigate(route('/credits/create?client=:id', { id: client.id }));
+    }, 150);
   };
 
   return (

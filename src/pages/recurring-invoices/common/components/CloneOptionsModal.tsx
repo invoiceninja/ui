@@ -17,6 +17,7 @@ import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { CloneOption } from '$app/components/CloneOption';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { Invoice as InvoiceIcon } from '$app/components/icons/Invoice';
 import { Modal } from '$app/components/Modal';
 import { creditAtom } from '$app/pages/credits/common/atoms';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
@@ -25,32 +26,47 @@ import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
-import { File, FileText } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { BiFile } from 'react-icons/bi';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import { recurringInvoiceAtom } from '../atoms';
+import { Refresh } from '$app/components/icons/Refresh';
+import { useColorScheme } from '$app/common/colors';
+import { Files } from '$app/components/icons/Files';
+import { Wallet } from '$app/components/icons/Wallet';
+import { FileClock } from '$app/components/icons/FileClock';
 
 interface Props {
   recurringInvoice: RecurringInvoice;
   dropdown: boolean;
 }
 
-export function CloneOptionsModal(props: Props) {
+export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
-
-  const { recurringInvoice, dropdown } = props;
-
   const hasPermission = useHasPermission();
+
+  const colors = useColorScheme();
+  const company = useCompanyChanges();
 
   const setQuote = useSetAtom(quoteAtom);
   const setCredit = useSetAtom(creditAtom);
   const setInvoice = useSetAtom(invoiceAtom);
   const setPurchaseOrder = useSetAtom(purchaseOrderAtom);
-  const company = useCompanyChanges();
+  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+  const cloneToRecurringInvoice = () => {
+    setRecurringInvoice({
+      ...recurringInvoice,
+      id: '',
+      documents: [],
+      number: '',
+    });
+
+    navigate('/recurring_invoices/create?action=clone');
+  };
 
   const cloneToInvoice = () => {
     setInvoice({
@@ -142,19 +158,20 @@ export function CloneOptionsModal(props: Props) {
 
   return (
     <>
-      {(hasPermission('create_invoice') ||
+      {(hasPermission('create_recurring_invoice') ||
+        hasPermission('create_invoice') ||
         hasPermission('create_quote') ||
         hasPermission('create_credit') ||
         hasPermission('create_purchase_order')) && (
         <EntityActionElement
           entity="recurring_invoice"
-          actionKey="clone_to_other"
+          actionKey="clone_to"
           isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_other')}
+          tooltipText={t('clone_to')}
           onClick={() => setIsModalVisible(true)}
           icon={MdControlPointDuplicate}
         >
-          {t('clone_to_other')}
+          {t('clone_to')}
         </EntityActionElement>
       )}
 
@@ -166,10 +183,18 @@ export function CloneOptionsModal(props: Props) {
       >
         <div className="flex justify-center">
           <div className="flex flex-1 flex-col items-center space-y-3">
+            {hasPermission('create_recurring_invoice') && (
+              <CloneOption
+                label={t('recurring_invoice')}
+                iconElement={<Refresh size="1.1rem" color={colors.$3} />}
+                onClick={cloneToRecurringInvoice}
+              />
+            )}
+
             {hasPermission('create_invoice') && (
               <CloneOption
                 label={t('invoice')}
-                icon={FileText}
+                iconElement={<InvoiceIcon size="1.1rem" color={colors.$3} />}
                 onClick={cloneToInvoice}
               />
             )}
@@ -177,7 +202,7 @@ export function CloneOptionsModal(props: Props) {
             {hasPermission('create_quote') && (
               <CloneOption
                 label={t('quote')}
-                icon={File}
+                iconElement={<Files size="1.1rem" color={colors.$3} />}
                 onClick={cloneToQuote}
               />
             )}
@@ -185,7 +210,7 @@ export function CloneOptionsModal(props: Props) {
             {hasPermission('create_credit') && (
               <CloneOption
                 label={t('credit')}
-                icon={FileText}
+                iconElement={<Wallet size="1.1rem" color={colors.$3} />}
                 onClick={cloneToCredit}
               />
             )}
@@ -193,7 +218,7 @@ export function CloneOptionsModal(props: Props) {
             {hasPermission('create_purchase_order') && (
               <CloneOption
                 label={t('purchase_order')}
-                icon={BiFile}
+                iconElement={<FileClock size="1.1rem" color={colors.$3} />}
                 onClick={cloneToPurchaseOrder}
               />
             )}

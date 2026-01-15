@@ -39,14 +39,13 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { EntityCreationModalAction } from '../components/EntityCreationModalAction';
 
 interface Params {
-  dropdown?: boolean;
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function useActions(params?: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
 
-  const { dropdown = true, setIsPurgeOrMergeActionCalled } = params || {};
+  const { setIsPurgeOrMergeActionCalled } = params || {};
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -113,9 +112,7 @@ export function useActions(params?: Params) {
           {t('settings')}
         </DropdownElement>
       ),
-    (client) => (
-      <EntityCreationModalAction client={client} dropdown={dropdown} />
-    ),
+    (client) => <EntityCreationModalAction client={client} />,
     (client) =>
       !client.is_deleted &&
       (isAdmin || isOwner) &&
