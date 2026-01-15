@@ -48,6 +48,7 @@ export interface Preferences {
   enable_public_notifications: boolean | null;
   use_system_fonts: boolean;
   document_builder_tour_shown?: boolean;
+  document_upload_tour_shown?: boolean;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
