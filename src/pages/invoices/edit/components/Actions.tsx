@@ -25,7 +25,6 @@ import {
   MdCancel,
   MdCloudCircle,
   MdComment,
-  MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
   MdDesignServices,
@@ -134,28 +133,6 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const setInvoice = useSetAtom(invoiceAtom);
-
-  const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({
-      ...invoice,
-      id: '',
-      number: '',
-      documents: [],
-      due_date: '',
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-      backup: undefined,
-    });
-
-    navigate('/invoices/create?action=clone');
-  };
 
   const cloneToNegativeInvoice = (invoice: Invoice) => {
     // Create a deep copy of the invoice with negative quantities for all line items
@@ -471,26 +448,10 @@ export function useActions(params?: Params) {
       </EntityActionElement>
     ),
     () => dropdown && <Divider withoutPadding />,
-    (invoice: Invoice) =>
-      hasPermission('create_invoice') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'clone_to_invoice',
-          })}
-          entity="invoice"
-          actionKey="clone_to_invoice"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_invoice')}
-          onClick={() => cloneToInvoice(invoice)}
-          icon={MdControlPointDuplicate}
-        >
-          {t('clone_to_invoice')}
-        </EntityActionElement>
-      ),
     (invoice: Invoice) => (
       <CloneOptionsModal
         {...(!dropdown && {
-          key: 'clone_to_other',
+          key: 'clone_to',
         })}
         dropdown={dropdown}
         invoice={invoice}

@@ -24,7 +24,7 @@ import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Action } from '$app/components/ResourceActions';
-import { useAtom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +32,6 @@ import {
   MdArchive,
   MdCloudCircle,
   MdComment,
-  MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
   MdDownload,
@@ -47,7 +46,6 @@ import {
   MdSwitchRight,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { purchaseOrderAtom } from './atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { Divider } from '$app/components/cards/Divider';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -57,15 +55,11 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
@@ -456,12 +450,9 @@ export function useActions(params: ActionsParams = {}) {
     entity: 'purchase_order',
   });
 
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
-
   const bulk = useBulk();
   const navigate = useNavigate();
   const markSent = useMarkSent();
-  const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
   const printPdf = usePrintPdf({ entity: 'purchase_order' });
   const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
@@ -477,27 +468,6 @@ export function useActions(params: ActionsParams = {}) {
     setChangeTemplateVisible,
     setChangeTemplateEntityContext,
   } = useChangeTemplate();
-
-  const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
-    setPurchaseOrder({
-      ...purchaseOrder,
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      client_id: '',
-      paid_to_date: 0,
-      vendor: undefined,
-    });
-
-    navigate('/purchase_orders/create?action=clone');
-  };
 
   const actions: Action<PurchaseOrder>[] = [
     (purchaseOrder) => (
@@ -708,26 +678,10 @@ export function useActions(params: ActionsParams = {}) {
       </EntityActionElement>
     ),
     () => <Divider withoutPadding />,
-    (purchaseOrder) =>
-      hasPermission('create_purchase_order') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'clone_to_purchase_order',
-          })}
-          entity="purchase_order"
-          actionKey="clone_to_purchase_order"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_purchase_order')}
-          onClick={() => cloneToPurchaseOrder(purchaseOrder)}
-          icon={MdControlPointDuplicate}
-        >
-          {t('clone_to_purchase_order')}
-        </EntityActionElement>
-      ),
     (purchaseOrder) => (
       <CloneOptionsModal
         {...(!dropdown && {
-          key: 'clone_to_other',
+          key: 'clone_to',
         })}
         purchaseOrder={purchaseOrder}
         dropdown={dropdown}

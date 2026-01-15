@@ -47,7 +47,6 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdComment,
-  MdControlPointDuplicate,
   MdDelete,
   MdEdit,
   MdInfo,
@@ -70,7 +69,6 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { UpdatePricesAction } from './components/UpdatePricesAction';
 import { IncreasePricesAction } from './components/IncreasePricesAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
@@ -324,11 +322,7 @@ export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const bulk = useBulkAction();
-  const navigate = useNavigate();
-  const hasPermission = useHasPermission();
   const toggleStartStop = useToggleStartStop();
-
-  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
   const {
     showEditAction,
@@ -340,17 +334,6 @@ export function useActions(params?: Params) {
     entity: 'recurring_invoice',
     editPageTabs: ['documents', 'settings', 'activity', 'history', 'schedule'],
   });
-
-  const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
-    setRecurringInvoice({
-      ...recurringInvoice,
-      id: '',
-      documents: [],
-      number: '',
-    });
-
-    navigate('/recurring_invoices/create?action=clone');
-  };
 
   const actions: Action<RecurringInvoice>[] = [
     (recurringInvoice) =>
@@ -475,26 +458,10 @@ export function useActions(params?: Params) {
       />
     ),
     () => <Divider withoutPadding />,
-    (recurringInvoice) =>
-      hasPermission('create_recurring_invoice') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'clone_to_recurring',
-          })}
-          entity="recurring_invoice"
-          actionKey="clone_to_recurring"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_recurring')}
-          onClick={() => cloneToRecurringInvoice(recurringInvoice)}
-          icon={MdControlPointDuplicate}
-        >
-          {t('clone_to_recurring')}
-        </EntityActionElement>
-      ),
     (recurringInvoice) => (
       <CloneOptionsModal
         {...(!dropdown && {
-          key: 'clone_to_other',
+          key: 'clone_to',
         })}
         recurringInvoice={recurringInvoice}
         dropdown={dropdown}
