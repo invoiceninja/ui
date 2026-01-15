@@ -110,7 +110,7 @@ export default function Documents() {
   });
 
   const columns = useTableColumns();
-  const { preferences } = usePreferences();
+  const { preferences, update, save } = usePreferences();
 
   const pages: Page[] = [
     {
@@ -120,7 +120,7 @@ export default function Documents() {
   ];
 
   useDriverTour({
-    show: !preferences.document_builder_tour_shown,
+    show: !preferences.document_upload_tour_shown,
     steps: [
       {
         element: '.document-creation-dropzone',
@@ -133,6 +133,12 @@ export default function Documents() {
       showProgress: false,
       allowClose: false,
       showButtons: ['next'],
+      onDestroyed: () => {
+        if (!preferences.document_upload_tour_shown) {
+          update('preferences.document_upload_tour_shown', true);
+          save({ silent: true });
+        }
+      },
     },
   });
 
