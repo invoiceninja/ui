@@ -44,6 +44,8 @@ import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { InputLabel } from '$app/components/forms';
+import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -64,6 +66,8 @@ export default function Credit() {
 
   const { data } = useCreditQuery({ id: id! });
 
+  const company = useCurrentCompany();
+
   const invoiceSum = useAtomValue(invoiceSumAtom);
   const [credit, setCredit] = useAtomWithPrevent(creditAtom);
 
@@ -72,9 +76,26 @@ export default function Credit() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+  const [triggerValidationQuery, setTriggerValidationQuery] =
+    useState<boolean>(true);
+
+  const { validationResponse } = useCheckEInvoiceValidation({
+    resource: credit,
+    enableQuery:
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.tax_data?.acts_as_sender &&
+      triggerValidationQuery &&
+      id === credit?.id,
+    onFinished: () => {
+      setTriggerValidationQuery(false);
+    },
+  });
 
   const actions = useActions();
-  const tabs = useTabs({ credit });
+  const tabs = useTabs({
+    credit,
+    eInvoiceValidationResponse: validationResponse,
+  });
 
   const { calculateInvoiceSum } = useCreditUtilities({ client });
 
