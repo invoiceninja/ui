@@ -14,7 +14,6 @@ export function useDateRangeColumns() {
   const columns: DateRangeColumn[] = [
     { column: 'date', queryParameterKey: 'date_range' },
     { column: 'due_date', queryParameterKey: 'due_date_range' },
-    { column: 'created_at', queryParameterKey: 'created_between' },
   ];
 
   return columns;
