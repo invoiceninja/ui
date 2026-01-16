@@ -86,7 +86,7 @@ export default function EInvoice() {
     queryKey: ['/api/v1/activities/entity', credit?.id],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'invoice',
+        entity: 'credit',
         entity_id: credit?.id,
       }).then(
         (response: AxiosResponse<GenericManyResponse<InvoiceActivity>>) =>
@@ -107,7 +107,7 @@ export default function EInvoice() {
       setIsFormBusy(true);
 
       request('POST', endpoint('/api/v1/einvoice/peppol/send'), {
-        entity: 'invoice',
+        entity: 'credit',
         entity_id: credit?.id,
       })
         .then(() => {
