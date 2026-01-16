@@ -67,9 +67,6 @@ export default function RecurringExpenses() {
         linkToCreateGuards={[permission('create_recurring_expense')]}
         hideEditableOptions={!hasPermission('edit_recurring_expense')}
         enableSavingFilterPreference
-        dateRangeColumns={[
-          { column: 'created_at', queryParameterKey: 'created_between' },
-        ]}
       />
     </Default>
   );

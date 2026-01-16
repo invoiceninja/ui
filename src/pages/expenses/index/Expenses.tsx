@@ -87,6 +87,7 @@ export default function Expenses() {
         linkToCreateGuards={[permission('create_expense')]}
         hideEditableOptions={!hasPermission('edit_expense')}
         enableSavingFilterPreference
+        dateRangeColumns={[{ column: 'date', queryParameterKey: 'date_range' }]}
       />
 
       <ChangeTemplateModal<Expense>
