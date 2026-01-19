@@ -12,16 +12,23 @@ import { IconType } from 'react-icons';
 import { Icon as ReactFeatherIcon } from 'react-feather';
 import { Icon } from './icons/Icon';
 import { Button } from './forms';
+import { ReactElement } from 'react';
 
 interface Props {
   onClick: () => void;
-  icon: IconType | ReactFeatherIcon;
+  icon?: IconType | ReactFeatherIcon;
   label: string;
+  iconElement?: ReactElement;
+  className?: string;
 }
 
-export function CloneOption(props: Props) {
-  const { onClick, icon, label } = props;
-
+export function CloneOption({
+  onClick,
+  icon,
+  label,
+  iconElement,
+  className,
+}: Props) {
   return (
     <Button
       behavior="button"
@@ -29,7 +36,12 @@ export function CloneOption(props: Props) {
       className="w-3/4"
       onClick={onClick}
     >
-      <Icon element={icon} style={{ width: '1.1rem', height: '1.1rem' }} />
+      {icon ? (
+        <Icon element={icon} style={{ width: '1.1rem', height: '1.1rem' }} />
+      ) : (
+        iconElement
+      )}
+
       <span>{label}</span>
     </Button>
   );

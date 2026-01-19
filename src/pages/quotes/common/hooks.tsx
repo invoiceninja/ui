@@ -52,7 +52,6 @@ import {
   MdArchive,
   MdCloudCircle,
   MdComment,
-  MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
   MdDone,
@@ -76,10 +75,8 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   useAdmin,
@@ -102,9 +99,9 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
-import { AiOutlineFileText } from 'react-icons/ai';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { ConvertOptionsModal } from './components/ConvertOptionsModal';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -381,8 +378,6 @@ export function useActions(params?: Params) {
     dropdown = true,
   } = params || {};
 
-  const setQuote = useSetAtom(quoteAtom);
-
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
   const { isEditPage } = useEntityPageIdentifier({
@@ -398,9 +393,7 @@ export function useActions(params?: Params) {
 
   const approve = useApprove();
   const bulk = useBulkAction();
-  const navigate = useNavigate();
   const markSent = useMarkSent();
-  const hasPermission = useHasPermission();
   const printPdf = usePrintPdf({ entity: 'quote' });
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const downloadEQuote = useDownloadEInvoice({
@@ -413,27 +406,6 @@ export function useActions(params?: Params) {
     setChangeTemplateVisible,
     setChangeTemplateEntityContext,
   } = useChangeTemplate();
-
-  const cloneToQuote = (quote: Quote) => {
-    setQuote({
-      ...quote,
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/quotes/create?action=clone');
-  };
 
   const actions: Action<Quote>[] = [
     (quote: Quote) =>
@@ -617,36 +589,15 @@ export function useActions(params?: Params) {
           {t('approve')}
         </EntityActionElement>
       ),
-    (quote) =>
-      quote.status_id !== QuoteStatus.Converted &&
-      hasPermission('create_invoice') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'convert_to_invoice',
-          })}
-          entity="quote"
-          actionKey="convert_to_invoice"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('convert_to_invoice')}
-          onClick={() => bulk([quote.id], 'convert_to_invoice')}
-          icon={AiOutlineFileText}
-          disablePreventNavigation
-        >
-          {t('convert_to_invoice')}
-        </EntityActionElement>
-      ),
-    (quote) =>
-      !quote.project_id &&
-      hasPermission('create_project') && (
-        <ConvertToProjectBulkAction
-          {...(!dropdown && {
-            key: 'convert_to_project',
-          })}
-          selectedIds={[quote.id]}
-          disablePreventNavigation
-          dropdown={dropdown}
-        />
-      ),
+    (quote) => (
+      <ConvertOptionsModal
+        {...(!dropdown && {
+          key: 'convert_to',
+        })}
+        dropdown={dropdown}
+        quote={quote}
+      />
+    ),
     (quote) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -670,26 +621,10 @@ export function useActions(params?: Params) {
       </EntityActionElement>
     ),
     () => <Divider withoutPadding />,
-    (quote) =>
-      hasPermission('create_quote') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'clone_to_quote',
-          })}
-          entity="quote"
-          actionKey="clone_to_quote"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_quote')}
-          onClick={() => cloneToQuote(quote)}
-          icon={MdControlPointDuplicate}
-        >
-          {t('clone_to_quote')}
-        </EntityActionElement>
-      ),
     (quote) => (
       <CloneOptionsModal
         {...(!dropdown && {
-          key: 'clone_to_other',
+          key: 'clone_to',
         })}
         dropdown={dropdown}
         quote={quote}
