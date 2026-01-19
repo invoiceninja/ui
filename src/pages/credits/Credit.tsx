@@ -81,11 +81,7 @@ export default function Credit() {
 
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: credit,
-    enableQuery:
-      company?.settings.e_invoice_type === 'PEPPOL' &&
-      company?.tax_data?.acts_as_sender &&
-      triggerValidationQuery &&
-      id === credit?.id,
+    enableQuery: triggerValidationQuery && id === credit?.id,
     onFinished: () => {
       setTriggerValidationQuery(false);
     },
@@ -181,6 +177,7 @@ export default function Credit() {
           <Outlet
             context={{
               credit,
+              setCredit,
               errors,
               isDefaultTerms,
               setIsDefaultTerms,
@@ -188,6 +185,8 @@ export default function Credit() {
               setIsDefaultFooter,
               client,
               invoiceSum,
+              eInvoiceValidationEntityResponse: validationResponse,
+              setTriggerValidationQuery,
             }}
           />
         </div>

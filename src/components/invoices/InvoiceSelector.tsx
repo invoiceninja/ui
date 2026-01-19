@@ -17,7 +17,10 @@ import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-pr
 interface Props extends GenericSelectorProps<Invoice> {
   clearButton?: boolean;
   onClearButtonClick?: () => void;
+  errorMessage?: string | string[];
+  clientId?: string;
 }
+
 export function InvoiceSelector(props: Props) {
   const formatMoney = useFormatMoney();
 
@@ -35,10 +38,12 @@ export function InvoiceSelector(props: Props) {
         value: props.value ?? null,
       }}
       endpoint={endpoint(
-        '/api/v1/invoices?include=client&filter_deleted_clients=true&status=active'
+        `/api/v1/invoices?include=client&filter_deleted_clients=true&status=active${
+          props.clientId ? `&client_id=${props.clientId}` : ''
+        }`
       )}
       onChange={(invoice: Entry<Invoice>) =>
-        invoice.resource && props.onChange(invoice.resource)
+        invoice.resource && props.onChange?.(invoice.resource)
       }
       entryOptions={{
         id: 'id',
@@ -46,6 +51,7 @@ export function InvoiceSelector(props: Props) {
         label: 'number',
         dropdownLabelFn: (invoice) => formatLabel(invoice),
         inputLabelFn: (invoice) => (invoice ? formatLabel(invoice) : ''),
+        searchable: 'number',
       }}
       onDismiss={props.onClearButtonClick}
       errorMessage={props.errorMessage}

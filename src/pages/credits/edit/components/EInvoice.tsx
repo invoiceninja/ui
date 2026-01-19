@@ -10,22 +10,15 @@
 
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
-import { EInvoiceComponent } from '$app/pages/settings';
 import { useQueryClient } from 'react-query';
-import {
-  Dispatch,
-  ReactNode,
-  RefObject,
-  SetStateAction,
-  useState,
-} from 'react';
+import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { Button, InputField, Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCheckCircle } from 'react-icons/md';
@@ -43,6 +36,7 @@ import { useColorScheme } from '$app/common/colors';
 import { cloneDeep, get, set } from 'lodash';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Credit } from '$app/common/interfaces/credit';
+import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 
 export interface Context {
   credit: Credit | undefined;
@@ -52,7 +46,6 @@ export interface Context {
   isDefaultFooter: boolean;
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
-  eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
@@ -62,6 +55,7 @@ const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
   const [t] = useTranslation();
+
   const queryClient = useQueryClient();
 
   const location = useLocation();
@@ -144,14 +138,6 @@ export default function EInvoice() {
     text = reactStringReplace(text, `:notes`, () => notesElement);
 
     return text;
-  };
-
-  const handleChange = (property: string, value: string | number | boolean) => {
-    const updatedCredit = cloneDeep(credit) as Credit;
-
-    set(updatedCredit, property, value);
-
-    setCredit(updatedCredit);
   };
 
   return (
@@ -321,61 +307,55 @@ export default function EInvoice() {
           </Card>
         )}
 
-      <Card title={t('date_range')}>
-        <Element leftSide={t('start_date')}>
-          <InputField
-            type="date"
-            value={
-              get(credit, 'e_invoice.Invoice.InvoicePeriod.0.StartDate') || ''
-            }
-            onValueChange={(value) =>
-              handleChange('e_invoice.Invoice.InvoicePeriod.0.StartDate', value)
-            }
-            errorMessage={
-              errors?.errors?.['e_invoice.InvoicePeriod.0.StartDate']
-            }
-          />
-        </Element>
-
-        <Element leftSide={t('end_date')}>
-          <InputField
-            type="date"
-            value={
-              get(credit, 'e_invoice.Invoice.InvoicePeriod.0.EndDate') || ''
-            }
-            onValueChange={(value) =>
-              handleChange('e_invoice.Invoice.InvoicePeriod.0.EndDate', value)
-            }
-            errorMessage={errors?.errors?.['e_invoice.InvoicePeriod.0.EndDate']}
-          />
-        </Element>
-      </Card>
-
-      <Card title={t('actual_delivery_date')}>
-        <Element
-          leftSide={t('date')}
-          leftSideHelp={t('actual_delivery_date_help')}
-        >
-          <InputField
-            type="date"
-            value={
-              get(credit, 'e_invoice.Invoice.Delivery.0.ActualDeliveryDate') ||
-              ''
-            }
-            onValueChange={(value) =>
-              handleChange(
-                'e_invoice.Invoice.Delivery.0.ActualDeliveryDate',
-                value
-              )
-            }
-            errorMessage={
-              errors?.errors?.[
-                'e_invoice.Invoice.Delivery.0.ActualDeliveryDate'
-              ]
-            }
-          />
-        </Element>
-      </Card>
+      {credit ? (
+        <Card title={t('invoice_reference')}>
+          <Element leftSide={t('invoice')}>
+            <InvoiceSelector
+              clientId={credit.client_id}
+              value={
+                get(
+                  credit,
+                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.ID',
+                  ''
+                ) as string | undefined
+              }
+              onChange={(value) => {
+                const updatedCredit = cloneDeep(credit) as Credit;
+                set(
+                  updatedCredit,
+                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.ID',
+                  value.number
+                );
+                set(
+                  updatedCredit,
+                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.IssueDate',
+                  value.date
+                );
+                setCredit(updatedCredit);
+              }}
+              onClearButtonClick={() => {
+                const updatedCredit = cloneDeep(credit) as Credit;
+                set(
+                  updatedCredit,
+                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.ID',
+                  ''
+                );
+                set(
+                  updatedCredit,
+                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.IssueDate',
+                  ''
+                );
+                setCredit(updatedCredit);
+              }}
+              errorMessage={
+                errors?.errors?.[
+                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.ID'
+                ]
+              }
+            />
+          </Element>
+        </Card>
+      ) : null}
     </>
   );
 }
