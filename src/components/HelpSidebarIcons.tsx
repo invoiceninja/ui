@@ -146,6 +146,8 @@ export function HelpSidebarIcons(props: Props) {
         title={t('contact_us')}
         visible={isContactVisible}
         onClose={setIsContactVisible}
+        disableClosing
+        enableClosingOnXMark
       >
         <InputField
           label={t('from')}
@@ -161,18 +163,30 @@ export function HelpSidebarIcons(props: Props) {
           onChange={formik.handleChange}
         />
 
-        <Toggle
-          id="send_errors"
-          label={t('include_recent_errors')}
-          onChange={(value) => formik.setFieldValue('send_logs', value)}
-        />
+        {isSelfHosted() && (
+          <Toggle
+            id="send_errors"
+            label={t('include_recent_errors')}
+            onChange={(value) => formik.setFieldValue('send_logs', value)}
+          />
+        )}
 
-        <Button
-          onClick={() => formik.submitForm()}
-          disabled={formik.isSubmitting}
-        >
-          {t('send')}
-        </Button>
+        <div className="flex gap-x-4 justify-end">
+          <Button
+            type="secondary"
+            onClick={() => setIsContactVisible(false)}
+            disabled={formik.isSubmitting}
+          >
+            {t('cancel')}
+          </Button>
+
+          <Button
+            onClick={() => formik.submitForm()}
+            disabled={formik.isSubmitting}
+          >
+            {t('send')}
+          </Button>
+        </div>
       </Modal>
 
       <Modal

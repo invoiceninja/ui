@@ -34,6 +34,7 @@ interface Props {
   withoutBorderLine?: boolean;
   withoutVerticalMargin?: boolean;
   withoutHorizontalPadding?: boolean;
+  enableClosingOnXMark?: boolean;
 }
 
 interface TransitionChildProps {
@@ -63,7 +64,8 @@ function TransitionChild(props: TransitionChildProps) {
 export function Modal(props: Props) {
   const [open, setOpen] = useState(false);
 
-  const { enableCloseOnClickAway, disableClosing } = props;
+  const { enableCloseOnClickAway, disableClosing, enableClosingOnXMark } =
+    props;
 
   useEffect(() => {
     setOpen(props.visible);
@@ -162,7 +164,7 @@ export function Modal(props: Props) {
                       {props.title}
                     </Dialog.Title>
 
-                    {!props.disableClosing && (
+                    {(!props.disableClosing || enableClosingOnXMark) && (
                       <div
                         className="cursor-pointer"
                         onClick={() => props.onClose(false)}
@@ -200,7 +202,8 @@ export function Modal(props: Props) {
                   className={classNames('text-sm flex flex-col space-y-4', {
                     'justify-center items-center': props.centerContent,
                     'mt-5 sm:mt-6':
-                      !props.disableClosing && !props.withoutVerticalMargin,
+                      (!props.disableClosing || enableClosingOnXMark) &&
+                      !props.withoutVerticalMargin,
                     'px-5':
                       !props.withoutPadding && !props.withoutHorizontalPadding,
                   })}
