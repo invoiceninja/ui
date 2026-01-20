@@ -34,6 +34,7 @@ import styled from 'styled-components';
 import { BookOpen } from '$app/components/icons/BookOpen';
 import { Import as ImportIcon } from '$app/components/icons/Import';
 import { Export } from '$app/components/icons/Export';
+import { createUniqueId } from '$app/common/helpers/custom-design/custom-design';
 
 export interface Context {
   errors: ValidationBag | undefined;
@@ -153,8 +154,18 @@ export default function Settings() {
 
         <Element leftSide={t('design')}>
           <DesignSelector
+            value={
+              payload.design?.design
+                ? createUniqueId(JSON.stringify(payload.design?.design))
+                : undefined
+            }
             onChange={(design) => handlePropertyChange('design', design.design)}
             actionVisibility={false}
+            customValueFn={(design) =>
+              design.design
+                ? createUniqueId(JSON.stringify(design.design))
+                : design.id
+            }
             errorMessage={
               errors?.errors['design.header'] ||
               errors?.errors['design.body'] ||

@@ -30,6 +30,7 @@ import { useFreePlanDesigns } from '../hooks/useFreePlanDesigns';
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
   disableWithQueryParameter?: boolean;
+  customValueFn?: (design: Design) => string;
 }
 
 export function DesignSelector(props: Props) {
@@ -142,6 +143,7 @@ export function DesignSelector(props: Props) {
           id: 'id',
           label: 'name',
           value: 'id',
+          customValue: (design) => props.customValueFn?.(design) || design.id,
         }}
         action={{
           label: t('new_design'),
