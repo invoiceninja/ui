@@ -227,7 +227,7 @@ export default function EInvoice() {
                       className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4"
                     >
                       <div className="whitespace-nowrap font-medium w-24">
-                        {t(entity)}:
+                        { entity === 'invoice' ? t('credit') : t(entity)}:
                       </div>
 
                       <div>
@@ -308,7 +308,7 @@ export default function EInvoice() {
         )}
 
       {credit ? (
-        <Card title={t('invoice_reference')}>
+        <Card title={t('reference')}>
           <Element leftSide={t('invoice')}>
             <InvoiceSelector
               clientId={credit.client_id}
