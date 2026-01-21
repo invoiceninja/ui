@@ -46,6 +46,7 @@ import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { InputLabel } from '$app/components/forms';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -67,6 +68,7 @@ export default function Credit() {
   const { data } = useCreditQuery({ id: id! });
 
   const company = useCurrentCompany();
+  const verifactuEnabled = useCompanyVerifactu();
 
   const invoiceSum = useAtomValue(invoiceSumAtom);
   const [credit, setCredit] = useAtomWithPrevent(creditAtom);
@@ -81,7 +83,12 @@ export default function Credit() {
 
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: credit,
-    enableQuery: triggerValidationQuery && id === credit?.id,
+    enableQuery:
+      ((company?.settings.e_invoice_type === 'PEPPOL' &&
+        company?.tax_data?.acts_as_sender) ||
+        verifactuEnabled) &&
+      triggerValidationQuery &&
+      id === credit?.id,
     onFinished: () => {
       setTriggerValidationQuery(false);
     },
