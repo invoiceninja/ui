@@ -155,7 +155,7 @@ export default function Settings() {
         <Element leftSide={t('design')}>
           <DesignSelector
             value={
-              payload.design?.design
+              payload?.design?.design
                 ? createUniqueId(JSON.stringify(payload.design?.design))
                 : undefined
             }
@@ -172,6 +172,11 @@ export default function Settings() {
               errors?.errors['design.footer'] ||
               errors?.errors['design.includes']
             }
+            {...(payload?.design?.id && {
+              excludeByValue: [
+                createUniqueId(JSON.stringify(payload.design?.design)),
+              ],
+            })}
           />
         </Element>
 
