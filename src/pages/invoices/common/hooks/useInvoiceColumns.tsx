@@ -43,6 +43,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -156,15 +157,15 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       entity: 'invoice',
     });
 
-  const isPeppolEnabled = () => {
+  const isPeppolEnabled = (currentInvoice: Invoice) => {
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' 
+      currentCompany.settings.e_invoice_type === 'PEPPOL' && PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '')
     );
   };
 
   const peppolSendingFailed = (currentInvoice: Invoice) => {
     return (
-      isPeppolEnabled() &&
+      isPeppolEnabled(currentInvoice) &&
       currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
       !currentInvoice.backup?.guid &&
       !currentInvoice.is_deleted &&
@@ -174,7 +175,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const peppolSendingSuccess = (currentInvoice: Invoice) => {
     return (
-      isPeppolEnabled() && currentInvoice.backup?.guid
+      isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid
     );
   };
 
