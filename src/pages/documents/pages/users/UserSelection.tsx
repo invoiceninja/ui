@@ -11,9 +11,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '$app/components/forms';
 import { Checkbox } from '$app/components/forms';
-import { Element } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { User as InvoiceNinjaUser } from '$app/common/interfaces/user';
 import { User as DocuNinjaUser } from '$app/common/interfaces/docuninja/api';
 import { request } from '$app/common/helpers/request';
@@ -117,7 +116,7 @@ export default function UserSelection() {
 
   const handleGrantAccess = async () => {
     if (selectedUserIds.length === 0) {
-      toast.error('Please select at least one user');
+      toast.error(t('please_select_at_least_one_user') as string);
       return;
     }
 
@@ -160,7 +159,7 @@ export default function UserSelection() {
 
       await Promise.all(promises);
       
-      toast.success('DocuNinja access granted successfully');
+      toast.success(t('docuninja_access_granted_successfully') as string);
       
       // Refetch both DocuNinja users and Invoice Ninja users to update status
       $refetch(['docuninja_users']);
@@ -171,7 +170,7 @@ export default function UserSelection() {
       
     } catch (error: any) {
       console.error('Error granting DocuNinja access:', error);
-      toast.error('Failed to grant DocuNinja access');
+      toast.error(t('docuninja_access_grant_failed') as string);
     } finally {
       setIsFormBusy(false);
     }
@@ -179,6 +178,9 @@ export default function UserSelection() {
 
   // Only show users that don't have DocuNinja access
   const availableUsers = usersWithStatus.filter(user => !user.hasDocuNinjaAccess);
+  const selectedUsers = availableUsers.filter(user =>
+    selectedUserIds.includes(user.id)
+  );
   const allAvailableSelected = availableUsers.length > 0 && 
     availableUsers.every(user => selectedUserIds.includes(user.id));
 
@@ -207,147 +209,181 @@ export default function UserSelection() {
   ];
 
   return (
-    <Default title={t('docuninja')} breadcrumbs={pages}>
+    <Default
+      title={t('docuninja')}
+      breadcrumbs={pages}
+      onCancelClick={() => {
+        if (isFormBusy) {
+          return;
+        }
+
+        navigate('/docuninja/users');
+      }}
+      onSaveClick={handleGrantAccess}
+      saveButtonLabel={isFormBusy ? t('processing') : t('add')}
+      disableSaveButton={selectedUserIds.length === 0 || isFormBusy}
+    >
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">{t('docuninja')}</h1>
-            <p className="text-gray-600 mt-1">
-              {t('docuninja_grant_access_help')}
-            </p>
-          </div>
-          
+        <div>
+          <h1 className="text-2xl font-bold">{t('docuninja')}</h1>
+          <p className="text-gray-600 mt-1">
+            {t('docuninja_grant_access_help')}
+          </p>
         </div>
 
-        {/* User Selection */}
-        <div>
-          <h2 className="text-lg font-medium mb-4">{t('users')}</h2>
-          
-          {isLoadingInvoiceUsers ? (
-            <div className="text-center py-8">
-              <div className="text-gray-500">{t('loading')}...</div>
-            </div>
-          ) : hasQuotaButNoUsers ? (
-            <div className="text-center py-8">
-              
-              <div className="text-sm text-gray-400 mb-4">
-                {t('docuninja_quota_available_but_no_users')}
-              </div>
-              <div className="text-sm text-gray-400 mb-4">
-                {t('users')}: {currentDocuNinjaUserCount} / {maxDocuNinjaUsers}
-              </div>
-              <div className="text-sm text-blue-500">
-                <Link to="/settings/users/create">{t('add_user')}</Link>
-              </div>
-            </div>
-          ) : availableUsers.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-500">{t('max_users_reached')}</div>
-              <div className="text-center py-4 space-x-2">
-                <span>{t('user_limit_reached')}</span>
-                <span className="text-blue-500">
-                <Link to="/settings/account_management">{t('upgrade')}</Link>
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {/* Select All */}
-              <Element>
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    checked={allAvailableSelected}
-                    onValueChange={() => {
-                      // Toggle the select all state
-                      const newCheckedState = !allAvailableSelected;
-                      handleSelectAll(newCheckedState);
-                    }}
-                    disabled={availableUsers.length === 0 || isFormBusy}
-                  />
-                  <span className="font-medium">
-                    {t('all')} ({availableUsers.length} {t('users')})
-                  </span>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="space-y-6">
+            <Card title={t('users')} className="shadow-sm" withoutBodyPadding>
+              {isLoadingInvoiceUsers ? (
+                <div className="px-6 py-10 text-center text-sm text-gray-500">
+                  {t('loading')}...
                 </div>
-              </Element>
-
-              {/* User List */}
-              <div className="grid gap-3">
-                {availableUsers.map((user) => (
-                  <Element key={user.id}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Checkbox
-                          checked={selectedUserIds.includes(user.id)}
-                          onValueChange={() => {
-                            // Toggle the current selection state
-                            const isCurrentlySelected = selectedUserIds.includes(user.id);
-                            const newCheckedState = !isCurrentlySelected;
-                            handleUserSelection(user.id, newCheckedState);
-                          }}
-                          disabled={isFormBusy}
-                        />
-                        <div>
-                          <div className="font-medium">
-                            {user.first_name} {user.last_name}
-                          </div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
+              ) : hasQuotaButNoUsers ? (
+                <div className="px-6 py-10 text-center">
+                  <div className="text-sm text-gray-400 mb-4">
+                    {t('docuninja_quota_available_but_no_users')}
+                  </div>
+                  <div className="text-sm text-gray-400 mb-4">
+                    {t('users')}: {currentDocuNinjaUserCount} / {maxDocuNinjaUsers}
+                  </div>
+                  <div className="text-sm text-blue-500">
+                    <Link to="/settings/users/create">{t('add_user')}</Link>
+                  </div>
+                </div>
+              ) : availableUsers.length === 0 ? (
+                <div className="px-6 py-10 text-center">
+                  <div className="text-gray-500">{t('max_users_reached')}</div>
+                  <div className="text-center py-4 space-x-2">
+                    <span>{t('user_limit_reached')}</span>
+                    <span className="text-blue-500">
+                      <Link to="/settings/account_management">{t('upgrade')}</Link>
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  <div className="flex items-center justify-between px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={allAvailableSelected}
+                        onValueChange={() => {
+                          const newCheckedState = !allAvailableSelected;
+                          handleSelectAll(newCheckedState);
+                        }}
+                        disabled={availableUsers.length === 0 || isFormBusy}
+                      />
+                      <div>
+                        <div className="font-medium">{t('all')}</div>
+                        <div className="text-xs text-gray-500">
+                          {availableUsers.length} {t('users')}
                         </div>
                       </div>
-                      <div className="text-sm text-gray-400">
-                        {t('available')}
-                      </div>
                     </div>
-                  </Element>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+                    <div className="text-xs text-gray-400">{t('available')}</div>
+                  </div>
 
-        {/* Permissions */}
-        {selectedUserIds.length > 0 && (
-          <div>
-            <h2 className="text-lg font-medium mb-4">{t('permissions')}</h2>
-            <div className="border rounded-lg p-6 bg-gray-50">
-              <Permissions
-                user={{ 
-                  company_user: { is_admin: isAdmin },
-                  permissions: permissions 
-                } as any}
-                setUser={() => {}} // Not needed for this use case
-                errors={undefined}
-                isFormBusy={isFormBusy}
-                permissions={permissions}
-                setPermissions={setPermissions}
-                isAdmin={isAdmin}
-                setIsAdmin={setIsAdmin}
-                notifications={{}}
-                setNotifications={() => {}}
-                allNotificationsValue="none"
-                setAllNotificationsValue={() => {}}
-              />
-            </div>
+                  {availableUsers.map((user) => {
+                    const isSelected = selectedUserIds.includes(user.id);
+
+                    return (
+                      <div
+                        key={user.id}
+                        className={`flex items-center justify-between px-6 py-4 ${
+                          isSelected ? 'bg-gray-50' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={isSelected}
+                            onValueChange={() => {
+                              const newCheckedState = !isSelected;
+                              handleUserSelection(user.id, newCheckedState);
+                            }}
+                            disabled={isFormBusy}
+                          />
+                          <div>
+                            <div className="font-medium">
+                              {user.first_name} {user.last_name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {user.email}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {isSelected ? t('selected') : t('available')}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            {selectedUserIds.length > 0 && (
+              <Card title={t('permissions')} className="shadow-sm">
+                <Permissions
+                  user={{
+                    company_user: { is_admin: isAdmin },
+                    permissions: permissions,
+                  } as any}
+                  setUser={() => {}}
+                  errors={undefined}
+                  isFormBusy={isFormBusy}
+                  permissions={permissions}
+                  setPermissions={setPermissions}
+                  isAdmin={isAdmin}
+                  setIsAdmin={setIsAdmin}
+                  notifications={{}}
+                  setNotifications={() => {}}
+                  allNotificationsValue="none"
+                  setAllNotificationsValue={() => {}}
+                />
+              </Card>
+            )}
           </div>
-        )}
 
-        {/* Actions */}
-        <div className="flex justify-end items-end pt-6 border-t">
-          
-          <div className="flex space-x-3">
-            <Button
-              type="secondary"
-              onClick={() => navigate('/docuninja/users')}
-              disabled={isFormBusy}
+          <div className="space-y-6">
+            <Card
+              title={`${t('selected')} ${t('users')}`}
+              className="shadow-sm"
+              withoutBodyPadding
             >
-              {t('cancel')}
-            </Button>
-            <Button
-              onClick={handleGrantAccess}
-              disabled={selectedUserIds.length === 0 || isFormBusy}
-            >
-              {isFormBusy ? t('processing') : t('add')}
-            </Button>
+              <div className="divide-y">
+                <Element leftSide={t('selected')}>
+                  <span className="font-medium">{selectedUserIds.length}</span>
+                </Element>
+                <Element leftSide={t('users')}>
+                  <span>
+                    {currentDocuNinjaUserCount} / {maxDocuNinjaUsers}
+                  </span>
+                </Element>
+                <div className="px-6 py-4">
+                  <div className="text-sm font-medium">{t('users')}</div>
+                  {selectedUsers.length === 0 ? (
+                    <div className="text-sm text-gray-500 mt-2">
+                      {t('select')}
+                    </div>
+                  ) : (
+                    <div className="mt-3 space-y-2">
+                      {selectedUsers.map((user) => (
+                        <div
+                          key={user.id}
+                          className="rounded-md border border-gray-200 px-3 py-2"
+                        >
+                          <div className="text-sm font-medium">
+                            {user.first_name} {user.last_name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {user.email}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
