@@ -24,8 +24,7 @@ import { ReactNode } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
-import { v4 } from 'uuid';
-import AppleSignin from 'react-apple-signin-auth';
+import { AppleOauth } from './AppleOauth';
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -139,20 +138,8 @@ export function SignInProviders() {
           <p>Log in with Microsoft</p>
         </SignInProviderButton>
 
-        {import.meta.env.VITE_ENABLE_APPLE_LOGIN === "true" ? (
-          <AppleSignin
-            authOptions={{
-              clientId: 'com.invoiceninja.client',
-              scope: 'email name',
-              redirectURI: 'https://invoicing.co/auth/apple',
-              state: '',
-              nonce: v4(),
-              usePopup: true,
-            }}
-            uiType="dark"
-            onSuccess={handleApple}
-            onError={() => toast.error()}
-          />
+        {import.meta.env.VITE_ENABLE_APPLE_LOGIN === 'true' ? (
+          <AppleOauth handleSignIn={handleApple} />
         ) : null}
       </div>
     </div>
