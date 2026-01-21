@@ -28,6 +28,7 @@ import {
 } from '@docuninja/builder2.0';
 import classNames from 'classnames';
 import { Check, ChevronLeft, ChevronRight } from 'react-feather';
+import type { LegacyRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiMinimize2 } from 'react-icons/fi';
 
@@ -48,7 +49,6 @@ export default function Index() {
 
   return (
     <div className="max-w-[90rem] mx-auto">
-      {/* @ts-expect-error - TODO: fix this */}
       <SignContext.Provider
         value={{
           endpoint: import.meta.env.VITE_DOCUNINJA_API_URL,
@@ -265,7 +265,7 @@ function SignCard({
       style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
     >
       <div
-        ref={headerRef}
+        ref={headerRef as LegacyRef<HTMLDivElement>}
         className={classNames('flex flex-col space-y-4 rounded-md', {
           'py-2 px-4': !(toggled && hasSignature),
           'px-6': toggled && hasSignature,
@@ -275,12 +275,18 @@ function SignCard({
       </div>
 
       {toggled && hasSignature ? (
-        <div className="flex justify-center" ref={contentRef}>
+        <div
+          className="flex justify-center"
+          ref={contentRef as LegacyRef<HTMLDivElement>}
+        >
           {content}
         </div>
       ) : null}
 
-      <div ref={footerRef} className="flex flex-col px-6">
+      <div
+        ref={footerRef as LegacyRef<HTMLDivElement>}
+        className="flex flex-col px-6"
+      >
         {footer}
       </div>
     </div>

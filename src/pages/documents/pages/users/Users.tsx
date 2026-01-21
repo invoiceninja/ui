@@ -66,8 +66,8 @@ export default function Users() {
         withResourcefulActions
         useRestoreForDeletedResources
         bulkRoute="/api/users/bulk"
-        linkToCreate="/documents/users/selection"
-        linkToEdit="/documents/users/:id/edit"
+        linkToCreate="/docuninja/users/selection"
+        linkToEdit="/docuninja/users/:id/edit"
         useDocuNinjaApi
         endpointHeaders={{
           Authorization: `Bearer ${getToken()}`,
