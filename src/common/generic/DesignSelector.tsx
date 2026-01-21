@@ -31,7 +31,9 @@ interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
   disableWithQueryParameter?: boolean;
   customValueFn?: (design: Design) => string;
-  excludeByValue?: string[];
+  exclude?: string[];
+  excludeByLabel?: boolean;
+  excludeWhenConfiguringEntries?: boolean;
 }
 
 export function DesignSelector(props: Props) {
@@ -158,7 +160,14 @@ export function DesignSelector(props: Props) {
         onDismiss={props.onClearButtonClick}
         disableWithQueryParameter={props.disableWithQueryParameter}
         errorMessage={props.errorMessage}
-        exclude={props.excludeByValue}
+        exclude={props.exclude}
+        {...(!proPlan() &&
+          !enterprisePlan() && {
+            includeOnly: freePlanDesigns,
+            includeByLabel: true,
+          })}
+        excludeByLabel={props.excludeByLabel}
+        excludeWhenConfiguringEntries={props.excludeWhenConfiguringEntries}
       />
     </>
   );

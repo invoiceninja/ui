@@ -72,6 +72,7 @@ export interface ComboboxStaticProps<T = any> {
   onInputValueChange?: (value: string) => void;
   compareOnlyByValue?: boolean;
   withShadow?: boolean;
+  excludeByLabel?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -115,6 +116,7 @@ export function Combobox<T = any>({
   onFocus,
   onInputValueChange,
   withShadow,
+  excludeByLabel = false,
 }: ComboboxStaticProps<T>) {
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
@@ -143,7 +145,9 @@ export function Combobox<T = any>({
         );
 
   filteredOptions = filteredOptions.filter((entry) =>
-    exclude.length > 0 ? !exclude.includes(entry.value) : true
+    exclude.length > 0
+      ? !exclude.includes(excludeByLabel ? entry.label : entry.value)
+      : true
   );
 
   filteredOptions = filteredOptions.filter((entry) =>
@@ -511,6 +515,7 @@ export function ComboboxStatic<T = any>({
   isDataLoading,
   compareOnlyByValue,
   withShadow,
+  excludeByLabel,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
 
@@ -535,7 +540,9 @@ export function ComboboxStatic<T = any>({
         );
 
   filteredValues = filteredValues.filter((entry) =>
-    exclude.length > 0 ? !exclude.includes(entry.value) : true
+    exclude.length > 0
+      ? !exclude.includes(excludeByLabel ? entry.label : entry.value)
+      : true
   );
 
   filteredValues = filteredValues.filter((entry) =>
@@ -864,6 +871,8 @@ export interface ComboboxAsyncProps<T> {
   onInputValueChange?: (value: string) => void;
   compareOnlyByValue?: boolean;
   withShadow?: boolean;
+  excludeByLabel?: boolean;
+  excludeWhenConfiguringEntries?: boolean;
 }
 
 export function ComboboxAsync<T = any>({
@@ -874,7 +883,7 @@ export function ComboboxAsync<T = any>({
   staleTime,
   initiallyVisible,
   sortBy = 'created_at|desc',
-  exclude,
+  exclude = [],
   includeOnly,
   includeByLabel,
   action,
@@ -887,6 +896,8 @@ export function ComboboxAsync<T = any>({
   onInputValueChange,
   compareOnlyByValue,
   withShadow,
+  excludeByLabel = false,
+  excludeWhenConfiguringEntries = false,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -934,7 +945,11 @@ export function ComboboxAsync<T = any>({
             })
           );
 
-          return data;
+          return data.filter((entry) =>
+            exclude.length > 0 && excludeWhenConfiguringEntries
+              ? !exclude.includes(excludeByLabel ? entry.label : entry.value)
+              : true
+          );
         }
       ),
     {
@@ -1057,6 +1072,7 @@ export function ComboboxAsync<T = any>({
         onEmptyValues={onEmptyValues}
         compareOnlyByValue={compareOnlyByValue}
         withShadow={withShadow}
+        excludeByLabel={excludeByLabel}
       />
     );
   }
@@ -1082,6 +1098,7 @@ export function ComboboxAsync<T = any>({
       onInputValueChange={onInputValueChange}
       compareOnlyByValue={compareOnlyByValue}
       withShadow={withShadow}
+      excludeByLabel={excludeByLabel}
     />
   );
 }
