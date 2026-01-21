@@ -386,7 +386,6 @@ function Builder() {
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
-        {/* @ts-expect-error It's safe */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,

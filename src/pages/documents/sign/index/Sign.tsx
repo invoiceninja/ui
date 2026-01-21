@@ -48,7 +48,6 @@ export default function Index() {
 
   return (
     <div className="max-w-[90rem] mx-auto">
-      {/* @ts-expect-error - TODO: fix this */}
       <SignContext.Provider
         value={{
           endpoint: import.meta.env.VITE_DOCUNINJA_API_URL,
