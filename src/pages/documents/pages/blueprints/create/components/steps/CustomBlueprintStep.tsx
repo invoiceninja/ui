@@ -16,7 +16,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms';
-import { Element } from '$app/components/cards';
+import { CardContainer, Element } from '$app/components/cards';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
@@ -69,7 +69,7 @@ export function CustomBlueprintStep({
   }
 
   return (
-    <div className="space-y-6">
+    <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('create_your_own')}</h2>
         <p className="text-gray-600">{t('create_your_own_description')}</p>
@@ -96,7 +96,7 @@ export function CustomBlueprintStep({
         />
       </Element>
 
-      <div className="flex justify-between p-6">
+      <div className="flex justify-between">
         <Button type="primary" onClick={onBack} behavior="button">
           {t('back')}
         </Button>
@@ -108,6 +108,6 @@ export function CustomBlueprintStep({
           {t('create_template')}
         </Button>
       </div>
-    </div>
+    </CardContainer>
   );
 }

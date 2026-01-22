@@ -9,7 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { Card } from '$app/components/cards';
+import { Card, CardContainer } from '$app/components/cards';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InvoiceNinjaDesignStep } from './steps/InvoiceNinjaDesignStep';
@@ -140,14 +140,14 @@ function SelectionStep({
   ];
 
   return (
-    <div className="space-y-6">
+    <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">
           {t('choose_template_type')}
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {options.map((option) => (
           <button
             type="button"
@@ -167,9 +167,9 @@ function SelectionStep({
         ))}
       </div>
 
-      <div className="flex justify-end p-6">
+      <div className="flex justify-end">
         <Button onClick={onCancel}>{t('back')}</Button>
       </div>
-    </div>
+    </CardContainer>
   );
 }

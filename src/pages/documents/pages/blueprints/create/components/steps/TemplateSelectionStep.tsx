@@ -12,7 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Button } from '$app/components/forms';
-import { Element } from '$app/components/cards';
+import { CardContainer, Element } from '$app/components/cards';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -188,7 +188,7 @@ export function TemplateSelectionStep({
   }
 
   return (
-    <div className="space-y-6">
+    <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('templates')}</h2>
         <p className="text-gray-600">{t('new_template_description')}</p>
@@ -275,7 +275,7 @@ export function TemplateSelectionStep({
         </div>
       </div>
 
-      <div className="flex justify-between p-6">
+      <div className="flex justify-between">
         <Button onClick={onBack}>{t('back')}</Button>
         <Button
           onClick={handleCreateBlueprint}
@@ -284,6 +284,6 @@ export function TemplateSelectionStep({
           {isLoading ? t('creating') : t('create_template')}
         </Button>
       </div>
-    </div>
+    </CardContainer>
   );
 }
