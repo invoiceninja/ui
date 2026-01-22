@@ -29,7 +29,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { get } from 'lodash';
 import { useColorScheme } from '$app/common/colors';
-import { freePlan } from '$app/common/guards/guards/free-plan';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -150,7 +149,7 @@ export function Preferences() {
           </div>
         </Element>
 
-        {!freePlan() && (
+        {company.legal_entity_id && (
           <Element leftSide={t('act_as_sender')}>
             <Toggle
               checked={form.values.acts_as_sender}
@@ -162,7 +161,7 @@ export function Preferences() {
           </Element>
         )}
 
-        {!freePlan() && (
+        {company.legal_entity_id && (
           <Element leftSide={t('act_as_receiver')}>
             <Toggle
               checked={form.values.acts_as_receiver}
@@ -174,7 +173,7 @@ export function Preferences() {
           </Element>
         )}
 
-        {!freePlan() && (
+        {company.legal_entity_id && (
           <Element leftSide={t('credits')}>
             <div className="flex items-center gap-1">
               <p>{t('total_credits_amount')}:</p>
@@ -203,7 +202,6 @@ export function useTriggerEInvoiceRoutes() {
   return (
     isSelfHosted() &&
     Boolean(company) &&
-    company?.settings.enable_e_invoice &&
     company?.settings.e_invoice_type === 'PEPPOL'
   );
 }
