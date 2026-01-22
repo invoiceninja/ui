@@ -10,12 +10,14 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { Card } from '$app/components/cards';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InvoiceNinjaDesignStep } from './steps/InvoiceNinjaDesignStep';
 import { CustomBlueprintStep } from './steps/CustomBlueprintStep';
 import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Clipboard, FileText, Tool } from 'react-feather';
 
 export type WizardStep = 'selection' | 'invoice-ninja' | 'custom' | 'template';
 
@@ -24,7 +26,10 @@ export interface BlueprintWizardProps {
   onCancel: () => void;
 }
 
-export function BlueprintWizard({ onComplete, onCancel }: BlueprintWizardProps) {
+export function BlueprintWizard({
+  onComplete,
+  onCancel,
+}: BlueprintWizardProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const [currentStep, setCurrentStep] = useState<WizardStep>('selection');
@@ -104,26 +109,32 @@ function SelectionStep({
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const options = [
+  const options: Array<{
+    id: string;
+    title: string;
+    description: string;
+    icon: ReactNode;
+    onClick: () => void;
+  }> = [
     {
       id: 'invoice-ninja',
       title: 'Invoice Ninja',
       description: t('invoice_ninja_template_description'),
-      icon: '📄',
+      icon: <Icon element={FileText} size={32} />,
       onClick: onSelectInvoiceNinja,
     },
     {
       id: 'custom',
       title: t('create_your_own'),
       description: t('create_your_own_description'),
-      icon: '🛠️',
+      icon: <Icon element={Tool} size={32} />,
       onClick: onSelectCustom,
     },
     {
       id: 'template',
       title: t('templates'),
       description: t('new_template_description'),
-      icon: '📋',
+      icon: <Icon element={Clipboard} size={32} />,
       onClick: onSelectTemplate,
     },
   ];
@@ -131,7 +142,9 @@ function SelectionStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">{t('choose_template_type')}</h2>
+        <h2 className="text-xl font-semibold mb-2">
+          {t('choose_template_type')}
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
@@ -145,7 +158,7 @@ function SelectionStep({
               borderColor: colors.$20,
             }}
           >
-            <div className="text-4xl mb-4">{option.icon}</div>
+            <div className="mb-4">{option.icon}</div>
             <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600">
               {option.title}
             </h3>
@@ -155,9 +168,7 @@ function SelectionStep({
       </div>
 
       <div className="flex justify-end p-6">
-        <Button onClick={onCancel}>
-          {t('back')}
-        </Button>
+        <Button onClick={onCancel}>{t('back')}</Button>
       </div>
     </div>
   );
