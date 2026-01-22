@@ -34,7 +34,7 @@ export function useTaskQuery(params: TaskParams) {
         'GET',
         endpoint('/api/v1/tasks/:id?include=status', { id: params.id })
       ).then((response) => response.data.data),
-    { staleTime: Infinity, enabled: params.enabled ?? true }
+    { staleTime: Infinity, enabled: params.enabled ?? Boolean(params.id) }
   );
 }
 
