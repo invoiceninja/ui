@@ -12,14 +12,28 @@ import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Button } from '$app/components/forms';
-import { Element } from '$app/components/cards';
-import { useState } from 'react';
+import { CardContainer, Element } from '$app/components/cards';
+import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Icon } from '$app/components/icons/Icon';
+import {
+  Briefcase,
+  Clipboard,
+  DollarSign,
+  Edit,
+  Key,
+  Layers,
+  Lock,
+  Settings,
+  Slash,
+  Tool,
+  Users,
+} from 'react-feather';
 
 interface TemplateSelectionStepProps {
   onComplete: (blueprintId: string) => void;
@@ -27,87 +41,104 @@ interface TemplateSelectionStepProps {
 }
 
 // Mock data - replace with actual API call
-const TEMPLATE_CATEGORIES = [
-  { id: 'business', name: 'Business', icon: '🏢' },
-  { id: 'sales', name: 'Sales', icon: '💰' },
-  { id: 'generic', name: 'Generic', icon: '🎨' },
-//   { id: 'modern', name: 'Modern', icon: '✨' },
+const TEMPLATE_CATEGORIES: Array<{
+  id: string;
+  name: string;
+  icon: ReactNode;
+}> = [
+  {
+    id: 'business',
+    name: 'Business',
+    icon: <Icon element={Briefcase} size={16} />,
+  },
+  { id: 'sales', name: 'Sales', icon: <Icon element={DollarSign} size={16} /> },
+  { id: 'generic', name: 'Generic', icon: <Icon element={Layers} size={16} /> },
+  //   { id: 'modern', name: 'Modern', icon: '✨' },
 ];
 
-const TEMPLATES = [
+const TEMPLATES: Array<{
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  preview: ReactNode;
+}> = [
   {
     id: 'nda-template',
     name: 'NDA',
     category: 'business',
     description: 'Non-Disclosure Agreement',
-    preview: '🔒',
+    preview: <Icon element={Lock} size={28} />,
   },
   {
     id: 'mutual-nda-template',
     name: 'Mutual NDA',
     category: 'business',
     description: 'Mutual Non-Disclosure Agreement',
-    preview: '🤝',
+    preview: <Icon element={Users} size={28} />,
   },
   {
     id: 'blank',
     name: 'Blank Template',
     category: 'generic',
     description: 'Start from scratch!',
-    preview: '📝',
+    preview: <Icon element={Edit} size={28} />,
   },
   {
     id: 'sales-contract',
     name: 'Sales Contract',
     category: 'sales',
     description: 'Simple and clean sales contract template',
-    preview: '💼',
+    preview: <Icon element={Briefcase} size={28} />,
   },
   {
     id: 'service-agreement',
     name: 'Service Agreement',
     category: 'business',
     description: 'Contemporary service agreement design',
-    preview: '⚙️',
+    preview: <Icon element={Settings} size={28} />,
   },
   {
     id: 'scope-of-work',
     name: 'Scope of Work',
     category: 'business',
     description: 'Contemporary scope of work design',
-    preview: '📋',
+    preview: <Icon element={Clipboard} size={28} />,
   },
   {
     id: 'non-solicitation-agreement',
     name: 'Non-Solicitation Agreement',
     category: 'business',
     description: 'Contemporary non-solicitation agreement design',
-    preview: '🚫',
+    preview: <Icon element={Slash} size={28} />,
   },
   {
     id: 'power-of-attorney',
     name: 'Power of Attorney',
     category: 'business',
     description: 'Contemporary power of attorney design',
-    preview: '⚖️',
+    preview: <Icon element={Key} size={28} />,
   },
   {
     id: 'partnership-agreement',
     name: 'Partnership Agreement',
     category: 'business',
     description: 'Contemporary partnership agreement design',
-    preview: '🤝',
+    preview: <Icon element={Users} size={28} />,
   },
   {
     id: 'independent-contractor-agreement',
     name: 'Independent Contractor Agreement',
     category: 'business',
     description: 'Contemporary independent contractor agreement design',
-    preview: '👷',
+    preview: <Icon element={Tool} size={28} />,
   },
 ];
 
-export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionStepProps) {
+export function TemplateSelectionStep({
+  onComplete,
+  onBack,
+}: TemplateSelectionStepProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
@@ -123,42 +154,41 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
     if (!selectedTemplate || isLoading) return;
 
     setIsLoading(true);
-    
+
     toast.processing();
-      request(
-        'GET',
-        docuNinjaEndpoint('/api/galleries/:id', { id: selectedTemplate }),{},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      ).then((response: any) => {
-
-      const templateHtml = response.data.html;
-      const templateName = response.data.name;
-
-      toast.success('template_loaded');
-      
-      // Navigate to GrapeJS editor with the template HTML
-      navigate(route('/docuninja/templates/create/editor'), {
-        state: { templateHtml, templateName }
-      });
-
-    }).catch ((error: AxiosError<ValidationBag>) => {
-      if (error.response?.status === 422) {
-        toast.error("Error loading template");
+    request(
+      'GET',
+      docuNinjaEndpoint('/api/galleries/:id', { id: selectedTemplate }),
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
       }
-    }).finally(() => {
-      setIsLoading(false);
-    });
-   
-  };
+    )
+      .then((response: any) => {
+        const templateHtml = response.data.html;
+        const templateName = response.data.name;
+
+        toast.success('template_loaded');
+
+        // Navigate to GrapeJS editor with the template HTML
+        navigate(route('/docuninja/templates/create/editor'), {
+          state: { templateHtml, templateName },
+        });
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.error('Error loading template');
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
 
   return (
-    <div className="space-y-6">
+    <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('templates')}</h2>
         <p className="text-gray-600">{t('new_template_description')}</p>
@@ -179,9 +209,10 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
                   }}
                   className={`px-3 py-2 rounded-md cursor-pointer transition-colors duration-150 font-medium`}
                   style={{
-                    backgroundColor: selectedCategory === category.id 
-                      ? colors.$20 
-                      : 'transparent',
+                    backgroundColor:
+                      selectedCategory === category.id
+                        ? colors.$20
+                        : 'transparent',
                     color: colors.$3,
                   }}
                   onMouseEnter={(e) => {
@@ -209,7 +240,8 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
         <div className="w-3/4">
           <Element>
             <h3 className="font-semibold mb-4">
-              {TEMPLATE_CATEGORIES.find(c => c.id === selectedCategory)?.name} {t('templates')}
+              {TEMPLATE_CATEGORIES.find((c) => c.id === selectedCategory)?.name}{' '}
+              {t('templates')}
             </h3>
             <div className="grid grid-cols-1 gap-4">
               {filteredTemplates.map((template) => (
@@ -223,17 +255,19 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                   style={{
-                    borderColor: selectedTemplate === template.id 
-                      ? colors.$3 
-                      : colors.$20,
-                    backgroundColor: selectedTemplate === template.id 
-                      ? colors.$3 + '10' 
-                      : 'transparent',
+                    borderColor:
+                      selectedTemplate === template.id ? colors.$3 : colors.$20,
+                    backgroundColor:
+                      selectedTemplate === template.id
+                        ? colors.$3 + '10'
+                        : 'transparent',
                   }}
                 >
-                  <div className="text-3xl mb-2">{template.preview}</div>
+                  <div className="mb-2">{template.preview}</div>
                   <h4 className="font-semibold mb-1">{template.name}</h4>
-                  <p className="text-sm text-gray-600">{template.description}</p>
+                  <p className="text-sm text-gray-600">
+                    {template.description}
+                  </p>
                 </button>
               ))}
             </div>
@@ -241,10 +275,8 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
         </div>
       </div>
 
-      <div className="flex justify-between p-6">
-        <Button onClick={onBack}>
-          {t('back')}
-        </Button>
+      <div className="flex justify-between">
+        <Button onClick={onBack}>{t('back')}</Button>
         <Button
           onClick={handleCreateBlueprint}
           disabled={!selectedTemplate || isLoading}
@@ -252,6 +284,6 @@ export function TemplateSelectionStep({ onComplete, onBack }: TemplateSelectionS
           {isLoading ? t('creating') : t('create_template')}
         </Button>
       </div>
-    </div>
+    </CardContainer>
   );
 }
