@@ -81,7 +81,11 @@ export default function Credit() {
 
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: credit,
-    enableQuery: triggerValidationQuery && id === credit?.id,
+    enableQuery:
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.tax_data?.acts_as_sender &&
+      triggerValidationQuery &&
+      id === credit?.id,
     onFinished: () => {
       setTriggerValidationQuery(false);
     },

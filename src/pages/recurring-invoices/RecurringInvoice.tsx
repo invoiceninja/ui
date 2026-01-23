@@ -88,8 +88,8 @@ export default function RecurringInvoice() {
     entity: 'recurring_invoice',
     resource: recurringInvoice,
     enableQuery:
-      (company?.settings.e_invoice_type === 'PEPPOL' &&
-        company?.tax_data?.acts_as_sender) &&
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.tax_data?.acts_as_sender &&
       triggerValidationQuery &&
       id === recurringInvoice?.id,
     onFinished: () => {
