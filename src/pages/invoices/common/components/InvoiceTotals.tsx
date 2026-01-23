@@ -29,6 +29,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Fragment, useRef } from 'react';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import useDoesTaxRateExitsByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExitsByComboValue';
 
 interface Props {
   resource: ProductTableResource;
@@ -48,6 +49,7 @@ export function InvoiceTotals(props: Props) {
   const company = useCurrentCompany();
   const variables = useTotalVariables();
   const reactSettings = useReactSettings();
+  const doesTaxRateExitsByComboValue = useDoesTaxRateExitsByComboValue();
 
   const resolveVariable = useResolveTotalVariable({
     resource,
@@ -142,26 +144,80 @@ export function InvoiceTotals(props: Props) {
                       variable === '$tax1'
                   ) && (
                     <Element leftSide={t('tax')} noExternalPadding>
-                      <TaxRateSelector
-                        defaultValue={getTaxRateComboValue(
-                          resource,
-                          'tax_name1'
-                        )}
-                        onChange={(value: Entry<TaxRate>) => {
-                          handleChange('tax_name1', value.resource?.name);
-                          handleChange('tax_rate1', value.resource?.rate);
-                        }}
-                        onClearButtonClick={() => {
-                          handleChange('tax_name1', '');
-                          handleChange('tax_rate1', 0);
-                        }}
-                        onTaxCreated={(taxRate) => {
-                          handleChange('tax_name1', taxRate.name);
-                          handleChange('tax_rate1', taxRate.rate);
-                        }}
-                        resourceTaxName={resource.tax_name1}
-                        resourceTaxRate={resource.tax_rate1}
-                      />
+                      <div className="flex flex-col gap-y-2 w-full">
+                        <TaxRateSelector
+                          defaultValue={getTaxRateComboValue(
+                            resource,
+                            'tax_name1'
+                          )}
+                          onChange={(value: Entry<TaxRate>) => {
+                            handleChange('tax_name1', value.resource?.name);
+                            handleChange('tax_rate1', value.resource?.rate);
+                          }}
+                          onClearButtonClick={() => {
+                            handleChange('tax_name1', '');
+                            handleChange('tax_rate1', 0);
+                          }}
+                          onTaxCreated={(taxRate) => {
+                            handleChange('tax_name1', taxRate.name);
+                            handleChange('tax_rate1', taxRate.rate);
+                          }}
+                          resourceTaxName={resource.tax_name1}
+                          resourceTaxRate={resource.tax_rate1}
+                        />
+
+                        <div className="w-full">
+                          {!doesTaxRateExitsByComboValue(
+                            resource?.tax_name1,
+                            resource?.tax_rate1
+                          ) && (
+                            <div className="flex items-center gap-x-2 self-start">
+                              <div>
+                                <Icon
+                                  element={MdWarning}
+                                  size={20}
+                                  color="orange"
+                                />
+                              </div>
+
+                              <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
+                                <span style={{ color: colors.$3 }}>
+                                  {reactStringReplace(
+                                    reactStringReplace(
+                                      `${t(
+                                        'modified_tax_applied'
+                                      )} :remove` as string,
+                                      ':name',
+                                      () => (
+                                        <span>
+                                          "
+                                          {`${resource?.tax_name1} ${resource?.tax_rate1}`}
+                                          "
+                                        </span>
+                                      )
+                                    ),
+                                    ':remove',
+                                    () => (
+                                      <span
+                                        className="underline cursor-pointer"
+                                        onClick={(event) => {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+
+                                          handleChange('tax_name1', '');
+                                          handleChange('tax_rate1', 0);
+                                        }}
+                                      >
+                                        {t('remove')}!
+                                      </span>
+                                    )
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </Element>
                   )}
 
@@ -171,26 +227,80 @@ export function InvoiceTotals(props: Props) {
                       variable === '$tax2'
                   ) && (
                     <Element leftSide={t('tax')} noExternalPadding>
-                      <TaxRateSelector
-                        defaultValue={getTaxRateComboValue(
-                          resource,
-                          'tax_name2'
-                        )}
-                        onChange={(value: Entry<TaxRate>) => {
-                          handleChange('tax_name2', value.resource?.name);
-                          handleChange('tax_rate2', value.resource?.rate);
-                        }}
-                        onClearButtonClick={() => {
-                          handleChange('tax_name2', '');
-                          handleChange('tax_rate2', 0);
-                        }}
-                        onTaxCreated={(taxRate) => {
-                          handleChange('tax_name2', taxRate.name);
-                          handleChange('tax_rate2', taxRate.rate);
-                        }}
-                        resourceTaxName={resource.tax_name2}
-                        resourceTaxRate={resource.tax_rate2}
-                      />
+                      <div className="flex flex-col gap-y-2 w-full">
+                        <TaxRateSelector
+                          defaultValue={getTaxRateComboValue(
+                            resource,
+                            'tax_name2'
+                          )}
+                          onChange={(value: Entry<TaxRate>) => {
+                            handleChange('tax_name2', value.resource?.name);
+                            handleChange('tax_rate2', value.resource?.rate);
+                          }}
+                          onClearButtonClick={() => {
+                            handleChange('tax_name2', '');
+                            handleChange('tax_rate2', 0);
+                          }}
+                          onTaxCreated={(taxRate) => {
+                            handleChange('tax_name2', taxRate.name);
+                            handleChange('tax_rate2', taxRate.rate);
+                          }}
+                          resourceTaxName={resource.tax_name2}
+                          resourceTaxRate={resource.tax_rate2}
+                        />
+
+                        <div className="w-full">
+                          {!doesTaxRateExitsByComboValue(
+                            resource?.tax_name2,
+                            resource?.tax_rate2
+                          ) && (
+                            <div className="flex items-center gap-x-2 self-start">
+                              <div>
+                                <Icon
+                                  element={MdWarning}
+                                  size={20}
+                                  color="orange"
+                                />
+                              </div>
+
+                              <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
+                                <span style={{ color: colors.$3 }}>
+                                  {reactStringReplace(
+                                    reactStringReplace(
+                                      `${t(
+                                        'modified_tax_applied'
+                                      )} :remove` as string,
+                                      ':name',
+                                      () => (
+                                        <span>
+                                          "
+                                          {`${resource?.tax_name2} ${resource?.tax_rate2}`}
+                                          "
+                                        </span>
+                                      )
+                                    ),
+                                    ':remove',
+                                    () => (
+                                      <span
+                                        className="underline cursor-pointer"
+                                        onClick={(event) => {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+
+                                          handleChange('tax_name2', '');
+                                          handleChange('tax_rate2', 0);
+                                        }}
+                                      >
+                                        {t('remove')}!
+                                      </span>
+                                    )
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </Element>
                   )}
 
@@ -200,26 +310,80 @@ export function InvoiceTotals(props: Props) {
                       variable === '$tax3'
                   ) && (
                     <Element leftSide={t('tax')} noExternalPadding>
-                      <TaxRateSelector
-                        defaultValue={getTaxRateComboValue(
-                          resource,
-                          'tax_name3'
-                        )}
-                        onChange={(value: Entry<TaxRate>) => {
-                          handleChange('tax_name3', value.resource?.name);
-                          handleChange('tax_rate3', value.resource?.rate);
-                        }}
-                        onClearButtonClick={() => {
-                          handleChange('tax_name3', '');
-                          handleChange('tax_rate3', 0);
-                        }}
-                        onTaxCreated={(taxRate) => {
-                          handleChange('tax_name3', taxRate.name);
-                          handleChange('tax_rate3', taxRate.rate);
-                        }}
-                        resourceTaxName={resource.tax_name3}
-                        resourceTaxRate={resource.tax_rate3}
-                      />
+                      <div className="flex flex-col gap-y-2 w-full">
+                        <TaxRateSelector
+                          defaultValue={getTaxRateComboValue(
+                            resource,
+                            'tax_name3'
+                          )}
+                          onChange={(value: Entry<TaxRate>) => {
+                            handleChange('tax_name3', value.resource?.name);
+                            handleChange('tax_rate3', value.resource?.rate);
+                          }}
+                          onClearButtonClick={() => {
+                            handleChange('tax_name3', '');
+                            handleChange('tax_rate3', 0);
+                          }}
+                          onTaxCreated={(taxRate) => {
+                            handleChange('tax_name3', taxRate.name);
+                            handleChange('tax_rate3', taxRate.rate);
+                          }}
+                          resourceTaxName={resource.tax_name3}
+                          resourceTaxRate={resource.tax_rate3}
+                        />
+
+                        <div className="w-full">
+                          {!doesTaxRateExitsByComboValue(
+                            resource?.tax_name3,
+                            resource?.tax_rate3
+                          ) && (
+                            <div className="flex items-center gap-x-2 self-start">
+                              <div>
+                                <Icon
+                                  element={MdWarning}
+                                  size={20}
+                                  color="orange"
+                                />
+                              </div>
+
+                              <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
+                                <span style={{ color: colors.$3 }}>
+                                  {reactStringReplace(
+                                    reactStringReplace(
+                                      `${t(
+                                        'modified_tax_applied'
+                                      )} :remove` as string,
+                                      ':name',
+                                      () => (
+                                        <span>
+                                          "
+                                          {`${resource?.tax_name3} ${resource?.tax_rate3}`}
+                                          "
+                                        </span>
+                                      )
+                                    ),
+                                    ':remove',
+                                    () => (
+                                      <span
+                                        className="underline cursor-pointer"
+                                        onClick={(event) => {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+
+                                          handleChange('tax_name3', '');
+                                          handleChange('tax_rate3', 0);
+                                        }}
+                                      >
+                                        {t('remove')}!
+                                      </span>
+                                    )
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </Element>
                   )}
                 </>
