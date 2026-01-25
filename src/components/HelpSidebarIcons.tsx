@@ -75,6 +75,7 @@ export function HelpSidebarIcons(props: Props) {
         .get('https://pdf.invoicing.co/api/version')
         .then((response) => response.data),
     staleTime: Infinity,
+    enabled: isSelfHosted(),
   });
 
   const { data: currentSystemInfo } = useQuery({
