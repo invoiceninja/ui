@@ -15,12 +15,18 @@ import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useColorScheme } from '$app/common/colors';
 import { Files } from '$app/components/icons/Files';
+import { useEffect } from 'react';
+import { cloneDeep, set } from 'lodash';
+import { injectInChanges } from '$app/common/stores/slices/company-users';
+import { useDispatch } from 'react-redux';
 
 export default function ProductQuoteColumns() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const company = useCompanyChanges();
 
+  const dispatch = useDispatch();
   const customField = useCustomField();
 
   const defaultVariables = [
@@ -50,7 +56,22 @@ export default function ProductQuoteColumns() {
     { value: '$product.tax', label: t('tax') },
   ];
 
-  const company = useCompanyChanges();
+  useEffect(() => {
+    if (
+      company?.settings.pdf_variables?.['product_columns'] &&
+      !company?.settings.pdf_variables?.['product_quote_columns']
+    ) {
+      const companyClone = cloneDeep(company);
+
+      set(
+        companyClone,
+        `settings.pdf_variables.product_quote_columns`,
+        companyClone?.settings.pdf_variables?.['product_columns']
+      );
+
+      dispatch(injectInChanges({ object: 'company', data: companyClone }));
+    }
+  }, [company]);
 
   return (
     <>

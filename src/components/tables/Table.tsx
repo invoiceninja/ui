@@ -21,6 +21,8 @@ interface Props extends CommonProps {
   isDataLoading?: boolean;
   resizable?: string;
   withoutBorder?: boolean;
+  withoutBottomRounding?: boolean;
+  withoutBottomPadding?: boolean;
 }
 
 export function Table(props: Props) {
@@ -35,6 +37,7 @@ export function Table(props: Props) {
       <div
         className={classNames('align-middle inline-block min-w-full', {
           'py-1.5': !props.withoutPadding,
+          'pb-0': props.withoutBottomPadding,
         })}
       >
         <div
@@ -45,6 +48,7 @@ export function Table(props: Props) {
               'border-t-0': props.withoutTopBorder,
               'border-l-0': props.withoutLeftBorder,
               'border-r-0': props.withoutRightBorder,
+              'rounded-b-none': props.withoutBottomRounding,
             }
           )}
           style={{

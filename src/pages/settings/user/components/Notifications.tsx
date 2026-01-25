@@ -155,6 +155,32 @@ export function Notifications() {
     dispatch(injectInChangesWithData(user));
   };
 
+  const handleEnableEInvoiceReceivedNotificationChange = (value: boolean) => {
+    const emailNotifications = userChanges?.company_user?.notifications?.email;
+
+    let updatedNotifications: string[] = [...emailNotifications];
+
+    if (!value) {
+      updatedNotifications = updatedNotifications.filter(
+        (notificationKey) => notificationKey !== 'enable_e_invoice_received_notification'
+      );
+    } else {
+      const isAlreadyAdded = updatedNotifications.find(
+        (notificationKey) => notificationKey === 'enable_e_invoice_received_notification'
+      );
+
+      if (!isAlreadyAdded) {
+        updatedNotifications = [...updatedNotifications, 'enable_e_invoice_received_notification'];
+      }
+    }
+
+    const user = cloneDeep(userChanges);
+
+    set(user, 'company_user.notifications.email', updatedNotifications);
+
+    dispatch(injectInChangesWithData(user));
+  };
+
   useEffect(() => {
     const emailNotifications = userChanges?.company_user?.notifications?.email;
 
@@ -210,6 +236,21 @@ export function Notifications() {
           )}
           onChange={(value) =>
             handleDisableRecurringPaymentNotificationChange(value)
+          }
+        />
+      </Element>
+
+      <Element
+        className="mb-4"
+        leftSide={t('enable_e_invoice_received_notification')}
+        leftSideHelp={t('enable_e_invoice_received_notification_help')}
+      >
+        <Toggle
+          checked={userChanges?.company_user?.notifications?.email?.find(
+            (key: string) => key === 'enable_e_invoice_received_notification'
+          )}
+          onChange={(value) =>
+            handleEnableEInvoiceReceivedNotificationChange(value)
           }
         />
       </Element>

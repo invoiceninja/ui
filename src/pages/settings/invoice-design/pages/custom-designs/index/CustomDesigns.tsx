@@ -14,8 +14,11 @@ import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanA
 import { DataTable } from '$app/components/DataTable';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Inline } from '$app/components/Inline';
+import { useActions } from '../../../common/hooks/useActions';
 
 export default function CustomDesigns() {
+  const actions = useActions();
+
   return (
     <>
       <AdvancedSettingsPlanAlert />
@@ -35,6 +38,7 @@ export default function CustomDesigns() {
           },
         ]}
         resource="design"
+        customActions={actions}
         linkToCreate="/settings/invoice_design/custom_designs/create"
         bulkRoute="/api/v1/designs/bulk"
         linkToEdit="/settings/invoice_design/custom_designs/:id/edit"

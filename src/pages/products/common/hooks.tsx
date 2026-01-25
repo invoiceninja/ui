@@ -51,6 +51,7 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -92,7 +93,7 @@ export function useAllProductColumns() {
     'updated_at',
   ] as const;
 
-  return productColumns;
+  return productColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useProductColumns() {
@@ -284,8 +285,12 @@ export function useProductColumns() {
     reactSettings?.react_table_columns?.product || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useActions() {

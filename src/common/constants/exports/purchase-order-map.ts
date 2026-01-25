@@ -50,4 +50,5 @@ export const purchaseorderMap: Record[] = [
   { trans: 'tax_rate2', value: 'purchase_order.tax_rate2', map: 'purchase_order' },
   { trans: 'tax_name3', value: 'purchase_order.tax_name3', map: 'purchase_order' },
   { trans: 'tax_rate3', value: 'purchase_order.tax_rate3', map: 'purchase_order' },
+  { trans: 'subtotal', value: 'purchase_order.subtotal', map: 'purchase_order' },
 ];

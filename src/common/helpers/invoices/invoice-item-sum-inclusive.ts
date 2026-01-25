@@ -32,8 +32,13 @@ export class InvoiceItemSumInclusive {
       | Credit
       | Quote
       | PurchaseOrder
-      | RecurringInvoice
+      | RecurringInvoice,
+    protected eInvoiceType?: string
   ) {}
+
+  public get isPeppol(): boolean {
+    return this.eInvoiceType === 'PEPPOL';
+  }
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {

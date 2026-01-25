@@ -50,7 +50,6 @@ import {
   MdArchive,
   MdCloudCircle,
   MdComment,
-  MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
   MdDesignServices,
@@ -71,7 +70,6 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useMarkPaid } from './hooks/useMarkPaid';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
@@ -98,6 +96,7 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -197,9 +196,11 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
 
     if (currency && credit) {
+      const eInvoiceType = company?.settings.e_invoice_type;
+
       const invoiceSum = credit.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(credit, currency).build()
-        : new InvoiceSum(credit, currency).build();
+        ? new InvoiceSumInclusive(credit, currency, eInvoiceType).build()
+        : new InvoiceSum(credit, currency, eInvoiceType).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -356,7 +357,6 @@ interface Params {
 export function useActions(params?: Params) {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
   const hasPermission = useHasPermission();
 
   const { dropdown = true } = params || {};
@@ -367,8 +367,6 @@ export function useActions(params?: Params) {
     entity: 'credit',
     editPageTabs: ['documents', 'settings', 'activity', 'history'],
   });
-
-  const setCredit = useSetAtom(creditAtom);
 
   const bulk = useBulk();
   const markSent = useMarkSent();
@@ -385,28 +383,6 @@ export function useActions(params?: Params) {
     setChangeTemplateVisible,
     setChangeTemplateEntityContext,
   } = useChangeTemplate();
-
-  const cloneToCredit = (credit: Credit) => {
-    setCredit({
-      ...credit,
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-      po_number: '',
-    });
-
-    navigate('/credits/create?action=clone');
-  };
 
   const actions: Action<Credit>[] = [
     (credit) => (
@@ -624,26 +600,10 @@ export function useActions(params?: Params) {
       </EntityActionElement>
     ),
     () => <Divider withoutPadding />,
-    (credit) =>
-      hasPermission('create_credit') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'clone_to_credit',
-          })}
-          entity="credit"
-          actionKey="clone_to_credit"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_credit')}
-          onClick={() => cloneToCredit(credit)}
-          icon={MdControlPointDuplicate}
-        >
-          {t('clone_to_credit')}
-        </EntityActionElement>
-      ),
     (credit) => (
       <CloneOptionsModal
         {...(!dropdown && {
-          key: 'clone_to_other',
+          key: 'clone_to',
         })}
         dropdown={dropdown}
         credit={credit}
@@ -767,7 +727,7 @@ export function useAllCreditColumns() {
     // 'vendor', @Todo: Need to fetch the relationship
   ] as const;
 
-  return creditColumns;
+  return creditColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useCreditColumns() {
@@ -1091,6 +1051,10 @@ export function useCreditColumns() {
     reactSettings?.react_table_columns?.credit || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }

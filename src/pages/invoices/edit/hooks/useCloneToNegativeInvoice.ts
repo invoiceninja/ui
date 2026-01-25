@@ -19,7 +19,6 @@ export function useCloneToNegativeInvoice() {
   const setInvoice = useSetAtom(invoiceAtom);
 
   const cloneToNegativeInvoice = (invoice: Invoice, reason?: string) => {
-    console.log('cloneToNegativeInvoice called with:', { invoice: invoice.id, reason });
     
     // Create a deep copy of the invoice with negative quantities for all line items
     const negativeInvoice = {

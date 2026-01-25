@@ -47,7 +47,6 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdComment,
-  MdControlPointDuplicate,
   MdDelete,
   MdEdit,
   MdInfo,
@@ -70,7 +69,6 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { UpdatePricesAction } from './components/UpdatePricesAction';
 import { IncreasePricesAction } from './components/IncreasePricesAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
@@ -86,9 +84,10 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { EntityActionElement } from '$app/components/EntityActionElement';
-import { confirmActionModalAtom } from './components/ConfirmActionModal';
 import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { SendNowAction } from './components/SendNowAction';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -197,9 +196,15 @@ export function useRecurringInvoiceUtilities(
     );
 
     if (currency && recurringInvoice) {
+      const eInvoiceType = company?.settings.e_invoice_type;
+
       const invoiceSum = recurringInvoice.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(recurringInvoice, currency).build()
-        : new InvoiceSum(recurringInvoice, currency).build();
+        ? new InvoiceSumInclusive(
+            recurringInvoice,
+            currency,
+            eInvoiceType
+          ).build()
+        : new InvoiceSum(recurringInvoice, currency, eInvoiceType).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -220,10 +225,11 @@ interface RecurringInvoiceSaveProps {
   setErrors: (errors: ValidationBag | undefined) => unknown;
   setIsFormBusy: Dispatch<SetStateAction<boolean>>;
   isFormBusy: boolean;
+  onSuccess?: () => void;
 }
 
 export function useSave(props: RecurringInvoiceSaveProps) {
-  const { setErrors, setIsFormBusy, isFormBusy } = props;
+  const { setErrors, setIsFormBusy, isFormBusy, onSuccess } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -252,6 +258,8 @@ export function useSave(props: RecurringInvoiceSaveProps) {
         $refetch(['recurring_invoices']);
 
         toast.success('updated_recurring_invoice');
+
+        onSuccess?.();
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -314,12 +322,7 @@ export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const bulk = useBulkAction();
-  const navigate = useNavigate();
-  const hasPermission = useHasPermission();
   const toggleStartStop = useToggleStartStop();
-  const setSendConfirmationVisible = useSetAtom(confirmActionModalAtom);
-
-  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
   const {
     showEditAction,
@@ -331,17 +334,6 @@ export function useActions(params?: Params) {
     entity: 'recurring_invoice',
     editPageTabs: ['documents', 'settings', 'activity', 'history', 'schedule'],
   });
-
-  const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
-    setRecurringInvoice({
-      ...recurringInvoice,
-      id: '',
-      documents: [],
-      number: '',
-    });
-
-    navigate('/recurring_invoices/create?action=clone');
-  };
 
   const actions: Action<RecurringInvoice>[] = [
     (recurringInvoice) =>
@@ -377,19 +369,20 @@ export function useActions(params?: Params) {
 
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'send_now',
-          })}
-          entity="recurring_invoice"
-          actionKey="send_now"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('start')}
-          onClick={() => setSendConfirmationVisible(true)}
-          icon={MdSend}
-        >
-          {t('send_now')}
-        </EntityActionElement>
+        <SendNowAction recurringInvoice={recurringInvoice}>
+          <EntityActionElement
+            {...(!dropdown && {
+              key: 'send_now',
+            })}
+            entity="recurring_invoice"
+            actionKey="send_now"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('start')}
+            icon={MdSend}
+          >
+            {t('send_now')}
+          </EntityActionElement>
+        </SendNowAction>
       ),
     (recurringInvoice) =>
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
@@ -465,26 +458,10 @@ export function useActions(params?: Params) {
       />
     ),
     () => <Divider withoutPadding />,
-    (recurringInvoice) =>
-      hasPermission('create_recurring_invoice') && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'clone_to_recurring',
-          })}
-          entity="recurring_invoice"
-          actionKey="clone_to_recurring"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_recurring')}
-          onClick={() => cloneToRecurringInvoice(recurringInvoice)}
-          icon={MdControlPointDuplicate}
-        >
-          {t('clone_to_recurring')}
-        </EntityActionElement>
-      ),
     (recurringInvoice) => (
       <CloneOptionsModal
         {...(!dropdown && {
-          key: 'clone_to_other',
+          key: 'clone_to',
         })}
         recurringInvoice={recurringInvoice}
         dropdown={dropdown}
@@ -663,7 +640,7 @@ export function useAllRecurringInvoiceColumns() {
     'updated_at',
   ] as const;
 
-  return recurringInvoiceColumns;
+  return recurringInvoiceColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useRecurringInvoiceColumns() {
@@ -951,8 +928,12 @@ export function useRecurringInvoiceColumns() {
     reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useRecurringInvoiceFilters() {

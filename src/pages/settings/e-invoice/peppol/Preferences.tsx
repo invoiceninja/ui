@@ -149,42 +149,48 @@ export function Preferences() {
           </div>
         </Element>
 
-        <Element leftSide={t('act_as_sender')}>
-          <Toggle
-            checked={form.values.acts_as_sender}
-            onValueChange={(v) => {
-              form.setFieldValue('acts_as_sender', v);
-              form.submitForm();
-            }}
-          />
-        </Element>
+        {company.legal_entity_id && (
+          <Element leftSide={t('act_as_sender')}>
+            <Toggle
+              checked={form.values.acts_as_sender}
+              onValueChange={(v) => {
+                form.setFieldValue('acts_as_sender', v);
+                form.submitForm();
+              }}
+            />
+          </Element>
+        )}
 
-        <Element leftSide={t('act_as_receiver')}>
-          <Toggle
-            checked={form.values.acts_as_receiver}
-            onValueChange={(v) => {
-              form.setFieldValue('acts_as_receiver', v);
-              form.submitForm();
-            }}
-          />
-        </Element>
+        {company.legal_entity_id && (
+          <Element leftSide={t('act_as_receiver')}>
+            <Toggle
+              checked={form.values.acts_as_receiver}
+              onValueChange={(v) => {
+                form.setFieldValue('acts_as_receiver', v);
+                form.submitForm();
+              }}
+            />
+          </Element>
+        )}
 
-        <Element leftSide={t('credits')}>
-          <div className="flex items-center gap-1">
-            <p>{t('total_credits_amount')}:</p>
-            <Quota />
-          </div>
+        {company.legal_entity_id && (
+          <Element leftSide={t('credits')}>
+            <div className="flex items-center gap-1">
+              <p>{t('total_credits_amount')}:</p>
+              <Quota />
+            </div>
 
-          <button
-            type="button"
-            onClick={() => setCreditsModalVisible(true)}
-            style={{
-              color: accentColor,
-            }}
-          >
-            {t('buy_credits')}
-          </button>
-        </Element>
+            <button
+              type="button"
+              onClick={() => setCreditsModalVisible(true)}
+              style={{
+                color: accentColor,
+              }}
+            >
+              {t('buy_credits')}
+            </button>
+          </Element>
+        )}
       </Card>
     </>
   );
@@ -196,7 +202,6 @@ export function useTriggerEInvoiceRoutes() {
   return (
     isSelfHosted() &&
     Boolean(company) &&
-    company?.settings.enable_e_invoice &&
     company?.settings.e_invoice_type === 'PEPPOL'
   );
 }

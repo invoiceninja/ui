@@ -31,9 +31,14 @@ export class InvoiceSumInclusive {
 
   constructor(
     public invoice: Invoice | Credit | PurchaseOrder | Quote | RecurringInvoice,
-    protected currency: Currency
+    protected currency: Currency,
+    protected eInvoiceType?: string
   ) {
-    this.invoiceItems = new InvoiceItemSumInclusive(this.invoice);
+    this.invoiceItems = new InvoiceItemSumInclusive(this.invoice, this.eInvoiceType);
+  }
+
+  public get isPeppol(): boolean {
+    return this.eInvoiceType === 'PEPPOL';
   }
 
   public build() {

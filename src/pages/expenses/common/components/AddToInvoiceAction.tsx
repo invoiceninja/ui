@@ -36,6 +36,7 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import collect from 'collect.js';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Button } from '$app/components/forms';
 
 interface Props {
   expenses: Expense[];
@@ -185,26 +186,28 @@ export function AddToInvoiceAction(props: Props) {
         onClose={() => setVisibleModal(false)}
         visible={visibleModal}
       >
-        <div className="flex flex-col space-y-1">
-          {invoices.map((invoice) => (
-            <Div
-              theme={{ hoverColor: colors.$5 }}
-              key={invoice.id}
-              onClick={() => handleAddToInvoice(invoice)}
-              className="flex items-center justify-between cursor-pointer rounded py-1 px-2"
-            >
-              <p>{invoice?.number}</p>
+        {Boolean(invoices.length) && (
+          <div className="flex flex-col space-y-1">
+            {invoices.map((invoice) => (
+              <Div
+                theme={{ hoverColor: colors.$5 }}
+                key={invoice.id}
+                onClick={() => handleAddToInvoice(invoice)}
+                className="flex items-center justify-between cursor-pointer rounded py-1 px-2"
+              >
+                <p>{invoice?.number}</p>
 
-              <p>
-                {formatMoney(
-                  invoice.amount,
-                  invoice.client?.country_id,
-                  invoice.client?.settings.currency_id
-                )}
-              </p>
-            </Div>
-          ))}
-        </div>
+                <p>
+                  {formatMoney(
+                    invoice.amount,
+                    invoice.client?.country_id,
+                    invoice.client?.settings.currency_id
+                  )}
+                </p>
+              </Div>
+            ))}
+          </div>
+        )}
 
         {isLoading && (
           <div className="flex justify-center">
@@ -213,8 +216,18 @@ export function AddToInvoiceAction(props: Props) {
         )}
 
         {!isLoading && !invoices.length && (
-          <div className="flex justify-center font-medium text-lg">
-            {t('no_invoices_found')}
+          <div className="flex flex-col space-y-4">
+            <span className="text-center" style={{ color: colors.$3 }}>
+              {t('no_invoices_found')}.
+            </span>
+
+            <Button
+              className="w-full"
+              behavior="button"
+              onClick={() => setVisibleModal(false)}
+            >
+              {t('close')}
+            </Button>
           </div>
         )}
       </Modal>

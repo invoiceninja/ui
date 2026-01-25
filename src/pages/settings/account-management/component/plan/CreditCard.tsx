@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from "$app/common/colors";
-import { endpoint } from "$app/common/helpers";
-import { request } from "$app/common/helpers/request";
-import { toast } from "$app/common/helpers/toast/toast";
-import { useAccentColor } from "$app/common/hooks/useAccentColor";
-import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
-import { CompanyGateway } from "$app/common/interfaces/company-gateway";
-import { Badge } from "$app/components/Badge";
-import { Button } from "$app/components/forms";
-import { Modal } from "$app/components/Modal";
-import { useFormik } from "formik";
-import { useState } from "react";
-import { Check, Trash2 } from "react-feather";
-import { useTranslation } from "react-i18next";
-import { useQueryClient } from "react-query";
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Badge } from '$app/components/Badge';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { useFormik } from 'formik';
+import { useState } from 'react';
+import { Check, Trash2 } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import visa from '/gateway-card-images/visa.png?url';
 import mc from '/gateway-card-images/mastercard.png?url';
 
@@ -58,7 +58,9 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
 
       request(
         'POST',
-        endpoint(`/api/client/account_management/methods/${gateway.id}/default`),
+        endpoint(
+          `/api/client/account_management/methods/${gateway.id}/default`
+        ),
         {
           account_key: account.key,
         }
@@ -113,8 +115,9 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
             ) : (
               <button
                 type="button"
-                className="bg-white p-1 rounded-full cursor-pointer"
+                className="p-1 rounded-full cursor-pointer"
                 onClick={() => setDefaultPopupVisible(true)}
+                style={{ backgroundColor: colors.$1 }}
               >
                 <Check size={18} />
               </button>
@@ -122,8 +125,9 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
 
             <button
               type="button"
-              className="bg-white p-1 rounded-full cursor-pointer"
+              className="p-1 rounded-full cursor-pointer"
               onClick={onDelete}
+              style={{ backgroundColor: colors.$1 }}
             >
               <Trash2 size={18} />
             </button>

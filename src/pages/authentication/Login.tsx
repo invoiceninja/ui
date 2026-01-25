@@ -65,6 +65,10 @@ export function Login() {
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data.errors);
+
+          if (error.response.data.message) {
+            setMessage(error.response.data.message);
+          }
         } else if (error.response?.status === 503) {
           toast.error('app_maintenance');
         } else {
@@ -115,9 +119,14 @@ export function Login() {
             />
 
             <div className="space-y-2">
-              <div className="flex flex-col lg:flex-row items-center justify-between">
-                <InputLabel>{`2FA - ${t('one_time_password')}`}</InputLabel>
-                <Link to="/recover_password">{t('forgot_password')}</Link>
+              <div className="flex items-center justify-between gap-x-3">
+                <InputLabel className="truncate">
+                  {`2FA - ${t('one_time_password')}`}
+                </InputLabel>
+
+                <Link className="truncate" to="/recover_password">
+                  {t('forgot_password')}
+                </Link>
               </div>
             </div>
 

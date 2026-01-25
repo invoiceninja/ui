@@ -114,6 +114,7 @@ export function Details(props: PurchaseOrderCardProps) {
       >
         <Element leftSide={t('po_number')}>
           <InputField
+            placeholder={t('auto_generate')}
             value={purchaseOrder.number}
             onValueChange={(value) => handleChange('number', value)}
             errorMessage={errors?.errors.number}

@@ -34,12 +34,12 @@ import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './edit/hooks/useTabs';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { useCalculateInvoiceSum } from './edit/hooks/useCalculateInvoiceSum';
 import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { purchaseOrderAtom } from './common/atoms';
 import { InputLabel } from '$app/components/forms';
+import { usePurchaseOrderUtilities } from './edit/hooks/usePurchaseOrderUtilities';
 
 export default function PurchaseOrder() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -74,7 +74,11 @@ export default function PurchaseOrder() {
   const actions = useActions();
   const tabs = useTabs({ purchaseOrder });
 
-  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
+  const { calculateInvoiceSum } = usePurchaseOrderUtilities({
+    purchaseOrder,
+    setPurchaseOrder,
+    setInvoiceSum,
+  });
 
   const onSave = useSave({
     setErrors,
