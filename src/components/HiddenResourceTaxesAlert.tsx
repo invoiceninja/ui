@@ -30,6 +30,22 @@ export function HiddenResourceTaxesAlert({ resource, className }: Props) {
       return true;
     }
 
+    const isAnyThirdTaxHidden = resource.line_items.some(
+      (lineItem) => lineItem.tax_name3
+    );
+
+    if (company.enabled_item_tax_rates === 2 && isAnyThirdTaxHidden) {
+      return true;
+    }
+
+    const isAnySecondOrThirdTaxHidden = resource.line_items.some(
+      (lineItem) => lineItem.tax_name2 || lineItem.tax_name3
+    );
+
+    if (company.enabled_item_tax_rates === 1 && isAnySecondOrThirdTaxHidden) {
+      return true;
+    }
+
     return false;
   };
 

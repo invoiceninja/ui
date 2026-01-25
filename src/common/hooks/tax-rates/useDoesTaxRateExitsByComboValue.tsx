@@ -8,10 +8,11 @@ const useDoesTaxRateExitsByComboValue = () => {
   });
 
   return (taxName: string, taxRate: number) => {
-    if (!taxes?.data.data || taxName === '' || !taxRate) return true;
+    if (!taxes?.data.data || !taxName || !taxRate) return true;
 
     return taxes?.data.data.some(
-      (tax: TaxRate) => tax.name === taxName && tax.rate === taxRate
+      (tax: TaxRate) =>
+        tax.name.toLowerCase() === taxName.toLowerCase() && tax.rate === taxRate
     );
   };
 };

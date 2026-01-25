@@ -39,7 +39,9 @@ export function TaxRateSelector(props: Props) {
     <>
       <ComboboxAsync<TaxRate>
         inputOptions={{
-          value: props.defaultValue ?? null,
+          value: props.defaultValue
+            ? String(props.defaultValue).toLowerCase()
+            : null,
         }}
         endpoint={endpoint('/api/v1/tax_rates?status=active')}
         onChange={(taxRate) => props.onChange && props.onChange(taxRate)}
@@ -52,7 +54,8 @@ export function TaxRateSelector(props: Props) {
           id: 'id',
           value: 'name',
           label: 'name',
-          customValue: (taxRate) => `${taxRate.name}||${taxRate.rate}`,
+          customValue: (taxRate) =>
+            `${taxRate.name}||${taxRate.rate}`.toLowerCase(),
           inputLabelFn: (taxRate) =>
             taxRate
               ? resourceTaxName === taxRate.name

@@ -69,12 +69,13 @@ export function InvoiceTotals(props: Props) {
       return true;
     }
 
+    if (company.enabled_tax_rates === 2 && resource?.tax_name3) {
+      return true;
+    }
+
     if (
-      company.enabled_item_tax_rates === 0 &&
-      resource?.line_items.some(
-        ({ tax_name1, tax_name2, tax_name3 }) =>
-          tax_name1 || tax_name2 || tax_name3
-      )
+      company.enabled_tax_rates === 1 &&
+      (resource?.tax_name2 || resource?.tax_name3)
     ) {
       return true;
     }
@@ -182,36 +183,20 @@ export function InvoiceTotals(props: Props) {
 
                               <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
                                 <span style={{ color: colors.$3 }}>
-                                  {reactStringReplace(
-                                    reactStringReplace(
-                                      `${t(
-                                        'modified_tax_applied'
-                                      )} :remove` as string,
-                                      ':name',
-                                      () => (
-                                        <span>
-                                          "
-                                          {`${resource?.tax_name1} ${resource?.tax_rate1}`}
-                                          "
-                                        </span>
-                                      )
-                                    ),
-                                    ':remove',
-                                    () => (
-                                      <span
-                                        className="underline cursor-pointer"
-                                        onClick={(event) => {
-                                          event.preventDefault();
-                                          event.stopPropagation();
+                                  {resource?.tax_name1} {resource?.tax_rate1}%
+                                </span>
 
-                                          handleChange('tax_name1', '');
-                                          handleChange('tax_rate1', 0);
-                                        }}
-                                      >
-                                        {t('remove')}!
-                                      </span>
-                                    )
-                                  )}
+                                <span
+                                  className="underline cursor-pointer"
+                                  onClick={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+
+                                    handleChange('tax_name1', '');
+                                    handleChange('tax_rate1', 0);
+                                  }}
+                                >
+                                  {t('remove')}
                                 </span>
                               </div>
                             </div>
@@ -265,36 +250,19 @@ export function InvoiceTotals(props: Props) {
 
                               <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
                                 <span style={{ color: colors.$3 }}>
-                                  {reactStringReplace(
-                                    reactStringReplace(
-                                      `${t(
-                                        'modified_tax_applied'
-                                      )} :remove` as string,
-                                      ':name',
-                                      () => (
-                                        <span>
-                                          "
-                                          {`${resource?.tax_name2} ${resource?.tax_rate2}`}
-                                          "
-                                        </span>
-                                      )
-                                    ),
-                                    ':remove',
-                                    () => (
-                                      <span
-                                        className="underline cursor-pointer"
-                                        onClick={(event) => {
-                                          event.preventDefault();
-                                          event.stopPropagation();
+                                  {resource?.tax_name2} {resource?.tax_rate2}%
+                                </span>
+                                <span
+                                  className="underline cursor-pointer"
+                                  onClick={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
 
-                                          handleChange('tax_name2', '');
-                                          handleChange('tax_rate2', 0);
-                                        }}
-                                      >
-                                        {t('remove')}!
-                                      </span>
-                                    )
-                                  )}
+                                    handleChange('tax_name2', '');
+                                    handleChange('tax_rate2', 0);
+                                  }}
+                                >
+                                  {t('remove')}
                                 </span>
                               </div>
                             </div>
@@ -348,36 +316,19 @@ export function InvoiceTotals(props: Props) {
 
                               <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
                                 <span style={{ color: colors.$3 }}>
-                                  {reactStringReplace(
-                                    reactStringReplace(
-                                      `${t(
-                                        'modified_tax_applied'
-                                      )} :remove` as string,
-                                      ':name',
-                                      () => (
-                                        <span>
-                                          "
-                                          {`${resource?.tax_name3} ${resource?.tax_rate3}`}
-                                          "
-                                        </span>
-                                      )
-                                    ),
-                                    ':remove',
-                                    () => (
-                                      <span
-                                        className="underline cursor-pointer"
-                                        onClick={(event) => {
-                                          event.preventDefault();
-                                          event.stopPropagation();
+                                  {resource?.tax_name3} {resource?.tax_rate3}%
+                                </span>
+                                <span
+                                  className="underline cursor-pointer"
+                                  onClick={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
 
-                                          handleChange('tax_name3', '');
-                                          handleChange('tax_rate3', 0);
-                                        }}
-                                      >
-                                        {t('remove')}!
-                                      </span>
-                                    )
-                                  )}
+                                    handleChange('tax_name3', '');
+                                    handleChange('tax_rate3', 0);
+                                  }}
+                                >
+                                  {t('remove')}
                                 </span>
                               </div>
                             </div>

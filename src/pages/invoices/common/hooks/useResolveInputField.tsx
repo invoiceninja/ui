@@ -47,7 +47,6 @@ import {
   getTaxRateComboValue,
   TaxNamePropertyType,
 } from '$app/common/helpers/tax-rates/tax-rates-combo';
-import reactStringReplace from 'react-string-replace';
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
@@ -260,17 +259,6 @@ export function useResolveInputField(props: Props) {
     await handleProductChange(index, value, updatedProduct);
   };
 
-  const isAnyTaxHidden = (lineItem: InvoiceItem) => {
-    if (
-      company.enabled_item_tax_rates === 0 &&
-      (lineItem?.tax_name1 || lineItem?.tax_name2 || lineItem?.tax_name3)
-    ) {
-      return true;
-    }
-
-    return false;
-  };
-
   const formatMoney = useFormatMoney({
     resource: props.resource,
     relationType: props.relationType,
@@ -359,7 +347,10 @@ export function useResolveInputField(props: Props) {
       return null;
     }
 
-    console.log(resource?.line_items[index]);
+    const taxComboValue = getTaxRateComboValue(
+      resource?.line_items[index],
+      property.replace('rate', 'name') as TaxNamePropertyType
+    );
 
     return (
       <div ref={taxRateFieldBox} className="flex flex-col items-center gap-y-2">
@@ -379,10 +370,11 @@ export function useResolveInputField(props: Props) {
           onClearButtonClick={() => handleTaxRateChange(property, index)}
         />
 
-        {!doesTaxRateExitsByComboValue(
-          resource?.line_items[index].tax_name1,
-          resource?.line_items[index].tax_rate1
-        ) &&
+        {taxComboValue &&
+          !doesTaxRateExitsByComboValue(
+            taxComboValue.split('||')[0],
+            parseFloat(taxComboValue.split('||')[1])
+          ) &&
           taxRateBoxWidth > 0 && (
             <div
               className="flex items-center gap-x-2 self-start"
@@ -394,32 +386,19 @@ export function useResolveInputField(props: Props) {
 
               <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
                 <span style={{ color: colors.$3 }}>
-                  {reactStringReplace(
-                    reactStringReplace(
-                      `${t('modified_tax_applied')} :remove` as string,
-                      ':name',
-                      () => (
-                        <span>
-                          "
-                          {`${resource?.line_items[index].tax_name1} ${resource?.line_items[index].tax_rate1}`}
-                          "
-                        </span>
-                      )
-                    ),
-                    ':remove',
-                    () => (
-                      <span
-                        className="underline cursor-pointer"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          handleTaxRateChange(property, index);
-                        }}
-                      >
-                        {t('remove')}!
-                      </span>
-                    )
-                  )}
+                  {taxComboValue.split('||')[0]} {taxComboValue.split('||')[1]}%
+                </span>
+
+                <span
+                  className="underline cursor-pointer"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    handleTaxRateChange(property, index);
+                  }}
+                >
+                  {t('remove')}
                 </span>
               </div>
             </div>
