@@ -166,8 +166,6 @@ export function DesignSelector(props: Props) {
             includeOnly: freePlanDesigns,
             includeByLabel: true,
           })}
-        excludeByLabel={props.excludeByLabel}
-        excludeWhenConfiguringEntries={props.excludeWhenConfiguringEntries}
       />
     </>
   );

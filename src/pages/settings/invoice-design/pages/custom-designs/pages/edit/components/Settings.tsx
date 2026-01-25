@@ -34,8 +34,6 @@ import styled from 'styled-components';
 import { BookOpen } from '$app/components/icons/BookOpen';
 import { Import as ImportIcon } from '$app/components/icons/Import';
 import { Export } from '$app/components/icons/Export';
-import { createUniqueId } from '$app/common/helpers/custom-design/custom-design';
-import { Spinner } from '$app/components/Spinner';
 
 export interface Context {
   errors: ValidationBag | undefined;
@@ -127,272 +125,242 @@ export default function Settings() {
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-        {payload.design ? (
+        <Element leftSide={t('name')}>
+          <InputField
+            value={payload.design?.name}
+            onValueChange={(value) => handlePropertyChange('name', value)}
+            errorMessage={errors?.errors.name}
+          />
+        </Element>
+
+        {payload.design?.is_template ? (
+          <Element leftSide={t('resource')}>
+            <div className="flex flex-col space-y-2">
+              {templateEntites.map((entity) => (
+                <Checkbox
+                  key={entity}
+                  label={t(entity)}
+                  value={entity}
+                  onValueChange={(value, checked) =>
+                    handleResourceChange(value, Boolean(checked))
+                  }
+                  checked={payload.design?.entities.includes(entity)}
+                />
+              ))}
+            </div>
+          </Element>
+        ) : null}
+
+        <Element leftSide={t('design')}>
+          <DesignSelector
+            onChange={(design) => handlePropertyChange('design', design.design)}
+            actionVisibility={false}
+            errorMessage={
+              errors?.errors['design.header'] ||
+              errors?.errors['design.body'] ||
+              errors?.errors['design.footer'] ||
+              errors?.errors['design.includes']
+            }
+          />
+        </Element>
+
+        {!payload.design?.is_template && (
           <>
-            <Element leftSide={t('name')}>
-              <InputField
-                value={payload.design?.name}
-                onValueChange={(value) => handlePropertyChange('name', value)}
-                errorMessage={errors?.errors.name}
-              />
+            <Element leftSide={t('entity')}>
+              <SelectField
+                value={payload.entity || 'invoice'}
+                onValueChange={(value) =>
+                  setPayload((current) => ({
+                    ...current,
+                    entity: value as EntityType,
+                    entity_id: '-1',
+                  }))
+                }
+                customSelector
+                dismissable={false}
+                errorMessage={errors?.errors.entity}
+              >
+                <option value="invoice">{t('invoice')}</option>
+                <option value="quote">{t('quote')}</option>
+                <option value="credit">{t('credit')}</option>
+                <option value="purchase_order">{t('purchase_order')}</option>
+              </SelectField>
             </Element>
 
-            {payload.design?.is_template ? (
-              <Element leftSide={t('resource')}>
-                <div className="flex flex-col space-y-2">
-                  {templateEntites.map((entity) => (
-                    <Checkbox
-                      key={entity}
-                      label={t(entity)}
-                      value={entity}
-                      onValueChange={(value, checked) =>
-                        handleResourceChange(value, Boolean(checked))
-                      }
-                      checked={payload.design?.entities.includes(entity)}
-                    />
-                  ))}
-                </div>
+            {payload.entity === 'invoice' && (
+              <Element leftSide={t('invoice')}>
+                <InvoiceSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id || '-1',
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '-1',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
               </Element>
-            ) : null}
-
-            <Element leftSide={t('design')}>
-              <DesignSelector
-                value={
-                  payload?.design
-                    ? createUniqueId(JSON.stringify(payload.design?.design))
-                    : undefined
-                }
-                onChange={(design) =>
-                  handlePropertyChange('design', design.design)
-                }
-                actionVisibility={false}
-                customValueFn={(design) =>
-                  design.design
-                    ? createUniqueId(JSON.stringify(design.design))
-                    : design.id
-                }
-                errorMessage={
-                  errors?.errors['design.header'] ||
-                  errors?.errors['design.body'] ||
-                  errors?.errors['design.footer'] ||
-                  errors?.errors['design.includes']
-                }
-                exclude={[payload?.design?.name]}
-                excludeByLabel
-                excludeWhenConfiguringEntries
-                disableWithQueryParameter
-              />
-            </Element>
-
-            {!payload.design?.is_template && (
-              <>
-                <Element leftSide={t('entity')}>
-                  <SelectField
-                    value={payload.entity || 'invoice'}
-                    onValueChange={(value) =>
-                      setPayload((current) => ({
-                        ...current,
-                        entity: value as EntityType,
-                        entity_id: '-1',
-                      }))
-                    }
-                    customSelector
-                    dismissable={false}
-                    errorMessage={errors?.errors.entity}
-                  >
-                    <option value="invoice">{t('invoice')}</option>
-                    <option value="quote">{t('quote')}</option>
-                    <option value="credit">{t('credit')}</option>
-                    <option value="purchase_order">
-                      {t('purchase_order')}
-                    </option>
-                  </SelectField>
-                </Element>
-
-                {payload.entity === 'invoice' && (
-                  <Element leftSide={t('invoice')}>
-                    <InvoiceSelector
-                      value={payload.entity_id}
-                      onChange={(value) =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: value.id || '-1',
-                        }))
-                      }
-                      onClearButtonClick={() =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: '-1',
-                        }))
-                      }
-                      errorMessage={errors?.errors.entity_id}
-                    />
-                  </Element>
-                )}
-
-                {payload.entity === 'quote' && (
-                  <Element leftSide={t('quote')}>
-                    <QuoteSelector
-                      value={payload.entity_id}
-                      onChange={(value) =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: value.id || '-1',
-                        }))
-                      }
-                      onClearButtonClick={() =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: '-1',
-                        }))
-                      }
-                      errorMessage={errors?.errors.entity_id}
-                    />
-                  </Element>
-                )}
-
-                {payload.entity === 'credit' && (
-                  <Element leftSide={t('credit')}>
-                    <CreditSelector
-                      value={payload.entity_id}
-                      onChange={(value) =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: value.id || '-1',
-                        }))
-                      }
-                      onClearButtonClick={() =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: '-1',
-                        }))
-                      }
-                      errorMessage={errors?.errors.entity_id}
-                    />
-                  </Element>
-                )}
-
-                {payload.entity === 'purchase_order' && (
-                  <Element leftSide={t('purchase_order')}>
-                    <PurchaseOrderSelector
-                      value={payload.entity_id}
-                      onChange={(value) =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: value.id || '-1',
-                        }))
-                      }
-                      onClearButtonClick={() =>
-                        setPayload((current) => ({
-                          ...current,
-                          entity_id: '-1',
-                        }))
-                      }
-                      errorMessage={errors?.errors.entity_id}
-                    />
-                  </Element>
-                )}
-              </>
             )}
 
-            <div className="px-4 sm:px-6 pb-6 pt-3">
-              <Divider
-                className="border-dashed"
-                borderColor={colors.$20}
-                withoutPadding
-              />
-            </div>
+            {payload.entity === 'quote' && (
+              <Element leftSide={t('quote')}>
+                <QuoteSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id || '-1',
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '-1',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
+              </Element>
+            )}
 
-            <div className="flex flex-col space-y-4 px-4 sm:px-6">
-              <Box
-                className="flex justify-between items-center p-4 border shadow-sm w-full rounded-md cursor-pointer"
-                theme={{
-                  backgroundColor: colors.$1,
-                  hoverBackgroundColor: colors.$4,
-                }}
-                onClick={() =>
-                  window.open(
-                    'https://invoiceninja.github.io/en/custom-fields/',
-                    '_blank'
-                  )
-                }
-                style={{ borderColor: colors.$24 }}
-              >
-                <div className="flex items-center space-x-2">
-                  <BookOpen color={colors.$3} size="1.4rem" />
+            {payload.entity === 'credit' && (
+              <Element leftSide={t('credit')}>
+                <CreditSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id || '-1',
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '-1',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
+              </Element>
+            )}
 
-                  <span className="text-sm" style={{ color: colors.$3 }}>
-                    {t('api_docs')}
-                  </span>
-                </div>
-
-                <div>
-                  <ArrowRight
-                    color={colors.$3}
-                    size="1.4rem"
-                    strokeWidth="1.5"
-                  />
-                </div>
-              </Box>
-
-              <Box
-                className="flex items-center p-4 border shadow-sm w-full rounded-md cursor-pointer space-x-2"
-                theme={{
-                  backgroundColor: colors.$1,
-                  hoverBackgroundColor: colors.$4,
-                }}
-                onClick={() => setIsImportModalVisible(true)}
-                style={{ borderColor: colors.$24 }}
-              >
-                <div>
-                  <ImportIcon color={colors.$3} size="1.4rem" />
-                </div>
-
-                <span className="text-sm" style={{ color: colors.$3 }}>
-                  {t('import')}
-                </span>
-              </Box>
-
-              <Box
-                className="flex items-center p-4 border shadow-sm w-full rounded-md cursor-pointer space-x-2"
-                theme={{
-                  backgroundColor: colors.$1,
-                  hoverBackgroundColor: colors.$4,
-                }}
-                onClick={handleExport}
-                style={{ borderColor: colors.$24 }}
-              >
-                <div>
-                  <Export color={colors.$3} size="1.4rem" strokeWidth="1" />
-                </div>
-
-                <span className="text-sm" style={{ color: colors.$3 }}>
-                  {t('export')}
-                </span>
-              </Box>
-            </div>
-
-            <div className="px-4 sm:px-6 pb-2 pt-6">
-              <Divider
-                className="border-dashed"
-                borderColor={colors.$20}
-                withoutPadding
-              />
-            </div>
-
-            <Element leftSide={t('html_mode')}>
-              <Toggle
-                checked={shouldRenderHTML}
-                onChange={(value) => setShouldRenderHTML(value)}
-                disabled={isFormBusy}
-              />
-            </Element>
+            {payload.entity === 'purchase_order' && (
+              <Element leftSide={t('purchase_order')}>
+                <PurchaseOrderSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id || '-1',
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '-1',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
+              </Element>
+            )}
           </>
-        ) : (
-          <div className="flex justify-center pt-10 pb-6 w-full">
-            <Spinner />
-          </div>
         )}
+
+        <div className="px-4 sm:px-6 pb-6 pt-3">
+          <Divider
+            className="border-dashed"
+            borderColor={colors.$20}
+            withoutPadding
+          />
+        </div>
+
+        <div className="flex flex-col space-y-4 px-4 sm:px-6">
+          <Box
+            className="flex justify-between items-center p-4 border shadow-sm w-full rounded-md cursor-pointer"
+            theme={{
+              backgroundColor: colors.$1,
+              hoverBackgroundColor: colors.$4,
+            }}
+            onClick={() =>
+              window.open(
+                'https://invoiceninja.github.io/en/custom-fields/',
+                '_blank'
+              )
+            }
+            style={{ borderColor: colors.$24 }}
+          >
+            <div className="flex items-center space-x-2">
+              <BookOpen color={colors.$3} size="1.4rem" />
+
+              <span className="text-sm" style={{ color: colors.$3 }}>
+                {t('api_docs')}
+              </span>
+            </div>
+
+            <div>
+              <ArrowRight color={colors.$3} size="1.4rem" strokeWidth="1.5" />
+            </div>
+          </Box>
+
+          <Box
+            className="flex items-center p-4 border shadow-sm w-full rounded-md cursor-pointer space-x-2"
+            theme={{
+              backgroundColor: colors.$1,
+              hoverBackgroundColor: colors.$4,
+            }}
+            onClick={() => setIsImportModalVisible(true)}
+            style={{ borderColor: colors.$24 }}
+          >
+            <div>
+              <ImportIcon color={colors.$3} size="1.4rem" />
+            </div>
+
+            <span className="text-sm" style={{ color: colors.$3 }}>
+              {t('import')}
+            </span>
+          </Box>
+
+          <Box
+            className="flex items-center p-4 border shadow-sm w-full rounded-md cursor-pointer space-x-2"
+            theme={{
+              backgroundColor: colors.$1,
+              hoverBackgroundColor: colors.$4,
+            }}
+            onClick={handleExport}
+            style={{ borderColor: colors.$24 }}
+          >
+            <div>
+              <Export color={colors.$3} size="1.4rem" strokeWidth="1" />
+            </div>
+
+            <span className="text-sm" style={{ color: colors.$3 }}>
+              {t('export')}
+            </span>
+          </Box>
+        </div>
+
+        <div className="px-4 sm:px-6 pb-2 pt-6">
+          <Divider
+            className="border-dashed"
+            borderColor={colors.$20}
+            withoutPadding
+          />
+        </div>
+
+        <Element leftSide={t('html_mode')}>
+          <Toggle
+            checked={shouldRenderHTML}
+            onChange={(value) => setShouldRenderHTML(value)}
+            disabled={isFormBusy}
+          />
+        </Element>
       </Card>
     </>
   );
