@@ -22,10 +22,13 @@ import { MdDownload, MdSend } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuoteQuery } from '../common/queries';
 import { Page } from '$app/components/Breadcrumbs';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Pdf() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const { documentTitle } = useTitle('view_pdf');
   const { id } = useParams();
@@ -55,19 +58,21 @@ export default function Pdf() {
       navigationTopRight={
         quote && (
           <div className="flex space-x-3">
-            <Button
-              className="flex items-center space-x-1"
-              onClick={() =>
-                navigate(
-                  route('/quotes/:id/email', {
-                    id: quote.id,
-                  })
-                )
-              }
-            >
-              <Icon element={MdSend} color="white" />
-              <span>{t('email_quote')}</span>
-            </Button>
+            {hasPermission('edit_quote') && (
+              <Button
+                className="flex items-center space-x-1"
+                onClick={() =>
+                  navigate(
+                    route('/quotes/:id/email', {
+                      id: quote.id,
+                    })
+                  )
+                }
+              >
+                <Icon element={MdSend} color="white" />
+                <span>{t('email_quote')}</span>
+              </Button>
+            )}
 
             <Button
               className="flex items-center space-x-1"

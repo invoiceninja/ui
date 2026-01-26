@@ -137,6 +137,7 @@ export function InvoiceDetails(props: Props) {
         <Element leftSide={t('invoice_number_short')}>
           <InputField
             id="number"
+            placeholder={t('auto_generate')}
             onValueChange={(value) => handleChange('number', value)}
             value={recurringInvoice?.number || ''}
             errorMessage={props.errors?.errors.number}

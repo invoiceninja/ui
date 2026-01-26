@@ -120,6 +120,7 @@ export const recurringInvoiceRoutes = (
           guards={[
             enabled(ModuleBitmask.RecurringInvoices),
             or(
+              permission('view_recurring_invoice'),
               permission('edit_recurring_invoice'),
               assigned('/api/v1/recurring_invoices/:id')
             ),

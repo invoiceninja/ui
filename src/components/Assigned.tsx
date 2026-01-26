@@ -42,9 +42,14 @@ export function Assigned({
   >();
 
   useEffect(() => {
-    if (user && entityId && !isAssigned) {
-      (async () => {
-        const entityResponse = await queryClient.fetchQuery(
+  // If preCheck is explicitly false, don't make the API call
+  if (preCheck === false) {
+    return;
+  }
+
+  if (user && entityId && !isAssigned) {
+    (async () => {
+      const entityResponse = await queryClient.fetchQuery(
           [cacheEndpoint, entityId],
           () =>
             request('GET', endpoint(apiEndpoint, { id: entityId })).then(

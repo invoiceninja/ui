@@ -68,9 +68,11 @@ export function useInvoiceUtilities(props: Props) {
     );
 
     if (currency && invoice) {
+      const eInvoiceType = company?.settings.e_invoice_type;
+
       const invoiceSum = invoice.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(invoice, currency).build()
-        : new InvoiceSum(invoice, currency).build();
+        ? new InvoiceSumInclusive(invoice, currency, eInvoiceType).build()
+        : new InvoiceSum(invoice, currency, eInvoiceType).build();
 
       setInvoiceSum(invoiceSum);
     }

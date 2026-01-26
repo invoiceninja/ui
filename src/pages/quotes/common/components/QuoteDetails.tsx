@@ -111,6 +111,7 @@ export function QuoteDetails(props: Props) {
         <Element leftSide={t('quote_number_short')}>
           <InputField
             id="number"
+            placeholder={t('auto_generate')}
             onValueChange={(value) => handleChange('number', value)}
             value={quote?.number || ''}
             errorMessage={errors?.errors.number}

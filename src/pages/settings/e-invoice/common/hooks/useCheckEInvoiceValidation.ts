@@ -11,12 +11,14 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
 interface Params {
-  resource: Invoice | undefined;
+  resource: Invoice | RecurringInvoice | undefined;
+  entity?: 'invoice' | 'recurring_invoice';
   enableQuery: boolean;
   onFinished?: () => void;
 }
@@ -34,7 +36,7 @@ export interface ValidationEntityResponse {
 }
 
 export function useCheckEInvoiceValidation(params: Params) {
-  const { resource, enableQuery, onFinished } = params;
+  const { resource, entity = 'invoice', enableQuery, onFinished } = params;
 
   const isEntityValidationQueryEnabled =
     import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true' ||
@@ -51,7 +53,7 @@ export function useCheckEInvoiceValidation(params: Params) {
       ['/api/v1/einvoice/validateEntity', resource?.id],
       () =>
         request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
-          entity: 'invoices',
+          entity: `${entity}s`,
           entity_id: resource?.id,
         })
           .then((response) => response)

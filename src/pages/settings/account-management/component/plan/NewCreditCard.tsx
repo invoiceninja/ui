@@ -18,7 +18,12 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { loadStripe } from '@stripe/stripe-js/pure';
-import { Stripe, StripeCardElement, StripeElements } from '@stripe/stripe-js';
+import {
+  Stripe,
+  StripeCardElement,
+  StripeCardElementOptions,
+  StripeElements,
+} from '@stripe/stripe-js';
 import { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -83,7 +88,24 @@ export function NewCreditCard({ visible, onClose }: NewCardProps) {
               });
 
               const elements = stripe.elements();
-              const card = elements.create('card');
+
+              const cardOptions: StripeCardElementOptions = {
+                style: {
+                  base: {
+                    color: colors.$3,
+                    fontSize: '16px',
+                    '::placeholder': {
+                      color: colors.$16,
+                    },
+                  },
+                  invalid: {
+                    color: '#ef4444',
+                    iconColor: '#ef4444',
+                  },
+                },
+              };
+
+              const card = elements.create('card', cardOptions);
 
               card.mount('#card-element');
 

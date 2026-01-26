@@ -46,4 +46,5 @@ export const quoteMap: Record[] = [
   { trans: 'tax_rate2', value: 'quote.tax_rate2', map: 'quote' },
   { trans: 'tax_name3', value: 'quote.tax_name3', map: 'quote' },
   { trans: 'tax_rate3', value: 'quote.tax_rate3', map: 'quote' },
+  { trans: 'subtotal', value: 'quote.subtotal', map: 'quote' },
 ];

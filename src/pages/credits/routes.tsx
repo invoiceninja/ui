@@ -38,6 +38,9 @@ const Activities = lazy(
 const History = lazy(
   () => import('$app/pages/credits/edit/components/History')
 );
+const EInvoice = lazy(
+  () => import('$app/pages/credits/edit/components/EInvoice')
+);
 
 export const creditRoutes = (
   <Route path="/credits">
@@ -88,6 +91,7 @@ export const creditRoutes = (
       }
     >
       <Route path="edit" element={<Edit />} />
+      <Route path="e_invoice" element={<EInvoice />} />
       <Route path="documents" element={<Documents />} />
       <Route path="settings" element={<Settings />} />
       <Route path="activity" element={<Activities />} />
@@ -100,7 +104,11 @@ export const creditRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Credits),
-            or(permission('edit_credit'), assigned('/api/v1/credits/:id')),
+            or(
+              permission('view_credit'),
+              permission('edit_credit'),
+              assigned('/api/v1/credits/:id')
+            ),
           ]}
           component={<Pdf />}
         />

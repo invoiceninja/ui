@@ -27,6 +27,7 @@ import React, {
   SetStateAction,
   useRef,
   useState,
+  useCallback,
 } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import collect from 'collect.js';
@@ -63,6 +64,7 @@ interface Props extends CommonProps {
   filter: string;
   withoutStatusFilter?: boolean;
   customFilter: string[] | undefined;
+  beforeFilterInput?: ReactNode;
 }
 
 export const ResetButton = styled.button`
@@ -125,7 +127,6 @@ export function Option(props: OptionProps<SelectOption, true>) {
     <components.Option className="rounded-sm" {...props}>
       <div className="flex space-x-3 items-center w-full truncate">
         <Checkbox className="rounded-md" checked={isSelected} />
-
         <span className="text-sm">{label}</span>
       </div>
     </components.Option>
@@ -193,7 +194,7 @@ export function SelectWithApplyButton(props: any) {
 
   const [tempValue, setTempValue] = useState(defaultValue);
 
-  const CustomMenu = (menuProps: MenuProps<SelectOption, true>) => {
+  const CustomMenu = useCallback((menuProps: MenuProps<SelectOption, true>) => {
     const [t] = useTranslation();
     const colors = useColorScheme();
     const reactSettings = useReactSettings();
@@ -238,7 +239,7 @@ export function SelectWithApplyButton(props: any) {
         </div>
       </components.Menu>
     );
-  };
+  }, []);
 
   const handleChange = (newValue: any) => {
     setTempValue(newValue);
@@ -303,7 +304,6 @@ export function Actions(props: Props) {
       return props.onCustomFilterChange(values);
     } else if (props.onCustomFilterChange && customFilterDropdowns.length > 1) {
       const values: string[] = [];
-
       (options as SelectOption[]).map((option: SelectOption) =>
         values.push(option.value)
       );
@@ -311,19 +311,18 @@ export function Actions(props: Props) {
       if (!customFilter?.length) {
         return props.onCustomFilterChange(values);
       } else {
-        const otherDropdownsOptions =
-          props.customFilters?.filter(
-            (option) =>
-              option.dropdownKey !== currentDropdownKey &&
-              customFilter.some(
-                (currentFilter) => currentFilter === option.value
-              )
-          ) || [];
+        return props.onCustomFilterChange((prev) => {
+          const filteredPrevValues = (prev || []).filter((value) => {
+            const option = props.customFilters?.find(
+              (opt) => opt.value === value
+            );
+            return option?.dropdownKey !== currentDropdownKey;
+          });
 
-        return props.onCustomFilterChange([
-          ...otherDropdownsOptions.map((option) => option.value),
-          ...values,
-        ]);
+          const finalValues = [...filteredPrevValues, ...values];
+
+          return finalValues;
+        });
       }
     }
   };
@@ -399,6 +398,8 @@ export function Actions(props: Props) {
         }}
       >
         {props.children}
+
+        {props.beforeFilterInput}
 
         <div className="relative">
           <InputField

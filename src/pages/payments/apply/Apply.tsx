@@ -9,49 +9,51 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputLabel } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
-import { useFormik } from 'formik';
+import { FormikProps, useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { DataTable } from '$app/components/DataTable';
+import { Invoice } from '$app/common/interfaces/invoice';
+import {
+  ApplyInvoice,
+  useApplyInvoiceTableColumns,
+} from '../common/hooks/useApplyInvoiceTableColumns';
+import { PaymentOnCreation } from '..';
 
 export default function Apply() {
   const [t] = useTranslation();
 
   const { id } = useParams();
   const colors = useColorScheme();
-  const { data: payment, isLoading } = usePaymentQuery({ id });
+
+  const { data: payment } = usePaymentQuery({ id });
 
   const [errors, setErrors] = useState<ValidationBag>();
 
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
 
-  const calcApplyAmount = (balance: number) => {
+  const calcApplyAmount = (balance: number, currentInvoices: Invoice[]) => {
     if (payment) {
       const unapplied = payment?.amount - payment?.applied;
 
       let invoices_total = 0;
-      formik.values.invoices.map((invoice: any) => {
+      currentInvoices.map((invoice: any) => {
         invoices_total = invoices_total + Number(invoice.amount);
       });
 
@@ -103,21 +105,13 @@ export default function Apply() {
         });
     },
   });
-  const handleInvoiceChange = (id: string, amount: number, number: string) => {
-    formik.setFieldValue('invoices', [
-      ...formik.values.invoices,
-      { _id: v4(), amount, credit_id: '', invoice_id: id, number: number },
-    ]);
-  };
 
-  const handleRemovingInvoice = (id: string) => {
-    formik.setFieldValue(
-      'invoices',
-      formik.values.invoices.filter(
-        (record: { _id: string }) => record._id !== id
-      )
-    );
-  };
+  const columns = useApplyInvoiceTableColumns({
+    payment: payment as unknown as PaymentOnCreation,
+    errors,
+    formik: formik as unknown as FormikProps<{ invoices: ApplyInvoice[] }>,
+    isApplyPage: true,
+  });
 
   useEffect(() => {
     let total = 0;
@@ -177,44 +171,46 @@ export default function Apply() {
         </>
       )}
 
-      <Element leftSide={t('invoices')}>
+      <>
         {payment?.client_id ? (
-          <ComboboxAsync<Invoice>
-            endpoint={endpoint(
-              `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
-            )}
-            inputOptions={{
-              value: 'id',
-            }}
-            entryOptions={{
-              id: 'id',
-              value: 'id',
-              label: 'name',
-              searchable: 'number',
-              dropdownLabelFn: (invoice) =>
-                `${t('invoice_number_short')}${invoice.number} - ${t(
-                  'balance'
-                )} ${formatMoney(
-                  invoice.balance,
-                  payment.client?.country_id,
-                  payment.client?.settings.currency_id
-                )}`,
-            }}
-            onChange={({ resource }) =>
-              resource
-                ? handleInvoiceChange(
-                    resource.id,
-                    calcApplyAmount(resource.balance),
-                    resource.number
-                  )
-                : null
-            }
-            initiallyVisible={isLoading}
-            exclude={collect(formik.values.invoices)
-              .pluck('invoice_id')
-              .toArray()}
-            clearInputAfterSelection
-          />
+          <div className="flex flex-col px-4 sm:px-6 gap-y-2 mt-4">
+            <InputLabel>{t('invoices')}</InputLabel>
+
+            <DataTable<Invoice>
+              resource="invoice"
+              endpoint={`/api/v1/invoices?include=client&payable=${payment?.client_id}&per_page=100&sort=date|desc&per_page=1000`}
+              columns={columns}
+              onSelectedResourcesChange={(selectedResources) => {
+                if (selectedResources.length > 0) {
+                  const newInvoices: any[] = [];
+
+                  selectedResources.forEach((resource: Invoice) => {
+                    newInvoices.push({
+                      _id: window.crypto.randomUUID(),
+                      amount: calcApplyAmount(resource.balance, newInvoices),
+                      credit_id: '',
+                      invoice_id: resource.id,
+                      number: resource.number,
+                    });
+                  });
+
+                  formik.setFieldValue('invoices', newInvoices);
+                } else {
+                  formik.setFieldValue('invoices', []);
+                }
+              }}
+              withoutPagination
+              withoutStatusFilter
+              withoutAllBulkActions
+              emptyState={
+                <div className="flex items-center justify-center py-2">
+                  <span className="text-sm" style={{ color: colors.$17 }}>
+                    {t('no_invoices_found')}
+                  </span>
+                </div>
+              }
+            />
+          </div>
         ) : null}
 
         {errors?.errors.invoices && (
@@ -222,60 +218,7 @@ export default function Apply() {
             <ErrorMessage>{errors.errors.invoices}</ErrorMessage>
           </div>
         )}
-      </Element>
-
-      {formik.values.invoices.map(
-        (
-          record: {
-            _id: string;
-            amount: number;
-            number: string;
-            balance: number;
-          },
-          index
-        ) => (
-          <Element key={index} leftSide={t('applied')}>
-            <div className="flex items-center space-x-2">
-              <InputField
-                disabled
-                label={t('invoice_number')}
-                value={record.number}
-              />
-              <NumberInputField
-                label={t('amount_received')}
-                value={record.amount || ''}
-                onValueChange={(value) =>
-                  formik.setFieldValue(
-                    `invoices.${index}.amount`,
-                    parseFloat(value)
-                  )
-                }
-              />
-
-              <div
-                className="cursor-pointer focus:outline-none focus:ring-0 mt-6"
-                onClick={() => handleRemovingInvoice(record._id)}
-              >
-                <CircleXMark
-                  color={colors.$16}
-                  hoverColor={colors.$3}
-                  borderColor={colors.$5}
-                  hoverBorderColor={colors.$17}
-                  size="1.6rem"
-                />
-              </div>
-            </div>
-
-            {errors?.errors[`invoices.${[index]}.invoice_id`] && (
-              <div className="py-2">
-                <ErrorMessage>
-                  {errors.errors[`invoices.${[index]}.invoice_id`]}
-                </ErrorMessage>
-              </div>
-            )}
-          </Element>
-        )
-      )}
+      </>
     </Card>
   );
 }

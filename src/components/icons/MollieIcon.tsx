@@ -9,12 +9,11 @@
  */
 
 interface Props {
-  size?: string;
   color?: string;
 }
 
 export function MollieIcon(props: Props) {
-  const { size = '2rem', color = 'currentColor' } = props;
+  const { color = 'currentColor' } = props;
 
   return (
     <svg
@@ -25,7 +24,7 @@ export function MollieIcon(props: Props) {
       y="0px"
       viewBox="0 0 320 94"
       style={{
-        width: size,
+        width: 'auto',
         height: 'auto',
         aspectRatio: '320/94',
       }}

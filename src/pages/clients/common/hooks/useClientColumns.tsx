@@ -36,6 +36,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'name',
@@ -94,7 +95,7 @@ export function useAllClientColumns() {
     'city',
   ] as const;
 
-  return clientColumns;
+  return clientColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useClientColumns() {
@@ -185,9 +186,9 @@ export function useClientColumns() {
               const firstName = resource.contacts[0].first_name || '';
               const lastName = resource.contacts[0].last_name || '';
               const email = resource.contacts[0].email || '';
-              
+
               const fullName = `${firstName} ${lastName}`.trim();
-              
+
               return fullName || email;
             })()}
           </DynamicLink>
@@ -447,6 +448,10 @@ export function useClientColumns() {
     reactSettings?.react_table_columns?.client || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }

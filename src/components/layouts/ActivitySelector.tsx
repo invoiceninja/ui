@@ -124,6 +124,15 @@ export const ACTIVITY_TYPES = {
     EINVOICE_DELIVERY_FAILURE: 147,
     E_EXPENSE_CREATED: 148,
     EMAIL_CREDIT: 149,
+    ACCOUNT_DELETED: 150,
+    MERGE_CLIENT: 151,
+    MERGE_VENDOR: 152,
+    PURGE_CLIENT: 153,
+    VERIFACTU_INVOICE_SENT: 154,
+    VERIFACTU_INVOICE_SENT_FAILURE: 155,
+    VERIFACTU_CANCELLATION_SENT: 156,
+    VERIFACTU_CANCELLATION_SENT_FAILURE: 157,
+    QUOTE_REJECTED: 158,
 } as const;
 
 export type ActivityType = typeof ACTIVITY_TYPES[keyof typeof ACTIVITY_TYPES];
@@ -235,6 +244,15 @@ export function useActivityLabels(): Record<ActivityType, string> {
         [ACTIVITY_TYPES.EINVOICE_DELIVERY_FAILURE]: t('einvoice_delivery_failure'),
         [ACTIVITY_TYPES.E_EXPENSE_CREATED]: t('e_expense_created'),
         [ACTIVITY_TYPES.EMAIL_CREDIT]: t('sent_credit'),
+        [ACTIVITY_TYPES.ACCOUNT_DELETED]: t('account_deleted'),
+        [ACTIVITY_TYPES.MERGE_CLIENT]: t('merge_client'),
+        [ACTIVITY_TYPES.MERGE_VENDOR]: t('merge_vendor'),
+        [ACTIVITY_TYPES.PURGE_CLIENT]: t('purge_client'),
+        [ACTIVITY_TYPES.VERIFACTU_INVOICE_SENT]: t('verifactu_invoice_sent'),
+        [ACTIVITY_TYPES.VERIFACTU_INVOICE_SENT_FAILURE]: t('verifactu_invoice_sent_failure'),
+        [ACTIVITY_TYPES.VERIFACTU_CANCELLATION_SENT]: t('verifactu_cancellation_sent'),
+        [ACTIVITY_TYPES.VERIFACTU_CANCELLATION_SENT_FAILURE]: t('verifactu_cancellation_sent_failure'),
+        [ACTIVITY_TYPES.QUOTE_REJECTED]: t('quote_rejected'),
     };
 }
 

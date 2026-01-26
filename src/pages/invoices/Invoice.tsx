@@ -47,7 +47,6 @@ import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/u
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
-import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 dayjs.extend(utc);
 
 export default function Invoice() {
@@ -63,7 +62,6 @@ export default function Invoice() {
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-  const verifactuEnabled = useCompanyVerifactu();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [triggerValidationQuery, setTriggerValidationQuery] =
@@ -80,9 +78,8 @@ export default function Invoice() {
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: invoice,
     enableQuery:
-      ((company?.settings.e_invoice_type === 'PEPPOL' &&
-        company?.tax_data?.acts_as_sender) ||
-        verifactuEnabled) &&
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.tax_data?.acts_as_sender &&
       triggerValidationQuery &&
       id === invoice?.id,
     onFinished: () => {
@@ -170,9 +167,7 @@ export default function Invoice() {
                 actions={actions}
                 onSaveClick={() => setSaveChanges(true)}
                 disableSaveButton={
-                  (invoice &&
-                    (invoice.status_id === InvoiceStatus.Cancelled ||
-                      invoice.is_deleted)) ||
+                  (invoice && invoice.status_id === InvoiceStatus.Cancelled) ||
                   isFormBusy
                 }
                 disableSaveButtonOnly={invoice.is_locked}

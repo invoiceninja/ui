@@ -44,7 +44,6 @@ export default function Credits() {
       excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_credit')]}
       hideEditableOptions={!hasPermission('edit_credit')}
-      withoutPerPageAsPreference
       withoutPageAsPreference
     />
   );

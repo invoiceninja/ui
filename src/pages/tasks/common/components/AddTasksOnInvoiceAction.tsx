@@ -22,6 +22,10 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { useQueryClient } from 'react-query';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Modal } from '$app/components/Modal';
+import { Button } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   tasks: Task[];
@@ -29,17 +33,20 @@ interface Props {
   setSelected?: (selected: string[]) => void;
 }
 
-export function AddTasksOnInvoiceAction(props: Props) {
-  const { tasks, isBulkAction } = props;
+export function AddTasksOnInvoiceAction({ tasks, isBulkAction }: Props) {
+  const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const queryClient = useQueryClient();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isNoInvoicesModalVisible, setIsNoInvoicesModalVisible] =
+    useState<boolean>(false);
 
   const handleOpenModal = () => {
     if (!tasks.length) {
@@ -87,7 +94,8 @@ export function AddTasksOnInvoiceAction(props: Props) {
         toast.dismiss();
 
         if (!response.data.data.length) {
-          return toast.error('no_invoices_found');
+          setIsNoInvoicesModalVisible(true);
+          return;
         }
 
         if (hasPermission('edit_invoice')) {
@@ -112,6 +120,26 @@ export function AddTasksOnInvoiceAction(props: Props) {
         tasks={tasks}
         invoices={invoices}
       />
+
+      <Modal
+        title={trans('add_to_invoice', { invoice: '' })}
+        visible={isNoInvoicesModalVisible}
+        onClose={() => setIsNoInvoicesModalVisible(false)}
+      >
+        <div className="flex flex-col space-y-4">
+          <span className="text-center" style={{ color: colors.$3 }}>
+            {trans('no_invoices_found', { invoice: '' })}.
+          </span>
+
+          <Button
+            className="w-full"
+            behavior="button"
+            onClick={() => setIsNoInvoicesModalVisible(false)}
+          >
+            {t('close')}
+          </Button>
+        </div>
+      </Modal>
 
       <DropdownElement
         onClick={handleOpenModal}

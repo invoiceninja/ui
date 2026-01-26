@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isDemo } from '$app/common/helpers';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { atom, useAtom } from 'jotai';
@@ -193,7 +194,8 @@ export function useSettingsRoutes() {
       name: t('system_logs'),
       href: '/settings/system_logs',
       current: location.pathname.startsWith('/settings/system_logs'),
-      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
+      enabled:
+        ((isAdmin || isOwner) && isCompanySettingsActive && !isDemo()) || false,
     },
   ];
 

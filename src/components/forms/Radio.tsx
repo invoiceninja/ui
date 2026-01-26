@@ -12,6 +12,7 @@ import { ChangeEvent } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props extends CommonProps {
   options: {
@@ -26,6 +27,8 @@ interface Props extends CommonProps {
 
 export function Radio(props: Props) {
   const colors = useColorScheme();
+
+  const reactSettings = useReactSettings();
 
   return (
     <fieldset>
@@ -48,9 +51,17 @@ export function Radio(props: Props) {
               name={props.name}
               type="radio"
               checked={option.value === props.defaultSelected}
-              className="focus:ring-0 h-4 w-4 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
-              style={{ color: colors.$3 }}
+              className="focus:ring-0 h-4 w-4 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer focus:ring-offset-0"
+              style={{
+                color: 'black',
+                borderColor: reactSettings?.dark_mode
+                  ? 'white'
+                  : option.value === props.defaultSelected
+                  ? ''
+                  : colors.$5,
+              }}
             />
+
             <label
               htmlFor={option.id}
               className={classNames('ml-3 block text-sm font-medium', {

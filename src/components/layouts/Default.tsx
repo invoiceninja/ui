@@ -65,6 +65,7 @@ import { ChartLine } from '../icons/ChartLine';
 import { ArrowsTransaction } from '../icons/ArrowsTransaction';
 import { Gear } from '../icons/Gear';
 import { Feedback } from '../Feedback';
+import { PriceIncreaseBanner } from '../banners/PriceIncrease';
 
 export interface SaveOption {
   label: string;
@@ -418,6 +419,9 @@ export function Default(props: Props) {
         <VerifyEmail />
         <VerifyPhone />
         <EInvoiceCredits />
+
+        {/* This component is only created for December 2025 if you see it in 2026 you can remove and delete it */}
+        <PriceIncreaseBanner />
       </div>
 
       <MobileSidebar

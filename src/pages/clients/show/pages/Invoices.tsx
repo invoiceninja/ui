@@ -52,7 +52,7 @@ export default function Invoices() {
         customActions={actions}
         customBulkActions={customBulkActions}
         withResourcefulActions
-        withoutDefaultBulkActions={Boolean(verifactuEnabled)}
+        withoutDefaultBulkActions
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate={route('/invoices/create?client=:id', { id })}
         linkToEdit="/invoices/:id/edit"
@@ -63,10 +63,15 @@ export default function Invoices() {
           setSelectedInvoiceIds(selected);
           setIsConfirmActionModalOpen(true);
         }}
-        withoutPerPageAsPreference
         withoutPageAsPreference
-        showDelete={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
-        showRestore={(invoice) => Boolean(!verifactuEnabled) || (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)}
+        showDelete={(invoice) =>
+          Boolean(!verifactuEnabled) ||
+          (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)
+        }
+        showRestore={(invoice) =>
+          Boolean(!verifactuEnabled) ||
+          (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)
+        }
       />
 
       <DeleteInvoicesConfirmationModal
