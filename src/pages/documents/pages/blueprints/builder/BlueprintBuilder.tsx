@@ -391,6 +391,7 @@ function BlueprintBuilder() {
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
+        {/* @ts-expect-error - TODO: fix this */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
