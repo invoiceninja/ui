@@ -945,11 +945,7 @@ export function ComboboxAsync<T = any>({
             })
           );
 
-          return data.filter((entry) =>
-            exclude.length > 0 && excludeWhenConfiguringEntries
-              ? !exclude.includes(excludeByLabel ? entry.label : entry.value)
-              : true
-          );
+          return data;
         }
       ),
     {
@@ -1013,7 +1009,13 @@ export function ComboboxAsync<T = any>({
 
   useEffect(() => {
     if (data) {
-      setEntries([...data]);
+      setEntries(
+        [...data].filter((entry) =>
+          exclude.length > 0 && excludeWhenConfiguringEntries
+            ? !exclude.includes(excludeByLabel ? entry.label : entry.value)
+            : true
+        )
+      );
     }
   }, [data]);
 

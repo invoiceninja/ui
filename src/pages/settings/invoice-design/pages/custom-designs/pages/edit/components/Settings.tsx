@@ -87,8 +87,6 @@ export default function Settings() {
     designPreviewPropertiesAtom
   );
 
-  console.log(designPreviewProperties);
-
   const getEntityPropertyValue = () => {
     return (
       designPreviewProperties.find(
