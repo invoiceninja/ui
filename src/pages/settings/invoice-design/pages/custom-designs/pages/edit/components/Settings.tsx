@@ -109,6 +109,11 @@ export default function Settings() {
         `[${existingDesignIndex}].entity`,
         value
       );
+      set(
+        updatedDesignPreviewProperties,
+        `[${existingDesignIndex}].entity_id`,
+        '-1'
+      );
 
       setDesignPreviewProperties(updatedDesignPreviewProperties);
     }
