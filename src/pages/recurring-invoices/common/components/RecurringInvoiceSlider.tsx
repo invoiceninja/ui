@@ -118,40 +118,6 @@ export const useGenerateActivityElement = () => {
   };
 };
 
-const useCalculateDueDate = (recurringInvoice: RecurringInvoice | null) => {
-  const [t] = useTranslation();
-
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
-  if (!recurringInvoice) {
-    return null;
-  }
-
-  if (recurringInvoice.client?.settings.payment_terms) {
-    return {
-      label: t('payment_terms'),
-      value: `${recurringInvoice.client?.settings.payment_terms} ${t('days')}`,
-    };
-  }
-
-  if (recurringInvoice.due_date_days) {
-    const dayNumber = parseInt(recurringInvoice.due_date_days);
-    const today = dayjs();
-    let nextDueDate = today.date(dayNumber);
-
-    if (nextDueDate.isBefore(today)) {
-      nextDueDate = nextDueDate.add(1, 'month');
-    }
-
-    return {
-      label: t('due_date'),
-      value: date(nextDueDate.unix(), dateFormat),
-    };
-  }
-
-  return null;
-};
-
 export const RecurringInvoiceSlider = () => {
   const [isVisible, setIsSliderVisible] = useAtom(
     recurringInvoiceSliderVisibilityAtom
@@ -171,7 +137,6 @@ export const RecurringInvoiceSlider = () => {
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
   const dateTime = useDateTime({ withTimezone: true });
-  const dueDate = useCalculateDueDate(recurringInvoice);
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -351,13 +316,13 @@ export const RecurringInvoiceSlider = () => {
               ) : null}
             </Element>
 
-            {dueDate && (
+            {(resource?.recurring_dates || [])?.length > 0 && (
               <Element
-                leftSide={dueDate.label}
+                leftSide={t('due_date')}
                 pushContentToRight
                 noExternalPadding
               >
-                {dueDate.value}
+                {date(resource?.recurring_dates?.[0]?.due_date, dateFormat)}
               </Element>
             )}
           </div>
