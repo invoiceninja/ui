@@ -515,7 +515,7 @@ export function ComboboxStatic<T = any>({
   isDataLoading,
   compareOnlyByValue,
   withShadow,
-  excludeByLabel,
+  excludeByLabel = false,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
 

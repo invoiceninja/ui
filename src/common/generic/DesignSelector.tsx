@@ -113,6 +113,7 @@ export function DesignSelector(props: Props) {
             id: 'id',
             label: 'name',
             value: 'id',
+            customValue: (design) => props.customValueFn?.(design) || design.id,
           }}
           action={{
             label: t('new_design'),
@@ -166,6 +167,8 @@ export function DesignSelector(props: Props) {
             includeOnly: freePlanDesigns,
             includeByLabel: true,
           })}
+        excludeByLabel={props.excludeByLabel}
+        excludeWhenConfiguringEntries={props.excludeWhenConfiguringEntries}
       />
     </>
   );
