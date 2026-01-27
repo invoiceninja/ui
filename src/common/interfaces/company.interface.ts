@@ -11,6 +11,7 @@
 import { EInvoiceType } from '$app/pages/settings';
 import { BankAccount } from './bank-accounts';
 import { Document } from './document.interface';
+import { Quickbooks } from './quickbooks';
 
 export interface Company {
   id: string;
@@ -90,6 +91,7 @@ export interface Company {
   expense_mailbox?: string;
   legal_entity_id: string | null;
   session_timeout?: number;
+  quickbooks?: Quickbooks;
 }
 
 export interface Settings {
