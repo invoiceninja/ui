@@ -12,7 +12,7 @@ import { Design } from '$app/common/interfaces/design';
 import { useEffect, useState } from 'react';
 import { useDesignQuery } from '$app/common/queries/designs';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
-import { atom } from 'jotai';
+import { useAtom } from 'jotai';
 import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -30,6 +30,7 @@ import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './pages/edit/common/hooks/useTabs';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { atomWithStorage } from 'jotai/utils';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -39,11 +40,52 @@ export interface PreviewPayload {
 
 export type EntityType = 'invoice' | 'quote' | 'credit' | 'purchase_order';
 
-export const payloadAtom = atom<PreviewPayload>({
-  design: null,
-  entity_id: '-1',
-  entity: 'invoice',
-});
+interface DesignEntitySelection {
+  entity: EntityType;
+  entity_id: string;
+}
+
+const DESIGN_ENTITY_STORAGE_KEY = 'custom_design_entity_selections';
+
+function getStoredEntitySelection(
+  designId: string
+): DesignEntitySelection | null {
+  try {
+    const stored = localStorage.getItem(DESIGN_ENTITY_STORAGE_KEY);
+    if (stored) {
+      const selections = JSON.parse(stored) as Record<
+        string,
+        DesignEntitySelection
+      >;
+      return selections[designId] || null;
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return null;
+}
+
+function saveEntitySelection(
+  designId: string,
+  entity: EntityType,
+  entity_id: string
+): void {
+  try {
+    const stored = localStorage.getItem(DESIGN_ENTITY_STORAGE_KEY);
+    const selections: Record<string, DesignEntitySelection> = stored
+      ? JSON.parse(stored)
+      : {};
+    selections[designId] = { entity, entity_id };
+    localStorage.setItem(DESIGN_ENTITY_STORAGE_KEY, JSON.stringify(selections));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+const shouldRenderHTMLAtom = atomWithStorage<boolean>(
+  'should_render_design_html',
+  false
+);
 
 export default function CustomDesign() {
   useTitle('invoice_design');
@@ -61,9 +103,10 @@ export default function CustomDesign() {
     entity_id: '-1',
     entity: 'invoice',
   });
+
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [shouldRenderHTML, setShouldRenderHTML] = useState<boolean>(false);
+  const [shouldRenderHTML, setShouldRenderHTML] = useAtom(shouldRenderHTMLAtom);
 
   const handleSaveInvoiceDesign = () => {
     if (!isFormBusy) {
@@ -101,16 +144,27 @@ export default function CustomDesign() {
   );
 
   useEffect(() => {
-    if (data) {
+    if (data && id) {
+      const storedSelection = getStoredEntitySelection(id);
       setPayload((current) => ({
         ...current,
         design: data,
+        ...(storedSelection && {
+          entity: storedSelection.entity,
+          entity_id: storedSelection.entity_id,
+        }),
       }));
     }
 
     return () =>
       setPayload({ design: null, entity_id: '-1', entity: 'invoice' });
-  }, [data]);
+  }, [data, id]);
+
+  useEffect(() => {
+    if (id && payload.design) {
+      saveEntitySelection(id, payload.entity, payload.entity_id);
+    }
+  }, [id, payload.entity, payload.entity_id, payload.design]);
 
   return (
     <>
