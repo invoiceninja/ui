@@ -43,6 +43,7 @@ export type EntityType = 'invoice' | 'quote' | 'credit' | 'purchase_order';
 interface DesignEntitySelection {
   entity: EntityType;
   entity_id: string;
+  baseDesignId?: string;
 }
 
 const DESIGN_ENTITY_STORAGE_KEY = 'custom_design_entity_selections';
@@ -68,14 +69,15 @@ function getStoredEntitySelection(
 function saveEntitySelection(
   designId: string,
   entity: EntityType,
-  entity_id: string
+  entity_id: string,
+  baseDesignId?: string
 ): void {
   try {
     const stored = localStorage.getItem(DESIGN_ENTITY_STORAGE_KEY);
     const selections: Record<string, DesignEntitySelection> = stored
       ? JSON.parse(stored)
       : {};
-    selections[designId] = { entity, entity_id };
+    selections[designId] = { entity, entity_id, baseDesignId };
     localStorage.setItem(DESIGN_ENTITY_STORAGE_KEY, JSON.stringify(selections));
   } catch {
     // Ignore storage errors
@@ -107,6 +109,7 @@ export default function CustomDesign() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [shouldRenderHTML, setShouldRenderHTML] = useAtom(shouldRenderHTMLAtom);
+  const [baseDesignId, setBaseDesignId] = useState<string | undefined>();
 
   const handleSaveInvoiceDesign = () => {
     if (!isFormBusy) {
@@ -154,17 +157,22 @@ export default function CustomDesign() {
           entity_id: storedSelection.entity_id,
         }),
       }));
+      if (storedSelection?.baseDesignId) {
+        setBaseDesignId(storedSelection.baseDesignId);
+      }
     }
 
-    return () =>
+    return () => {
       setPayload({ design: null, entity_id: '-1', entity: 'invoice' });
+      setBaseDesignId(undefined);
+    };
   }, [data, id]);
 
   useEffect(() => {
     if (id && payload.design) {
-      saveEntitySelection(id, payload.entity, payload.entity_id);
+      saveEntitySelection(id, payload.entity, payload.entity_id, baseDesignId);
     }
-  }, [id, payload.entity, payload.entity_id, payload.design]);
+  }, [id, payload.entity, payload.entity_id, payload.design, baseDesignId]);
 
   return (
     <>
@@ -188,6 +196,8 @@ export default function CustomDesign() {
                 setShouldRenderHTML,
                 payload,
                 setPayload,
+                baseDesignId,
+                setBaseDesignId,
               }}
             />
           </div>

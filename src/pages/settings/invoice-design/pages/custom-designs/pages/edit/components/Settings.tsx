@@ -42,6 +42,8 @@ export interface Context {
   setShouldRenderHTML: Dispatch<SetStateAction<boolean>>;
   payload: PreviewPayload;
   setPayload: Dispatch<SetStateAction<PreviewPayload>>;
+  baseDesignId: string | undefined;
+  setBaseDesignId: Dispatch<SetStateAction<string | undefined>>;
 }
 
 const Box = styled.div`
@@ -63,6 +65,8 @@ export default function Settings() {
     setShouldRenderHTML,
     payload,
     setPayload,
+    baseDesignId,
+    setBaseDesignId,
   } = context;
 
   const colors = useColorScheme();
@@ -153,7 +157,12 @@ export default function Settings() {
 
         <Element leftSide={t('design')}>
           <DesignSelector
-            onChange={(design) => handlePropertyChange('design', design.design)}
+            value={baseDesignId}
+            onChange={(design) => {
+              handlePropertyChange('design', design.design);
+              setBaseDesignId(design.id);
+            }}
+            onClearButtonClick={() => setBaseDesignId(undefined)}
             actionVisibility={false}
             errorMessage={
               errors?.errors['design.header'] ||
