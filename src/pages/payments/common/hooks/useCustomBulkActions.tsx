@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { Payment } from '$app/common/interfaces/payment';
 import { useBulk } from '$app/common/queries/payments';
 import { CustomBulkAction } from '$app/components/DataTable';
@@ -21,6 +22,9 @@ export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const bulk = useBulk();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const showEmailPaymentAction = (payments: Payment[]) => {
     return payments.every(({ client }) =>
@@ -47,21 +51,22 @@ export const useCustomBulkActions = () => {
           {t('email_payment')}
         </DropdownElement>
       ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/payments/bulk',
-            entity: 'payment',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/payments/bulk',
+              entity: 'payment',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

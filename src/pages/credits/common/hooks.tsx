@@ -97,6 +97,7 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -361,6 +362,9 @@ export function useActions(params?: Params) {
 
   const { dropdown = true } = params || {};
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
   const { isEditPage } = useEntityPageIdentifier({
@@ -577,28 +581,29 @@ export function useActions(params?: Params) {
           {t('mark_paid')}
         </EntityActionElement>
       ),
-    (credit) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'run_template',
-        })}
-        entity="credit"
-        actionKey="run_template"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('run_template')}
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([credit]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/credits/bulk',
-            entity: 'credit',
-          });
-        }}
-        icon={MdDesignServices}
-      >
-        {t('run_template')}
-      </EntityActionElement>
-    ),
+    (credit) =>
+      shouldBeRunTemplateActionVisible && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'run_template',
+          })}
+          entity="credit"
+          actionKey="run_template"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('run_template')}
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([credit]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/credits/bulk',
+              entity: 'credit',
+            });
+          }}
+          icon={MdDesignServices}
+        >
+          {t('run_template')}
+        </EntityActionElement>
+      ),
     () => <Divider withoutPadding />,
     (credit) => (
       <CloneOptionsModal
