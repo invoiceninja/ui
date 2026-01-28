@@ -1,7 +1,7 @@
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 
-const useDoesTaxRateExitsByComboValue = () => {
+export default function useDoesTaxRateExistsByComboValue() {
   const { data: taxes } = useTaxRatesQuery({
     status: ['active'],
     perPage: 1000,
@@ -15,6 +15,4 @@ const useDoesTaxRateExitsByComboValue = () => {
         tax.name.toLowerCase() === taxName.toLowerCase() && tax.rate === taxRate
     );
   };
-};
-
-export default useDoesTaxRateExitsByComboValue;
+}

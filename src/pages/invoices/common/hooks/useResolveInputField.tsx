@@ -11,7 +11,7 @@
 import { resolveProperty } from '$app/pages/invoices/common/helpers/resolve-property';
 import { useHandleProductChange } from './useHandleProductChange';
 import { InputField } from '$app/components/forms';
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useFormatMoney } from './useFormatMoney';
 import {
   InvoiceItem,
@@ -50,7 +50,7 @@ import {
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import useDoesTaxRateExitsByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExitsByComboValue';
+import useDoesTaxRateExistsByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistsByComboValue';
 import { useColorScheme } from '$app/common/colors';
 
 const numberInputs = [
@@ -107,16 +107,7 @@ export function useResolveInputField(props: Props) {
 
   const { resource } = props;
 
-  const taxRateFieldBox = useRef<HTMLDivElement>(null);
-  const [taxRateBoxWidth, setTaxRateBoxWidth] = useState<number>(0);
-
-  useEffect(() => {
-    if (taxRateFieldBox.current) {
-      setTaxRateBoxWidth(taxRateFieldBox.current.offsetWidth);
-    }
-  }, [taxRateFieldBox.current]);
-
-  const doesTaxRateExitsByComboValue = useDoesTaxRateExitsByComboValue();
+  const doesTaxRateExistsByComboValue = useDoesTaxRateExistsByComboValue();
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
@@ -353,7 +344,7 @@ export function useResolveInputField(props: Props) {
     );
 
     return (
-      <div ref={taxRateFieldBox} className="flex flex-col items-center gap-y-2">
+      <div className="flex flex-col items-center gap-y-2">
         <TaxRateSelector
           key={`${property}${resource?.line_items[index][property]}`}
           onChange={(value) =>
@@ -371,15 +362,11 @@ export function useResolveInputField(props: Props) {
         />
 
         {taxComboValue &&
-          !doesTaxRateExitsByComboValue(
+          !doesTaxRateExistsByComboValue(
             taxComboValue.split('||')[0],
             parseFloat(taxComboValue.split('||')[1])
-          ) &&
-          taxRateBoxWidth > 0 && (
-            <div
-              className="flex items-center gap-x-2 self-start"
-              style={{ maxWidth: taxRateBoxWidth }}
-            >
+          ) && (
+            <div className="flex items-center gap-x-2 self-start max-w-full">
               <div>
                 <Icon element={MdWarning} size={20} color="orange" />
               </div>
