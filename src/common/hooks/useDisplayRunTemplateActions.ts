@@ -1,3 +1,13 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 import { useQuery } from 'react-query';
 import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
@@ -20,6 +30,6 @@ export function useDisplayRunTemplateActions() {
   );
 
   return {
-    shouldBeVisible: typeof data !== 'undefined' ? data.length > 0 : true,
+    shouldBeVisible: typeof data !== 'undefined' ? data.length > 0 : false,
   };
 }
