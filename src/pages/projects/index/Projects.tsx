@@ -73,6 +73,9 @@ export default function Projects() {
         linkToCreateGuards={[permission('create_project')]}
         hideEditableOptions={!hasPermission('edit_project')}
         enableSavingFilterPreference
+        dateRangeColumns={[
+          { column: 'created_at', queryParameterKey: 'created_between' },
+        ]}
       />
 
       <ChangeTemplateModal<Project>
