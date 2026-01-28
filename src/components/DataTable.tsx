@@ -634,8 +634,13 @@ export function DataTable<T extends object>(props: Props<T>) {
     status,
     customFilter,
     dateRange,
-    dateRangeQueryParameter,
   ]);
+
+  useEffect(() => {
+    if (!dateRange?.split(',').every((date) => date.length > 1)) {
+      setAreRowsRendered(true);
+    }
+  }, [dateRange]);
 
   useEffect(() => {
     if (isFetching || isLoading) {
