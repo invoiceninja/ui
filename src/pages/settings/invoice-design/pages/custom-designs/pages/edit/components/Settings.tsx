@@ -13,7 +13,7 @@ import { Card, Element } from '$app/components/cards';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { Checkbox, InputField, SelectField } from '$app/components/forms';
 import { Divider } from '$app/components/cards/Divider';
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { trans } from '$app/common/helpers';
 import { useAtom, useSetAtom } from 'jotai';
@@ -56,7 +56,7 @@ const Box = styled.div`
 interface DesignPreviewProperties {
   design_id: string;
   entity_id: string;
-  entity: string;
+  entity: EntityType;
   html_mode: boolean;
 }
 
@@ -92,6 +92,11 @@ export default function Settings() {
       )?.entity || 'invoice'
     );
   };
+
+  const entityValue = useMemo(
+    () => getEntityPropertyValue(),
+    [getEntityPropertyValue]
+  );
 
   const handleEntityChange = (value: EntityType) => {
     const existingDesignIndex = designPreviewProperties.findIndex(
@@ -129,6 +134,11 @@ export default function Settings() {
     )?.entity_id;
   };
 
+  const entityIdValue = useMemo(
+    () => getEntityIdPropertyValue(),
+    [getEntityIdPropertyValue]
+  );
+
   const handleEntityIdChange = (value: string) => {
     const existingDesignIndex = designPreviewProperties.findIndex(
       (property) => property.design_id === payload.design?.id
@@ -160,6 +170,11 @@ export default function Settings() {
       )?.html_mode
     );
   };
+
+  const htmlModeValue = useMemo(
+    () => getHtmlModePropertyValue(),
+    [getHtmlModePropertyValue]
+  );
 
   const handleHtmlModeChange = (value: boolean) => {
     const existingDesignIndex = designPreviewProperties.findIndex(
@@ -281,7 +296,7 @@ export default function Settings() {
           <>
             <Element leftSide={t('entity')}>
               <SelectField
-                value={getEntityPropertyValue()}
+                value={entityValue}
                 onValueChange={(value) =>
                   handleEntityChange(value as EntityType)
                 }
@@ -299,7 +314,7 @@ export default function Settings() {
             {payload.entity === 'invoice' && (
               <Element leftSide={t('invoice')}>
                 <InvoiceSelector
-                  value={getEntityIdPropertyValue()}
+                  value={entityIdValue}
                   onChange={(value) => handleEntityIdChange(value.id || '-1')}
                   onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
@@ -310,7 +325,7 @@ export default function Settings() {
             {payload.entity === 'quote' && (
               <Element leftSide={t('quote')}>
                 <QuoteSelector
-                  value={getEntityIdPropertyValue()}
+                  value={entityIdValue}
                   onChange={(value) => handleEntityIdChange(value.id || '-1')}
                   onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
@@ -321,7 +336,7 @@ export default function Settings() {
             {payload.entity === 'credit' && (
               <Element leftSide={t('credit')}>
                 <CreditSelector
-                  value={getEntityIdPropertyValue()}
+                  value={entityIdValue}
                   onChange={(value) => handleEntityIdChange(value.id || '-1')}
                   onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
@@ -332,7 +347,7 @@ export default function Settings() {
             {payload.entity === 'purchase_order' && (
               <Element leftSide={t('purchase_order')}>
                 <PurchaseOrderSelector
-                  value={getEntityIdPropertyValue()}
+                  value={entityIdValue}
                   onChange={(value) => handleEntityIdChange(value.id || '-1')}
                   onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
@@ -425,8 +440,8 @@ export default function Settings() {
 
         <Element leftSide={t('html_mode')}>
           <Toggle
-            checked={getHtmlModePropertyValue()}
-            onChange={(value) => handleHtmlModeChange(value)}
+            checked={htmlModeValue}
+            onChange={handleHtmlModeChange}
             disabled={isFormBusy}
           />
         </Element>

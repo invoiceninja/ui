@@ -131,12 +131,10 @@ export default function CustomDesign() {
           },
         ]);
 
-        setTimeout(() => {
-          setPayload((current) => ({
-            ...current,
-            design: data,
-          }));
-        }, 200);
+        setPayload((current) => ({
+          ...current,
+          design: data,
+        }));
       }
     }
 
