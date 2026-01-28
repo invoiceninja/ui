@@ -30,10 +30,6 @@ import { useFreePlanDesigns } from '../hooks/useFreePlanDesigns';
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
   disableWithQueryParameter?: boolean;
-  customValueFn?: (design: Design) => string;
-  exclude?: string[];
-  excludeByLabel?: boolean;
-  excludeWhenConfiguringEntries?: boolean;
 }
 
 export function DesignSelector(props: Props) {
@@ -113,7 +109,6 @@ export function DesignSelector(props: Props) {
             id: 'id',
             label: 'name',
             value: 'id',
-            customValue: (design) => props.customValueFn?.(design) || design.id,
           }}
           action={{
             label: t('new_design'),
@@ -147,7 +142,6 @@ export function DesignSelector(props: Props) {
           id: 'id',
           label: 'name',
           value: 'id',
-          customValue: (design) => props.customValueFn?.(design) || design.id,
         }}
         action={{
           label: t('new_design'),
@@ -161,14 +155,11 @@ export function DesignSelector(props: Props) {
         onDismiss={props.onClearButtonClick}
         disableWithQueryParameter={props.disableWithQueryParameter}
         errorMessage={props.errorMessage}
-        exclude={props.exclude}
         {...(!proPlan() &&
           !enterprisePlan() && {
             includeOnly: freePlanDesigns,
             includeByLabel: true,
           })}
-        excludeByLabel={props.excludeByLabel}
-        excludeWhenConfiguringEntries={props.excludeWhenConfiguringEntries}
       />
     </>
   );
