@@ -50,7 +50,7 @@ import {
 import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import useDoesTaxRateExistsByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistsByComboValue';
+import useDoesTaxRateExistByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistByComboValue';
 import { useColorScheme } from '$app/common/colors';
 
 const numberInputs = [
@@ -107,7 +107,7 @@ export function useResolveInputField(props: Props) {
 
   const { resource } = props;
 
-  const doesTaxRateExistsByComboValue = useDoesTaxRateExistsByComboValue();
+  const doesTaxRateExistByComboValue = useDoesTaxRateExistByComboValue();
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
@@ -362,7 +362,7 @@ export function useResolveInputField(props: Props) {
         />
 
         {taxComboValue &&
-          !doesTaxRateExistsByComboValue(
+          !doesTaxRateExistByComboValue(
             taxComboValue.split('||')[0],
             parseFloat(taxComboValue.split('||')[1])
           ) && (

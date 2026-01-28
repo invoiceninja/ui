@@ -29,7 +29,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Fragment, useRef } from 'react';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import useDoesTaxRateExistsByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistsByComboValue';
+import useDoesTaxRateExistByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistByComboValue';
 
 interface Props {
   resource: ProductTableResource;
@@ -49,7 +49,7 @@ export function InvoiceTotals(props: Props) {
   const company = useCurrentCompany();
   const variables = useTotalVariables();
   const reactSettings = useReactSettings();
-  const doesTaxRateExistsByComboValue = useDoesTaxRateExistsByComboValue();
+  const doesTaxRateExistByComboValue = useDoesTaxRateExistByComboValue();
 
   const resolveVariable = useResolveTotalVariable({
     resource,
@@ -168,7 +168,7 @@ export function InvoiceTotals(props: Props) {
                         />
 
                         <div className="w-full">
-                          {!doesTaxRateExistsByComboValue(
+                          {!doesTaxRateExistByComboValue(
                             resource?.tax_name1,
                             resource?.tax_rate1
                           ) && (
@@ -235,7 +235,7 @@ export function InvoiceTotals(props: Props) {
                         />
 
                         <div className="w-full">
-                          {!doesTaxRateExistsByComboValue(
+                          {!doesTaxRateExistByComboValue(
                             resource?.tax_name2,
                             resource?.tax_rate2
                           ) && (
@@ -301,7 +301,7 @@ export function InvoiceTotals(props: Props) {
                         />
 
                         <div className="w-full">
-                          {!doesTaxRateExistsByComboValue(
+                          {!doesTaxRateExistByComboValue(
                             resource?.tax_name3,
                             resource?.tax_rate3
                           ) && (

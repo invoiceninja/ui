@@ -1,7 +1,7 @@
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 
-export default function useDoesTaxRateExistsByComboValue() {
+export default function useDoesTaxRateExistByComboValue() {
   const { data: taxes } = useTaxRatesQuery({
     status: ['active'],
     perPage: 1000,
