@@ -102,6 +102,7 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -378,6 +379,9 @@ export function useActions(params?: Params) {
     dropdown = true,
   } = params || {};
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
   const { isEditPage } = useEntityPageIdentifier({
@@ -598,28 +602,29 @@ export function useActions(params?: Params) {
         quote={quote}
       />
     ),
-    (quote) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'run_template',
-        })}
-        entity="quote"
-        actionKey="run_template"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('run_template')}
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([quote]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/quotes/bulk',
-            entity: 'quote',
-          });
-        }}
-        icon={MdDesignServices}
-      >
-        {t('run_template')}
-      </EntityActionElement>
-    ),
+    (quote) =>
+      shouldBeRunTemplateActionVisible && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'run_template',
+          })}
+          entity="quote"
+          actionKey="run_template"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('run_template')}
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([quote]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/quotes/bulk',
+              entity: 'quote',
+            });
+          }}
+          icon={MdDesignServices}
+        >
+          {t('run_template')}
+        </EntityActionElement>
+      ),
     () => <Divider withoutPadding />,
     (quote) => (
       <CloneOptionsModal
