@@ -43,6 +43,7 @@ import { DataTable } from '$app/components/DataTable';
 import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
 import { useCreditColumns } from './hooks/useCreditColumns';
 import { TableTotalFooter } from './components/TableTotalFooter';
+import { v4 } from 'uuid';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -153,7 +154,7 @@ export default function Create() {
                 ...current,
                 invoices: [
                   {
-                    _id: window.crypto.randomUUID(),
+                    _id: v4(),
                     invoice_id: invoice.id,
                     amount:
                       invoice.balance > 0 ? invoice.balance : invoice.amount,
@@ -172,7 +173,7 @@ export default function Create() {
               ...current,
               credits: [
                 {
-                  _id: window.crypto.randomUUID(),
+                  _id: v4(),
                   credit_id: credit.id,
                   amount: credit.balance > 0 ? credit.balance : credit.amount,
                 },
@@ -331,7 +332,7 @@ export default function Create() {
                       );
 
                       newInvoices.push({
-                        _id: window.crypto.randomUUID(),
+                        _id: v4(),
                         amount: existingInvoice
                           ? existingInvoice.amount
                           : resource.balance > 0
@@ -405,7 +406,7 @@ export default function Create() {
                       );
 
                       newCredits.push({
-                        _id: window.crypto.randomUUID(),
+                        _id: v4(),
                         amount: existingCredit
                           ? existingCredit.amount
                           : resource.balance > 0
