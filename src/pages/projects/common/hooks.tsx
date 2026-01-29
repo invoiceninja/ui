@@ -54,6 +54,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export const defaultColumns: string[] = [
   'name',
@@ -318,6 +319,9 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'project',
     editPageTabs: ['documents'],
@@ -356,21 +360,22 @@ export function useActions() {
           {t('clone')}
         </DropdownElement>
       ),
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([project]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/projects/bulk',
-            entity: 'project',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (project: Project) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([project]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/projects/bulk',
+              entity: 'project',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
@@ -416,6 +421,9 @@ export const useCustomBulkActions = () => {
   const documentsBulk = useDocumentsBulk();
 
   const invoiceProject = useInvoiceProject();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const shouldDownloadDocuments = (projects: Project[]) => {
     return projects.some(({ documents }) => documents.length);
@@ -467,21 +475,22 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/projects/bulk',
-            entity: 'project',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/projects/bulk',
+              entity: 'project',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

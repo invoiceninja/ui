@@ -13,10 +13,10 @@ import { Card, Element } from '$app/components/cards';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { Checkbox, InputField, SelectField } from '$app/components/forms';
 import { Divider } from '$app/components/cards/Divider';
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { trans } from '$app/common/helpers';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -34,6 +34,8 @@ import styled from 'styled-components';
 import { BookOpen } from '$app/components/icons/BookOpen';
 import { Import as ImportIcon } from '$app/components/icons/Import';
 import { Export } from '$app/components/icons/Export';
+import { atomWithStorage } from 'jotai/utils';
+import { cloneDeep, set } from 'lodash';
 
 export interface Context {
   errors: ValidationBag | undefined;
@@ -50,6 +52,17 @@ const Box = styled.div`
     background-color: ${({ theme }) => theme.hoverBackgroundColor};
   }
 `;
+
+interface DesignPreviewProperties {
+  design_id: string;
+  entity_id: string;
+  entity: EntityType;
+  html_mode: boolean;
+}
+
+export const designPreviewPropertiesAtom = atomWithStorage<
+  DesignPreviewProperties[]
+>('designPreviewProperties', []);
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -68,6 +81,121 @@ export default function Settings() {
   const colors = useColorScheme();
 
   const setIsImportModalVisible = useSetAtom(importModalVisiblityAtom);
+  const [designPreviewProperties, setDesignPreviewProperties] = useAtom(
+    designPreviewPropertiesAtom
+  );
+
+  const getEntityPropertyValue = () => {
+    return (
+      designPreviewProperties.find(
+        (property) => property.design_id === (payload.design?.id || '')
+      )?.entity || 'invoice'
+    );
+  };
+
+  const entityValue = useMemo(
+    () => getEntityPropertyValue(),
+    [getEntityPropertyValue]
+  );
+
+  const handleEntityChange = (value: EntityType) => {
+    const existingDesignIndex = designPreviewProperties.findIndex(
+      (property) => property.design_id === payload.design?.id
+    );
+
+    if (existingDesignIndex !== -1) {
+      const updatedDesignPreviewProperties = cloneDeep(designPreviewProperties);
+      set(
+        updatedDesignPreviewProperties,
+        `[${existingDesignIndex}].entity`,
+        value
+      );
+      set(
+        updatedDesignPreviewProperties,
+        `[${existingDesignIndex}].entity_id`,
+        '-1'
+      );
+
+      setDesignPreviewProperties(updatedDesignPreviewProperties);
+    }
+
+    setTimeout(() => {
+      setPayload((current) => ({
+        ...current,
+        entity: value,
+        entity_id: '-1',
+      }));
+    }, 200);
+  };
+
+  const getEntityIdPropertyValue = () => {
+    return designPreviewProperties.find(
+      (property) => property.design_id === (payload.design?.id || '')
+    )?.entity_id;
+  };
+
+  const entityIdValue = useMemo(
+    () => getEntityIdPropertyValue(),
+    [getEntityIdPropertyValue]
+  );
+
+  const handleEntityIdChange = (value: string) => {
+    const existingDesignIndex = designPreviewProperties.findIndex(
+      (property) => property.design_id === payload.design?.id
+    );
+
+    if (existingDesignIndex !== -1) {
+      const updatedDesignPreviewProperties = cloneDeep(designPreviewProperties);
+      set(
+        updatedDesignPreviewProperties,
+        `[${existingDesignIndex}].entity_id`,
+        value
+      );
+
+      setDesignPreviewProperties(updatedDesignPreviewProperties);
+    }
+
+    setTimeout(() => {
+      setPayload((current) => ({
+        ...current,
+        entity_id: value,
+      }));
+    }, 200);
+  };
+
+  const getHtmlModePropertyValue = () => {
+    return Boolean(
+      designPreviewProperties.find(
+        (property) => property.design_id === (payload.design?.id || '')
+      )?.html_mode
+    );
+  };
+
+  const htmlModeValue = useMemo(
+    () => getHtmlModePropertyValue(),
+    [getHtmlModePropertyValue]
+  );
+
+  const handleHtmlModeChange = (value: boolean) => {
+    const existingDesignIndex = designPreviewProperties.findIndex(
+      (property) => property.design_id === payload.design?.id
+    );
+
+    if (existingDesignIndex !== -1) {
+      const updatedDesignPreviewProperties = cloneDeep(designPreviewProperties);
+      set(
+        updatedDesignPreviewProperties,
+        `[${existingDesignIndex}].html_mode`,
+        value
+      );
+
+      setDesignPreviewProperties(updatedDesignPreviewProperties);
+    }
+
+    setTimeout(() => {
+      setShouldRenderHTML(value);
+    }, 200);
+  };
 
   const handleExportToTxtFile = () => {
     if (payload.design) {
@@ -168,13 +296,9 @@ export default function Settings() {
           <>
             <Element leftSide={t('entity')}>
               <SelectField
-                value={payload.entity || 'invoice'}
+                value={entityValue}
                 onValueChange={(value) =>
-                  setPayload((current) => ({
-                    ...current,
-                    entity: value as EntityType,
-                    entity_id: '-1',
-                  }))
+                  handleEntityChange(value as EntityType)
                 }
                 customSelector
                 dismissable={false}
@@ -190,19 +314,9 @@ export default function Settings() {
             {payload.entity === 'invoice' && (
               <Element leftSide={t('invoice')}>
                 <InvoiceSelector
-                  value={payload.entity_id}
-                  onChange={(value) =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: value.id || '-1',
-                    }))
-                  }
-                  onClearButtonClick={() =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: '-1',
-                    }))
-                  }
+                  value={entityIdValue}
+                  onChange={(value) => handleEntityIdChange(value.id || '-1')}
+                  onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
                 />
               </Element>
@@ -211,19 +325,9 @@ export default function Settings() {
             {payload.entity === 'quote' && (
               <Element leftSide={t('quote')}>
                 <QuoteSelector
-                  value={payload.entity_id}
-                  onChange={(value) =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: value.id || '-1',
-                    }))
-                  }
-                  onClearButtonClick={() =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: '-1',
-                    }))
-                  }
+                  value={entityIdValue}
+                  onChange={(value) => handleEntityIdChange(value.id || '-1')}
+                  onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
                 />
               </Element>
@@ -232,19 +336,9 @@ export default function Settings() {
             {payload.entity === 'credit' && (
               <Element leftSide={t('credit')}>
                 <CreditSelector
-                  value={payload.entity_id}
-                  onChange={(value) =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: value.id || '-1',
-                    }))
-                  }
-                  onClearButtonClick={() =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: '-1',
-                    }))
-                  }
+                  value={entityIdValue}
+                  onChange={(value) => handleEntityIdChange(value.id || '-1')}
+                  onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
                 />
               </Element>
@@ -253,19 +347,9 @@ export default function Settings() {
             {payload.entity === 'purchase_order' && (
               <Element leftSide={t('purchase_order')}>
                 <PurchaseOrderSelector
-                  value={payload.entity_id}
-                  onChange={(value) =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: value.id || '-1',
-                    }))
-                  }
-                  onClearButtonClick={() =>
-                    setPayload((current) => ({
-                      ...current,
-                      entity_id: '-1',
-                    }))
-                  }
+                  value={entityIdValue}
+                  onChange={(value) => handleEntityIdChange(value.id || '-1')}
+                  onClearButtonClick={() => handleEntityIdChange('-1')}
                   errorMessage={errors?.errors.entity_id}
                 />
               </Element>
@@ -356,8 +440,8 @@ export default function Settings() {
 
         <Element leftSide={t('html_mode')}>
           <Toggle
-            checked={shouldRenderHTML}
-            onChange={(value) => setShouldRenderHTML(value)}
+            checked={htmlModeValue}
+            onChange={handleHtmlModeChange}
             disabled={isFormBusy}
           />
         </Element>

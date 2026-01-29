@@ -874,7 +874,7 @@ export function ComboboxAsync<T = any>({
   staleTime,
   initiallyVisible,
   sortBy = 'created_at|desc',
-  exclude,
+  exclude = [],
   includeOnly,
   includeByLabel,
   action,
