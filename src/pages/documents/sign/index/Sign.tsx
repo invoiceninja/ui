@@ -25,6 +25,7 @@ import {
   type SignatureSelectorInputProps,
   type StartSigningButtonProps,
   type SubmitButtonProps,
+  SuccessProps,
 } from '@docuninja/builder2.0';
 import classNames from 'classnames';
 import { Check, ChevronLeft, ChevronRight } from 'react-feather';
@@ -149,7 +150,7 @@ function DateInput({ value, onChange }: DateInputProps) {
   );
 }
 
-function Success() {
+function Success({ closeTab }: SuccessProps) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -168,8 +169,19 @@ function Success() {
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
     >
-      <div className="text-sm px-4 sm:px-6" style={{ color: colors.$3 }}>
-        {t('download_signed_document')}
+      <div className="flex flex-col gap-6 px-4 sm:px-6">
+        <div className="text-sm" style={{ color: colors.$3 }}>
+          {t('download_signed_document')}
+        </div>
+
+        <Button
+          type="primary"
+          behavior="button"
+          className="w-full"
+          onClick={closeTab}
+        >
+          {t('close_tab')}
+        </Button>
       </div>
     </Card>
   );
