@@ -30,6 +30,7 @@ import { QuoteContext } from '../create/Create';
 import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
 import { useProductQuoteColumns } from '$app/pages/invoices/common/hooks/useProductQuoteColumns';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -106,6 +107,10 @@ export default function Edit() {
         <QuoteDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
+          {quote && (
+            <HiddenResourceTaxesAlert className="mb-2" resource={quote} />
+          )}
+
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}

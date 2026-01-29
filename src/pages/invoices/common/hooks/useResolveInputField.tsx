@@ -47,6 +47,11 @@ import {
   getTaxRateComboValue,
   TaxNamePropertyType,
 } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { Icon } from '$app/components/icons/Icon';
+import { MdWarning } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
+import useDoesTaxRateExistByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistByComboValue';
+import { useColorScheme } from '$app/common/colors';
 
 const numberInputs = [
   'discount',
@@ -93,11 +98,16 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 };
 
 export function useResolveInputField(props: Props) {
+  const [t] = useTranslation();
+
   const location = useLocation();
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
   const { resource } = props;
+
+  const doesTaxRateExistByComboValue = useDoesTaxRateExistByComboValue();
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
@@ -245,7 +255,10 @@ export function useResolveInputField(props: Props) {
     relationType: props.relationType,
   });
 
-  const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators, resource);
+  const getCurrency = useGetCurrencySeparators(
+    setInputCurrencySeparators,
+    resource
+  );
 
   useEffect(() => {
     if (resource[props.relationType]) {
@@ -325,21 +338,59 @@ export function useResolveInputField(props: Props) {
       return null;
     }
 
+    const taxComboValue = getTaxRateComboValue(
+      resource?.line_items[index],
+      property.replace('rate', 'name') as TaxNamePropertyType
+    );
+
     return (
-      <TaxRateSelector
-        key={`${property}${resource?.line_items[index][property]}`}
-        onChange={(value) =>
-          value.resource && handleTaxRateChange(property, index, value.resource)
-        }
-        onTaxCreated={(taxRate) =>
-          handleTaxRateChange(property, index, taxRate)
-        }
-        defaultValue={getTaxRateComboValue(
-          resource?.line_items[index],
-          property.replace('rate', 'name') as TaxNamePropertyType
-        )}
-        onClearButtonClick={() => handleTaxRateChange(property, index)}
-      />
+      <div className="flex flex-col items-center gap-y-2">
+        <TaxRateSelector
+          key={`${property}${resource?.line_items[index][property]}`}
+          onChange={(value) =>
+            value.resource &&
+            handleTaxRateChange(property, index, value.resource)
+          }
+          onTaxCreated={(taxRate) =>
+            handleTaxRateChange(property, index, taxRate)
+          }
+          defaultValue={getTaxRateComboValue(
+            resource?.line_items[index],
+            property.replace('rate', 'name') as TaxNamePropertyType
+          )}
+          onClearButtonClick={() => handleTaxRateChange(property, index)}
+        />
+
+        {taxComboValue &&
+          !doesTaxRateExistByComboValue(
+            taxComboValue.split('||')[0],
+            parseFloat(taxComboValue.split('||')[1])
+          ) && (
+            <div className="flex items-center gap-x-2 self-start max-w-full">
+              <div>
+                <Icon element={MdWarning} size={20} color="orange" />
+              </div>
+
+              <div className="flex gap-x-1 items-center text-sm font-medium text-wrap flex-wrap">
+                <span style={{ color: colors.$3 }}>
+                  {taxComboValue.split('||')[0]} {taxComboValue.split('||')[1]}%
+                </span>
+
+                <span
+                  className="underline cursor-pointer"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    handleTaxRateChange(property, index);
+                  }}
+                >
+                  {t('remove')}
+                </span>
+              </div>
+            </div>
+          )}
+      </div>
     );
   };
 

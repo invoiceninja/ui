@@ -25,6 +25,7 @@ import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/component
 import { useColorScheme } from '$app/common/colors';
 import { PurchaseOrderContext } from '../create/Create';
 import { usePurchaseOrderUtilities } from './hooks/usePurchaseOrderUtilities';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -109,6 +110,13 @@ export default function Edit() {
         )}
 
         <div className="col-span-12">
+          {purchaseOrder && (
+            <HiddenResourceTaxesAlert
+              className="mb-2"
+              resource={purchaseOrder}
+            />
+          )}
+
           {purchaseOrder ? (
             <ProductsTable
               type="product"
