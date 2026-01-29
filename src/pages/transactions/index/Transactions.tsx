@@ -156,6 +156,7 @@ export default function Transactions() {
           hideEditableOptions={!hasPermission('edit_bank_transaction')}
           enableSavingFilterPreference
           dateRangeColumns={[
+            { column: 'date', queryParameterKey: 'date_range' },
             { column: 'created_at', queryParameterKey: 'created_between' },
           ]}
         />

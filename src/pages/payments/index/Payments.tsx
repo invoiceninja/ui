@@ -141,6 +141,10 @@ export default function Payments() {
         enableSavingFilterPreference
         dateRangeColumns={[
           {
+            column: 'date',
+            queryParameterKey: 'date_range',
+          },
+          {
             column: 'created_at',
             queryParameterKey: 'created_between',
           },

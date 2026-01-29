@@ -68,6 +68,7 @@ export default function RecurringExpenses() {
         hideEditableOptions={!hasPermission('edit_recurring_expense')}
         enableSavingFilterPreference
         dateRangeColumns={[
+          { column: 'date', queryParameterKey: 'date_range' },
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
       />
