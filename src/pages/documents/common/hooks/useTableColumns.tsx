@@ -16,6 +16,7 @@ import { Document } from '$app/common/interfaces/docuninja/api';
 import { Badge, BadgeVariant } from '$app/components/Badge';
 import { DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
+import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
 
 export const STATUS_VARIANTS = {
@@ -48,7 +49,9 @@ export function useTableColumns() {
 
   const getContactName = (document: Document) => {
     const firstInvitation = document.invitations?.find(
-      (invitation) => invitation.client_contact_id !== undefined && invitation.client_contact_id !== null
+      (invitation) =>
+        invitation.client_contact_id !== undefined &&
+        invitation.client_contact_id !== null
     );
 
     if (firstInvitation) {
@@ -69,14 +72,12 @@ export function useTableColumns() {
 
   const getUserName = (document: Document) => {
     const firstInvitation = document.invitations?.find(
-      (invitation) => invitation.user_id !== undefined && invitation.user_id !== null
+      (invitation) =>
+        invitation.user_id !== undefined && invitation.user_id !== null
     );
 
     if (firstInvitation?.user) {
-      if (
-        !firstInvitation.user.first_name &&
-        !firstInvitation.user.last_name
-      ) {
+      if (!firstInvitation.user.first_name && !firstInvitation.user.last_name) {
         return firstInvitation.user.email;
       }
 
@@ -87,26 +88,20 @@ export function useTableColumns() {
   };
 
   const documentStatus = (document: Document) => {
-    
-    let variant = STATUS_VARIANTS[document.status_id as keyof typeof STATUS_VARIANTS] as BadgeVariant;
+    let variant = STATUS_VARIANTS[
+      document.status_id as keyof typeof STATUS_VARIANTS
+    ] as BadgeVariant;
     let label = STATUS_LABELS[document.status_id as keyof typeof STATUS_LABELS];
 
     if (document.is_deleted) {
       variant = 'red';
       label = t('deleted');
-    }
-    else if (document.archived_at !== null) {
+    } else if (document.archived_at !== null) {
       variant = 'orange';
       label = t('archived');
     }
 
-    return (
-      <Badge
-        variant={variant}
-      >
-        {label}
-      </Badge>
-    );
+    return <Badge variant={variant}>{label}</Badge>;
   };
 
   const columns: DataTableColumns<Document> = [
@@ -121,8 +116,8 @@ export function useTableColumns() {
       format: (_, document) => getUserName(document),
     },
     {
-      id: 'description',
-      label: t('description'),
+      id: 'document',
+      label: t('document'),
       format: (_, document) => (
         <Link to={route('/docuninja/:id', { id: document.id })}>
           <span className="truncate block max-w-xs">
@@ -134,36 +129,29 @@ export function useTableColumns() {
     {
       id: 'files',
       label: t('files'),
-      format: (_, document) => (
-        <>
-          {document.files && document.files.length > 0 ? (
-            <div className="flex items-center gap-3">
-              <div className="bg-emerald-500 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
-                <span className="font-medium">
-                  {document.files[0].page_count}
-                </span>
+      format: (_, document) => {
+        const totalPages = collect(document.files ?? []).sum(
+          (file) => file.page_count || 0
+        );
 
-                <span className="text-xs">
-                  {document.files[0].page_count === 1 ? t('page') : t('pages')}
-                </span>
-              </div>
+        return (
+          <>
+            {document.files && document.files.length > 0 ? (
+              <div className="flex items-center gap-3">
+                <div className="bg-emerald-500 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                  <span className="font-medium">{totalPages}</span>
 
-              <div>
-                <span className="text-gray-900 font-medium">
-                  {document.files[0].filename.split('.')[0]}
-                </span>
-                {document.files.length > 1 && (
-                  <span className="ml-2" style={{ color: colors.$17 }}>
-                    & {document.files.length - 1} more
+                  <span className="text-xs lowercase">
+                    {totalPages === 1 ? t('page') : t('pages')}
                   </span>
-                )}
+                </div>
               </div>
-            </div>
-          ) : (
-            <span className="text-gray-400">—</span>
-          )}
-        </>
-      ),
+            ) : (
+              <span className="text-gray-400">—</span>
+            )}
+          </>
+        );
+      },
     },
     {
       id: 'status',
