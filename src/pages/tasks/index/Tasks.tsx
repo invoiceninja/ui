@@ -168,6 +168,7 @@ export default function Tasks() {
         filterColumns={filterColumns}
         dateRangeColumns={[
           { column: 'calculated_start_date', queryParameterKey: 'date_range' },
+          { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
       />
 
