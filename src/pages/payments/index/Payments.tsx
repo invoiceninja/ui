@@ -143,6 +143,7 @@ export default function Payments() {
           {
             column: 'date',
             queryParameterKey: 'date_range',
+            includeColumnNameInQuery: true,
           },
           {
             column: 'created_at',

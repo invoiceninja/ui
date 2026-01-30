@@ -67,6 +67,7 @@ import { FilterColumn } from './FilterColumn';
 export interface DateRangeColumn {
   column: string;
   queryParameterKey: string;
+  includeColumnNameInQuery?: boolean;
 }
 
 export type DataTableColumns<T = any> = {
@@ -372,7 +373,19 @@ export function DataTable<T extends object>(props: Props<T>) {
       dateRangeQueryParameter &&
       dateRange?.split(',').every((date) => date.length > 1)
     ) {
-      apiEndpoint.searchParams.set(dateRangeQueryParameter, dateRange);
+      const dateRangeColumn = dateRangeColumns.find(
+        (dateRangeColumn) =>
+          dateRangeColumn.queryParameterKey === dateRangeQueryParameter
+      );
+
+      if (dateRangeColumn?.includeColumnNameInQuery) {
+        apiEndpoint.searchParams.set(
+          dateRangeQueryParameter,
+          `${dateRangeColumn.column},${dateRange}`
+        );
+      } else {
+        apiEndpoint.searchParams.set(dateRangeQueryParameter, dateRange);
+      }
     }
 
     if (
