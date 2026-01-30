@@ -16,7 +16,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms';
-import { Element } from '$app/components/cards';
+import { CardContainer, Element } from '$app/components/cards';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
@@ -31,7 +31,10 @@ interface Payload {
   description: string;
 }
 
-export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepProps) {
+export function CustomBlueprintStep({
+  onComplete,
+  onBack,
+}: CustomBlueprintStepProps) {
   const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
   const [payload, setPayload] = useState<Payload>({
@@ -44,39 +47,29 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
 
     setErrors(undefined);
 
-     request(
-        'POST',
-        docuNinjaEndpoint('/api/blueprints'),
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      ).then((response: GenericSingleResourceResponse<Document>) =>{
+    request('POST', docuNinjaEndpoint('/api/blueprints'), payload, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+      },
+    })
+      .then((response: GenericSingleResourceResponse<Document>) => {
+        toast.success('template_created');
+        $refetch(['blueprints']);
 
-          toast.success('template_created');
-          $refetch(['blueprints']);
-          
-          onComplete(response.data.data.id);
-
-      }).catch((error: AxiosError<ValidationBag>) => {
-      
+        onComplete(response.data.data.id);
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        }
-        else {
+        } else {
           toast.error('Error creating blueprint:');
         }
-
       });
-  };
+  }
 
   return (
-    <div className="space-y-6">
+    <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('create_your_own')}</h2>
         <p className="text-gray-600">{t('create_your_own_description')}</p>
@@ -95,25 +88,26 @@ export function CustomBlueprintStep({ onComplete, onBack }: CustomBlueprintStepP
         <InputField
           element="textarea"
           value={payload.description}
-          onValueChange={(value) => setPayload({ ...payload, description: value })}
+          onValueChange={(value) =>
+            setPayload({ ...payload, description: value })
+          }
           errorMessage={errors?.errors.description}
           placeholder={t('description')}
         />
       </Element>
 
-      <div className="flex justify-between p-6">
-        <Button 
-          type="primary"
-          onClick={onBack}>
+      <div className="flex justify-between">
+        <Button type="primary" onClick={onBack} behavior="button">
           {t('back')}
         </Button>
         <Button
+          behavior="button"
           type="primary"
           onClick={handleCreateBlueprint}
         >
           {t('create_template')}
         </Button>
       </div>
-    </div>
+    </CardContainer>
   );
 }

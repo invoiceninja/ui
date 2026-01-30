@@ -21,13 +21,17 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
+import { Badge } from '$app/components/Badge';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { DocumentCreationDropZone } from '../common/components/DocumentCreationDropZone';
+import { X } from 'react-feather';
 
 interface Payload {
   description: string;
+  'files[]': File[];
 }
 
 export default function Create() {
@@ -48,7 +52,8 @@ export default function Create() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
   const [payload, setPayload] = useState<Payload>({
-    description: '',
+    description: 'Untitled document',
+    'files[]': [],
   });
 
   const handleCreate = () => {
@@ -56,10 +61,17 @@ export default function Create() {
       toast.processing();
 
       setErrors(undefined);
-
       setIsFormBusy(true);
 
-      request('POST', docuNinjaEndpoint('/api/documents'), payload, {
+      const formData = new FormData();
+
+      formData.append('description', payload.description);
+
+      payload['files[]'].forEach((file) => {
+        formData.append('files[]', file);
+      });
+
+      request('POST', docuNinjaEndpoint('/api/documents'), formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
         },
@@ -71,6 +83,7 @@ export default function Create() {
 
           setPayload({
             description: '',
+            'files[]': [],
           });
 
           navigate(
@@ -85,6 +98,11 @@ export default function Create() {
         })
         .finally(() => setIsFormBusy(false));
     }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    const updatedFiles = payload['files[]'].filter((_, i) => i !== index);
+    setPayload({ ...payload, 'files[]': updatedFiles });
   };
 
   return (
@@ -110,6 +128,34 @@ export default function Create() {
               errorMessage={errors?.errors.description}
             />
           </Element>
+
+          <Element>
+            <DocumentCreationDropZone
+              onSelectFiles={(f) => setPayload({ ...payload, 'files[]': f })}
+            />
+          </Element>
+
+          {payload['files[]'].length > 0 && (
+            <Element leftSide={t('files')}>
+              <div className="flex flex-wrap gap-2">
+                {payload['files[]'].map((file, index) => (
+                  <Badge key={index} variant="blue">
+                    <div className="flex items-center gap-2">
+                      <span>{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(index)}
+                        className="hover:opacity-70 transition-opacity"
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </Badge>
+                ))}
+              </div>
+            </Element>
+          )}
         </Card>
       </div>
     </Default>

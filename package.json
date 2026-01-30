@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "file:../builder2.0",
+    "@docuninja/builder2.0": "^0.0.38",
     "@emotion/styled": "^11.14.0",
     "@fontsource/alex-brush": "^5.2.6",
     "@fontsource/dancing-script": "^5.2.6",
@@ -34,6 +34,7 @@
     "deep-object-diff": "^1.1.9",
     "dompurify": "^3.2.4",
     "dotenv": "^16.4.7",
+    "driver.js": "^1.4.0",
     "font-awesome": "^4.7.0",
     "formik": "^2.4.6",
     "grapesjs": "^0.22.13",

@@ -9,64 +9,60 @@ import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
-import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField, SelectField } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
-import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
-import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { Alertbox } from '$app/pages/documents/builder/Builder';
+import {
+  Alertbox,
+  ConfirmationDialog,
+  ConfirmationDialogButton,
+  CreateDialogTabButton,
+  CreateUserForm,
+  DeleteButton,
+  DeleteDialog,
+  ImportFromGoogleDrive,
+  Loading,
+  RectangleSettingsButton,
+  RectangleSettingsCheckbox,
+  RectangleSettingsDialog,
+  RectangleSettingsInput,
+  RectangleSettingsLabel,
+  RectangleSettingsOptionItem,
+  RectangleSettingsOptionsList,
+  RectangleSettingsRemoveButton,
+  RectangleSettingsSaveButton,
+  RectangleSettingsSelect,
+  ToolboxContext,
+  UninviteButton,
+  UninviteDialog,
+  Upload,
+  UploadDialog,
+  ValidationErrors,
+} from '$app/pages/documents/builder/components';
 import {
   Builder as Builder$,
   BuilderContext,
-  ConfirmationDialogButtonProps,
-  ConfirmationDialogProps,
   CreateClientTabProps,
   CreateDialogProps,
-  CreateDialogTabButtonProps,
-  DeleteDialogButtonProps,
-  DeleteDialogProps,
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
-  ToolboxContextProps,
-  UninviteDialogButtonProps,
-  UninviteDialogProps,
-  UploadDialogProps,
-  UploadProps,
-  ValidationErrorsProps,
   CreateBlueprintSignatoryProps,
 } from '@docuninja/builder2.0';
 import { useEffect, useState } from 'react';
-import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate, useParams } from 'react-router-dom';
 
-function Loading() {
-  return (
-    <div className="flex justify-center items-center py-6 sm:py-8 px-4 sm:px-6">
-      <Spinner />
-    </div>
-  );
-}
-
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
 
   return (
-    <Modal
-      title={t('send_confirmation')}
-      visible={open}
-      onClose={onOpenChange}
-    >
+    <Modal title={t('send_confirmation')} visible={open} onClose={onOpenChange}>
       {content}
 
       <div
@@ -149,81 +145,6 @@ function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
   );
 }
 
-function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal title={t('delete_document')} visible={open} onClose={onOpenChange}>
-      <p>{t('delete_docuninja_document_confirmation')}</p>
-
-      {action}
-    </Modal>
-  );
-}
-
-function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button behavior="button" disabled={isSubmitting} className="w-full">
-      {t('delete')}
-    </Button>
-  );
-}
-
-function Upload({ ...props }: UploadProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button behavior="button" type="secondary" {...props} className="w-full">
-      {t('upload')}
-    </Button>
-  );
-}
-
-function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal
-      title={t('upload')}
-      visible={open}
-      onClose={onOpenChange}
-      size="small"
-    >
-      {content}
-    </Modal>
-  );
-}
-
-function ValidationErrors({ content }: ValidationErrorsProps) {
-  return <Alert>{content}</Alert>;
-}
-
-function ConfirmationDialog({
-  isOpen,
-  onOpenChange,
-  content,
-  action,
-}: ConfirmationDialogProps) {
-  return (
-    <Modal title="Confirmation" visible={isOpen} onClose={onOpenChange}>
-      {content}
-      {action}
-    </Modal>
-  );
-}
-
-function ConfirmationDialogButton({ ...props }: ConfirmationDialogButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button behavior="button" {...props}>
-      {t('confirm')}
-    </Button>
-  );
-}
-
 export function CreateDialog({
   open,
   onOpenChange,
@@ -268,42 +189,6 @@ function CreateClientForm({ fields, errors }: CreateClientTabProps) {
         </div>
       ))}
     </>
-  );
-}
-
-function CreateUserForm({ fields, errors }: CreateClientTabProps) {
-  const [t] = useTranslation();
-
-  return (
-    <>
-      {fields.map((field) => (
-        <div key={field.name} className="mb-4">
-          <InputField
-            label={t(field.name)}
-            errorMessage={errors?.errors[field.name]}
-            onValueChange={field.onValueChange}
-          />
-        </div>
-      ))}
-    </>
-  );
-}
-
-function CreateDialogTabButton({
-  form,
-  isSubmitting,
-}: CreateDialogTabButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button
-      form={form}
-      behavior="submit"
-      disabled={isSubmitting}
-      className="w-full"
-    >
-      {t('create')}
-    </Button>
   );
 }
 
@@ -377,87 +262,6 @@ function SignatorySelector({
   );
 }
 
-function UninviteDialog({
-  open,
-  onOpenChange,
-  content,
-  action,
-}: UninviteDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal
-      title={t('remove_invitations')}
-      visible={open}
-      onClose={onOpenChange}
-    >
-      {content}
-      {action}
-    </Modal>
-  );
-}
-
-function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
-  return (
-    <Button form={form} behavior="button" disabled={isSubmitting}>
-      Continue
-    </Button>
-  );
-}
-
-function ToolboxContext({ options }: ToolboxContextProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Dropdown
-      customLabel={
-        <span>
-          <Settings />
-        </span>
-      }
-    >
-      {options?.map((option, i) =>
-        option.children.length > 0 ? (
-          <>
-            {option.children.map((child, j) => (
-              <DropdownElement
-                key={`${i}-${j}`}
-                value={child.value}
-                onClick={child.onSelect}
-              >
-                <div className="flex items-center gap-2">
-                  {t(child.label) || child.label}
-
-                  {option.value === child.value ? <Check size={18} /> : null}
-                </div>
-              </DropdownElement>
-            ))}
-          </>
-        ) : (
-          <DropdownElement
-            key={i}
-            value={option.value}
-            onClick={() =>
-              option.type !== 'toggle' ? option.onSelect(option.value) : null
-            }
-          >
-            <div className="flex items-center gap-2">
-              {option.type === 'toggle' ? (
-                <Toggle
-                  checked={option.value as boolean}
-                  onValueChange={option.onSelect}
-                />
-              ) : null}
-
-              {t(option.label) || option.label}
-            </div>
-          </DropdownElement>
-        )
-      )}
-    </Dropdown>
-  );
-}
-
 function BlueprintBuilder() {
   const [t] = useTranslation();
 
@@ -474,7 +278,7 @@ function BlueprintBuilder() {
       setBlueprint(blueprintResponse.data.data);
     }
   }, [blueprintResponse]);
-  
+
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const pages: Page[] = [
@@ -543,7 +347,6 @@ function BlueprintBuilder() {
 
   const navigate = useNavigate();
 
-  
   return (
     <Default
       title={t('')}
@@ -551,23 +354,25 @@ function BlueprintBuilder() {
       navigationTopRight={
         <div className="flex items-center gap-2">
           {blueprint?.is_template && blueprint?.template && (
-          <Button
-            type="secondary"  
-            behavior="button"
-            onClick={() => {
-              navigate(route('/docuninja/templates/:id/editor', { 
-                id, 
-                state: { 
-                  templateHtml: blueprint.template, 
-                  blueprintName: blueprint.name 
-                } 
-              }));
-            }}
-            disabled={isDocumentSaving}
-            disableWithoutIcon
-          >
-            {t('edit_template')}
-          </Button>
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() => {
+                navigate(
+                  route('/docuninja/templates/:id/editor', {
+                    id,
+                    state: {
+                      templateHtml: blueprint.template,
+                      blueprintName: blueprint.name,
+                    },
+                  })
+                );
+              }}
+              disabled={isDocumentSaving}
+              disableWithoutIcon
+            >
+              {t('edit_template')}
+            </Button>
           )}
 
           <Button
@@ -586,7 +391,7 @@ function BlueprintBuilder() {
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
-        {/* @ts-expect-error It's safe */}
+        {/* @ts-expect-error - TODO: fix this */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
@@ -638,6 +443,21 @@ function BlueprintBuilder() {
               toolboxContext: ToolboxContext,
               helper: () => null,
               alert: Alertbox,
+              imports: {
+                googleDrive: ImportFromGoogleDrive,
+              },
+              rectangleSettings: {
+                dialog: RectangleSettingsDialog,
+                save: RectangleSettingsSaveButton,
+                button: RectangleSettingsButton,
+                input: RectangleSettingsInput,
+                label: RectangleSettingsLabel,
+                checkbox: RectangleSettingsCheckbox,
+                select: RectangleSettingsSelect,
+                removeButton: RectangleSettingsRemoveButton,
+                optionItem: RectangleSettingsOptionItem,
+                optionsList: RectangleSettingsOptionsList,
+              },
             },
             styles: {
               frame: {
@@ -689,7 +509,25 @@ function BlueprintBuilder() {
             company:
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
-              readonly: false,
+            readonly: false,
+            services: {
+              google: {
+                appId: import.meta.env.VITE_GOOGLE_APP_ID,
+                clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+              },
+            },
+            translations: {
+              element: t('element') as string,
+              tips_and_notes: t('tips_and_notes') as string,
+              default_checkbox_label: t('default_checkbox_label') as string,
+              empty_checkbox_label: t('empty_checkbox_label') as string,
+              select_needs_two_options: t('select_needs_two_options') as string,
+              default_select_label: t('default_select_label') as string,
+              radio_needs_two_options: t('radio_needs_two_options') as string,
+              default_radio_group_label: t('default_radio_group_label') as string,
+              multiselect_needs_two_options: t('multiselect_needs_two_options') as string,
+              default_multiselect_label: t('default_multiselect_label') as string,
+            },
           }}
         >
           <Builder$ />

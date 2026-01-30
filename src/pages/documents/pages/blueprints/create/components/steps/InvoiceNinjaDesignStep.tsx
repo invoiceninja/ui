@@ -16,7 +16,7 @@ import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useBlueprintsQuery } from '$app/common/queries/docuninja/blueprints';
 import { Button } from '$app/components/forms';
-import { Element } from '$app/components/cards';
+import { CardContainer, Element } from '$app/components/cards';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
@@ -34,26 +34,32 @@ const ENTITY_TYPES = [
   { value: 'purchase_order', label: 'Purchase Order' },
 ];
 
-export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesignStepProps) {
+export function InvoiceNinjaDesignStep({
+  onComplete,
+  onBack,
+}: InvoiceNinjaDesignStepProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedEntityType, setSelectedEntityType] = useState<string>('');
 
   // Fetch existing blueprints
-  const { data: blueprintsData, isLoading: isLoadingBlueprints } = useBlueprintsQuery({
-    perPage: '100',
-    currentPage: '1',
-    status: ['active'],
-  });
+  const { data: blueprintsData, isLoading: isLoadingBlueprints } =
+    useBlueprintsQuery({
+      perPage: '100',
+      currentPage: '1',
+      status: ['active'],
+    });
 
   // Create a map of existing entity types from blueprints
   const existingEntityTypes = useMemo(() => {
     if (!blueprintsData?.data?.data) return new Set<string>();
-    
+
     return new Set(
       blueprintsData.data.data
-        .map((blueprint: Blueprint) => blueprint.document?.metadata?.entity_type)
+        .map(
+          (blueprint: Blueprint) => blueprint.document?.metadata?.entity_type
+        )
         .filter(Boolean)
     );
   }, [blueprintsData]);
@@ -70,15 +76,16 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
     toast.processing();
 
     try {
-      const response = await request(
+      const response = (await request(
         'POST',
         endpoint('/api/docuninja/stub_blueprint'),
-        { entity: selectedEntityType }, { skipIntercept: true }
-      ) as GenericSingleResourceResponse<Document>;
+        { entity: selectedEntityType },
+        { skipIntercept: true }
+      )) as GenericSingleResourceResponse<Document>;
 
       toast.success('template_created');
       $refetch(['blueprints']);
-      
+
       onComplete(response.data.data.id);
     } catch (error) {
       // console.error('Error creating blueprint:', error);
@@ -108,7 +115,7 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
   }
 
   return (
-    <div className="space-y-6">
+    <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('document_type')}</h2>
         <p className="text-gray-600">{t('document_type_description')}</p>
@@ -125,12 +132,14 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
                   : 'border-gray-200 hover:border-gray-300'
               }`}
               style={{
-                borderColor: selectedEntityType === entityType.value 
-                  ? colors.$3 
-                  : colors.$20,
-                backgroundColor: selectedEntityType === entityType.value 
-                  ? colors.$3 + '10' 
-                  : 'transparent',
+                borderColor:
+                  selectedEntityType === entityType.value
+                    ? colors.$3
+                    : colors.$20,
+                backgroundColor:
+                  selectedEntityType === entityType.value
+                    ? colors.$3 + '10'
+                    : 'transparent',
               }}
             >
               <input
@@ -143,17 +152,14 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
               />
               <div>
                 <div className="font-semibold">{t(entityType.value)}</div>
-                
               </div>
             </label>
           ))}
         </div>
       </Element>
 
-      <div className="flex justify-between p-6">
-        <Button onClick={onBack}>
-          {t('back')}
-        </Button>
+      <div className="flex justify-between">
+        <Button onClick={onBack}>{t('back')}</Button>
         <Button
           onClick={handleCreateBlueprint}
           disabled={!selectedEntityType || isLoading}
@@ -161,6 +167,6 @@ export function InvoiceNinjaDesignStep({ onComplete, onBack }: InvoiceNinjaDesig
           {isLoading ? t('creating') : t('create_template')}
         </Button>
       </div>
-    </div>
+    </CardContainer>
   );
 }

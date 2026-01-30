@@ -25,9 +25,11 @@ import {
   type SignatureSelectorInputProps,
   type StartSigningButtonProps,
   type SubmitButtonProps,
+  SuccessProps,
 } from '@docuninja/builder2.0';
 import classNames from 'classnames';
 import { Check, ChevronLeft, ChevronRight } from 'react-feather';
+import type { LegacyRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiMinimize2 } from 'react-icons/fi';
 
@@ -44,11 +46,10 @@ const Div = styled.div`
 
 export default function Index() {
   const params = useParams();
-
   const colors = useColorScheme();
 
   return (
-    <div>
+    <div className="max-w-[90rem] mx-auto">
       {/* @ts-expect-error - TODO: fix this */}
       <SignContext.Provider
         value={{
@@ -149,7 +150,7 @@ function DateInput({ value, onChange }: DateInputProps) {
   );
 }
 
-function Success() {
+function Success({ closeTab }: SuccessProps) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -168,8 +169,19 @@ function Success() {
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
     >
-      <div className="text-sm px-4 sm:px-6" style={{ color: colors.$3 }}>
-        {t('download_signed_document')}
+      <div className="flex flex-col gap-6 px-4 sm:px-6">
+        <div className="text-sm" style={{ color: colors.$3 }}>
+          {t('download_signed_document')}
+        </div>
+
+        <Button
+          type="primary"
+          behavior="button"
+          className="w-full"
+          onClick={closeTab}
+        >
+          {t('close_tab')}
+        </Button>
       </div>
     </Card>
   );
@@ -266,7 +278,7 @@ function SignCard({
       style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
     >
       <div
-        ref={headerRef}
+        ref={headerRef as LegacyRef<HTMLDivElement>}
         className={classNames('flex flex-col space-y-4 rounded-md', {
           'py-2 px-4': !(toggled && hasSignature),
           'px-6': toggled && hasSignature,
@@ -276,12 +288,18 @@ function SignCard({
       </div>
 
       {toggled && hasSignature ? (
-        <div className="flex justify-center" ref={contentRef}>
+        <div
+          className="flex justify-center"
+          ref={contentRef as LegacyRef<HTMLDivElement>}
+        >
           {content}
         </div>
       ) : null}
 
-      <div ref={footerRef} className="flex flex-col px-6">
+      <div
+        ref={footerRef as LegacyRef<HTMLDivElement>}
+        className="flex flex-col px-6"
+      >
         {footer}
       </div>
     </div>

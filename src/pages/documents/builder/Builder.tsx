@@ -13,42 +13,22 @@ import { useColorScheme } from '$app/common/colors';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Alert } from '$app/components/Alert';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
+import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { Settings } from '$app/components/icons/Settings';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
-import { Spinner } from '$app/components/Spinner';
 import {
-  AlertProps,
   Builder as Builder$,
   BuilderContext,
-  ConfirmationDialogButtonProps,
-  ConfirmationDialogProps,
-  CreateClientTabProps,
   CreateDialogProps,
-  CreateDialogTabButtonProps,
-  DeleteDialogButtonProps,
-  DeleteDialogProps,
   Document,
   SendDialogButtonProps,
   SendDialogProps,
-  ToolboxContextProps,
-  UninviteDialogButtonProps,
-  UninviteDialogProps,
-  UploadDialogProps,
-  UploadProps,
-  ValidationErrorsProps,
 } from '@docuninja/builder2.0';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
@@ -60,14 +40,35 @@ import {
 } from '../pages/blueprints/builder/Elements';
 import { FaFileSignature } from 'react-icons/fa';
 import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
-
-function Loading() {
-  return (
-    <div className="flex justify-center items-center py-6 sm:py-8 px-4 sm:px-6">
-      <Spinner />
-    </div>
-  );
-}
+import {
+  Alertbox,
+  ConfirmationDialog,
+  ConfirmationDialogButton,
+  CreateDialogTabButton,
+  CreateUserForm,
+  DeleteButton,
+  DeleteDialog,
+  ImportFromGoogleDrive,
+  Loading,
+  RectangleSettingsButton,
+  RectangleSettingsCheckbox,
+  RectangleSettingsDialog,
+  RectangleSettingsInput,
+  RectangleSettingsLabel,
+  RectangleSettingsOptionItem,
+  RectangleSettingsOptionsList,
+  RectangleSettingsRemoveButton,
+  RectangleSettingsSaveButton,
+  RectangleSettingsSelect,
+  ToolboxContext,
+  UninviteButton,
+  UninviteDialog,
+  Upload,
+  UploadDialog,
+  ValidationErrors,
+} from './components';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -99,81 +100,6 @@ function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
   );
 }
 
-function DeleteDialog({ open, onOpenChange, action }: DeleteDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal title={t('delete_document')} visible={open} onClose={onOpenChange}>
-      <p>{t('delete_docuninja_document_confirmation')}</p>
-
-      {action}
-    </Modal>
-  );
-}
-
-function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button disabled={isSubmitting} className="w-full">
-      {t('delete')}
-    </Button>
-  );
-}
-
-function Upload({ ...props }: UploadProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button behavior="button" type="secondary" {...props} className="w-full">
-      {t('upload')}
-    </Button>
-  );
-}
-
-function UploadDialog({ open, onOpenChange, content }: UploadDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal
-      title={t('upload')}
-      visible={open}
-      onClose={onOpenChange}
-      size="small"
-    >
-      {content}
-    </Modal>
-  );
-}
-
-function ValidationErrors({ content }: ValidationErrorsProps) {
-  return <Alert>{content}</Alert>;
-}
-
-function ConfirmationDialog({
-  isOpen,
-  onOpenChange,
-  content,
-  action,
-}: ConfirmationDialogProps) {
-  return (
-    <Modal title="Confirmation" visible={isOpen} onClose={onOpenChange}>
-      {content}
-      {action}
-    </Modal>
-  );
-}
-
-function ConfirmationDialogButton({ ...props }: ConfirmationDialogButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button behavior="button" {...props}>
-      {t('confirm')}
-    </Button>
-  );
-}
-
 export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   const [t] = useTranslation();
 
@@ -196,131 +122,6 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   );
 }
 
-function CreateUserForm({ fields, errors }: CreateClientTabProps) {
-  const [t] = useTranslation();
-
-  return (
-    <>
-      {fields.map((field) => (
-        <div key={field.name} className="mb-4">
-          <InputField
-            label={t(field.name)}
-            errorMessage={errors?.errors[field.name]}
-            onValueChange={field.onValueChange}
-          />
-        </div>
-      ))}
-    </>
-  );
-}
-
-function CreateDialogTabButton({
-  form,
-  isSubmitting,
-}: CreateDialogTabButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button
-      form={form}
-      behavior="submit"
-      disabled={isSubmitting}
-      className="w-full"
-    >
-      {t('create')}
-    </Button>
-  );
-}
-
-function UninviteDialog({
-  open,
-  onOpenChange,
-  content,
-  action,
-}: UninviteDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal
-      title={t('remove_invitations')}
-      visible={open}
-      onClose={onOpenChange}
-    >
-      {content}
-      {action}
-    </Modal>
-  );
-}
-
-function UninviteButton({ isSubmitting, form }: UninviteDialogButtonProps) {
-  return (
-    <Button form={form} disabled={isSubmitting}>
-      Continue
-    </Button>
-  );
-}
-
-function ToolboxContext({ options }: ToolboxContextProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Dropdown
-      customLabel={
-        <span>
-          <Settings />
-        </span>
-      }
-    >
-      {options?.map((option, i) =>
-        option.children.length > 0 ? (
-          <>
-            {option.children.map((child, j) => (
-              <DropdownElement
-                key={`${i}-${j}`}
-                value={child.value}
-                onClick={child.onSelect}
-              >
-                <div className="flex items-center gap-2">
-                  {t(child.label) || child.label}
-
-                  {option.value === child.value ? <Check size={18} /> : null}
-                </div>
-              </DropdownElement>
-            ))}
-          </>
-        ) : (
-          <DropdownElement
-            key={i}
-            value={option.value}
-            onClick={() =>
-              option.type !== 'toggle' ? option.onSelect(option.value) : null
-            }
-          >
-            <div className="flex items-center gap-2">
-              {option.type === 'toggle' ? (
-                <Toggle
-                  checked={option.value as boolean}
-                  onValueChange={option.onSelect}
-                />
-              ) : null}
-
-              {t(option.label) || option.label}
-            </div>
-          </DropdownElement>
-        )
-      )}
-    </Dropdown>
-  );
-}
-
-export function Alertbox({ children }: AlertProps) {
-  return (
-    <Alert className="m-5" type="danger">
-      {children}
-    </Alert>
-  );
-}
-
 function Builder() {
   const [t] = useTranslation();
 
@@ -336,6 +137,78 @@ function Builder() {
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
+  const { preferences, update, save } = usePreferences();
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-rightSide',
+        popover: {
+          description: t('tour_signatory_selector') as string,
+          nextBtnText: t('tour_continue_select_signatory') as string,
+        },
+      },
+    ],
+    eventName: 'builder:loaded',
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+    },
+  });
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-toolbox',
+        popover: {
+          description: t('tour_toolbox_description') as string,
+        },
+      },
+      {
+        element: '.builder-central',
+        popover: {
+          description: t('tour_document_canvas') as string,
+        },
+      },
+    ],
+    eventName: 'builder:signatory-selected',
+    options: {
+      showProgress: true,
+      allowClose: false,
+      disableActiveInteraction: true,
+    },
+    delay: 500,
+  });
+
+  useDriverTour({
+    show: !preferences.document_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-save-button',
+        popover: {
+          description: t('tour_save_document') as string,
+        },
+      },
+    ],
+    eventName: 'builder:first-rectangle-drawn',
+    options: {
+      showProgress: false,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.document_builder_tour_shown) {
+          update('preferences.document_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
+    },
+  });
+
   const pages: Page[] = [
     { name: t('docuninja'), href: '/docuninja' },
     {
@@ -348,6 +221,7 @@ function Builder() {
     toast.processing();
 
     setIsDocumentSaving(true);
+
     window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
@@ -400,6 +274,10 @@ function Builder() {
       setIsDocumentSaving(false);
     };
 
+    const handleSaveError = () => {
+      setIsDocumentSaving(false);
+    };
+
     window.addEventListener(
       'refetch.docuninja.document',
       refetchDocuninjaDocument
@@ -414,6 +292,8 @@ function Builder() {
       'builder:document.finalize.save',
       handleFinalizeDocumentSave
     );
+
+    window.addEventListener('builder:save.error', handleSaveError);
 
     return () => {
       window.removeEventListener(
@@ -430,6 +310,8 @@ function Builder() {
         'builder:document.finalize.save',
         handleFinalizeDocumentSave
       );
+
+      window.removeEventListener('builder:save.error', handleSaveError);
     };
   }, []);
 
@@ -492,6 +374,7 @@ function Builder() {
             onClick={handleSave}
             disabled={isDocumentSaving}
             disableWithoutIcon
+            className="builder-save-button"
           >
             {t('save')}
           </Button>
@@ -503,7 +386,7 @@ function Builder() {
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
-        {/* @ts-expect-error It's safe */}
+        {/* @ts-expect-error - TODO: fix this */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
@@ -551,6 +434,21 @@ function Builder() {
               toolboxContext: ToolboxContext,
               helper: () => null,
               alert: Alertbox,
+              imports: {
+                googleDrive: ImportFromGoogleDrive,
+              },
+              rectangleSettings: {
+                dialog: RectangleSettingsDialog,
+                save: RectangleSettingsSaveButton,
+                button: RectangleSettingsButton,
+                input: RectangleSettingsInput,
+                label: RectangleSettingsLabel,
+                checkbox: RectangleSettingsCheckbox,
+                select: RectangleSettingsSelect,
+                removeButton: RectangleSettingsRemoveButton,
+                optionItem: RectangleSettingsOptionItem,
+                optionsList: RectangleSettingsOptionsList,
+              },
             },
             styles: {
               frame: {
@@ -608,6 +506,30 @@ function Builder() {
               undefined,
             readonly: false,
             onEntityReady: (entity) => setEntity(entity as Document),
+            services: {
+              google: {
+                appId: import.meta.env.VITE_GOOGLE_APP_ID,
+                clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+              },
+            },
+            translations: {
+              element: t('element') as string,
+              tips_and_notes: t('tips_and_notes') as string,
+              default_checkbox_label: t('default_checkbox_label') as string,
+              empty_checkbox_label: t('empty_checkbox_label') as string,
+              select_needs_two_options: t('select_needs_two_options') as string,
+              default_select_label: t('default_select_label') as string,
+              radio_needs_two_options: t('radio_needs_two_options') as string,
+              default_radio_group_label: t(
+                'default_radio_group_label'
+              ) as string,
+              multiselect_needs_two_options: t(
+                'multiselect_needs_two_options'
+              ) as string,
+              default_multiselect_label: t(
+                'default_multiselect_label'
+              ) as string,
+            },
           }}
         >
           <Builder$ />
@@ -616,5 +538,7 @@ function Builder() {
     </Default>
   );
 }
+
+export { Alertbox, ImportFromGoogleDrive } from './components';
 
 export default Builder;

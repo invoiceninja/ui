@@ -15,13 +15,16 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Template } from '$app/common/interfaces/docuninja/api';
-import { Element } from '$app/components/cards';
-import { Divider } from '$app/components/cards/Divider';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
+import { AxiosError } from 'axios';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +35,7 @@ function EmailSettings() {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [currentTemplates, setCurrentTemplates] = useState<Template[]>([]);
+  const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const { data: templates, isLoading } = useQuery({
     queryKey: ['/api/templates/docuninja'],
@@ -101,6 +105,14 @@ function EmailSettings() {
         .then(() => {
           toast.success('templates_updated');
           $refetch(['docuninja_templates']);
+          setErrors(null);
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          toast.error();
+
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+          }
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -117,104 +129,112 @@ function EmailSettings() {
       onClick: handleSave,
       disableSaveButton: isFormBusy,
     },
-    [currentTemplates]
+    [currentTemplates, isFormBusy]
   );
 
   const colors = useColorScheme();
 
-
   return (
     <>
-    
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
-            
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 font-bold">
-          {t('company')}
-        </h3>
-        {variables.docu_company.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('document')}
-        </h3>
-        {variables.docu_document.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('sender')}
-        </h3>
-        {variables.docu_sender.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('user')}
-        </h3>
-        {variables.docu_user.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
-  
-      <div className="flex flex-col items-center">
-        <h3 className="px-2 py-1 rounded m-1 text-center font-bold">
-          {t('contact')}
-        </h3>
-        {variables.docu_contact.map((variable, index) => (
-          <Variable key={index}>{variable}</Variable>
-        ))}
-      </div>
+      {errors && <ValidationAlert errors={errors} />}
 
-    </div>
+      <Card
+        title={t('email_templates')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+        withoutBodyPadding
+        withoutHeaderBorder
+      >
+        {isLoading && (
+          <div className="flex justify-center items-center py-8">
+            <Spinner />
+          </div>
+        )}
 
-    <div className="flex flex-col pt-2 pb-2">
-      {isLoading && (
-        <div className="flex justify-center items-center py-8">
-          <Spinner />
-        </div>
-      )}
+        {!isLoading && currentTemplates.length === 0 && (
+          <div className="flex justify-center items-center py-2 px-4 sm:px-6 font-medium">
+            {t('no_templates_found')}.
+          </div>
+        )}
 
-      {!isLoading && currentTemplates.length === 0 && (
-        <div className="flex justify-center items-center py-2 px-4 sm:px-6 font-medium">
-          {t('no_templates_found')}.
-        </div>
-      )}
+        {!isLoading && currentTemplates.length > 0 && (
+          <TabGroup 
+            tabs={currentTemplates.map(template => template.name)}
+            horizontalPaddingWidth="1.5rem"
+            withHorizontalPadding
+            fullRightPadding
+            withoutVerticalMargin
+          >
+            {currentTemplates.map((template, index) => (
+              <div key={template.id} className="pt-4 pb-6">
+                <Element leftSide={t('subject')}>
+                  <InputField
+                    value={template.subject}
+                    onValueChange={(value) => handleChangeSubject(index, value)}
+                  />
+                </Element>
 
-      {templates &&
-        !isLoading &&
-        templates.map((template: Template, index: number) => (
-    
-        <>  
-        <Element leftSide={template.name} key={template.id}>
-          <div className="flex flex-col gap-4 mb-4 mt-4">
-            <InputField
-              label={t('subject')}
-              value={template.subject}
-              onValueChange={(value) => handleChangeSubject(index, value)}
-            />
+                <Element leftSide={t('body')}>
+                  <InputField
+                    element="textarea"
+                    value={template.body}
+                    onValueChange={(value) => handleChangeBody(index, value)}
+                  />
+                </Element>
+              </div>
+            ))}
+          </TabGroup>
+        )}
+      </Card>
 
-            <InputField
-              label={t('body')}
-              element="textarea"
-              value={template.body}
-              onValueChange={(value) => handleChangeBody(index, value)}
-            />
+      <Card
+        title={t('variables')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
+        <Element leftSide={t('company')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.docu_company.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
           </div>
         </Element>
-        <Divider withoutPadding borderColor={colors.$20} />
-        </>
-    
-      ))}
-    </div>
-  </>
+
+        <Element leftSide={t('document')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.docu_document.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+
+        <Element leftSide={t('sender')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.docu_sender.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+
+        <Element leftSide={t('user')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.docu_user.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+
+        <Element leftSide={t('contact')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.docu_contact.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+      </Card>
+    </>
   );
 }
 
