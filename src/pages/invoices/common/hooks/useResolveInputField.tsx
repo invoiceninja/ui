@@ -282,12 +282,10 @@ export function useResolveInputField(props: Props) {
 
   const showTaxRateSelector = (
     property: 'tax_rate1' | 'tax_rate2' | 'tax_rate3',
-    index: number
+    index: number,
+    lineItem: InvoiceItem
   ) => {
-    // Do this only if `calculate_taxes` is enabled
     if (company.calculate_taxes) {
-      const lineItem = resource?.line_items[index];
-
       if (lineItem.tax_id === '7' || lineItem.tax_id === '') {
         return (
           <Inline>
@@ -341,14 +339,14 @@ export function useResolveInputField(props: Props) {
     }
 
     const taxComboValue = getTaxRateComboValue(
-      resource?.line_items[index],
+      lineItem,
       property.replace('rate', 'name') as TaxNamePropertyType
     );
 
     return (
       <div className="flex flex-col items-center gap-y-2">
         <TaxRateSelector
-          key={`${property}${resource?.line_items[index][property]}`}
+          key={`${property}${lineItem[property]}`}
           onChange={(value) =>
             value.resource &&
             handleTaxRateChange(property, index, value.resource)
@@ -357,7 +355,7 @@ export function useResolveInputField(props: Props) {
             handleTaxRateChange(property, index, taxRate)
           }
           defaultValue={getTaxRateComboValue(
-            resource?.line_items[index],
+            lineItem,
             property.replace('rate', 'name') as TaxNamePropertyType
           )}
           onClearButtonClick={() => handleTaxRateChange(property, index)}
@@ -402,19 +400,18 @@ export function useResolveInputField(props: Props) {
     if (property === 'product_key') {
       return (
         <ProductSelector
-          key={`${property}${resource?.line_items[index][property]}`}
+          key={`${property}${lineItem[property]}`}
           onChange={(value) => {
-            if (value.value !== resource?.line_items[index][property]) {
+            if (value.value !== lineItem[property]) {
               onProductChange(index, value.label, value.resource);
             }
           }}
           className="w-auto"
-          defaultValue={resource?.line_items[index][property]}
+          defaultValue={lineItem[property]}
           onProductCreated={(product) =>
             product && onProductChange(index, product.product_key, product)
           }
           clearButton
-          //onInputValueChange={(value) => onChange('product_key', value, index)}
           onClearButtonClick={() => handleProductChange(index, '', null)}
           displayStockQuantity={location.pathname.startsWith('/invoices')}
         />
@@ -427,9 +424,9 @@ export function useResolveInputField(props: Props) {
           id={property}
           key={`${property}${index}`}
           element="textarea"
-          value={resource?.line_items[index][property]}
+          value={lineItem[property]}
           onValueChange={(value) => {
-            if (resource?.line_items[index][property] !== value) {
+            if (lineItem[property] !== value) {
               onChange(property, value, index);
             }
           }}
@@ -453,14 +450,14 @@ export function useResolveInputField(props: Props) {
                 : inputCurrencySeparators?.precision || 2
             }
             id={property}
-            value={resource?.line_items[index][property] || ''}
+            value={lineItem[property] || ''}
             className="auto"
             onValueChange={(value: string) => {
-              onChange(
-                property,
-                isNaN(parseFloat(value)) ? 0 : parseFloat(value),
-                index
-              );
+              const parsed = isNaN(parseFloat(value)) ? 0 : parseFloat(value);
+
+              if (lineItem[property] !== parsed) {
+                onChange(property, parsed, index);
+              }
             }}
           />
         )
@@ -468,23 +465,19 @@ export function useResolveInputField(props: Props) {
     }
 
     if ('gross_line_total' === property) {
-      return formatMoney(
-        (resource?.line_items[index][property] ?? 0) as number
-      );
+      return formatMoney((lineItem[property] ?? 0) as number);
     }
 
     if ('tax_amount' === property) {
-      return formatMoney(
-        (resource?.line_items[index][property] ?? 0) as number
-      );
+      return formatMoney((lineItem[property] ?? 0) as number);
     }
 
     if (taxInputs.includes(property)) {
-      return showTaxRateSelector(property as 'tax_rate1', index);
+      return showTaxRateSelector(property as 'tax_rate1', index, lineItem);
     }
 
     if (['line_total'].includes(property)) {
-      return formatMoney(resource?.line_items[index][property] as number);
+      return formatMoney(lineItem[property] as number);
     }
 
     if (['product1', 'product2', 'product3', 'product4'].includes(property)) {
@@ -496,19 +489,25 @@ export function useResolveInputField(props: Props) {
       return company.custom_fields?.[property] ? (
         <CustomField
           field={property}
-          defaultValue={resource?.line_items[index][field]}
+          defaultValue={lineItem[field]}
           value={company.custom_fields?.[property]}
-          onValueChange={(value) => onChange(field, value, index)}
+          onValueChange={(value) => {
+            if (lineItem[field] !== value) {
+              onChange(field, value, index);
+            }
+          }}
           fieldOnly
           selectMenuPosition="fixed"
         />
       ) : (
         <InputField
           id={property}
-          value={resource?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onChange(property, event.target.value, index)
-          }
+          value={lineItem[property]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (lineItem[property] !== event.target.value) {
+              onChange(property, event.target.value, index);
+            }
+          }}
         />
       );
     }
@@ -522,19 +521,25 @@ export function useResolveInputField(props: Props) {
       return company.custom_fields?.[property] ? (
         <CustomField
           field={property}
-          defaultValue={resource?.line_items[index][field]}
+          defaultValue={lineItem[field]}
           value={company.custom_fields?.[property]}
-          onValueChange={(value) => onChange(field, value, index)}
+          onValueChange={(value) => {
+            if (lineItem[field] !== value) {
+              onChange(field, value, index);
+            }
+          }}
           fieldOnly
           selectMenuPosition="fixed"
         />
       ) : (
         <InputField
           id={property}
-          value={resource?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onChange(property, event.target.value, index)
-          }
+          value={lineItem[property]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (lineItem[property] !== event.target.value) {
+              onChange(property, event.target.value, index);
+            }
+          }}
         />
       );
     }
@@ -542,10 +547,12 @@ export function useResolveInputField(props: Props) {
     return (
       <InputField
         id={property}
-        value={resource?.line_items[index][property]}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          onChange(property, event.target.value, index)
-        }
+        value={lineItem[property]}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          if (lineItem[property] !== event.target.value) {
+            onChange(property, event.target.value, index);
+          }
+        }}
       />
     );
   };
