@@ -10,6 +10,7 @@
 
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
@@ -31,6 +32,8 @@ interface Props {
 export function Actions(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const { id } = useParams();
 
@@ -71,19 +74,21 @@ export function Actions(props: Props) {
         />
       </span>
 
-      <Button
-        className="flex items-center space-x-1"
-        onClick={() =>
-          navigate(
-            route('/invoices/:id/email', {
-              id: invoice.id,
-            })
-          )
-        }
-      >
-        <Icon element={MdSend} color="white" />
-        <span>{t('email_invoice')}</span>
-      </Button>
+      {hasPermission('edit_invoice') && (
+        <Button
+          className="flex items-center space-x-1"
+          onClick={() =>
+            navigate(
+              route('/invoices/:id/email', {
+                id: invoice.id,
+              })
+            )
+          }
+        >
+          <Icon element={MdSend} color="white" />
+          <span>{t('email_invoice')}</span>
+        </Button>
+      )}
 
       <Button
         className="flex items-center space-x-1"

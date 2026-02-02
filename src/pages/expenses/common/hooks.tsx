@@ -53,7 +53,10 @@ import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from './hooks/useCalculateExpenseAmount';
+import {
+  useCalculateExpenseAmount,
+  useCalculateExpenseExclusiveAmount,
+} from './hooks/useCalculateExpenseAmount';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import {
   extractTextFromHTML,
@@ -70,14 +73,19 @@ import {
 import { Link } from '$app/components/forms';
 import classNames from 'classnames';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export function useActions() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
 
-  const navigate = useNavigate();
   const bulk = useBulk();
+  const navigate = useNavigate();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const setExpense = useSetAtom(expenseAtom);
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
@@ -155,7 +163,8 @@ export function useActions() {
           {t('clone_to_recurring')}
         </DropdownElement>
       ),
-      (expense) => (
+    (expense) =>
+      shouldBeRunTemplateActionVisible && (
         <DropdownElement
           onClick={() => {
             setChangeTemplateVisible(true);
@@ -263,7 +272,7 @@ export function useAllExpenseColumns() {
     'updated_at',
   ] as const;
 
-  return expenseColumns;
+  return expenseColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useExpenseColumns() {
@@ -596,8 +605,12 @@ export function useExpenseColumns() {
     reactSettings?.react_table_columns?.expense || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 interface HandleChangeExpenseParams {

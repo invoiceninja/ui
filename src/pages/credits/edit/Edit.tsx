@@ -25,6 +25,7 @@ import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
 import { CreditsContext } from '../create/Create';
 import { useColorScheme } from '$app/common/colors';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -95,6 +96,10 @@ export default function Edit() {
         <CreditDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
+          {credit && (
+            <HiddenResourceTaxesAlert className="mb-2" resource={credit} />
+          )}
+
           {credit ? (
             <ProductsTable
               type="product"

@@ -21,7 +21,7 @@ import {
   MdPaid,
   MdPrint,
   MdArchive,
-  MdRestore
+  MdRestore,
 } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
@@ -43,6 +43,7 @@ import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
 import { CancelInvoiceBulkAction } from '../components/CancelInvoiceBulkAction';
 import { Divider } from '$app/components/cards/Divider';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -50,6 +51,9 @@ export const useCustomBulkActions = () => {
   const documentsBulk = useDocumentsBulk();
 
   const hasPermission = useHasPermission();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const downloadPdfs = useDownloadPdfs({ entity: 'invoice' });
@@ -95,11 +99,13 @@ export const useCustomBulkActions = () => {
   };
 
   const showCancelOption = (invoices: Invoice[]) => {
-
-    if(verifactuEnabled) {
-      return !invoices.some((invoice) => invoice.status_id !== InvoiceStatus.Sent || 
-      (invoice.backup?.document_type ?? '') !== 'F1' || 
-      (invoice.backup?.child_invoice_ids?.length ?? 0) > 0);
+    if (verifactuEnabled) {
+      return !invoices.some(
+        (invoice) =>
+          invoice.status_id !== InvoiceStatus.Sent ||
+          (invoice.backup?.document_type ?? '') !== 'F1' ||
+          (invoice.backup?.child_invoice_ids?.length ?? 0) > 0
+      );
     }
 
     return !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent);
@@ -148,28 +154,35 @@ export const useCustomBulkActions = () => {
   const verifactuEnabled = useCompanyVerifactu();
 
   const showRestoreBulkAction = (invoices: Invoice[]) => {
-    if(verifactuEnabled) {
-      return invoices.every((invoice) => invoice.archived_at > 0 && !invoice.is_deleted);
+    if (verifactuEnabled) {
+      return invoices.every(
+        (invoice) => invoice.archived_at > 0 && !invoice.is_deleted
+      );
     }
 
     return !invoices.some(
       ({ status_id, archived_at }) =>
-        !archived_at ||
-        status_id === InvoiceStatus.Cancelled
+        !archived_at || status_id === InvoiceStatus.Cancelled
     );
   };
 
   const showArchiveBulkAction = (invoices: Invoice[]) => {
-    return invoices.every((invoice) => getEntityState(invoice) === EntityState.Active);
+    return invoices.every(
+      (invoice) => getEntityState(invoice) === EntityState.Active
+    );
   };
 
   const showDeleteBulkAction = (invoices: Invoice[]) => {
-    
-    if(verifactuEnabled) {
-      return invoices.every((invoice) => invoice.status_id === InvoiceStatus.Draft);
+    if (verifactuEnabled) {
+      return invoices.every(
+        (invoice) => invoice.status_id === InvoiceStatus.Draft
+      );
     }
 
-    return invoices.every((invoice) => getEntityState(invoice) === (EntityState.Active || EntityState.Archived));
+    return invoices.every(
+      (invoice) =>
+        getEntityState(invoice) === (EntityState.Active || EntityState.Archived)
+    );
   };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
@@ -284,21 +297,22 @@ export const useCustomBulkActions = () => {
           setSelected={setSelected}
         />
       ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/invoices/bulk',
-            entity: 'invoice',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/invoices/bulk',
+              entity: 'invoice',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
 
     ({ selectedResources }) =>
       Boolean(

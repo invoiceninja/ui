@@ -47,7 +47,9 @@ import { ExternalLink } from 'react-feather';
 import { InputLabel } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 import { TasksTabLabel } from '../common/components/TasksTabLabel';
+import { TaxDataBadge } from './components/TaxDataBadge';
 import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -171,6 +173,7 @@ export default function Edit() {
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly
+              afterClientName={<TaxDataBadge invoice={invoice} />}
             />
           </div>
         </Card>
@@ -182,6 +185,10 @@ export default function Edit() {
         />
 
         <div className="col-span-12">
+          {invoice && (
+            <HiddenResourceTaxesAlert className="mb-2" resource={invoice} />
+          )}
+
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
@@ -191,7 +198,7 @@ export default function Edit() {
               }
             }}
           >
-            <div>
+            <div className="w-full">
               {invoice && client ? (
                 <ProductsTable
                   type="product"

@@ -79,6 +79,8 @@ import {
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export const defaultColumns: string[] = [
   'status',
@@ -125,7 +127,7 @@ export function useAllTaskColumns() {
     'assigned_user',
   ] as const;
 
-  return taskColumns;
+  return taskColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useTaskColumns() {
@@ -388,8 +390,12 @@ export function useTaskColumns() {
     reactSettings?.react_table_columns?.task || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }
 
 export function useSave() {
@@ -472,6 +478,9 @@ export function useActions(params?: Params) {
 
   const invoiceTask = useInvoiceTask();
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const setTask = useSetAtom(taskAtom);
 
   const cloneToTask = (task: Task) => {
@@ -545,21 +554,22 @@ export function useActions(params?: Params) {
           {t('clone')}
         </DropdownElement>
       ),
-    (task: Task) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([task]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/tasks/bulk',
-            entity: 'task',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (task: Task) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([task]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/tasks/bulk',
+              entity: 'task',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) && (
         <Divider withoutPadding />
@@ -610,6 +620,9 @@ export const useCustomBulkActions = () => {
   const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const shouldDownloadDocuments = (tasks: Task[]) => {
     return tasks.some(({ documents }) => documents.length);
@@ -728,21 +741,22 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/tasks/bulk',
-            entity: 'task',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/tasks/bulk',
+              entity: 'task',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

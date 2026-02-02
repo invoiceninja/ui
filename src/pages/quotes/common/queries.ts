@@ -47,6 +47,6 @@ export function useQuoteQuery({ id }: QuoteQueryParams) {
       ).then(
         (response: GenericSingleResourceResponse<Quote>) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(id) }
   );
 }

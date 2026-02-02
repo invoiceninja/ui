@@ -305,14 +305,26 @@ export const RecurringInvoiceSlider = () => {
             </Element>
 
             <Element
+              className="border-b border-dashed"
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {recurringInvoice ? (
                 <RecurringInvoiceStatus entity={recurringInvoice} />
               ) : null}
             </Element>
+
+            {(resource?.recurring_dates || [])?.length > 0 && (
+              <Element
+                leftSide={t('due_date')}
+                pushContentToRight
+                noExternalPadding
+              >
+                {date(resource?.recurring_dates?.[0]?.due_date, dateFormat)}
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />

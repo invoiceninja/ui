@@ -25,7 +25,6 @@ import {
   MdCancel,
   MdCloudCircle,
   MdComment,
-  MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
   MdDesignServices,
@@ -64,6 +63,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { useMarkPaid } from '../hooks/useMarkPaid';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -94,6 +94,9 @@ export function useActions(params?: Params) {
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
   const verifactuEnabled = useCompanyVerifactu();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'invoice',
@@ -134,28 +137,6 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const setInvoice = useSetAtom(invoiceAtom);
-
-  const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({
-      ...invoice,
-      id: '',
-      number: '',
-      documents: [],
-      due_date: '',
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-      backup: undefined,
-    });
-
-    navigate('/invoices/create?action=clone');
-  };
 
   const cloneToNegativeInvoice = (invoice: Invoice) => {
     // Create a deep copy of the invoice with negative quantities for all line items
@@ -448,49 +429,34 @@ export function useActions(params?: Params) {
           {t('schedule')}
         </EntityActionElement>
       ),
-    (invoice: Invoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'run_template',
-        })}
-        entity="invoice"
-        actionKey="run_template"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('run_template')}
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([invoice]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/invoices/bulk',
-            entity: 'invoice',
-          });
-        }}
-        icon={MdDesignServices}
-      >
-        {t('run_template')}
-      </EntityActionElement>
-    ),
-    () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      hasPermission('create_invoice') && (
+      shouldBeRunTemplateActionVisible && (
         <EntityActionElement
           {...(!dropdown && {
-            key: 'clone_to_invoice',
+            key: 'run_template',
           })}
           entity="invoice"
-          actionKey="clone_to_invoice"
+          actionKey="run_template"
           isCommonActionSection={!dropdown}
-          tooltipText={t('clone_to_invoice')}
-          onClick={() => cloneToInvoice(invoice)}
-          icon={MdControlPointDuplicate}
+          tooltipText={t('run_template')}
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([invoice]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/invoices/bulk',
+              entity: 'invoice',
+            });
+          }}
+          icon={MdDesignServices}
         >
-          {t('clone_to_invoice')}
+          {t('run_template')}
         </EntityActionElement>
       ),
+    () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) => (
       <CloneOptionsModal
         {...(!dropdown && {
-          key: 'clone_to_other',
+          key: 'clone_to',
         })}
         dropdown={dropdown}
         invoice={invoice}

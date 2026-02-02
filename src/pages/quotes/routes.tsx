@@ -116,7 +116,11 @@ export const quoteRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Quotes),
-            or(permission('edit_quote'), assigned('/api/v1/quotes/:id')),
+            or(
+              permission('view_quote'),
+              permission('edit_quote'),
+              assigned('/api/v1/quotes/:id')
+            ),
           ]}
           component={<Outlet />}
         />

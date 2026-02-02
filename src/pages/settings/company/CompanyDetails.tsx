@@ -18,11 +18,13 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { Tabs } from '$app/components/Tabs';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useCompanyDetailsTabs } from './common/hooks/useCompanyDetailsTabs';
 import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { useAtomValue } from 'jotai';
+import { TaxDataModal } from '$app/pages/clients/show/components/TaxDataModal';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
@@ -31,11 +33,14 @@ export function CompanyDetails() {
 
   useTitle('company_details');
 
+  const location = useLocation();
   const colors = useColorScheme();
   const tabs = useCompanyDetailsTabs();
 
   const onCancel = useDiscardChanges();
   const onSave = useHandleCompanySave();
+
+  const companyChanges = useCompanyChanges();
 
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
@@ -59,6 +64,18 @@ export function CompanyDetails() {
         withoutBodyPadding
         withoutHeaderBorder
         style={{ borderColor: colors.$24 }}
+        topRight={
+          location.pathname.endsWith('address') && companyChanges ? (
+            <>
+              <TaxDataModal
+                resourceId={companyChanges.id}
+                resourceType="company"
+                taxData={companyChanges.origin_tax_data}
+                buttonType="secondary"
+              />
+            </>
+          ) : undefined
+        }
       >
         <Tabs
           tabs={tabs}

@@ -20,11 +20,9 @@ import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
 import { Client } from '$app/common/interfaces/client';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Inline } from '$app/components/Inline';
 import { Tooltip } from '$app/components/Tooltip';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useCallback } from 'react';
-import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -36,6 +34,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'name',
@@ -94,7 +93,7 @@ export function useAllClientColumns() {
     'city',
   ] as const;
 
-  return clientColumns;
+  return clientColumns.map((column) => normalizeColumnName(column));
 }
 
 export function useClientColumns() {
@@ -185,9 +184,9 @@ export function useClientColumns() {
               const firstName = resource.contacts[0].first_name || '';
               const lastName = resource.contacts[0].last_name || '';
               const email = resource.contacts[0].email || '';
-              
+
               const fullName = `${firstName} ${lastName}`.trim();
-              
+
               return fullName || email;
             })()}
           </DynamicLink>
@@ -414,10 +413,7 @@ export function useClientColumns() {
       label: t('website'),
       format: (value) => (
         <Link to={value.toString()} external>
-          <Inline>
-            <span>{value}</span>
-            {value.toString().length > 0 && <ExternalLink size={14} />}
-          </Inline>
+          {value}
         </Link>
       ),
     },
@@ -447,6 +443,10 @@ export function useClientColumns() {
     reactSettings?.react_table_columns?.client || defaultColumns;
 
   return columns
-    .filter((column) => list.includes(column.column))
-    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+    .filter((column) => list.includes(normalizeColumnName(column.column)))
+    .sort(
+      (a, b) =>
+        list.indexOf(normalizeColumnName(a.column)) -
+        list.indexOf(normalizeColumnName(b.column))
+    );
 }

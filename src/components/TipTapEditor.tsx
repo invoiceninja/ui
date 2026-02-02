@@ -57,6 +57,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useTranslation } from 'react-i18next';
 import { useClickAway, useDebounce } from 'react-use';
 import HardBreak from '@tiptap/extension-hard-break';
+import classNames from 'classnames';
 
 interface ThemeProps {
   backgroundColor: string;
@@ -867,15 +868,16 @@ export function TipTapEditor({
   minHeight = '12.5rem',
 }: TipTapEditorProps) {
   const [t] = useTranslation();
+
   const colors = useColorScheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [currentValue, setCurrentValue] = useState<string | undefined>();
   const [linkUrl, setLinkUrl] = useState<string>('');
   const [htmlCode, setHtmlCode] = useState<string>('');
   const [htmlModal, setHtmlModal] = useState<boolean>(false);
   const [linkModal, setLinkModal] = useState<boolean>(false);
   const [textColor, setTextColor] = useState<string>('#000000');
+  const [currentValue, setCurrentValue] = useState<string | undefined>();
   const [backgroundColor, setBackgroundColor] = useState<string>('#FFFF00');
 
   const editor = useEditor({
@@ -943,8 +945,12 @@ export function TipTapEditor({
 
   useDebounce(
     () => {
-      if (typeof currentValue === 'string') {
-        onValueChange(editor?.getText() ? currentValue : '');
+      if (typeof currentValue === 'string' && editor) {
+        const htmlContent = editor.getText() ? currentValue : '';
+
+        if (htmlContent !== value) {
+          onValueChange(htmlContent);
+        }
       }
     },
     500,
@@ -952,16 +958,23 @@ export function TipTapEditor({
   );
 
   useEffect(() => {
-    if (typeof value === 'string' && typeof currentValue === 'undefined') {
-      editor?.commands.setContent(value);
-    }
-  }, [value]);
+    if (!editor) return;
 
-  useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || '');
+    const editorHTML = editor.getHTML();
+    const shouldUpdate =
+      value !== undefined && value !== editorHTML && !editor.isFocused;
+
+    if (shouldUpdate) {
+      editor.commands.setContent(value);
+      setCurrentValue(value);
     }
   }, [value, editor]);
+
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(!disabled);
+    }
+  }, [disabled, editor]);
 
   const openLinkModal = useCallback(() => {
     if (!editor) return;
@@ -1222,7 +1235,12 @@ export function TipTapEditor({
   ];
 
   return (
-    <EditorContainer theme={theme} className={parentBoxClassName}>
+    <EditorContainer
+      theme={theme}
+      className={classNames(parentBoxClassName, {
+        'opacity-50': disabled,
+      })}
+    >
       {label && (
         <EditorLabel theme={theme}>
           <InputLabel>{label}</InputLabel>
