@@ -16,7 +16,12 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { MdDownload, MdSettings, MdTimer } from 'react-icons/md';
+import {
+  MdDownload,
+  MdPictureAsPdf,
+  MdSettings,
+  MdTimer,
+} from 'react-icons/md';
 
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -185,6 +190,15 @@ export function useActions(params?: Params) {
           icon={<Icon element={MdTimer} />}
         >
           {t('timeline')}
+        </DropdownElement>
+      ),
+    (doc) =>
+      Boolean(doc && !doc.is_deleted && doc.files && doc.files.length > 0) && (
+        <DropdownElement
+          onClick={() => navigate(route('/docuninja/:id/pdf', { id: doc.id }))}
+          icon={<Icon element={MdPictureAsPdf} />}
+        >
+          {t('view_pdf')}
         </DropdownElement>
       ),
     (doc) =>
