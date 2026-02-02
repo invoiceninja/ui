@@ -280,6 +280,13 @@ export function useResolveInputField(props: Props) {
   const taxCategories = useTaxCategories();
   const { preferences } = usePreferences();
 
+  const resolveComputedItem = (
+    index: number,
+    lineItem: InvoiceItem
+  ): InvoiceItem => {
+    return resource?.line_items[index] ?? lineItem;
+  };
+
   const showTaxRateSelector = (
     property: 'tax_rate1' | 'tax_rate2' | 'tax_rate3',
     index: number,
@@ -465,11 +472,15 @@ export function useResolveInputField(props: Props) {
     }
 
     if ('gross_line_total' === property) {
-      return formatMoney((lineItem[property] ?? 0) as number);
+      const computedItem = resolveComputedItem(index, lineItem);
+
+      return formatMoney((computedItem[property] ?? 0) as number);
     }
 
     if ('tax_amount' === property) {
-      return formatMoney((lineItem[property] ?? 0) as number);
+      const computedItem = resolveComputedItem(index, lineItem);
+
+      return formatMoney((computedItem[property] ?? 0) as number);
     }
 
     if (taxInputs.includes(property)) {
@@ -477,7 +488,9 @@ export function useResolveInputField(props: Props) {
     }
 
     if (['line_total'].includes(property)) {
-      return formatMoney(lineItem[property] as number);
+      const computedItem = resolveComputedItem(index, lineItem);
+
+      return formatMoney(computedItem[property] as number);
     }
 
     if (['product1', 'product2', 'product3', 'product4'].includes(property)) {

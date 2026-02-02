@@ -1,3 +1,13 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { AlignJustify, Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +16,12 @@ import {
   useResolveInputField,
 } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from '@hello-pangea/dnd';
 import { resolveColumnWidth } from '../helpers/resolve-column-width';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
@@ -72,8 +86,6 @@ const ProductRow = memo(
 
     const colors = useColorScheme();
     const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
-
-    console.log('ProductRow rendered');
 
     return (
       <Draggable
@@ -176,6 +188,9 @@ function ProductsTableInner(props: Props) {
   const onCreateItemClickRef = useRef(props.onCreateItemClick);
   onCreateItemClickRef.current = props.onCreateItemClick;
 
+  const onSortRef = useRef(props.onSort);
+  onSortRef.current = props.onSort;
+
   const handleLineItemPropertyChange = useCallback(
     (key: keyof InvoiceItem, value: unknown, resourceIndex: number) => {
       setLineItems((prev) =>
@@ -237,10 +252,41 @@ function ProductsTableInner(props: Props) {
     return lineItems.some((lineItem) => isLineItemEmpty(lineItem));
   }, [lineItems]);
 
-  const onDragEnd = useHandleSortingRows({
-    resource: props.resource,
-    onSort: props.onSort,
-  });
+  const handleDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) return;
+
+      const sourceIndex = result.source.index;
+      const destinationIndex = result.destination.index;
+
+      if (sourceIndex === destinationIndex) return;
+
+      setLineItems((prev) => {
+        const reordered = [...prev];
+        const [moved] = reordered.splice(sourceIndex, 1);
+        reordered.splice(destinationIndex, 0, moved);
+
+        // Build the full reordered line_items for the parent
+        // by replacing the items of our type in resource.line_items
+        const typeId =
+          props.type === 'task'
+            ? InvoiceItemType.Task
+            : InvoiceItemType.Product;
+
+        const otherItems = resource.line_items.filter(
+          (li) => li.type_id !== typeId
+        );
+
+        const newLineItems = [...reordered, ...otherItems];
+
+        // Notify parent asynchronously so we don't set state during render
+        setTimeout(() => onSortRef.current(newLineItems), 0);
+
+        return reordered;
+      });
+    },
+    [props.type, resource.line_items]
+  );
 
   const resolveInputFieldFn = useResolveInputField({
     type: props.type,
@@ -262,8 +308,6 @@ function ProductsTableInner(props: Props) {
     []
   );
 
-  console.log('products inner rendered');
-
   return (
     <Table>
       <Thead backgroundColor={themeColors.$5}>
@@ -273,7 +317,7 @@ function ProductsTableInner(props: Props) {
           </Th>
         ))}
       </Thead>
-      <DragDropContext onDragEnd={onDragEnd}>
+      <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="product-table">
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
